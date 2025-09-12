@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Work\\AI Code\\Time Attendance System\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj",
+      "projectUniqueName": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj",
       "projectName": "TimeAttendanceSystem.Domain",
-      "projectPath": "D:\\Work\\AI Code\\Time Attendance System\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj",
+      "projectPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj",
       "packagesPath": "C:\\Users\\hhammad\\.nuget\\packages\\",
-      "outputPath": "D:\\Work\\AI Code\\Time Attendance System\\src\\Domain\\TimeAttendanceSystem.Domain\\obj\\",
+      "outputPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

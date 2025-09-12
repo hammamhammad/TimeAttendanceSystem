@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Work\\AI Code\\Time Attendance System\\tests\\UnitTests\\TimeAttendanceSystem.UnitTests\\TimeAttendanceSystem.UnitTests.csproj": {}
+    "D:\\Work\\AI Code\\TimeAttendanceSystem\\tests\\UnitTests\\TimeAttendanceSystem.UnitTests\\TimeAttendanceSystem.UnitTests.csproj": {}
   },
   "projects": {
-    "D:\\Work\\AI Code\\Time Attendance System\\src\\Application\\TimeAttendanceSystem.Application\\TimeAttendanceSystem.Application.csproj": {
+    "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Application\\TimeAttendanceSystem.Application\\TimeAttendanceSystem.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Work\\AI Code\\Time Attendance System\\src\\Application\\TimeAttendanceSystem.Application\\TimeAttendanceSystem.Application.csproj",
+        "projectUniqueName": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Application\\TimeAttendanceSystem.Application\\TimeAttendanceSystem.Application.csproj",
         "projectName": "TimeAttendanceSystem.Application",
-        "projectPath": "D:\\Work\\AI Code\\Time Attendance System\\src\\Application\\TimeAttendanceSystem.Application\\TimeAttendanceSystem.Application.csproj",
+        "projectPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Application\\TimeAttendanceSystem.Application\\TimeAttendanceSystem.Application.csproj",
         "packagesPath": "C:\\Users\\hhammad\\.nuget\\packages\\",
-        "outputPath": "D:\\Work\\AI Code\\Time Attendance System\\src\\Application\\TimeAttendanceSystem.Application\\obj\\",
+        "outputPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Application\\TimeAttendanceSystem.Application\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -32,8 +32,8 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "D:\\Work\\AI Code\\Time Attendance System\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj": {
-                "projectPath": "D:\\Work\\AI Code\\Time Attendance System\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj"
+              "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj": {
+                "projectPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj"
               }
             }
           }
@@ -103,14 +103,14 @@
         }
       }
     },
-    "D:\\Work\\AI Code\\Time Attendance System\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj": {
+    "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Work\\AI Code\\Time Attendance System\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj",
+        "projectUniqueName": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj",
         "projectName": "TimeAttendanceSystem.Domain",
-        "projectPath": "D:\\Work\\AI Code\\Time Attendance System\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj",
+        "projectPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj",
         "packagesPath": "C:\\Users\\hhammad\\.nuget\\packages\\",
-        "outputPath": "D:\\Work\\AI Code\\Time Attendance System\\src\\Domain\\TimeAttendanceSystem.Domain\\obj\\",
+        "outputPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -168,14 +168,14 @@
         }
       }
     },
-    "D:\\Work\\AI Code\\Time Attendance System\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure\\TimeAttendanceSystem.Infrastructure.csproj": {
+    "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure\\TimeAttendanceSystem.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Work\\AI Code\\Time Attendance System\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure\\TimeAttendanceSystem.Infrastructure.csproj",
+        "projectUniqueName": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure\\TimeAttendanceSystem.Infrastructure.csproj",
         "projectName": "TimeAttendanceSystem.Infrastructure",
-        "projectPath": "D:\\Work\\AI Code\\Time Attendance System\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure\\TimeAttendanceSystem.Infrastructure.csproj",
+        "projectPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure\\TimeAttendanceSystem.Infrastructure.csproj",
         "packagesPath": "C:\\Users\\hhammad\\.nuget\\packages\\",
-        "outputPath": "D:\\Work\\AI Code\\Time Attendance System\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure\\obj\\",
+        "outputPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -196,11 +196,11 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "D:\\Work\\AI Code\\Time Attendance System\\src\\Application\\TimeAttendanceSystem.Application\\TimeAttendanceSystem.Application.csproj": {
-                "projectPath": "D:\\Work\\AI Code\\Time Attendance System\\src\\Application\\TimeAttendanceSystem.Application\\TimeAttendanceSystem.Application.csproj"
+              "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Application\\TimeAttendanceSystem.Application\\TimeAttendanceSystem.Application.csproj": {
+                "projectPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Application\\TimeAttendanceSystem.Application\\TimeAttendanceSystem.Application.csproj"
               },
-              "D:\\Work\\AI Code\\Time Attendance System\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj": {
-                "projectPath": "D:\\Work\\AI Code\\Time Attendance System\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj"
+              "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj": {
+                "projectPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj"
               }
             }
           }
@@ -286,14 +286,14 @@
         }
       }
     },
-    "D:\\Work\\AI Code\\Time Attendance System\\tests\\UnitTests\\TimeAttendanceSystem.UnitTests\\TimeAttendanceSystem.UnitTests.csproj": {
+    "D:\\Work\\AI Code\\TimeAttendanceSystem\\tests\\UnitTests\\TimeAttendanceSystem.UnitTests\\TimeAttendanceSystem.UnitTests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Work\\AI Code\\Time Attendance System\\tests\\UnitTests\\TimeAttendanceSystem.UnitTests\\TimeAttendanceSystem.UnitTests.csproj",
+        "projectUniqueName": "D:\\Work\\AI Code\\TimeAttendanceSystem\\tests\\UnitTests\\TimeAttendanceSystem.UnitTests\\TimeAttendanceSystem.UnitTests.csproj",
         "projectName": "TimeAttendanceSystem.UnitTests",
-        "projectPath": "D:\\Work\\AI Code\\Time Attendance System\\tests\\UnitTests\\TimeAttendanceSystem.UnitTests\\TimeAttendanceSystem.UnitTests.csproj",
+        "projectPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\tests\\UnitTests\\TimeAttendanceSystem.UnitTests\\TimeAttendanceSystem.UnitTests.csproj",
         "packagesPath": "C:\\Users\\hhammad\\.nuget\\packages\\",
-        "outputPath": "D:\\Work\\AI Code\\Time Attendance System\\tests\\UnitTests\\TimeAttendanceSystem.UnitTests\\obj\\",
+        "outputPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\tests\\UnitTests\\TimeAttendanceSystem.UnitTests\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -314,14 +314,14 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "D:\\Work\\AI Code\\Time Attendance System\\src\\Application\\TimeAttendanceSystem.Application\\TimeAttendanceSystem.Application.csproj": {
-                "projectPath": "D:\\Work\\AI Code\\Time Attendance System\\src\\Application\\TimeAttendanceSystem.Application\\TimeAttendanceSystem.Application.csproj"
+              "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Application\\TimeAttendanceSystem.Application\\TimeAttendanceSystem.Application.csproj": {
+                "projectPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Application\\TimeAttendanceSystem.Application\\TimeAttendanceSystem.Application.csproj"
               },
-              "D:\\Work\\AI Code\\Time Attendance System\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj": {
-                "projectPath": "D:\\Work\\AI Code\\Time Attendance System\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj"
+              "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj": {
+                "projectPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj"
               },
-              "D:\\Work\\AI Code\\Time Attendance System\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure\\TimeAttendanceSystem.Infrastructure.csproj": {
-                "projectPath": "D:\\Work\\AI Code\\Time Attendance System\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure\\TimeAttendanceSystem.Infrastructure.csproj"
+              "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure\\TimeAttendanceSystem.Infrastructure.csproj": {
+                "projectPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure\\TimeAttendanceSystem.Infrastructure.csproj"
               }
             }
           }

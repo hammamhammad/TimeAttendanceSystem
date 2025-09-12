@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "x9eGJs6OQb4=",
+  "dgSpecHash": "obvvgnM4BLU=",
   "success": true,
-  "projectFilePath": "D:\\Work\\AI Code\\Time Attendance System\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure\\TimeAttendanceSystem.Infrastructure.csproj",
+  "projectFilePath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure\\TimeAttendanceSystem.Infrastructure.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\hhammad\\.nuget\\packages\\automapper\\13.0.1\\automapper.13.0.1.nupkg.sha512",
     "C:\\Users\\hhammad\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",

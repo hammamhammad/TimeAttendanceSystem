@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "rqmBc1ssEZM=",
+  "dgSpecHash": "dPcxEYRIbxo=",
   "success": true,
-  "projectFilePath": "D:\\Work\\AI Code\\Time Attendance System\\src\\Shared\\TimeAttendanceSystem.Shared\\TimeAttendanceSystem.Shared.csproj",
+  "projectFilePath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Shared\\TimeAttendanceSystem.Shared\\TimeAttendanceSystem.Shared.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\hhammad\\.nuget\\packages\\microsoft.extensions.localization.abstractions\\9.0.0\\microsoft.extensions.localization.abstractions.9.0.0.nupkg.sha512"
   ],
