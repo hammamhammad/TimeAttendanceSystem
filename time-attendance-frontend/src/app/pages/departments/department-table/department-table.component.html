@@ -1,0 +1,349 @@
+<div class="department-table">
+  <!-- Controls -->
+  <div class="table-controls mb-3" *ngIf="showControls">
+    <div class="row g-2 align-items-center">
+      <div class="col-md-4">
+        <div class="input-group">
+          <span class="input-group-text">
+            <i class="fas fa-search"></i>
+          </span>
+          <input 
+            type="text" 
+            class="form-control" 
+            [placeholder]="i18n.t('common.search') + '...'"
+            [value]="searchTerm()"
+            (input)="onSearchChange($any($event.target).value)"
+          />
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-check">
+          <input 
+            class="form-check-input" 
+            type="checkbox" 
+            id="showInactiveTable"
+            [checked]="showInactive()"
+            (change)="onShowInactiveChange($any($event.target).checked)"
+          />
+          <label class="form-check-label" for="showInactiveTable">
+            {{ i18n.t('common.showInactive') }}
+          </label>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-check">
+          <input 
+            class="form-check-input" 
+            type="checkbox" 
+            id="showHierarchy"
+            [checked]="showHierarchy()"
+            (change)="showHierarchy.set($any($event.target).checked)"
+          />
+          <label class="form-check-label" for="showHierarchy">
+            {{ i18n.t('department.showHierarchy') }}
+          </label>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="btn-group btn-group-sm">
+          <button 
+            type="button" 
+            class="btn btn-outline-secondary"
+            (click)="refresh()"
+            [title]="i18n.t('common.refresh')"
+          >
+            <i class="fas fa-sync"></i>
+          </button>
+          @if (allowEdit) {
+            <button 
+              *appHasPermission="PERMISSIONS.DEPARTMENT_CREATE"
+              type="button" 
+              class="btn btn-primary"
+              (click)="onAddDepartment()"
+              [title]="i18n.t('department.addDepartment')"
+            >
+              <i class="fas fa-plus"></i>
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Bulk Actions -->
+    <div class="row mt-2" *ngIf="selectedDepartments().size > 0 && allowSelection">
+      <div class="col-12">
+        <div class="alert alert-info d-flex align-items-center">
+          <span class="flex-grow-1">
+            <i class="fas fa-info-circle me-2"></i>
+            {{ selectedDepartments().size }} {{ i18n.t('common.selected') }}
+          </span>
+          <div class="btn-group btn-group-sm">
+            @if (allowDelete) {
+              <button 
+                *appHasPermission="PERMISSIONS.DEPARTMENT_DELETE"
+                type="button" 
+                class="btn btn-outline-danger"
+                (click)="onBulkDelete()"
+              >
+                <i class="fas fa-trash me-1"></i>
+                {{ i18n.t('common.deleteSelected') }}
+              </button>
+            }
+            <button 
+              type="button" 
+              class="btn btn-outline-secondary"
+              (click)="clearSelection()"
+            >
+              <i class="fas fa-times me-1"></i>
+              {{ i18n.t('common.clearSelection') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading()" class="text-center p-4">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">{{ i18n.t('common.loading') }}...</span>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-container" *ngIf="!loading()">
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead class="table-light sticky-top">
+          <tr>
+            <th *ngIf="allowSelection" class="selection-column">
+              <div class="form-check">
+                <input 
+                  class="form-check-input" 
+                  type="checkbox" 
+                  [checked]="isAllPageSelected()"
+                  [indeterminate]="isSomePageSelected()"
+                  (change)="toggleAllSelection()"
+                />
+              </div>
+            </th>
+            <th class="sortable" (click)="onSort('name')">
+              <div class="d-flex align-items-center">
+                {{ i18n.t('department.name') }}
+                <i class="ms-2" [class]="getSortIcon('name')"></i>
+              </div>
+            </th>
+            <th class="sortable" (click)="onSort('code')">
+              <div class="d-flex align-items-center">
+                {{ i18n.t('department.code') }}
+                <i class="ms-2" [class]="getSortIcon('code')"></i>
+              </div>
+            </th>
+            <th *ngIf="showHierarchy()">{{ i18n.t('department.path') }}</th>
+            <th class="sortable" (click)="onSort('managerName')">
+              <div class="d-flex align-items-center">
+                {{ i18n.t('department.manager') }}
+                <i class="ms-2" [class]="getSortIcon('managerName')"></i>
+              </div>
+            </th>
+            <th class="sortable text-center" (click)="onSort('employeeCount')">
+              <div class="d-flex align-items-center justify-content-center">
+                {{ i18n.t('common.employees') }}
+                <i class="ms-2" [class]="getSortIcon('employeeCount')"></i>
+              </div>
+            </th>
+            <th class="sortable" (click)="onSort('location')">
+              <div class="d-flex align-items-center">
+                {{ i18n.t('department.location') }}
+                <i class="ms-2" [class]="getSortIcon('location')"></i>
+              </div>
+            </th>
+            <th class="sortable text-center" (click)="onSort('isActive')">
+              <div class="d-flex align-items-center justify-content-center">
+                {{ i18n.t('common.status') }}
+                <i class="ms-2" [class]="getSortIcon('isActive')"></i>
+              </div>
+            </th>
+            <th class="actions-column" *ngIf="showControls">{{ i18n.t('common.actions') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let dept of getPaginatedDepartments(); trackBy: trackByDeptId"
+              [class.table-warning]="!dept.isActive"
+              [class.selected-row]="isSelected(dept.id)"
+              (click)="selectDepartment(dept)">
+            
+            <!-- Selection Checkbox -->
+            <td *ngIf="allowSelection" class="selection-column">
+              <div class="form-check">
+                <input 
+                  class="form-check-input" 
+                  type="checkbox" 
+                  [checked]="isSelected(dept.id)"
+                  (change)="toggleSelection(dept.id); $event.stopPropagation()"
+                />
+              </div>
+            </td>
+
+            <!-- Department Name -->
+            <td>
+              <div class="d-flex align-items-center">
+                <div [class]="getIndentClass(dept.level)" *ngIf="showHierarchy()"></div>
+                <i class="fas fa-building text-primary me-2"></i>
+                <div>
+                  <div class="fw-medium">{{ dept.name }}</div>
+                  <div class="text-muted small" *ngIf="dept.nameAr">{{ dept.nameAr }}</div>
+                  <div class="text-muted small" *ngIf="dept.description">{{ dept.description }}</div>
+                </div>
+              </div>
+            </td>
+
+            <!-- Department Code -->
+            <td>
+              <span class="badge bg-light text-dark border">{{ dept.code }}</span>
+            </td>
+
+            <!-- Department Path -->
+            <td *ngIf="showHierarchy()">
+              <small class="text-muted">{{ dept.path }}</small>
+            </td>
+
+            <!-- Manager -->
+            <td>
+              <div *ngIf="dept.managerName" class="d-flex align-items-center">
+                <i class="fas fa-user-tie text-secondary me-2"></i>
+                {{ dept.managerName }}
+              </div>
+              <span *ngIf="!dept.managerName" class="text-muted">-</span>
+            </td>
+
+            <!-- Employee Count -->
+            <td class="text-center">
+              <span class="badge" 
+                    [class.bg-success]="dept.employeeCount > 0"
+                    [class.bg-secondary]="dept.employeeCount === 0">
+                {{ dept.employeeCount }}
+              </span>
+            </td>
+
+            <!-- Location -->
+            <td>
+              <div *ngIf="dept.location" class="d-flex align-items-center">
+                <i class="fas fa-map-marker-alt text-secondary me-2"></i>
+                {{ dept.location }}
+              </div>
+              <span *ngIf="!dept.location" class="text-muted">-</span>
+            </td>
+
+            <!-- Status -->
+            <td class="text-center">
+              <span class="badge" 
+                    [class.bg-success]="dept.isActive"
+                    [class.bg-secondary]="!dept.isActive">
+                {{ dept.isActive ? i18n.t('common.active') : i18n.t('common.inactive') }}
+              </span>
+            </td>
+
+            <!-- Actions -->
+            <td class="actions-column" *ngIf="showControls">
+              <div class="btn-group btn-group-sm">
+                @if (allowEdit) {
+                  <button 
+                    *appHasPermission="PERMISSIONS.DEPARTMENT_UPDATE"
+                    type="button"
+                    class="btn btn-outline-primary"
+                    (click)="onEditDepartment(dept); $event.stopPropagation()"
+                    [title]="i18n.t('common.edit')"
+                  >
+                    <i class="fas fa-edit"></i>
+                  </button>
+                }
+                @if (allowDelete && dept.employeeCount === 0) {
+                  <button 
+                    *appHasPermission="PERMISSIONS.DEPARTMENT_DELETE"
+                    type="button"
+                    class="btn btn-outline-danger"
+                    (click)="onDeleteDepartment(dept); $event.stopPropagation()"
+                    [title]="i18n.t('common.delete')"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
+                }
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Empty State -->
+    <div class="text-center p-4 text-muted" *ngIf="getPaginatedDepartments().length === 0">
+      <i class="fas fa-building fa-3x mb-3"></i>
+      <h5>{{ i18n.t('department.noDepartments') }}</h5>
+      <p>{{ i18n.t('department.noDepartmentsDescription') }}</p>
+      <button 
+        type="button" 
+        class="btn btn-primary"
+        (click)="onAddDepartment()"
+        *ngIf="allowEdit"
+      >
+        <i class="fas fa-plus me-2"></i>
+        {{ i18n.t('department.addFirstDepartment') }}
+      </button>
+    </div>
+
+    <!-- Pagination -->
+    <nav aria-label="Department pagination" *ngIf="totalPages() > 1" class="mt-3">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <div class="d-flex align-items-center">
+            <label class="form-label me-2 mb-0">{{ i18n.t('common.pageSize') }}:</label>
+            <select 
+              class="form-select form-select-sm" 
+              style="width: auto;"
+              [value]="pageSize()"
+              (change)="onPageSizeChange(+$any($event.target).value)"
+            >
+              <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+            </select>
+            <span class="text-muted ms-3">
+              {{ i18n.t('common.showing') }} 
+              {{ (currentPage() - 1) * pageSize() + 1 }}-{{ Math.min(currentPage() * pageSize(), filteredDepartments().length) }} 
+              {{ i18n.t('common.of') }} 
+              {{ filteredDepartments().length }}
+            </span>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <ul class="pagination pagination-sm justify-content-end mb-0">
+            <li class="page-item" [class.disabled]="currentPage() === 1">
+              <button class="page-link" (click)="onPageChange(currentPage() - 1)" [disabled]="currentPage() === 1">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+            </li>
+            
+            <li *ngFor="let page of getPageNumbers()" 
+                class="page-item" 
+                [class.active]="page === currentPage()"
+                [class.disabled]="page === -1">
+              <button 
+                class="page-link" 
+                *ngIf="page !== -1"
+                (click)="onPageChange(page)"
+              >
+                {{ page }}
+              </button>
+              <span class="page-link" *ngIf="page === -1">...</span>
+            </li>
+            
+            <li class="page-item" [class.disabled]="currentPage() === totalPages()">
+              <button class="page-link" (click)="onPageChange(currentPage() + 1)" [disabled]="currentPage() === totalPages()">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </div>
+</div>

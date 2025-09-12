@@ -1,0 +1,318 @@
+<div class="container-fluid">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>{{ t('employees.title') }}</h2>
+    <a 
+      *appHasPermission="PERMISSIONS.EMPLOYEE_CREATE"
+      class="btn btn-primary"
+      routerLink="/employees/create">
+      <i class="fa-solid fa-plus me-2"></i>
+      {{ t('employees.add_employee') }}
+    </a>
+  </div>
+
+  <!-- Filters -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label class="form-label">{{ t('common.search') }}</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              formControlName="search"
+              [placeholder]="t('employees.search_placeholder')">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">{{ t('employees.branch') }}</label>
+            <select class="form-select" formControlName="branchId">
+              <option value="">{{ t('common.all') }}</option>
+              @for (branch of branches(); track branch.id) {
+                <option [value]="branch.id">{{ branch.name }}</option>
+              }
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">{{ t('employees.department') }}</label>
+            <select class="form-select" formControlName="departmentId">
+              <option value="">{{ t('common.all') }}</option>
+              @for (dept of departments(); track dept.id) {
+                <option [value]="dept.id">{{ dept.name }}</option>
+              }
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">{{ t('employees.employment_status.title') }}</label>
+            <select class="form-select" formControlName="employmentStatus">
+              <option value="">{{ t('common.all') }}</option>
+              <option [value]="EmploymentStatus.FullTime">{{ getEmploymentStatusLabel(EmploymentStatus.FullTime) }}</option>
+              <option [value]="EmploymentStatus.PartTime">{{ getEmploymentStatusLabel(EmploymentStatus.PartTime) }}</option>
+              <option [value]="EmploymentStatus.Contract">{{ getEmploymentStatusLabel(EmploymentStatus.Contract) }}</option>
+              <option [value]="EmploymentStatus.Intern">{{ getEmploymentStatusLabel(EmploymentStatus.Intern) }}</option>
+              <option [value]="EmploymentStatus.Consultant">{{ getEmploymentStatusLabel(EmploymentStatus.Consultant) }}</option>
+              <option [value]="EmploymentStatus.Terminated">{{ getEmploymentStatusLabel(EmploymentStatus.Terminated) }}</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">{{ t('common.status') }}</label>
+            <select class="form-select" formControlName="isActive">
+              <option value="">{{ t('common.all') }}</option>
+              <option value="true">{{ t('common.active') }}</option>
+              <option value="false">{{ t('common.inactive') }}</option>
+            </select>
+          </div>
+          <div class="col-md-1 d-flex align-items-end">
+            <button type="submit" class="btn btn-outline-primary me-2">
+              <i class="fa-solid fa-search"></i>
+            </button>
+            <button type="button" class="btn btn-outline-secondary" (click)="onClearFilters()">
+              <i class="fa-solid fa-times"></i>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Employee List -->
+  <div class="card">
+    <div class="card-body">
+      @if (loading()) {
+        <div class="d-flex justify-content-center py-4">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">{{ t('common.loading') }}</span>
+          </div>
+        </div>
+      } @else if (employees().length === 0) {
+        <div class="text-center py-4">
+          <i class="fa-solid fa-users fa-3x text-muted mb-3"></i>
+          <p class="text-muted">{{ t('employees.no_employees_found') }}</p>
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>{{ t('employees.employee_number') }}</th>
+                <th>{{ t('employees.full_name') }}</th>
+                <th>{{ t('employees.job_title') }}</th>
+                <th>{{ t('employees.department') }}</th>
+                <th>{{ t('employees.employment_status.title') }}</th>
+                <th>{{ t('employees.hire_date') }}</th>
+                <th>{{ t('common.status') }}</th>
+                <th>{{ t('common.actions') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (employee of employees(); track employee.id) {
+                <tr>
+                  <td class="fw-medium">{{ employee.employeeNumber }}</td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      @if (employee.photoUrl) {
+                        <img [src]="employee.photoUrl" 
+                             [alt]="employee.fullName"
+                             class="rounded-circle me-2"
+                             style="width: 32px; height: 32px; object-fit: cover;">
+                      } @else {
+                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-2"
+                             style="width: 32px; height: 32px;">
+                          <i class="fa-solid fa-user text-white"></i>
+                        </div>
+                      }
+                      <div>
+                        <div class="fw-medium">{{ employee.fullName }}</div>
+                        @if (employee.email) {
+                          <small class="text-muted">{{ employee.email }}</small>
+                        }
+                      </div>
+                    </div>
+                  </td>
+                  <td>{{ employee.jobTitle }}</td>
+                  <td>{{ employee.departmentName || '-' }}</td>
+                  <td>
+                    <span class="badge" 
+                          [class]="'bg-' + (employee.employmentStatus === EmploymentStatus.FullTime ? 'success' : 
+                                           employee.employmentStatus === EmploymentStatus.PartTime ? 'info' :
+                                           employee.employmentStatus === EmploymentStatus.Contract ? 'warning' :
+                                           employee.employmentStatus === EmploymentStatus.Terminated ? 'danger' : 'secondary')">
+                      {{ getEmploymentStatusLabel(employee.employmentStatus) }}
+                    </span>
+                  </td>
+                  <td>{{ employee.hireDate | date:'shortDate' }}</td>
+                  <td>
+                    <span class="badge" [class]="employee.isActive ? 'bg-success' : 'bg-secondary'">
+                      {{ employee.isActive ? t('common.active') : t('common.inactive') }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="btn-group btn-group-sm">
+                      <button 
+                        *appHasPermission="PERMISSIONS.EMPLOYEE_READ"
+                        class="btn btn-outline-primary"
+                        [title]="t('common.view_details')"
+                        (click)="onShowEditModal(employee)">
+                        <i class="fa-solid fa-eye"></i>
+                      </button>
+                      <button 
+                        *appHasPermission="PERMISSIONS.EMPLOYEE_UPDATE"
+                        class="btn btn-outline-secondary"
+                        [title]="t('common.edit')"
+                        (click)="onShowEditModal(employee)">
+                        <i class="fa-solid fa-pencil"></i>
+                      </button>
+                      <button 
+                        *appHasPermission="PERMISSIONS.EMPLOYEE_DELETE"
+                        class="btn btn-outline-danger"
+                        [title]="t('common.delete')"
+                        (click)="onShowDeleteModal(employee)">
+                        <i class="fa-solid fa-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        @if (totalPages() > 1) {
+          <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+              <li class="page-item" [class.disabled]="currentPage() === 1">
+                <button class="page-link" (click)="onPageChange(currentPage() - 1)" [disabled]="currentPage() === 1">
+                  {{ t('common.previous') }}
+                </button>
+              </li>
+              @for (page of getPaginationNumbers(); track page) {
+                <li class="page-item" [class.active]="page === currentPage()">
+                  <button class="page-link" (click)="onPageChange(page)">{{ page }}</button>
+                </li>
+              }
+              <li class="page-item" [class.disabled]="currentPage() === totalPages()">
+                <button class="page-link" (click)="onPageChange(currentPage() + 1)" [disabled]="currentPage() === totalPages()">
+                  {{ t('common.next') }}
+                </button>
+              </li>
+            </ul>
+          </nav>
+        }
+      }
+    </div>
+  </div>
+</div>
+
+
+<!-- Edit Employee Modal -->
+@if (showEditModal()) {
+  <div class="modal fade show d-block" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ t('employees.edit_employee') }}</h5>
+          <button type="button" class="btn-close" (click)="onCloseModals()"></button>
+        </div>
+        <form [formGroup]="editForm" (ngSubmit)="onUpdateEmployee()">
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">{{ t('employees.first_name') }} *</label>
+                <input type="text" class="form-control" formControlName="firstName" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">{{ t('employees.last_name') }} *</label>
+                <input type="text" class="form-control" formControlName="lastName" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">{{ t('employees.first_name_ar') }}</label>
+                <input type="text" class="form-control" formControlName="firstNameAr">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">{{ t('employees.last_name_ar') }}</label>
+                <input type="text" class="form-control" formControlName="lastNameAr">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">{{ t('employees.email') }}</label>
+                <input type="email" class="form-control" formControlName="email">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">{{ t('employees.phone') }}</label>
+                <input type="tel" class="form-control" formControlName="phone">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">{{ t('employees.job_title') }} *</label>
+                <input type="text" class="form-control" formControlName="jobTitle" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">{{ t('employees.department') }}</label>
+                <select class="form-select" formControlName="departmentId">
+                  <option value="">{{ t('common.select') }}</option>
+                  @for (dept of departments(); track dept.id) {
+                    <option [value]="dept.id">{{ dept.name }}</option>
+                  }
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">{{ t('employees.employment_status.title') }} *</label>
+                <select class="form-select" formControlName="employmentStatus" required>
+                  @for (status of employmentStatusValues; track status) {
+                    <option [value]="status">{{ getEmploymentStatusLabel(status) }}</option>
+                  }
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">{{ t('employees.work_location.title') }} *</label>
+                <select class="form-select" formControlName="workLocationType" required>
+                  @for (type of workLocationValues; track type) {
+                    <option [value]="type">{{ getWorkLocationTypeLabel(type) }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="onCloseModals()">
+              {{ t('common.cancel') }}
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="editForm.invalid">
+              {{ t('common.save') }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show"></div>
+}
+
+<!-- Delete Employee Modal -->
+@if (showDeleteModal() && selectedEmployee()) {
+  <div class="modal fade show d-block" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ t('employees.delete_employee') }}</h5>
+          <button type="button" class="btn-close" (click)="onCloseModals()"></button>
+        </div>
+        <div class="modal-body">
+          <p>{{ t('employees.delete_confirmation') }}</p>
+          <div class="alert alert-warning">
+            <strong>{{ selectedEmployee()?.fullName }}</strong><br>
+            <small>{{ t('employees.employee_number') }}: {{ selectedEmployee()?.employeeNumber }}</small>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="onCloseModals()">
+            {{ t('common.cancel') }}
+          </button>
+          <button type="button" class="btn btn-danger" (click)="onDeleteEmployee()">
+            {{ t('common.delete') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show"></div>
+}

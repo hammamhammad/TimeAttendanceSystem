@@ -1,0 +1,316 @@
+Angular Frontend – Generation Instructions (Best-Practice Spec)
+0) Baseline
+
+Angular: latest (standalone components, control flow @if/@for, signals)
+
+UI: Bootstrap latest, Font Awesome latest
+
+i18n: English/Arabic with RTL/LTR switching at runtime
+
+Auth: JWT (access + refresh), role/permission aware UI
+
+Quality: ESLint, strict TS, Prettier, unit tests for core pieces
+
+1) Install & Wire UI
+
+Install: npm i bootstrap @fortawesome/fontawesome-free
+
+angular.json > styles:
+
+node_modules/bootstrap/dist/css/bootstrap.min.css
+
+node_modules/@fortawesome/fontawesome-free/css/all.min.css
+
+src/styles.css
+
+Global CSS: root vars, light surface backgrounds, responsive helpers.
+
+2) Project Structure (standalone)
+src/
+  app/
+    core/                 # singletons (auth, i18n, http, guards, title)
+      auth/
+        auth.service.ts
+        auth.interceptor.ts
+        permission.service.ts
+        auth.guard.ts         # canMatch for protected routes
+      i18n/
+        i18n.service.ts       # signal-based locale + dir
+        translations/         # JSON per locale (en/ar)
+      http/
+        api.config.ts         # baseUrl, endpoints
+      title/
+        app-title.strategy.ts # sets <title> from route data
+    layout/
+      layout.component.{ts,html,css}
+      sidenav/
+        sidenav.component.{ts,html,css}
+      topbar/
+        topbar.component.{ts,html,css}
+    shared/
+      ui/
+        form-field/           # helper component for label + help text
+        icon.pipe.ts          # maps semantic icon keys -> FA classes
+      directives/
+        has-permission.directive.ts
+      models/                 # DTOs from backend (User, Employee, etc.)
+      utils/                  # date, currency, etc.
+    pages/
+      dashboard/...
+      users/...
+      employees/...
+      settings/...
+    app.routes.ts
+    app.config.ts
+    app.component.{ts,html,css}
+
+3) Routing & Shell
+
+Root layout hosts side-nav + top-bar + <router-outlet>.
+
+Child routes set data: { title: 'Page Title', permission: 'employee.read' }.
+
+Implement TitleStrategy to sync <title> and top-bar title from route data.
+
+Protect routes with canMatch: [AuthGuard] (checks login + route permission).
+
+4) Layout Requirements
+Side-nav (collapsible)
+
+Shows icon + title; collapses to icons-only (72px).
+
+Items driven by a MenuService (path, i18n key, icon, permission).
+
+Use Font Awesome classes (fa-solid fa-users, etc.).
+
+New control flow in template:
+
+<ul class="nav flex-column mt-2">
+  @for (item of menuItems; track item.path) {
+    @if (!item.permission || hasPerm(item.permission)) {
+      <li class="nav-item">
+        <a class="nav-link d-flex align-items-center" [routerLink]="item.path" routerLinkActive="active">
+          <i class="{{ item.icon }} me-2"></i>
+          @if (!collapsed) { <span class="text-truncate">{{ t(item.titleKey) }}</span> }
+        </a>
+      </li>
+    }
+  }
+</ul>
+
+
+Keyboard & ARIA: toggle button has aria-label="Toggle menu" and updates aria-expanded.
+
+Top-bar
+
+Left: menu button (on mobile) to toggle side-nav.
+
+Center: current page name (from route data).
+
+Right: current user menu (name, settings, logout), language switch button.
+
+Language switch calls i18n.setLocale('en'|'ar'); update documentElement.lang/dir.
+
+5) i18n & RTL/LTR Behavior
+
+I18nService with a signal locale = signal<'en'|'ar'>('en').
+
+On change:
+
+document.documentElement.lang = locale
+
+document.documentElement.dir = locale === 'ar' ? 'rtl' : 'ltr'
+
+Translation loader: simple JSON key/value per locale (translations/en.json, ar.json).
+
+Provide a function t(key: string): string in a translation service/pipe.
+
+CSS fixes for RTL (global):
+
+:root[dir="rtl"] .me-2 { margin-left: .5rem !important; margin-right: 0 !important; }
+:root[dir="rtl"] .ms-2 { margin-right: .5rem !important; margin-left: 0 !important; }
+
+6) Auth, Roles & Permissions
+
+AuthService holds currentUser as a signal (id, displayName, role, permissions, branchScope).
+
+PermissionService.has('employee.read') checks against currentUser.permissions.
+
+HasPermissionDirective to show/hide blocks (structural directive using @if internally).
+
+Http interceptor attaches JWT; handles 401/refresh; routes to /login if failed.
+
+7) New Template Control Flow — Use Everywhere
+
+Replace *ngIf → @if, *ngFor → @for.
+
+Always provide track function or key with @for for performance.
+
+Prefer deferred views for large lists (Angular @defer if needed later).
+
+8) Forms (Reactive) with Brief Descriptions
+
+Use Reactive Forms, Bootstrap form classes, and help text per field via .form-text.
+
+Create a reusable FormField component for consistent label/input/help/error wiring:
+
+Inputs: label, control, placeholder, help, type='text|email|select|...', icon?.
+
+Template shows:
+
+<label> connected by for/id
+
+Input control
+
+Help text: <div class="form-text">{{ help }}</div>
+
+Validation messages using @if (control.touched && control.errors) { ... }
+
+Example (users page):
+
+<form [formGroup]="form" (ngSubmit)="save()" novalidate>
+  <app-form-field
+    label="{{ t('users.username') }}"
+    [control]="form.controls.username"
+    placeholder="{{ t('users.username_ph') }}"
+    help="{{ t('users.username_help') }}">
+  </app-form-field>
+
+  <app-form-field
+    label="{{ t('users.email') }}"
+    [control]="form.controls.email"
+    type="email"
+    placeholder="{{ t('users.email_ph') }}"
+    help="{{ t('users.email_help') }}">
+  </app-form-field>
+
+  <div class="d-flex gap-2">
+    <button class="btn btn-primary" type="submit" [disabled]="form.invalid">
+      <i class="fa-solid fa-floppy-disk me-1"></i>{{ t('common.save') }}
+    </button>
+    <button class="btn btn-outline-secondary" type="button" (click)="cancel()">
+      <i class="fa-solid fa-xmark me-1"></i>{{ t('common.cancel') }}
+    </button>
+  </div>
+</form>
+
+
+Field descriptions live in translations/* (e.g., users.username_help: “Unique login name.” / “اسم فريد لتسجيل الدخول.”).
+
+9) Pages to Scaffold (match backend)
+
+Dashboard: simple cards (counts), responsive grid.
+
+Users: table (server paging/sort/search), create/edit dialog/page with described fields.
+
+Employees: similar table + form (branch/department selects).
+
+Settings: profile + locale preference.
+
+Each page:
+
+Reads title from route data.
+
+Wraps content in .container-fluid.
+
+Uses @if/@for for lists and conditional UIs.
+
+Uses PermissionService to gate actions (e.g., Create/Edit/Delete).
+
+10) HTTP & Error UX
+
+Base API URL from environment.
+
+Generic ApiService wrapper with HttpClient.
+
+Interceptor:
+
+Adds Authorization: Bearer <token>.
+
+On 401 attempts refresh; if fails, clears session & redirects.
+
+Error presentation:
+
+Map RFC7807 ProblemDetails to Bootstrap toasts/alerts.
+
+Show inline field errors for 400 validation (keyed by field).
+
+11) State & Performance
+
+Prefer signals over RxJS when local to component/app state.
+
+Use trackBy in @for, OnPush by default (standalone does this well).
+
+Defer heavy modules with lazy routes.
+
+Avoid deep component trees for forms; reuse FormField.
+
+12) Accessibility & Keyboard
+
+All interactive elements have labels/roles.
+
+Side-nav toggle updates aria-expanded.
+
+Focus management on route change: set focus to page <h1>.
+
+13) Theming & Responsiveness
+
+Use Bootstrap grid/utilities.
+
+Collapsible side-nav auto-collapses under md breakpoint; top-bar shows hamburger.
+
+Provide CSS variables for brand colors; ensure contrast meets WCAG AA.
+
+14) Testing & Linting
+
+ESLint with Angular recommended config; Prettier.
+
+Unit tests:
+
+I18nService (dir/lang switches)
+
+HasPermissionDirective logic
+
+AuthInterceptor attaches tokens, handles 401
+
+One form component validates help text + errors rendering
+
+Basic e2e for navigation + RTL toggle.
+
+15) Deliverables (what to generate)
+
+Layout: LayoutComponent, SideNavComponent, TopBarComponent (split html/ts/css)
+
+Core services: AuthService, PermissionService, I18nService, AuthInterceptor
+
+Directive: HasPermissionDirective
+
+TitleStrategy: AppTitleStrategy wired in app.config.ts
+
+MenuService with menu items (path, titleKey, icon, permission)
+
+Pages: Dashboard, Users, Employees, Settings (stub tables/forms)
+
+FormField reusable component (label + input + help + errors)
+
+Translations: en.json, ar.json with menu labels, page titles, field labels & help
+
+Styles: global RTL tweaks, side-nav widths, top-bar height
+
+16) Acceptance Criteria
+
+Side-nav collapses/expands; icons always visible; titles hidden when collapsed.
+
+Top-bar shows route title, current user, language switch working.
+
+Language switch flips text + direction (LTR/RTL) instantly; layout remains usable.
+
+All lists & conditions use @for and @if (no legacy *ngFor/*ngIf).
+
+Forms are Reactive, each field shows a brief description and validation messages.
+
+Permissions hide disallowed menu items/actions.
+
+JWT is sent on API calls; 401 refresh flow works (stub or real).
+
+Lint/tests pass; app builds without warnings.

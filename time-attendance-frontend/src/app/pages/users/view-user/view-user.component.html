@@ -1,0 +1,217 @@
+<div class="container-fluid">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2>{{ t('users.view_details') }}</h2>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a routerLink="/dashboard">{{ t('dashboard.title') }}</a>
+          </li>
+          <li class="breadcrumb-item">
+            <a routerLink="/users">{{ t('users.title') }}</a>
+          </li>
+          <li class="breadcrumb-item active">{{ t('users.view_details') }}</li>
+        </ol>
+      </nav>
+    </div>
+    <div class="btn-group">
+      <button 
+        *appHasPermission="PERMISSIONS.USER_UPDATE"
+        type="button" 
+        class="btn btn-primary"
+        (click)="onEdit()">
+        <i class="fa-solid fa-edit me-2"></i>
+        {{ t('users.edit') }}
+      </button>
+      <button 
+        type="button" 
+        class="btn btn-outline-secondary"
+        (click)="onBack()">
+        <i class="fa-solid fa-arrow-left me-2"></i>
+        {{ t('common.back') }}
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="d-flex justify-content-center py-5">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">{{ t('common.loading') }}</span>
+      </div>
+    </div>
+  } @else if (user()) {
+    <!-- User Details -->
+    <div class="row">
+      <!-- Main Information Card -->
+      <div class="col-lg-8">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">
+              <div class="d-flex align-items-center">
+                <div class="avatar-sm me-3">
+                  <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+                    {{ (user()?.username?.charAt(0) || '')?.toUpperCase() }}
+                  </div>
+                </div>
+                <div>
+                  <div class="fw-medium">
+                    {{ user()?.username }}
+                    @if (user()?.mustChangePassword) {
+                      <i class="fa-solid fa-exclamation-triangle text-warning ms-2" [title]="t('users.must_change_password')"></i>
+                    }
+                  </div>
+                  <small class="text-muted">{{ user()?.email }}</small>
+                </div>
+              </div>
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <!-- Basic Information -->
+              <div class="col-md-6">
+                <dl class="row">
+                  <dt class="col-sm-4">{{ t('users.username') }}:</dt>
+                  <dd class="col-sm-8">{{ user()?.username }}</dd>
+                  
+                  <dt class="col-sm-4">{{ t('users.email') }}:</dt>
+                  <dd class="col-sm-8">{{ user()?.email }}</dd>
+                  
+                  <dt class="col-sm-4">{{ t('users.phone') }}:</dt>
+                  <dd class="col-sm-8">{{ user()?.phone || '-' }}</dd>
+                  
+                  <dt class="col-sm-4">{{ t('users.language') }}:</dt>
+                  <dd class="col-sm-8">
+                    @if (user()?.preferredLanguage === 'ar') {
+                      {{ t('common.language_arabic') }}
+                    } @else {
+                      {{ t('common.language_english') }}
+                    }
+                  </dd>
+                </dl>
+              </div>
+
+              <!-- Status Information -->
+              <div class="col-md-6">
+                <dl class="row">
+                  <dt class="col-sm-4">{{ t('common.status') }}:</dt>
+                  <dd class="col-sm-8">
+                    @if (isUserLocked(user()?.lockoutEndUtc)) {
+                      <span class="badge bg-danger">{{ t('users.locked') }}</span>
+                    } @else if (user()?.isActive) {
+                      <span class="badge bg-success">{{ t('common.active') }}</span>
+                    } @else {
+                      <span class="badge bg-secondary">{{ t('common.inactive') }}</span>
+                    }
+                  </dd>
+                  
+                  <dt class="col-sm-4">{{ t('users.created_at') }}:</dt>
+                  <dd class="col-sm-8">{{ formatDate(user()!.createdAtUtc!) }}</dd>
+                  
+                  <dt class="col-sm-4">{{ t('users.two_factor') }}:</dt>
+                  <dd class="col-sm-8">
+                    @if (user()?.twoFactorEnabled) {
+                      <span class="badge bg-success">{{ t('common.enabled') }}</span>
+                    } @else {
+                      <span class="badge bg-secondary">{{ t('common.disabled') }}</span>
+                    }
+                  </dd>
+                  
+                  <dt class="col-sm-4">{{ t('users.login_attempts') }}:</dt>
+                  <dd class="col-sm-8">{{ user()?.accessFailedCount || 0 }}</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Roles and Branches Card -->
+      <div class="col-lg-4">
+        <div class="card">
+          <div class="card-header">
+            <h6 class="card-title mb-0">{{ t('users.roles_and_access') }}</h6>
+          </div>
+          <div class="card-body">
+            <!-- Roles -->
+            <div class="mb-3">
+              <h6 class="fw-semibold">{{ t('users.roles') }}</h6>
+              @if (user()?.roles && user()!.roles.length > 0) {
+                <div class="d-flex flex-wrap gap-1">
+                  @for (role of user()?.roles; track role) {
+                    <span class="badge bg-info">{{ getRoleName(role) }}</span>
+                  }
+                </div>
+              } @else {
+                <p class="text-muted mb-0">{{ t('users.no_roles') }}</p>
+              }
+            </div>
+            
+            <!-- Branches -->
+            <div>
+              <h6 class="fw-semibold">{{ t('users.branches') }}</h6>
+              @if (user()?.branches && (user()?.branches?.length || 0) > 0) {
+                <div class="d-flex flex-wrap gap-1">
+                  @for (branch of user()?.branches; track branch) {
+                    <span class="badge bg-secondary">{{ getBranchName(branch) }}</span>
+                  }
+                </div>
+              } @else {
+                <p class="text-muted mb-0">{{ t('users.all_branches') }}</p>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions Card -->
+        <div class="card mt-3">
+          <div class="card-header">
+            <h6 class="card-title mb-0">{{ t('common.actions') }}</h6>
+          </div>
+          <div class="card-body">
+            <div class="d-grid gap-2">
+              <button 
+                *appHasPermission="PERMISSIONS.USER_UPDATE"
+                type="button" 
+                class="btn btn-outline-primary"
+                (click)="onEdit()">
+                <i class="fa-solid fa-edit me-2"></i>
+                {{ t('users.edit') }}
+              </button>
+              <button 
+                *appHasPermission="PERMISSIONS.USER_ASSIGN_ROLE"
+                type="button" 
+                class="btn btn-outline-info"
+                (click)="onManageRoles()">
+                <i class="fa-solid fa-user-tag me-2"></i>
+                {{ t('users.manage_roles') }}
+              </button>
+              @if (user()?.isActive) {
+                <button 
+                  *appHasPermission="PERMISSIONS.USER_LOCK"
+                  type="button" 
+                  class="btn btn-outline-warning">
+                  <i class="fa-solid fa-lock me-2"></i>
+                  {{ t('users.lock_account') }}
+                </button>
+              } @else {
+                <button 
+                  *appHasPermission="PERMISSIONS.USER_UNLOCK"
+                  type="button" 
+                  class="btn btn-outline-success">
+                  <i class="fa-solid fa-unlock me-2"></i>
+                  {{ t('users.unlock_account') }}
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="alert alert-danger">
+      <i class="fa-solid fa-exclamation-triangle me-2"></i>
+      {{ error() || t('users.user_not_found') }}
+    </div>
+  }
+</div>

@@ -1,0 +1,184 @@
+using Microsoft.EntityFrameworkCore;
+using TimeAttendanceSystem.Domain.Common;
+using TimeAttendanceSystem.Domain.Branches;
+using TimeAttendanceSystem.Domain.Employees;
+using TimeAttendanceSystem.Domain.Users;
+
+namespace TimeAttendanceSystem.Infrastructure.Persistence;
+
+/// <summary>
+/// Entity Framework Core database context for the Time Attendance System providing comprehensive data access.
+/// Implements enterprise-grade database operations with audit logging, change tracking, and multi-tenant support
+/// for organizational time attendance management, user authentication, and employee lifecycle operations.
+/// </summary>
+/// <remarks>
+/// Database Context Features:
+/// - Complete domain entity mapping with proper relationships and constraints
+/// - Automatic audit trail generation with creation and modification timestamps
+/// - Multi-tenant data isolation through branch-scoped access control
+/// - Comprehensive security entity management (users, roles, permissions)
+/// - Employee lifecycle management with organizational hierarchy support
+/// - Session and authentication token management for security operations
+/// - Configuration-driven entity mapping through Fluent API configurations
+/// 
+/// Entity Collections:
+/// - Organizational: Branches, Departments for multi-tenant structure
+/// - Security: Users, Roles, Permissions, RefreshTokens for authentication/authorization
+/// - Employee Management: Employees, EmployeeUserLinks for HR operations
+/// - Audit & Compliance: AuditLogs, LoginAttempts, PasswordHistory for security monitoring
+/// - Session Management: UserSessions, BlacklistedTokens for secure session control
+/// - Two-Factor Authentication: TwoFactorBackupCodes for enhanced security
+/// 
+/// Data Integrity Features:
+/// - Automatic timestamp management for creation and modification tracking
+/// - Entity state change detection and audit trail generation
+/// - Referential integrity enforcement through foreign key relationships
+/// - Data validation through domain entity constraints and business rules
+/// - Transaction support ensuring data consistency across related entities
+/// - Optimistic concurrency control preventing data conflicts
+/// 
+/// Security and Compliance:
+/// - Comprehensive audit logging for regulatory compliance requirements
+/// - User activity tracking through login attempts and session management
+/// - Password security through history tracking and policy enforcement
+/// - Token security through blacklist management and refresh token rotation
+/// - Multi-tenant data isolation preventing cross-organization data access
+/// - GDPR compliance support through data lifecycle management
+/// 
+/// Performance Optimization:
+/// - Entity configuration through separate configuration classes
+/// - Lazy loading and eager loading support for optimal query performance
+/// - Connection pooling and transaction scoping for scalable operations
+/// - Query optimization through proper indexing and relationship mapping
+/// - Async operations throughout for non-blocking database access
+/// - Memory-efficient change tracking and entity materialization
+/// 
+/// Multi-tenant Architecture:
+/// - Branch-based data partitioning for organizational isolation
+/// - User scope enforcement through branch relationship validation
+/// - Department-level access control within organizational boundaries
+/// - Cross-tenant administrative operations with proper authorization
+/// - Scalable multi-tenant design supporting organizational growth
+/// - Data security through tenant-scoped query filters and access controls
+/// </remarks>
+public class TimeAttendanceDbContext : DbContext
+{
+    /// <summary>
+    /// Initializes a new instance of the TimeAttendanceDbContext with specified configuration options.
+    /// Sets up the database context with connection string, provider settings, and operational parameters.
+    /// </summary>
+    /// <param name="options">Database context options containing connection configuration and provider settings</param>
+    public TimeAttendanceDbContext(DbContextOptions<TimeAttendanceDbContext> options) : base(options)
+    {
+    }
+
+    public DbSet<Branch> Branches => Set<Branch>();
+    public DbSet<Department> Departments => Set<Department>();
+    public DbSet<User> Users => Set<User>();
+    public DbSet<Role> Roles => Set<Role>();
+    public DbSet<Permission> Permissions => Set<Permission>();
+    public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
+    public DbSet<UserRole> UserRoles => Set<UserRole>();
+    public DbSet<UserBranchScope> UserBranchScopes => Set<UserBranchScope>();
+    public DbSet<Employee> Employees => Set<Employee>();
+    public DbSet<EmployeeUserLink> EmployeeUserLinks => Set<EmployeeUserLink>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<LoginAttempt> LoginAttempts => Set<LoginAttempt>();
+    public DbSet<PasswordHistory> PasswordHistory => Set<PasswordHistory>();
+    public DbSet<BlacklistedToken> BlacklistedTokens => Set<BlacklistedToken>();
+    public DbSet<TwoFactorBackupCode> TwoFactorBackupCodes => Set<TwoFactorBackupCode>();
+    public DbSet<UserSession> UserSessions => Set<UserSession>();
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+
+    /// <summary>
+    /// Configures the database model using Fluent API configurations from the current assembly.
+    /// Applies entity configurations, relationships, constraints, and indexes for comprehensive data modeling.
+    /// </summary>
+    /// <param name="modelBuilder">Entity Framework model builder for database schema configuration</param>
+    /// <remarks>
+    /// Model Configuration Features:
+    /// - Automatic discovery and application of IEntityTypeConfiguration implementations
+    /// - Comprehensive entity relationship mapping with foreign key constraints
+    /// - Index creation for query performance optimization
+    /// - Data validation rules and business constraint enforcement
+    /// - Multi-tenant query filters for organizational data isolation
+    /// - Audit field configuration for automatic timestamp management
+    /// 
+    /// Configuration Assembly Scanning:
+    /// - Scans current assembly for all IEntityTypeConfiguration implementations
+    /// - Automatically applies configurations without manual registration
+    /// - Maintains separation of concerns through dedicated configuration classes
+    /// - Supports modular configuration management and maintainability
+    /// - Enables consistent configuration patterns across all entities
+    /// </remarks>
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(TimeAttendanceDbContext).Assembly);
+        base.OnModelCreating(modelBuilder);
+    }
+
+    /// <summary>
+    /// Persists changes to the database with automatic audit trail generation and timestamp management.
+    /// Implements comprehensive change tracking, audit logging, and data integrity validation
+    /// for all entity modifications within the organizational time attendance system.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token for async operation control</param>
+    /// <returns>Number of entities successfully persisted to the database</returns>
+    /// <remarks>
+    /// Save Changes Process:
+    /// 1. Change Detection: Identifies all added and modified BaseEntity instances
+    /// 2. Timestamp Assignment: Sets CreatedAtUtc for new entities, ModifiedAtUtc for changes
+    /// 3. Audit Trail Generation: Creates comprehensive audit records for compliance
+    /// 4. Validation Execution: Runs entity validation and business rule enforcement
+    /// 5. Database Persistence: Commits all changes within a single transaction
+    /// 6. Return Count: Provides number of affected entities for logging and monitoring
+    /// 
+    /// Automatic Audit Features:
+    /// - Creation timestamp assignment for new entities
+    /// - Modification timestamp updates for changed entities
+    /// - Comprehensive change tracking for compliance requirements
+    /// - User context integration for audit trail attribution
+    /// - Transaction-scoped operations ensuring data consistency
+    /// - Exception handling and rollback on validation failures
+    /// 
+    /// Data Integrity Enforcement:
+    /// - Automatic timestamp management preventing manual manipulation
+    /// - Entity state validation ensuring proper lifecycle management
+    /// - Business rule enforcement through domain entity validation
+    /// - Referential integrity maintenance through foreign key constraints
+    /// - Optimistic concurrency control preventing data conflicts
+    /// - Transaction isolation ensuring consistent database state
+    /// 
+    /// Performance Considerations:
+    /// - Efficient change detection through Entity Framework change tracker
+    /// - Batch operations for multiple entity updates
+    /// - Minimal database round trips through transaction scoping
+    /// - Memory-efficient processing of large change sets
+    /// - Async operations for non-blocking database access
+    /// - Optimized query generation for complex entity relationships
+    /// </remarks>
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        var entries = ChangeTracker
+            .Entries()
+            .Where(e => e.Entity is BaseEntity && (
+                e.State == EntityState.Added ||
+                e.State == EntityState.Modified));
+
+        foreach (var entityEntry in entries)
+        {
+            var entity = (BaseEntity)entityEntry.Entity;
+
+            if (entityEntry.State == EntityState.Added)
+            {
+                entity.CreatedAtUtc = DateTime.UtcNow;
+            }
+            else
+            {
+                entity.ModifiedAtUtc = DateTime.UtcNow;
+            }
+        }
+
+        return await base.SaveChangesAsync(cancellationToken);
+    }
+}

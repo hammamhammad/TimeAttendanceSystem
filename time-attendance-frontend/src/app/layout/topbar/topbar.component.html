@@ -1,0 +1,76 @@
+<header class="topbar">
+  <div class="topbar-content">
+    <!-- Left section: Menu toggle -->
+    <div class="topbar-left">
+      <button class="btn btn-link topbar-btn" 
+              type="button"
+              (click)="onToggleSidenav()"
+              [attr.aria-label]="t('nav.toggle_menu')"
+              [attr.aria-expanded]="!sidenavCollapsed()">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+
+    <!-- Center section: Page title -->
+    <div class="topbar-center">
+      <h1 class="page-title mb-0">{{ pageTitle() }}</h1>
+    </div>
+
+    <!-- Right section: User menu and language switch -->
+    <div class="topbar-right">
+      <!-- Language switch -->
+      <button class="btn btn-link topbar-btn me-2" 
+              type="button"
+              (click)="onSwitchLanguage()"
+              [attr.aria-label]="t('settings.language')">
+        <i class="fa-solid fa-globe"></i>
+        <span class="d-none d-md-inline ms-1">
+          {{ currentLocale() === 'en' ? 'عربي' : 'English' }}
+        </span>
+      </button>
+
+      <!-- User menu -->
+      <div class="dropdown" 
+           [class.show]="showUserMenu()">
+        <button class="btn btn-link topbar-btn dropdown-toggle" 
+                type="button"
+                (click)="onToggleUserMenu()"
+                [attr.aria-expanded]="showUserMenu()">
+          <i class="fa-solid fa-user me-1"></i>
+          <span class="d-none d-md-inline">{{ currentUser()?.username }}</span>
+        </button>
+        
+        @if (showUserMenu()) {
+          <ul class="dropdown-menu dropdown-menu-end show">
+            <li>
+              <a class="dropdown-item" href="#" (click)="$event.preventDefault()">
+                <i class="fa-solid fa-user me-2"></i>
+                {{ t('settings.profile') }}
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="#" (click)="$event.preventDefault()">
+                <i class="fa-solid fa-cog me-2"></i>
+                {{ t('nav.settings') }}
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item text-danger" 
+                 href="#" 
+                 (click)="$event.preventDefault(); onLogout()">
+                <i class="fa-solid fa-sign-out-alt me-2"></i>
+                {{ t('nav.logout') }}
+              </a>
+            </li>
+          </ul>
+        }
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Backdrop for mobile menu -->
+@if (showUserMenu()) {
+  <div class="dropdown-backdrop" (click)="onClickOutside()"></div>
+}

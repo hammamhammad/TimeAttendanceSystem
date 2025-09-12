@@ -1,0 +1,223 @@
+<div class="departments-page">
+  <!-- Page Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>{{ i18n.t('department.departments') }}</h2>
+  </div>
+
+  <!-- Filters Card -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">{{ i18n.t('common.branch') }}</label>
+          <select 
+            class="form-select"
+            [value]="selectedBranch()?.id || ''"
+            (change)="onBranchChange(+$any($event.target).value)"
+          >
+            <option value="">{{ i18n.t('common.selectBranch') }}</option>
+            <option *ngFor="let branch of branches()" [value]="branch.id">
+              {{ branch.name }} ({{ branch.code }})
+            </option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">{{ i18n.t('common.view') }}</label>
+          <div class="btn-group w-100" role="group">
+            <input 
+              type="radio" 
+              class="btn-check" 
+              name="viewMode" 
+              id="tableView" 
+              [checked]="viewMode() === 'table'"
+              (change)="onViewModeChange('table')"
+            />
+            <label class="btn btn-outline-primary" for="tableView">
+              <i class="fas fa-table me-2"></i>
+              {{ i18n.t('common.table') }}
+            </label>
+            <input 
+              type="radio" 
+              class="btn-check" 
+              name="viewMode" 
+              id="treeView"
+              [checked]="viewMode() === 'tree'"
+              (change)="onViewModeChange('tree')"
+            />
+            <label class="btn btn-outline-primary" for="treeView">
+              <i class="fas fa-sitemap me-2"></i>
+              {{ i18n.t('common.tree') }}
+            </label>
+          </div>
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+          <button 
+            *appHasPermission="PERMISSIONS.DEPARTMENT_CREATE"
+            type="button" 
+            class="btn btn-primary"
+            (click)="onDepartmentAdd()"
+            [disabled]="!selectedBranch()"
+          >
+            <i class="fas fa-plus me-2"></i>
+            {{ i18n.t('department.addDepartment') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Departments Content Card -->
+  <div class="card">
+    <div class="card-body">
+      <!-- No Branch Selected -->
+      <div class="alert alert-info" *ngIf="!selectedBranch()">
+        <div class="d-flex align-items-center">
+          <i class="fas fa-info-circle me-3"></i>
+          <div>
+            <strong>{{ i18n.t('common.selectBranch') }}</strong><br>
+            <small>{{ i18n.t('department.selectBranchToManage') }}</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table View -->
+      <app-department-table
+        *ngIf="viewMode() === 'table' && selectedBranch()"
+        [selectedBranchId]="selectedBranch()?.id"
+        [allowSelection]="true"
+        [allowEdit]="true"
+        [allowDelete]="true"
+        [showControls]="true"
+        (departmentSelected)="onDepartmentSelected($event)"
+        (departmentEdit)="onDepartmentEdit($event)"
+        (departmentDelete)="onDepartmentDelete($event)"
+        (departmentAdd)="onDepartmentAdd()"
+      ></app-department-table>
+
+      <!-- Tree View -->
+      <app-department-tree
+        *ngIf="viewMode() === 'tree' && selectedBranch()"
+        [selectedBranchId]="selectedBranch()?.id"
+        [allowSelection]="true"
+        [allowEdit]="true"
+        [allowDelete]="true"
+        [showControls]="true"
+        (departmentSelected)="onDepartmentSelected($event)"
+        (departmentEdit)="onDepartmentEdit($event)"
+        (departmentDelete)="onDepartmentDelete($event)"
+        (departmentAdd)="onDepartmentAdd($event)"
+      ></app-department-tree>
+    </div>
+  </div>
+
+  <!-- Selected Department Info Panel -->
+  <div class="selected-info" *ngIf="selectedDepartment() && !showForm()">
+    <div class="card border-primary">
+      <div class="card-header bg-primary text-white">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <i class="fas fa-info-circle me-2"></i>
+            {{ i18n.t('department.selectedDepartment') }}
+          </div>
+          <button 
+            type="button" 
+            class="btn btn-sm btn-outline-light"
+            (click)="selectedDepartment.set(null)"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <h6 class="fw-bold">{{ selectedDepartment()?.name }}</h6>
+            <p class="text-muted mb-2">{{ selectedDepartment()?.code }}</p>
+            <p class="small mb-2" *ngIf="selectedDepartment()?.description">
+              {{ selectedDepartment()?.description }}
+            </p>
+          </div>
+          <div class="col-md-6">
+            <div class="row g-2">
+              <div class="col-6" *ngIf="selectedDepartment()?.managerName">
+                <small class="text-muted">{{ i18n.t('department.manager') }}</small><br>
+                <strong>{{ selectedDepartment()?.managerName }}</strong>
+              </div>
+              <div class="col-6">
+                <small class="text-muted">{{ i18n.t('common.employees') }}</small><br>
+                <strong>{{ selectedDepartment()?.employeeCount || 0 }}</strong>
+              </div>
+              <div class="col-6" *ngIf="selectedDepartment()?.location">
+                <small class="text-muted">{{ i18n.t('department.location') }}</small><br>
+                <strong>{{ selectedDepartment()?.location }}</strong>
+              </div>
+              <div class="col-6">
+                <small class="text-muted">{{ i18n.t('common.status') }}</small><br>
+                <span class="badge" 
+                      [class.bg-success]="selectedDepartment()?.isActive"
+                      [class.bg-secondary]="!selectedDepartment()?.isActive">
+                  {{ selectedDepartment()?.isActive ? i18n.t('common.active') : i18n.t('common.inactive') }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-3">
+          <div class="btn-group btn-group-sm">
+            <button 
+              *appHasPermission="PERMISSIONS.DEPARTMENT_UPDATE"
+              type="button" 
+              class="btn btn-outline-primary"
+              (click)="onDepartmentEdit(selectedDepartment()!)"
+            >
+              <i class="fas fa-edit me-1"></i>
+              {{ i18n.t('common.edit') }}
+            </button>
+            <button 
+              *appHasPermission="PERMISSIONS.DEPARTMENT_DELETE"
+              type="button" 
+              class="btn btn-outline-danger"
+              (click)="onDepartmentDelete(selectedDepartment()!)"
+              [disabled]="selectedDepartment()?.employeeCount! > 0"
+            >
+              <i class="fas fa-trash me-1"></i>
+              {{ i18n.t('common.delete') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Department Form Modal -->
+<div class="modal fade" 
+     [class.show]="showForm()" 
+     [style.display]="showForm() ? 'block' : 'none'"
+     *ngIf="showForm()">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fas fa-building me-2"></i>
+          {{ isEditMode() ? i18n.t('department.editDepartment') : i18n.t('department.addDepartment') }}
+        </h5>
+        <button type="button" class="btn-close" (click)="onFormClose()"></button>
+      </div>
+      <div class="modal-body">
+        <app-department-form
+          [department]="selectedDepartment()"
+          [branchId]="selectedBranch()?.id || null"
+          [isEditMode]="isEditMode()"
+          (save)="onFormSave($event)"
+          (cancel)="onFormClose()"
+        ></app-department-form>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade" 
+     [class.show]="showForm()" 
+     *ngIf="showForm()" 
+     (click)="onFormClose()">
+</div>

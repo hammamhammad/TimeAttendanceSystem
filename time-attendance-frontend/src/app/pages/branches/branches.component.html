@@ -1,0 +1,475 @@
+<div class="branches-container">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="mb-1">
+        <i class="fas fa-code-branch me-2 text-primary"></i>
+        {{ t('branches.title') }}
+      </h2>
+      <p class="text-muted mb-0">{{ t('branches.subtitle') }}</p>
+    </div>
+    
+    <button 
+      *appHasPermission="PERMISSIONS.BRANCH_CREATE"
+      class="btn btn-primary"
+      (click)="onCreateBranch()"
+      [disabled]="loading()"
+    >
+      <i class="fas fa-plus me-2"></i>
+      {{ t('branches.create_branch') }}
+    </button>
+  </div>
+
+  <!-- Search and Filters -->
+  <div class="search-filters">
+    <div class="filter-row">
+      <!-- Search -->
+      <div class="flex-grow-1" style="min-width: 300px;">
+        <label for="search" class="form-label">{{ t('common.search') }}</label>
+        <div class="input-group">
+          <span class="input-group-text">
+            <i class="fas fa-search"></i>
+          </span>
+          <input
+            type="text"
+            id="search"
+            class="form-control"
+            [(ngModel)]="searchTerm"
+            [placeholder]="t('branches.search_placeholder')"
+            (keyup.enter)="onSearch()"
+          />
+          <button 
+            class="btn btn-outline-secondary" 
+            type="button"
+            (click)="onSearch()"
+          >
+            {{ t('common.search') }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Status Filter -->
+      <div style="min-width: 200px;">
+        <label for="activeFilter" class="form-label">{{ t('common.status') }}</label>
+        <select
+          id="activeFilter"
+          class="form-select"
+          [(ngModel)]="activeFilter"
+          (change)="onFilterChange()"
+        >
+          <option [value]="undefined">{{ t('common.all') }}</option>
+          <option [value]="true">{{ t('common.active') }}</option>
+          <option [value]="false">{{ t('common.inactive') }}</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">{{ t('common.loading') }}</span>
+      </div>
+      <p class="text-muted mt-2">{{ t('branches.loading') }}</p>
+    </div>
+  }
+
+  <!-- Branches Grid -->
+  @if (!loading() && branches().length > 0) {
+    <div class="row g-4">
+      @for (branch of branches(); track branch.id) {
+        <div class="col-lg-6 col-xl-4">
+          <div class="card branch-card h-100">
+            <!-- Branch Header -->
+            <div class="branch-header">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <h5 class="card-title mb-1">
+                    <i class="fas fa-building me-2"></i>
+                    {{ branch.name }}
+                  </h5>
+                  <p class="card-text mb-0 opacity-90">
+                    <small>
+                      <i class="fas fa-code me-1"></i>
+                      {{ branch.code }}
+                    </small>
+                  </p>
+                </div>
+                <span 
+                  class="badge status-badge"
+                  [class]="branch.isActive ? 'bg-success' : 'bg-danger'"
+                >
+                  <i class="fas" [ngClass]="getStatusIcon(branch.isActive)"></i>
+                  {{ getStatusText(branch.isActive) }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Branch Body -->
+            <div class="card-body">
+              <!-- Timezone Info -->
+              <div class="mb-3">
+                <small class="text-muted">
+                  <i class="fas fa-clock me-1"></i>
+                  {{ t('branches.timezone') }}: {{ branch.timeZone }}
+                </small>
+              </div>
+
+              <!-- Statistics -->
+              <div class="stats-grid">
+                <div class="stat-item">
+                  <div class="stat-number">{{ branch.employeeCount }}</div>
+                  <div class="stat-label">{{ t('branches.employees') }}</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-number">{{ branch.departmentCount }}</div>
+                  <div class="stat-label">{{ t('branches.departments') }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Branch Footer -->
+            <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+              <small class="text-muted">
+                <i class="fas fa-calendar-plus me-1"></i>
+                {{ t('common.created') }}: {{ formatDate(branch.createdAtUtc) }}
+              </small>
+              
+              <div class="btn-group" role="group">
+                <button 
+                  *appHasPermission="PERMISSIONS.BRANCH_UPDATE"
+                  class="btn btn-sm btn-outline-primary"
+                  (click)="onEditBranch(branch)"
+                  [title]="t('common.edit')"
+                >
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button 
+                  *appHasPermission="PERMISSIONS.BRANCH_DELETE"
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="onDeleteBranch(branch)"
+                  [title]="t('common.delete')"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-container">
+      <!-- Results Info -->
+      <div class="text-muted">
+        {{ t('common.showing') }} 
+        {{ ((currentPage() - 1) * pageSize()) + 1 }} - 
+        {{ getEndCount() }} 
+        {{ t('common.of') }} 
+        {{ totalCount() }} 
+        {{ t('branches.results') }}
+      </div>
+
+      <!-- Page Size Selector -->
+      <div class="page-size-selector">
+        <label for="pageSize" class="form-label mb-0">{{ t('common.show') }}:</label>
+        <select
+          id="pageSize"
+          class="form-select form-select-sm"
+          [value]="pageSize()"
+          (change)="pageSize.set(+$any($event.target).value); onPageSizeChange()"
+        >
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="50">50</option>
+        </select>
+        <span class="text-muted">{{ t('common.per_page') }}</span>
+      </div>
+
+      <!-- Pagination Controls -->
+      @if (totalPages() > 1) {
+        <nav aria-label="Branches pagination">
+          <ul class="pagination mb-0">
+            <!-- Previous -->
+            <li class="page-item" [class.disabled]="currentPage() === 1">
+              <button 
+                class="page-link" 
+                (click)="onPageChange(currentPage() - 1)"
+                [disabled]="currentPage() === 1"
+              >
+                <i class="fas fa-chevron-left"></i>
+              </button>
+            </li>
+
+            <!-- Page Numbers -->
+            @for (page of getPaginationArray(); track page) {
+              <li class="page-item" [class.active]="page === currentPage()">
+                <button class="page-link" (click)="onPageChange(page)">
+                  {{ page }}
+                </button>
+              </li>
+            }
+
+            <!-- Next -->
+            <li class="page-item" [class.disabled]="currentPage() === totalPages()">
+              <button 
+                class="page-link" 
+                (click)="onPageChange(currentPage() + 1)"
+                [disabled]="currentPage() === totalPages()"
+              >
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </li>
+          </ul>
+        </nav>
+      }
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!loading() && branches().length === 0) {
+    <div class="text-center py-5">
+      <i class="fas fa-code-branch fa-4x text-muted mb-3"></i>
+      <h5>{{ t('branches.no_branches_found') }}</h5>
+      <p class="text-muted">{{ t('branches.no_branches_message') }}</p>
+    </div>
+  }
+</div>
+
+<!-- Create Branch Modal -->
+@if (showCreateModal()) {
+  <div class="modal fade show" style="display: block;" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="fas fa-plus me-2"></i>
+            {{ t('branches.create_branch') }}
+          </h5>
+          <button type="button" class="btn-close" (click)="onCloseModal()"></button>
+        </div>
+        <div class="modal-body">
+          <form (ngSubmit)="onSubmitCreate()">
+            <div class="mb-3">
+              <label for="createCode" class="form-label">{{ t('branches.code') }} <span class="text-danger">*</span></label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="createCode"
+                [(ngModel)]="branchForm.code"
+                name="code"
+                required
+                [placeholder]="t('branches.code_placeholder')"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="createName" class="form-label">{{ t('branches.name') }} <span class="text-danger">*</span></label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="createName"
+                [(ngModel)]="branchForm.name"
+                name="name"
+                required
+                [placeholder]="t('branches.name_placeholder')"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="createTimeZone" class="form-label">{{ t('branches.timezone') }} <span class="text-danger">*</span></label>
+              <select 
+                class="form-select" 
+                id="createTimeZone"
+                [(ngModel)]="branchForm.timeZone"
+                name="timeZone"
+                required
+              >
+                <option value="">Select timezone...</option>
+                @for (timezone of timezoneOptions; track timezone.value) {
+                  <option [value]="timezone.value">
+                    {{ timezone.label }} ({{ timezone.offset }})
+                  </option>
+                }
+              </select>
+            </div>
+            <div class="mb-3">
+              <div class="form-check">
+                <input 
+                  class="form-check-input" 
+                  type="checkbox" 
+                  id="createIsActive"
+                  [(ngModel)]="branchForm.isActive"
+                  name="isActive"
+                />
+                <label class="form-check-label" for="createIsActive">
+                  {{ t('common.active') }}
+                </label>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="onCloseModal()" [disabled]="submitting()">
+            {{ t('common.cancel') }}
+          </button>
+          <button 
+            type="button" 
+            class="btn btn-primary" 
+            (click)="onSubmitCreate()"
+            [disabled]="submitting() || !isFormValid()"
+          >
+            @if (submitting()) {
+              <span class="spinner-border spinner-border-sm me-2"></span>
+            }
+            {{ t('common.save') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show"></div>
+}
+
+<!-- Edit Branch Modal -->
+@if (showEditModal()) {
+  <div class="modal fade show" style="display: block;" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="fas fa-edit me-2"></i>
+            {{ t('branches.edit_branch') }}
+          </h5>
+          <button type="button" class="btn-close" (click)="onCloseModal()"></button>
+        </div>
+        <div class="modal-body">
+          <form (ngSubmit)="onSubmitEdit()">
+            <div class="mb-3">
+              <label for="editCode" class="form-label">{{ t('branches.code') }} <span class="text-danger">*</span></label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="editCode"
+                [(ngModel)]="branchForm.code"
+                name="code"
+                required
+                [placeholder]="t('branches.code_placeholder')"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="editName" class="form-label">{{ t('branches.name') }} <span class="text-danger">*</span></label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="editName"
+                [(ngModel)]="branchForm.name"
+                name="name"
+                required
+                [placeholder]="t('branches.name_placeholder')"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="editTimeZone" class="form-label">{{ t('branches.timezone') }} <span class="text-danger">*</span></label>
+              <select 
+                class="form-select" 
+                id="editTimeZone"
+                [(ngModel)]="branchForm.timeZone"
+                name="timeZone"
+                required
+              >
+                <option value="">Select timezone...</option>
+                @for (timezone of timezoneOptions; track timezone.value) {
+                  <option [value]="timezone.value">
+                    {{ timezone.label }} ({{ timezone.offset }})
+                  </option>
+                }
+              </select>
+            </div>
+            <div class="mb-3">
+              <div class="form-check">
+                <input 
+                  class="form-check-input" 
+                  type="checkbox" 
+                  id="editIsActive"
+                  [(ngModel)]="branchForm.isActive"
+                  name="isActive"
+                />
+                <label class="form-check-label" for="editIsActive">
+                  {{ t('common.active') }}
+                </label>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="onCloseModal()" [disabled]="submitting()">
+            {{ t('common.cancel') }}
+          </button>
+          <button 
+            type="button" 
+            class="btn btn-primary" 
+            (click)="onSubmitEdit()"
+            [disabled]="submitting() || !isFormValid()"
+          >
+            @if (submitting()) {
+              <span class="spinner-border spinner-border-sm me-2"></span>
+            }
+            {{ t('common.save') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show"></div>
+}
+
+<!-- Delete Confirmation Modal -->
+@if (showDeleteModal()) {
+  <div class="modal fade show" style="display: block;" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-danger">
+            <i class="fas fa-trash me-2"></i>
+            {{ t('branches.delete_branch') }}
+          </h5>
+          <button type="button" class="btn-close" (click)="onCloseModal()"></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-3">
+            {{ t('branches.delete_confirmation') }}
+          </p>
+          @if (selectedBranch()) {
+            <div class="card">
+              <div class="card-body">
+                <h6 class="card-title">{{ selectedBranch()!.name }}</h6>
+                <p class="card-text text-muted mb-0">
+                  <small>{{ t('branches.code') }}: {{ selectedBranch()!.code }}</small>
+                </p>
+              </div>
+            </div>
+          }
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="onCloseModal()" [disabled]="submitting()">
+            {{ t('common.cancel') }}
+          </button>
+          <button 
+            type="button" 
+            class="btn btn-danger" 
+            (click)="onConfirmDelete()"
+            [disabled]="submitting()"
+          >
+            @if (submitting()) {
+              <span class="spinner-border spinner-border-sm me-2"></span>
+            }
+            {{ t('common.delete') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show"></div>
+}

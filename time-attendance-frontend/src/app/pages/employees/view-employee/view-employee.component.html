@@ -1,0 +1,233 @@
+<div class="container-fluid">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2>{{ t('employees.view_details') }}</h2>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a routerLink="/dashboard">{{ t('dashboard.title') }}</a>
+          </li>
+          <li class="breadcrumb-item">
+            <a routerLink="/employees">{{ t('employees.title') }}</a>
+          </li>
+          <li class="breadcrumb-item active">{{ t('employees.view_details') }}</li>
+        </ol>
+      </nav>
+    </div>
+    <div class="btn-group">
+      <button 
+        *appHasPermission="PERMISSIONS.EMPLOYEE_UPDATE"
+        type="button" 
+        class="btn btn-primary"
+        (click)="onEdit()">
+        <i class="fa-solid fa-edit me-2"></i>
+        {{ t('employees.edit') }}
+      </button>
+      <button 
+        type="button" 
+        class="btn btn-outline-secondary"
+        (click)="onBack()">
+        <i class="fa-solid fa-arrow-left me-2"></i>
+        {{ t('common.back') }}
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="d-flex justify-content-center py-5">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">{{ t('common.loading') }}</span>
+      </div>
+    </div>
+  } @else if (employee()) {
+    <!-- Employee Details -->
+    <div class="row">
+      <!-- Main Information Card -->
+      <div class="col-lg-8">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">
+              <div class="d-flex align-items-center">
+                <div class="avatar-sm me-3">
+                  <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+                    {{ (employee()?.firstName?.charAt(0) || '')?.toUpperCase() }}{{ (employee()?.lastName?.charAt(0) || '')?.toUpperCase() }}
+                  </div>
+                </div>
+                <div>
+                  <div class="fw-medium">{{ employee()?.fullName }}</div>
+                  <small class="text-muted">{{ employee()?.employeeNumber }}</small>
+                </div>
+              </div>
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <!-- Basic Information -->
+              <div class="col-md-6">
+                <dl class="row">
+                  <dt class="col-sm-5">{{ t('employees.employee_number') }}:</dt>
+                  <dd class="col-sm-7">{{ employee()?.employeeNumber }}</dd>
+                  
+                  <dt class="col-sm-5">{{ t('employees.first_name') }}:</dt>
+                  <dd class="col-sm-7">{{ employee()?.firstName }}</dd>
+                  
+                  <dt class="col-sm-5">{{ t('employees.last_name') }}:</dt>
+                  <dd class="col-sm-7">{{ employee()?.lastName }}</dd>
+                  
+                  <dt class="col-sm-5">{{ t('employees.email') }}:</dt>
+                  <dd class="col-sm-7">{{ employee()?.email || '-' }}</dd>
+                  
+                  <dt class="col-sm-5">{{ t('employees.phone') }}:</dt>
+                  <dd class="col-sm-7">{{ employee()?.phone || '-' }}</dd>
+                  
+                  <dt class="col-sm-5">{{ t('employees.national_id') }}:</dt>
+                  <dd class="col-sm-7">{{ employee()?.nationalId || '-' }}</dd>
+                </dl>
+              </div>
+
+              <!-- Employment Information -->
+              <div class="col-md-6">
+                <dl class="row">
+                  <dt class="col-sm-5">{{ t('employees.job_title') }}:</dt>
+                  <dd class="col-sm-7">{{ employee()?.jobTitle }}</dd>
+                  
+                  <dt class="col-sm-5">{{ t('employees.branch') }}:</dt>
+                  <dd class="col-sm-7">{{ employee()?.branchName }}</dd>
+                  
+                  <dt class="col-sm-5">{{ t('employees.department') }}:</dt>
+                  <dd class="col-sm-7">{{ employee()?.departmentName || '-' }}</dd>
+                  
+                  <dt class="col-sm-5">{{ t('employees.manager') }}:</dt>
+                  <dd class="col-sm-7">{{ employee()?.managerName || '-' }}</dd>
+                  
+                  <dt class="col-sm-5">{{ t('employees.hire_date') }}:</dt>
+                  <dd class="col-sm-7">{{ formatDate(employee()!.hireDate) }}</dd>
+                  
+                  @if (employee()?.dateOfBirth) {
+                    <dt class="col-sm-5">{{ t('employees.date_of_birth') }}:</dt>
+                    <dd class="col-sm-7">{{ formatDate(employee()!.dateOfBirth!) }}</dd>
+                  }
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status and Details Card -->
+      <div class="col-lg-4">
+        <div class="card">
+          <div class="card-header">
+            <h6 class="card-title mb-0">{{ t('employees.employment_details') }}</h6>
+          </div>
+          <div class="card-body">
+            <!-- Status -->
+            <div class="mb-3">
+              <h6 class="fw-semibold">{{ t('common.status') }}</h6>
+              @if (employee()?.isActive) {
+                <span class="badge bg-success">{{ t('common.active') }}</span>
+              } @else {
+                <span class="badge bg-secondary">{{ t('common.inactive') }}</span>
+              }
+            </div>
+            
+            <!-- Employment Status -->
+            <div class="mb-3">
+              <h6 class="fw-semibold">{{ t('employees.employment_status.title') }}</h6>
+              <span class="badge bg-info">{{ getEmploymentStatusLabel(employee()!.employmentStatus) }}</span>
+            </div>
+
+            <!-- Work Location -->
+            <div class="mb-3">
+              <h6 class="fw-semibold">{{ t('employees.work_location.title') }}</h6>
+              <span class="badge bg-secondary">{{ getWorkLocationTypeLabel(employee()!.workLocationType) }}</span>
+            </div>
+
+            <!-- Gender -->
+            @if (employee()?.gender) {
+              <div class="mb-3">
+                <h6 class="fw-semibold">{{ t('employees.gender.title') }}</h6>
+                <span class="badge bg-light text-dark">{{ getGenderLabel(employee()!.gender!) }}</span>
+              </div>
+            }
+
+            <!-- Created Date -->
+            <div>
+              <h6 class="fw-semibold">{{ t('employees.created_at') }}</h6>
+              <small class="text-muted">{{ formatDate(employee()!.createdAtUtc) }}</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Arabic Names Card (if available) -->
+        @if (employee()?.firstNameAr || employee()?.lastNameAr || employee()?.jobTitleAr) {
+          <div class="card mt-3">
+            <div class="card-header">
+              <h6 class="card-title mb-0">{{ t('employees.arabic_names') }}</h6>
+            </div>
+            <div class="card-body">
+              @if (employee()?.firstNameAr) {
+                <div class="mb-2">
+                  <small class="text-muted">{{ t('employees.first_name_ar') }}</small><br>
+                  <span>{{ employee()?.firstNameAr }}</span>
+                </div>
+              }
+              @if (employee()?.lastNameAr) {
+                <div class="mb-2">
+                  <small class="text-muted">{{ t('employees.last_name_ar') }}</small><br>
+                  <span>{{ employee()?.lastNameAr }}</span>
+                </div>
+              }
+              @if (employee()?.jobTitleAr) {
+                <div>
+                  <small class="text-muted">{{ t('employees.job_title_ar') }}</small><br>
+                  <span>{{ employee()?.jobTitleAr }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Quick Actions Card -->
+        <div class="card mt-3">
+          <div class="card-header">
+            <h6 class="card-title mb-0">{{ t('common.actions') }}</h6>
+          </div>
+          <div class="card-body">
+            <div class="d-grid gap-2">
+              <button 
+                *appHasPermission="PERMISSIONS.EMPLOYEE_UPDATE"
+                type="button" 
+                class="btn btn-outline-primary"
+                (click)="onEdit()">
+                <i class="fa-solid fa-edit me-2"></i>
+                {{ t('employees.edit') }}
+              </button>
+              @if (employee()?.isActive) {
+                <button 
+                  type="button" 
+                  class="btn btn-outline-warning">
+                  <i class="fa-solid fa-user-slash me-2"></i>
+                  {{ t('employees.deactivate') }}
+                </button>
+              } @else {
+                <button 
+                  type="button" 
+                  class="btn btn-outline-success">
+                  <i class="fa-solid fa-user-check me-2"></i>
+                  {{ t('employees.activate') }}
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="alert alert-danger">
+      <i class="fa-solid fa-exclamation-triangle me-2"></i>
+      {{ error() || t('employees.employee_not_found') }}
+    </div>
+  }
+</div>

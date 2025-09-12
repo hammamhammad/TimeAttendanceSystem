@@ -1,0 +1,407 @@
+<div class="container-fluid">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2>{{ t('employees.create_employee') }}</h2>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a routerLink="/dashboard">{{ t('dashboard.title') }}</a>
+          </li>
+          <li class="breadcrumb-item">
+            <a routerLink="/employees">{{ t('employees.title') }}</a>
+          </li>
+          <li class="breadcrumb-item active">{{ t('employees.create_employee') }}</li>
+        </ol>
+      </nav>
+    </div>
+    <button 
+      type="button" 
+      class="btn btn-outline-secondary"
+      (click)="onCancel()"
+      [disabled]="submitting()">
+      <i class="fa-solid fa-arrow-left me-2"></i>
+      {{ t('common.back') }}
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="d-flex justify-content-center py-5">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">{{ t('common.loading') }}</span>
+      </div>
+    </div>
+  } @else {
+    <!-- Main Form -->
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">
+          <i class="fa-solid fa-user-plus me-2"></i>
+          {{ t('employees.employee_information') }}
+        </h5>
+      </div>
+      <div class="card-body">
+        <form [formGroup]="createForm" (ngSubmit)="onSubmit()">
+          <!-- Required Information Section -->
+          <div class="mb-4">
+            <h6 class="text-primary mb-3">
+              <i class="fa-solid fa-asterisk me-2"></i>
+              {{ t('employees.required_information') }}
+            </h6>
+            <div class="row g-3">
+              <!-- Branch -->
+              <div class="col-md-6">
+                <label class="form-label">
+                  {{ t('employees.branch') }}
+                  <span class="text-danger">*</span>
+                </label>
+                <select 
+                  class="form-select" 
+                  formControlName="branchId" 
+                  [class.is-invalid]="hasError('branchId')"
+                  (change)="onBranchChange(+$any($event.target).value)">
+                  <option value="">{{ t('common.select_branch') }}</option>
+                  @for (branch of branches(); track branch.id) {
+                    <option [value]="branch.id">{{ branch.name }}</option>
+                  }
+                </select>
+                @if (hasError('branchId')) {
+                  <div class="invalid-feedback">{{ getError('branchId') }}</div>
+                }
+              </div>
+
+              <!-- Employee Number -->
+              <div class="col-md-6">
+                <label class="form-label">
+                  {{ t('employees.employee_number') }}
+                  <span class="text-danger">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  formControlName="employeeNumber"
+                  [class.is-invalid]="hasError('employeeNumber')"
+                  [placeholder]="t('employees.employee_number_placeholder')">
+                @if (hasError('employeeNumber')) {
+                  <div class="invalid-feedback">{{ getError('employeeNumber') }}</div>
+                }
+                <div class="form-text">{{ t('employees.employee_number_hint') }}</div>
+              </div>
+
+              <!-- First Name -->
+              <div class="col-md-6">
+                <label class="form-label">
+                  {{ t('employees.first_name') }}
+                  <span class="text-danger">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  formControlName="firstName"
+                  [class.is-invalid]="hasError('firstName')"
+                  [placeholder]="t('employees.first_name_placeholder')">
+                @if (hasError('firstName')) {
+                  <div class="invalid-feedback">{{ getError('firstName') }}</div>
+                }
+              </div>
+
+              <!-- Last Name -->
+              <div class="col-md-6">
+                <label class="form-label">
+                  {{ t('employees.last_name') }}
+                  <span class="text-danger">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  formControlName="lastName"
+                  [class.is-invalid]="hasError('lastName')"
+                  [placeholder]="t('employees.last_name_placeholder')">
+                @if (hasError('lastName')) {
+                  <div class="invalid-feedback">{{ getError('lastName') }}</div>
+                }
+              </div>
+
+              <!-- Hire Date -->
+              <div class="col-md-6">
+                <label class="form-label">
+                  {{ t('employees.hire_date') }}
+                  <span class="text-danger">*</span>
+                </label>
+                <input 
+                  type="date" 
+                  class="form-control" 
+                  formControlName="hireDate"
+                  [class.is-invalid]="hasError('hireDate')">
+                @if (hasError('hireDate')) {
+                  <div class="invalid-feedback">{{ getError('hireDate') }}</div>
+                }
+              </div>
+
+              <!-- Job Title -->
+              <div class="col-md-6">
+                <label class="form-label">
+                  {{ t('employees.job_title') }}
+                  <span class="text-danger">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  formControlName="jobTitle"
+                  [class.is-invalid]="hasError('jobTitle')"
+                  [placeholder]="t('employees.job_title_placeholder')">
+                @if (hasError('jobTitle')) {
+                  <div class="invalid-feedback">{{ getError('jobTitle') }}</div>
+                }
+              </div>
+
+              <!-- Employment Status -->
+              <div class="col-md-6">
+                <label class="form-label">
+                  {{ t('employees.employment_status.title') }}
+                  <span class="text-danger">*</span>
+                </label>
+                <select 
+                  class="form-select" 
+                  formControlName="employmentStatus"
+                  [class.is-invalid]="hasError('employmentStatus')">
+                  @for (status of employmentStatusValues; track status) {
+                    <option [value]="status">{{ getEmploymentStatusLabel(status) }}</option>
+                  }
+                </select>
+                @if (hasError('employmentStatus')) {
+                  <div class="invalid-feedback">{{ getError('employmentStatus') }}</div>
+                }
+              </div>
+
+              <!-- Work Location -->
+              <div class="col-md-6">
+                <label class="form-label">
+                  {{ t('employees.work_location.title') }}
+                  <span class="text-danger">*</span>
+                </label>
+                <select 
+                  class="form-select" 
+                  formControlName="workLocationType"
+                  [class.is-invalid]="hasError('workLocationType')">
+                  @for (type of workLocationValues; track type) {
+                    <option [value]="type">{{ getWorkLocationTypeLabel(type) }}</option>
+                  }
+                </select>
+                @if (hasError('workLocationType')) {
+                  <div class="invalid-feedback">{{ getError('workLocationType') }}</div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <hr>
+
+          <!-- Optional Information Section -->
+          <div class="mb-4">
+            <h6 class="text-secondary mb-3">
+              <i class="fa-solid fa-info-circle me-2"></i>
+              {{ t('employees.additional_information') }}
+            </h6>
+            <div class="row g-3">
+              <!-- Arabic Names -->
+              <div class="col-md-6">
+                <label class="form-label">{{ t('employees.first_name_ar') }}</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  formControlName="firstNameAr"
+                  [class.is-invalid]="hasError('firstNameAr')"
+                  [placeholder]="t('employees.first_name_ar_placeholder')">
+                @if (hasError('firstNameAr')) {
+                  <div class="invalid-feedback">{{ getError('firstNameAr') }}</div>
+                }
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">{{ t('employees.last_name_ar') }}</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  formControlName="lastNameAr"
+                  [class.is-invalid]="hasError('lastNameAr')"
+                  [placeholder]="t('employees.last_name_ar_placeholder')">
+                @if (hasError('lastNameAr')) {
+                  <div class="invalid-feedback">{{ getError('lastNameAr') }}</div>
+                }
+              </div>
+
+              <!-- Job Title Arabic -->
+              <div class="col-md-6">
+                <label class="form-label">{{ t('employees.job_title_ar') }}</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  formControlName="jobTitleAr"
+                  [class.is-invalid]="hasError('jobTitleAr')"
+                  [placeholder]="t('employees.job_title_ar_placeholder')">
+                @if (hasError('jobTitleAr')) {
+                  <div class="invalid-feedback">{{ getError('jobTitleAr') }}</div>
+                }
+              </div>
+
+              <!-- National ID -->
+              <div class="col-md-6">
+                <label class="form-label">{{ t('employees.national_id') }}</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  formControlName="nationalId"
+                  [class.is-invalid]="hasError('nationalId')"
+                  [placeholder]="t('employees.national_id_placeholder')">
+                @if (hasError('nationalId')) {
+                  <div class="invalid-feedback">{{ getError('nationalId') }}</div>
+                }
+                <div class="form-text">{{ t('employees.national_id_hint') }}</div>
+              </div>
+
+              <!-- Email -->
+              <div class="col-md-6">
+                <label class="form-label">{{ t('employees.email') }}</label>
+                <input 
+                  type="email" 
+                  class="form-control" 
+                  formControlName="email"
+                  [class.is-invalid]="hasError('email')"
+                  [placeholder]="t('employees.email_placeholder')">
+                @if (hasError('email')) {
+                  <div class="invalid-feedback">{{ getError('email') }}</div>
+                }
+              </div>
+
+              <!-- Phone -->
+              <div class="col-md-6">
+                <label class="form-label">{{ t('employees.phone') }}</label>
+                <input 
+                  type="tel" 
+                  class="form-control" 
+                  formControlName="phone"
+                  [class.is-invalid]="hasError('phone')"
+                  [placeholder]="t('employees.phone_placeholder')">
+                @if (hasError('phone')) {
+                  <div class="invalid-feedback">{{ getError('phone') }}</div>
+                }
+              </div>
+
+              <!-- Date of Birth -->
+              <div class="col-md-6">
+                <label class="form-label">{{ t('employees.date_of_birth') }}</label>
+                <input 
+                  type="date" 
+                  class="form-control" 
+                  formControlName="dateOfBirth"
+                  [class.is-invalid]="hasError('dateOfBirth')">
+                @if (hasError('dateOfBirth')) {
+                  <div class="invalid-feedback">{{ getError('dateOfBirth') }}</div>
+                }
+                <div class="form-text">{{ t('employees.minimum_age_hint') }}</div>
+              </div>
+
+              <!-- Gender -->
+              <div class="col-md-6">
+                <label class="form-label">{{ t('employees.gender.title') }}</label>
+                <select 
+                  class="form-select" 
+                  formControlName="gender"
+                  [class.is-invalid]="hasError('gender')">
+                  <option value="">{{ t('common.select') }}</option>
+                  @for (gender of genderValues; track gender) {
+                    <option [value]="gender">{{ getGenderLabel(gender) }}</option>
+                  }
+                </select>
+                @if (hasError('gender')) {
+                  <div class="invalid-feedback">{{ getError('gender') }}</div>
+                }
+              </div>
+
+              <!-- Department -->
+              <div class="col-md-6">
+                <label class="form-label">{{ t('employees.department') }}</label>
+                <select 
+                  class="form-select" 
+                  formControlName="departmentId"
+                  [class.is-invalid]="hasError('departmentId')"
+                  [disabled]="departments().length === 0">
+                  <option value="">{{ t('common.select_department') }}</option>
+                  @for (dept of departments(); track dept.id) {
+                    <option [value]="dept.id">{{ dept.name }}</option>
+                  }
+                </select>
+                @if (hasError('departmentId')) {
+                  <div class="invalid-feedback">{{ getError('departmentId') }}</div>
+                }
+                @if (departments().length === 0) {
+                  <div class="form-text text-muted">{{ t('employees.select_branch_first') }}</div>
+                }
+              </div>
+
+              <!-- Manager -->
+              <div class="col-md-6">
+                <label class="form-label">{{ t('employees.manager') }}</label>
+                <select 
+                  class="form-select" 
+                  formControlName="managerEmployeeId"
+                  [class.is-invalid]="hasError('managerEmployeeId')"
+                  [disabled]="managers().length === 0">
+                  <option value="">{{ t('common.select_manager') }}</option>
+                  @for (manager of managers(); track manager.id) {
+                    <option [value]="manager.id">{{ manager.name }} ({{ manager.employeeNumber }})</option>
+                  }
+                </select>
+                @if (hasError('managerEmployeeId')) {
+                  <div class="invalid-feedback">{{ getError('managerEmployeeId') }}</div>
+                }
+                @if (managers().length === 0) {
+                  <div class="form-text text-muted">{{ t('employees.select_branch_first') }}</div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Validation Rules Info -->
+          <div class="alert alert-info">
+            <h6 class="alert-heading">
+              <i class="fa-solid fa-info-circle me-2"></i>
+              {{ t('employees.validation_rules.title') }}
+            </h6>
+            <ul class="mb-0">
+              <li>{{ t('employees.validation_rules.employee_number') }}</li>
+              <li>{{ t('employees.validation_rules.names') }}</li>
+              <li>{{ t('employees.validation_rules.email') }}</li>
+              <li>{{ t('employees.validation_rules.phone') }}</li>
+              <li>{{ t('employees.validation_rules.national_id') }}</li>
+              <li>{{ t('employees.validation_rules.age') }}</li>
+            </ul>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="d-flex justify-content-end gap-2">
+            <button 
+              type="button" 
+              class="btn btn-outline-secondary"
+              (click)="onCancel()"
+              [disabled]="submitting()">
+              <i class="fa-solid fa-times me-2"></i>
+              {{ t('common.cancel') }}
+            </button>
+            <button 
+              type="submit" 
+              class="btn btn-primary"
+              [disabled]="createForm.invalid || submitting()">
+              @if (submitting()) {
+                <div class="spinner-border spinner-border-sm me-2"></div>
+              } @else {
+                <i class="fa-solid fa-save me-2"></i>
+              }
+              {{ submitting() ? t('common.saving') : t('employees.create_employee') }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }

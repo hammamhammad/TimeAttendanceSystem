@@ -1,0 +1,115 @@
+@if (show && user) {
+  <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-md">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="fa-solid fa-user-tag me-2"></i>
+            {{ t('users.manage_roles') }}
+          </h5>
+          <button type="button" class="btn-close" (click)="closeModal()"></button>
+        </div>
+        
+        <div class="modal-body">
+          @if (error()) {
+            <div class="alert alert-danger" role="alert">
+              <i class="fa-solid fa-exclamation-triangle me-2"></i>
+              {{ error() }}
+            </div>
+          }
+
+          <!-- User Info -->
+          <div class="user-info mb-4">
+            <div class="d-flex align-items-center">
+              <div class="avatar-md me-3">
+                <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+                  {{ user.username.charAt(0).toUpperCase() }}
+                </div>
+              </div>
+              <div>
+                <h6 class="mb-1">{{ user.username }}</h6>
+                <p class="text-muted mb-0">{{ user.email }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Current Roles -->
+          <div class="current-roles mb-4">
+            <h6 class="mb-2">{{ t('users.current_roles') }}</h6>
+            @if (user.roles.length > 0) {
+              <div class="d-flex flex-wrap gap-2">
+                @for (roleName of user.roles; track roleName) {
+                  <span class="badge bg-primary">{{ roleName }}</span>
+                }
+              </div>
+            } @else {
+              <p class="text-muted mb-0">{{ t('users.no_roles') }}</p>
+            }
+          </div>
+
+          <!-- Available Roles -->
+          <div class="available-roles" *appHasPermission="PERMISSIONS.USER_ASSIGN_ROLE">
+            <h6 class="mb-3">{{ t('users.available_roles') }}</h6>
+            
+            @if (loading()) {
+              <div class="text-center py-3">
+                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                  <span class="visually-hidden">{{ t('common.loading') }}</span>
+                </div>
+                <p class="text-muted mt-2 mb-0">{{ t('users.updating_roles') }}</p>
+              </div>
+            } @else {
+              <div class="roles-list">
+                @for (role of availableRoles(); track role.id) {
+                  <div class="role-item" [class.loading]="loading()">
+                    <div class="form-check d-flex align-items-start">
+                      <input
+                        *appHasPermission="PERMISSIONS.USER_ASSIGN_ROLE"
+                        class="form-check-input mt-1"
+                        type="checkbox"
+                        [id]="'role-' + role.id"
+                        [checked]="isRoleAssigned(role.id)"
+                        [disabled]="loading()"
+                        (change)="onToggleRole(role)"
+                      />
+                      <div class="form-check-content ms-2 flex-grow-1">
+                        <label class="form-check-label fw-medium" [for]="'role-' + role.id">
+                          <span class="badge me-2" [class]="getRoleBadgeClass(role)">
+                            {{ role.name }}
+                          </span>
+                        </label>
+                        @if (getRoleDescription(role)) {
+                          <p class="text-muted small mb-0">
+                            {{ getRoleDescription(role) }}
+                          </p>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Help Text -->
+          <div class="alert alert-info mt-3" role="alert" *appHasPermission="PERMISSIONS.USER_ASSIGN_ROLE">
+            <i class="fa-solid fa-info-circle me-2"></i>
+            <small>{{ t('users.role_management_help') }}</small>
+          </div>
+
+          <!-- No Permission Message -->
+          <div class="alert alert-warning mt-3" role="alert" *ngIf="!permissionService.has(PERMISSIONS.USER_ASSIGN_ROLE)">
+            <i class="fa-solid fa-lock me-2"></i>
+            <small>{{ t('users.no_role_assignment_permission') }}</small>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">
+            {{ t('common.close') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

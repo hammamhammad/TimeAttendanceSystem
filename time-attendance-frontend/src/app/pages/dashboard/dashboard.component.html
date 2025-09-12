@@ -1,0 +1,151 @@
+<div class="dashboard-container">
+  <!-- Welcome Section -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="welcome-card p-4 rounded">
+        <h2 class="mb-2">
+          {{ t('common.welcome') }}{{ currentUser()?.username ? ', ' + currentUser()?.username : '' }}!
+        </h2>
+        <p class="text-muted mb-0">{{ t('dashboard.welcome_message') }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  @if (loading()) {
+    <div class="row">
+      @for (item of [1,2,3,4]; track $index) {
+        <div class="col-xl-3 col-md-6 mb-4">
+          <div class="card">
+            <div class="card-body">
+              <div class="d-flex align-items-center">
+                <div class="placeholder-glow flex-grow-1">
+                  <span class="placeholder col-8"></span>
+                  <span class="placeholder col-4"></span>
+                </div>
+                <div class="placeholder-glow">
+                  <span class="placeholder col-12" style="width: 40px; height: 40px;"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="row">
+      @for (card of dashboardCards(); track card.title) {
+        <div class="col-xl-3 col-md-6 mb-4">
+          <div class="card border-start-4" [class]="getCardColorClass(card.color)">
+            <div class="card-body">
+              <div class="row no-gutters align-items-center">
+                <div class="col me-2">
+                  <div class="text-xs font-weight-bold text-uppercase mb-1 text-muted">
+                    {{ card.title }}
+                  </div>
+                  <div class="h5 mb-0 font-weight-bold text-gray-800">
+                    {{ card.value }}
+                  </div>
+                </div>
+                <div class="col-auto">
+                  <i class="{{ card.icon }} fa-2x" [class]="'text-' + card.color"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Recent Activities -->
+  <div class="row">
+    <div class="col-lg-8 mb-4">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h6 class="m-0 font-weight-bold text-primary">{{ t('dashboard.recent_activities') }}</h6>
+          <button class="btn btn-sm btn-outline-primary">
+            <i class="fa-solid fa-refresh me-1"></i>
+            {{ t('common.refresh') }}
+          </button>
+        </div>
+        <div class="card-body">
+          @if (loading()) {
+            <div class="placeholder-glow">
+              @for (item of [1,2,3,4,5]; track $index) {
+                <div class="d-flex mb-3">
+                  <span class="placeholder col-1 me-3"></span>
+                  <div class="flex-grow-1">
+                    <span class="placeholder col-8 mb-1"></span>
+                    <span class="placeholder col-4"></span>
+                  </div>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="activity-list">
+              <div class="activity-item d-flex align-items-center mb-3">
+                <div class="activity-icon bg-primary">
+                  <i class="fa-solid fa-user-plus text-white"></i>
+                </div>
+                <div class="activity-content ms-3">
+                  <div class="activity-text">New user "john.doe" was created</div>
+                  <div class="activity-time text-muted">2 minutes ago</div>
+                </div>
+              </div>
+              
+              <div class="activity-item d-flex align-items-center mb-3">
+                <div class="activity-icon bg-success">
+                  <i class="fa-solid fa-clock text-white"></i>
+                </div>
+                <div class="activity-content ms-3">
+                  <div class="activity-text">Employee "Jane Smith" checked in</div>
+                  <div class="activity-time text-muted">5 minutes ago</div>
+                </div>
+              </div>
+              
+              <div class="activity-item d-flex align-items-center mb-3">
+                <div class="activity-icon bg-warning">
+                  <i class="fa-solid fa-exclamation-triangle text-white"></i>
+                </div>
+                <div class="activity-content ms-3">
+                  <div class="activity-text">Late arrival detected for "Mike Johnson"</div>
+                  <div class="activity-time text-muted">10 minutes ago</div>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="col-lg-4 mb-4">
+      <div class="card">
+        <div class="card-header">
+          <h6 class="m-0 font-weight-bold text-primary">{{ t('dashboard.quick_actions') }}</h6>
+        </div>
+        <div class="card-body">
+          <div class="d-grid gap-2">
+            <button class="btn btn-outline-primary">
+              <i class="fa-solid fa-user-plus me-2"></i>
+              {{ t('users.create_user') }}
+            </button>
+            <button class="btn btn-outline-success">
+              <i class="fa-solid fa-user-tie me-2"></i>
+              {{ t('employees.add_employee') }}
+            </button>
+            <button class="btn btn-outline-info">
+              <i class="fa-solid fa-chart-line me-2"></i>
+              {{ t('dashboard.view_reports') }}
+            </button>
+            <button class="btn btn-outline-secondary">
+              <i class="fa-solid fa-cog me-2"></i>
+              {{ t('nav.settings') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

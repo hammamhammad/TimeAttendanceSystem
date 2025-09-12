@@ -1,0 +1,288 @@
+<div class="roles-page">
+  <!-- Page Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>{{ t('roles.title') }}</h2>
+    <button 
+      *appHasPermission="PERMISSIONS.ROLE_CREATE"
+      class="btn btn-primary"
+      (click)="onCreateRole()">
+      <i class="fa-solid fa-plus me-2"></i>
+      {{ t('roles.create_role') }}
+    </button>
+  </div>
+
+  <!-- Filters Card -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-8">
+          <label class="form-label">{{ t('common.search') }}</label>
+          <div class="input-group">
+            <span class="input-group-text">
+              <i class="fa-solid fa-search"></i>
+            </span>
+            <input 
+              type="text" 
+              class="form-control" 
+              [placeholder]="t('roles.search_placeholder')"
+              [(ngModel)]="searchTerm"
+              (input)="onSearchChange()"
+            />
+          </div>
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+          <button class="btn btn-outline-secondary" (click)="onClearFilters()">
+            <i class="fa-solid fa-filter-circle-xmark me-1"></i>
+            {{ t('common.clear') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Roles Table Card -->
+  <div class="card">
+    <div class="card-body">
+      @if (loading()) {
+        <div class="text-center py-4">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">{{ t('common.loading') }}</span>
+          </div>
+          <p class="mt-2 text-muted">{{ t('common.loading') }}</p>
+        </div>
+      } @else if (filteredRoles().length === 0) {
+        <div class="text-center py-4">
+          <i class="fa-solid fa-user-shield fa-3x text-muted mb-3"></i>
+          <p class="text-muted">{{ t('roles.no_roles_found') }}</p>
+          @if (hasActiveFilters()) {
+            <button class="btn btn-outline-primary" (click)="onClearFilters()">
+              {{ t('common.clear_filters') }}
+            </button>
+          }
+        </div>
+      } @else {
+        <!-- Table -->
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>{{ t('roles.name') }}</th>
+                <th>{{ t('roles.permissions') }}</th>
+                <th>{{ t('roles.user_count') }}</th>
+                <th>{{ t('roles.type') }}</th>
+                <th>{{ t('roles.created_at') }}</th>
+                <th width="120">{{ t('common.actions') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (role of filteredRoles(); track role.id) {
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div class="avatar-sm me-2">
+                        <div class="avatar-title bg-info-subtle text-info rounded-circle">
+                          <i class="fa-solid fa-user-shield"></i>
+                        </div>
+                      </div>
+                      <div>
+                        <div class="fw-medium">
+                          {{ role.name }}
+                          @if (role.isSystem) {
+                            <i class="fa-solid fa-shield-alt text-primary ms-1" [title]="t('roles.system_role')"></i>
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    @if (role.permissions.length > 0) {
+                      <div class="d-flex flex-wrap gap-1">
+                        @for (permission of role.permissions | slice:0:3; track permission.key || permission.id) {
+                          <span class="badge bg-secondary-subtle text-secondary small">{{ permission.key }}</span>
+                        }
+                        @if (role.permissions.length > 3) {
+                          <span class="badge bg-light text-dark small">+{{ role.permissions.length - 3 }} more</span>
+                        }
+                      </div>
+                    } @else {
+                      <span class="text-muted">{{ t('roles.no_permissions') }}</span>
+                    }
+                  </td>
+                  <td>
+                    <span class="badge bg-primary-subtle text-primary">{{ role.userCount }}</span>
+                  </td>
+                  <td>
+                    @if (role.isSystem) {
+                      <span class="badge bg-warning-subtle text-warning">{{ t('roles.system') }}</span>
+                    } @else {
+                      <span class="badge bg-success-subtle text-success">{{ t('roles.custom') }}</span>
+                    }
+                  </td>
+                  <td>{{ formatDate(role.createdAtUtc) }}</td>
+                  <td>
+                    <div class="btn-group" role="group">
+                      <!-- View Role Button -->
+                      <button 
+                        *appHasPermission="PERMISSIONS.ROLE_READ"
+                        class="btn btn-sm btn-outline-primary"
+                        [title]="t('common.view')"
+                        (click)="onViewRole(role)"
+                      >
+                        <i class="fa-solid fa-eye"></i>
+                      </button>
+                      
+                      <!-- Manage Permissions Button -->
+                      @if (canManagePermissions(role)) {
+                        <button 
+                          *appHasPermission="PERMISSIONS.ROLE_ASSIGN_PERMISSIONS"
+                          class="btn btn-sm btn-outline-info"
+                          [title]="t('roles.manage_permissions')"
+                          (click)="onManagePermissions(role)"
+                        >
+                          <i class="fa-solid fa-key"></i>
+                        </button>
+                      }
+                      
+                      <!-- Edit Role Button -->
+                      @if (canEditRole(role)) {
+                        <button 
+                          *appHasPermission="PERMISSIONS.ROLE_UPDATE"
+                          class="btn btn-sm btn-outline-warning"
+                          [title]="t('common.edit')"
+                          (click)="onEditRole(role)"
+                        >
+                          <i class="fa-solid fa-edit"></i>
+                        </button>
+                      }
+                      
+                      <!-- Delete Role Button -->
+                      @if (canDeleteRole(role)) {
+                        <button 
+                          *appHasPermission="PERMISSIONS.ROLE_DELETE"
+                          class="btn btn-sm btn-outline-danger"
+                          [title]="t('common.delete')"
+                          (click)="onDeleteRole(role)"
+                        >
+                          <i class="fa-solid fa-trash"></i>
+                        </button>
+                      }
+                      
+                      <!-- Protected Role Indicator -->
+                      @if (isProtectedRole(role)) {
+                        <span 
+                          class="btn btn-sm btn-outline-secondary disabled"
+                          [title]="t('roles.protected_role')"
+                        >
+                          <i class="fa-solid fa-shield-alt"></i>
+                        </span>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Permission Management Modal -->
+@if (showPermissionsModal()) {
+  <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="fa-solid fa-key me-2"></i>
+            {{ t('roles.manage_permissions_for') }}: {{ selectedRole()?.name }}
+          </h5>
+          <button type="button" class="btn-close" (click)="closePermissionsModal()"></button>
+        </div>
+        
+        <div class="modal-body">
+          @if (selectedRole()) {
+            <!-- Role Info -->
+            <div class="role-info mb-4">
+              <div class="d-flex align-items-center">
+                <div class="avatar-md me-3">
+                  <div class="avatar-title bg-info-subtle text-info rounded-circle">
+                    <i class="fa-solid fa-user-shield"></i>
+                  </div>
+                </div>
+                <div>
+                  <h6 class="mb-1">{{ selectedRole()!.name }}</h6>
+                  <p class="text-muted mb-0">
+                    {{ selectedRole()!.permissions.length }} {{ t('roles.permissions_assigned') }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- All Permissions List -->
+            <div class="permissions-list border rounded p-3" style="max-height: 400px; overflow-y: auto;">
+              <div class="row g-2">
+                @for (permission of allPermissions(); track permission.id) {
+                  <div class="col-md-6 col-lg-4">
+                    <div class="permission-item border rounded p-2" 
+                         [class.bg-light]="isPermissionAssigned(permission.id)"
+                         [class.loading]="managingPermissions()">
+                      <div class="form-check d-flex align-items-start">
+                        <input
+                          class="form-check-input mt-1"
+                          type="checkbox"
+                          [id]="'permission-' + permission.id"
+                          [checked]="isPermissionAssigned(permission.id)"
+                          [disabled]="managingPermissions()"
+                          (change)="onTogglePermission(permission)"
+                        />
+                        <div class="form-check-content ms-2 flex-grow-1">
+                          <div class="d-flex align-items-center mb-1">
+                            <i class="fas me-1 text-muted" [ngClass]="getPermissionIcon(permission.key)" style="font-size: 0.75rem;"></i>
+                            <label class="form-check-label fw-medium me-2" [for]="'permission-' + permission.id">
+                              <small>{{ getPermissionResource(permission.key) }}</small>
+                            </label>
+                            <span class="badge" [ngClass]="getActionBadgeClass(permission.key)" style="font-size: 0.65rem;">
+                              {{ getPermissionAction(permission.key) }}
+                            </span>
+                          </div>
+                          <p class="text-muted small mb-0" style="font-size: 0.7rem; margin-left: 1.25rem;">
+                            {{ getPermissionDescription(permission) }}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+              
+              @if (allPermissions().length === 0) {
+                <div class="text-center py-4">
+                  <i class="fa-solid fa-key fa-2x text-muted mb-2"></i>
+                  <p class="text-muted mb-0">{{ t('roles.no_permissions_available') }}</p>
+                </div>
+              }
+            </div>
+
+            @if (managingPermissions()) {
+              <div class="text-center py-3">
+                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                  <span class="visually-hidden">{{ t('common.loading') }}</span>
+                </div>
+                <p class="text-muted mt-2 mb-0">{{ t('roles.updating_permissions') }}</p>
+              </div>
+            }
+          }
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closePermissionsModal()">
+            {{ t('common.close') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
