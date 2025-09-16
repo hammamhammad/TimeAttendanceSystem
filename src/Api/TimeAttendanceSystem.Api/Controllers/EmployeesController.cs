@@ -6,6 +6,7 @@ using TimeAttendanceSystem.Application.Employees.Commands.UpdateEmployee;
 using TimeAttendanceSystem.Application.Employees.Commands.DeleteEmployee;
 using TimeAttendanceSystem.Application.Employees.Queries.GetEmployees;
 using TimeAttendanceSystem.Application.Employees.Queries.GetEmployeeById;
+using TimeAttendanceSystem.Application.ShiftAssignments.Commands.UpdateEmployeeShift;
 using TimeAttendanceSystem.Domain.Common;
 
 namespace TimeAttendanceSystem.Api.Controllers;
@@ -270,6 +271,38 @@ public class EmployeesController : ControllerBase
 
         return NoContent();
     }
+
+    /// <summary>
+    /// Updates the current shift assignment for a specific employee.
+    /// Deactivates any existing active shift assignments and creates a new active assignment.
+    /// </summary>
+    /// <param name="id">Unique identifier of the employee whose shift is being updated</param>
+    /// <param name="request">Shift update request containing new shift information</param>
+    /// <returns>Confirmation of successful shift update operation</returns>
+    /// <response code="200">Employee shift updated successfully</response>
+    /// <response code="400">Invalid shift update request or validation errors</response>
+    /// <response code="404">Employee not found or access denied</response>
+    /// <response code="401">Unauthorized access - authentication required</response>
+    /// <response code="403">Forbidden - insufficient permissions for shift assignment</response>
+    [HttpPost("{id}/shift")]
+    public async Task<IActionResult> UpdateEmployeeShift(long id, [FromBody] UpdateEmployeeShiftRequest request)
+    {
+        var command = new UpdateEmployeeShiftCommand(
+            id,
+            request.ShiftId,
+            request.EffectiveDate,
+            request.Notes
+        );
+
+        var result = await _mediator.Send(command);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(new { error = result.Error });
+        }
+
+        return Ok(new { success = true, message = "Employee shift updated successfully" });
+    }
 }
 
 /// <summary>
@@ -350,4 +383,17 @@ public record UpdateEmployeeRequest(
     long? ManagerEmployeeId,
     WorkLocationType WorkLocationType,
     string? PhotoUrl
+);
+
+/// <summary>
+/// Request model for updating an employee's current shift assignment.
+/// Contains the new shift information and optional effective date and notes.
+/// </summary>
+/// <param name="ShiftId">The identifier of the new shift to assign to the employee</param>
+/// <param name="EffectiveDate">Optional effective date for the new shift assignment (defaults to today)</param>
+/// <param name="Notes">Optional notes about the shift change reason</param>
+public record UpdateEmployeeShiftRequest(
+    long ShiftId,
+    DateTime? EffectiveDate = null,
+    string? Notes = null
 );

@@ -55,16 +55,15 @@
                   {{ t('employees.branch') }}
                   <span class="text-danger">*</span>
                 </label>
-                <select 
-                  class="form-select" 
-                  formControlName="branchId" 
+                <app-searchable-select
+                  [options]="branchSelectOptions"
+                  [value]="createForm.get('branchId')?.value?.toString() || ''"
+                  (selectionChange)="onBranchSelectionChange($event)"
+                  [placeholder]="t('common.select_branch')"
+                  [searchable]="true"
+                  [clearable]="false"
                   [class.is-invalid]="hasError('branchId')"
-                  (change)="onBranchChange(+$any($event.target).value)">
-                  <option value="">{{ t('common.select_branch') }}</option>
-                  @for (branch of branches(); track branch.id) {
-                    <option [value]="branch.id">{{ branch.name }}</option>
-                  }
-                </select>
+                ></app-searchable-select>
                 @if (hasError('branchId')) {
                   <div class="invalid-feedback">{{ getError('branchId') }}</div>
                 }
@@ -322,16 +321,16 @@
               <!-- Department -->
               <div class="col-md-6">
                 <label class="form-label">{{ t('employees.department') }}</label>
-                <select 
-                  class="form-select" 
-                  formControlName="departmentId"
+                <app-searchable-select
+                  [options]="departmentSelectOptions"
+                  [value]="createForm.get('departmentId')?.value?.toString() || ''"
+                  (selectionChange)="onDepartmentSelectionChange($event)"
+                  [placeholder]="t('common.select_department')"
+                  [searchable]="true"
+                  [clearable]="false"
+                  [disabled]="departments().length === 0"
                   [class.is-invalid]="hasError('departmentId')"
-                  [disabled]="departments().length === 0">
-                  <option value="">{{ t('common.select_department') }}</option>
-                  @for (dept of departments(); track dept.id) {
-                    <option [value]="dept.id">{{ dept.name }}</option>
-                  }
-                </select>
+                ></app-searchable-select>
                 @if (hasError('departmentId')) {
                   <div class="invalid-feedback">{{ getError('departmentId') }}</div>
                 }
@@ -343,16 +342,16 @@
               <!-- Manager -->
               <div class="col-md-6">
                 <label class="form-label">{{ t('employees.manager') }}</label>
-                <select 
-                  class="form-select" 
-                  formControlName="managerEmployeeId"
+                <app-searchable-select
+                  [options]="managerSelectOptions"
+                  [value]="createForm.get('managerEmployeeId')?.value?.toString() || ''"
+                  (selectionChange)="onManagerSelectionChange($event)"
+                  [placeholder]="t('common.select_manager')"
+                  [searchable]="true"
+                  [clearable]="false"
+                  [disabled]="managers().length === 0"
                   [class.is-invalid]="hasError('managerEmployeeId')"
-                  [disabled]="managers().length === 0">
-                  <option value="">{{ t('common.select_manager') }}</option>
-                  @for (manager of managers(); track manager.id) {
-                    <option [value]="manager.id">{{ manager.name }} ({{ manager.employeeNumber }})</option>
-                  }
-                </select>
+                ></app-searchable-select>
                 @if (hasError('managerEmployeeId')) {
                   <div class="invalid-feedback">{{ getError('managerEmployeeId') }}</div>
                 }

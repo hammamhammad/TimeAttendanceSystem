@@ -6,5 +6,6 @@ namespace TimeAttendanceSystem.Application.Authorization.Commands.Login;
 public record LoginCommand(
     string Username,
     string Password,
-    string? DeviceInfo = null
+    string? DeviceInfo = null,
+    bool RememberMe = false
 ) : IRequest<Result<LoginResponse>>;

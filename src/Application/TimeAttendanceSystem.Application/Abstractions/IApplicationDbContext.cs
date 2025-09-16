@@ -3,6 +3,7 @@ using TimeAttendanceSystem.Domain.Branches;
 using TimeAttendanceSystem.Domain.Common;
 using TimeAttendanceSystem.Domain.Employees;
 using TimeAttendanceSystem.Domain.Users;
+using TimeAttendanceSystem.Domain.Shifts;
 
 namespace TimeAttendanceSystem.Application.Abstractions;
 
@@ -303,6 +304,53 @@ public interface IApplicationDbContext
     /// - User activity tracking and accountability
     /// </remarks>
     DbSet<AuditLog> AuditLogs { get; }
+
+    /// <summary>
+    /// Gets the database set for Shift entities representing work shift definitions.
+    /// Enables comprehensive shift management with flexible, multi-period, and hours-only support.
+    /// </summary>
+    /// <value>DbSet for querying and managing Shift entities</value>
+    /// <remarks>
+    /// Shift Entity Features:
+    /// - Time-based and hours-only shift types
+    /// - Flexible working hours with grace periods
+    /// - Night shift support spanning midnight
+    /// - Multi-period shifts with break scheduling
+    /// - Branch-scoped shift definitions
+    /// </remarks>
+    DbSet<Shift> Shifts { get; }
+
+    /// <summary>
+    /// Gets the database set for ShiftPeriod entities representing working time blocks within shifts.
+    /// Enables detailed time period management for complex shift patterns.
+    /// </summary>
+    /// <value>DbSet for querying and managing ShiftPeriod entities</value>
+    /// <remarks>
+    /// ShiftPeriod Entity Features:
+    /// - Detailed working time block definitions
+    /// - Start and end time management with hour calculations
+    /// - Night period detection for midnight-spanning shifts
+    /// - Multi-period shift support with ordering
+    /// - Automatic total hours calculation
+    /// </remarks>
+    DbSet<ShiftPeriod> ShiftPeriods { get; }
+
+
+    /// <summary>
+    /// Gets the database set for ShiftAssignment entities representing shift assignments to employees, departments, or branches.
+    /// Enables comprehensive shift assignment management with effective date tracking and hierarchical assignment support.
+    /// </summary>
+    /// <value>DbSet for querying and managing ShiftAssignment entities</value>
+    /// <remarks>
+    /// ShiftAssignment Entity Features:
+    /// - Multi-level assignment support: Employee, Department, and Branch levels
+    /// - Effective date management for future and historical assignments
+    /// - Assignment priority and override capabilities for conflict resolution
+    /// - Comprehensive audit trail and status tracking
+    /// - Automatic inheritance from department/branch to employee level
+    /// - Flexible assignment patterns supporting various business needs
+    /// </remarks>
+    DbSet<ShiftAssignment> ShiftAssignments { get; }
 
     /// <summary>
     /// Asynchronously saves all pending changes to the database.

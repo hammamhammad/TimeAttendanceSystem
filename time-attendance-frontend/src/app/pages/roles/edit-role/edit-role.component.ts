@@ -274,7 +274,7 @@ export class EditRoleComponent implements OnInit {
       this.loadPermissions();
       this.loadRole(roleId);
     } else {
-      this.error.set('Invalid role ID');
+      this.error.set(this.i18n.t('roles.invalid_role_id'));
       this.loading.set(false);
     }
   }
@@ -309,7 +309,7 @@ export class EditRoleComponent implements OnInit {
         this.allPermissions.set([]);
         this.notificationService.error(
           this.i18n.t('app.error'),
-          'Failed to load permissions'
+          this.i18n.t('roles.failed_to_load_permissions')
         );
       }
     });
@@ -345,7 +345,7 @@ export class EditRoleComponent implements OnInit {
         this.saving.set(false);
         this.notificationService.success(
           this.i18n.t('app.success'),
-          'Role updated successfully'
+          this.i18n.t('roles.role_updated_successfully')
         );
         this.router.navigate(['/roles', this.role()!.id, 'view']);
       },
@@ -433,7 +433,7 @@ export class EditRoleComponent implements OnInit {
   }
 
   getPermissionDescription(permission: any): string {
-    return permission.description || `${permission.key} permission`;
+    return permission.description || this.i18n.t('roles.no_description');
   }
 
   onCancel(): void {

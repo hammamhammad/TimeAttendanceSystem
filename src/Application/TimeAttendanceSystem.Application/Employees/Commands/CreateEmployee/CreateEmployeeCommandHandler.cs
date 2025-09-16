@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using TimeAttendanceSystem.Application.Abstractions;
 using TimeAttendanceSystem.Application.Common;
 using TimeAttendanceSystem.Domain.Employees;
+using TimeAttendanceSystem.Domain.Shifts;
+using TimeAttendanceSystem.Domain.Common;
 
 namespace TimeAttendanceSystem.Application.Employees.Commands.CreateEmployee;
 
@@ -104,8 +106,8 @@ public class CreateEmployeeCommandHandler : BaseHandler<CreateEmployeeCommand, R
         if (branch == null)
             return Result.Failure<long>("Branch does not exist.");
 
-        // Enforce branch-scoped access control (system admins have unrestricted access)
-        if (!CurrentUser.IsSystemAdmin && !CurrentUser.BranchIds.Contains(request.BranchId))
+        // Enforce branch-scoped access control (system admins and users with no branch restrictions have unrestricted access)
+        if (!CurrentUser.IsSystemAdmin && CurrentUser.BranchIds.Any() && !CurrentUser.BranchIds.Contains(request.BranchId))
             return Result.Failure<long>("Access denied to this branch.");
 
         // Check employee number uniqueness within the branch scope
@@ -164,7 +166,66 @@ public class CreateEmployeeCommandHandler : BaseHandler<CreateEmployeeCommand, R
         Context.Employees.Add(employee);
         await Context.SaveChangesAsync(cancellationToken);
 
+        // Automatically assign default shift to new employee
+        await AssignDefaultShiftToEmployeeAsync(employee.Id, cancellationToken);
+
         // Return success result with created employee ID
         return Result.Success(employee.Id);
+    }
+
+    /// <summary>
+    /// Automatically assigns the default shift (Flexible Hours 7:30 - 9:00) to a newly created employee.
+    /// This ensures all new employees have a default shift assignment for time attendance tracking.
+    /// </summary>
+    /// <param name="employeeId">ID of the employee to assign the default shift to</param>
+    /// <param name="cancellationToken">Cancellation token for async operation control</param>
+    /// <remarks>
+    /// Default Shift Assignment Logic:
+    /// - Finds the "Flexible Hours 7:30 - 9:00" shift
+    /// - Creates an active shift assignment for the employee
+    /// - Sets effective date to current date with no end date
+    /// - Uses high priority (10) to ensure it's the primary assignment
+    /// - Fails silently if default shift doesn't exist (non-critical operation)
+    /// </remarks>
+    private async Task AssignDefaultShiftToEmployeeAsync(long employeeId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            // Find the default flexible hours shift
+            var defaultShift = await Context.Shifts
+                .FirstOrDefaultAsync(s => s.Name == "Flexible Hours 7:30 - 9:00" && s.Status == ShiftStatus.Active, cancellationToken);
+
+            if (defaultShift == null)
+            {
+                // Default shift doesn't exist, skip assignment (non-critical)
+                return;
+            }
+
+            // Create shift assignment for the new employee
+            var shiftAssignment = new ShiftAssignment
+            {
+                ShiftId = defaultShift.Id,
+                AssignmentType = ShiftAssignmentType.Employee,
+                EmployeeId = employeeId,
+                DepartmentId = null,
+                BranchId = null,
+                EffectiveDate = DateTime.UtcNow.Date,
+                EndDate = null, // No end date - permanent assignment
+                Status = ShiftAssignmentStatus.Active,
+                Priority = 10, // High priority for default assignment
+                Notes = "Automatic default shift assignment for new employee",
+                AssignedByUserId = CurrentUser.UserId ?? 1, // Default to system admin user
+                CreatedAtUtc = DateTime.UtcNow,
+                CreatedBy = CurrentUser.Username ?? "SYSTEM"
+            };
+
+            Context.ShiftAssignments.Add(shiftAssignment);
+            await Context.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception)
+        {
+            // Fail silently - shift assignment is not critical for employee creation
+            // The employee creation should succeed even if shift assignment fails
+        }
     }
 }

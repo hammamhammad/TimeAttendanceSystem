@@ -4,6 +4,7 @@ using TimeAttendanceSystem.Domain.Branches;
 using TimeAttendanceSystem.Domain.Common;
 using TimeAttendanceSystem.Domain.Employees;
 using TimeAttendanceSystem.Domain.Users;
+using TimeAttendanceSystem.Domain.Shifts;
 
 namespace TimeAttendanceSystem.Infrastructure.Persistence;
 
@@ -33,6 +34,9 @@ public class ApplicationDbContextAdapter : IApplicationDbContext
     public DbSet<TwoFactorBackupCode> TwoFactorBackupCodes => _context.TwoFactorBackupCodes;
     public DbSet<UserSession> UserSessions => _context.UserSessions;
     public DbSet<AuditLog> AuditLogs => _context.AuditLogs;
+    public DbSet<Shift> Shifts => _context.Shifts;
+    public DbSet<ShiftPeriod> ShiftPeriods => _context.ShiftPeriods;
+    public DbSet<ShiftAssignment> ShiftAssignments => _context.ShiftAssignments;
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

@@ -148,9 +148,9 @@ public class LoginCommandHandler : BaseHandler<LoginCommand, Result<LoginRespons
         var branchIds = user.UserBranchScopes.Select(ubs => ubs.BranchId).ToList();
 
         // Generate JWT access and refresh tokens with user claims
-        var accessToken = _tokenGenerator.GenerateAccessToken(user, roles, permissions, branchIds);
+        var accessToken = _tokenGenerator.GenerateAccessToken(user, roles, permissions, branchIds, request.RememberMe);
         var refreshToken = _tokenGenerator.GenerateRefreshToken();
-        var expiresAt = _tokenGenerator.GetTokenExpiration();
+        var expiresAt = _tokenGenerator.GetTokenExpiration(request.RememberMe);
 
         // Reset security counters on successful authentication
         if (user.FailedLoginAttempts > 0)

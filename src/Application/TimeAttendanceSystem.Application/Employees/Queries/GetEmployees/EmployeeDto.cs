@@ -255,6 +255,20 @@ public class EmployeeDto
     public WorkLocationType WorkLocationType { get; set; }
 
     /// <summary>
+    /// Gets or sets the identifier of the employee's currently assigned shift.
+    /// Links to the active shift assignment for schedule management.
+    /// </summary>
+    /// <value>Current shift ID (optional if no shift assigned)</value>
+    public long? CurrentShiftId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the name of the employee's currently assigned shift.
+    /// Human-readable shift identification for display purposes.
+    /// </summary>
+    /// <value>Current shift name (optional if no shift assigned)</value>
+    public string? CurrentShiftName { get; set; }
+
+    /// <summary>
     /// Gets or sets the employee's active status for current workforce analysis.
     /// Indicates whether the employee is currently part of the active workforce.
     /// </summary>

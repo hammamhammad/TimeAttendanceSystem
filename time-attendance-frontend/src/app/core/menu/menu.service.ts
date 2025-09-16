@@ -50,6 +50,26 @@ export class MenuService {
       permission: 'department.read'
     },
     {
+      path: '/shifts',
+      titleKey: 'nav.shifts',
+      icon: 'fa-solid fa-clock',
+      permission: undefined, // Special handling in sidenav component
+      children: [
+        {
+          path: '/shifts',
+          titleKey: 'shifts.title',
+          icon: 'fa-solid fa-clock',
+          permission: 'shift.read'
+        },
+        {
+          path: '/shifts/assign',
+          titleKey: 'shifts.assignments.title',
+          icon: 'fa-solid fa-user-clock',
+          permission: 'shift.assign'
+        }
+      ]
+    },
+    {
       path: '/reports',
       titleKey: 'nav.reports',
       icon: 'fa-solid fa-chart-bar',

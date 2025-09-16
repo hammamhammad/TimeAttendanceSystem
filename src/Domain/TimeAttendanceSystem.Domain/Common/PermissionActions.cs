@@ -56,7 +56,7 @@ public static class PermissionActions
         { Assign, "Assign resources or relationships" },
         { Unassign, "Remove resource assignments" },
         { Manage, "Full management capabilities" },
-        { Configure, "Configure settings and parameters" }
+        { Configure, "Configure settings and parameters" },
     };
 
     public static readonly Dictionary<string, string> ActionColors = new()
@@ -86,7 +86,7 @@ public static class PermissionActions
         { Assign, "info" },
         { Unassign, "warning" },
         { Manage, "primary" },
-        { Configure, "primary" }
+        { Configure, "primary" },
     };
     
     public static string GetActionDescription(string action)

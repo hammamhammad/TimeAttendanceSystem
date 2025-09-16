@@ -1,4 +1,4 @@
-import { Component, signal, inject, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, signal, inject, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { I18nService } from '../../../core/i18n/i18n.service';
@@ -20,13 +20,14 @@ interface SortConfig {
   templateUrl: './department-table.component.html',
   styleUrls: ['./department-table.component.css']
 })
-export class DepartmentTableComponent implements OnInit {
+export class DepartmentTableComponent implements OnInit, OnChanges {
   @Input() selectedBranchId?: number;
   @Input() allowSelection = true;
   @Input() allowEdit = true;
   @Input() allowDelete = true;
   @Input() showControls = true;
   @Output() departmentSelected = new EventEmitter<DepartmentDto>();
+  @Output() departmentView = new EventEmitter<DepartmentDto>();
   @Output() departmentEdit = new EventEmitter<DepartmentDto>();
   @Output() departmentDelete = new EventEmitter<DepartmentDto>();
   @Output() departmentAdd = new EventEmitter<void>();
@@ -38,6 +39,7 @@ export class DepartmentTableComponent implements OnInit {
   // Permission constants for use in template
   readonly PERMISSIONS = {
     DEPARTMENT_CREATE: `${PermissionResources.DEPARTMENT}.${PermissionActions.CREATE}`,
+    DEPARTMENT_READ: `${PermissionResources.DEPARTMENT}.${PermissionActions.READ}`,
     DEPARTMENT_UPDATE: `${PermissionResources.DEPARTMENT}.${PermissionActions.UPDATE}`,
     DEPARTMENT_DELETE: `${PermissionResources.DEPARTMENT}.${PermissionActions.DELETE}`
   };
@@ -61,28 +63,46 @@ export class DepartmentTableComponent implements OnInit {
   pageSizeOptions = [5, 10, 25, 50, 100];
 
   ngOnInit() {
+    console.log('DepartmentTableComponent ngOnInit - selectedBranchId:', this.selectedBranchId);
     this.loadDepartments();
   }
 
-  async loadDepartments() {
-    this.loading.set(true);
-    
-    try {
-      const departments = await this.departmentsService.getDepartments({
-        branchId: this.selectedBranchId,
-        includeTree: false,
-        includeInactive: this.showInactive()
-      }).toPromise();
-      
-      if (departments) {
-        this.departments.set(departments);
-        this.applyFiltersAndSort();
-      }
-    } catch (error) {
-      console.error('Failed to load departments:', error);
-    } finally {
-      this.loading.set(false);
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log('DepartmentTableComponent ngOnChanges:', changes);
+    if (changes['selectedBranchId']) {
+      console.log('selectedBranchId changed from', changes['selectedBranchId'].previousValue, 'to', changes['selectedBranchId'].currentValue);
+      this.loadDepartments();
     }
+  }
+
+  loadDepartments() {
+    console.log('loadDepartments called - selectedBranchId:', this.selectedBranchId);
+    this.loading.set(true);
+
+    console.log('Making departments API call with params:', {
+      branchId: this.selectedBranchId,
+      includeTree: false,
+      includeInactive: this.showInactive()
+    });
+
+    this.departmentsService.getDepartments({
+      branchId: this.selectedBranchId,
+      includeTree: false,
+      includeInactive: this.showInactive()
+    }).subscribe({
+      next: (departments) => {
+        console.log('Departments API response:', departments);
+        if (departments) {
+          this.departments.set(departments);
+          this.applyFiltersAndSort();
+        }
+        this.loading.set(false);
+      },
+      error: (error) => {
+        console.error('Failed to load departments:', error);
+        this.loading.set(false);
+      }
+    });
   }
 
   applyFiltersAndSort() {
@@ -253,6 +273,10 @@ export class DepartmentTableComponent implements OnInit {
 
   onAddDepartment() {
     this.departmentAdd.emit();
+  }
+
+  onViewDepartment(dept: DepartmentDto) {
+    this.departmentView.emit(dept);
   }
 
   onEditDepartment(dept: DepartmentDto) {

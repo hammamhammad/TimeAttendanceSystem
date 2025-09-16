@@ -87,6 +87,7 @@ export interface LoginRequest {
   username: string;
   password: string;
   deviceInfo?: string;
+  rememberMe?: boolean;
 }
 
 export interface LoginResponse {

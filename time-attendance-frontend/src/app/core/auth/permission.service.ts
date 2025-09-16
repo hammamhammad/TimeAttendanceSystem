@@ -103,4 +103,17 @@ export class PermissionService {
       PermissionUtils.buildPermissionKey(PermissionResources.EMPLOYEE, PermissionActions.MANAGE)
     ]);
   }
+
+  canAccessShifts(): boolean {
+    return this.hasAny([
+      'shift.read',
+      'shift.create',
+      'shift.update',
+      'shift.delete',
+      'shift.assign',
+      'shift.unassign',
+      'shift.export',
+      'shift.import'
+    ]);
+  }
 }

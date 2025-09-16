@@ -1,0 +1,124 @@
+<div class="searchable-select position-relative">
+  <div class="input-group">
+    <!-- Main input field -->
+    <input
+      type="text"
+      class="form-control"
+      [class.is-invalid]="required && !selectedValue() && searchTerm().trim() === ''"
+      [value]="displayValue()"
+      [placeholder]="placeholder"
+      [disabled]="disabled"
+      [readonly]="!searchable"
+      (input)="searchable ? onSearchInput($event) : null"
+      (focus)="onInputFocus()"
+      (blur)="onInputBlur()"
+      (click)="!searchable ? onToggleDropdown() : null"
+      autocomplete="off"
+    />
+
+    <!-- Loading indicator -->
+    <div class="input-group-text" *ngIf="loading">
+      <div class="spinner-border spinner-border-sm" role="status">
+        <span class="visually-hidden">{{ loadingMessage }}...</span>
+      </div>
+    </div>
+
+    <!-- Clear button -->
+    <button
+      type="button"
+      class="btn btn-outline-secondary"
+      *ngIf="clearable && selectedValue() && !loading && !disabled"
+      (click)="onClear($event)"
+      [title]="i18n.t('common.clear')"
+    >
+      <i class="fas fa-times"></i>
+    </button>
+
+    <!-- Dropdown toggle button -->
+    <button
+      type="button"
+      class="btn btn-outline-secondary dropdown-toggle"
+      *ngIf="!loading"
+      [disabled]="disabled"
+      (click)="onToggleDropdown()"
+      [attr.aria-expanded]="showDropdown()"
+    >
+      <span class="visually-hidden">{{ i18n.t('common.select') }}</span>
+    </button>
+  </div>
+
+  <!-- Dropdown menu -->
+  <div
+    class="dropdown-menu show w-100 mt-1 shadow"
+    *ngIf="showDropdown() && !loading"
+    [style.max-height]="maxDropdownHeight"
+    [style.overflow-y]="'auto'"
+    [style.position]="'absolute'"
+    [style.z-index]="'1050'"
+  >
+    <!-- Options list -->
+    <ng-container *ngIf="hasResults()">
+      <button
+        type="button"
+        class="dropdown-item"
+        [class.disabled]="option.disabled"
+        *ngFor="let option of filteredOptions(); trackBy: trackByValue"
+        (click)="onSelectOption(option)"
+      >
+        <div class="d-flex flex-column">
+          <span class="fw-medium" [class.text-muted]="option.disabled">
+            {{ option.label }}
+          </span>
+          <small class="text-muted" *ngIf="option.subLabel">
+            {{ option.subLabel }}
+          </small>
+        </div>
+      </button>
+    </ng-container>
+
+    <!-- Custom value option -->
+    <button
+      type="button"
+      class="dropdown-item"
+      *ngIf="shouldShowCustomValueOption()"
+      (click)="onSelectCustomValue()"
+    >
+      <div class="d-flex align-items-center">
+        <i class="fas fa-plus me-2 text-primary"></i>
+        <span class="text-primary">
+          {{ customValueMessage }}: "{{ searchTerm() }}"
+        </span>
+      </div>
+    </button>
+
+    <!-- No results message -->
+    <div
+      class="dropdown-item-text text-center py-3 text-muted"
+      *ngIf="shouldShowNoResults()"
+    >
+      {{ noResultsMessage }}
+    </div>
+
+    <!-- Empty message -->
+    <div
+      class="dropdown-item-text text-center py-3 text-muted"
+      *ngIf="shouldShowEmptyMessage()"
+    >
+      {{ emptyMessage }}
+    </div>
+  </div>
+
+  <!-- Loading dropdown -->
+  <div
+    class="dropdown-menu show w-100 mt-1 shadow text-center py-3"
+    *ngIf="showDropdown() && loading"
+    style="position: absolute; z-index: 1050;"
+  >
+    <div class="d-flex align-items-center justify-content-center">
+      <div class="spinner-border spinner-border-sm me-2" role="status">
+        <span class="visually-hidden">{{ loadingMessage }}...</span>
+      </div>
+      <span class="text-muted">{{ loadingMessage }}...</span>
+    </div>
+  </div>
+</div>

@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { Branch, BranchesResponse, CreateBranchRequest, UpdateBranchRequest } from '../../shared/models/branch.model';
 import { environment } from '../../../environments/environment';
 
@@ -42,5 +43,12 @@ export class BranchesService {
 
   deleteBranch(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  getBranchesForDropdown(): Observable<Branch[]> {
+    return this.http.get<BranchesResponse>(`${this.baseUrl}?pageSize=100&isActive=true`)
+      .pipe(
+        map(response => response.items)
+      );
   }
 }

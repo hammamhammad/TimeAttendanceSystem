@@ -187,9 +187,45 @@ export const routes: Routes = [
       {
         path: 'departments/:id/edit',
         loadComponent: () => import('./pages/departments/edit-department/edit-department.component').then(m => m.EditDepartmentComponent),
-        data: { 
+        data: {
           title: 'departments.edit',
           permission: 'department.update'
+        },
+        canMatch: [authGuard]
+      },
+      {
+        path: 'shifts',
+        loadComponent: () => import('./pages/shifts/shifts.component').then(m => m.ShiftsComponent),
+        data: {
+          title: 'shifts.title',
+          permission: 'shift.read'
+        },
+        canMatch: [authGuard]
+      },
+      {
+        path: 'shifts/create',
+        loadComponent: () => import('./pages/shifts/create-shift/create-shift.component').then(m => m.CreateShiftComponent),
+        data: {
+          title: 'shifts.create_shift',
+          permission: 'shift.create'
+        },
+        canMatch: [authGuard]
+      },
+      {
+        path: 'shifts/:id/edit',
+        loadComponent: () => import('./pages/shifts/edit-shift/edit-shift.component').then(m => m.EditShiftComponent),
+        data: {
+          title: 'shifts.edit_shift',
+          permission: 'shift.update'
+        },
+        canMatch: [authGuard]
+      },
+      {
+        path: 'shifts/assign',
+        loadComponent: () => import('./pages/shifts/assign-shifts/assign-shifts.component').then(m => m.AssignShiftsComponent),
+        data: {
+          title: 'shifts.assignments.title',
+          permission: 'shift.assign'
         },
         canMatch: [authGuard]
       },

@@ -5,6 +5,7 @@ using TimeAttendanceSystem.Application.Departments.Commands.CreateDepartment;
 using TimeAttendanceSystem.Application.Departments.Commands.UpdateDepartment;
 using TimeAttendanceSystem.Application.Departments.Commands.DeleteDepartment;
 using TimeAttendanceSystem.Application.Departments.Queries.GetDepartments;
+using TimeAttendanceSystem.Application.Departments.Queries.GetDepartmentById;
 
 namespace TimeAttendanceSystem.Api.Controllers;
 
@@ -29,12 +30,32 @@ public class DepartmentsController : ControllerBase
         [FromQuery] long? parentDepartmentId = null,
         [FromQuery] bool includeInactive = false)
     {
+        Console.WriteLine($"DEPARTMENTS CONTROLLER: Request received - User: {User.Identity?.Name}, Authenticated: {User.Identity?.IsAuthenticated}, branchId={branchId}, includeTree={includeTree}, isActive={isActive}, search={search}, parentDepartmentId={parentDepartmentId}, includeInactive={includeInactive}");
+
         var query = new GetDepartmentsQuery(branchId, includeTree, isActive, search, parentDepartmentId, includeInactive);
         var result = await _mediator.Send(query);
+
+        Console.WriteLine($"DEBUG GetDepartments result: IsFailure={result.IsFailure}, Count={result.Value?.Count ?? 0}");
 
         if (result.IsFailure)
         {
             return BadRequest(new { error = result.Error });
+        }
+
+        return Ok(result.Value);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetDepartmentById(long id)
+    {
+        var query = new GetDepartmentByIdQuery(id);
+        var result = await _mediator.Send(query);
+
+        if (result.IsFailure)
+        {
+            return result.Error == "Department not found"
+                ? NotFound(new { error = result.Error })
+                : BadRequest(new { error = result.Error });
         }
 
         return Ok(result.Value);

@@ -22,6 +22,142 @@ namespace TimeAttendanceSystem.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.AttendanceRecord", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("AllowFlexibleHours")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("AutoCheckOutTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CalculationDetails")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CheckInTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("CheckOutTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<int>("EarlyDepartureMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int?>("FlexMinutesAfter")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("FlexMinutesBefore")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("GracePeriodMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsAutoCheckOut")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsCheckInRequired")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsEarlyDeparture")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsLate")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsNightShift")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsOvertime")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsUndertime")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("LateMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<TimeSpan?>("OvertimeHours")
+                        .HasColumnType("time");
+
+                    b.Property<TimeSpan?>("RequiredHours")
+                        .HasColumnType("time");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<DateTime?>("ShiftEndTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("ShiftId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("ShiftStartTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<TimeSpan?>("UndertimeHours")
+                        .HasColumnType("time");
+
+                    b.Property<TimeSpan?>("WorkedHours")
+                        .HasColumnType("time");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Date")
+                        .HasDatabaseName("IX_AttendanceRecords_Date");
+
+                    b.HasIndex("ShiftId")
+                        .HasDatabaseName("IX_AttendanceRecords_ShiftId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_AttendanceRecords_Status");
+
+                    b.HasIndex("EmployeeId", "Date")
+                        .IsUnique()
+                        .HasDatabaseName("IX_AttendanceRecords_Employee_Date");
+
+                    b.ToTable("AttendanceRecords", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_AttendanceRecords_CheckOutAfterCheckIn", "CheckOutTime IS NULL OR CheckInTime IS NULL OR CheckOutTime > CheckInTime");
+
+                            t.HasCheckConstraint("CK_AttendanceRecords_NonNegativeMinutes", "LateMinutes >= 0 AND EarlyDepartureMinutes >= 0");
+                        });
+                });
+
             modelBuilder.Entity("TimeAttendanceSystem.Domain.Branches.Branch", b =>
                 {
                     b.Property<long>("Id")
@@ -392,6 +528,339 @@ namespace TimeAttendanceSystem.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("EmployeeUserLinks", (string)null);
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Shifts.Shift", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("AllowFlexibleHours")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<TimeOnly?>("CoreEnd")
+                        .HasColumnType("time");
+
+                    b.Property<TimeOnly?>("CoreStart")
+                        .HasColumnType("time");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int?>("FlexMinutesAfter")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("FlexMinutesBefore")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("GracePeriodMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("HasCoreHours")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsAutoCheckOut")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsCheckInRequired")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true)
+                        .HasColumnName("RequiresCheckInOut");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsFriday")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsMonday")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsNightShift")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsSaturday")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsSunday")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsThursday")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsTuesday")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsWednesday")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<decimal?>("RequiredHours")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<decimal?>("RequiredWeeklyHours")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<int>("ShiftType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("Shifts", (string)null);
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Shifts.ShiftAssignment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("AssignedByUserId")
+                        .HasColumnType("bigint")
+                        .HasComment("ID of the user who created this assignment");
+
+                    b.Property<int>("AssignmentType")
+                        .HasColumnType("int")
+                        .HasComment("Type of assignment: Employee (1), Department (2), or Branch (3)");
+
+                    b.Property<long?>("BranchId")
+                        .HasColumnType("bigint")
+                        .HasComment("Branch ID for branch-level assignments (null for employee/department assignments)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<long?>("DepartmentId")
+                        .HasColumnType("bigint")
+                        .HasComment("Department ID for department-level assignments (null for employee/branch assignments)");
+
+                    b.Property<DateTime>("EffectiveDate")
+                        .HasColumnType("datetime2")
+                        .HasComment("Date when this assignment becomes active");
+
+                    b.Property<long?>("EmployeeId")
+                        .HasColumnType("bigint")
+                        .HasComment("Employee ID for employee-level assignments (null for department/branch assignments)");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2")
+                        .HasComment("Optional end date for temporary assignments");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)")
+                        .HasComment("Optional notes about the assignment");
+
+                    b.Property<int>("Priority")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(10)
+                        .HasComment("Assignment priority for conflict resolution (higher values take precedence)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<long>("ShiftId")
+                        .HasColumnType("bigint")
+                        .HasComment("Foreign key to the Shift entity being assigned");
+
+                    b.Property<int>("Status")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1)
+                        .HasComment("Assignment status: Pending (1), Active (2), Inactive (3), Expired (4), Cancelled (5)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId");
+
+                    b.HasIndex("DepartmentId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("ShiftId")
+                        .HasDatabaseName("IX_ShiftAssignments_ShiftId")
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.HasIndex("AssignmentType", "BranchId", "EffectiveDate")
+                        .HasDatabaseName("IX_ShiftAssignments_Branch_EffectiveDate")
+                        .HasFilter("[IsDeleted] = 0 AND [AssignmentType] = 3 AND [BranchId] IS NOT NULL");
+
+                    b.HasIndex("AssignmentType", "DepartmentId", "EffectiveDate")
+                        .HasDatabaseName("IX_ShiftAssignments_Department_EffectiveDate")
+                        .HasFilter("[IsDeleted] = 0 AND [AssignmentType] = 2 AND [DepartmentId] IS NOT NULL");
+
+                    b.HasIndex("AssignmentType", "EmployeeId", "EffectiveDate")
+                        .HasDatabaseName("IX_ShiftAssignments_Employee_EffectiveDate")
+                        .HasFilter("[IsDeleted] = 0 AND [AssignmentType] = 1 AND [EmployeeId] IS NOT NULL");
+
+                    b.HasIndex("Priority", "Status", "EffectiveDate")
+                        .HasDatabaseName("IX_ShiftAssignments_Priority_Status_EffectiveDate")
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.HasIndex("Status", "EffectiveDate", "EndDate")
+                        .HasDatabaseName("IX_ShiftAssignments_Status_EffectiveDate_EndDate")
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("ShiftAssignments", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_ShiftAssignments_BranchTypeMatch", "([AssignmentType] = 3 AND [BranchId] IS NOT NULL AND [EmployeeId] IS NULL AND [DepartmentId] IS NULL) OR\r\n              ([AssignmentType] != 3)");
+
+                            t.HasCheckConstraint("CK_ShiftAssignments_DepartmentTypeMatch", "([AssignmentType] = 2 AND [DepartmentId] IS NOT NULL AND [EmployeeId] IS NULL AND [BranchId] IS NULL) OR\r\n              ([AssignmentType] != 2)");
+
+                            t.HasCheckConstraint("CK_ShiftAssignments_EmployeeTypeMatch", "([AssignmentType] = 1 AND [EmployeeId] IS NOT NULL AND [DepartmentId] IS NULL AND [BranchId] IS NULL) OR\r\n              ([AssignmentType] != 1)");
+
+                            t.HasCheckConstraint("CK_ShiftAssignments_EndDateAfterEffectiveDate", "[EndDate] IS NULL OR [EndDate] > [EffectiveDate]");
+
+                            t.HasCheckConstraint("CK_ShiftAssignments_SingleTargetType", "(CASE WHEN [AssignmentType] = 1 THEN 1 ELSE 0 END) +\r\n              (CASE WHEN [AssignmentType] = 2 THEN 1 ELSE 0 END) +\r\n              (CASE WHEN [AssignmentType] = 3 THEN 1 ELSE 0 END) = 1");
+
+                            t.HasCheckConstraint("CK_ShiftAssignments_ValidPriority", "[Priority] >= 0 AND [Priority] <= 100");
+                        });
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Shifts.ShiftPeriod", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("time");
+
+                    b.Property<decimal>("Hours")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsNightPeriod")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("PeriodOrder")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<long>("ShiftId")
+                        .HasColumnType("bigint");
+
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ShiftId", "PeriodOrder")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("ShiftPeriods", (string)null);
                 });
 
             modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.BlacklistedToken", b =>
@@ -1057,6 +1526,25 @@ namespace TimeAttendanceSystem.Infrastructure.Migrations
                     b.ToTable("UserSessions", (string)null);
                 });
 
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.AttendanceRecord", b =>
+                {
+                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TimeAttendanceSystem.Domain.Shifts.Shift", "Shift")
+                        .WithMany()
+                        .HasForeignKey("ShiftId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Shift");
+                });
+
             modelBuilder.Entity("TimeAttendanceSystem.Domain.Branches.Department", b =>
                 {
                     b.HasOne("TimeAttendanceSystem.Domain.Branches.Branch", "Branch")
@@ -1121,6 +1609,53 @@ namespace TimeAttendanceSystem.Infrastructure.Migrations
                     b.Navigation("Employee");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Shifts.ShiftAssignment", b =>
+                {
+                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_ShiftAssignments_Branches");
+
+                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_ShiftAssignments_Departments");
+
+                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_ShiftAssignments_Employees");
+
+                    b.HasOne("TimeAttendanceSystem.Domain.Shifts.Shift", "Shift")
+                        .WithMany()
+                        .HasForeignKey("ShiftId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_ShiftAssignments_Shifts");
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("Department");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Shift");
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Shifts.ShiftPeriod", b =>
+                {
+                    b.HasOne("TimeAttendanceSystem.Domain.Shifts.Shift", "Shift")
+                        .WithMany("ShiftPeriods")
+                        .HasForeignKey("ShiftId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Shift");
                 });
 
             modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.BlacklistedToken", b =>
@@ -1262,6 +1797,11 @@ namespace TimeAttendanceSystem.Infrastructure.Migrations
                     b.Navigation("DirectReports");
 
                     b.Navigation("EmployeeUserLink");
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Shifts.Shift", b =>
+                {
+                    b.Navigation("ShiftPeriods");
                 });
 
             modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.Permission", b =>

@@ -1,0 +1,60 @@
+<!-- Filters Card -->
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label class="form-label">{{ i18n.t('common.branch') }}</label>
+        <app-searchable-select
+          [options]="branchSelectOptions"
+          [value]="selectedBranch?.id?.toString() || ''"
+          (selectionChange)="onBranchSelectionChange($event)"
+          [placeholder]="i18n.t('common.selectBranch')"
+          [searchable]="true"
+          [clearable]="false"
+          [loading]="branchesLoading"
+        ></app-searchable-select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">{{ i18n.t('common.view') }}</label>
+        <div class="btn-group w-100" role="group">
+          <input
+            type="radio"
+            class="btn-check"
+            name="viewMode"
+            id="tableView"
+            [checked]="viewMode === 'table'"
+            (change)="onViewModeChange('table')"
+          />
+          <label class="btn btn-outline-primary" for="tableView">
+            <i class="fas fa-table me-2"></i>
+            {{ i18n.t('common.table') }}
+          </label>
+          <input
+            type="radio"
+            class="btn-check"
+            name="viewMode"
+            id="treeView"
+            [checked]="viewMode === 'tree'"
+            (change)="onViewModeChange('tree')"
+          />
+          <label class="btn btn-outline-primary" for="treeView">
+            <i class="fas fa-sitemap me-2"></i>
+            {{ i18n.t('common.tree') }}
+          </label>
+        </div>
+      </div>
+      <div class="col-md-3 d-flex align-items-end">
+        <button
+          *appHasPermission="PERMISSIONS.DEPARTMENT_CREATE"
+          type="button"
+          class="btn btn-primary"
+          (click)="onDepartmentAdd()"
+          [disabled]="branchesLoading"
+        >
+          <i class="fas fa-plus me-2"></i>
+          {{ i18n.t('department.addDepartment') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

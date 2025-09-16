@@ -83,7 +83,7 @@ public interface IJwtTokenGenerator
     /// Token Format: "Bearer {access_token}"
     /// Lifetime: Configurable, typically 15-60 minutes
     /// </remarks>
-    string GenerateAccessToken(User user, IReadOnlyList<string> roles, IReadOnlyList<string> permissions, IReadOnlyList<long> branchIds);
+    string GenerateAccessToken(User user, IReadOnlyList<string> roles, IReadOnlyList<string> permissions, IReadOnlyList<long> branchIds, bool rememberMe = false);
 
     /// <summary>
     /// Generates a cryptographically secure refresh token for token renewal operations.
@@ -159,5 +159,5 @@ public interface IJwtTokenGenerator
     /// Time Format: UTC DateTime for timezone independence
     /// Typical Values: 15 minutes (high security) to 60 minutes (balanced)
     /// </remarks>
-    DateTime GetTokenExpiration();
+    DateTime GetTokenExpiration(bool rememberMe = false);
 }

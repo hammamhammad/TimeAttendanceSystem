@@ -44,6 +44,13 @@ import { I18nService } from '../../../core/i18n/i18n.service';
           </div>
         </div>
       } @else if (department()) {
+        @if (error()) {
+          <div class="alert alert-danger">
+            <i class="fa-solid fa-exclamation-triangle me-2"></i>
+            {{ error() }}
+          </div>
+        }
+
         <!-- Main Form Card -->
         <div class="card">
           <div class="card-header">
@@ -53,9 +60,11 @@ import { I18nService } from '../../../core/i18n/i18n.service';
             </h5>
           </div>
           <div class="card-body">
-            <app-department-form 
+            <app-department-form
               [department]="department()"
+              [branchId]="department()?.branchId || null"
               [isEditMode]="true"
+              [externalSaving]="saving()"
               (save)="onDepartmentSaved($event)"
               (cancel)="onCancel()">
             </app-department-form>
@@ -78,6 +87,7 @@ export class EditDepartmentComponent implements OnInit {
 
   department = signal<Department | null>(null);
   loading = signal(true);
+  saving = signal(false);
   error = signal('');
 
   ngOnInit(): void {
@@ -104,7 +114,26 @@ export class EditDepartmentComponent implements OnInit {
   }
 
   onDepartmentSaved(department: CreateDepartmentRequest | UpdateDepartmentRequest): void {
-    this.router.navigate(['/departments']);
+    if (this.saving() || !this.department()) return;
+
+    this.saving.set(true);
+    this.error.set('');
+
+    const departmentId = this.department()!.id;
+    const updateRequest = department as UpdateDepartmentRequest;
+
+    this.departmentsService.updateDepartment(departmentId, updateRequest).subscribe({
+      next: () => {
+        console.log('Department updated successfully');
+        this.saving.set(false);
+        this.router.navigate(['/departments']);
+      },
+      error: (error) => {
+        console.error('Error updating department:', error);
+        this.error.set(this.getErrorMessage(error));
+        this.saving.set(false);
+      }
+    });
   }
 
   onCancel(): void {

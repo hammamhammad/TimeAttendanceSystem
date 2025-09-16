@@ -1,7 +1,7 @@
 {
-  "TimeAttendanceSystem.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "D:\\Work\\AI Code\\Time Attendance System\\src\\Api\\TimeAttendanceSystem.Api",
-  "TimeAttendanceSystem.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "D:\\Work\\AI Code\\Time Attendance System\\src\\Application\\TimeAttendanceSystem.Application",
-  "TimeAttendanceSystem.Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "D:\\Work\\AI Code\\Time Attendance System\\src\\Domain\\TimeAttendanceSystem.Domain",
-  "TimeAttendanceSystem.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "D:\\Work\\AI Code\\Time Attendance System\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure",
-  "TimeAttendanceSystem.Shared, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "D:\\Work\\AI Code\\Time Attendance System\\src\\Shared\\TimeAttendanceSystem.Shared"
+  "TimeAttendanceSystem.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Api\\TimeAttendanceSystem.Api",
+  "TimeAttendanceSystem.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Application\\TimeAttendanceSystem.Application",
+  "TimeAttendanceSystem.Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain",
+  "TimeAttendanceSystem.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure",
+  "TimeAttendanceSystem.Shared, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Shared\\TimeAttendanceSystem.Shared"
 }

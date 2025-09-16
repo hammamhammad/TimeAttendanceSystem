@@ -60,6 +60,7 @@
     "roles": "الأدوار",
     "branches": "الفروع",
     "departments": "الأقسام",
+    "shifts": "الوردیات",
     "reports": "التقارير",
     "settings": "الإعدادات",
     "logout": "تسجيل الخروج",
@@ -68,12 +69,22 @@
   "dashboard": {
     "title": "لوحة التحكم",
     "welcome": "مرحباً بعودتك",
+    "welcome_message": "إليك ما يحدث في مؤسستك اليوم",
+    "total_users": "إجمالي المستخدمين",
     "total_employees": "إجمالي الموظفين",
     "active_employees": "الموظفون النشطون",
+    "active_sessions": "الجلسات النشطة",
     "present_today": "الحاضرون اليوم",
     "absent_today": "الغائبون اليوم",
     "recent_activities": "الأنشطة الأخيرة",
-    "attendance_summary": "ملخص الحضور"
+    "quick_actions": "الإجراءات السريعة",
+    "view_reports": "عرض التقارير",
+    "sample_activity_1": "تم إنشاء مستخدم جديد \"john.doe\"",
+    "sample_activity_2": "الموظف \"Jane Smith\" قام بتسجيل الدخول",
+    "sample_activity_3": "تم رصد تأخير وصول للموظف \"Mike Johnson\"",
+    "time_ago_2min": "منذ دقيقتين",
+    "time_ago_5min": "منذ 5 دقائق",
+    "time_ago_10min": "منذ 10 دقائق"
   },
   "employees": {
     "title": "إدارة الموظفين",
@@ -114,6 +125,17 @@
     "department": "القسم",
     "branch": "الفرع",
     "manager": "المدير",
+    "current_shift": "النوبة الحالية",
+    "no_shift_assigned": "لم يتم تخصيص نوبة",
+    "change_shift": "تغيير النوبة",
+    "employee": "الموظف",
+    "new_shift": "النوبة الجديدة",
+    "select_shift": "اختر نوبة",
+    "shift_required": "النوبة مطلوبة",
+    "effective_date": "تاريخ السريان",
+    "effective_date_help": "اتركه فارغاً لاستخدام تاريخ اليوم",
+    "notes": "الملاحظات",
+    "notes_placeholder": "سبب تغيير النوبة...",
     "photo": "الصورة",
     "select_branch_first": "يرجى اختيار الفرع أولاً",
     "no_employees_found": "لم يتم العثور على موظفين",
@@ -138,7 +160,10 @@
       "contract": "عقد",
       "intern": "متدرب",
       "consultant": "استشاري",
-      "terminated": "منتهي الخدمة"
+      "terminated": "منتهي الخدمة",
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "on_leave": "في إجازة"
     },
     "gender": {
       "title": "الجنس",
@@ -149,8 +174,14 @@
       "title": "مكان العمل",
       "onsite": "في الموقع",
       "remote": "عن بعد",
-      "hybrid": "مختلط"
-    }
+      "hybrid": "مختلط",
+      "field": "العمل الميداني"
+    },
+    "employee_number_readonly": "لا يمكن تغيير رقم الموظف بعد الإنشاء",
+    "branch_readonly": "لا يمكن تغيير الفرع بعد إنشاء الموظف",
+    "update_employee": "تحديث الموظف",
+    "created_at": "تاريخ الإنشاء",
+    "invalid_employee_id": "معرف موظف غير صحيح"
   },
   "roles": {
     "title": "إدارة الأدوار",
@@ -191,7 +222,20 @@
     "search_permissions_placeholder": "البحث في الصلاحيات...",
     "select_all_in_group": "تحديد الكل في هذه المجموعة",
     "clear_all_in_group": "إلغاء الكل في هذه المجموعة",
-    "no_permissions_available": "لا توجد صلاحيات متاحة"
+    "no_permissions_available": "لا توجد صلاحيات متاحة",
+    "failed_to_load_permissions": "فشل في تحميل الصلاحيات",
+    "delete_role": "حذف الدور",
+    "delete_role_confirmation": "هل أنت متأكد من حذف الدور \"{{roleName}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+    "role_deleted_successfully": "تم حذف الدور بنجاح",
+    "failed_to_update_permission": "فشل في تحديث الصلاحية",
+    "role_created_successfully": "تم إنشاء الدور بنجاح",
+    "invalid_role_id": "معرف دور غير صحيح",
+    "role_updated_successfully": "تم تحديث الدور بنجاح",
+    "role_name_required": "اسم الدور مطلوب",
+    "failed_to_create_role": "فشل في إنشاء الدور",
+    "no_description": "لا يوجد وصف متاح",
+    "view_details": "عرض تفاصيل الدور",
+    "edit": "تعديل"
   },
   "users": {
     "title": "المستخدمون",
@@ -203,6 +247,7 @@
     "manage_roles": "إدارة الأدوار",
     "user_details": "تفاصيل المستخدم",
     "user_information": "معلومات المستخدم",
+    "basic_information": "المعلومات الأساسية",
     "username": "اسم المستخدم",
     "email": "البريد الإلكتروني",
     "phone": "الهاتف",
@@ -274,12 +319,255 @@
     "descriptionArPlaceholder": "أدخل وصف القسم بالعربية",
     "additionalInformation": "معلومات إضافية",
     "selectManager": "اختر المدير",
+    "selectBranchFirst": "يرجى اختيار الفرع أولاً لعرض المديرين",
     "managerHelp": "اختياري: تعيين موظف كمدير للقسم",
     "costCenter": "مركز التكلفة",
     "costCenterPlaceholder": "أدخل رمز مركز التكلفة",
     "locationPlaceholder": "أدخل موقع القسم",
     "isActive": "القسم نشط",
-    "isActiveHelp": "الأقسام غير النشطة لن تظهر في معظم العروض"
+    "isActiveHelp": "الأقسام غير النشطة لن تظهر في معظم العروض",
+    "information": "معلومات القسم",
+    "create": "إنشاء قسم",
+    "edit": "تعديل القسم",
+    "view": "عرض القسم",
+    "not_found": "القسم غير موجود",
+    "allDepartments": "جميع الأقسام",
+    "showingAllDepartments": "عرض الأقسام من جميع الفروع. اختر فرعاً محدداً للتصفية.",
+    "hierarchy": "التسلسل الهرمي للأقسام",
+    "statistics": "الإحصائيات",
+    "employees": "الموظفون",
+    "sub_departments": "الأقسام الفرعية",
+    "contact_info": "معلومات الاتصال",
+    "view_details": "عرض التفاصيل",
+    "view_employees": "عرض الموظفين",
+    "create_subdepartment": "إنشاء قسم فرعي",
+    "department_not_found": "القسم غير موجود",
+    "root_department": "القسم الرئيسي",
+    "description_ar": "الوصف (بالعربية)"
+  },
+  "departments": {
+    "title": "الأقسام",
+    "view_details": "عرض تفاصيل القسم",
+    "edit": "تعديل القسم",
+    "name": "اسم القسم",
+    "name_ar": "اسم القسم (بالعربية)",
+    "code": "رمز القسم",
+    "parent": "القسم الرئيسي",
+    "manager": "المدير",
+    "cost_center": "مركز التكلفة",
+    "location": "الموقع",
+    "description_ar": "الوصف (بالعربية)",
+    "contact_info": "معلومات الاتصال",
+    "view_employees": "عرض الموظفين",
+    "create_subdepartment": "إنشاء قسم فرعي",
+    "statistics": "الإحصائيات",
+    "employees": "الموظفون",
+    "sub_departments": "الأقسام الفرعية",
+    "hierarchy": "التسلسل الهرمي",
+    "department_not_found": "القسم غير موجود",
+    "root_department": "القسم الرئيسي"
+  },
+  "shifts": {
+    "title": "إدارة الوردیات",
+    "subtitle": "إدارة وردیات العمل وجداول المواعید",
+    "noShifts": "لم یتم العثور على وردیات",
+    "noShiftsDescription": "أنشئ أول وردیة للبدء بإدارة الوقت",
+    "searchPlaceholder": "البحث في الوردیات بالاسم أو الوصف...",
+    "results": "النتائج",
+    "create": "إنشاء وردیة",
+    "create_shift": "إنشاء وردیة جدیدة",
+    "createDescription": "إنشاء وردیة عمل جدیدة لتحدید ساعات العمل وقواعد الحضور",
+    "edit": "تعدیل الوردیة",
+    "edit_shift": "تعدیل الوردیة",
+    "update": "تحدیث الوردیة",
+    "delete": "حذف الوردیة",
+    "namePlaceholder": "أدخل اسم الوردیة",
+    "descriptionPlaceholder": "أدخل وصف الوردیة (اختیاري)",
+    "hours": "ساعات",
+    "name": "اسم الوردیة",
+    "description": "الوصف",
+    "branch": "الفرع",
+    "type": "نوع الوردیة",
+    "actions": {
+      "create": "إنشاء وردیة"
+    },
+    "periods": "فترات العمل",
+    "addPeriod": "إضافة فترة",
+    "removePeriod": "إزالة فترة",
+    "startTime": "وقت البدء",
+    "endTime": "وقت الانتهاء",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "requiredHours": "الساعات المطلوبة یومیاً",
+    "checkInRequired": "تسجیل الحضور مطلوب",
+    "autoCheckOut": "تسجیل الانصراف التلقائي",
+    "allowFlexibleHours": "السماح بالساعات المرنة",
+    "flexMinutesBefore": "دقائق مرنة قبل",
+    "flexMinutesAfter": "دقائق مرنة بعد",
+    "gracePeriodMinutes": "فترة السماح (دقائق)",
+    "isNightShift": "النوبة الليلية",
+    "totalHours": "إجمالي الساعات",
+    "period": "الفترة",
+    "workingDays": "أيام العمل",
+    "fields": {
+      "name": "اسم الوردیة",
+      "status": "الحالة",
+      "type": "نوع الوردیة",
+      "periods": "فترات العمل",
+      "requirements": "المتطلبات"
+    },
+    "workingSchedule": "جدولة العمل",
+    "extendedRules": "القواعد التجارية الموسعة",
+    "coreHours": "الساعات الأساسية",
+    "requiredWeeklyHours": "الساعات الأسبوعية المطلوبة",
+    "hasCoreHours": "تفعيل الساعات الأساسية",
+    "coreStart": "بداية الساعات الأساسية",
+    "coreEnd": "نهاية الساعات الأساسية",
+    "shiftSummary": "ملخص الوردية",
+    "weeklyHours": "الساعات الأسبوعية",
+    "workingDaysCount": "أيام العمل",
+    "basicInformation": "المعلومات الأساسية",
+    "shiftConfiguration": "إعداد الوردية",
+    "advancedOptions": "الخيارات المتقدمة",
+    "types": {
+      "timeBased": "مبنیة على الوقت",
+      "hoursOnly": "ساعات فقط"
+    },
+    "status": {
+      "active": "فعّال",
+      "inactive": "غیر فعّال",
+      "draft": "مسودة",
+      "archived": "مؤرشف"
+    },
+    "periodTypes": {
+      "dayShift": "وردیة نهاریة",
+      "nightShift": "وردیة لیلیة (تمتد عبر منتصف اللیل)",
+      "order": "الترتیب"
+    },
+    "validation": {
+      "name": {
+        "required": "اسم الوردیة مطلوب"
+      },
+      "branch": {
+        "required": "اختیار الفرع مطلوب"
+      },
+      "timeBased": {
+        "periodsRequired": "الوردیات المبنیة على الوقت یجب أن تحتوي على فترة عمل واحدة على الأقل",
+        "noRequiredHours": "الوردیات المبنیة على الوقت یجب ألا تحتوي على ساعات مطلوبة"
+      },
+      "hoursOnly": {
+        "noPeriods": "وردیات الساعات فقط یجب ألا تحتوي على فترات عمل",
+        "requiredHours": "وردیات الساعات فقط یجب أن تحتوي على ساعات مطلوبة صحیحة أكبر من 0",
+        "maxHours": "الساعات المطلوبة لا یمكن أن تتجاوز 24 ساعة یومیاً",
+        "noFlexibleHours": "الساعات المرنة غیر صالحة لوردیات الساعات فقط",
+        "noGracePeriod": "فترة السماح غیر صالحة لوردیات الساعات فقط"
+      },
+      "periods": {
+        "maxTwo": "یمكن أن تحتوي الوردیات على فترتین عمل كحد أقصى یومیاً",
+        "sameTime": "الفترة {{period}} لا یمكن أن تحتوي على نفس وقت البدء والانتهاء",
+        "positiveHours": "الفترة {{period}} یجب أن تحتوي على ساعات عمل إیجابیة",
+        "maxHours": "الفترة {{period}} لا یمكن أن تتجاوز 24 ساعة",
+        "overlap": "فترات العمل لا یمكن أن تتداخل",
+        "multipleNight": "لا یمكن وجود فترات لیلیة متعددة في وردیة واحدة"
+      },
+      "flexible": {
+        "maxBefore": "الدقائق المرنة قبل لا یمكن أن تتجاوز 8 ساعات (480 دقیقة)",
+        "maxAfter": "الدقائق المرنة بعد لا یمكن أن تتجاوز 8 ساعات (480 دقیقة)",
+        "noGracePeriod": "فترة السماح غیر مسموحة عند تفعیل الساعات المرنة"
+      },
+      "gracePeriod": {
+        "max": "فترة السماح لا یمكن أن تتجاوز ساعتین (120 دقیقة)"
+      },
+      "checkInOut": {
+        "conflict": "إما یجب أن یكون تسجیل الحضور مطلوباً أو تسجیل الانصراف التلقائي مُفعل"
+      },
+      "workingDays": {
+        "required": "یجب اختیار یوم عمل واحد على الأقل"
+      },
+      "coreHours": {
+        "required": "یجب تحدید أوقات بدء ونهایة الساعات الأساسیة عند تفعیل الساعات الأساسیة",
+        "sameTime": "یجب أن یكون وقت بدء الساعات الأساسیة مختلفاً عن وقت النهایة",
+        "outsidePeriods": "یجب أن تكون الساعات الأساسیة ضمن فترات الوردیة المحددة"
+      },
+      "weeklyHours": {
+        "positive": "یجب أن تكون الساعات الأسبوعیة المطلوبة أكبر من 0",
+        "maxWeekly": "لا یمكن أن تتجاوز الساعات الأسبوعیة المطلوبة 168 ساعة في الأسبوع"
+      }
+    },
+    "help": {
+      "shiftType": {
+        "timeBased": "أوقات بدء ونهایة ثابتة مع فترات عمل محددة",
+        "hoursOnly": "توقیت مرن یتطلب عدد ساعات معین یومیاً"
+      },
+      "requiredHours": "لوردیات الساعات فقط: إجمالي الساعات التي یجب أن یعملها الموظف یومیاً (حد أقصى 24 ساعة)",
+      "checkInRequired": "ما إذا كان یجب على الموظفین تسجیل الحضور لهذه الوردیة (یتم تمییز الغیاب في حالة الفقدان)",
+      "autoCheckOut": "النظام یسجل انصراف الموظفین تلقائیاً عند انتهاء وقت الوردیة",
+      "flexibleHours": "السماح بتسجیل الحضور ضمن نافذة زمنیة بدلاً من الوقت الدقیق للبدء",
+      "flexBefore": "دقائق قبل وقت البدء عندما یُسمح بتسجیل الحضور (حد أقصى 8 ساعات)",
+      "flexAfter": "دقائق بعد وقت البدء عندما یُسمح بتسجیل الحضور (حد أقصى 8 ساعات)",
+      "gracePeriod": "تسامح تأخیر تسجیل الحضور دون عقوبة (حد أقصى ساعتان)",
+      "nightShift": "الوردیات اللیلیة تمتد عبر منتصف اللیل عندما یكون وقت الانتهاء أبكر من وقت البدء",
+      "multiPeriod": "وردیات منقسمة مع حتى فترتي عمل (مثل صباح + مساء)",
+      "workingDays": "اختر أیام الأسبوع التي تنطبق علیها هذه الوردیة",
+      "requiredWeeklyHours": "إجمالي الساعات التي یجب أن یعملها الموظف عبر أسبوع عمل الوردیة (حد أقصى 168 ساعة)",
+      "coreHours": "تحدید نوافذ الحضور الإلزامي كل یوم عمل",
+      "coreStart": "وقت بدء الحضور الإلزامي خلال أیام العمل",
+      "coreEnd": "وقت انتهاء الحضور الإلزامي خلال أیام العمل"
+    },
+    "deleteConfirmation": "هل أنت متأكد من حذف هذه الوردیة؟ لا یمكن التراجع عن هذا الإجراء وسیؤثر على جمیع الجداول المرتبطة.",
+    "success": {
+      "created": "تم إنشاء الوردیة بنجاح",
+      "updated": "تم تحدیث الوردیة بنجاح",
+      "deleted": "تم حذف الوردیة بنجاح"
+    },
+    "loading": {
+      "creating": "جاري إنشاء الوردیة...",
+      "updating": "جاري تحدیث الوردیة...",
+      "deleting": "جاري حذف الوردیة..."
+    },
+    "assignments": {
+      "title": "تعیینات الوردیات",
+      "subtitle": "تعیین الوردیات للموظفین أو الأقسام أو الفروع",
+      "noAssignments": "لا توجد تعیینات وردیات",
+      "noAssignmentsDescription": "قم بإنشاء تعیینات الوردیات لتحدید من یعمل في أي وردیة",
+      "searchPlaceholder": "ابحث في التعیینات حسب الوردیة أو الموظف أو القسم أو الفرع...",
+      "createButton": "تعیین وردیة",
+      "createTitle": "إنشاء تعیین وردیة",
+      "editTitle": "تعدیل تعیین وردیة",
+      "assignmentType": "نوع التعیین",
+      "target": "هدف التعیین",
+      "effectiveDate": "تاریخ السریان",
+      "endDate": "تاریخ الانتهاء",
+      "priority": "الأولویة",
+      "currentlyActiveOnly": "النشطة حالیاً فقط",
+      "confirmDelete": "هل أنت متأكد من حذف تعیین الوردیة هذا؟",
+      "notesPlaceholder": "ملاحظات اختیاریة حول هذا التعیین...",
+      "loadError": "فشل في تحمیل تعیینات الوردیات",
+      "types": {
+        "employee": "موظف",
+        "department": "قسم",
+        "branch": "فرع"
+      },
+      "status": {
+        "pending": "معلقة",
+        "active": "نشطة",
+        "inactive": "غیر نشطة",
+        "expired": "منتهیة الصلاحیة",
+        "cancelled": "ملغاة"
+      },
+      "success": {
+        "created": "تم إنشاء تعیین الوردیة بنجاح",
+        "updated": "تم تحدیث تعیین الوردیة بنجاح",
+        "deleted": "تم حذف تعیین الوردیة بنجاح"
+      },
+      "validation": {
+        "shiftRequired": "یرجى اختیار وردیة",
+        "targetRequired": "یرجى اختیار هدف للتعیین",
+        "effectiveDateRequired": "تاریخ السریان مطلوب",
+        "endDateAfterEffective": "یجب أن یكون تاریخ الانتهاء بعد تاریخ السریان",
+        "priorityRange": "یجب أن تكون الأولویة بین 0 و 100"
+      }
+    }
   },
   "settings": {
     "title": "الإعدادات",
@@ -360,7 +648,22 @@
     "expandAll": "توسيع الكل",
     "collapseAll": "طي الكل",
     "language_english": "English",
-    "language_arabic": "العربية"
+    "language_arabic": "العربية",
+    "allBranches": "جمیع الفروع",
+    "minutes": "دقائق",
+    "create": "إنشاء",
+    "results": "النتائج",
+    "validationErrors": "أخطاء التحقق",
+    "noResultsFound": "لا توجد نتائج",
+    "days": {
+      "sunday": "الأحد",
+      "monday": "الإثنین",
+      "tuesday": "الثلاثاء",
+      "wednesday": "الأربعاء",
+      "thursday": "الخمیس",
+      "friday": "الجمعة",
+      "saturday": "السبت"
+    }
   },
   "validation": {
     "required": "هذا الحقل مطلوب",

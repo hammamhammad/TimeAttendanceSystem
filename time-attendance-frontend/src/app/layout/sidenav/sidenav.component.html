@@ -1,7 +1,7 @@
-<nav class="sidenav" 
+<nav class="sidenav"
      [class.collapsed]="collapsed()"
      [attr.aria-expanded]="!collapsed()">
-  
+
   <div class="sidenav-header p-3">
     @if (!collapsed()) {
       <h5 class="text-truncate mb-0">Time Attendance</h5>
@@ -12,17 +12,58 @@
 
   <ul class="nav flex-column mt-2">
     @for (item of menuItems(); track item.path) {
-      @if (!item.permission || hasPerm(item.permission)) {
+      @if (hasParentMenuPermission(item)) {
         <li class="nav-item">
-          <a class="nav-link d-flex align-items-center" 
-             [routerLink]="item.path" 
-             routerLinkActive="active"
-             [title]="collapsed() ? t(item.titleKey) : ''">
-            <i class="{{ item.icon }} me-2"></i>
-            @if (!collapsed()) { 
-              <span class="text-truncate">{{ t(item.titleKey) }}</span> 
+          <!-- Parent menu item -->
+          @if (item.children && item.children.length > 0) {
+            <!-- Menu item with children -->
+            <a class="nav-link d-flex align-items-center justify-content-between"
+               [class.active]="isParentActive(item)"
+               (click)="toggleSubmenu(item.path)"
+               style="cursor: pointer"
+               [title]="collapsed() ? t(item.titleKey) : ''">
+              <div class="d-flex align-items-center">
+                <i class="{{ item.icon }} me-2"></i>
+                @if (!collapsed()) {
+                  <span class="text-truncate">{{ t(item.titleKey) }}</span>
+                }
+              </div>
+              @if (!collapsed() && hasVisibleChildren(item)) {
+                <i class="fas fa-chevron-down"
+                   [class.rotate-180]="isSubmenuOpen(item.path)"
+                   style="transition: transform 0.2s ease;"></i>
+              }
+            </a>
+            <!-- Submenu -->
+            @if (!collapsed() && isSubmenuOpen(item.path) && hasVisibleChildren(item)) {
+              <ul class="nav flex-column submenu ms-3">
+                @for (child of item.children; track child.path) {
+                  @if (!child.permission || hasPerm(child.permission)) {
+                    <li class="nav-item">
+                      <a class="nav-link d-flex align-items-center"
+                         [routerLink]="child.path"
+                         routerLinkActive="active"
+                         [title]="t(child.titleKey)">
+                        <i class="{{ child.icon }} me-2"></i>
+                        <span class="text-truncate">{{ t(child.titleKey) }}</span>
+                      </a>
+                    </li>
+                  }
+                }
+              </ul>
             }
-          </a>
+          } @else {
+            <!-- Simple menu item without children -->
+            <a class="nav-link d-flex align-items-center"
+               [routerLink]="item.path"
+               routerLinkActive="active"
+               [title]="collapsed() ? t(item.titleKey) : ''">
+              <i class="{{ item.icon }} me-2"></i>
+              @if (!collapsed()) {
+                <span class="text-truncate">{{ t(item.titleKey) }}</span>
+              }
+            </a>
+          }
         </li>
       }
     }

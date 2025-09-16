@@ -1,10 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { 
-  EmployeeDto, 
-  CreateEmployeeRequest, 
+import { Observable, map } from 'rxjs';
+import {
+  EmployeeDto,
+  CreateEmployeeRequest,
   UpdateEmployeeRequest,
   EmployeesFilter,
   PagedResult,
@@ -12,6 +11,7 @@ import {
   DepartmentDto,
   EmployeeSelectOption
 } from '../../shared/models/employee.model';
+import { UpdateEmployeeShiftRequest } from '../../shared/models/shift.model';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -54,6 +54,10 @@ export class EmployeesService {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 
+  updateEmployeeShift(employeeId: number, request: UpdateEmployeeShiftRequest): Observable<{success: boolean, message: string}> {
+    return this.http.post<{success: boolean, message: string}>(`${this.baseUrl}/${employeeId}/shift`, request);
+  }
+
   // Helper methods for dropdowns
   getBranches(): Observable<PagedResult<BranchDto>> {
     let httpParams = new HttpParams()
@@ -73,12 +77,16 @@ export class EmployeesService {
     return this.http.get<DepartmentDto[]>(this.departmentsUrl, { params: httpParams });
   }
 
-  getEmployeesForSelection(): Observable<EmployeeSelectOption[]> {
+  getEmployeesForSelection(branchId?: number): Observable<EmployeeSelectOption[]> {
     let httpParams = new HttpParams()
       .set('page', '1')
       .set('pageSize', '1000')
       .set('isActive', 'true');
-    
+
+    if (branchId) {
+      httpParams = httpParams.set('branchId', branchId.toString());
+    }
+
     return this.http.get<PagedResult<EmployeeDto>>(this.baseUrl, { params: httpParams })
       .pipe(
         map(result => result.items.map(emp => ({

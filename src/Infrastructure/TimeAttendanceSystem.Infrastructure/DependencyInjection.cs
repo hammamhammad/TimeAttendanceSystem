@@ -26,6 +26,7 @@ public static class DependencyInjection
         services.AddScoped<ITwoFactorService, TwoFactorService>();
         services.AddScoped<IDeviceService, DeviceService>();
 
+
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {

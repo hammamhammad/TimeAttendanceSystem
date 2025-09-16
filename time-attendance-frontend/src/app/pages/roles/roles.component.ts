@@ -44,7 +44,11 @@ export class RolesComponent implements OnInit {
   
   // Filter signals
   searchTerm = '';
-  
+
+  // Sorting state
+  sortColumn = signal<keyof Role>('name');
+  sortDirection = signal<'asc' | 'desc'>('asc');
+
   // Modal state
   showPermissionsModal = signal(false);
   selectedRole = signal<Role | null>(null);
@@ -88,7 +92,7 @@ export class RolesComponent implements OnInit {
         console.error('Failed to load permissions:', error);
         this.notificationService.error(
           this.t('app.error'),
-          'Failed to load permissions'
+          this.t('roles.failed_to_load_permissions')
         );
       }
     });
@@ -102,7 +106,7 @@ export class RolesComponent implements OnInit {
         console.error('Failed to load grouped permissions:', error);
         this.notificationService.error(
           this.t('app.error'),
-          'Failed to load grouped permissions'
+          this.t('roles.failed_to_load_permissions')
         );
       }
     });
@@ -113,10 +117,36 @@ export class RolesComponent implements OnInit {
 
     if (this.searchTerm) {
       const search = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(role => 
+      filtered = filtered.filter(role =>
         role.name.toLowerCase().includes(search)
       );
     }
+
+    // Apply sorting
+    const column = this.sortColumn();
+    const direction = this.sortDirection();
+
+    filtered.sort((a, b) => {
+      let aVal = a[column];
+      let bVal = b[column];
+
+      // Handle null/undefined values
+      if (aVal == null && bVal == null) return 0;
+      if (aVal == null) return direction === 'asc' ? 1 : -1;
+      if (bVal == null) return direction === 'asc' ? -1 : 1;
+
+      // Convert to comparable values
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        aVal = aVal.toLowerCase();
+        bVal = bVal.toLowerCase();
+      }
+
+      let comparison = 0;
+      if (aVal < bVal) comparison = -1;
+      else if (aVal > bVal) comparison = 1;
+
+      return direction === 'asc' ? comparison : -comparison;
+    });
 
     return filtered;
   }
@@ -222,7 +252,7 @@ export class RolesComponent implements OnInit {
         this.managingPermissions.set(false);
         this.notificationService.error(
           this.t('app.error'),
-          'Failed to update permission'
+          this.t('roles.failed_to_update_permission')
         );
       }
     });
@@ -273,8 +303,8 @@ export class RolesComponent implements OnInit {
     if (!this.canDeleteRole(role)) return;
     
     const result = await this.confirmationService.confirm({
-      title: 'Delete Role',
-      message: `Are you sure you want to delete the role "${role.name}"? This action cannot be undone.`,
+      title: this.t('roles.delete_role'),
+      message: this.t('roles.delete_role_confirmation').replace('{{roleName}}', role.name),
       confirmText: this.t('common.delete'),
       cancelText: this.t('common.cancel'),
       confirmButtonClass: 'btn-danger',
@@ -288,7 +318,7 @@ export class RolesComponent implements OnInit {
           this.roles.set(this.roles().filter(r => r.id !== role.id));
           this.notificationService.success(
             this.t('app.success'),
-            'Role deleted successfully'
+            this.t('roles.role_deleted_successfully')
           );
         },
         error: (error) => {
@@ -337,5 +367,37 @@ export class RolesComponent implements OnInit {
     const actionDesc = PermissionUtils.getActionDescription(action);
     const resourceDesc = PermissionUtils.getResourceDescription(resource);
     return `${actionDesc} ${resourceDesc.toLowerCase()}`;
+  }
+
+  // Sorting methods
+  onSort(column: keyof Role): void {
+    const currentColumn = this.sortColumn();
+    const currentDirection = this.sortDirection();
+
+    if (currentColumn === column) {
+      // Toggle direction if same column
+      this.sortDirection.set(currentDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Set new column and default to ascending
+      this.sortColumn.set(column);
+      this.sortDirection.set('asc');
+    }
+  }
+
+  getSortIcon(column: keyof Role): string {
+    const currentColumn = this.sortColumn();
+    const currentDirection = this.sortDirection();
+
+    if (currentColumn !== column) {
+      return 'fas fa-sort text-muted';
+    }
+
+    return currentDirection === 'asc' ? 'fas fa-sort-up text-primary' : 'fas fa-sort-down text-primary';
+  }
+
+  isSortable(column: keyof Role): boolean {
+    // Define which columns are sortable
+    const sortableColumns: (keyof Role)[] = ['name', 'userCount', 'createdAtUtc'];
+    return sortableColumns.includes(column);
   }
 }

@@ -24,6 +24,8 @@ export interface EmployeeDto {
   managerName?: string;
   workLocationType: WorkLocationType;
   photoUrl?: string;
+  currentShiftId?: number;
+  currentShiftName?: string;
   isActive: boolean;
   createdAtUtc: string;
 }
@@ -76,6 +78,9 @@ export interface EmployeesFilter {
   managerId?: number;
   isActive?: boolean;
   employmentStatus?: string;
+  // Sorting properties
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
 }
 
 export interface PagedResult<T> {

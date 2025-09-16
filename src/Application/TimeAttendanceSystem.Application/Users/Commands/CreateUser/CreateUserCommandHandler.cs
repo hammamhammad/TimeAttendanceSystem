@@ -153,7 +153,7 @@ public class CreateUserCommandHandler : BaseHandler<CreateUserCommand, Result<lo
             Phone = request.Phone,
             PasswordHash = hash,
             PasswordSalt = salt,
-            MustChangePassword = false, // Admin sets initial password
+            MustChangePassword = true, // New users must change password on first login
             PreferredLanguage = request.PreferredLanguage,
             IsActive = true,
             CreatedAtUtc = DateTime.UtcNow,

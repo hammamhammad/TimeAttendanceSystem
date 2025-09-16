@@ -221,7 +221,7 @@ export class ViewRoleComponent implements OnInit {
     if (roleId) {
       this.loadRole(roleId);
     } else {
-      this.error.set('Invalid role ID');
+      this.error.set(this.i18n.t('roles.invalid_role_id'));
       this.loading.set(false);
     }
   }
@@ -286,7 +286,7 @@ export class ViewRoleComponent implements OnInit {
   }
 
   getPermissionDescription(permission: any): string {
-    return permission.description || `${permission.key} permission`;
+    return permission.description || this.i18n.t('roles.no_description');
   }
 
   private getErrorMessage(error: any): string {

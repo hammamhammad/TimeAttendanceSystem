@@ -44,7 +44,21 @@
       "Bash(npx ng build:*)",
       "Bash(ng build)",
       "Bash(Stop-Process -Id 29676 -Force)",
-      "Bash(rg:*)"
+      "Bash(rg:*)",
+      "Bash(dotnet ef migrations:*)",
+      "Bash(npx tsc:*)",
+      "Bash(timeout 10 npm start)",
+      "Bash(Stop-Process -Id 24188 -Force)",
+      "Bash(powershell.exe Stop-Process:*)",
+      "Bash(timeout 5 sleep 5)",
+      "Bash(ng build:*)",
+      "Bash(timeout 10 sleep 5)",
+      "Bash(dotnet ef dbcontext:*)",
+      "Bash(awk:*)",
+      "Bash(powershell:*)",
+      "Bash(grep:*)",
+      "Bash(sed:*)",
+      "Bash(npx ng:*)"
     ],
     "deny": [],
     "ask": []

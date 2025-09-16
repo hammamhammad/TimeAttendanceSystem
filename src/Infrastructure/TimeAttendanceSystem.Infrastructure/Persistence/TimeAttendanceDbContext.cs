@@ -3,6 +3,7 @@ using TimeAttendanceSystem.Domain.Common;
 using TimeAttendanceSystem.Domain.Branches;
 using TimeAttendanceSystem.Domain.Employees;
 using TimeAttendanceSystem.Domain.Users;
+using TimeAttendanceSystem.Domain.Shifts;
 
 namespace TimeAttendanceSystem.Infrastructure.Persistence;
 
@@ -89,6 +90,9 @@ public class TimeAttendanceDbContext : DbContext
     public DbSet<TwoFactorBackupCode> TwoFactorBackupCodes => Set<TwoFactorBackupCode>();
     public DbSet<UserSession> UserSessions => Set<UserSession>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<Shift> Shifts => Set<Shift>();
+    public DbSet<ShiftPeriod> ShiftPeriods => Set<ShiftPeriod>();
+    public DbSet<ShiftAssignment> ShiftAssignments => Set<ShiftAssignment>();
 
     /// <summary>
     /// Configures the database model using Fluent API configurations from the current assembly.

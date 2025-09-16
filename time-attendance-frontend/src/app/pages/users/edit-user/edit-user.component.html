@@ -122,8 +122,8 @@
                   formControlName="preferredLanguage"
                   [class.is-invalid]="isFieldInvalid('preferredLanguage')"
                 >
-                  <option value="en">English</option>
-                  <option value="ar">العربية</option>
+                  <option value="en">{{ t('common.language_english') }}</option>
+                  <option value="ar">{{ t('common.language_arabic') }}</option>
                 </select>
                 @if (isFieldInvalid('preferredLanguage')) {
                   <div class="invalid-feedback">{{ getFieldError('preferredLanguage') }}</div>

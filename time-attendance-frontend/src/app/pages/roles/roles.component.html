@@ -21,11 +21,12 @@
             <span class="input-group-text">
               <i class="fa-solid fa-search"></i>
             </span>
-            <input 
-              type="text" 
-              class="form-control" 
+            <input
+              type="text"
+              class="form-control"
               [placeholder]="t('roles.search_placeholder')"
               [(ngModel)]="searchTerm"
+              [ngModelOptions]="{standalone: true}"
               (input)="onSearchChange()"
             />
           </div>
@@ -66,11 +67,20 @@
           <table class="table table-hover">
             <thead class="table-light">
               <tr>
-                <th>{{ t('roles.name') }}</th>
+                <th [class.sortable]="isSortable('name')" (click)="isSortable('name') && onSort('name')">
+                  {{ t('roles.name') }}
+                  <i *ngIf="isSortable('name')" [ngClass]="getSortIcon('name')" class="ms-1"></i>
+                </th>
                 <th>{{ t('roles.permissions') }}</th>
-                <th>{{ t('roles.user_count') }}</th>
+                <th [class.sortable]="isSortable('userCount')" (click)="isSortable('userCount') && onSort('userCount')">
+                  {{ t('roles.user_count') }}
+                  <i *ngIf="isSortable('userCount')" [ngClass]="getSortIcon('userCount')" class="ms-1"></i>
+                </th>
                 <th>{{ t('roles.type') }}</th>
-                <th>{{ t('roles.created_at') }}</th>
+                <th [class.sortable]="isSortable('createdAtUtc')" (click)="isSortable('createdAtUtc') && onSort('createdAtUtc')">
+                  {{ t('roles.created_at') }}
+                  <i *ngIf="isSortable('createdAtUtc')" [ngClass]="getSortIcon('createdAtUtc')" class="ms-1"></i>
+                </th>
                 <th width="120">{{ t('common.actions') }}</th>
               </tr>
             </thead>

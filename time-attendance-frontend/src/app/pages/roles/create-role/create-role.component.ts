@@ -59,7 +59,7 @@ export class CreateRoleComponent implements OnInit {
         this.loading.set(false);
         this.notificationService.error(
           this.t('app.error'),
-          'Failed to load permissions'
+          this.t('roles.failed_to_load_permissions')
         );
       }
     });
@@ -99,7 +99,7 @@ export class CreateRoleComponent implements OnInit {
       next: () => {
         this.notificationService.success(
           this.t('app.success'),
-          'Role created successfully'
+          this.t('roles.role_created_successfully')
         );
         this.router.navigate(['/roles']);
       },

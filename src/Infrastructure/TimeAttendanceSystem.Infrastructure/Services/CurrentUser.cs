@@ -57,10 +57,15 @@ public class CurrentUser : ICurrentUser
             var user = _httpContextAccessor.HttpContext?.User;
             if (user == null) return Array.Empty<long>();
 
-            return user.FindAll("branch_scope")
+            var branchClaims = user.FindAll("branch_scope").ToList();
+            var branchIds = branchClaims
                 .Select(c => long.TryParse(c.Value, out var branchId) ? branchId : 0)
                 .Where(id => id > 0)
                 .ToList();
+
+            Console.WriteLine($"DEBUG CurrentUser.BranchIds - Username: {Username}, BranchClaims: {branchClaims.Count}, BranchIds: [{string.Join(",", branchIds)}], IsSystemAdmin: {IsSystemAdmin}");
+
+            return branchIds;
         }
     }
 

@@ -1,25 +1,33 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, inject, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { BranchesService } from './branches.service';
 import { Branch, BranchesResponse, CreateBranchRequest, UpdateBranchRequest } from '../../shared/models/branch.model';
-import { TIMEZONE_OPTIONS, TimezoneOption } from '../../shared/constants/timezone.constants';
 import { PermissionService } from '../../core/auth/permission.service';
 import { PermissionResources, PermissionActions } from '../../shared/utils/permission.utils';
-import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
+import { NotificationService } from '../../core/notifications/notification.service';
+import { ConfirmationService } from '../../core/confirmation/confirmation.service';
+import { BranchFiltersComponent } from './branch-filters/branch-filters.component';
+import { BranchTableComponent } from './branch-table/branch-table.component';
+import { BranchFormModalComponent } from './branch-form-modal/branch-form-modal.component';
 
 @Component({
   selector: 'app-branches',
   standalone: true,
-  imports: [CommonModule, FormsModule, HasPermissionDirective],
+  imports: [CommonModule, BranchFiltersComponent, BranchTableComponent, BranchFormModalComponent],
   templateUrl: './branches.component.html',
   styleUrls: ['./branches.component.css']
 })
 export class BranchesComponent implements OnInit {
   private branchesService = inject(BranchesService);
+  private notificationService = inject(NotificationService);
+  private confirmationService = inject(ConfirmationService);
+  private router = inject(Router);
   public i18n = inject(I18nService);
   public permissionService = inject(PermissionService);
+
+  @ViewChild(BranchFormModalComponent) branchFormModal!: BranchFormModalComponent;
 
   // Permission constants for use in template
   readonly PERMISSIONS = {
@@ -29,58 +37,36 @@ export class BranchesComponent implements OnInit {
     BRANCH_DELETE: `${PermissionResources.BRANCH}.${PermissionActions.DELETE}`,
     BRANCH_MANAGE: `${PermissionResources.BRANCH}.${PermissionActions.MANAGE}`
   };
-  
-  // Timezone options
-  timezoneOptions = TIMEZONE_OPTIONS;
 
   // Signals for state management
   loading = signal(false);
   branches = signal<Branch[]>([]);
-  
+
   // Pagination
   currentPage = signal(1);
   pageSize = signal(10);
   totalCount = signal(0);
   totalPages = signal(0);
-  
-  // Filters
-  searchTerm = '';
-  activeFilter: boolean | undefined = undefined;
+
+  // Filter state
+  currentFilter: any = {};
 
   // Modal state
-  showCreateModal = signal(false);
-  showEditModal = signal(false);
-  showDeleteModal = signal(false);
+  showBranchForm = signal(false);
   selectedBranch = signal<Branch | null>(null);
-  
-  // Form state
-  branchForm = {
-    code: '',
-    name: '',
-    timeZone: '',
-    isActive: true
-  };
-  
-  submitting = signal(false);
 
   ngOnInit(): void {
     this.loadBranches();
   }
 
-  t(key: string): string {
-    return this.i18n.t(key);
-  }
-
   loadBranches(): void {
     this.loading.set(true);
-    
-    const search = this.searchTerm.trim() || undefined;
-    
+
     this.branchesService.getBranches(
-      this.currentPage(), 
-      this.pageSize(), 
-      search, 
-      this.activeFilter
+      this.currentPage(),
+      this.pageSize(),
+      this.currentFilter.search,
+      this.currentFilter.isActive
     ).subscribe({
       next: (response: BranchesResponse) => {
         this.branches.set(response.items);
@@ -91,18 +77,71 @@ export class BranchesComponent implements OnInit {
       error: (error) => {
         console.error('Failed to load branches:', error);
         this.loading.set(false);
+        this.notificationService.error(
+          this.i18n.t('app.error'),
+          this.i18n.t('errors.server')
+        );
       }
     });
   }
 
-  onSearch(): void {
+  // Filter event handlers
+  onSearchChange(searchTerm: string): void {
+    this.currentFilter = { ...this.currentFilter, search: searchTerm };
     this.currentPage.set(1);
     this.loadBranches();
   }
 
-  onFilterChange(): void {
+  onFiltersChange(filters: any): void {
+    this.currentFilter = { ...filters };
     this.currentPage.set(1);
     this.loadBranches();
+  }
+
+  onAddBranch(): void {
+    this.selectedBranch.set(null);
+    this.showBranchForm.set(true);
+  }
+
+  // Table event handlers
+  onViewBranch(branch: Branch): void {
+    this.router.navigate(['/branches', branch.id, 'view']);
+  }
+
+  onEditBranch(branch: Branch): void {
+    this.selectedBranch.set(branch);
+    this.showBranchForm.set(true);
+  }
+
+  async onDeleteBranch(branch: Branch): Promise<void> {
+    const result = await this.confirmationService.confirm({
+      title: this.i18n.t('branches.delete_branch'),
+      message: `Are you sure you want to delete "${branch.name}"? This action cannot be undone.`,
+      confirmText: this.i18n.t('common.delete'),
+      cancelText: this.i18n.t('common.cancel'),
+      confirmButtonClass: 'btn-danger',
+      icon: 'fa-trash',
+      iconClass: 'text-danger'
+    });
+
+    if (result.confirmed) {
+      this.branchesService.deleteBranch(branch.id).subscribe({
+        next: () => {
+          this.loadBranches();
+          this.notificationService.success(
+            this.i18n.t('app.success'),
+            this.i18n.t('branches.branch_deleted')
+          );
+        },
+        error: (error) => {
+          console.error('Failed to delete branch:', error);
+          this.notificationService.error(
+            this.i18n.t('app.error'),
+            this.i18n.t('errors.server')
+          );
+        }
+      });
+    }
   }
 
   onPageChange(page: number): void {
@@ -110,163 +149,78 @@ export class BranchesComponent implements OnInit {
     this.loadBranches();
   }
 
-  onPageSizeChange(): void {
+  onPageSizeChange(size: number): void {
+    this.pageSize.set(size);
     this.currentPage.set(1);
     this.loadBranches();
   }
 
-  getStatusClass(isActive: boolean): string {
-    return isActive ? 'text-success' : 'text-danger';
+  onSelectionChange(selectedBranches: Branch[]): void {
+    // Handle bulk selection for future bulk operations
+    console.log('Selected branches:', selectedBranches);
   }
 
-  getStatusIcon(isActive: boolean): string {
-    return isActive ? 'fa-check-circle' : 'fa-times-circle';
+  onSortChange(sortEvent: {column: string, direction: 'asc' | 'desc'}): void {
+    this.currentFilter = {
+      ...this.currentFilter,
+      sortBy: sortEvent.column,
+      sortDirection: sortEvent.direction
+    };
+    this.currentPage.set(1);
+    this.loadBranches();
   }
 
-  getStatusText(isActive: boolean): string {
-    return isActive ? this.t('common.active') : this.t('common.inactive');
-  }
+  // Modal event handlers
+  onBranchSave(branchData: CreateBranchRequest | UpdateBranchRequest): void {
+    const isEdit = !!this.selectedBranch();
 
-  formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }
-
-  getPaginationArray(): number[] {
-    const total = this.totalPages();
-    const current = this.currentPage();
-    const delta = 2;
-    
-    let start = Math.max(1, current - delta);
-    let end = Math.min(total, current + delta);
-    
-    if (end - start < 4 && total > 4) {
-      if (start === 1) {
-        end = Math.min(total, start + 4);
-      } else if (end === total) {
-        start = Math.max(1, end - 4);
-      }
+    if (isEdit) {
+      this.branchesService.updateBranch(this.selectedBranch()!.id, branchData as UpdateBranchRequest).subscribe({
+        next: () => {
+          this.showBranchForm.set(false);
+          this.selectedBranch.set(null);
+          this.loadBranches();
+          this.branchFormModal?.resetSubmitting();
+          this.notificationService.success(
+            this.i18n.t('app.success'),
+            this.i18n.t('branches.branch_updated')
+          );
+        },
+        error: (error: any) => {
+          console.error('Failed to update branch:', error);
+          this.branchFormModal?.resetSubmitting();
+          this.notificationService.error(
+            this.i18n.t('app.error'),
+            this.i18n.t('errors.server')
+          );
+        }
+      });
+    } else {
+      this.branchesService.createBranch(branchData as CreateBranchRequest).subscribe({
+        next: () => {
+          this.showBranchForm.set(false);
+          this.selectedBranch.set(null);
+          this.loadBranches();
+          this.branchFormModal?.resetSubmitting();
+          this.notificationService.success(
+            this.i18n.t('app.success'),
+            this.i18n.t('branches.branch_created')
+          );
+        },
+        error: (error: any) => {
+          console.error('Failed to create branch:', error);
+          this.branchFormModal?.resetSubmitting();
+          this.notificationService.error(
+            this.i18n.t('app.error'),
+            this.i18n.t('errors.server')
+          );
+        }
+      });
     }
-    
-    const pages = [];
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
-    
-    return pages;
   }
 
-  getEndCount(): number {
-    return Math.min(this.currentPage() * this.pageSize(), this.totalCount());
-  }
-
-  // CRUD Operations
-  onCreateBranch(): void {
-    this.resetForm();
-    this.showCreateModal.set(true);
-  }
-
-  onEditBranch(branch: Branch): void {
-    this.selectedBranch.set(branch);
-    this.branchForm = {
-      code: branch.code,
-      name: branch.name,
-      timeZone: branch.timeZone,
-      isActive: branch.isActive
-    };
-    this.showEditModal.set(true);
-  }
-
-  onDeleteBranch(branch: Branch): void {
-    this.selectedBranch.set(branch);
-    this.showDeleteModal.set(true);
-  }
-
-  onSubmitCreate(): void {
-    if (!this.isFormValid()) return;
-
-    this.submitting.set(true);
-    const request: CreateBranchRequest = {
-      code: this.branchForm.code.trim(),
-      name: this.branchForm.name.trim(),
-      timeZone: this.branchForm.timeZone.trim(),
-      isActive: this.branchForm.isActive
-    };
-
-    this.branchesService.createBranch(request).subscribe({
-      next: () => {
-        this.showCreateModal.set(false);
-        this.loadBranches();
-        this.submitting.set(false);
-      },
-      error: (error) => {
-        console.error('Failed to create branch:', error);
-        this.submitting.set(false);
-      }
-    });
-  }
-
-  onSubmitEdit(): void {
-    if (!this.isFormValid() || !this.selectedBranch()) return;
-
-    this.submitting.set(true);
-    const request: UpdateBranchRequest = {
-      code: this.branchForm.code.trim(),
-      name: this.branchForm.name.trim(),
-      timeZone: this.branchForm.timeZone.trim(),
-      isActive: this.branchForm.isActive
-    };
-
-    this.branchesService.updateBranch(this.selectedBranch()!.id, request).subscribe({
-      next: () => {
-        this.showEditModal.set(false);
-        this.loadBranches();
-        this.submitting.set(false);
-      },
-      error: (error) => {
-        console.error('Failed to update branch:', error);
-        this.submitting.set(false);
-      }
-    });
-  }
-
-  onConfirmDelete(): void {
-    if (!this.selectedBranch()) return;
-
-    this.submitting.set(true);
-    this.branchesService.deleteBranch(this.selectedBranch()!.id).subscribe({
-      next: () => {
-        this.showDeleteModal.set(false);
-        this.loadBranches();
-        this.submitting.set(false);
-      },
-      error: (error) => {
-        console.error('Failed to delete branch:', error);
-        this.submitting.set(false);
-      }
-    });
-  }
-
-  onCloseModal(): void {
-    this.showCreateModal.set(false);
-    this.showEditModal.set(false);
-    this.showDeleteModal.set(false);
+  onCloseBranchForm(): void {
+    this.showBranchForm.set(false);
     this.selectedBranch.set(null);
-    this.submitting.set(false);
-  }
-
-  private resetForm(): void {
-    this.branchForm = {
-      code: '',
-      name: '',
-      timeZone: 'UTC',
-      isActive: true
-    };
-  }
-
-  isFormValid(): boolean {
-    return this.branchForm.code.trim().length > 0 &&
-           this.branchForm.name.trim().length > 0 &&
-           this.branchForm.timeZone.trim().length > 0;
   }
 }

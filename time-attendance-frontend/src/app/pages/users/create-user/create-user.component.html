@@ -124,7 +124,7 @@
                   <div class="invalid-feedback">{{ getFieldError('password') }}</div>
                 }
                 <small class="form-text text-muted">
-                  Must be at least 8 characters with uppercase, lowercase, digit, and special character.
+                  {{ t('auth.password_requirements') }}
                 </small>
               </div>
 
@@ -157,8 +157,8 @@
                   formControlName="preferredLanguage"
                   [class.is-invalid]="isFieldInvalid('preferredLanguage')"
                 >
-                  <option value="en">English</option>
-                  <option value="ar">العربية</option>
+                  <option value="en">{{ t('common.language_english') }}</option>
+                  <option value="ar">{{ t('common.language_arabic') }}</option>
                 </select>
                 @if (isFieldInvalid('preferredLanguage')) {
                   <div class="invalid-feedback">{{ getFieldError('preferredLanguage') }}</div>

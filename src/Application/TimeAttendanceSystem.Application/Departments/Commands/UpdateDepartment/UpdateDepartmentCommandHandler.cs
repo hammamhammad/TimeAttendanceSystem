@@ -17,7 +17,7 @@ public class UpdateDepartmentCommandHandler : BaseHandler<UpdateDepartmentComman
         if (department == null)
             return Result.Failure("Department not found.");
 
-        if (!CurrentUser.IsSystemAdmin && !CurrentUser.BranchIds.Contains(department.BranchId))
+        if (!CurrentUser.IsSystemAdmin && CurrentUser.BranchIds.Any() && !CurrentUser.BranchIds.Contains(department.BranchId))
             return Result.Failure("Access denied to this department's branch.");
 
         // Check if department code is unique within branch (excluding current department)

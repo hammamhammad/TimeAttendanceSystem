@@ -13,6 +13,9 @@ public class GetDepartmentsQueryHandler : BaseHandler<GetDepartmentsQuery, Resul
 
     public override async Task<Result<List<DepartmentDto>>> Handle(GetDepartmentsQuery request, CancellationToken cancellationToken)
     {
+        Console.WriteLine($"DEBUG GetDepartmentsQueryHandler - Request: BranchId={request.BranchId}, IncludeTree={request.IncludeTree}, IsActive={request.IsActive}, IncludeInactive={request.IncludeInactive}");
+        Console.WriteLine($"DEBUG GetDepartmentsQueryHandler - CurrentUser: IsSystemAdmin={CurrentUser.IsSystemAdmin}, BranchIds.Count={CurrentUser.BranchIds.Count()}, BranchIds=[{string.Join(",", CurrentUser.BranchIds)}]");
+
         var query = Context.Departments
             .Include(d => d.Branch)
             .Include(d => d.ParentDepartment)
@@ -23,8 +26,10 @@ public class GetDepartmentsQueryHandler : BaseHandler<GetDepartmentsQuery, Resul
         {
             query = query.Where(d => d.BranchId == request.BranchId.Value);
         }
-        else if (!CurrentUser.IsSystemAdmin)
+        else if (!CurrentUser.IsSystemAdmin && CurrentUser.BranchIds.Any())
         {
+            // Only apply branch filtering if user has specific branch assignments
+            // Users without branch assignments can see all departments (for read permissions)
             query = query.Where(d => CurrentUser.BranchIds.Contains(d.BranchId));
         }
 

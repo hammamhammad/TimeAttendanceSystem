@@ -7,6 +7,7 @@ public static class PermissionResources
     public const string Employee = "employee";
     public const string Branch = "branch";
     public const string Department = "department";
+    public const string Shift = "shift";
     public const string Attendance = "attendance";
     public const string Schedule = "schedule";
     public const string Report = "report";
@@ -24,6 +25,7 @@ public static class PermissionResources
         { Employee, "Employee records and information" },
         { Branch, "Company branches and locations" },
         { Department, "Organizational departments" },
+        { Shift, "Work shifts and time periods" },
         { Attendance, "Time tracking and attendance records" },
         { Schedule, "Work schedules and shift management" },
         { Report, "Reports and analytics" },
@@ -42,7 +44,8 @@ public static class PermissionResources
         { Employee, "fa-users" },
         { Branch, "fa-building" },
         { Department, "fa-sitemap" },
-        { Attendance, "fa-clock" },
+        { Shift, "fa-clock" },
+        { Attendance, "fa-user-clock" },
         { Schedule, "fa-calendar-alt" },
         { Report, "fa-chart-bar" },
         { Settings, "fa-cog" },

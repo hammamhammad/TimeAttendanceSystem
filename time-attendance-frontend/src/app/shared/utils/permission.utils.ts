@@ -24,7 +24,7 @@ export const PermissionActions = {
   ASSIGN: 'assign',
   UNASSIGN: 'unassign',
   MANAGE: 'manage',
-  CONFIGURE: 'configure'
+  CONFIGURE: 'configure',
 } as const;
 
 export const PermissionResources = {
@@ -33,6 +33,7 @@ export const PermissionResources = {
   EMPLOYEE: 'employee',
   BRANCH: 'branch',
   DEPARTMENT: 'department',
+  SHIFT: 'shift',
   ATTENDANCE: 'attendance',
   SCHEDULE: 'schedule',
   REPORT: 'report',
@@ -70,7 +71,7 @@ export const ActionDescriptions: Record<string, string> = {
   [PermissionActions.ASSIGN]: 'Assign resources or relationships',
   [PermissionActions.UNASSIGN]: 'Remove resource assignments',
   [PermissionActions.MANAGE]: 'Full management capabilities',
-  [PermissionActions.CONFIGURE]: 'Configure settings and parameters'
+  [PermissionActions.CONFIGURE]: 'Configure settings and parameters',
 };
 
 export const ResourceDescriptions: Record<string, string> = {
@@ -79,6 +80,7 @@ export const ResourceDescriptions: Record<string, string> = {
   [PermissionResources.EMPLOYEE]: 'Employee records and information',
   [PermissionResources.BRANCH]: 'Company branches and locations',
   [PermissionResources.DEPARTMENT]: 'Organizational departments',
+  [PermissionResources.SHIFT]: 'Work shifts and time periods',
   [PermissionResources.ATTENDANCE]: 'Time tracking and attendance records',
   [PermissionResources.SCHEDULE]: 'Work schedules and shift management',
   [PermissionResources.REPORT]: 'Reports and analytics',
@@ -125,7 +127,8 @@ export const ResourceIcons: Record<string, string> = {
   [PermissionResources.EMPLOYEE]: 'fa-users',
   [PermissionResources.BRANCH]: 'fa-building',
   [PermissionResources.DEPARTMENT]: 'fa-sitemap',
-  [PermissionResources.ATTENDANCE]: 'fa-clock',
+  [PermissionResources.SHIFT]: 'fa-clock',
+  [PermissionResources.ATTENDANCE]: 'fa-user-clock',
   [PermissionResources.SCHEDULE]: 'fa-calendar-alt',
   [PermissionResources.REPORT]: 'fa-chart-bar',
   [PermissionResources.SETTINGS]: 'fa-cog',

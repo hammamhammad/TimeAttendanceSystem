@@ -1,7 +1,6 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { UsersService } from './users.service';
 import { UserDto, PagedResult } from '../../shared/models/user.model';
@@ -10,7 +9,8 @@ import { NotificationService } from '../../core/notifications/notification.servi
 import { ConfirmationService } from '../../core/confirmation/confirmation.service';
 import { PermissionService } from '../../core/auth/permission.service';
 import { PermissionResources, PermissionActions } from '../../shared/utils/permission.utils';
-import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
+import { UserFiltersComponent } from './user-filters/user-filters.component';
+import { UserTableComponent } from './user-table/user-table.component';
 
 interface Role {
   id: number;
@@ -20,7 +20,7 @@ interface Role {
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, RoleManagementComponent, HasPermissionDirective],
+  imports: [CommonModule, RoleManagementComponent, UserFiltersComponent, UserTableComponent],
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.css']
 })
@@ -28,6 +28,7 @@ export class UsersComponent implements OnInit {
   private usersService = inject(UsersService);
   private notificationService = inject(NotificationService);
   private confirmationService = inject(ConfirmationService);
+  private router = inject(Router);
   public i18n = inject(I18nService);
   public permissionService = inject(PermissionService);
 
@@ -37,19 +38,14 @@ export class UsersComponent implements OnInit {
   pagedResult = signal<PagedResult<UserDto> | null>(null);
   currentPage = signal(1);
   pageSize = signal(10);
-  
-  // Filter signals
-  searchTerm = '';
-  statusFilter = '';
-  roleFilter = '';
-  
+
+  // Filter state
+  currentFilter: any = {};
+
   // Modal state
-  showUserModal = signal(false);
-  showUserForm = signal(false);
   showRoleManagement = signal(false);
   selectedUser = signal<UserDto | null>(null);
-  editingUser = signal<UserDto | null>(null);
-  
+
   // Mock data for roles - in real app this would come from a roles service
   availableRoles = signal<Role[]>([
     { id: 1, name: 'SystemAdmin' },
@@ -58,8 +54,13 @@ export class UsersComponent implements OnInit {
     { id: 4, name: 'User' }
   ]);
 
-  // Helper for Math functions in template
-  Math = Math;
+  // Computed signals for pagination
+  totalPages = computed(() => this.pagedResult()?.totalPages || 1);
+  totalItems = computed(() => this.pagedResult()?.totalItems || 0);
+
+  // Writable signals for template binding
+  totalPagesSignal = signal(1);
+  totalItemsSignal = signal(0);
 
   // Permission constants for use in template
   readonly PERMISSIONS = {
@@ -72,168 +73,93 @@ export class UsersComponent implements OnInit {
     USER_MANAGE: `${PermissionResources.USER}.${PermissionActions.MANAGE}`
   };
 
-  // Helper methods for user protection
-  isSystemAdmin(user: UserDto): boolean {
-    // Only the systemadmin user is non-deletable and non-editable
-    return user.username.toLowerCase() === 'systemadmin';
-  }
-
-  canEditUser(user: UserDto): boolean {
-    return !this.isSystemAdmin(user);
-  }
-
-  canDeleteUser(user: UserDto): boolean {
-    return !this.isSystemAdmin(user);
-  }
-
   ngOnInit(): void {
     this.loadUsers();
   }
 
-  t(key: string): string {
-    return this.i18n.t(key);
-  }
-
   loadUsers(): void {
     this.loading.set(true);
-    
+
     const filter = {
       page: this.currentPage(),
       pageSize: this.pageSize(),
-      search: this.searchTerm || undefined,
-      isActive: this.statusFilter ? this.statusFilter === 'true' : undefined,
-      roleId: this.roleFilter ? parseInt(this.roleFilter) : undefined
+      ...this.currentFilter
     };
 
     this.usersService.getUsers(filter).subscribe({
       next: (result) => {
         this.pagedResult.set(result);
         this.users.set(result.items);
+        this.totalPagesSignal.set(result.totalPages);
+        this.totalItemsSignal.set(result.totalItems);
         this.loading.set(false);
       },
       error: (error) => {
         console.error('Failed to load users:', error);
         this.loading.set(false);
         this.notificationService.error(
-          this.t('errors.server'),
-          this.t('errors.network')
+          this.i18n.t('errors.server'),
+          this.i18n.t('errors.network')
         );
       }
     });
   }
 
-  onSearchChange(): void {
-    // Debounce search - reset to first page
-    this.currentPage.set(1);
-    setTimeout(() => this.loadUsers(), 300);
-  }
-
-  onFilterChange(): void {
+  // Filter event handlers
+  onSearchChange(searchTerm: string): void {
+    this.currentFilter = { ...this.currentFilter, search: searchTerm };
     this.currentPage.set(1);
     this.loadUsers();
   }
 
-  onClearFilters(): void {
-    this.searchTerm = '';
-    this.statusFilter = '';
-    this.roleFilter = '';
+  onFiltersChange(filters: any): void {
+    this.currentFilter = { ...filters };
     this.currentPage.set(1);
     this.loadUsers();
   }
 
-  hasActiveFilters(): boolean {
-    return !!(this.searchTerm || this.statusFilter || this.roleFilter);
+  onAddUser(): void {
+    this.router.navigate(['/users/create']);
   }
 
-  onPageChange(page: number): void {
-    if (page >= 1 && page <= (this.pagedResult()?.totalPages || 1)) {
-      this.currentPage.set(page);
-      this.loadUsers();
-    }
-  }
-
-  getPageNumbers(): number[] {
-    const totalPages = this.pagedResult()?.totalPages || 1;
-    const current = this.currentPage();
-    const pages: number[] = [];
-    
-    // Show max 5 page numbers
-    const start = Math.max(1, current - 2);
-    const end = Math.min(totalPages, start + 4);
-    
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
-    
-    return pages;
-  }
-
-  formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleDateString(this.i18n.getCurrentLocale(), {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  }
-
-  isUserLocked(lockoutEndUtc: string): boolean {
-    return new Date(lockoutEndUtc) > new Date();
-  }
-
-  // User actions
-  onCreateUser(): void {
-    this.editingUser.set(null);
-    this.showUserForm.set(true);
-  }
-
+  // Table event handlers
   onViewUser(user: UserDto): void {
-    this.selectedUser.set(user);
-    this.showUserModal.set(true);
+    this.router.navigate(['/users', user.id, 'view']);
   }
 
   onEditUser(user: UserDto): void {
-    if (!this.canEditUser(user)) {
-      return; // Prevent editing systemadmin user
-    }
-    this.closeModal();
-    this.editingUser.set(user);
-    this.showUserForm.set(true);
+    this.router.navigate(['/users', user.id, 'edit']);
   }
 
   async onDeleteUser(user: UserDto): Promise<void> {
-    if (!this.canDeleteUser(user)) {
-      return; // Prevent deleting systemadmin user
-    }
-
-    const confirmMessage = this.t('users.confirm_delete_user').replace('{{username}}', user.username);
+    const confirmMessage = this.i18n.t('users.confirm_delete_user').replace('{{username}}', user.username);
     const result = await this.confirmationService.confirm({
-      title: this.t('users.delete_user'),
+      title: this.i18n.t('users.delete_user'),
       message: confirmMessage,
-      confirmText: this.t('common.delete'),
-      cancelText: this.t('common.cancel'),
+      confirmText: this.i18n.t('common.delete'),
+      cancelText: this.i18n.t('common.cancel'),
       confirmButtonClass: 'btn-danger',
       icon: 'fa-trash',
       iconClass: 'text-danger'
     });
-    
+
     if (result.confirmed) {
       this.usersService.deleteUser(user.id).subscribe({
         next: () => {
-          this.loadUsers(); // Refresh the list
+          this.loadUsers();
           this.notificationService.success(
-            this.t('app.success'),
-            this.t('users.user_deleted')
+            this.i18n.t('app.success'),
+            this.i18n.t('users.user_deleted')
           );
         },
         error: (error) => {
-          let errorMessage = this.t('errors.server');
+          let errorMessage = this.i18n.t('errors.server');
           if (error.error && error.error.error) {
             errorMessage = error.error.error;
           }
-          
+
           this.notificationService.error(
-            this.t('app.error'),
+            this.i18n.t('app.error'),
             errorMessage
           );
         }
@@ -242,54 +168,47 @@ export class UsersComponent implements OnInit {
   }
 
   onManageRoles(user: UserDto): void {
-    if (!this.canEditUser(user)) {
-      return; // Prevent managing roles for systemadmin user
-    }
     this.selectedUser.set(user);
     this.showRoleManagement.set(true);
   }
 
-  closeModal(): void {
-    this.showUserModal.set(false);
-    this.selectedUser.set(null);
+  onPageChange(page: number): void {
+    this.currentPage.set(page);
+    this.loadUsers();
   }
 
-  // Form event handlers
-  onUserCreated(user: UserDto): void {
-    this.loadUsers(); // Refresh the list
-    this.notificationService.success(
-      this.t('app.success'),
-      this.t('users.user_added')
-    );
+  onPageSizeChange(size: number): void {
+    this.pageSize.set(size);
+    this.currentPage.set(1);
+    this.loadUsers();
   }
 
-  onUserSaved(user: UserDto): void {
-    this.loadUsers(); // Refresh the list
-    this.notificationService.success(
-      this.t('app.success'),
-      this.t('users.user_updated')
-    );
+  onSelectionChange(selectedUsers: UserDto[]): void {
+    // Handle bulk selection for future bulk operations
+    console.log('Selected users:', selectedUsers);
   }
 
+  onSortChange(sortEvent: {column: string, direction: 'asc' | 'desc'}): void {
+    this.currentFilter = {
+      ...this.currentFilter,
+      sortBy: sortEvent.column,
+      sortDirection: sortEvent.direction
+    };
+    this.currentPage.set(1);
+    this.loadUsers();
+  }
+
+  // Modal event handlers
   onRolesUpdated(user: UserDto): void {
-    this.loadUsers(); // Refresh the list
+    this.loadUsers();
     this.notificationService.success(
-      this.t('app.success'),
+      this.i18n.t('app.success'),
       'User roles updated successfully'
     );
   }
 
-  onShowUserFormChange(show: boolean): void {
-    this.showUserForm.set(show);
-    if (!show) {
-      this.editingUser.set(null);
-    }
-  }
-
-  onShowRoleManagementChange(show: boolean): void {
-    this.showRoleManagement.set(show);
-    if (!show) {
-      this.selectedUser.set(null);
-    }
+  onCloseRoleManagement(): void {
+    this.showRoleManagement.set(false);
+    this.selectedUser.set(null);
   }
 }

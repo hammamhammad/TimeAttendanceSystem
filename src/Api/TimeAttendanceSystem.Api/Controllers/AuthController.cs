@@ -106,7 +106,7 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var command = new LoginCommand(request.Username, request.Password, request.DeviceInfo);
+        var command = new LoginCommand(request.Username, request.Password, request.DeviceInfo, request.RememberMe);
         var result = await _mediator.Send(command);
 
         if (result.IsFailure)
@@ -614,7 +614,8 @@ public class AuthController : ControllerBase
 /// <param name="Username">User's unique username for authentication</param>
 /// <param name="Password">User's password in plain text (encrypted in transit via HTTPS)</param>
 /// <param name="DeviceInfo">Optional device/browser information for session fingerprinting</param>
-public record LoginRequest(string Username, string Password, string? DeviceInfo = null);
+/// <param name="RememberMe">Flag indicating whether to use extended token expiration for persistent sessions</param>
+public record LoginRequest(string Username, string Password, string? DeviceInfo = null, bool RememberMe = false);
 
 /// <summary>
 /// Request model for refreshing expired access tokens.

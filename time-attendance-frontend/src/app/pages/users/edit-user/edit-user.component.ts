@@ -40,8 +40,10 @@ export class EditUserComponent implements OnInit {
   ngOnInit() {
     this.userId = +this.route.snapshot.params['id'];
     if (this.userId) {
-      this.loadUser();
-      this.loadRoles();
+      // Load roles first, then user data to properly map role names to IDs
+      this.loadRoles().then(() => {
+        this.loadUser();
+      });
       this.loadBranches();
     } else {
       this.router.navigate(['/users']);
@@ -75,14 +77,18 @@ export class EditUserComponent implements OnInit {
     });
   }
 
-  private loadRoles() {
-    this.usersService.getRoles().subscribe({
-      next: (roles) => {
-        this.availableRoles.set(roles);
-      },
-      error: (error) => {
-        console.error('Error loading roles:', error);
-      }
+  private loadRoles(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.usersService.getRoles().subscribe({
+        next: (roles) => {
+          this.availableRoles.set(roles);
+          resolve();
+        },
+        error: (error) => {
+          console.error('Error loading roles:', error);
+          reject(error);
+        }
+      });
     });
   }
 
@@ -105,10 +111,20 @@ export class EditUserComponent implements OnInit {
       isActive: user.isActive
     });
 
-    // Set selected roles and branches (roles are strings in User interface)
-    this.selectedRoleIds.set([]);
+    // Map role names to role IDs
+    const roleIds: number[] = [];
+    if (user.roles && this.availableRoles().length > 0) {
+      user.roles.forEach(roleName => {
+        const role = this.availableRoles().find(r => r.name === roleName);
+        if (role) {
+          roleIds.push(role.id);
+        }
+      });
+    }
+
+    this.selectedRoleIds.set(roleIds);
     this.selectedBranchIds.set(user.branches?.map(b => b.id) || []);
-    
+
     this.userForm.patchValue({
       roleIds: this.selectedRoleIds(),
       branchIds: this.selectedBranchIds()

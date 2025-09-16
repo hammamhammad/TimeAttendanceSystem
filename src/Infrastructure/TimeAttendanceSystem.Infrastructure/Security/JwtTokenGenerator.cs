@@ -135,7 +135,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
     /// - Data isolation enforcement through JWT claims validation
     /// - Scalable multi-tenant architecture with performance optimization
     /// </remarks>
-    public string GenerateAccessToken(User user, IReadOnlyList<string> roles, IReadOnlyList<string> permissions, IReadOnlyList<long> branchIds)
+    public string GenerateAccessToken(User user, IReadOnlyList<string> roles, IReadOnlyList<string> permissions, IReadOnlyList<long> branchIds, bool rememberMe = false)
     {
         var signingCredentials = new SigningCredentials(
             new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"]!)),
@@ -173,7 +173,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         var securityToken = new JwtSecurityToken(
             issuer: _configuration["Jwt:Issuer"],
             audience: _configuration["Jwt:Audience"],
-            expires: GetTokenExpiration(),
+            expires: GetTokenExpiration(rememberMe),
             claims: claims,
             signingCredentials: signingCredentials);
 
@@ -242,8 +242,16 @@ public class JwtTokenGenerator : IJwtTokenGenerator
     /// - High-security: Very short expiration (5 minutes) with frequent refresh
     /// - Mobile apps: Balanced expiration considering network conditions
     /// </remarks>
-    public DateTime GetTokenExpiration()
+    public DateTime GetTokenExpiration(bool rememberMe = false)
     {
+        if (rememberMe)
+        {
+            // For "Remember Me", use extended expiration (7 days)
+            var rememberMeDays = _configuration.GetValue<int>("Jwt:RememberMeDays", 7);
+            return DateTime.UtcNow.AddDays(rememberMeDays);
+        }
+
+        // Default short expiration for regular login
         var expiryMinutes = _configuration.GetValue<int>("Jwt:ExpiryMinutes", 15);
         return DateTime.UtcNow.AddMinutes(expiryMinutes);
     }

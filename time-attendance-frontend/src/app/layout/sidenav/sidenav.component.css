@@ -64,6 +64,46 @@
   margin-right: 0 !important;
 }
 
+/* Submenu styles */
+.submenu {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 0.25rem;
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.submenu .nav-link {
+  padding: 0.5rem 1rem 0.5rem 2.5rem;
+  font-size: 0.875rem;
+  border-left: none;
+}
+
+.submenu .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.submenu .nav-link.active {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-left: 3px solid var(--bs-primary);
+}
+
+/* Chevron rotation animation */
+.rotate-180 {
+  transform: rotate(180deg);
+}
+
+/* RTL Support for submenus */
+:root[dir="rtl"] .submenu .nav-link {
+  padding-left: 1rem;
+  padding-right: 2.5rem;
+  border-left: none;
+  border-right: none;
+}
+
+:root[dir="rtl"] .submenu .nav-link.active {
+  border-right: 3px solid var(--bs-primary);
+}
+
 /* RTL Support */
 :root[dir="rtl"] .sidenav {
   left: auto !important;

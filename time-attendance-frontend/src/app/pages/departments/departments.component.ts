@@ -1,17 +1,19 @@
 import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { DepartmentsService } from './departments.service';
 import { DepartmentDto } from '../../shared/models/department.model';
 import { BranchDto } from '../../shared/models/employee.model';
 import { DepartmentTableComponent } from './department-table/department-table.component';
 import { DepartmentTreeComponent } from './department-tree/department-tree.component';
-import { DepartmentFormComponent } from './department-form/department-form.component';
+import { DepartmentFiltersComponent } from './department-filters/department-filters.component';
+import { DepartmentInfoPanelComponent } from './department-info-panel/department-info-panel.component';
 import { ConfirmationService } from '../../core/confirmation/confirmation.service';
 import { PermissionService } from '../../core/auth/permission.service';
 import { PermissionResources, PermissionActions } from '../../shared/utils/permission.utils';
-import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
+import { SearchableSelectOption } from '../../shared/components/searchable-select/searchable-select.component';
 
 type ViewMode = 'table' | 'tree';
 
@@ -19,12 +21,12 @@ type ViewMode = 'table' | 'tree';
   selector: 'app-departments',
   standalone: true,
   imports: [
-    CommonModule, 
-    FormsModule, 
-    DepartmentTableComponent, 
+    CommonModule,
+    FormsModule,
+    DepartmentTableComponent,
     DepartmentTreeComponent,
-    DepartmentFormComponent,
-    HasPermissionDirective
+    DepartmentFiltersComponent,
+    DepartmentInfoPanelComponent,
   ],
   templateUrl: './departments.component.html',
   styleUrls: ['./departments.component.css']
@@ -34,6 +36,7 @@ export class DepartmentsComponent implements OnInit {
   private departmentsService = inject(DepartmentsService);
   private confirmationService = inject(ConfirmationService);
   public permissionService = inject(PermissionService);
+  private router = inject(Router);
 
   // Permission constants for use in template
   readonly PERMISSIONS = {
@@ -48,40 +51,48 @@ export class DepartmentsComponent implements OnInit {
   viewMode = signal<ViewMode>('table');
   selectedBranch = signal<BranchDto | null>(null);
   selectedDepartment = signal<DepartmentDto | null>(null);
-  showForm = signal(false);
-  isEditMode = signal(false);
+  branchesLoading = signal(false);
+  branches = signal<BranchDto[]>([]);
 
-  // Mock branches - replace with actual service call
-  branches = signal<BranchDto[]>([
-    { id: 1, name: 'Main Branch', code: 'MAIN', location: 'Headquarters', isActive: true },
-    { id: 2, name: 'Branch 2', code: 'BR02', location: 'Downtown', isActive: true }
-  ]);
 
   ngOnInit() {
-    // Set default branch if available
-    const branches = this.branches();
-    if (branches.length > 0) {
-      this.selectedBranch.set(branches[0]);
-    }
+    // Component initialization if needed
   }
+
 
   onViewModeChange(mode: ViewMode) {
     this.viewMode.set(mode);
   }
 
   onBranchChange(branchId: number) {
+    if (!branchId || branchId === 0) {
+      this.selectedBranch.set(null);
+      return;
+    }
+
     const branch = this.branches().find(b => b.id === branchId);
     this.selectedBranch.set(branch || null);
+  }
+
+  onBranchSelectionChange(branchIdStr: string) {
+    const branchId = branchIdStr ? parseInt(branchIdStr) : 0;
+    this.onBranchChange(branchId);
+  }
+
+  onCloseInfoPanel() {
+    this.selectedDepartment.set(null);
   }
 
   onDepartmentSelected(department: DepartmentDto) {
     this.selectedDepartment.set(department);
   }
 
+  onDepartmentView(department: DepartmentDto) {
+    this.router.navigate(['/departments', department.id, 'view']);
+  }
+
   onDepartmentEdit(department: DepartmentDto) {
-    this.selectedDepartment.set(department);
-    this.isEditMode.set(true);
-    this.showForm.set(true);
+    this.router.navigate(['/departments', department.id, 'edit']);
   }
 
   async onDepartmentDelete(department: DepartmentDto): Promise<void> {
@@ -101,60 +112,13 @@ export class DepartmentsComponent implements OnInit {
   }
 
   onDepartmentAdd(data?: { parentId?: number }) {
-    this.selectedDepartment.set(null);
-    this.isEditMode.set(false);
-    this.showForm.set(true);
-    
-    // If parentId is provided, we could pre-fill parent department
     if (data?.parentId) {
-      // Handle parent department selection
-      console.log('Adding department with parent:', data.parentId);
-    }
-  }
-
-  onFormClose() {
-    this.showForm.set(false);
-    this.selectedDepartment.set(null);
-    this.isEditMode.set(false);
-  }
-
-  onFormSave(department: any) {
-    if (this.isEditMode()) {
-      this.updateDepartment(department);
+      this.router.navigate(['/departments/create'], { queryParams: { parentId: data.parentId } });
     } else {
-      this.createDepartment(department);
+      this.router.navigate(['/departments/create']);
     }
   }
 
-  private async createDepartment(department: any) {
-    try {
-      await this.departmentsService.createDepartment({
-        ...department,
-        branchId: this.selectedBranch()?.id
-      }).toPromise();
-      
-      this.onFormClose();
-      this.refreshData();
-    } catch (error) {
-      console.error('Failed to create department:', error);
-    }
-  }
-
-  private async updateDepartment(department: any) {
-    if (!this.selectedDepartment()?.id) return;
-    
-    try {
-      await this.departmentsService.updateDepartment(
-        this.selectedDepartment()!.id, 
-        department
-      ).toPromise();
-      
-      this.onFormClose();
-      this.refreshData();
-    } catch (error) {
-      console.error('Failed to update department:', error);
-    }
-  }
 
   private async deleteDepartment(id: number) {
     try {

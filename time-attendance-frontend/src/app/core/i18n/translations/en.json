@@ -60,6 +60,7 @@
     "roles": "Roles",
     "branches": "Branches",
     "departments": "Departments",
+    "shifts": "Shifts",
     "reports": "Reports",
     "settings": "Settings",
     "logout": "Logout",
@@ -68,12 +69,22 @@
   "dashboard": {
     "title": "Dashboard",
     "welcome": "Welcome back",
+    "welcome_message": "Here's what's happening at your organization today",
+    "total_users": "Total Users",
     "total_employees": "Total Employees",
     "active_employees": "Active Employees",
+    "active_sessions": "Active Sessions",
     "present_today": "Present Today",
     "absent_today": "Absent Today",
     "recent_activities": "Recent Activities",
-    "attendance_summary": "Attendance Summary"
+    "quick_actions": "Quick Actions",
+    "view_reports": "View Reports",
+    "sample_activity_1": "New user \"john.doe\" was created",
+    "sample_activity_2": "Employee \"Jane Smith\" checked in",
+    "sample_activity_3": "Late arrival detected for \"Mike Johnson\"",
+    "time_ago_2min": "2 minutes ago",
+    "time_ago_5min": "5 minutes ago",
+    "time_ago_10min": "10 minutes ago"
   },
   "employees": {
     "title": "Employee Management",
@@ -114,6 +125,17 @@
     "department": "Department",
     "branch": "Branch",
     "manager": "Manager",
+    "current_shift": "Current Shift",
+    "no_shift_assigned": "No shift assigned",
+    "change_shift": "Change Shift",
+    "employee": "Employee",
+    "new_shift": "New Shift",
+    "select_shift": "Select a shift",
+    "shift_required": "Shift is required",
+    "effective_date": "Effective Date",
+    "effective_date_help": "Leave empty to use today's date",
+    "notes": "Notes",
+    "notes_placeholder": "Reason for shift change...",
     "photo": "Photo",
     "select_branch_first": "Please select a branch first",
     "no_employees_found": "No employees found",
@@ -145,7 +167,10 @@
       "contract": "Contract",
       "intern": "Intern",
       "consultant": "Consultant",
-      "terminated": "Terminated"
+      "terminated": "Terminated",
+      "active": "Active",
+      "inactive": "Inactive",
+      "on_leave": "On Leave"
     },
     "gender": {
       "title": "Gender",
@@ -154,10 +179,16 @@
     },
     "work_location": {
       "title": "Work Location",
-      "onsite": "On-Site",
+      "onsite": "Onsite",
       "remote": "Remote",
-      "hybrid": "Hybrid"
-    }
+      "hybrid": "Hybrid",
+      "field": "Field"
+    },
+    "employee_number_readonly": "Employee number cannot be changed after creation",
+    "branch_readonly": "Branch cannot be changed after employee creation",
+    "update_employee": "Update Employee",
+    "created_at": "Created At",
+    "invalid_employee_id": "Invalid employee ID"
   },
   "roles": {
     "title": "Role Management",
@@ -193,12 +224,30 @@
     "search_permissions_placeholder": "Search permissions...",
     "select_all_in_group": "Select all in this group",
     "clear_all_in_group": "Clear all in this group",
-    "no_permissions_available": "No permissions available"
+    "no_permissions_available": "No permissions available",
+    "failed_to_load_permissions": "Failed to load permissions",
+    "delete_role": "Delete Role",
+    "delete_role_confirmation": "Are you sure you want to delete the role \"{{roleName}}\"? This action cannot be undone.",
+    "role_deleted_successfully": "Role deleted successfully",
+    "failed_to_update_permission": "Failed to update permission",
+    "role_created_successfully": "Role created successfully",
+    "invalid_role_id": "Invalid role ID",
+    "role_updated_successfully": "Role updated successfully",
+    "role_name_required": "Role name is required",
+    "failed_to_create_role": "Failed to create role",
+    "no_description": "No description available",
+    "role_information": "Role Information",
+    "basic_information": "Basic Information",
+    "view_details": "View Role Details",
+    "role_not_found": "Role not found",
+    "edit": "Edit",
+    "system_role_name_readonly": "System role name cannot be modified",
+    "name_placeholder": "Enter role name"
   },
   "branches": {
     "title": "Branch Management",
     "subtitle": "Manage organizational branches and locations",
-    "name": "Branch Name", 
+    "name": "Branch Name",
     "code": "Branch Code",
     "timezone": "Time Zone",
     "status": "Status",
@@ -227,6 +276,7 @@
     "manage_roles": "Manage Roles",
     "user_details": "User Details",
     "user_information": "User Information",
+    "basic_information": "Basic Information",
     "username": "Username",
     "email": "Email",
     "phone": "Phone",
@@ -298,12 +348,255 @@
     "descriptionArPlaceholder": "Enter department description in Arabic",
     "additionalInformation": "Additional Information",
     "selectManager": "Select Manager",
+    "selectBranchFirst": "Please select a branch first to view managers",
     "managerHelp": "Optional: Assign an employee as department manager",
     "costCenter": "Cost Center",
     "costCenterPlaceholder": "Enter cost center code",
     "locationPlaceholder": "Enter department location",
     "isActive": "Department is Active",
-    "isActiveHelp": "Inactive departments will be hidden from most views"
+    "isActiveHelp": "Inactive departments will be hidden from most views",
+    "information": "Department Information",
+    "create": "Create Department",
+    "edit": "Edit Department",
+    "view": "View Department",
+    "not_found": "Department not found",
+    "allDepartments": "All Departments",
+    "showingAllDepartments": "Showing departments from all branches. Select a specific branch to filter.",
+    "hierarchy": "Department Hierarchy",
+    "statistics": "Statistics",
+    "employees": "Employees",
+    "sub_departments": "Sub-departments",
+    "contact_info": "Contact Information",
+    "view_details": "View Details",
+    "view_employees": "View Employees",
+    "create_subdepartment": "Create Sub-department",
+    "department_not_found": "Department not found",
+    "root_department": "Root Department",
+    "description_ar": "Description (Arabic)"
+  },
+  "departments": {
+    "title": "Departments",
+    "view_details": "View Department Details",
+    "edit": "Edit Department",
+    "name": "Department Name",
+    "name_ar": "Department Name (Arabic)",
+    "code": "Department Code",
+    "parent": "Parent Department",
+    "manager": "Manager",
+    "cost_center": "Cost Center",
+    "location": "Location",
+    "description_ar": "Description (Arabic)",
+    "contact_info": "Contact Information",
+    "view_employees": "View Employees",
+    "create_subdepartment": "Create Sub-department",
+    "statistics": "Statistics",
+    "employees": "Employees",
+    "sub_departments": "Sub-departments",
+    "hierarchy": "Hierarchy",
+    "department_not_found": "Department not found",
+    "root_department": "Root Department"
+  },
+  "shifts": {
+    "title": "Shift Management",
+    "subtitle": "Manage work shifts and time schedules",
+    "noShifts": "No shifts found",
+    "noShiftsDescription": "Create your first shift to get started with time management",
+    "searchPlaceholder": "Search shifts by name or description...",
+    "results": "results",
+    "create": "Create Shift",
+    "create_shift": "Create New Shift",
+    "createDescription": "Create a new work shift to define working hours and shift rules",
+    "edit": "Edit Shift",
+    "edit_shift": "Edit Shift",
+    "update": "Update Shift",
+    "delete": "Delete Shift",
+    "namePlaceholder": "Enter shift name",
+    "descriptionPlaceholder": "Enter shift description (optional)",
+    "hours": "hours",
+    "name": "Shift Name",
+    "description": "Description",
+    "branch": "Branch",
+    "type": "Shift Type",
+    "actions": {
+      "create": "Create Shift"
+    },
+    "periods": "Working Periods",
+    "addPeriod": "Add Period",
+    "removePeriod": "Remove Period",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "save": "Save",
+    "cancel": "Cancel",
+    "requiredHours": "Required Hours Per Day",
+    "checkInRequired": "Check-In Required",
+    "autoCheckOut": "Auto Check-Out",
+    "allowFlexibleHours": "Allow Flexible Hours",
+    "flexMinutesBefore": "Flex Minutes Before",
+    "flexMinutesAfter": "Flex Minutes After",
+    "gracePeriodMinutes": "Grace Period (Minutes)",
+    "isNightShift": "Night Shift",
+    "totalHours": "Total Hours",
+    "period": "Period",
+    "workingDays": "Working Days",
+    "fields": {
+      "name": "Shift Name",
+      "status": "Status",
+      "type": "Shift Type",
+      "periods": "Working Periods",
+      "requirements": "Requirements"
+    },
+    "workingSchedule": "Working Schedule",
+    "extendedRules": "Extended Business Rules",
+    "coreHours": "Core Hours",
+    "requiredWeeklyHours": "Required Weekly Hours",
+    "hasCoreHours": "Enable Core Hours",
+    "coreStart": "Core Hours Start",
+    "coreEnd": "Core Hours End",
+    "shiftSummary": "Shift Summary",
+    "weeklyHours": "Weekly Hours",
+    "workingDaysCount": "Working Days",
+    "basicInformation": "Basic Information",
+    "shiftConfiguration": "Shift Configuration",
+    "advancedOptions": "Advanced Options",
+    "types": {
+      "timeBased": "Time-based",
+      "hoursOnly": "Hours Only"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "draft": "Draft",
+      "archived": "Archived"
+    },
+    "periodTypes": {
+      "dayShift": "Day Shift",
+      "nightShift": "Night Shift (spans midnight)",
+      "order": "Order"
+    },
+    "validation": {
+      "name": {
+        "required": "Shift name is required"
+      },
+      "branch": {
+        "required": "Branch selection is required"
+      },
+      "timeBased": {
+        "periodsRequired": "Time-based shifts must have at least one working period",
+        "noRequiredHours": "Time-based shifts should not have required hours set"
+      },
+      "hoursOnly": {
+        "noPeriods": "Hours-only shifts should not have working periods",
+        "requiredHours": "Hours-only shifts must have valid required hours greater than 0",
+        "maxHours": "Required hours cannot exceed 24 hours per day",
+        "noFlexibleHours": "Flexible hours are not valid for hours-only shifts",
+        "noGracePeriod": "Grace period is not valid for hours-only shifts"
+      },
+      "periods": {
+        "maxTwo": "Shifts can have at most two working periods per day",
+        "sameTime": "Period {{period}} cannot have the same start and end time",
+        "positiveHours": "Period {{period}} must have positive working hours",
+        "maxHours": "Period {{period}} cannot exceed 24 hours",
+        "overlap": "Working periods cannot overlap",
+        "multipleNight": "Cannot have multiple night periods in a single shift"
+      },
+      "flexible": {
+        "maxBefore": "Flex minutes before cannot exceed 8 hours (480 minutes)",
+        "maxAfter": "Flex minutes after cannot exceed 8 hours (480 minutes)",
+        "noGracePeriod": "Grace period is not allowed when flexible hours is enabled"
+      },
+      "gracePeriod": {
+        "max": "Grace period cannot exceed 2 hours (120 minutes)"
+      },
+      "checkInOut": {
+        "conflict": "Either check-in must be required or auto check-out must be enabled"
+      },
+      "workingDays": {
+        "required": "At least one working day must be selected"
+      },
+      "coreHours": {
+        "required": "Core hours start and end times must be set when core hours are enabled",
+        "sameTime": "Core hours start time must be different from end time",
+        "outsidePeriods": "Core hours must be within the defined shift periods"
+      },
+      "weeklyHours": {
+        "positive": "Required weekly hours must be greater than 0",
+        "maxWeekly": "Required weekly hours cannot exceed 168 hours per week"
+      }
+    },
+    "help": {
+      "shiftType": {
+        "timeBased": "Fixed start and end times with defined working periods",
+        "hoursOnly": "Flexible timing requiring a specific number of hours per day"
+      },
+      "requiredHours": "For hours-only shifts: total hours employee must work per day (max 24 hours)",
+      "checkInRequired": "Whether employees must check-in for this shift (absence flagged if missing)",
+      "autoCheckOut": "System automatically checks out employees at shift end time",
+      "flexibleHours": "Allow check-in within a time window instead of exact start time",
+      "flexBefore": "Minutes before start time when check-in is allowed (max 8 hours)",
+      "flexAfter": "Minutes after start time when check-in is allowed (max 8 hours)",
+      "gracePeriod": "Late check-in tolerance without penalty (max 2 hours)",
+      "nightShift": "Night shifts span midnight when end time is earlier than start time",
+      "multiPeriod": "Split shifts with up to 2 working periods (e.g., morning + evening)",
+      "workingDays": "Select which days of the week this shift applies to",
+      "requiredWeeklyHours": "Total hours an employee must work across the shift's work week (max 168 hours)",
+      "coreHours": "Define mandatory presence windows each working day",
+      "coreStart": "Start time for mandatory presence during working days",
+      "coreEnd": "End time for mandatory presence during working days"
+    },
+    "deleteConfirmation": "Are you sure you want to delete this shift? This action cannot be undone and will affect all associated schedules.",
+    "success": {
+      "created": "Shift created successfully",
+      "updated": "Shift updated successfully",
+      "deleted": "Shift deleted successfully"
+    },
+    "loading": {
+      "creating": "Creating shift...",
+      "updating": "Updating shift...",
+      "deleting": "Deleting shift..."
+    },
+    "assignments": {
+      "title": "Shift Assignments",
+      "subtitle": "Assign shifts to employees, departments, or branches",
+      "noAssignments": "No shift assignments found",
+      "noAssignmentsDescription": "Create shift assignments to define who works which shifts",
+      "searchPlaceholder": "Search assignments by shift, employee, department, or branch...",
+      "createButton": "Assign Shift",
+      "createTitle": "Create Shift Assignment",
+      "editTitle": "Edit Shift Assignment",
+      "assignmentType": "Assignment Type",
+      "target": "Assignment Target",
+      "effectiveDate": "Effective Date",
+      "endDate": "End Date",
+      "priority": "Priority",
+      "currentlyActiveOnly": "Currently Active Only",
+      "confirmDelete": "Are you sure you want to delete this shift assignment?",
+      "notesPlaceholder": "Optional notes about this assignment...",
+      "loadError": "Failed to load shift assignments",
+      "types": {
+        "employee": "Employee",
+        "department": "Department",
+        "branch": "Branch"
+      },
+      "status": {
+        "pending": "Pending",
+        "active": "Active",
+        "inactive": "Inactive",
+        "expired": "Expired",
+        "cancelled": "Cancelled"
+      },
+      "success": {
+        "created": "Shift assignment created successfully",
+        "updated": "Shift assignment updated successfully",
+        "deleted": "Shift assignment deleted successfully"
+      },
+      "validation": {
+        "shiftRequired": "Please select a shift",
+        "targetRequired": "Please select a target for assignment",
+        "effectiveDateRequired": "Effective date is required",
+        "endDateAfterEffective": "End date must be after effective date",
+        "priorityRange": "Priority must be between 0 and 100"
+      }
+    }
   },
   "settings": {
     "title": "Settings",
@@ -345,21 +638,27 @@
     "loading": "Loading...",
     "saving": "Saving...",
     "no_data": "No data available",
-    "showing": "Showing",
-    "of": "of",
-    "close": "Close",
+    "select": "Select",
+    "create": "Create",
+    "edit": "Edit",
+    "update": "Update",
+    "delete": "Delete",
     "cancel": "Cancel",
     "save": "Save",
-    "back": "Back",
-    "select": "Select",
+    "close": "Close",
+    "confirm": "Confirm",
+    "filters": "Filters",
+    "showing": "Showing",
+    "to": "to",
+    "of": "of",
+    "entries": "entries",
+    "previous": "Previous",
+    "next": "Next",
+    "indefinite": "Indefinite",
     "select_branch": "Select Branch",
     "select_department": "Select Department",
     "select_manager": "Select Manager",
     "view_details": "View Details",
-    "previous": "Previous",
-    "next": "Next",
-    "edit": "Edit",
-    "delete": "Delete",
     "show": "Show",
     "per_page": "per page",
     "branch": "Branch",
@@ -376,7 +675,6 @@
     "sortOrder": "Sort Order",
     "sortOrderHelp": "Lower numbers appear first in listings",
     "reset": "Reset",
-    "update": "Update",
     "showInactive": "Show Inactive",
     "refresh": "Refresh",
     "selected": "selected",
@@ -386,7 +684,22 @@
     "expandAll": "Expand All",
     "collapseAll": "Collapse All",
     "language_english": "English",
-    "language_arabic": "العربية"
+    "language_arabic": "العربية",
+    "allBranches": "All Branches",
+    "minutes": "minutes",
+    "results": "results",
+    "validationErrors": "Validation Errors",
+    "back": "Back",
+    "noResultsFound": "No results found",
+    "days": {
+      "sunday": "Sunday",
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday"
+    }
   },
   "validation": {
     "required": "This field is required",

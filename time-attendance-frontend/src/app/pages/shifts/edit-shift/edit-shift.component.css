@@ -1,0 +1,66 @@
+/* Edit Shift Component Styles */
+
+.form-check.p-3.border {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.form-check.p-3.border:hover {
+  background-color: rgba(0, 123, 255, 0.05);
+  border-color: var(--bs-primary) !important;
+}
+
+.form-check-input:checked ~ .form-check-label {
+  color: var(--bs-primary);
+}
+
+.card .card-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.badge {
+  font-size: 0.75em;
+}
+
+.alert-info {
+  background-color: rgba(13, 202, 240, 0.1);
+  border-color: rgba(13, 202, 240, 0.2);
+  color: #055160;
+}
+
+.form-switch .form-check-input {
+  cursor: pointer;
+}
+
+.btn-outline-danger.btn-sm {
+  --bs-btn-padding-y: 0.25rem;
+  --bs-btn-padding-x: 0.5rem;
+  --bs-btn-font-size: 0.875rem;
+}
+
+/* Loading state styles */
+.spinner-border {
+  width: 2rem;
+  height: 2rem;
+}
+
+/* Form validation styles */
+.form-control:invalid {
+  border-color: #dc3545;
+}
+
+.form-control:valid {
+  border-color: #198754;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .container-fluid {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .card-body {
+    padding: 1.5rem !important;
+  }
+}

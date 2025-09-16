@@ -146,3 +146,24 @@
   border-radius: 0.5rem;
   padding: 1rem;
 }
+
+/* Sortable table headers */
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.15s ease-in-out;
+}
+
+th.sortable:hover {
+  background-color: #e9ecef;
+}
+
+th.sortable i {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  transition: opacity 0.15s ease-in-out;
+}
+
+th.sortable:hover i {
+  opacity: 1;
+}

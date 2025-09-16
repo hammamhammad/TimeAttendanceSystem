@@ -1,0 +1,398 @@
+<div class="container-fluid">
+  <!-- Page Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 mb-0">{{ i18n.t('shifts.assignments.title') }}</h1>
+      <p class="text-muted">{{ i18n.t('shifts.assignments.subtitle') }}</p>
+    </div>
+    <button
+      *appHasPermission="PERMISSIONS.SHIFT_ASSIGNMENT_CREATE"
+      type="button"
+      class="btn btn-primary"
+      (click)="openCreateModal()">
+      <i class="fas fa-plus me-2"></i>
+      {{ i18n.t('shifts.assignments.createButton') }}
+    </button>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5 class="mb-0">{{ i18n.t('common.filters') }}</h5>
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+        <!-- Search -->
+        <div class="col-md-3">
+          <label class="form-label">{{ i18n.t('common.search') }}</label>
+          <input
+            type="text"
+            class="form-control"
+            [placeholder]="i18n.t('shifts.assignments.searchPlaceholder')"
+            [ngModel]="searchTerm()"
+            [ngModelOptions]="{standalone: true}"
+            (ngModelChange)="searchTerm.set($event)"
+            (keyup.enter)="onSearchChanged()">
+        </div>
+
+        <!-- Assignment Type Filter -->
+        <div class="col-md-2">
+          <label class="form-label">{{ i18n.t('shifts.assignments.assignmentType') }}</label>
+          <app-searchable-select
+            [options]="assignmentTypeFilterOptions"
+            [value]="selectedAssignmentType()?.toString() || ''"
+            (selectionChange)="selectedAssignmentType.set($event ? +$event : null); onFilterChanged()"
+            [searchable]="false"
+            [clearable]="false"
+          ></app-searchable-select>
+        </div>
+
+        <!-- Status Filter -->
+        <div class="col-md-2">
+          <label class="form-label">{{ i18n.t('common.status') }}</label>
+          <app-searchable-select
+            [options]="statusFilterOptions"
+            [value]="selectedStatus()?.toString() || ''"
+            (selectionChange)="selectedStatus.set($event ? +$event : null); onFilterChanged()"
+            [searchable]="false"
+            [clearable]="false"
+          ></app-searchable-select>
+        </div>
+
+        <!-- Shift Filter -->
+        <div class="col-md-2">
+          <label class="form-label">{{ i18n.t('shifts.shift') }}</label>
+          <app-searchable-select
+            [options]="shiftFilterOptions"
+            [value]="selectedShiftId()?.toString() || ''"
+            (selectionChange)="selectedShiftId.set($event ? +$event : null); onFilterChanged()"
+            [searchable]="true"
+            [clearable]="false"
+          ></app-searchable-select>
+        </div>
+
+        <!-- Currently Active Filter -->
+        <div class="col-md-2">
+          <div class="form-check mt-4">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="currentlyActive"
+              [ngModel]="currentlyActiveOnly()"
+              [ngModelOptions]="{standalone: true}"
+              (ngModelChange)="currentlyActiveOnly.set($event); onFilterChanged()">
+            <label class="form-check-label" for="currentlyActive">
+              {{ i18n.t('shifts.assignments.currentlyActiveOnly') }}
+            </label>
+          </div>
+        </div>
+
+        <!-- Clear Filters -->
+        <div class="col-md-1">
+          <button
+            type="button"
+            class="btn btn-outline-secondary mt-4"
+            (click)="clearFilters()">
+            {{ i18n.t('common.clear') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assignments Table -->
+  <div class="card">
+    <div class="card-body">
+      <!-- Loading State -->
+      <div *ngIf="loading()" class="text-center py-4">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">{{ i18n.t('common.loading') }}</span>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="error()" class="alert alert-danger">
+        {{ error() }}
+      </div>
+
+      <!-- Table -->
+      <div *ngIf="!loading() && !error()" class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>{{ i18n.t('shifts.shift') }}</th>
+              <th>{{ i18n.t('shifts.assignments.assignmentType') }}</th>
+              <th>{{ i18n.t('shifts.assignments.target') }}</th>
+              <th>{{ i18n.t('shifts.assignments.effectiveDate') }}</th>
+              <th>{{ i18n.t('shifts.assignments.endDate') }}</th>
+              <th>{{ i18n.t('common.status') }}</th>
+              <th>{{ i18n.t('shifts.assignments.priority') }}</th>
+              <th *appHasPermission="PERMISSIONS.SHIFT_ASSIGNMENT_MANAGE">{{ i18n.t('common.actions') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let assignment of assignments()" [class.table-success]="isCurrentlyActive(assignment)">
+              <td>
+                <div>
+                  <strong>{{ assignment.shiftName }}</strong>
+                  <small class="text-muted d-block">{{ assignment.shiftType }}</small>
+                </div>
+              </td>
+              <td>
+                <span class="badge bg-info">{{ assignment.assignmentTypeDisplay }}</span>
+              </td>
+              <td>
+                <div>
+                  <strong>{{ assignment.targetDisplayName }}</strong>
+                  <small *ngIf="assignment.employeeNumber" class="text-muted d-block">
+                    {{ i18n.t('employees.employeeNumber') }}: {{ assignment.employeeNumber }}
+                  </small>
+                  <small *ngIf="assignment.branchCode" class="text-muted d-block">
+                    {{ i18n.t('branches.code') }}: {{ assignment.branchCode }}
+                  </small>
+                </div>
+              </td>
+              <td>{{ formatDate(assignment.effectiveDate) }}</td>
+              <td>
+                <span *ngIf="assignment.endDate">{{ formatDate(assignment.endDate) }}</span>
+                <span *ngIf="!assignment.endDate" class="text-muted">{{ i18n.t('common.indefinite') }}</span>
+              </td>
+              <td>
+                <span class="badge" [ngClass]="getStatusBadgeClass(assignment.status)">
+                  {{ assignment.statusDisplay }}
+                </span>
+              </td>
+              <td>
+                <span class="badge bg-secondary">{{ assignment.priority }}</span>
+              </td>
+              <td *appHasPermission="PERMISSIONS.SHIFT_ASSIGNMENT_MANAGE">
+                <div class="btn-group btn-group-sm">
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary"
+                    (click)="editAssignment(assignment)"
+                    [title]="i18n.t('common.edit')">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-outline-danger"
+                    (click)="deleteAssignment(assignment)"
+                    [title]="i18n.t('common.delete')">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="assignments().length === 0">
+              <td [attr.colspan]="8" class="text-center py-4 text-muted">
+                {{ i18n.t('shifts.assignments.noAssignments') }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <nav *ngIf="totalPages() > 1" class="mt-4">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <span class="text-muted">
+              {{ i18n.t('common.showing') }}
+              {{ (currentPage() - 1) * pageSize() + 1 }}
+              {{ i18n.t('common.to') }}
+              {{ Math.min(currentPage() * pageSize(), totalCount()) }}
+              {{ i18n.t('common.of') }}
+              {{ totalCount() }}
+              {{ i18n.t('common.entries') }}
+            </span>
+          </div>
+          <ul class="pagination pagination-sm mb-0">
+            <li class="page-item" [class.disabled]="currentPage() === 1">
+              <a class="page-link" (click)="onPageChanged(currentPage() - 1)">
+                {{ i18n.t('common.previous') }}
+              </a>
+            </li>
+            <li
+              *ngFor="let page of [].constructor(totalPages()); let i = index"
+              class="page-item"
+              [class.active]="currentPage() === i + 1">
+              <a class="page-link" (click)="onPageChanged(i + 1)">{{ i + 1 }}</a>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage() === totalPages()">
+              <a class="page-link" (click)="onPageChanged(currentPage() + 1)">
+                {{ i18n.t('common.next') }}
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<!-- Create Assignment Modal -->
+<div class="modal fade" [class.show]="showCreateModal()" [style.display]="showCreateModal() ? 'block' : 'none'">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ i18n.t('shifts.assignments.createTitle') }}</h5>
+        <button type="button" class="btn-close" (click)="closeCreateModal()"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="row g-3">
+            <!-- Shift Selection -->
+            <div class="col-md-6">
+              <label class="form-label">{{ i18n.t('shifts.shift') }} <span class="text-danger">*</span></label>
+              <app-searchable-select
+                [options]="shiftSelectOptions"
+                [ngModel]="createForm().shiftId.toString()"
+                [ngModelOptions]="{standalone: true}"
+                (selectionChange)="onShiftSelectionChange($event)"
+                [placeholder]="i18n.t('common.select')"
+                [searchable]="true"
+                [clearable]="false"
+              ></app-searchable-select>
+            </div>
+
+            <!-- Assignment Type -->
+            <div class="col-md-6">
+              <label class="form-label">{{ i18n.t('shifts.assignments.assignmentType') }} <span class="text-danger">*</span></label>
+              <app-searchable-select
+                [options]="assignmentTypeSelectOptions"
+                [ngModel]="createForm().assignmentType.toString()"
+                [ngModelOptions]="{standalone: true}"
+                (selectionChange)="onAssignmentTypeSelectionChange($event)"
+                [searchable]="false"
+                [clearable]="false"
+              ></app-searchable-select>
+            </div>
+
+            <!-- Employee Selection (if Employee type) -->
+            <div *ngIf="createForm().assignmentType === ShiftAssignmentType.Employee" class="col-md-6">
+              <label class="form-label">{{ i18n.t('employees.employee') }} <span class="text-danger">*</span></label>
+              <app-searchable-select
+                [options]="employeeSelectOptions"
+                [ngModel]="createForm().employeeId?.toString() || ''"
+                [ngModelOptions]="{standalone: true}"
+                (selectionChange)="onEmployeeSelectionChange($event)"
+                [placeholder]="i18n.t('common.select')"
+                [searchable]="true"
+                [clearable]="false"
+              ></app-searchable-select>
+            </div>
+
+            <!-- Department Selection (if Department type) -->
+            <div *ngIf="createForm().assignmentType === ShiftAssignmentType.Department" class="col-md-6">
+              <label class="form-label">{{ i18n.t('departments.department') }} <span class="text-danger">*</span></label>
+              <app-searchable-select
+                [options]="departmentSelectOptions"
+                [ngModel]="createForm().departmentId?.toString() || ''"
+                [ngModelOptions]="{standalone: true}"
+                (selectionChange)="onDepartmentSelectionChange($event)"
+                [placeholder]="i18n.t('common.select')"
+                [searchable]="true"
+                [clearable]="false"
+              ></app-searchable-select>
+            </div>
+
+            <!-- Branch Selection (if Branch type) -->
+            <div *ngIf="createForm().assignmentType === ShiftAssignmentType.Branch" class="col-md-6">
+              <label class="form-label">{{ i18n.t('branches.branch') }} <span class="text-danger">*</span></label>
+              <app-searchable-select
+                [options]="branchSelectOptions"
+                [ngModel]="createForm().branchId?.toString() || ''"
+                [ngModelOptions]="{standalone: true}"
+                (selectionChange)="onBranchSelectionChange($event)"
+                [placeholder]="i18n.t('common.select')"
+                [searchable]="true"
+                [clearable]="false"
+              ></app-searchable-select>
+            </div>
+
+            <!-- Effective Date -->
+            <div class="col-md-6">
+              <label class="form-label">{{ i18n.t('shifts.assignments.effectiveDate') }} <span class="text-danger">*</span></label>
+              <input
+                type="date"
+                class="form-control"
+                name="effectiveDate"
+                [ngModel]="createForm().effectiveDate"
+                [ngModelOptions]="{standalone: true}"
+                (ngModelChange)="updateCreateForm('effectiveDate', $event)"
+                required>
+            </div>
+
+            <!-- End Date -->
+            <div class="col-md-6">
+              <label class="form-label">{{ i18n.t('shifts.assignments.endDate') }}</label>
+              <input
+                type="date"
+                class="form-control"
+                name="endDate"
+                [ngModel]="createForm().endDate"
+                [ngModelOptions]="{standalone: true}"
+                (ngModelChange)="updateCreateForm('endDate', $event)">
+            </div>
+
+            <!-- Status -->
+            <div class="col-md-6">
+              <label class="form-label">{{ i18n.t('common.status') }}</label>
+              <app-searchable-select
+                [options]="statusSelectOptions"
+                [ngModel]="createForm().status?.toString() || ''"
+                [ngModelOptions]="{standalone: true}"
+                (selectionChange)="onStatusSelectionChange($event)"
+                [searchable]="false"
+                [clearable]="false"
+              ></app-searchable-select>
+            </div>
+
+            <!-- Priority -->
+            <div class="col-md-6">
+              <label class="form-label">{{ i18n.t('shifts.assignments.priority') }}</label>
+              <input
+                type="number"
+                class="form-control"
+                name="priority"
+                min="0"
+                max="100"
+                [ngModel]="createForm().priority"
+                [ngModelOptions]="{standalone: true}"
+                (ngModelChange)="updateCreateForm('priority', +$event)">
+            </div>
+
+            <!-- Notes -->
+            <div class="col-12">
+              <label class="form-label">{{ i18n.t('common.notes') }}</label>
+              <textarea
+                class="form-control"
+                name="notes"
+                rows="3"
+                [ngModel]="createForm().notes"
+                [ngModelOptions]="{standalone: true}"
+                (ngModelChange)="updateCreateForm('notes', $event)"
+                [placeholder]="i18n.t('shifts.assignments.notesPlaceholder')"></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeCreateModal()">
+          {{ i18n.t('common.cancel') }}
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="createAssignment()"
+          [disabled]="!isCreateFormValid()">
+          {{ i18n.t('common.create') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Backdrop -->
+<div *ngIf="showCreateModal() || showEditModal()" class="modal-backdrop fade show"></div>

@@ -7,11 +7,12 @@ import { Employee } from '../../../shared/models/employee.model';
 import { Branch } from '../../../shared/models/branch.model';
 import { Department } from '../../../shared/models/department.model';
 import { I18nService } from '../../../core/i18n/i18n.service';
+import { SearchableSelectComponent, SearchableSelectOption } from '../../../shared/components/searchable-select/searchable-select.component';
 
 @Component({
   selector: 'app-edit-employee',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, SearchableSelectComponent],
   template: `
     <div class="container-fluid">
       <!-- Header -->
@@ -174,7 +175,7 @@ import { I18nService } from '../../../core/i18n/i18n.service';
                       class="form-select" 
                       formControlName="workLocationType"
                       [class.is-invalid]="isFieldInvalid('workLocationType')">
-                      <option value="Office">{{ i18n.t('employees.work_location.office') }}</option>
+                      <option value="OnSite">{{ i18n.t('employees.work_location.onsite') }}</option>
                       <option value="Remote">{{ i18n.t('employees.work_location.remote') }}</option>
                       <option value="Hybrid">{{ i18n.t('employees.work_location.hybrid') }}</option>
                       <option value="Field">{{ i18n.t('employees.work_location.field') }}</option>
@@ -310,15 +311,15 @@ import { I18nService } from '../../../core/i18n/i18n.service';
                   <!-- Department -->
                   <div class="col-md-6">
                     <label class="form-label">{{ i18n.t('employees.department') }}</label>
-                    <select 
-                      class="form-select" 
-                      formControlName="departmentId"
-                      [class.is-invalid]="isFieldInvalid('departmentId')">
-                      <option value="">{{ i18n.t('common.select_department') }}</option>
-                      @for (dept of departments(); track dept.id) {
-                        <option [value]="dept.id">{{ dept.name }}</option>
-                      }
-                    </select>
+                    <app-searchable-select
+                      [options]="departmentSelectOptions"
+                      [value]="employeeForm.get('departmentId')?.value?.toString() || ''"
+                      (selectionChange)="onDepartmentSelectionChange($event)"
+                      [placeholder]="i18n.t('common.select_department')"
+                      [searchable]="true"
+                      [clearable]="false"
+                      [class.is-invalid]="isFieldInvalid('departmentId')"
+                    ></app-searchable-select>
                     @if (isFieldInvalid('departmentId')) {
                       <div class="invalid-feedback">{{ getFieldError('departmentId') }}</div>
                     }
@@ -327,15 +328,15 @@ import { I18nService } from '../../../core/i18n/i18n.service';
                   <!-- Manager -->
                   <div class="col-md-6">
                     <label class="form-label">{{ i18n.t('employees.manager') }}</label>
-                    <select 
-                      class="form-select" 
-                      formControlName="managerEmployeeId"
-                      [class.is-invalid]="isFieldInvalid('managerEmployeeId')">
-                      <option value="">{{ i18n.t('common.select_manager') }}</option>
-                      @for (manager of managers(); track manager.id) {
-                        <option [value]="manager.id">{{ manager.name }} ({{ manager.employeeNumber }})</option>
-                      }
-                    </select>
+                    <app-searchable-select
+                      [options]="managerSelectOptions"
+                      [value]="employeeForm.get('managerEmployeeId')?.value?.toString() || ''"
+                      (selectionChange)="onManagerSelectionChange($event)"
+                      [placeholder]="i18n.t('common.select_manager')"
+                      [searchable]="true"
+                      [clearable]="false"
+                      [class.is-invalid]="isFieldInvalid('managerEmployeeId')"
+                    ></app-searchable-select>
                     @if (isFieldInvalid('managerEmployeeId')) {
                       <div class="invalid-feedback">{{ getFieldError('managerEmployeeId') }}</div>
                     }
@@ -397,7 +398,7 @@ export class EditEmployeeComponent implements OnInit {
     if (employeeId) {
       this.loadEmployee(employeeId);
     } else {
-      this.error.set('Invalid employee ID');
+      this.error.set(this.i18n.t('employees.invalid_employee_id'));
       this.loading.set(false);
     }
   }
@@ -416,7 +417,7 @@ export class EditEmployeeComponent implements OnInit {
       dateOfBirth: [''],
       gender: [''],
       employmentStatus: ['Active', Validators.required],
-      workLocationType: ['Office', Validators.required],
+      workLocationType: ['OnSite', Validators.required],
       departmentId: [''],
       managerEmployeeId: ['']
     });
@@ -489,7 +490,7 @@ export class EditEmployeeComponent implements OnInit {
       phone: formValue.phone || undefined,
       nationalId: formValue.nationalId || undefined,
       dateOfBirth: formValue.dateOfBirth || undefined,
-      gender: formValue.gender || undefined,
+      gender: formValue.gender ? +formValue.gender : undefined,
       employmentStatus: formValue.employmentStatus,
       workLocationType: formValue.workLocationType,
       departmentId: formValue.departmentId || undefined,
@@ -536,6 +537,49 @@ export class EditEmployeeComponent implements OnInit {
   isFieldInvalid(fieldName: string): boolean {
     const field = this.employeeForm.get(fieldName);
     return !!(field?.errors && field.touched);
+  }
+
+  // Searchable select options
+  get departmentSelectOptions(): SearchableSelectOption[] {
+    const options: SearchableSelectOption[] = [
+      { value: '', label: this.i18n.t('common.select_department') }
+    ];
+
+    this.departments().forEach(dept => {
+      options.push({
+        value: dept.id.toString(),
+        label: dept.name,
+        subLabel: dept.code
+      });
+    });
+
+    return options;
+  }
+
+  get managerSelectOptions(): SearchableSelectOption[] {
+    const options: SearchableSelectOption[] = [
+      { value: '', label: this.i18n.t('common.select_manager') }
+    ];
+
+    this.managers().forEach(manager => {
+      options.push({
+        value: manager.id.toString(),
+        label: manager.name,
+        subLabel: manager.employeeNumber
+      });
+    });
+
+    return options;
+  }
+
+  onDepartmentSelectionChange(departmentIdStr: string) {
+    const departmentId = departmentIdStr ? parseInt(departmentIdStr) : 0;
+    this.employeeForm.patchValue({ departmentId: departmentId || '' });
+  }
+
+  onManagerSelectionChange(managerIdStr: string) {
+    const managerId = managerIdStr ? parseInt(managerIdStr) : 0;
+    this.employeeForm.patchValue({ managerEmployeeId: managerId || '' });
   }
 
   private getErrorMessage(error: any): string {

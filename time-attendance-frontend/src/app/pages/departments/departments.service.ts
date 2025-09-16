@@ -19,7 +19,7 @@ export class DepartmentsService {
   getDepartments(filter: DepartmentFilter = {}): Observable<DepartmentDto[]> {
     let params = new HttpParams();
     
-    if (filter.branchId !== undefined) {
+    if (filter.branchId !== undefined && filter.branchId !== null) {
       params = params.set('branchId', filter.branchId.toString());
     }
     if (filter.includeTree !== undefined) {

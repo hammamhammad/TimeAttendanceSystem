@@ -70,7 +70,25 @@ export class UsersService {
   }
 
   getRoles(): Observable<any[]> {
-    return this.http.get<any[]>(`${environment.apiUrl}/api/v1/roles`);
+    return this.http.get<any[]>(`${environment.apiUrl}/api/v1/roles`).pipe(
+      map((response: any) => {
+        console.log('Roles API response:', response);
+        // Handle different response structures
+        if (Array.isArray(response)) {
+          return response;
+        }
+        // If it's wrapped in a Result object, extract the value
+        if (response && response.value && Array.isArray(response.value)) {
+          return response.value;
+        }
+        // If it has an items property (paginated), use that
+        if (response && response.items && Array.isArray(response.items)) {
+          return response.items;
+        }
+        console.warn('Unexpected roles response format:', response);
+        return [];
+      })
+    );
   }
 
   getBranches(): Observable<any[]> {

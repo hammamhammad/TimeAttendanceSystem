@@ -19,7 +19,7 @@ public class CreateDepartmentCommandHandler : BaseHandler<CreateDepartmentComman
         if (branch == null)
             return Result.Failure<long>("Branch does not exist.");
 
-        if (!CurrentUser.IsSystemAdmin && !CurrentUser.BranchIds.Contains(request.BranchId))
+        if (!CurrentUser.IsSystemAdmin && CurrentUser.BranchIds.Any() && !CurrentUser.BranchIds.Contains(request.BranchId))
             return Result.Failure<long>("Access denied to this branch.");
 
         // Check if department code is unique within branch

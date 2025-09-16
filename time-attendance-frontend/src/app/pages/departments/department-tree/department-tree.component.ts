@@ -20,6 +20,7 @@ export class DepartmentTreeComponent implements OnInit {
   @Input() allowDelete = true;
   @Input() showControls = true;
   @Output() departmentSelected = new EventEmitter<DepartmentDto>();
+  @Output() departmentView = new EventEmitter<DepartmentDto>();
   @Output() departmentEdit = new EventEmitter<DepartmentDto>();
   @Output() departmentDelete = new EventEmitter<DepartmentDto>();
   @Output() departmentAdd = new EventEmitter<{ parentId?: number }>();
@@ -142,6 +143,10 @@ export class DepartmentTreeComponent implements OnInit {
 
   onAddDepartment(parentNode?: DepartmentTreeNode) {
     this.departmentAdd.emit({ parentId: parentNode?.id });
+  }
+
+  onViewDepartment(node: DepartmentTreeNode) {
+    this.departmentView.emit(node);
   }
 
   onEditDepartment(node: DepartmentTreeNode) {

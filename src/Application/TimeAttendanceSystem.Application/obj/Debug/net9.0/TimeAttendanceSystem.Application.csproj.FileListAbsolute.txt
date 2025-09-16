@@ -13,3 +13,19 @@ D:\Work\AI Code\Time Attendance System\src\Application\TimeAttendanceSystem.Appl
 D:\Work\AI Code\Time Attendance System\src\Application\TimeAttendanceSystem.Application\obj\Debug\net9.0\refint\TimeAttendanceSystem.Application.dll
 D:\Work\AI Code\Time Attendance System\src\Application\TimeAttendanceSystem.Application\obj\Debug\net9.0\TimeAttendanceSystem.Application.pdb
 D:\Work\AI Code\Time Attendance System\src\Application\TimeAttendanceSystem.Application\obj\Debug\net9.0\ref\TimeAttendanceSystem.Application.dll
+D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\bin\Debug\net9.0\TimeAttendanceSystem.Application.deps.json
+D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\bin\Debug\net9.0\TimeAttendanceSystem.Application.dll
+D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\bin\Debug\net9.0\TimeAttendanceSystem.Application.pdb
+D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\bin\Debug\net9.0\TimeAttendanceSystem.Domain.dll
+D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\bin\Debug\net9.0\TimeAttendanceSystem.Domain.pdb
+D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\obj\Debug\net9.0\TimeAttendanceSystem.Application.csproj.AssemblyReference.cache
+D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\obj\Debug\net9.0\TimeAttendanceSystem.Application.GeneratedMSBuildEditorConfig.editorconfig
+D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\obj\Debug\net9.0\TimeAttendanceSystem.Application.AssemblyInfoInputs.cache
+D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\obj\Debug\net9.0\TimeAttendanceSystem.Application.AssemblyInfo.cs
+D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\obj\Debug\net9.0\TimeAttendanceSystem.Application.csproj.CoreCompileInputs.cache
+D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\obj\Debug\net9.0\TimeAttendanceSystem.Application.sourcelink.json
+D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\obj\Debug\net9.0\TimeAtte.DC461CC3.Up2Date
+D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\obj\Debug\net9.0\TimeAttendanceSystem.Application.dll
+D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\obj\Debug\net9.0\refint\TimeAttendanceSystem.Application.dll
+D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\obj\Debug\net9.0\TimeAttendanceSystem.Application.pdb
+D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\obj\Debug\net9.0\ref\TimeAttendanceSystem.Application.dll

@@ -138,7 +138,15 @@
         <!-- Action Buttons -->
         <div class="node-actions" *ngIf="showControls">
           <div class="btn-group btn-group-sm">
-            <button 
+            <button
+              type="button"
+              class="btn btn-outline-primary"
+              (click)="onViewDepartment(node); $event.stopPropagation()"
+              [title]="i18n.t('common.view')"
+            >
+              <i class="fas fa-eye"></i>
+            </button>
+            <button
               type="button"
               class="btn btn-outline-success"
               (click)="onAddDepartment(node); $event.stopPropagation()"
@@ -147,16 +155,16 @@
             >
               <i class="fas fa-plus"></i>
             </button>
-            <button 
+            <button
               type="button"
-              class="btn btn-outline-primary"
+              class="btn btn-outline-secondary"
               (click)="onEditDepartment(node); $event.stopPropagation()"
               *ngIf="allowEdit"
               [title]="i18n.t('common.edit')"
             >
               <i class="fas fa-edit"></i>
             </button>
-            <button 
+            <button
               type="button"
               class="btn btn-outline-danger"
               (click)="onDeleteDepartment(node); $event.stopPropagation()"

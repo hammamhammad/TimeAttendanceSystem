@@ -1,9 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { DepartmentFormComponent } from '../department-form/department-form.component';
 import { Department, DepartmentDto, CreateDepartmentRequest, UpdateDepartmentRequest } from '../../../shared/models/department.model';
 import { I18nService } from '../../../core/i18n/i18n.service';
+import { DepartmentsService } from '../departments.service';
 
 @Component({
   selector: 'app-create-department',
@@ -36,6 +37,13 @@ import { I18nService } from '../../../core/i18n/i18n.service';
         </button>
       </div>
 
+      @if (error()) {
+        <div class="alert alert-danger">
+          <i class="fa-solid fa-exclamation-triangle me-2"></i>
+          {{ error() }}
+        </div>
+      }
+
       <!-- Main Form Card -->
       <div class="card">
         <div class="card-header">
@@ -45,7 +53,8 @@ import { I18nService } from '../../../core/i18n/i18n.service';
           </h5>
         </div>
         <div class="card-body">
-          <app-department-form 
+          <app-department-form
+            [externalSaving]="saving()"
             (save)="onDepartmentCreated($event)"
             (cancel)="onCancel()">
           </app-department-form>
@@ -56,13 +65,42 @@ import { I18nService } from '../../../core/i18n/i18n.service';
 })
 export class CreateDepartmentComponent {
   private router = inject(Router);
+  private departmentsService = inject(DepartmentsService);
   public i18n = inject(I18nService);
 
+  saving = signal(false);
+  error = signal('');
+
   onDepartmentCreated(department: CreateDepartmentRequest | UpdateDepartmentRequest): void {
-    this.router.navigate(['/departments']);
+    if (this.saving()) return;
+
+    this.saving.set(true);
+    this.error.set('');
+
+    const createRequest = department as CreateDepartmentRequest;
+
+    this.departmentsService.createDepartment(createRequest).subscribe({
+      next: (response) => {
+        console.log('Department created successfully:', response);
+        this.saving.set(false);
+        this.router.navigate(['/departments']);
+      },
+      error: (error) => {
+        console.error('Error creating department:', error);
+        this.error.set(this.getErrorMessage(error));
+        this.saving.set(false);
+      }
+    });
   }
 
   onCancel(): void {
     this.router.navigate(['/departments']);
+  }
+
+  private getErrorMessage(error: any): string {
+    if (error?.error?.error) {
+      return error.error.error;
+    }
+    return this.i18n.t('errors.unknown');
   }
 }

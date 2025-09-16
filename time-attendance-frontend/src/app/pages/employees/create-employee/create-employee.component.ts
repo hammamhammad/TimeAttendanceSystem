@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { I18nService } from '../../../core/i18n/i18n.service';
+import { SearchableSelectComponent, SearchableSelectOption } from '../../../shared/components/searchable-select/searchable-select.component';
 import { EmployeesService } from '../employees.service';
 import { 
   BranchDto, 
@@ -17,7 +18,7 @@ import {
 @Component({
   selector: 'app-create-employee',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, SearchableSelectComponent],
   templateUrl: './create-employee.component.html',
   styleUrls: ['./create-employee.component.css']
 })
@@ -193,7 +194,7 @@ export class CreateEmployeeComponent implements OnInit {
         departmentId: formValue.departmentId ? +formValue.departmentId : null,
         managerEmployeeId: formValue.managerEmployeeId ? +formValue.managerEmployeeId : null,
         dateOfBirth: formValue.dateOfBirth || null,
-        gender: formValue.gender || null,
+        gender: formValue.gender ? +formValue.gender : null, // Convert string to number
         firstNameAr: formValue.firstNameAr || null,
         lastNameAr: formValue.lastNameAr || null,
         jobTitleAr: formValue.jobTitleAr || null,
@@ -266,6 +267,70 @@ export class CreateEmployeeComponent implements OnInit {
     };
     
     return fieldMap[backendFieldName] || null;
+  }
+
+  // Searchable select options
+  get branchSelectOptions(): SearchableSelectOption[] {
+    const options: SearchableSelectOption[] = [
+      { value: '', label: this.t('common.select_branch') }
+    ];
+
+    this.branches().forEach(branch => {
+      options.push({
+        value: branch.id.toString(),
+        label: `${branch.name} (${branch.code})`,
+        subLabel: branch.location
+      });
+    });
+
+    return options;
+  }
+
+  get departmentSelectOptions(): SearchableSelectOption[] {
+    const options: SearchableSelectOption[] = [
+      { value: '', label: this.t('common.select_department') }
+    ];
+
+    this.departments().forEach(dept => {
+      options.push({
+        value: dept.id.toString(),
+        label: dept.name
+      });
+    });
+
+    return options;
+  }
+
+  get managerSelectOptions(): SearchableSelectOption[] {
+    const options: SearchableSelectOption[] = [
+      { value: '', label: this.t('common.select_manager') }
+    ];
+
+    this.managers().forEach(manager => {
+      options.push({
+        value: manager.id.toString(),
+        label: manager.name,
+        subLabel: manager.employeeNumber
+      });
+    });
+
+    return options;
+  }
+
+  onBranchSelectionChange(branchIdStr: string) {
+    const branchId = branchIdStr ? parseInt(branchIdStr) : 0;
+    this.createForm.patchValue({ branchId: branchId || '' });
+    this.onBranchChange(branchId);
+  }
+
+  onDepartmentSelectionChange(departmentIdStr: string) {
+    const departmentId = departmentIdStr ? parseInt(departmentIdStr) : 0;
+    this.createForm.patchValue({ departmentId: departmentId || '' });
+  }
+
+  onManagerSelectionChange(managerIdStr: string) {
+    const managerId = managerIdStr ? parseInt(managerIdStr) : 0;
+    this.createForm.patchValue({ managerEmployeeId: managerId || '' });
   }
 
   // Helper methods for template

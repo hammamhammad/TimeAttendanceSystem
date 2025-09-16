@@ -107,7 +107,12 @@ export class AuthService {
    * ```
    */
   login(credentials: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${API_CONFIG.baseUrl}${API_CONFIG.endpoints.auth.login}`, credentials)
+    return this.http.post<LoginResponse>(`${API_CONFIG.baseUrl}${API_CONFIG.endpoints.auth.login}`, {
+      username: credentials.username,
+      password: credentials.password,
+      deviceInfo: credentials.deviceInfo,
+      rememberMe: credentials.rememberMe || false
+    })
       .pipe(
         tap(response => {
           this.setSession(response);
