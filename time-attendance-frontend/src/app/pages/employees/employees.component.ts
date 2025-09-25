@@ -1,4 +1,4 @@
-import { Component, signal, inject, OnInit } from '@angular/core';
+import { Component, signal, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { I18nService } from '../../core/i18n/i18n.service';
@@ -29,6 +29,8 @@ export class EmployeesComponent implements OnInit {
   private notificationService = inject(NotificationService);
   private confirmationService = inject(ConfirmationService);
   private router = inject(Router);
+
+  @ViewChild('changeShiftModal') changeShiftModal!: ChangeShiftModalComponent;
 
   // Signals
   employees = signal<EmployeeDto[]>([]);
@@ -172,6 +174,7 @@ export class EmployeesComponent implements OnInit {
   onShiftChanged(event: {employee: EmployeeDto, shiftData: any}) {
     this.employeesService.updateEmployeeShift(event.employee.id, event.shiftData).subscribe({
       next: () => {
+        this.changeShiftModal.resetSubmitting();
         this.showChangeShiftModal.set(false);
         this.selectedEmployee.set(null);
         this.loadEmployees();
@@ -182,9 +185,20 @@ export class EmployeesComponent implements OnInit {
       },
       error: (error) => {
         console.error('Failed to update employee shift:', error);
+
+        // Reset the modal loading state and show error
+        let errorMessage = 'Failed to update employee shift';
+        if (error?.error?.message) {
+          errorMessage = error.error.message;
+        } else if (typeof error?.error === 'string') {
+          errorMessage = error.error;
+        }
+
+        this.changeShiftModal.showError(errorMessage);
+
         this.notificationService.error(
           this.i18n.t('app.error'),
-          this.i18n.t('errors.server')
+          errorMessage
         );
       }
     });

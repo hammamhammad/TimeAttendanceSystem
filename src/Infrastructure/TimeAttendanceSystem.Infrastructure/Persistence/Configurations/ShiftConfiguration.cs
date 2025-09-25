@@ -80,6 +80,10 @@ public class ShiftConfiguration : IEntityTypeConfiguration<Shift>
             .IsRequired()
             .HasDefaultValue(false);
 
+        builder.Property(x => x.IsDefault)
+            .IsRequired()
+            .HasDefaultValue(false);
+
         // Map IsCheckInRequired to RequiresCheckInOut column for backward compatibility
         builder.Property(x => x.IsCheckInRequired)
             .HasColumnName("RequiresCheckInOut")

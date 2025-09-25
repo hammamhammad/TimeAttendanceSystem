@@ -54,132 +54,22 @@
   <!-- Shifts Table -->
   <div class="card">
     <div class="card-body">
-      <!-- Loading State -->
-      <div *ngIf="loading()" class="text-center py-4">
-        <div class="spinner-border" role="status">
-          <span class="visually-hidden">{{ t('common.loading') }}</span>
-        </div>
-      </div>
-
-      <!-- Shifts Table -->
-      <div *ngIf="!loading()">
-        <div class="table-responsive">
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th>{{ t('shifts.fields.name') }}</th>
-                <th>{{ t('shifts.fields.status') }}</th>
-                <th>{{ t('shifts.fields.type') }}</th>
-                <th>{{ t('shifts.fields.periods') }}</th>
-                <th>{{ t('shifts.fields.requirements') }}</th>
-                <th>{{ t('common.actions') }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let shift of shifts()">
-                <td>
-                  <div>
-                    <strong>{{ shift.name }}</strong>
-                    <small *ngIf="shift.description" class="d-block text-muted">
-                      {{ shift.description }}
-                    </small>
-                  </div>
-                </td>
-                <td>
-                  <span class="badge" [class]="getShiftStatusClass(shift.status)">
-                    {{ getShiftStatusText(shift.status) }}
-                  </span>
-                </td>
-                <td>
-                  <span class="badge"
-                        [class]="shift.shiftType === ShiftType.TimeBased ? 'bg-primary' : 'bg-info'">
-                    {{ getShiftTypeText(shift.shiftType) }}
-                  </span>
-                </td>
-                <td>
-                  <div *ngIf="shift.shiftType === ShiftType.TimeBased">
-                    <div *ngFor="let period of shift.shiftPeriods" class="small">
-                      {{ formatTime(period.startTime) }} - {{ formatTime(period.endTime) }}
-                      <span *ngIf="period.isNightPeriod" class="badge bg-warning ms-1">{{ t('shifts.nightShift') }}</span>
-                    </div>
-                  </div>
-                  <div *ngIf="shift.shiftType === ShiftType.HoursOnly">
-                    {{ shift.requiredHours }} {{ t('shifts.hours') }}
-                  </div>
-                </td>
-                <td>
-                  <div class="small">
-                    <div *ngIf="shift.isCheckInRequired">
-                      <i class="fas fa-check text-success me-1"></i>{{ t('shifts.checkInRequired') }}
-                    </div>
-                    <div *ngIf="shift.isAutoCheckOut">
-                      <i class="fas fa-check text-success me-1"></i>{{ t('shifts.autoCheckOut') }}
-                    </div>
-                    <div *ngIf="shift.allowFlexibleHours">
-                      <i class="fas fa-check text-success me-1"></i>{{ t('shifts.flexibleHours') }}
-                    </div>
-                    <div *ngIf="shift.gracePeriodMinutes">
-                      <i class="fas fa-clock text-info me-1"></i>{{ shift.gracePeriodMinutes }}min {{ t('shifts.gracePeriod') }}
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <div class="btn-group btn-group-sm">
-                    <button
-                      *appHasPermission="PERMISSIONS.SHIFT_UPDATE"
-                      class="btn btn-outline-primary"
-                      (click)="onEditShift(shift)"
-                      [title]="t('common.edit')">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button
-                      *appHasPermission="PERMISSIONS.SHIFT_DELETE"
-                      class="btn btn-outline-danger"
-                      (click)="onDeleteShift(shift)"
-                      [title]="t('common.delete')">
-                      <i class="fas fa-trash"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Empty State -->
-        <div *ngIf="shifts().length === 0" class="text-center py-4">
-          <i class="fas fa-clock fa-3x text-muted mb-3"></i>
-          <h5 class="text-muted">{{ t('shifts.noShifts') }}</h5>
-          <p class="text-muted">{{ t('shifts.noShiftsDescription') }}</p>
-        </div>
-
-        <!-- Pagination -->
-        <nav *ngIf="totalPages() > 1" class="d-flex justify-content-between align-items-center mt-3">
-          <div class="text-muted">
-            {{ t('common.showing') }}
-            {{ (currentPage() - 1) * pageSize() + 1 }} - {{ getEndCount() }}
-            {{ t('common.of') }} {{ totalCount() }} {{ t('common.results') }}
-          </div>
-
-          <ul class="pagination mb-0">
-            <li class="page-item" [class.disabled]="currentPage() === 1">
-              <button class="page-link" (click)="onPageChange(currentPage() - 1)" [disabled]="currentPage() === 1">
-                {{ t('common.previous') }}
-              </button>
-            </li>
-
-            <li class="page-item" *ngFor="let page of getPaginationArray()" [class.active]="page === currentPage()">
-              <button class="page-link" (click)="onPageChange(page)">{{ page }}</button>
-            </li>
-
-            <li class="page-item" [class.disabled]="currentPage() === totalPages()">
-              <button class="page-link" (click)="onPageChange(currentPage() + 1)" [disabled]="currentPage() === totalPages()">
-                {{ t('common.next') }}
-              </button>
-            </li>
-          </ul>
-        </nav>
-      </div>
+      <app-data-table
+        [data]="tableData()"
+        [columns]="tableColumns()"
+        [actions]="tableActions()"
+        [loading]="loading"
+        [currentPage]="currentPage"
+        [totalPages]="totalPages"
+        [totalItems]="totalCount"
+        [pageSize]="pageSize"
+        [emptyMessage]="t('shifts.noShifts')"
+        [emptyTitle]="t('shifts.noShiftsDescription')"
+        [responsiveMode]="'auto'"
+        (actionClick)="onActionClick($event)"
+        (pageChange)="onTablePageChange($event)"
+        (pageSizeChange)="onTablePageSizeChange($event)">
+      </app-data-table>
     </div>
   </div>
 </div>
@@ -252,7 +142,8 @@
           </div>
 
           <!-- Hours Only Configuration -->
-          <div *ngIf="shiftForm.shiftType === ShiftType.HoursOnly" class="mb-3">
+          @if (shiftForm.shiftType === ShiftType.HoursOnly) {
+          <div class="mb-3">
             <label class="form-label required">{{ t('shifts.fields.requiredHours') }}</label>
             <div class="input-group">
               <input type="number" class="form-control" [(ngModel)]="shiftForm.requiredHours"
@@ -260,9 +151,11 @@
               <span class="input-group-text">{{ t('shifts.hours') }}</span>
             </div>
           </div>
+          }
 
           <!-- Time-Based Configuration -->
-          <div *ngIf="shiftForm.shiftType === ShiftType.TimeBased">
+          @if (shiftForm.shiftType === ShiftType.TimeBased) {
+          <div>
             <!-- Shift Periods -->
             <div class="mb-3">
               <div class="d-flex justify-content-between align-items-center mb-2">
@@ -274,7 +167,8 @@
                 </button>
               </div>
 
-              <div *ngFor="let period of shiftForm.shiftPeriods; let i = index" class="card mb-2">
+              @for (period of shiftForm.shiftPeriods; track i; let i = $index) {
+              <div class="card mb-2">
                 <div class="card-body p-3">
                   <div class="d-flex justify-content-between align-items-center mb-2">
                     <h6 class="mb-0">{{ t('shifts.period') }} {{ period.periodOrder }}</h6>
@@ -298,6 +192,7 @@
                   </div>
                 </div>
               </div>
+              }
             </div>
 
             <!-- Flexible Hours -->
@@ -312,7 +207,8 @@
                 <small class="form-text text-muted d-block">{{ t('shifts.flexibleHoursDescription') }}</small>
               </div>
 
-              <div *ngIf="shiftForm.allowFlexibleHours" class="row">
+              @if (shiftForm.allowFlexibleHours) {
+              <div class="row">
                 <div class="col-md-6">
                   <label class="form-label">{{ t('shifts.fields.flexMinutesBefore') }}</label>
                   <div class="input-group">
@@ -330,6 +226,7 @@
                   </div>
                 </div>
               </div>
+              }
             </div>
 
             <!-- Grace Period -->
@@ -341,12 +238,14 @@
                 <span class="input-group-text">{{ t('common.minutes') }}</span>
               </div>
               <small class="form-text text-muted">{{ t('shifts.gracePeriodDescription') }}</small>
-              <small *ngIf="shiftForm.allowFlexibleHours && shiftForm.gracePeriodMinutes"
-                     class="form-text text-info d-block">
+              @if (shiftForm.allowFlexibleHours && shiftForm.gracePeriodMinutes) {
+              <small class="form-text text-info d-block">
                 <i class="fas fa-info-circle me-1"></i>{{ t('shifts.validation.flexibleHoursAndGraceCombined') }}
               </small>
+              }
             </div>
           </div>
+          }
 
           <!-- Check-in/Check-out Options -->
           <div class="row mb-3">
@@ -381,7 +280,9 @@
         <button type="button" class="btn btn-primary"
                 (click)="showCreateModal() ? onSubmitCreate() : onSubmitEdit()"
                 [disabled]="!isFormValid() || submitting()">
-          <span *ngIf="submitting()" class="spinner-border spinner-border-sm me-2"></span>
+          @if (submitting()) {
+          <span class="spinner-border spinner-border-sm me-2"></span>
+          }
           {{ showCreateModal() ? t('common.create') : t('common.update') }}
         </button>
       </div>
@@ -400,7 +301,9 @@
 
       <div class="modal-body">
         <p>{{ t('shifts.deleteConfirmation') }}</p>
-        <p *ngIf="selectedShift()"><strong>{{ selectedShift()?.name }}</strong></p>
+        @if (selectedShift()) {
+        <p><strong>{{ selectedShift()?.name }}</strong></p>
+        }
       </div>
 
       <div class="modal-footer">
@@ -410,7 +313,9 @@
         <button type="button" class="btn btn-danger"
                 (click)="onConfirmDelete()"
                 [disabled]="submitting()">
-          <span *ngIf="submitting()" class="spinner-border spinner-border-sm me-2"></span>
+          @if (submitting()) {
+          <span class="spinner-border spinner-border-sm me-2"></span>
+          }
           {{ t('common.delete') }}
         </button>
       </div>
@@ -418,7 +323,40 @@
   </div>
 </div>
 
+<!-- Default Shift Confirmation Modal -->
+<div class="modal fade" [class.show]="showDefaultShiftModal()" [style.display]="showDefaultShiftModal() ? 'block' : 'none'">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ t('shifts.defaultShift.confirmReplace') }}</h5>
+        <button type="button" class="btn-close" (click)="onCloseModal()"></button>
+      </div>
+
+      <div class="modal-body">
+        <p>{{ t('shifts.defaultShift.confirmReplaceMessage') }}</p>
+        <p><strong>{{ t('shifts.defaultShift.newShift') }}:</strong> {{ selectedShift()?.name }}</p>
+        <p><strong>{{ t('shifts.defaultShift.currentShift') }}:</strong> {{ defaultShift()?.name }}</p>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="onCloseModal()">
+          {{ t('shifts.defaultShift.cancelButton') }}
+        </button>
+        <button type="button" class="btn btn-success"
+                (click)="onConfirmSetDefaultShift()"
+                [disabled]="submitting()">
+          @if (submitting()) {
+          <span class="spinner-border spinner-border-sm me-2"></span>
+          }
+          {{ t('shifts.defaultShift.confirmButton') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Modal Backdrop -->
-<div *ngIf="showCreateModal() || showEditModal() || showDeleteModal()"
-     class="modal-backdrop fade show"
+@if (showCreateModal() || showEditModal() || showDeleteModal() || showDefaultShiftModal()) {
+<div class="modal-backdrop fade show"
      (click)="onCloseModal()"></div>
+}

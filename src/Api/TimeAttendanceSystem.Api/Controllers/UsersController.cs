@@ -123,6 +123,7 @@ public class UsersController : ControllerBase
     /// - Audit logging for compliance requirements
     /// </remarks>
     [HttpGet]
+    [Authorize(Policy = "UserRead")]
     public async Task<IActionResult> GetUsers(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10,
@@ -143,6 +144,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "UserManagement")]
     public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request)
     {
         var command = new CreateUserCommand(
@@ -166,6 +168,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [Authorize(Policy = "UserRead")]
     public async Task<IActionResult> GetUserById(long id)
     {
         var query = new GetUserByIdQuery(id);
@@ -180,6 +183,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Policy = "UserManagement")]
     public async Task<IActionResult> UpdateUser(long id, [FromBody] UpdateUserRequest request)
     {
         var command = new UpdateUserCommand
@@ -202,6 +206,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Policy = "UserManagement")]
     public async Task<IActionResult> DeleteUser(long id)
     {
         var command = new DeleteUserCommand(id);
@@ -216,6 +221,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPost("{id}/roles")]
+    [Authorize(Policy = "UserRoleAssignment")]
     public async Task<IActionResult> AssignRole(long id, [FromBody] AssignRoleRequest request)
     {
         var command = new AssignUserRoleCommand
@@ -235,6 +241,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpDelete("{id}/roles/{roleId}")]
+    [Authorize(Policy = "UserRoleAssignment")]
     public async Task<IActionResult> RemoveRole(long id, long roleId)
     {
         var command = new RemoveUserRoleCommand
@@ -254,6 +261,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPost("{id}/branches")]
+    [Authorize(Policy = "UserManagement")]
     public async Task<IActionResult> AssignBranch(long id, [FromBody] AssignBranchRequest request)
     {
         var command = new AssignUserBranchScopeCommand

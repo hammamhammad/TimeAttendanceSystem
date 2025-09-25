@@ -1,9 +1,11 @@
 using Microsoft.OpenApi.Models;
+using Coravel;
 using TimeAttendanceSystem.Api.Configuration;
 using TimeAttendanceSystem.Api.Filters;
 using TimeAttendanceSystem.Api.Middleware;
 using TimeAttendanceSystem.Application;
 using TimeAttendanceSystem.Infrastructure;
+using TimeAttendanceSystem.Infrastructure.BackgroundJobs;
 using TimeAttendanceSystem.Infrastructure.Persistence;
 using TimeAttendanceSystem.Shared.Localization;
 using System.Globalization;
@@ -58,6 +60,7 @@ builder.Services.AddCors(options =>
 });
 
 // Add services to the container.
+builder.Services.AddMemoryCache();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
@@ -120,11 +123,27 @@ builder.Services.AddSwaggerGen(options =>
 var app = builder.Build();
 
 // Seed database
-using (var scope = app.Services.CreateScope())
+try
 {
-    var context = scope.ServiceProvider.GetRequiredService<TimeAttendanceDbContext>();
-    await SeedData.SeedAsync(context);
+    using (var scope = app.Services.CreateScope())
+    {
+        var context = scope.ServiceProvider.GetRequiredService<TimeAttendanceDbContext>();
+        await SeedData.SeedAsync(context);
+    }
 }
+catch (Exception ex)
+{
+    var logger = app.Services.GetService<ILogger<Program>>();
+    logger?.LogError(ex, "Failed to seed database. Application will continue without seeding.");
+}
+
+// Configure Coravel background jobs
+app.Services.UseScheduler(scheduler =>
+{
+    // Schedule daily attendance generation to run every day at 2:00 AM
+    scheduler.Schedule<DailyAttendanceGenerationJob>()
+        .DailyAt(2, 0); // 2:00 AM every day
+});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

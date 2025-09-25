@@ -31,14 +31,15 @@ import { HasPermissionDirective } from '../../../shared/directives/has-permissio
           </nav>
         </div>
         <div class="btn-group">
-          <button 
-            *appHasPermission="PERMISSIONS.ROLE_UPDATE"
-            type="button" 
-            class="btn btn-primary"
-            (click)="onEdit()">
-            <i class="fa-solid fa-edit me-2"></i>
-            {{ i18n.t('roles.edit') }}
-          </button>
+          @if (canEditRole()) {
+            <button
+              type="button"
+              class="btn btn-primary"
+              (click)="onEdit()">
+              <i class="fa-solid fa-edit me-2"></i>
+              {{ i18n.t('roles.edit') }}
+            </button>
+          }
           <button 
             type="button" 
             class="btn btn-outline-secondary"
@@ -128,22 +129,24 @@ import { HasPermissionDirective } from '../../../shared/directives/has-permissio
               </div>
               <div class="card-body">
                 <div class="d-grid gap-2">
-                  <button 
-                    *appHasPermission="PERMISSIONS.ROLE_UPDATE"
-                    type="button" 
-                    class="btn btn-outline-primary"
-                    (click)="onEdit()">
-                    <i class="fa-solid fa-edit me-2"></i>
-                    {{ i18n.t('roles.edit') }}
-                  </button>
-                  <button 
-                    *appHasPermission="PERMISSIONS.ROLE_ASSIGN_PERMISSIONS"
-                    type="button" 
-                    class="btn btn-outline-info"
-                    (click)="onManagePermissions()">
-                    <i class="fa-solid fa-key me-2"></i>
-                    {{ i18n.t('roles.manage_permissions') }}
-                  </button>
+                  @if (canEditRole()) {
+                    <button
+                      type="button"
+                      class="btn btn-outline-primary"
+                      (click)="onEdit()">
+                      <i class="fa-solid fa-edit me-2"></i>
+                      {{ i18n.t('roles.edit') }}
+                    </button>
+                  }
+                  @if (canManagePermissions()) {
+                    <button
+                      type="button"
+                      class="btn btn-outline-info"
+                      (click)="onManagePermissions()">
+                      <i class="fa-solid fa-key me-2"></i>
+                      {{ i18n.t('roles.manage_permissions') }}
+                    </button>
+                  }
                 </div>
               </div>
             </div>
@@ -239,14 +242,40 @@ export class ViewRoleComponent implements OnInit {
     });
   }
 
+  canEditRole(): boolean {
+    const role = this.role();
+    if (!role) return false;
+
+    // First check if user has permission to update roles
+    if (!this.permissionService.has(this.PERMISSIONS.ROLE_UPDATE)) {
+      return false;
+    }
+
+    // Check if role is editable
+    return role.isEditable;
+  }
+
+  canManagePermissions(): boolean {
+    const role = this.role();
+    if (!role) return false;
+
+    // First check if user has permission to assign permissions
+    if (!this.permissionService.has(this.PERMISSIONS.ROLE_ASSIGN_PERMISSIONS)) {
+      return false;
+    }
+
+    // Check if role is editable (same logic as edit)
+    return role.isEditable;
+  }
+
   onEdit(): void {
-    if (this.role()) {
+    if (this.canEditRole()) {
       this.router.navigate(['/roles', this.role()!.id, 'edit']);
     }
   }
 
   onManagePermissions(): void {
-    if (this.role()) {
+    if (this.canManagePermissions()) {
       this.router.navigate(['/roles', this.role()!.id, 'edit']);
     }
   }

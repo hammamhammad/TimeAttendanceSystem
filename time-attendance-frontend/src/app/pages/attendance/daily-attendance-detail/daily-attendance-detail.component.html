@@ -1,0 +1,325 @@
+<!-- Loading State -->
+@if (loading()) {
+  <div class="d-flex justify-content-center align-items-center" style="min-height: 400px;">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">{{ i18n.t('common.loading') }}</span>
+    </div>
+  </div>
+}
+
+<!-- Error State -->
+@if (error()) {
+  <div class="alert alert-danger" role="alert">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    {{ error() }}
+  </div>
+}
+
+<!-- Main Content -->
+@if (!loading() && !error() && employee() && attendanceRecord()) {
+  <div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+      <div class="col">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h2 class="mb-1">{{ i18n.t('attendance.daily_detail.title') }}</h2>
+            <nav aria-label="breadcrumb">
+              <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                  <a routerLink="/attendance">{{ i18n.t('attendance.title') }}</a>
+                </li>
+                <li class="breadcrumb-item">
+                  <a routerLink="/attendance/daily">{{ i18n.t('attendance.daily_view') }}</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">
+                  {{ i18n.t('attendance.daily_detail.title') }}
+                </li>
+              </ol>
+            </nav>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-primary" (click)="onRefresh()">
+              <i class="fas fa-sync-alt me-2"></i>
+              {{ i18n.t('common.refresh') }}
+            </button>
+            <button type="button" class="btn btn-primary" (click)="onEdit()">
+              <i class="fas fa-edit me-2"></i>
+              {{ i18n.t('attendance.actions.edit') }}
+            </button>
+            <button type="button" class="btn btn-outline-secondary" (click)="onBack()">
+              <i class="fas fa-arrow-left me-2"></i>
+              {{ i18n.t('common.back') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Employee Information Card -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">
+              <i class="fas fa-user me-2"></i>
+              {{ i18n.t('attendance.daily_detail.employee_info') }}
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-3">
+                <strong>{{ i18n.t('employees.fields.employee_number') }}:</strong>
+                <br>
+                <span class="text-muted">{{ employee()?.employeeNumber }}</span>
+              </div>
+              <div class="col-md-3">
+                <strong>{{ i18n.t('employees.fields.full_name') }}:</strong>
+                <br>
+                <span class="text-primary fw-bold">{{ employee()?.fullName }}</span>
+              </div>
+              <div class="col-md-3">
+                <strong>{{ i18n.t('employees.fields.department') }}:</strong>
+                <br>
+                <span class="text-muted">{{ employee()?.departmentName || '--' }}</span>
+              </div>
+              <div class="col-md-3">
+                <strong>{{ i18n.t('attendance.fields.attendance_date') }}:</strong>
+                <br>
+                <span class="text-info fw-bold">{{ attendanceDate | date: 'fullDate' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Attendance Status Overview -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">
+              <i class="fas fa-chart-line me-2"></i>
+              {{ i18n.t('attendance.daily_detail.attendance_overview') }}
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row text-center">
+              <div class="col-md-2">
+                <div class="border rounded p-3">
+                  <h6 class="text-muted small mb-1">{{ i18n.t('attendance.fields.status') }}</h6>
+                  <span [class]="getStatusBadgeClass(attendanceRecord()!.status)" class="fs-6">
+                    {{ getStatusDisplayText(attendanceRecord()!.status) }}
+                  </span>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="border rounded p-3">
+                  <h6 class="text-muted small mb-1">{{ i18n.t('attendance.fields.working_hours') }}</h6>
+                  <div class="fw-bold text-primary">{{ formatHoursAsTime(attendanceRecord()!.workingHours || 0) }}</div>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="border rounded p-3">
+                  <h6 class="text-muted small mb-1">{{ i18n.t('attendance.fields.overtime_hours') }}</h6>
+                  <div class="fw-bold text-success">{{ formatHoursAsTime(attendanceRecord()!.overtimeHours || 0) }}</div>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="border rounded p-3">
+                  <h6 class="text-muted small mb-1">{{ i18n.t('attendance.fields.late_minutes') }}</h6>
+                  <div class="fw-bold text-warning">{{ attendanceRecord()!.lateMinutes || 0 }} {{ i18n.t('common.minutes') }}</div>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="border rounded p-3">
+                  <h6 class="text-muted small mb-1">{{ i18n.t('attendance.fields.early_leave_minutes') }}</h6>
+                  <div class="fw-bold text-info">{{ attendanceRecord()!.earlyLeaveMinutes || 0 }} {{ i18n.t('common.minutes') }}</div>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="border rounded p-3">
+                  <h6 class="text-muted small mb-1">{{ i18n.t('attendance.fields.total_late') }}</h6>
+                  <div class="fw-bold text-danger">{{ getTotalLateMinutes() }} {{ i18n.t('common.minutes') }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Time Details -->
+    <div class="row mb-4">
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">
+              <i class="fas fa-clock me-2"></i>
+              {{ i18n.t('attendance.daily_detail.time_details') }}
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row mb-3">
+              <div class="col-6">
+                <strong>{{ i18n.t('attendance.fields.check_in_time') }}:</strong>
+                <br>
+                <span [class]="attendanceRecord()!.actualCheckInTime ? 'text-success fw-bold' : 'text-muted'">
+                  {{ formatTime(attendanceRecord()!.actualCheckInTime) }}
+                </span>
+              </div>
+              <div class="col-6">
+                <strong>{{ i18n.t('attendance.fields.check_out_time') }}:</strong>
+                <br>
+                <span [class]="attendanceRecord()!.actualCheckOutTime ? 'text-info fw-bold' : 'text-muted'">
+                  {{ formatTime(attendanceRecord()!.actualCheckOutTime) }}
+                </span>
+              </div>
+            </div>
+            @if (attendanceRecord()!.breakHours) {
+              <div class="row">
+                <div class="col-12">
+                  <strong>{{ i18n.t('attendance.fields.break_hours') }}:</strong>
+                  <br>
+                  <span class="text-warning fw-bold">{{ formatHoursAsTime(attendanceRecord()!.breakHours || 0) }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Shift Information -->
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">
+              <i class="fas fa-calendar-clock me-2"></i>
+              {{ i18n.t('attendance.daily_detail.shift_info') }}
+            </h5>
+          </div>
+          <div class="card-body">
+            @if (shift(); as shiftData) {
+              <div>
+                <div class="row mb-3">
+                  <div class="col-6">
+                    <strong>{{ i18n.t('shifts.fields.name') }}:</strong>
+                    <br>
+                    <span class="text-primary fw-bold">{{ shiftData.name }}</span>
+                  </div>
+                  <div class="col-6">
+                    <strong>{{ i18n.t('shifts.fields.description') }}:</strong>
+                    <br>
+                    <span class="text-muted">{{ shiftData.description || '--' }}</span>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <div class="col-6">
+                    <strong>{{ i18n.t('shifts.fields.start_time') }}:</strong>
+                    <br>
+                    <span class="text-success">{{ getShiftStartTime(shiftData) }}</span>
+                  </div>
+                  <div class="col-6">
+                    <strong>{{ i18n.t('shifts.fields.end_time') }}:</strong>
+                    <br>
+                    <span class="text-info">{{ getShiftEndTime(shiftData) }}</span>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <div class="col-6">
+                    <strong>{{ i18n.t('shifts.fields.working_hours') }}:</strong>
+                    <br>
+                    <span class="text-primary fw-bold">{{ formatHoursAsTime(shiftData.requiredHours || 0) }}</span>
+                  </div>
+                  <div class="col-6">
+                    <strong>{{ i18n.t('shifts.fields.shift_type') }}:</strong>
+                    <br>
+                    <span class="text-warning">{{ getShiftTypeDisplay(shiftData) }}</span>
+                  </div>
+                </div>
+                @if (shiftData.allowFlexibleHours) {
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="alert alert-info">
+                        <strong>{{ i18n.t('shifts.fields.flexible_hours') }}:</strong>
+                        <ul class="mb-0 mt-2">
+                          <li>{{ i18n.t('shifts.fields.flex_minutes_before') }}: {{ shiftData.flexMinutesBefore || 0 }} {{ i18n.t('common.minutes') }}</li>
+                          <li>{{ i18n.t('shifts.fields.flex_minutes_after') }}: {{ shiftData.flexMinutesAfter || 0 }} {{ i18n.t('common.minutes') }}</li>
+                          <li>{{ i18n.t('shifts.fields.grace_period') }}: {{ shiftData.gracePeriodMinutes || 0 }} {{ i18n.t('common.minutes') }}</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="text-center text-muted py-3">
+                <i class="fas fa-info-circle fa-2x mb-2"></i>
+                <p>{{ i18n.t('attendance.daily_detail.no_shift_assigned') }}</p>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Additional Information -->
+    @if (attendanceRecord()!.notes || attendanceRecord()!.isApproved !== undefined) {
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="card-title mb-0">
+                <i class="fas fa-sticky-note me-2"></i>
+                {{ i18n.t('attendance.daily_detail.additional_info') }}
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                @if (attendanceRecord()!.notes) {
+                  <div class="col-md-6">
+                    <strong>{{ i18n.t('attendance.fields.notes') }}:</strong>
+                    <br>
+                    <p class="text-muted">{{ attendanceRecord()!.notes }}</p>
+                  </div>
+                }
+                @if (attendanceRecord()!.isManualOverride) {
+                  <div class="col-md-6">
+                    <strong>{{ i18n.t('attendance.fields.manual_override') }}:</strong>
+                    <br>
+                    <span class="badge bg-warning">{{ i18n.t('attendance.status.manual_override') }}</span>
+                  </div>
+                }
+              </div>
+              @if (attendanceRecord()!.isApproved !== undefined) {
+                <div class="row">
+                  <div class="col-12">
+                    <strong>{{ i18n.t('attendance.fields.approval_status') }}:</strong>
+                    <br>
+                    <span [class]="attendanceRecord()!.isApproved ? 'badge bg-success' : 'badge bg-warning'">
+                      {{ attendanceRecord()!.isApproved ? i18n.t('attendance.approved') : i18n.t('attendance.pending_approval') }}
+                    </span>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}
+
+<!-- No Data State -->
+@if (!loading() && !error() && (!employee() || !attendanceRecord())) {
+  <div class="text-center py-5">
+    <i class="fas fa-exclamation-circle fa-3x text-muted mb-3"></i>
+    <h5 class="text-muted">{{ i18n.t('attendance.daily_detail.no_data') }}</h5>
+    <p class="text-muted">{{ i18n.t('attendance.daily_detail.no_data_description') }}</p>
+    <button type="button" class="btn btn-primary" (click)="onBack()">
+      <i class="fas fa-arrow-left me-2"></i>
+      {{ i18n.t('common.back') }}
+    </button>
+  </div>
+}

@@ -142,5 +142,5 @@
 }
 
 .table-responsive::-webkit-scrollbar-thumb:hover {
-  background: var(--bs-dark);
+  background: var(--bs-primary);
 }

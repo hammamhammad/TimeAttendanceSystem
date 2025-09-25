@@ -1,0 +1,8 @@
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\FlexibleHoursTest.src.Shared.TimeAttendanceSystem.Shared.Localization.Resources.ValidationMessages.resources
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\FlexibleHoursTest.src.Shared.TimeAttendanceSystem.Shared.Localization.Resources.ValidationMessages.ar.resources
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\FlexibleHoursTest.csproj.GenerateResource.cache
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\FlexibleHoursTest.GeneratedMSBuildEditorConfig.editorconfig
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\FlexibleHoursTest.AssemblyInfoInputs.cache
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\FlexibleHoursTest.AssemblyInfo.cs
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\FlexibleHoursTest.csproj.CoreCompileInputs.cache
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\FlexibleHoursTest.sourcelink.json

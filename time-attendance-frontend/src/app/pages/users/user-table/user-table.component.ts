@@ -54,7 +54,7 @@ import { PermissionResources, PermissionActions } from '../../../shared/utils/pe
 
           <!-- Roles -->
           <div *ngSwitchCase="'roles'">
-            <span *ngFor="let role of user.roles" class="badge bg-secondary me-1">
+            <span *ngFor="let role of user.roles" class="badge bg-light text-dark border me-1">
               {{ role }}
             </span>
             <span *ngIf="user.roles.length === 0" class="text-muted">No roles assigned</span>

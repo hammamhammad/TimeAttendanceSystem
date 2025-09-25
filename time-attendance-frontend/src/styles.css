@@ -1,6 +1,12 @@
 /* Global styles for Time Attendance System */
 
-/* CSS Custom Properties */
+/* Import Global Design System */
+@import './styles/variables.css';
+@import './styles/utilities.css';
+@import './styles/components.css';
+@import './styles/patterns.css';
+
+/* Legacy CSS Custom Properties (for backward compatibility) */
 :root {
   --bs-primary-rgb: 13, 110, 253;
   --bs-success-rgb: 25, 135, 84;

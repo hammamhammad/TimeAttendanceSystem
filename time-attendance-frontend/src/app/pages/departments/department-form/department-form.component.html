@@ -23,57 +23,65 @@
           [loading]="loadingBranches()"
           [class.is-invalid]="isFieldInvalid('branchId')"
         ></app-searchable-select>
-        <div class="invalid-feedback" *ngIf="isFieldInvalid('branchId')">
-          {{ getFieldError('branchId') }}
-        </div>
+        @if (isFieldInvalid('branchId')) {
+          <div class="invalid-feedback">
+            {{ getFieldError('branchId') }}
+          </div>
+        }
       </div>
     }
 
     <!-- Name -->
     <div class="col-md-6">
       <label class="form-label required">{{ i18n.t('department.name') }}</label>
-      <input 
-        type="text" 
+      <input
+        type="text"
         class="form-control"
         formControlName="name"
         [class.is-invalid]="isFieldInvalid('name')"
         [placeholder]="i18n.t('department.namePlaceholder')"
       />
-      <div class="invalid-feedback" *ngIf="isFieldInvalid('name')">
-        {{ getFieldError('name') }}
-      </div>
+      @if (isFieldInvalid('name')) {
+        <div class="invalid-feedback">
+          {{ getFieldError('name') }}
+        </div>
+      }
     </div>
 
     <!-- Arabic Name -->
     <div class="col-md-6">
       <label class="form-label">{{ i18n.t('department.nameAr') }}</label>
-      <input 
-        type="text" 
+      <input
+        type="text"
         class="form-control"
         formControlName="nameAr"
         [class.is-invalid]="isFieldInvalid('nameAr')"
         [placeholder]="i18n.t('department.nameArPlaceholder')"
         dir="rtl"
       />
-      <div class="invalid-feedback" *ngIf="isFieldInvalid('nameAr')">
-        {{ getFieldError('nameAr') }}
-      </div>
+      @if (isFieldInvalid('nameAr')) {
+        <div class="invalid-feedback">
+          {{ getFieldError('nameAr') }}
+        </div>
+      }
     </div>
 
     <!-- Code -->
     <div class="col-md-6">
       <label class="form-label required">{{ i18n.t('department.code') }}</label>
-      <input 
-        type="text" 
+      <input
+        type="text"
         class="form-control"
         formControlName="code"
         [class.is-invalid]="isFieldInvalid('code')"
         [placeholder]="i18n.t('department.codePlaceholder')"
         style="text-transform: uppercase;"
       />
-      <div class="invalid-feedback" *ngIf="isFieldInvalid('code')">
-        {{ getFieldError('code') }}
-      </div>
+      @if (isFieldInvalid('code')) {
+        <div class="invalid-feedback">
+          {{ getFieldError('code') }}
+        </div>
+      }
     </div>
 
     <!-- Parent Department -->
@@ -90,9 +98,11 @@
         [loading]="loading()"
         [class.is-invalid]="isFieldInvalid('parentDepartmentId')"
       ></app-searchable-select>
-      <div class="invalid-feedback" *ngIf="isFieldInvalid('parentDepartmentId')">
-        {{ getFieldError('parentDepartmentId') }}
-      </div>
+      @if (isFieldInvalid('parentDepartmentId')) {
+        <div class="invalid-feedback">
+          {{ getFieldError('parentDepartmentId') }}
+        </div>
+      }
       <small class="form-text text-muted">
         {{ i18n.t('department.parentDepartmentHelp') }}
       </small>
@@ -101,22 +111,24 @@
     <!-- Description -->
     <div class="col-md-6">
       <label class="form-label">{{ i18n.t('common.description') }}</label>
-      <textarea 
+      <textarea
         class="form-control"
         formControlName="description"
         [class.is-invalid]="isFieldInvalid('description')"
         [placeholder]="i18n.t('department.descriptionPlaceholder')"
         rows="3"
       ></textarea>
-      <div class="invalid-feedback" *ngIf="isFieldInvalid('description')">
-        {{ getFieldError('description') }}
-      </div>
+      @if (isFieldInvalid('description')) {
+        <div class="invalid-feedback">
+          {{ getFieldError('description') }}
+        </div>
+      }
     </div>
 
     <!-- Arabic Description -->
     <div class="col-md-6">
       <label class="form-label">{{ i18n.t('department.descriptionAr') }}</label>
-      <textarea 
+      <textarea
         class="form-control"
         formControlName="descriptionAr"
         [class.is-invalid]="isFieldInvalid('descriptionAr')"
@@ -124,9 +136,11 @@
         rows="3"
         dir="rtl"
       ></textarea>
-      <div class="invalid-feedback" *ngIf="isFieldInvalid('descriptionAr')">
-        {{ getFieldError('descriptionAr') }}
-      </div>
+      @if (isFieldInvalid('descriptionAr')) {
+        <div class="invalid-feedback">
+          {{ getFieldError('descriptionAr') }}
+        </div>
+      }
     </div>
 
     <!-- Additional Information -->
@@ -154,53 +168,61 @@
         />
 
         <!-- Loading indicator -->
-        <div *ngIf="loadingManagers()" class="position-absolute top-50 end-0 translate-middle-y me-3">
-          <div class="spinner-border spinner-border-sm" role="status">
-            <span class="visually-hidden">{{ i18n.t('common.loading') }}...</span>
+        @if (loadingManagers()) {
+          <div class="position-absolute top-50 end-0 translate-middle-y me-3">
+            <div class="spinner-border spinner-border-sm" role="status">
+              <span class="visually-hidden">{{ i18n.t('common.loading') }}...</span>
+            </div>
           </div>
-        </div>
+        }
 
         <!-- Dropdown -->
-        <div
-          class="dropdown-menu show w-100 mt-1 shadow"
-          *ngIf="showManagerDropdown() && !loadingManagers() && filteredManagers().length > 0"
-          style="max-height: 200px; overflow-y: auto; position: absolute; z-index: 1050;"
-        >
-          <button
-            type="button"
-            class="dropdown-item d-flex justify-content-between align-items-center"
-            *ngFor="let manager of filteredManagers(); let i = index"
-            (click)="onSelectManager(manager)"
+        @if (showManagerDropdown() && !loadingManagers() && filteredManagers().length > 0) {
+          <div
+            class="dropdown-menu show w-100 mt-1 shadow"
+            style="max-height: 200px; overflow-y: auto; position: absolute; z-index: 1050;"
           >
-            <div class="d-flex flex-column">
-              <span class="fw-medium">{{ manager.name }}</span>
-              <small class="text-muted">{{ manager.employeeNumber }}</small>
-            </div>
-          </button>
-        </div>
+            @for (manager of filteredManagers(); track $index) {
+              <button
+                type="button"
+                class="dropdown-item d-flex justify-content-between align-items-center"
+                (click)="onSelectManager(manager)"
+              >
+                <div class="d-flex flex-column">
+                  <span class="fw-medium">{{ manager.name }}</span>
+                  <small class="text-muted">{{ manager.employeeNumber }}</small>
+                </div>
+              </button>
+            }
+          </div>
+        }
 
         <!-- No results -->
-        <div
-          class="dropdown-menu show w-100 mt-1 shadow text-center py-3"
-          *ngIf="showManagerDropdown() && !loadingManagers() && filteredManagers().length === 0 && managerSearchTerm()"
-          style="position: absolute; z-index: 1050;"
-        >
-          <span class="text-muted">{{ i18n.t('common.noResultsFound') }}</span>
-        </div>
+        @if (showManagerDropdown() && !loadingManagers() && filteredManagers().length === 0 && managerSearchTerm()) {
+          <div
+            class="dropdown-menu show w-100 mt-1 shadow text-center py-3"
+            style="position: absolute; z-index: 1050;"
+          >
+            <span class="text-muted">{{ i18n.t('common.noResultsFound') }}</span>
+          </div>
+        }
 
         <!-- No branch selected message for create mode -->
-        <div
-          class="dropdown-menu show w-100 mt-1 shadow text-center py-3"
-          *ngIf="!isEditMode && showManagerDropdown() && !loadingManagers() && managers().length === 0"
-          style="position: absolute; z-index: 1050;"
-        >
-          <span class="text-muted">{{ i18n.t('department.selectBranchFirst') }}</span>
-        </div>
+        @if (!isEditMode && showManagerDropdown() && !loadingManagers() && managers().length === 0) {
+          <div
+            class="dropdown-menu show w-100 mt-1 shadow text-center py-3"
+            style="position: absolute; z-index: 1050;"
+          >
+            <span class="text-muted">{{ i18n.t('department.selectBranchFirst') }}</span>
+          </div>
+        }
       </div>
 
-      <div class="invalid-feedback" *ngIf="isFieldInvalid('managerEmployeeId')">
-        {{ getFieldError('managerEmployeeId') }}
-      </div>
+      @if (isFieldInvalid('managerEmployeeId')) {
+        <div class="invalid-feedback">
+          {{ getFieldError('managerEmployeeId') }}
+        </div>
+      }
       <small class="form-text text-muted">
         {{ i18n.t('department.managerHelp') }}
       </small>
@@ -209,76 +231,86 @@
     <!-- Cost Center -->
     <div class="col-md-6">
       <label class="form-label">{{ i18n.t('department.costCenter') }}</label>
-      <input 
-        type="text" 
+      <input
+        type="text"
         class="form-control"
         formControlName="costCenter"
         [class.is-invalid]="isFieldInvalid('costCenter')"
         [placeholder]="i18n.t('department.costCenterPlaceholder')"
       />
-      <div class="invalid-feedback" *ngIf="isFieldInvalid('costCenter')">
-        {{ getFieldError('costCenter') }}
-      </div>
+      @if (isFieldInvalid('costCenter')) {
+        <div class="invalid-feedback">
+          {{ getFieldError('costCenter') }}
+        </div>
+      }
     </div>
 
     <!-- Location -->
     <div class="col-md-6">
       <label class="form-label">{{ i18n.t('department.location') }}</label>
-      <input 
-        type="text" 
+      <input
+        type="text"
         class="form-control"
         formControlName="location"
         [class.is-invalid]="isFieldInvalid('location')"
         [placeholder]="i18n.t('department.locationPlaceholder')"
       />
-      <div class="invalid-feedback" *ngIf="isFieldInvalid('location')">
-        {{ getFieldError('location') }}
-      </div>
+      @if (isFieldInvalid('location')) {
+        <div class="invalid-feedback">
+          {{ getFieldError('location') }}
+        </div>
+      }
     </div>
 
     <!-- Phone -->
     <div class="col-md-6">
       <label class="form-label">{{ i18n.t('common.phone') }}</label>
-      <input 
-        type="tel" 
+      <input
+        type="tel"
         class="form-control"
         formControlName="phone"
         [class.is-invalid]="isFieldInvalid('phone')"
         [placeholder]="i18n.t('common.phonePlaceholder')"
       />
-      <div class="invalid-feedback" *ngIf="isFieldInvalid('phone')">
-        {{ getFieldError('phone') }}
-      </div>
+      @if (isFieldInvalid('phone')) {
+        <div class="invalid-feedback">
+          {{ getFieldError('phone') }}
+        </div>
+      }
     </div>
 
     <!-- Email -->
     <div class="col-md-6">
       <label class="form-label">{{ i18n.t('common.email') }}</label>
-      <input 
-        type="email" 
+      <input
+        type="email"
         class="form-control"
         formControlName="email"
         [class.is-invalid]="isFieldInvalid('email')"
         [placeholder]="i18n.t('common.emailPlaceholder')"
       />
-      <div class="invalid-feedback" *ngIf="isFieldInvalid('email')">
-        {{ getFieldError('email') }}
-      </div>
+      @if (isFieldInvalid('email')) {
+        <div class="invalid-feedback">
+          {{ getFieldError('email') }}
+        </div>
+      }
     </div>
 
     <!-- Sort Order -->
     <div class="col-md-6">
       <label class="form-label">{{ i18n.t('common.sortOrder') }}</label>
-      <input 
-        type="number" 
+      <input
+        type="number"
         class="form-control"
         formControlName="sortOrder"
         [class.is-invalid]="isFieldInvalid('sortOrder')"
         min="0"
       />
-      <div class="invalid-feedback" *ngIf="isFieldInvalid('sortOrder')">
-        {{ getFieldError('sortOrder') }}
-      </div>
+      @if (isFieldInvalid('sortOrder')) {
+        <div class="invalid-feedback">
+          {{ getFieldError('sortOrder') }}
+        </div>
+      }
       <small class="form-text text-muted">
         {{ i18n.t('common.sortOrderHelp') }}
       </small>
@@ -295,9 +327,9 @@
     <!-- Active Status -->
     <div class="col-12">
       <div class="form-check form-switch">
-        <input 
-          class="form-check-input" 
-          type="checkbox" 
+        <input
+          class="form-check-input"
+          type="checkbox"
           formControlName="isActive"
           id="isActiveSwitch"
         />
@@ -315,8 +347,8 @@
   <div class="form-actions">
     <div class="d-flex justify-content-between">
       <div>
-        <button 
-          type="button" 
+        <button
+          type="button"
           class="btn btn-outline-secondary"
           (click)="onReset()"
           [disabled]="isSaving()"
@@ -326,8 +358,8 @@
         </button>
       </div>
       <div class="d-flex gap-2">
-        <button 
-          type="button" 
+        <button
+          type="button"
           class="btn btn-secondary"
           (click)="onCancel()"
           [disabled]="isSaving()"
@@ -335,13 +367,17 @@
           <i class="fas fa-times me-2"></i>
           {{ i18n.t('common.cancel') }}
         </button>
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           class="btn btn-primary"
           [disabled]="form.invalid || isSaving()"
         >
-          <span *ngIf="isSaving()" class="spinner-border spinner-border-sm me-2"></span>
-          <i *ngIf="!isSaving()" class="fas fa-save me-2"></i>
+          @if (isSaving()) {
+            <span class="spinner-border spinner-border-sm me-2"></span>
+          }
+          @if (!isSaving()) {
+            <i class="fas fa-save me-2"></i>
+          }
           {{ isSaving() ? i18n.t('common.saving') : (isEditMode ? i18n.t('common.update') : i18n.t('common.save')) }}
         </button>
       </div>
@@ -350,10 +386,12 @@
 </form>
 
 <!-- Loading Overlay -->
-<div class="loading-overlay" *ngIf="loading()">
-  <div class="d-flex align-items-center justify-content-center h-100">
-    <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">{{ i18n.t('common.loading') }}...</span>
+@if (loading()) {
+  <div class="loading-overlay">
+    <div class="d-flex align-items-center justify-content-center h-100">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">{{ i18n.t('common.loading') }}...</span>
+      </div>
     </div>
   </div>
-</div>
+}

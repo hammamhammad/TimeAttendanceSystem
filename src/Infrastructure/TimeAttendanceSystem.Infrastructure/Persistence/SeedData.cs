@@ -1,8 +1,7 @@
-using TimeAttendanceSystem.Domain.Branches;
 using TimeAttendanceSystem.Domain.Users;
 using TimeAttendanceSystem.Domain.Common;
 using TimeAttendanceSystem.Domain.Shifts;
-using TimeAttendanceSystem.Domain.Employees;
+using TimeAttendanceSystem.Domain.Settings;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
@@ -13,11 +12,6 @@ public static class SeedData
 {
     public static async Task SeedAsync(TimeAttendanceDbContext context)
     {
-        if (!await context.Branches.AnyAsync())
-        {
-            await SeedBranchesAsync(context);
-        }
-
         // Always ensure all permissions are created and up-to-date
         await SeedPermissionsAsync(context);
 
@@ -31,44 +25,23 @@ public static class SeedData
             await SeedUsersAsync(context);
         }
 
-        if (!await context.Shifts.AnyAsync())
-        {
-            await SeedShiftsAsync(context);
-        }
-
-        if (!await context.Departments.AnyAsync())
-        {
-            await SeedDepartmentsAsync(context);
-        }
-
-        if (!await context.Employees.AnyAsync())
-        {
-            await SeedEmployeesAsync(context);
-        }
-
-        // Assign default shift to all employees
-        await AssignDefaultShiftToEmployeesAsync(context);
-
         // Always ensure SystemAdmin has all permissions (including newly added ones)
         await EnsureSystemAdminHasAllPermissionsAsync(context);
 
-        await context.SaveChangesAsync();
-    }
-
-    private static async Task SeedBranchesAsync(TimeAttendanceDbContext context)
-    {
-        var branch = new Branch
+        if (!await context.Shifts.AnyAsync())
         {
-            Code = "HQ",
-            Name = "Head Quarters",
-            TimeZone = "Asia/Riyadh",
-            IsActive = true,
-            CreatedAtUtc = DateTime.UtcNow,
-            CreatedBy = "SYSTEM"
-        };
+            await SeedDefaultShiftAsync(context);
+        }
 
-        await context.Branches.AddAsync(branch);
+        if (!await context.OvertimeConfigurations.AnyAsync())
+        {
+            await SeedDefaultOvertimeConfigurationAsync(context);
+        }
+
+
         await context.SaveChangesAsync();
+
+        Console.WriteLine("✅ Essential system data seeding completed (permissions, roles, users, default shift, overtime configuration)");
     }
 
     private static async Task SeedPermissionsAsync(TimeAttendanceDbContext context)
@@ -78,7 +51,7 @@ public static class SeedData
         // User Management - Extended CRUD with specialized actions
         permissions.AddRange(PermissionBuilder.CreateExtendedCrudPermissions(PermissionResources.User, "User Management"));
         permissions.AddRange(PermissionBuilder.CreateResourcePermissions(PermissionResources.User, "User Management",
-            PermissionActions.AssignRole, PermissionActions.RemoveRole, PermissionActions.ResetPassword, 
+            PermissionActions.AssignRole, PermissionActions.RemoveRole, PermissionActions.ResetPassword,
             PermissionActions.Lock, PermissionActions.Unlock, PermissionActions.Activate, PermissionActions.Deactivate));
 
         // Role Management - Extended CRUD with permission assignment
@@ -94,805 +67,215 @@ public static class SeedData
         // Branch Management - Standard operations
         permissions.AddRange(PermissionBuilder.CreateExtendedCrudPermissions(PermissionResources.Branch, "Branch Management"));
         permissions.AddRange(PermissionBuilder.CreateResourcePermissions(PermissionResources.Branch, "Branch Management",
-            PermissionActions.Activate, PermissionActions.Deactivate, PermissionActions.Manage));
+            PermissionActions.Activate, PermissionActions.Deactivate));
 
         // Department Management - Standard operations
         permissions.AddRange(PermissionBuilder.CreateExtendedCrudPermissions(PermissionResources.Department, "Department Management"));
         permissions.AddRange(PermissionBuilder.CreateResourcePermissions(PermissionResources.Department, "Department Management",
             PermissionActions.Activate, PermissionActions.Deactivate, PermissionActions.Assign, PermissionActions.Unassign));
 
-        // Shift Management - Work shifts and assignment management
-        Console.WriteLine($"DEBUG: Creating shift permissions - PermissionResources.Shift = '{PermissionResources.Shift}'");
-        var shiftExtendedCrudPermissions = PermissionBuilder.CreateExtendedCrudPermissions(PermissionResources.Shift, "Shift Management");
-        Console.WriteLine($"DEBUG: Created {shiftExtendedCrudPermissions.Count} extended CRUD permissions for shift");
-        foreach (var perm in shiftExtendedCrudPermissions)
-        {
-            Console.WriteLine($"DEBUG: Shift CRUD Permission: {perm.Key} - {perm.Description}");
-        }
-        permissions.AddRange(shiftExtendedCrudPermissions);
+        // Shift Management - Full CRUD with assignment capabilities
+        permissions.AddRange(PermissionBuilder.CreateExtendedCrudPermissions(PermissionResources.Shift, "Shift Management"));
+        permissions.AddRange(PermissionBuilder.CreateResourcePermissions(PermissionResources.Shift, "Shift Management",
+            PermissionActions.Assign, PermissionActions.Unassign));
 
-        var shiftAssignPermissions = PermissionBuilder.CreateResourcePermissions(PermissionResources.Shift, "Shift Management",
-            PermissionActions.Assign, PermissionActions.Unassign);
-        Console.WriteLine($"DEBUG: Created {shiftAssignPermissions.Count} assignment permissions for shift");
-        foreach (var perm in shiftAssignPermissions)
-        {
-            Console.WriteLine($"DEBUG: Shift Assignment Permission: {perm.Key} - {perm.Description}");
-        }
-        permissions.AddRange(shiftAssignPermissions);
-
-        // Attendance Management - Specialized workflow actions
+        // Attendance Management - Extended CRUD with approval
         permissions.AddRange(PermissionBuilder.CreateExtendedCrudPermissions(PermissionResources.Attendance, "Attendance Management"));
         permissions.AddRange(PermissionBuilder.CreateResourcePermissions(PermissionResources.Attendance, "Attendance Management",
-            PermissionActions.Approve, PermissionActions.Reject, PermissionActions.Archive, PermissionActions.Restore));
+            PermissionActions.Approve, PermissionActions.Reject));
 
-        // Schedule Management - Work schedules and shift management
+        // Report Management - Read and view focused
+        permissions.AddRange(PermissionBuilder.CreateResourcePermissions(PermissionResources.Report, "Reporting",
+            PermissionActions.Read, PermissionActions.View, PermissionActions.Export));
+
+        // System Administration - Core system functions
+        permissions.AddRange(PermissionBuilder.CreateResourcePermissions(PermissionResources.System, "System Administration",
+            PermissionActions.Configure, PermissionActions.Manage, PermissionActions.Restore));
+
+        // Audit Management - Read-only with export
+        permissions.AddRange(PermissionBuilder.CreateResourcePermissions(PermissionResources.Audit, "Audit Management",
+            PermissionActions.Read, PermissionActions.Export));
+
+        // Settings Management - Configuration and preferences
+        permissions.AddRange(PermissionBuilder.CreateExtendedCrudPermissions(PermissionResources.Settings, "Settings Management"));
+        permissions.AddRange(PermissionBuilder.CreateResourcePermissions(PermissionResources.Settings, "Settings Management",
+            PermissionActions.Configure, PermissionActions.Manage));
+
+        // Schedule Management - Work schedules and planning
         permissions.AddRange(PermissionBuilder.CreateExtendedCrudPermissions(PermissionResources.Schedule, "Schedule Management"));
         permissions.AddRange(PermissionBuilder.CreateResourcePermissions(PermissionResources.Schedule, "Schedule Management",
-            PermissionActions.Assign, PermissionActions.Unassign, PermissionActions.Approve, PermissionActions.Reject,
-            PermissionActions.Activate, PermissionActions.Deactivate, PermissionActions.Archive, PermissionActions.Restore));
+            PermissionActions.Assign, PermissionActions.Unassign, PermissionActions.Approve, PermissionActions.Reject));
 
-        // Reports Management - View and export focused
-        permissions.AddRange(PermissionBuilder.CreateResourcePermissions(PermissionResources.Report, "Reports",
-            PermissionActions.Read, PermissionActions.Create, PermissionActions.Export, PermissionActions.Download, 
-            PermissionActions.Archive, PermissionActions.Configure));
+        // Dashboard Management - Views and widgets
+        permissions.AddRange(PermissionBuilder.CreateResourcePermissions(PermissionResources.Dashboard, "Dashboard Management",
+            PermissionActions.Read, PermissionActions.View, PermissionActions.Configure));
 
-        // System Settings - Configuration management
-        permissions.AddRange(PermissionBuilder.CreateResourcePermissions(PermissionResources.Settings, "System Settings",
-            PermissionActions.Read, PermissionActions.Update, PermissionActions.Configure, PermissionActions.Export, PermissionActions.Import));
+        // Permission Management - Direct permission control
+        permissions.AddRange(PermissionBuilder.CreateExtendedCrudPermissions(PermissionResources.Permission, "Permission Management"));
+        permissions.AddRange(PermissionBuilder.CreateResourcePermissions(PermissionResources.Permission, "Permission Management",
+            PermissionActions.Assign, PermissionActions.Unassign, PermissionActions.Manage));
 
-        // Dashboard - View and configuration
-        permissions.AddRange(PermissionBuilder.CreateResourcePermissions(PermissionResources.Dashboard, "Dashboard",
-            PermissionActions.Read, PermissionActions.Configure, PermissionActions.Export));
+        // Notification Management - System alerts and messages
+        permissions.AddRange(PermissionBuilder.CreateExtendedCrudPermissions(PermissionResources.Notification, "Notification Management"));
+        permissions.AddRange(PermissionBuilder.CreateResourcePermissions(PermissionResources.Notification, "Notification Management",
+            PermissionActions.Activate, PermissionActions.Deactivate));
 
-        // System Administration - Advanced system controls
-        permissions.AddRange(PermissionBuilder.CreateResourcePermissions(PermissionResources.System, "System Administration",
-            PermissionActions.Manage, PermissionActions.Configure, PermissionActions.Archive, PermissionActions.Restore));
+        // Overtime Management - Settings for overtime calculation and configuration
+        permissions.AddRange(PermissionBuilder.CreateResourcePermissions("settings.overtime", "Overtime Management",
+            PermissionActions.Read, PermissionActions.Create, PermissionActions.Update, PermissionActions.Delete,
+            PermissionActions.Configure, PermissionActions.Manage, PermissionActions.Activate));
 
-        // Permission Management - Meta permissions for managing permissions themselves
-        permissions.AddRange(PermissionBuilder.CreateStandardCrudPermissions(PermissionResources.Permission, "Permission Management"));
-        
-        // Audit and Monitoring
-        permissions.AddRange(PermissionBuilder.CreateResourcePermissions(PermissionResources.Audit, "Audit & Monitoring",
-            PermissionActions.Read, PermissionActions.Export, PermissionActions.Archive));
+        // Public Holiday Management - Managing public holidays and calendar
+        permissions.AddRange(PermissionBuilder.CreateExtendedCrudPermissions(PermissionResources.PublicHoliday, "Public Holiday Management"));
+        permissions.AddRange(PermissionBuilder.CreateResourcePermissions(PermissionResources.PublicHoliday, "Public Holiday Management",
+            PermissionActions.Configure, PermissionActions.Manage,
+            PermissionActions.Activate, PermissionActions.Deactivate));
 
-        // Get existing permissions to avoid duplicates
-        var existingPermissionKeys = await context.Permissions
+
+        // Get existing permission keys
+        var existingKeys = await context.Permissions
             .Where(p => !p.IsDeleted)
             .Select(p => p.Key)
             .ToListAsync();
 
-        // Only add permissions that don't already exist
-        var newPermissions = permissions.Where(p => !existingPermissionKeys.Contains(p.Key)).ToList();
+        // Filter out existing permissions
+        var newPermissions = permissions.Where(p => !existingKeys.Contains(p.Key)).ToList();
 
         if (newPermissions.Any())
         {
             Console.WriteLine($"Adding {newPermissions.Count} new permissions");
             await context.Permissions.AddRangeAsync(newPermissions);
             await context.SaveChangesAsync();
-
-            // Assign new permissions to SystemAdmin role
-            var systemAdminRole = await context.Roles.FirstOrDefaultAsync(r => r.Name == "SystemAdmin");
-            if (systemAdminRole != null)
-            {
-                var newSystemAdminPermissions = newPermissions.Select(p => new RolePermission
-                {
-                    RoleId = systemAdminRole.Id,
-                    PermissionId = p.Id
-                }).ToArray();
-
-                await context.RolePermissions.AddRangeAsync(newSystemAdminPermissions);
-                await context.SaveChangesAsync();
-
-                Console.WriteLine($"Added {newSystemAdminPermissions.Length} new permissions to SystemAdmin role");
-            }
-        }
-        else
-        {
-            Console.WriteLine("All permissions already exist, skipping creation");
         }
     }
 
     private static async Task SeedRolesAsync(TimeAttendanceDbContext context)
     {
-        var allPermissions = await context.Permissions.ToListAsync();
-
-        // System Admin Role - All permissions
-        var systemAdminRole = new Role
+        var roles = new List<Role>
         {
-            Name = "SystemAdmin",
-            IsSystem = true,
-            IsEditable = false,
-            IsDeletable = false,
-            CreatedAtUtc = DateTime.UtcNow,
-            CreatedBy = "SYSTEM"
-        };
-
-        await context.Roles.AddAsync(systemAdminRole);
-        await context.SaveChangesAsync();
-
-        var systemAdminPermissions = allPermissions.Select(p => new RolePermission
-        {
-            RoleId = systemAdminRole.Id,
-            PermissionId = p.Id
-        }).ToArray();
-
-        await context.RolePermissions.AddRangeAsync(systemAdminPermissions);
-
-        // Admin Role - All except user management
-        var adminRole = new Role
-        {
-            Name = "Admin",
-            IsSystem = true,
-            IsEditable = true,
-            IsDeletable = false,
-            CreatedAtUtc = DateTime.UtcNow,
-            CreatedBy = "SYSTEM"
-        };
-
-        await context.Roles.AddAsync(adminRole);
-        await context.SaveChangesAsync();
-
-        var adminPermissions = allPermissions
-            .Where(p => !p.Key.StartsWith("user.") && !p.Key.StartsWith("settings."))
-            .Select(p => new RolePermission
+            new Role
             {
-                RoleId = adminRole.Id,
-                PermissionId = p.Id
-            }).ToArray();
-
-        await context.RolePermissions.AddRangeAsync(adminPermissions);
-
-        // HR Operation Role - Limited permissions
-        var hrRole = new Role
-        {
-            Name = "HROperation",
-            IsSystem = true,
-            IsEditable = true,
-            IsDeletable = true,
-            CreatedAtUtc = DateTime.UtcNow,
-            CreatedBy = "SYSTEM"
+                Name = "SystemAdmin",
+                IsSystem = true,
+                IsEditable = false,
+                IsDeletable = false,
+                CreatedAtUtc = DateTime.UtcNow,
+                CreatedBy = "SYSTEM"
+            },
+            new Role
+            {
+                Name = "Admin",
+                IsSystem = true,
+                IsEditable = false,
+                IsDeletable = false,
+                CreatedAtUtc = DateTime.UtcNow,
+                CreatedBy = "SYSTEM"
+            },
+            new Role
+            {
+                Name = "Manager",
+                IsSystem = false,
+                IsEditable = true,
+                IsDeletable = true,
+                CreatedAtUtc = DateTime.UtcNow,
+                CreatedBy = "SYSTEM"
+            },
+            new Role
+            {
+                Name = "Employee",
+                IsSystem = false,
+                IsEditable = true,
+                IsDeletable = true,
+                CreatedAtUtc = DateTime.UtcNow,
+                CreatedBy = "SYSTEM"
+            }
         };
 
-        await context.Roles.AddAsync(hrRole);
-        await context.SaveChangesAsync();
-
-        var hrPermissions = allPermissions
-            .Where(p => p.Key.In("employee.read", "employee.create", "employee.update", "employee.export", "employee.import", 
-                                 "branch.read", "department.read", "attendance.read", "attendance.create", 
-                                 "attendance.update", "schedule.read", "schedule.create", "schedule.update", 
-                                 "schedule.assign", "schedule.unassign", "report.read", "dashboard.read"))
-            .Select(p => new RolePermission
-            {
-                RoleId = hrRole.Id,
-                PermissionId = p.Id
-            }).ToArray();
-
-        await context.RolePermissions.AddRangeAsync(hrPermissions);
-
-        // Default User Role - Basic permissions for registered users
-        var userRole = new Role
-        {
-            Name = "User",
-            IsSystem = true,
-            IsEditable = true,
-            IsDeletable = true,
-            CreatedAtUtc = DateTime.UtcNow,
-            CreatedBy = "SYSTEM"
-        };
-
-        await context.Roles.AddAsync(userRole);
-        await context.SaveChangesAsync();
-
-        // Basic permissions for regular users (read-only access)
-        var userPermissions = allPermissions
-            .Where(p => p.Key.In("dashboard.read", "employee.read", "branch.read", "department.read", "report.read"))
-            .Select(p => new RolePermission
-            {
-                RoleId = userRole.Id,
-                PermissionId = p.Id
-            }).ToArray();
-
-        await context.RolePermissions.AddRangeAsync(userPermissions);
-
+        await context.Roles.AddRangeAsync(roles);
         await context.SaveChangesAsync();
     }
 
     private static async Task SeedUsersAsync(TimeAttendanceDbContext context)
     {
-        var systemAdminRole = await context.Roles.FirstAsync(r => r.Name == "SystemAdmin");
-        var branch = await context.Branches.FirstAsync();
-
-        var (hash, salt) = HashPassword("TempP@ssw0rd123!");
-        
-        var systemAdmin = new User
+        // Create SystemAdmin user
+        var (sysAdminHash, sysAdminSalt) = HashPassword("TempP@ssw0rd123!");
+        var systemAdminUser = new User
         {
             Username = "systemadmin",
-            Email = "admin@timeattendance.com",
-            PasswordHash = hash,
-            PasswordSalt = salt,
-            MustChangePassword = true,
+            Email = "systemadmin@system.com",
+            PasswordHash = sysAdminHash,
+            PasswordSalt = sysAdminSalt,
+            TwoFactorEnabled = false,
+            EmailConfirmed = true,
             IsActive = true,
             CreatedAtUtc = DateTime.UtcNow,
             CreatedBy = "SYSTEM"
         };
 
-        await context.Users.AddAsync(systemAdmin);
+      
+        await context.Users.AddRangeAsync(new[] { systemAdminUser });
         await context.SaveChangesAsync();
 
-        // Assign SystemAdmin role
-        var userRole = new UserRole
+        // Assign SystemAdmin role to systemadmin user
+        var systemAdminRole = await context.Roles.FirstAsync(r => r.Name == "SystemAdmin");
+        var systemAdminUserRole = new UserRole
         {
-            UserId = systemAdmin.Id,
+            UserId = systemAdminUser.Id,
             RoleId = systemAdminRole.Id
         };
 
-        await context.UserRoles.AddAsync(userRole);
+
+        await context.UserRoles.AddRangeAsync(new[] { systemAdminUserRole });
         await context.SaveChangesAsync();
-    }
-
-    private static async Task SeedShiftsAsync(TimeAttendanceDbContext context)
-    {
-        var shifts = new List<Shift>
-        {
-            new()
-            {
-                Name = "Flexible Hours 7:30 - 9:00",
-                Description = "Flexible working hours with flexible start time between 7:30 AM and 9:00 AM",
-                ShiftType = ShiftType.TimeBased,
-                RequiredHours = null,
-                Status = ShiftStatus.Active,
-                IsCheckInRequired = true,
-                IsAutoCheckOut = false,
-                AllowFlexibleHours = true,
-                FlexMinutesBefore = 90, // 1.5 hours before 9:00 AM (7:30 AM)
-                FlexMinutesAfter = 0,
-                GracePeriodMinutes = 15,
-                RequiredWeeklyHours = 40,
-                HasCoreHours = true,
-                CoreStart = new TimeOnly(9, 0), // Core hours start at 9:00 AM
-                CoreEnd = new TimeOnly(16, 0), // Core hours end at 4:00 PM
-                IsSunday = false,
-                IsMonday = true,
-                IsTuesday = true,
-                IsWednesday = true,
-                IsThursday = true,
-                IsFriday = true,
-                IsSaturday = false,
-                IsNightShift = false,
-                CreatedAtUtc = DateTime.UtcNow,
-                CreatedBy = "SYSTEM"
-            },
-            new()
-            {
-                Name = "Morning Shift",
-                Description = "Standard morning working hours",
-                ShiftType = ShiftType.TimeBased,
-                RequiredHours = null,
-                Status = ShiftStatus.Active,
-                IsCheckInRequired = true,
-                IsAutoCheckOut = false,
-                AllowFlexibleHours = false,
-                FlexMinutesBefore = 0,
-                FlexMinutesAfter = 0,
-                GracePeriodMinutes = 15,
-                RequiredWeeklyHours = 40,
-                HasCoreHours = false,
-                CoreStart = null,
-                CoreEnd = null,
-                IsSunday = false,
-                IsMonday = true,
-                IsTuesday = true,
-                IsWednesday = true,
-                IsThursday = true,
-                IsFriday = true,
-                IsSaturday = false,
-                IsNightShift = false,
-                CreatedAtUtc = DateTime.UtcNow,
-                CreatedBy = "SYSTEM"
-            },
-            new()
-            {
-                Name = "Evening Shift",
-                Description = "Standard evening working hours",
-                ShiftType = ShiftType.TimeBased,
-                RequiredHours = null,
-                Status = ShiftStatus.Active,
-                IsCheckInRequired = true,
-                IsAutoCheckOut = false,
-                AllowFlexibleHours = false,
-                FlexMinutesBefore = 0,
-                FlexMinutesAfter = 0,
-                GracePeriodMinutes = 15,
-                RequiredWeeklyHours = 40,
-                HasCoreHours = false,
-                CoreStart = null,
-                CoreEnd = null,
-                IsSunday = false,
-                IsMonday = true,
-                IsTuesday = true,
-                IsWednesday = true,
-                IsThursday = true,
-                IsFriday = true,
-                IsSaturday = false,
-                IsNightShift = false,
-                CreatedAtUtc = DateTime.UtcNow,
-                CreatedBy = "SYSTEM"
-            },
-            new()
-            {
-                Name = "Night Shift",
-                Description = "Night working hours",
-                ShiftType = ShiftType.TimeBased,
-                RequiredHours = null,
-                Status = ShiftStatus.Active,
-                IsCheckInRequired = true,
-                IsAutoCheckOut = false,
-                AllowFlexibleHours = false,
-                FlexMinutesBefore = 0,
-                FlexMinutesAfter = 0,
-                GracePeriodMinutes = 15,
-                RequiredWeeklyHours = 40,
-                HasCoreHours = false,
-                CoreStart = null,
-                CoreEnd = null,
-                IsSunday = false,
-                IsMonday = true,
-                IsTuesday = true,
-                IsWednesday = true,
-                IsThursday = true,
-                IsFriday = true,
-                IsSaturday = false,
-                IsNightShift = true,
-                CreatedAtUtc = DateTime.UtcNow,
-                CreatedBy = "SYSTEM"
-            }
-        };
-
-        await context.Shifts.AddRangeAsync(shifts);
-        await context.SaveChangesAsync();
-
-        // Add shift periods for each shift
-        var flexibleShift = shifts.FirstOrDefault(s => s.Name == "Flexible Hours 7:30 - 9:00");
-        var morningShift = shifts.FirstOrDefault(s => s.Name == "Morning Shift");
-        var eveningShift = shifts.FirstOrDefault(s => s.Name == "Evening Shift");
-        var nightShift = shifts.FirstOrDefault(s => s.Name == "Night Shift");
-
-        var shiftPeriods = new List<ShiftPeriod>();
-
-        if (flexibleShift != null)
-        {
-            shiftPeriods.Add(new ShiftPeriod
-            {
-                ShiftId = flexibleShift.Id,
-                PeriodOrder = 1,
-                StartTime = new TimeOnly(7, 30), // Earliest start time
-                EndTime = new TimeOnly(16, 30), // 8 hours after latest start (9:00 AM + 8 hours = 5:00 PM, but allowing 30 min flex)
-                CreatedAtUtc = DateTime.UtcNow,
-                CreatedBy = "SYSTEM"
-            });
-        }
-
-        if (morningShift != null)
-        {
-            shiftPeriods.Add(new ShiftPeriod
-            {
-                ShiftId = morningShift.Id,
-                PeriodOrder = 1,
-                StartTime = new TimeOnly(8, 0),
-                EndTime = new TimeOnly(17, 0),
-                CreatedAtUtc = DateTime.UtcNow,
-                CreatedBy = "SYSTEM"
-            });
-        }
-
-        if (eveningShift != null)
-        {
-            shiftPeriods.Add(new ShiftPeriod
-            {
-                ShiftId = eveningShift.Id,
-                PeriodOrder = 1,
-                StartTime = new TimeOnly(16, 0),
-                EndTime = new TimeOnly(1, 0),
-                CreatedAtUtc = DateTime.UtcNow,
-                CreatedBy = "SYSTEM"
-            });
-        }
-
-        if (nightShift != null)
-        {
-            shiftPeriods.Add(new ShiftPeriod
-            {
-                ShiftId = nightShift.Id,
-                PeriodOrder = 1,
-                StartTime = new TimeOnly(22, 0),
-                EndTime = new TimeOnly(6, 0),
-                CreatedAtUtc = DateTime.UtcNow,
-                CreatedBy = "SYSTEM"
-            });
-        }
-
-        await context.ShiftPeriods.AddRangeAsync(shiftPeriods);
-        await context.SaveChangesAsync();
-    }
-
-    private static async Task SeedDepartmentsAsync(TimeAttendanceDbContext context)
-    {
-        var branch = await context.Branches.FirstAsync();
-
-        var departments = new List<Department>
-        {
-            new Department
-            {
-                BranchId = branch.Id,
-                Code = "DEPT01",
-                Name = "Human Resources",
-                NameAr = "الموارد البشرية",
-                Description = "Employee relations, recruitment, and HR policies",
-                DescriptionAr = "علاقات الموظفين والتوظيف وسياسات الموارد البشرية",
-                IsActive = true,
-                SortOrder = 1,
-                CreatedAtUtc = DateTime.UtcNow,
-                CreatedBy = "SYSTEM"
-            },
-            new Department
-            {
-                BranchId = branch.Id,
-                Code = "DEPT02",
-                Name = "Information Technology",
-                NameAr = "تكنولوجيا المعلومات",
-                Description = "Software development, infrastructure, and technical support",
-                DescriptionAr = "تطوير البرمجيات والبنية التحتية والدعم التقني",
-                IsActive = true,
-                SortOrder = 2,
-                CreatedAtUtc = DateTime.UtcNow,
-                CreatedBy = "SYSTEM"
-            },
-            new Department
-            {
-                BranchId = branch.Id,
-                Code = "DEPT03",
-                Name = "Finance",
-                NameAr = "المالية",
-                Description = "Financial planning, accounting, and budget management",
-                DescriptionAr = "التخطيط المالي والمحاسبة وإدارة الميزانية",
-                IsActive = true,
-                SortOrder = 3,
-                CreatedAtUtc = DateTime.UtcNow,
-                CreatedBy = "SYSTEM"
-            },
-            new Department
-            {
-                BranchId = branch.Id,
-                Code = "DEPT04",
-                Name = "Marketing",
-                NameAr = "التسويق",
-                Description = "Brand management, advertising, and customer outreach",
-                DescriptionAr = "إدارة العلامة التجارية والإعلان والتواصل مع العملاء",
-                IsActive = true,
-                SortOrder = 4,
-                CreatedAtUtc = DateTime.UtcNow,
-                CreatedBy = "SYSTEM"
-            },
-            new Department
-            {
-                BranchId = branch.Id,
-                Code = "DEPT05",
-                Name = "Operations",
-                NameAr = "العمليات",
-                Description = "Daily operations, logistics, and process management",
-                DescriptionAr = "العمليات اليومية واللوجستيات وإدارة العمليات",
-                IsActive = true,
-                SortOrder = 5,
-                CreatedAtUtc = DateTime.UtcNow,
-                CreatedBy = "SYSTEM"
-            }
-        };
-
-        await context.Departments.AddRangeAsync(departments);
-        await context.SaveChangesAsync();
-    }
-
-    private static async Task SeedEmployeesAsync(TimeAttendanceDbContext context)
-    {
-        var branch = await context.Branches.FirstAsync();
-        var departments = await context.Departments.ToListAsync();
-
-        var employees = new List<Employee>
-        {
-            // HR Department
-            new Employee
-            {
-                BranchId = branch.Id,
-                DepartmentId = departments.First(d => d.Code == "DEPT01").Id,
-                EmployeeNumber = "EMP001",
-                FirstName = "Ahmed",
-                LastName = "Hassan",
-                FirstNameAr = "أحمد",
-                LastNameAr = "حسن",
-                Email = "ahmed.hassan@company.com",
-                Phone = "+966501234567",
-                HireDate = new DateTime(2023, 1, 15),
-                EmploymentStatus = EmploymentStatus.FullTime,
-                JobTitle = "HR Manager",
-                JobTitleAr = "مدير الموارد البشرية",
-                WorkLocationType = WorkLocationType.OnSite,
-                CreatedAtUtc = DateTime.UtcNow,
-                CreatedBy = "SYSTEM"
-            },
-            new Employee
-            {
-                BranchId = branch.Id,
-                DepartmentId = departments.First(d => d.Code == "DEPT01").Id,
-                EmployeeNumber = "EMP002",
-                FirstName = "Fatima",
-                LastName = "Al-Zahra",
-                FirstNameAr = "فاطمة",
-                LastNameAr = "الزهراء",
-                Email = "fatima.alzahra@company.com",
-                Phone = "+966501234568",
-                HireDate = new DateTime(2023, 2, 1),
-                EmploymentStatus = EmploymentStatus.FullTime,
-                JobTitle = "HR Specialist",
-                JobTitleAr = "أخصائي موارد بشرية",
-                WorkLocationType = WorkLocationType.OnSite,
-                CreatedAtUtc = DateTime.UtcNow,
-                CreatedBy = "SYSTEM"
-            },
-            // IT Department
-            new Employee
-            {
-                BranchId = branch.Id,
-                DepartmentId = departments.First(d => d.Code == "DEPT02").Id,
-                EmployeeNumber = "EMP003",
-                FirstName = "Mohammed",
-                LastName = "Al-Rashid",
-                FirstNameAr = "محمد",
-                LastNameAr = "الراشد",
-                Email = "mohammed.alrashid@company.com",
-                Phone = "+966501234570",
-                HireDate = new DateTime(2023, 3, 1),
-                EmploymentStatus = EmploymentStatus.FullTime,
-                JobTitle = "IT Manager",
-                JobTitleAr = "مدير تكنولوجيا المعلومات",
-                WorkLocationType = WorkLocationType.OnSite,
-                CreatedAtUtc = DateTime.UtcNow,
-                CreatedBy = "SYSTEM"
-            },
-            new Employee
-            {
-                BranchId = branch.Id,
-                DepartmentId = departments.First(d => d.Code == "DEPT02").Id,
-                EmployeeNumber = "EMP004",
-                FirstName = "Aisha",
-                LastName = "Salem",
-                FirstNameAr = "عائشة",
-                LastNameAr = "سالم",
-                Email = "aisha.salem@company.com",
-                Phone = "+966501234571",
-                HireDate = new DateTime(2023, 3, 15),
-                EmploymentStatus = EmploymentStatus.FullTime,
-                JobTitle = "Software Developer",
-                JobTitleAr = "مطور برمجيات",
-                WorkLocationType = WorkLocationType.OnSite,
-                CreatedAtUtc = DateTime.UtcNow,
-                CreatedBy = "SYSTEM"
-            },
-            // Finance Department
-            new Employee
-            {
-                BranchId = branch.Id,
-                DepartmentId = departments.First(d => d.Code == "DEPT03").Id,
-                EmployeeNumber = "EMP005",
-                FirstName = "Layla",
-                LastName = "Al-Habib",
-                FirstNameAr = "ليلى",
-                LastNameAr = "الحبيب",
-                Email = "layla.alhabib@company.com",
-                Phone = "+966501234573",
-                HireDate = new DateTime(2023, 4, 1),
-                EmploymentStatus = EmploymentStatus.FullTime,
-                JobTitle = "Finance Manager",
-                JobTitleAr = "مدير مالي",
-                WorkLocationType = WorkLocationType.OnSite,
-                CreatedAtUtc = DateTime.UtcNow,
-                CreatedBy = "SYSTEM"
-            },
-            new Employee
-            {
-                BranchId = branch.Id,
-                DepartmentId = departments.First(d => d.Code == "DEPT03").Id,
-                EmployeeNumber = "EMP006",
-                FirstName = "Youssef",
-                LastName = "Al-Kindi",
-                FirstNameAr = "يوسف",
-                LastNameAr = "الكندي",
-                Email = "youssef.alkindi@company.com",
-                Phone = "+966501234574",
-                HireDate = new DateTime(2023, 4, 15),
-                EmploymentStatus = EmploymentStatus.FullTime,
-                JobTitle = "Accountant",
-                JobTitleAr = "محاسب",
-                WorkLocationType = WorkLocationType.OnSite,
-                CreatedAtUtc = DateTime.UtcNow,
-                CreatedBy = "SYSTEM"
-            },
-            // Marketing Department
-            new Employee
-            {
-                BranchId = branch.Id,
-                DepartmentId = departments.First(d => d.Code == "DEPT04").Id,
-                EmployeeNumber = "EMP007",
-                FirstName = "Zainab",
-                LastName = "Al-Farisi",
-                FirstNameAr = "زينب",
-                LastNameAr = "الفارسي",
-                Email = "zainab.alfarisi@company.com",
-                Phone = "+966501234575",
-                HireDate = new DateTime(2023, 5, 1),
-                EmploymentStatus = EmploymentStatus.FullTime,
-                JobTitle = "Marketing Manager",
-                JobTitleAr = "مدير تسويق",
-                WorkLocationType = WorkLocationType.OnSite,
-                CreatedAtUtc = DateTime.UtcNow,
-                CreatedBy = "SYSTEM"
-            },
-            new Employee
-            {
-                BranchId = branch.Id,
-                DepartmentId = departments.First(d => d.Code == "DEPT04").Id,
-                EmployeeNumber = "EMP008",
-                FirstName = "Hassan",
-                LastName = "Al-Omari",
-                FirstNameAr = "حسان",
-                LastNameAr = "العمري",
-                Email = "hassan.alomari@company.com",
-                Phone = "+966501234576",
-                HireDate = new DateTime(2023, 5, 15),
-                EmploymentStatus = EmploymentStatus.FullTime,
-                JobTitle = "Marketing Specialist",
-                JobTitleAr = "أخصائي تسويق",
-                WorkLocationType = WorkLocationType.OnSite,
-                CreatedAtUtc = DateTime.UtcNow,
-                CreatedBy = "SYSTEM"
-            },
-            // Operations Department
-            new Employee
-            {
-                BranchId = branch.Id,
-                DepartmentId = departments.First(d => d.Code == "DEPT05").Id,
-                EmployeeNumber = "EMP009",
-                FirstName = "Mariam",
-                LastName = "Al-Dosari",
-                FirstNameAr = "مريم",
-                LastNameAr = "الدوسري",
-                Email = "mariam.aldosari@company.com",
-                Phone = "+966501234577",
-                HireDate = new DateTime(2023, 6, 1),
-                EmploymentStatus = EmploymentStatus.FullTime,
-                JobTitle = "Operations Manager",
-                JobTitleAr = "مدير العمليات",
-                WorkLocationType = WorkLocationType.OnSite,
-                CreatedAtUtc = DateTime.UtcNow,
-                CreatedBy = "SYSTEM"
-            },
-            new Employee
-            {
-                BranchId = branch.Id,
-                DepartmentId = departments.First(d => d.Code == "DEPT05").Id,
-                EmployeeNumber = "EMP010",
-                FirstName = "Saeed",
-                LastName = "Al-Ghamdi",
-                FirstNameAr = "سعيد",
-                LastNameAr = "الغامدي",
-                Email = "saeed.alghamdi@company.com",
-                Phone = "+966501234578",
-                HireDate = new DateTime(2023, 6, 15),
-                EmploymentStatus = EmploymentStatus.FullTime,
-                JobTitle = "Operations Coordinator",
-                JobTitleAr = "منسق عمليات",
-                WorkLocationType = WorkLocationType.OnSite,
-                CreatedAtUtc = DateTime.UtcNow,
-                CreatedBy = "SYSTEM"
-            }
-        };
-
-        await context.Employees.AddRangeAsync(employees);
-        await context.SaveChangesAsync();
-    }
-
-    private static (string hash, string salt) HashPassword(string password)
-    {
-        var saltBytes = new byte[32];
-        using var rng = RandomNumberGenerator.Create();
-        rng.GetBytes(saltBytes);
-        var salt = Convert.ToBase64String(saltBytes);
-
-        using var pbkdf2 = new Rfc2898DeriveBytes(password, saltBytes, 10000, HashAlgorithmName.SHA256);
-        var hash = Convert.ToBase64String(pbkdf2.GetBytes(32));
-
-        return (hash, salt);
-    }
-
-    private static async Task AssignDefaultShiftToEmployeesAsync(TimeAttendanceDbContext context)
-    {
-        // Find the flexible hours shift (default shift)
-        var flexibleShift = await context.Shifts
-            .FirstOrDefaultAsync(s => s.Name == "Flexible Hours 7:30 - 9:00" && s.Status == ShiftStatus.Active);
-
-        if (flexibleShift == null)
-        {
-            Console.WriteLine("Flexible Hours shift not found, skipping default shift assignment");
-            return;
-        }
-
-        // Get all employees who don't have any active shift assignments
-        var allEmployees = await context.Employees
-            .Where(e => e.EmploymentStatus != EmploymentStatus.Terminated)
-            .ToListAsync();
-
-        var existingAssignmentEmployeeIds = await context.ShiftAssignments
-            .Where(sa => sa.Status == ShiftAssignmentStatus.Active && sa.AssignmentType == ShiftAssignmentType.Employee)
-            .Select(sa => sa.EmployeeId)
-            .ToListAsync();
-
-        var employeesWithoutShift = allEmployees
-            .Where(e => !existingAssignmentEmployeeIds.Contains(e.Id))
-            .ToList();
-
-        if (!employeesWithoutShift.Any())
-        {
-            Console.WriteLine("All employees already have shift assignments");
-            return;
-        }
-
-        // Create shift assignments for employees without shifts
-        var shiftAssignments = new List<ShiftAssignment>();
-        foreach (var employee in employeesWithoutShift)
-        {
-            shiftAssignments.Add(new ShiftAssignment
-            {
-                ShiftId = flexibleShift.Id,
-                AssignmentType = ShiftAssignmentType.Employee,
-                EmployeeId = employee.Id,
-                DepartmentId = null,
-                BranchId = null,
-                EffectiveDate = DateTime.UtcNow.Date,
-                EndDate = null, // No end date - permanent assignment
-                Status = ShiftAssignmentStatus.Active,
-                Priority = 10,
-                Notes = "Default shift assignment - created during system seed",
-                AssignedByUserId = 1, // System admin user
-                CreatedAtUtc = DateTime.UtcNow,
-                CreatedBy = "SYSTEM"
-            });
-        }
-
-        await context.ShiftAssignments.AddRangeAsync(shiftAssignments);
-        await context.SaveChangesAsync();
-
-        Console.WriteLine($"Assigned default flexible hours shift to {shiftAssignments.Count} employees");
     }
 
     private static async Task EnsureSystemAdminHasAllPermissionsAsync(TimeAttendanceDbContext context)
     {
+        // Get SystemAdmin and Admin roles
         var systemAdminRole = await context.Roles.FirstOrDefaultAsync(r => r.Name == "SystemAdmin");
-        if (systemAdminRole == null)
+        var adminRole = await context.Roles.FirstOrDefaultAsync(r => r.Name == "Admin");
+
+        if (systemAdminRole == null && adminRole == null)
         {
-            Console.WriteLine("SystemAdmin role not found, skipping permission sync");
+            Console.WriteLine("No protected roles found, skipping permission sync");
             return;
         }
 
         // Get all permissions
         var allPermissions = await context.Permissions.Where(p => !p.IsDeleted).ToListAsync();
 
-        // Get existing role permissions for SystemAdmin
+        // Get system permissions (to exclude from Admin role)
+        var systemPermissions = allPermissions
+            .Where(p => p.Key.StartsWith(PermissionResources.System + "."))
+            .ToList();
+
+        // Handle SystemAdmin role - gets ALL permissions
+        if (systemAdminRole != null)
+        {
+            await AssignPermissionsToRole(context, systemAdminRole, allPermissions, "SystemAdmin");
+        }
+
+        // Handle Admin role - gets all permissions EXCEPT system permissions
+        if (adminRole != null)
+        {
+            var adminPermissions = allPermissions
+                .Where(p => !p.Key.StartsWith(PermissionResources.System + "."))
+                .ToList();
+
+            await AssignPermissionsToRole(context, adminRole, adminPermissions, "Admin");
+        }
+    }
+
+    private static async Task AssignPermissionsToRole(TimeAttendanceDbContext context, Role role, List<Permission> permissionsToAssign, string roleName)
+    {
+        // Get existing role permissions for this role
         var existingRolePermissionIds = await context.RolePermissions
-            .Where(rp => rp.RoleId == systemAdminRole.Id)
+            .Where(rp => rp.RoleId == role.Id)
             .Select(rp => rp.PermissionId)
             .ToListAsync();
 
         // Find missing permissions
-        var missingPermissions = allPermissions
+        var missingPermissions = permissionsToAssign
             .Where(p => !existingRolePermissionIds.Contains(p.Id))
             .ToList();
 
@@ -900,25 +283,125 @@ public static class SeedData
         {
             var newRolePermissions = missingPermissions.Select(p => new RolePermission
             {
-                RoleId = systemAdminRole.Id,
+                RoleId = role.Id,
                 PermissionId = p.Id
-            }).ToArray();
+            }).ToList();
 
             await context.RolePermissions.AddRangeAsync(newRolePermissions);
-            Console.WriteLine($"Added {newRolePermissions.Length} missing permissions to SystemAdmin role");
+            await context.SaveChangesAsync();
+
+            Console.WriteLine($"Added {newRolePermissions.Count} missing permissions to {roleName} role");
         }
         else
         {
-            Console.WriteLine("SystemAdmin already has all permissions");
+            Console.WriteLine($"{roleName} role already has all required permissions");
         }
     }
 
-}
-
-public static class Extensions
-{
-    public static bool In<T>(this T value, params T[] values)
+    private static async Task SeedDefaultShiftAsync(TimeAttendanceDbContext context)
     {
-        return values.Contains(value);
+        // Create the default shift with extracted data from the current database
+        var defaultShift = new Shift
+        {
+            Name = "Flexible hour 7:30 - 9:00",
+            Description = "The default shift to all newly created employees",
+            ShiftType = ShiftType.TimeBased,
+            Status = ShiftStatus.Active,
+            RequiredHours = null,
+            IsCheckInRequired = true,
+            IsAutoCheckOut = false,
+            AllowFlexibleHours = true,
+            FlexMinutesBefore = 30,
+            FlexMinutesAfter = 60,
+            GracePeriodMinutes = null,
+            RequiredWeeklyHours = null,
+            HasCoreHours = false,
+            CoreStart = null,
+            CoreEnd = null,
+            IsSunday = true,
+            IsMonday = true,
+            IsTuesday = true,
+            IsWednesday = true,
+            IsThursday = true,
+            IsFriday = false,
+            IsSaturday = false,
+            IsNightShift = false,
+            IsDefault = true,
+            CreatedAtUtc = DateTime.UtcNow,
+            CreatedBy = "SYSTEM"
+        };
+
+        await context.Shifts.AddAsync(defaultShift);
+        await context.SaveChangesAsync();
+
+        // Create the shift period
+        var shiftPeriod = new ShiftPeriod
+        {
+            ShiftId = defaultShift.Id,
+            PeriodOrder = 1,
+            StartTime = new TimeOnly(8, 0), // 08:00
+            EndTime = new TimeOnly(16, 0),  // 16:00
+            Hours = 8.00m,
+            IsNightPeriod = false,
+            CreatedAtUtc = DateTime.UtcNow,
+            CreatedBy = "SYSTEM"
+        };
+
+        await context.ShiftPeriods.AddAsync(shiftPeriod);
+        await context.SaveChangesAsync();
+
+        Console.WriteLine("✅ Default shift created: 'Flexible hour 7:30 - 9:00' (8:00-17:00)");
+    }
+
+    private static async Task SeedDefaultOvertimeConfigurationAsync(TimeAttendanceDbContext context)
+    {
+        // Create the default overtime configuration with standard business rules
+        var defaultOvertimeConfig = new OvertimeConfiguration
+        {
+            EnablePreShiftOvertime = false,
+            EnablePostShiftOvertime = true,
+            NormalDayRate = 1.5m,
+            PublicHolidayRate = 2.0m,
+            OffDayRate = 1.5m,
+            MinimumOvertimeMinutes = 15,
+            ConsiderFlexibleTime = true,
+            MaxPreShiftOvertimeHours = 2.0m,
+            MaxPostShiftOvertimeHours = 4.0m,
+            RequireApproval = false,
+            OvertimeGracePeriodMinutes = 5,
+            WeekendAsOffDay = true,
+            RoundingIntervalMinutes = 15,
+            PolicyNotes = "Default overtime configuration - Post-shift overtime enabled with 1.5x rate for normal days, 2.0x for holidays, and 2.5x for off days. Minimum 15 minutes threshold with 15-minute rounding.",
+            IsActive = true,
+            EffectiveFromDate = DateTime.UtcNow,
+            EffectiveToDate = null,
+            CreatedAtUtc = DateTime.UtcNow,
+            CreatedBy = "SYSTEM"
+        };
+
+        await context.OvertimeConfigurations.AddAsync(defaultOvertimeConfig);
+        await context.SaveChangesAsync();
+
+        Console.WriteLine("✅ Default overtime configuration created: Post-shift overtime enabled (1.5x normal, 2.0x holiday, 2.5x off-day rates)");
+    }
+
+
+    private static (string hash, string salt) HashPassword(string password)
+    {
+        // Generate a random salt
+        var saltBytes = new byte[32];
+        using (var rng = RandomNumberGenerator.Create())
+        {
+            rng.GetBytes(saltBytes);
+        }
+        var salt = Convert.ToBase64String(saltBytes);
+
+        // Hash the password with the salt using PBKDF2-SHA256 (same as login verification)
+        using (var pbkdf2 = new Rfc2898DeriveBytes(password, saltBytes, 10000, HashAlgorithmName.SHA256))
+        {
+            var hashBytes = pbkdf2.GetBytes(32);
+            var hash = Convert.ToBase64String(hashBytes);
+            return (hash, salt);
+        }
     }
 }

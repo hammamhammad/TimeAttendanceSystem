@@ -1,3 +1,4 @@
+/* Component-Specific Table Container */
 .department-table {
   background: white;
   border-radius: 8px;
@@ -16,30 +17,7 @@
   overflow-y: auto;
 }
 
-/* Table Styles */
-.table {
-  margin-bottom: 0;
-}
-
-.table thead th {
-  border-bottom: 2px solid #dee2e6;
-  background-color: #f8f9fa;
-  font-weight: 600;
-  color: #495057;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-.table tbody tr {
-  transition: all 0.2s ease;
-}
-
-.table tbody tr:hover {
-  background-color: #f8f9fa;
-  cursor: pointer;
-}
-
+/* Component-Specific Table Styles */
 .table tbody tr.selected-row {
   background-color: #e3f2fd;
   border-left: 4px solid #2196f3;
@@ -53,7 +31,7 @@
   background-color: #ffeaa7;
 }
 
-/* Column Styles */
+/* Component-Specific Column Widths */
 .selection-column {
   width: 50px;
   text-align: center;
@@ -64,6 +42,7 @@
   text-align: center;
 }
 
+/* Component-Specific Sortable Headers */
 .sortable {
   cursor: pointer;
   user-select: none;
@@ -85,7 +64,7 @@
   opacity: 1;
 }
 
-/* Hierarchy Indentation */
+/* Component-Specific Hierarchy Indentation */
 .indent-0 { margin-left: 0; }
 .indent-1 { margin-left: 20px; }
 .indent-2 { margin-left: 40px; }
@@ -93,46 +72,7 @@
 .indent-4 { margin-left: 80px; }
 .indent-5 { margin-left: 100px; }
 
-/* Badge Styles */
-.badge {
-  font-size: 0.7rem;
-  padding: 0.35rem 0.6rem;
-  font-weight: 500;
-}
-
-/* Button Styles */
-.btn-group .btn {
-  border: none;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
-}
-
-.btn-group .btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-}
-
-.btn-outline-primary:hover {
-  background-color: #2196f3;
-  border-color: #2196f3;
-}
-
-.btn-outline-danger:hover {
-  background-color: #dc3545;
-  border-color: #dc3545;
-}
-
-.btn-outline-secondary:hover {
-  background-color: #6c757d;
-  border-color: #6c757d;
-}
-
-/* Form Controls */
-.form-check-input {
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
+/* Component-Specific Checkbox States */
 .form-check-input:checked {
   background-color: #2196f3;
   border-color: #2196f3;
@@ -143,27 +83,12 @@
   border-color: #ffc107;
 }
 
-.form-select {
-  cursor: pointer;
-  transition: border-color 0.2s ease;
-}
-
 .form-select:focus {
   border-color: #2196f3;
   box-shadow: 0 0 0 0.2rem rgba(33, 150, 243, 0.25);
 }
 
-/* Pagination */
-.pagination {
-  margin-bottom: 0;
-}
-
-.page-link {
-  color: #6c757d;
-  border: 1px solid #dee2e6;
-  transition: all 0.2s ease;
-}
-
+/* Component-Specific Pagination Colors */
 .page-link:hover {
   color: #2196f3;
   background-color: #f8f9fa;
@@ -176,40 +101,27 @@
   color: white;
 }
 
-.page-item.disabled .page-link {
-  color: #adb5bd;
-  background-color: #fff;
-  border-color: #dee2e6;
-  cursor: not-allowed;
-}
-
-/* Alerts */
-.alert {
-  border: none;
-  border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
+/* Component-Specific Alert */
 .alert-info {
   background-color: #e3f2fd;
   color: #0277bd;
   border-left: 4px solid #2196f3;
 }
 
-/* Loading State */
+/* Component-Specific Loading State */
 .spinner-border {
   color: #2196f3;
   width: 3rem;
   height: 3rem;
 }
 
-/* Empty State */
+/* Component-Specific Empty State */
 .text-muted i.fa-3x {
   color: #adb5bd !important;
   margin-bottom: 1rem;
 }
 
-/* RTL Support */
+/* Component-Specific RTL Support */
 [dir="rtl"] .table tbody tr.selected-row {
   border-left: none;
   border-right: 4px solid #2196f3;
@@ -226,31 +138,22 @@
   border-right: 4px solid #2196f3;
 }
 
-/* Responsive Design */
+/* Component-Specific Responsive Design */
 @media (max-width: 768px) {
   .table-controls .row > div {
     margin-bottom: 0.5rem;
   }
-  
-  .table-responsive {
-    font-size: 0.875rem;
-  }
-  
+
   .btn-group .btn {
     padding: 0.25rem 0.5rem;
     font-size: 0.75rem;
   }
-  
-  .badge {
-    font-size: 0.65rem;
-    padding: 0.25rem 0.4rem;
-  }
-  
+
   .pagination {
     justify-content: center;
     margin-top: 1rem;
   }
-  
+
   .d-flex.align-items-center span.text-muted {
     display: none;
   }
@@ -260,51 +163,31 @@
   .table-container {
     max-height: 60vh;
   }
-  
+
   .table thead th {
     font-size: 0.75rem;
     padding: 0.5rem 0.25rem;
   }
-  
+
   .table tbody td {
     padding: 0.5rem 0.25rem;
   }
-  
+
   .btn-group {
     flex-direction: column;
   }
-  
+
   .btn-group .btn {
     margin-bottom: 2px;
     border-radius: 4px !important;
   }
-  
+
   .actions-column {
     width: 80px;
   }
 }
 
-/* Custom Scrollbar */
-.table-container::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-.table-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
-}
-
-.table-container::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
-}
-
-.table-container::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
-}
-
-/* Animations */
+/* Component-Specific Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -320,34 +203,7 @@
   animation: fadeIn 0.3s ease-out;
 }
 
-/* Status Indicators */
-.badge.bg-success {
-  background-color: #198754 !important;
-}
-
-.badge.bg-secondary {
-  background-color: #6c757d !important;
-}
-
-.badge.bg-light {
-  background-color: #f8f9fa !important;
-  border: 1px solid #dee2e6;
-}
-
-/* Icon Colors */
-.text-primary {
-  color: #2196f3 !important;
-}
-
-.text-secondary {
-  color: #6c757d !important;
-}
-
-.text-muted {
-  color: #6c757d !important;
-}
-
-/* Hover Effects */
+/* Component-Specific Icon Hover Effects */
 .sortable i {
   transition: transform 0.2s ease;
 }
@@ -366,7 +222,7 @@
   transform: scale(1.1);
 }
 
-/* Focus States */
+/* Component-Specific Focus States */
 .table tbody tr:focus-within {
   outline: 2px solid #2196f3;
   outline-offset: -2px;
@@ -376,18 +232,18 @@
   box-shadow: 0 0 0 0.2rem rgba(33, 150, 243, 0.25);
 }
 
-/* Print Styles */
+/* Component-Specific Print Styles */
 @media print {
   .table-controls,
   .actions-column,
   .pagination {
     display: none !important;
   }
-  
+
   .table {
     font-size: 0.8rem;
   }
-  
+
   .table tbody tr.selected-row {
     background-color: transparent !important;
     border-left: none !important;

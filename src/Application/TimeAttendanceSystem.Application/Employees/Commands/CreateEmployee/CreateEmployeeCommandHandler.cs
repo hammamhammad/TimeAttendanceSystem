@@ -174,14 +174,14 @@ public class CreateEmployeeCommandHandler : BaseHandler<CreateEmployeeCommand, R
     }
 
     /// <summary>
-    /// Automatically assigns the default shift (Flexible Hours 7:30 - 9:00) to a newly created employee.
+    /// Automatically assigns the default shift to a newly created employee.
     /// This ensures all new employees have a default shift assignment for time attendance tracking.
     /// </summary>
     /// <param name="employeeId">ID of the employee to assign the default shift to</param>
     /// <param name="cancellationToken">Cancellation token for async operation control</param>
     /// <remarks>
     /// Default Shift Assignment Logic:
-    /// - Finds the "Flexible Hours 7:30 - 9:00" shift
+    /// - Finds the shift marked as default (IsDefault = true)
     /// - Creates an active shift assignment for the employee
     /// - Sets effective date to current date with no end date
     /// - Uses high priority (10) to ensure it's the primary assignment
@@ -191,9 +191,9 @@ public class CreateEmployeeCommandHandler : BaseHandler<CreateEmployeeCommand, R
     {
         try
         {
-            // Find the default flexible hours shift
+            // Find the default shift marked with IsDefault flag
             var defaultShift = await Context.Shifts
-                .FirstOrDefaultAsync(s => s.Name == "Flexible Hours 7:30 - 9:00" && s.Status == ShiftStatus.Active, cancellationToken);
+                .FirstOrDefaultAsync(s => s.IsDefault && s.Status == ShiftStatus.Active && !s.IsDeleted, cancellationToken);
 
             if (defaultShift == null)
             {
@@ -209,8 +209,8 @@ public class CreateEmployeeCommandHandler : BaseHandler<CreateEmployeeCommand, R
                 EmployeeId = employeeId,
                 DepartmentId = null,
                 BranchId = null,
-                EffectiveDate = DateTime.UtcNow.Date,
-                EndDate = null, // No end date - permanent assignment
+                EffectiveFromDate = DateTime.UtcNow.Date,
+                EffectiveToDate = null, // No end date - permanent assignment
                 Status = ShiftAssignmentStatus.Active,
                 Priority = 10, // High priority for default assignment
                 Notes = "Automatic default shift assignment for new employee",

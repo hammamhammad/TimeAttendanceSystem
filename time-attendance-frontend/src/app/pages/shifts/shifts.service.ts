@@ -47,4 +47,13 @@ export class ShiftsService {
   deleteShift(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
+
+  getDefaultShift(): Observable<Shift | null> {
+    return this.http.get<Shift | null>(`${this.baseUrl}/default`);
+  }
+
+  setDefaultShift(id: number, forceReplace: boolean = false): Observable<void> {
+    const params = new HttpParams().set('forceReplace', forceReplace.toString());
+    return this.http.post<void>(`${this.baseUrl}/${id}/set-default`, {}, { params });
+  }
 }

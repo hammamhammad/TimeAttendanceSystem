@@ -1,0 +1,258 @@
+/* Component-Specific Layout */
+.monthly-report-container {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  min-height: 100vh;
+}
+
+/* Component-Specific Page Header */
+.page-header {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+}
+
+.page-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.025em;
+}
+
+/* Component-Specific Avatar */
+.avatar-circle {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+/* Component-Specific Table Cells */
+.attendance-rate-cell {
+  min-width: 120px;
+}
+
+.working-hours-cell .fw-semibold {
+  font-size: 0.95rem;
+}
+
+.working-hours-cell small {
+  font-size: 0.8rem;
+}
+
+/* Component-Specific Export Options */
+.export-option-card {
+  text-align: center;
+  padding: 1.5rem;
+  border: 1px solid #e9ecef;
+  border-radius: 0.5rem;
+  background: white;
+  transition: all 0.3s ease-in-out;
+  height: 100%;
+}
+
+.export-option-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #0d6efd;
+}
+
+.export-icon {
+  margin-bottom: 1rem;
+}
+
+.export-option-card h6 {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: #495057;
+}
+
+.export-option-card .text-muted {
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+/* Component-Specific Animations */
+.export-option-card {
+  animation: slideInUp 0.6s ease-out;
+}
+
+.export-section .col-md-4:nth-child(1) .export-option-card { animation-delay: 0.1s; }
+.export-section .col-md-4:nth-child(2) .export-option-card { animation-delay: 0.2s; }
+.export-section .col-md-4:nth-child(3) .export-option-card { animation-delay: 0.3s; }
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Component-Specific Loading State */
+.card .card-body.loading {
+  position: relative;
+  min-height: 300px;
+}
+
+.card .card-body.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #0d6efd;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Component-Specific Animation Delays for Summary Cards */
+.report-summary .col-xl-2:nth-child(1) { animation-delay: 0.1s; }
+.report-summary .col-xl-2:nth-child(2) { animation-delay: 0.15s; }
+.report-summary .col-xl-2:nth-child(3) { animation-delay: 0.2s; }
+.report-summary .col-xl-2:nth-child(4) { animation-delay: 0.25s; }
+.report-summary .col-xl-2:nth-child(5) { animation-delay: 0.3s; }
+.report-summary .col-xl-2:nth-child(6) { animation-delay: 0.35s; }
+
+/* Component-Specific Responsive Design */
+@media (max-width: 768px) {
+  .monthly-report-container {
+    padding: 1rem;
+  }
+
+  .page-title {
+    font-size: 1.75rem;
+  }
+
+  .page-header {
+    padding: 1rem;
+  }
+
+  .page-header .d-flex {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 1rem;
+  }
+
+  .header-actions {
+    width: 100%;
+  }
+
+  .header-actions .d-flex {
+    flex-wrap: wrap;
+    gap: 0.5rem !important;
+  }
+
+  .btn {
+    white-space: nowrap;
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+  }
+
+  .avatar-circle {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.8rem;
+  }
+
+  .col-md-6 {
+    flex: 0 0 auto;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  .col-md-3 {
+    flex: 0 0 auto;
+    width: 50%;
+  }
+
+  .col-md-4 {
+    flex: 0 0 auto;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  .export-option-card {
+    padding: 1rem;
+  }
+
+  .section-title {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .monthly-report-container {
+    padding: 0.75rem;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .page-header {
+    padding: 0.75rem;
+  }
+
+  .col-md-3 {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+
+  .header-actions .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .attendance-rate-cell {
+    min-width: 100px;
+  }
+}
+
+/* Component-Specific Print Styles */
+@media print {
+  .monthly-report-container {
+    background: white;
+    padding: 1rem;
+  }
+
+  .btn,
+  .header-actions,
+  .export-section {
+    display: none;
+  }
+
+  .card {
+    box-shadow: none;
+    border: 1px solid #000;
+    break-inside: avoid;
+  }
+
+  .page-title {
+    color: #000;
+  }
+
+  .section-title {
+    color: #000;
+  }
+}

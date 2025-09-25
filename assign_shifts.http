@@ -1,0 +1,25 @@
+### Assign Default Shift to All Employees
+### This file contains HTTP requests to assign shifts using the existing API
+
+### 1. First, let's try to get available shifts
+GET http://localhost:5099/api/shifts
+Accept: application/json
+
+### 2. Get all employees
+GET http://localhost:5099/api/employees
+Accept: application/json
+
+### 3. Create shift assignments for all employees
+### (You'll need to modify this based on the actual API structure)
+POST http://localhost:5099/api/shift-assignments
+Content-Type: application/json
+
+{
+  "shiftId": 1,
+  "assignmentType": "Employee",
+  "employeeId": 1,
+  "effectiveDate": "2025-09-17",
+  "status": "Active",
+  "priority": 50,
+  "notes": "Default shift assignment"
+}

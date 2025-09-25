@@ -33,6 +33,17 @@ export class SidenavComponent {
     return !permission || this.permissionService.has(permission);
   }
 
+  // Check permissions for child menu items with special handling
+  hasChildMenuPermission(child: MenuItem): boolean {
+    // Special case for public holidays - use the proper permission service method
+    if (child.path === '/settings/public-holidays') {
+      return this.permissionService.canReadPublicHolidays();
+    }
+
+    // Default permission check
+    return !child.permission || this.hasPerm(child.permission);
+  }
+
   // Special permission check for parent menus that should show with any related permission
   hasParentMenuPermission(item: MenuItem): boolean {
     // Special case for shift menu - show if user has any shift-related permission
@@ -46,6 +57,7 @@ export class SidenavComponent {
              this.permissionService.has('attendance.read') ||
              this.permissionService.has('attendance.calculate');
     }
+
 
     if (!item.permission) return true;
 
@@ -81,7 +93,7 @@ export class SidenavComponent {
   // Check if menu item has any visible children
   hasVisibleChildren(item: MenuItem): boolean {
     return !!(item.children && item.children.some(child =>
-      !child.permission || this.hasPerm(child.permission)
+      this.hasChildMenuPermission(child)
     ));
   }
 }

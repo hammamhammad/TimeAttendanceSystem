@@ -93,8 +93,8 @@ export class NotificationService {
 
   /**
    * Displays an error notification indicating operation failure or critical issues.
-   * Remains persistent by default requiring manual dismissal for user acknowledgment.
-   * 
+   * Automatically dismisses after 5 seconds like success messages for better UX.
+   *
    * @param title - The primary error message or title for the error notification
    * @param message - Optional detailed error message providing additional context
    * @param options - Optional configuration for duration and persistence behavior
@@ -104,8 +104,8 @@ export class NotificationService {
       type: 'error',
       title,
       message,
-      duration: options?.duration ?? 0, // Errors are persistent by default
-      persistent: options?.persistent ?? true
+      duration: options?.duration ?? 5000, // Auto-dismiss after 5 seconds like success messages
+      persistent: options?.persistent ?? false
     });
   }
 

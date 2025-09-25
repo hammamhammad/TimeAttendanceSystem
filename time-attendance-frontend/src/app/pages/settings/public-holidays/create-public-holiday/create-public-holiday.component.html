@@ -1,0 +1,377 @@
+<div class="container-fluid">
+  <!-- Page Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 mb-1">{{ t('settings.holidays.createHoliday') }}</h1>
+      <p class="text-muted mb-0">{{ t('settings.holidays.createHolidayDescription') }}</p>
+    </div>
+    <div>
+      <button type="button"
+              class="btn btn-outline-secondary me-2"
+              (click)="onCancel()">
+        <i class="fas fa-arrow-left me-1"></i>
+        {{ t('common.back') }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Form Card -->
+  <div class="card">
+    <div class="card-body">
+      <form [formGroup]="holidayForm" (ngSubmit)="onSubmit()">
+        <div class="row">
+          <!-- Basic Information -->
+          <div class="col-md-6">
+            <h5 class="mb-3">{{ t('settings.holidays.basicInformation') }}</h5>
+
+            <!-- Name -->
+            <div class="mb-3">
+              <label for="name" class="form-label">
+                {{ t('settings.holidays.name') }}
+                <span class="text-danger">*</span>
+              </label>
+              <input type="text"
+                     id="name"
+                     class="form-control"
+                     formControlName="name"
+                     [class.is-invalid]="isFieldInvalid('name')"
+                     [placeholder]="t('settings.holidays.namePlaceholder')">
+              @if (isFieldInvalid('name')) {
+                <div class="invalid-feedback">
+                  {{ getFieldError('name') }}
+                </div>
+              }
+            </div>
+
+            <!-- Arabic Name -->
+            <div class="mb-3">
+              <label for="nameAr" class="form-label">{{ t('settings.holidays.nameAr') }}</label>
+              <input type="text"
+                     id="nameAr"
+                     class="form-control"
+                     formControlName="nameAr"
+                     [class.is-invalid]="isFieldInvalid('nameAr')"
+                     [placeholder]="t('settings.holidays.nameArPlaceholder')">
+              @if (isFieldInvalid('nameAr')) {
+                <div class="invalid-feedback">
+                  {{ getFieldError('nameAr') }}
+                </div>
+              }
+            </div>
+
+            <!-- Holiday Type -->
+            <div class="mb-3">
+              <label for="holidayType" class="form-label">
+                {{ t('settings.holidays.type') }}
+                <span class="text-danger">*</span>
+              </label>
+              <select id="holidayType"
+                      class="form-select"
+                      formControlName="holidayType"
+                      [class.is-invalid]="isFieldInvalid('holidayType')">
+                @for (type of holidayTypes(); track type.value) {
+                  <option [value]="type.value">{{ type.label }}</option>
+                }
+              </select>
+              @if (isFieldInvalid('holidayType')) {
+                <div class="invalid-feedback">
+                  {{ getFieldError('holidayType') }}
+                </div>
+              }
+              <div class="form-text">
+                {{ getHolidayTypeDescription() }}
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-3">
+              <label for="description" class="form-label">{{ t('settings.holidays.description') }}</label>
+              <textarea id="description"
+                        class="form-control"
+                        formControlName="description"
+                        rows="3"
+                        [class.is-invalid]="isFieldInvalid('description')"
+                        [placeholder]="t('settings.holidays.descriptionPlaceholder')">
+              </textarea>
+              @if (isFieldInvalid('description')) {
+                <div class="invalid-feedback">
+                  {{ getFieldError('description') }}
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Date Configuration -->
+          <div class="col-md-6">
+            <h5 class="mb-3">{{ t('settings.holidays.dateConfiguration') }}</h5>
+
+            <!-- Specific Date (One Time only) -->
+            @if (showSpecificDateField()) {
+              <div class="mb-3">
+                <label for="specificDate" class="form-label">
+                  {{ t('settings.holidays.specificDate') }}
+                  <span class="text-danger">*</span>
+                </label>
+                <input type="date"
+                       id="specificDate"
+                       class="form-control"
+                       formControlName="specificDate"
+                       [class.is-invalid]="isFieldInvalid('specificDate')">
+                @if (isFieldInvalid('specificDate')) {
+                  <div class="invalid-feedback">
+                    {{ getFieldError('specificDate') }}
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Month (Annual and Floating) -->
+            @if (showMonthField()) {
+              <div class="mb-3">
+                <label for="month" class="form-label">
+                  {{ t('settings.holidays.month') }}
+                  <span class="text-danger">*</span>
+                </label>
+                <select id="month"
+                        class="form-select"
+                        formControlName="month"
+                        [class.is-invalid]="isFieldInvalid('month')">
+                  <option value="">{{ t('common.select') }}</option>
+                  @for (month of getMonthOptions(); track month.value) {
+                    <option [value]="month.value">{{ month.label }}</option>
+                  }
+                </select>
+                @if (isFieldInvalid('month')) {
+                  <div class="invalid-feedback">
+                    {{ getFieldError('month') }}
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Day (Annual and Monthly) -->
+            @if (showDayField()) {
+              <div class="mb-3">
+                <label for="day" class="form-label">
+                  {{ t('settings.holidays.day') }}
+                  <span class="text-danger">*</span>
+                </label>
+                <select id="day"
+                        class="form-select"
+                        formControlName="day"
+                        [class.is-invalid]="isFieldInvalid('day')">
+                  <option value="">{{ t('common.select') }}</option>
+                  @for (day of getDayOptions(); track day) {
+                    <option [value]="day">{{ day }}</option>
+                  }
+                </select>
+                @if (isFieldInvalid('day')) {
+                  <div class="invalid-feedback">
+                    {{ getFieldError('day') }}
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Week of Month (Floating only) -->
+            @if (showWeekOfMonthField()) {
+              <div class="mb-3">
+                <label for="weekOfMonth" class="form-label">
+                  {{ t('settings.holidays.weekOfMonth') }}
+                  <span class="text-danger">*</span>
+                </label>
+                <select id="weekOfMonth"
+                        class="form-select"
+                        formControlName="weekOfMonth"
+                        [class.is-invalid]="isFieldInvalid('weekOfMonth')">
+                  <option value="">{{ t('common.select') }}</option>
+                  @for (week of getWeekOfMonthOptions(); track week.value) {
+                    <option [value]="week.value">{{ week.label }}</option>
+                  }
+                </select>
+                @if (isFieldInvalid('weekOfMonth')) {
+                  <div class="invalid-feedback">
+                    {{ getFieldError('weekOfMonth') }}
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Day of Week (Floating only) -->
+            @if (showDayOfWeekField()) {
+              <div class="mb-3">
+                <label for="dayOfWeek" class="form-label">
+                  {{ t('settings.holidays.dayOfWeek') }}
+                  <span class="text-danger">*</span>
+                </label>
+                <select id="dayOfWeek"
+                        class="form-select"
+                        formControlName="dayOfWeek"
+                        [class.is-invalid]="isFieldInvalid('dayOfWeek')">
+                  <option value="">{{ t('common.select') }}</option>
+                  @for (dayOfWeek of getDayOfWeekOptions(); track dayOfWeek.value) {
+                    <option [value]="dayOfWeek.value">{{ dayOfWeek.label }}</option>
+                  }
+                </select>
+                @if (isFieldInvalid('dayOfWeek')) {
+                  <div class="invalid-feedback">
+                    {{ getFieldError('dayOfWeek') }}
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Priority -->
+            <div class="mb-3">
+              <label for="priority" class="form-label">{{ t('settings.holidays.priority') }}</label>
+              <input type="number"
+                     id="priority"
+                     class="form-control"
+                     formControlName="priority"
+                     min="1"
+                     max="100"
+                     [class.is-invalid]="isFieldInvalid('priority')">
+              @if (isFieldInvalid('priority')) {
+                <div class="invalid-feedback">
+                  {{ getFieldError('priority') }}
+                </div>
+              }
+              <div class="form-text">{{ t('settings.holidays.priorityHelp') }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Settings -->
+        <div class="row">
+          <div class="col-12">
+            <h5 class="mb-3">{{ t('settings.holidays.additionalSettings') }}</h5>
+          </div>
+
+          <div class="col-md-6">
+            <!-- Scope -->
+            <div class="mb-3">
+              <div class="form-check form-switch">
+                <input class="form-check-input"
+                       type="checkbox"
+                       id="isNational"
+                       formControlName="isNational">
+                <label class="form-check-label" for="isNational">
+                  {{ t('settings.holidays.isNational') }}
+                </label>
+              </div>
+              <div class="form-text">{{ t('settings.holidays.isNationalHelp') }}</div>
+            </div>
+
+            <!-- Active Status -->
+            <div class="mb-3">
+              <div class="form-check form-switch">
+                <input class="form-check-input"
+                       type="checkbox"
+                       id="isActive"
+                       formControlName="isActive">
+                <label class="form-check-label" for="isActive">
+                  {{ t('settings.holidays.isActive') }}
+                </label>
+              </div>
+              <div class="form-text">{{ t('settings.holidays.isActiveHelp') }}</div>
+            </div>
+
+            <!-- Country Code -->
+            <div class="mb-3">
+              <label for="countryCode" class="form-label">{{ t('settings.holidays.countryCode') }}</label>
+              <input type="text"
+                     id="countryCode"
+                     class="form-control"
+                     formControlName="countryCode"
+                     [class.is-invalid]="isFieldInvalid('countryCode')"
+                     [placeholder]="t('settings.holidays.countryCodePlaceholder')">
+              @if (isFieldInvalid('countryCode')) {
+                <div class="invalid-feedback">
+                  {{ getFieldError('countryCode') }}
+                </div>
+              }
+              <div class="form-text">{{ t('settings.holidays.countryCodeHelp') }}</div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <!-- Effective From Year -->
+            <div class="mb-3">
+              <label for="effectiveFromYear" class="form-label">{{ t('settings.holidays.effectiveFromYear') }}</label>
+              <select id="effectiveFromYear"
+                      class="form-select"
+                      formControlName="effectiveFromYear"
+                      [class.is-invalid]="isFieldInvalid('effectiveFromYear')">
+                <option value="">{{ t('settings.holidays.noLimit') }}</option>
+                @for (year of getYearOptions(); track year) {
+                  <option [value]="year">{{ year }}</option>
+                }
+              </select>
+              @if (isFieldInvalid('effectiveFromYear')) {
+                <div class="invalid-feedback">
+                  {{ getFieldError('effectiveFromYear') }}
+                </div>
+              }
+            </div>
+
+            <!-- Effective To Year -->
+            <div class="mb-3">
+              <label for="effectiveToYear" class="form-label">{{ t('settings.holidays.effectiveToYear') }}</label>
+              <select id="effectiveToYear"
+                      class="form-select"
+                      formControlName="effectiveToYear"
+                      [class.is-invalid]="isFieldInvalid('effectiveToYear')">
+                <option value="">{{ t('settings.holidays.noLimit') }}</option>
+                @for (year of getYearOptions(); track year) {
+                  <option [value]="year">{{ year }}</option>
+                }
+              </select>
+              @if (isFieldInvalid('effectiveToYear')) {
+                <div class="invalid-feedback">
+                  {{ getFieldError('effectiveToYear') }}
+                </div>
+              }
+            </div>
+
+            <!-- Branch (shown when not national) -->
+            @if (!holidayForm.get('isNational')?.value) {
+              <div class="mb-3">
+                <label for="branchId" class="form-label">{{ t('settings.holidays.branch') }}</label>
+                <select id="branchId"
+                        class="form-select"
+                        formControlName="branchId"
+                        [class.is-invalid]="isFieldInvalid('branchId')">
+                  <option value="">{{ t('common.select') }}</option>
+                  <!-- Branch options would be loaded from a branches service -->
+                </select>
+                @if (isFieldInvalid('branchId')) {
+                  <div class="invalid-feedback">
+                    {{ getFieldError('branchId') }}
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="d-flex justify-content-end gap-2 mt-4">
+          <button type="button"
+                  class="btn btn-outline-secondary"
+                  (click)="onCancel()"
+                  [disabled]="submitting()">
+            {{ t('common.cancel') }}
+          </button>
+          <button type="submit"
+                  class="btn btn-primary"
+                  [disabled]="submitting() || holidayForm.invalid">
+            @if (submitting()) {
+              <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+            }
+            {{ t('settings.holidays.createHoliday') }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,304 @@
+<div class="container-fluid p-4">
+  <!-- Page Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <h2 class="mb-0">{{ i18nService.t('attendance.dashboard_title') }}</h2>
+        <div>
+          <button
+            type="button"
+            class="btn btn-outline-primary"
+            (click)="refresh()"
+            [disabled]="loading()">
+            <i class="fa-solid fa-refresh me-2" [class.fa-spin]="loading()"></i>{{ i18nService.t('app.refresh') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">{{ i18nService.t('app.loading') }}</span>
+      </div>
+      <p class="mt-2 text-muted">{{ i18nService.t('attendance.messages.loading_data') }}</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error()) {
+    <div class="alert alert-danger">
+      <i class="fa-solid fa-exclamation-triangle"></i>
+      {{ error() }}
+    </div>
+  }
+
+  <!-- Dashboard Content -->
+  @if (!loading() && !error()) {
+    <div>
+
+    <!-- Summary Cards Row -->
+    <div class="row mb-4">
+      @for (card of summaryCards(); track card.title) {
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-3">
+          <app-attendance-summary-card
+            [data]="card"
+            [loading]="loading()"
+            [showProgress]="!!card.percentage"
+            [clickable]="!!card.link"
+            (cardClick)="card.link ? navigateToSection(card.link) : null">
+          </app-attendance-summary-card>
+        </div>
+      }
+    </div>
+
+    <!-- Charts and Analytics Row -->
+    <div class="row mb-4">
+      <!-- Today's Attendance Distribution -->
+      <div class="col-12 col-lg-6 mb-4">
+        <div class="card h-100">
+          <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">
+                <i class="fa-solid fa-chart-pie text-primary me-2"></i>
+                {{ i18nService.t('attendance.dashboard.todays_distribution') }}
+              </h5>
+              <span class="badge bg-primary">{{ i18nService.t('attendance.dashboard.today') }}</span>
+            </div>
+            <p class="mb-0 mt-2 text-muted small">
+              <i class="fa-solid fa-info-circle me-1"></i>
+              {{ i18nService.t('attendance.chart.descriptions.todays_distribution') }}
+            </p>
+          </div>
+          <div class="card-body">
+            <app-attendance-chart
+              [type]="'doughnut'"
+              [data]="attendanceChartData()"
+              [loading]="loading()"
+              [height]="300">
+            </app-attendance-chart>
+
+            <!-- Helpful Message for No Data -->
+            @if (!loading() && hasNoAttendanceData()) {
+              <div class="alert alert-info mt-3">
+                <i class="fa-solid fa-info-circle me-2"></i>
+                <small>{{ i18nService.t('attendance.dashboard.no_data_hint') }}</small>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Weekly Trend -->
+      <div class="col-12 col-lg-6 mb-4">
+        <div class="card h-100">
+          <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">
+                <i class="fa-solid fa-chart-line text-info me-2"></i>
+                {{ i18nService.t('attendance.dashboard.weekly_trend') }}
+              </h5>
+              <span class="badge bg-info">{{ i18nService.t('attendance.dashboard.last_7_days') }}</span>
+            </div>
+            <p class="mb-0 mt-2 text-muted small">
+              <i class="fa-solid fa-info-circle me-1"></i>
+              {{ i18nService.t('attendance.chart.descriptions.weekly_trend') }}
+            </p>
+          </div>
+          <div class="card-body">
+            <app-attendance-chart
+              [type]="'line'"
+              [data]="weeklyTrendData()"
+              [loading]="loading()"
+              [height]="300">
+            </app-attendance-chart>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detailed Information Row -->
+    <div class="row mb-4">
+      <!-- Incomplete Records -->
+      <div class="col-12 col-lg-6 mb-4">
+        <div class="card h-100">
+          <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">
+                <i class="fa-solid fa-exclamation-triangle text-warning me-2"></i>
+                {{ i18nService.t('attendance.dashboard.incomplete_records') }}
+              </h5>
+              <span class="badge bg-warning">{{ incompleteRecords().length }}</span>
+            </div>
+          </div>
+          <div class="card-body">
+            @if (incompleteRecords().length === 0) {
+              <div class="text-center py-4">
+                <i class="fa-solid fa-check-circle text-success fa-3x mb-3"></i>
+                <p class="text-muted">{{ i18nService.t('attendance.status_messages.all_records_complete') }}</p>
+              </div>
+            }
+
+            @if (incompleteRecords().length > 0) {
+              <div>
+                @for (record of incompleteRecords().slice(0, 5); track record.id) {
+                  <div class="d-flex justify-content-between align-items-center mb-3 p-2 border rounded">
+                    <div>
+                      <div class="fw-semibold">{{ record.employeeName }}</div>
+                      <small class="text-muted">{{ record.employeeNumber }} • {{ record.attendanceDate | date:'shortDate' }}</small>
+                    </div>
+                    <span [class]="getStatusBadgeClass(record.status)">
+                      {{ i18nService.t(getStatusText(record.status)) }}
+                    </span>
+                  </div>
+                }
+
+                @if (incompleteRecords().length > 5) {
+                  <div class="text-center">
+                    <a routerLink="/attendance/reports" class="btn btn-outline-primary btn-sm">
+                      {{ i18nService.t('attendance.messages.view_all_more') }} ({{ incompleteRecords().length - 5 }})
+                    </a>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="col-12 col-lg-6 mb-4">
+        <div class="card h-100">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <i class="fa-solid fa-bolt text-primary me-2"></i>
+              {{ i18nService.t('dashboard.quick_actions') }}
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="d-grid gap-3">
+              <a routerLink="/attendance/daily" class="btn btn-outline-primary text-start">
+                <i class="fa-solid fa-calendar-day me-3"></i>
+                <div>
+                  <div class="fw-semibold">{{ i18nService.t('attendance.daily_view') }}</div>
+                  <small class="text-muted">View today's attendance status</small>
+                </div>
+              </a>
+
+              <a routerLink="/attendance/monthly-report" class="btn btn-outline-success text-start">
+                <i class="fa-solid fa-calendar-alt me-3"></i>
+                <div>
+                  <div class="fw-semibold">{{ i18nService.t('attendance.monthly_report') }}</div>
+                  <small class="text-muted">Generate monthly attendance summaries</small>
+                </div>
+              </a>
+
+              <a routerLink="/attendance/transactions" class="btn btn-outline-info text-start">
+                <i class="fa-solid fa-clock-rotate-left me-3"></i>
+                <div>
+                  <div class="fw-semibold">{{ i18nService.t('attendance.transactions_report') }}</div>
+                  <small class="text-muted">View all check-in/out transactions</small>
+                </div>
+              </a>
+
+              <a routerLink="/attendance/reports" class="btn btn-outline-warning text-start">
+                <i class="fa-solid fa-file-alt me-3"></i>
+                <div>
+                  <div class="fw-semibold">{{ i18nService.t('attendance.actions.generate_report') }}</div>
+                  <small class="text-muted">Generate detailed attendance reports</small>
+                </div>
+              </a>
+
+              <a routerLink="/attendance/statistics" class="btn btn-outline-secondary text-start">
+                <i class="fa-solid fa-chart-bar me-3"></i>
+                <div>
+                  <div class="fw-semibold">{{ i18nService.t('attendance.statistics.menu') }}</div>
+                  <small class="text-muted">View attendance analytics and trends</small>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Performance Metrics Row -->
+    <div class="row">
+      <!-- Average Working Hours -->
+      <div class="col-12 col-sm-6 col-lg-3 mb-4">
+        <div class="card text-center border-start border-primary border-4">
+          <div class="card-body">
+            <div class="icon-circle bg-primary bg-opacity-10 mx-auto mb-3">
+              <i class="fa-solid fa-clock fa-2x text-primary"></i>
+            </div>
+            <h4 class="text-primary">{{ formatDuration(todayStats()?.averageWorkingHours || 0) }}</h4>
+            <p class="text-muted small mb-0">{{ i18nService.t('attendance.statistics.average_working_hours') }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total Overtime -->
+      <div class="col-12 col-sm-6 col-lg-3 mb-4">
+        <div class="card text-center border-start border-info border-4">
+          <div class="card-body">
+            <div class="icon-circle bg-info bg-opacity-10 mx-auto mb-3">
+              <i class="fa-solid fa-business-time fa-2x text-info"></i>
+            </div>
+            <h4 class="text-info">{{ formatDuration(todayStats()?.totalOvertimeHours || 0) }}</h4>
+            <p class="text-muted small mb-0">{{ i18nService.t('attendance.statistics.total_overtime_hours') }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overtime Workers -->
+      <div class="col-12 col-sm-6 col-lg-3 mb-4">
+        <div class="card text-center border-start border-warning border-4">
+          <div class="card-body">
+            <div class="icon-circle bg-warning bg-opacity-10 mx-auto mb-3">
+              <i class="fa-solid fa-user-clock fa-2x text-warning"></i>
+            </div>
+            <h4 class="text-warning">{{ todayStats()?.overtimeEmployees || 0 }}</h4>
+            <p class="text-muted small mb-0">{{ i18nService.t('attendance.statistics.overtime_employees') }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Attendance Rate -->
+      <div class="col-12 col-sm-6 col-lg-3 mb-4">
+        <div class="card text-center border-start border-success border-4">
+          <div class="card-body">
+            <div class="icon-circle bg-success bg-opacity-10 mx-auto mb-3">
+              <i class="fa-solid fa-percentage fa-2x text-success"></i>
+            </div>
+            <h4 class="text-success">{{ getAttendanceRatePercentage() }}%</h4>
+            <p class="text-muted small mb-0">{{ i18nService.t('attendance.statistics.attendance_rate') }}</p>
+
+            <!-- Progress bar for attendance rate -->
+            <div class="progress mt-2" style="height: 6px;">
+              <div
+                class="progress-bar bg-success"
+                role="progressbar"
+                [style.width.%]="getAttendanceRatePercentage()"
+                [attr.aria-valuenow]="getAttendanceRatePercentage()"
+                aria-valuemin="0"
+                aria-valuemax="100">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Updates Badge -->
+    <div class="text-center mt-4">
+      <span class="badge bg-light text-dark">
+        <i class="fa-solid fa-circle text-success me-2" style="font-size: 0.5rem;"></i>
+        {{ i18nService.t('attendance.dashboard.live_updates') }}
+        <small class="ms-2 text-muted">{{ i18nService.t('attendance.dashboard.last_updated') }}: {{ currentDate() | date:'short' }}</small>
+      </span>
+    </div>
+    </div>
+  }
+</div>

@@ -21,6 +21,7 @@ public class BranchesController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Policy = "BranchRead")]
     public async Task<IActionResult> GetBranches(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10,
@@ -39,6 +40,7 @@ public class BranchesController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "BranchManagement")]
     public async Task<IActionResult> CreateBranch([FromBody] CreateBranchRequest request)
     {
         var command = new CreateBranchCommand(
@@ -59,6 +61,7 @@ public class BranchesController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Policy = "BranchManagement")]
     public async Task<IActionResult> UpdateBranch(long id, [FromBody] UpdateBranchRequest request)
     {
         var command = new UpdateBranchCommand(
@@ -80,6 +83,7 @@ public class BranchesController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Policy = "BranchManagement")]
     public async Task<IActionResult> DeleteBranch(long id)
     {
         var command = new DeleteBranchCommand(id);

@@ -78,6 +78,7 @@ public class SessionsController : ControllerBase
     /// - Security audit and compliance reporting
     /// </remarks>
     [HttpGet]
+    [Authorize(Policy = "UserSessionManagement")]
     public async Task<IActionResult> GetUserSessions()
     {
         var query = new GetUserSessionsQuery();
@@ -121,6 +122,7 @@ public class SessionsController : ControllerBase
     /// - Suspicious activity mitigation
     /// </remarks>
     [HttpDelete("{sessionId}")]
+    [Authorize(Policy = "UserSessionManagement")]
     public async Task<IActionResult> TerminateSession(string sessionId)
     {
         var command = new TerminateSessionCommand(sessionId);
@@ -166,6 +168,7 @@ public class SessionsController : ControllerBase
     /// proper command implementation for bulk session termination.
     /// </remarks>
     [HttpDelete("terminate-all")]
+    [Authorize(Policy = "UserSessionManagement")]
     public async Task<IActionResult> TerminateAllSessions()
     {
         // Get current user's session from the request context

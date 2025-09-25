@@ -40,6 +40,12 @@ public class UpdateRoleCommandHandler : BaseHandler<UpdateRoleCommand, Result>
             return Result.Failure("Role not found");
         }
 
+        // Check if role is editable
+        if (!role.IsEditable)
+        {
+            return Result.Failure("This role cannot be modified");
+        }
+
         // Check if it's a system role and prevent name changes for system roles
         if (role.IsSystem)
         {

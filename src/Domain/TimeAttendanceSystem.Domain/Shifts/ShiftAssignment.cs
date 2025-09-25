@@ -89,14 +89,14 @@ public class ShiftAssignment : BaseEntity
     /// Supports future-dated assignments for planning and scheduling purposes.
     /// </summary>
     /// <value>Date when the shift assignment takes effect</value>
-    public DateTime EffectiveDate { get; set; }
+    public DateTime EffectiveFromDate { get; set; }
 
     /// <summary>
     /// Gets or sets the end date when this assignment expires.
     /// Optional field supporting temporary assignments and shift rotations.
     /// </summary>
     /// <value>Date when the shift assignment ends (optional for permanent assignments)</value>
-    public DateTime? EndDate { get; set; }
+    public DateTime? EffectiveToDate { get; set; }
 
     /// <summary>
     /// Gets or sets the status of the shift assignment.
@@ -194,13 +194,13 @@ public class ShiftAssignment : BaseEntity
         }
 
         // Validate date logic
-        if (EndDate.HasValue && EndDate <= EffectiveDate)
+        if (EffectiveToDate.HasValue && EffectiveToDate <= EffectiveFromDate)
         {
             errors.Add("End date must be after effective date");
         }
 
         // Validate effective date is not in the distant past (more than 5 years)
-        if (EffectiveDate < DateTime.UtcNow.AddYears(-5))
+        if (EffectiveFromDate < DateTime.UtcNow.AddYears(-5))
         {
             errors.Add("Effective date cannot be more than 5 years in the past");
         }
@@ -222,8 +222,8 @@ public class ShiftAssignment : BaseEntity
     {
         var now = DateTime.UtcNow.Date;
         return Status == ShiftAssignmentStatus.Active &&
-               EffectiveDate.Date <= now &&
-               (!EndDate.HasValue || EndDate.Value.Date >= now);
+               EffectiveFromDate.Date <= now &&
+               (!EffectiveToDate.HasValue || EffectiveToDate.Value.Date >= now);
     }
 
     /// <summary>
@@ -234,8 +234,8 @@ public class ShiftAssignment : BaseEntity
     public bool IsActiveOnDate(DateTime date)
     {
         return Status == ShiftAssignmentStatus.Active &&
-               EffectiveDate.Date <= date.Date &&
-               (!EndDate.HasValue || EndDate.Value.Date >= date.Date);
+               EffectiveFromDate.Date <= date.Date &&
+               (!EffectiveToDate.HasValue || EffectiveToDate.Value.Date >= date.Date);
     }
 
     /// <summary>

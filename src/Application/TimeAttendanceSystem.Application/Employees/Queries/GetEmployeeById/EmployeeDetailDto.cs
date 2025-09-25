@@ -31,6 +31,8 @@ public class EmployeeDetailDto
     public string? ManagerEmployeeNumber { get; set; }
     public WorkLocationType WorkLocationType { get; set; }
     public string? PhotoUrl { get; set; }
+    public long? CurrentShiftId { get; set; }
+    public string? CurrentShiftName { get; set; }
     public bool IsActive { get; set; }
     public DateTime CreatedAtUtc { get; set; }
     public DateTime? ModifiedAtUtc { get; set; }

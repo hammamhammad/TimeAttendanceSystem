@@ -1,0 +1,38 @@
+<div class="chart-container">
+  <!-- Chart Title -->
+  @if (title) {
+    <div class="chart-header mb-3">
+      <h5 class="chart-title text-center">{{ title }}</h5>
+    </div>
+  }
+
+  <!-- Loading State -->
+  @if (loading) {
+    <div class="chart-loading text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">{{ i18nService.t('app.loading') }}</span>
+      </div>
+      <p class="mt-2 text-muted">{{ i18nService.t('attendance.chart.loading') }}</p>
+    </div>
+  }
+
+  <!-- Chart Canvas -->
+  @if (!loading && hasData()) {
+    <div class="chart-wrapper" [style.height.px]="height" [style.width.px]="width">
+      <canvas
+        #chartCanvas
+        class="attendance-chart"
+        [attr.aria-label]="title || 'Attendance Chart'"
+        role="img">
+      </canvas>
+    </div>
+  }
+
+  <!-- No Data State -->
+  @if (!loading && !hasData()) {
+    <div class="no-data-state text-center py-5">
+      <i class="fa-solid fa-chart-bar fa-3x text-muted mb-3"></i>
+      <p class="text-muted">{{ i18nService.t('attendance.chart.no_data') }}</p>
+    </div>
+  }
+</div>

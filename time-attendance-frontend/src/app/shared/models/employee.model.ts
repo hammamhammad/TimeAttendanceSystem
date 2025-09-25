@@ -26,6 +26,12 @@ export interface EmployeeDto {
   photoUrl?: string;
   currentShiftId?: number;
   currentShiftName?: string;
+  currentShift?: {
+    id: number;
+    name: string;
+    startTime?: string;
+    endTime?: string;
+  };
   isActive: boolean;
   createdAtUtc: string;
 }
@@ -97,12 +103,14 @@ export enum Gender {
 }
 
 export enum EmploymentStatus {
-  FullTime = 1,
-  PartTime = 2,
-  Contract = 3,
-  Intern = 4,
-  Consultant = 5,
-  Terminated = 6
+  Active = 1,
+  FullTime = 2,
+  PartTime = 3,
+  Contract = 4,
+  Intern = 5,
+  Consultant = 6,
+  Terminated = 7,
+  Inactive = 8
 }
 
 export enum WorkLocationType {

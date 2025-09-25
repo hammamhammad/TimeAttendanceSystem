@@ -188,6 +188,7 @@ D:\Work\AI Code\TimeAttendanceSystem\src\Api\TimeAttendanceSystem.Api\bin\Debug\
 D:\Work\AI Code\TimeAttendanceSystem\src\Api\TimeAttendanceSystem.Api\bin\Debug\net9.0\AutoMapper.dll
 D:\Work\AI Code\TimeAttendanceSystem\src\Api\TimeAttendanceSystem.Api\bin\Debug\net9.0\Azure.Core.dll
 D:\Work\AI Code\TimeAttendanceSystem\src\Api\TimeAttendanceSystem.Api\bin\Debug\net9.0\Azure.Identity.dll
+D:\Work\AI Code\TimeAttendanceSystem\src\Api\TimeAttendanceSystem.Api\bin\Debug\net9.0\Coravel.dll
 D:\Work\AI Code\TimeAttendanceSystem\src\Api\TimeAttendanceSystem.Api\bin\Debug\net9.0\FluentValidation.dll
 D:\Work\AI Code\TimeAttendanceSystem\src\Api\TimeAttendanceSystem.Api\bin\Debug\net9.0\FluentValidation.DependencyInjectionExtensions.dll
 D:\Work\AI Code\TimeAttendanceSystem\src\Api\TimeAttendanceSystem.Api\bin\Debug\net9.0\Humanizer.dll

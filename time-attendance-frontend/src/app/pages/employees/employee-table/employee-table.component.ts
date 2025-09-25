@@ -42,6 +42,11 @@ import { PermissionResources, PermissionActions } from '../../../shared/utils/pe
             </div>
           </div>
 
+          <!-- Employee Code -->
+          <span *ngSwitchCase="'employeeCode'" class="fw-medium">
+            {{ employee.employeeNumber }}
+          </span>
+
           <!-- Department with branch -->
           <div *ngSwitchCase="'department'">
             <div>{{ employee.departmentName }}</div>
@@ -84,11 +89,8 @@ import { PermissionResources, PermissionActions } from '../../../shared/utils/pe
 
           <!-- Current shift -->
           <div *ngSwitchCase="'shift'">
-            <div *ngIf="employee.currentShift">{{ employee.currentShift.name }}</div>
-            <small *ngIf="employee.currentShift" class="text-muted">
-              {{ employee.currentShift.startTime }} - {{ employee.currentShift.endTime }}
-            </small>
-            <span *ngIf="!employee.currentShift" class="text-muted">No shift assigned</span>
+            <div *ngIf="employee.currentShiftName">{{ employee.currentShiftName }}</div>
+            <span *ngIf="!employee.currentShiftName" class="text-muted">No shift assigned</span>
           </div>
         </ng-container>
       </ng-template>
@@ -132,14 +134,76 @@ export class EmployeeTableComponent {
   @Output() sortChange = new EventEmitter<{column: string, direction: 'asc' | 'desc'}>();
 
   columns: TableColumn[] = [
-    { key: 'name', label: 'Employee', width: '250px', sortable: true },
-    { key: 'employeeCode', label: 'Code', width: '100px', sortable: true },
-    { key: 'department', label: 'Department', width: '200px', sortable: true },
-    { key: 'employmentStatus', label: 'Employment', width: '120px', align: 'center', sortable: true },
-    { key: 'workLocation', label: 'Location', width: '100px', align: 'center' },
-    { key: 'shift', label: 'Current Shift', width: '150px' },
-    { key: 'hireDate', label: 'Hire Date', width: '120px', sortable: true },
-    { key: 'status', label: 'Status', width: '100px', align: 'center', sortable: true }
+    {
+      key: 'name',
+      label: 'Employee',
+      width: '250px',
+      sortable: true,
+      priority: 'high',
+      mobileLabel: 'Employee'
+    },
+    {
+      key: 'employeeCode',
+      label: 'Code',
+      width: '100px',
+      sortable: true,
+      priority: 'high',
+      mobileLabel: 'Code'
+    },
+    {
+      key: 'department',
+      label: 'Department',
+      width: '200px',
+      sortable: true,
+      priority: 'medium',
+      hideOnMobile: false,
+      mobileLabel: 'Dept'
+    },
+    {
+      key: 'employmentStatus',
+      label: 'Employment',
+      width: '120px',
+      align: 'center',
+      sortable: true,
+      priority: 'low',
+      hideOnMobile: true,
+      mobileLabel: 'Status'
+    },
+    {
+      key: 'workLocation',
+      label: 'Location',
+      width: '100px',
+      align: 'center',
+      priority: 'low',
+      hideOnMobile: true,
+      mobileLabel: 'Location'
+    },
+    {
+      key: 'shift',
+      label: 'Current Shift',
+      width: '150px',
+      priority: 'medium',
+      hideOnMobile: false,
+      mobileLabel: 'Shift'
+    },
+    {
+      key: 'hireDate',
+      label: 'Hire Date',
+      width: '120px',
+      sortable: true,
+      priority: 'low',
+      hideOnMobile: true,
+      mobileLabel: 'Hired'
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      width: '100px',
+      align: 'center',
+      sortable: true,
+      priority: 'high',
+      mobileLabel: 'Status'
+    }
   ];
 
   get actions(): TableAction[] {
@@ -224,27 +288,31 @@ export class EmployeeTableComponent {
   }
 
   getEmploymentStatusLabel(status: EmploymentStatus): string {
-    const statusMap = {
+    const statusMap: { [key: number]: string } = {
+      [EmploymentStatus.Active]: 'Active',
       [EmploymentStatus.FullTime]: 'Full Time',
       [EmploymentStatus.PartTime]: 'Part Time',
       [EmploymentStatus.Contract]: 'Contract',
       [EmploymentStatus.Intern]: 'Intern',
       [EmploymentStatus.Consultant]: 'Consultant',
-      [EmploymentStatus.Terminated]: 'Terminated'
+      [EmploymentStatus.Terminated]: 'Terminated',
+      [EmploymentStatus.Inactive]: 'Inactive'
     };
     return statusMap[status] || 'Unknown';
   }
 
   getEmploymentStatusClass(status: EmploymentStatus): string {
-    const classMap = {
+    const classMap: { [key: number]: string } = {
+      [EmploymentStatus.Active]: 'bg-success',
       [EmploymentStatus.FullTime]: 'bg-success',
       [EmploymentStatus.PartTime]: 'bg-info',
       [EmploymentStatus.Contract]: 'bg-warning',
       [EmploymentStatus.Intern]: 'bg-primary',
-      [EmploymentStatus.Consultant]: 'bg-secondary',
-      [EmploymentStatus.Terminated]: 'bg-danger'
+      [EmploymentStatus.Consultant]: 'bg-light text-dark border',
+      [EmploymentStatus.Terminated]: 'bg-danger',
+      [EmploymentStatus.Inactive]: 'bg-light text-dark border'
     };
-    return classMap[status] || 'bg-secondary';
+    return classMap[status] || 'bg-light text-dark border';
   }
 
   getGenderLabel(gender: Gender): string {

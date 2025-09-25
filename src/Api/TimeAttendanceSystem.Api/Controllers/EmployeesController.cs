@@ -110,6 +110,7 @@ public class EmployeesController : ControllerBase
     /// <response code="401">Unauthorized access - authentication required</response>
     /// <response code="403">Forbidden - insufficient permissions for employee access</response>
     [HttpGet]
+    [Authorize(Policy = "EmployeeRead")]
     public async Task<IActionResult> GetEmployees(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10,
@@ -142,6 +143,7 @@ public class EmployeesController : ControllerBase
     /// <response code="401">Unauthorized access - authentication required</response>
     /// <response code="403">Forbidden - insufficient permissions for employee access</response>
     [HttpGet("{id}")]
+    [Authorize(Policy = "EmployeeRead")]
     public async Task<IActionResult> GetEmployeeById(long id)
     {
         var query = new GetEmployeeByIdQuery(id);
@@ -167,6 +169,7 @@ public class EmployeesController : ControllerBase
     /// <response code="403">Forbidden - insufficient permissions for employee creation</response>
     /// <response code="409">Conflict - duplicate employee number or email address</response>
     [HttpPost]
+    [Authorize(Policy = "EmployeeManagement")]
     public async Task<IActionResult> CreateEmployee([FromBody] CreateEmployeeRequest request)
     {
         var command = new CreateEmployeeCommand(
@@ -214,6 +217,7 @@ public class EmployeesController : ControllerBase
     /// <response code="403">Forbidden - insufficient permissions for employee modification</response>
     /// <response code="409">Conflict - duplicate email address or organizational hierarchy conflict</response>
     [HttpPut("{id}")]
+    [Authorize(Policy = "EmployeeManagement")]
     public async Task<IActionResult> UpdateEmployee(long id, [FromBody] UpdateEmployeeRequest request)
     {
         var command = new UpdateEmployeeCommand
@@ -259,6 +263,7 @@ public class EmployeesController : ControllerBase
     /// <response code="403">Forbidden - insufficient permissions for employee deletion</response>
     /// <response code="409">Conflict - cannot delete employee with active dependencies</response>
     [HttpDelete("{id}")]
+    [Authorize(Policy = "EmployeeManagement")]
     public async Task<IActionResult> DeleteEmployee(long id)
     {
         var command = new DeleteEmployeeCommand(id);
@@ -285,6 +290,7 @@ public class EmployeesController : ControllerBase
     /// <response code="401">Unauthorized access - authentication required</response>
     /// <response code="403">Forbidden - insufficient permissions for shift assignment</response>
     [HttpPost("{id}/shift")]
+    [Authorize(Policy = "EmployeeAssignment")]
     public async Task<IActionResult> UpdateEmployeeShift(long id, [FromBody] UpdateEmployeeShiftRequest request)
     {
         var command = new UpdateEmployeeShiftCommand(

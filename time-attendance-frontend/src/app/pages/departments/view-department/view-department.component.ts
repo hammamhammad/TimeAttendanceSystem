@@ -61,7 +61,7 @@ import { I18nService } from '../../../core/i18n/i18n.service';
                 <h5 class="card-title mb-0">
                   <div class="d-flex align-items-center">
                     <div class="avatar-sm me-3">
-                      <div class="avatar-title bg-secondary-subtle text-secondary rounded-circle">
+                      <div class="avatar-title bg-light text-primary rounded-circle">
                         <i class="fa-solid fa-sitemap"></i>
                       </div>
                     </div>
@@ -108,7 +108,7 @@ import { I18nService } from '../../../core/i18n/i18n.service';
                         @if (department()?.isActive) {
                           <span class="badge bg-success">{{ i18n.t('common.active') }}</span>
                         } @else {
-                          <span class="badge bg-secondary">{{ i18n.t('common.inactive') }}</span>
+                          <span class="badge bg-light text-dark border">{{ i18n.t('common.inactive') }}</span>
                         }
                       </dd>
                     </dl>
@@ -301,7 +301,6 @@ export class ViewDepartmentComponent implements OnInit {
     const departmentId = this.route.snapshot.paramMap.get('id');
     if (departmentId) {
       this.loadDepartment(departmentId);
-      this.loadStatistics(departmentId);
       this.loadSubDepartments(departmentId);
       this.loadHierarchy(departmentId);
     } else {
@@ -314,6 +313,11 @@ export class ViewDepartmentComponent implements OnInit {
     this.departmentsService.getDepartmentById(+departmentId).subscribe({
       next: (department) => {
         this.department.set(department);
+        // Update statistics with real data after department is loaded
+        this.statistics.set({
+          employeeCount: department.employeeCount || 0,
+          subDepartmentCount: 0 // Will be updated when we load sub-departments
+        });
         this.loading.set(false);
       },
       error: (error) => {
@@ -323,13 +327,6 @@ export class ViewDepartmentComponent implements OnInit {
     });
   }
 
-  loadStatistics(departmentId: string): void {
-    // Mock statistics for now
-    this.statistics.set({
-      employeeCount: Math.floor(Math.random() * 50),
-      subDepartmentCount: Math.floor(Math.random() * 10)
-    });
-  }
 
   loadSubDepartments(departmentId: string): void {
     // Mock sub-departments for now

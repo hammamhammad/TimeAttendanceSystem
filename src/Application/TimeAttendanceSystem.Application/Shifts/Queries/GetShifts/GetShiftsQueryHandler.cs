@@ -18,6 +18,7 @@ public class GetShiftsQueryHandler : BaseHandler<GetShiftsQuery, Result<PagedRes
     {
         var query = Context.Shifts
             .Include(s => s.ShiftPeriods.OrderBy(sp => sp.PeriodOrder))
+            .Where(s => !s.IsDeleted)
             .AsQueryable();
 
         // Apply search filter
@@ -66,6 +67,7 @@ public class GetShiftsQueryHandler : BaseHandler<GetShiftsQuery, Result<PagedRes
                 IsFriday = s.IsFriday,
                 IsSaturday = s.IsSaturday,
                 IsNightShift = s.IsNightShift,
+                IsDefault = s.IsDefault,
 
                 ShiftPeriods = s.ShiftPeriods.Select(sp => new ShiftPeriodDto
                 {

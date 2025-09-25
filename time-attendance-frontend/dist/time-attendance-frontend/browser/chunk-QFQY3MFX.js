@@ -1,1 +1,0 @@
-var n=(t=>(t[t.Male=1]="Male",t[t.Female=2]="Female",t))(n||{}),i=(e=>(e[e.FullTime=1]="FullTime",e[e.PartTime=2]="PartTime",e[e.Contract=3]="Contract",e[e.Intern=4]="Intern",e[e.Consultant=5]="Consultant",e[e.Terminated=6]="Terminated",e))(i||{}),a=(r=>(r[r.OnSite=1]="OnSite",r[r.Remote=2]="Remote",r[r.Hybrid=3]="Hybrid",r))(a||{});export{n as a,i as b,a as c};

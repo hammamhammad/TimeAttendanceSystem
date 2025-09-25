@@ -95,13 +95,6 @@
   border-color: #dee2e6 !important;
 }
 
-.alert-info {
-  background-color: #d1ecf1;
-  border-color: #bee5eb;
-  color: #0c5460;
-  font-weight: 500;
-}
-
 /* Custom badge colors for actions */
 .bg-purple-subtle {
   background-color: #e9d5ff !important;

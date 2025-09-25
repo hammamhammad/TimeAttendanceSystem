@@ -1,0 +1,403 @@
+.employee-attendance-detail {
+  padding: 1.5rem;
+  min-height: calc(100vh - 120px);
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.page-title {
+  color: #2c3e50;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+/* Employee Info Card */
+.employee-info-card {
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background: white;
+  overflow: hidden;
+}
+
+.employee-info-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+}
+
+.employee-info-card .card-header {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-bottom: 1px solid #f1f3f4;
+  border-radius: 16px 16px 0 0;
+  padding: 1.5rem 1.75rem;
+  position: relative;
+}
+
+.employee-info-card .card-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 1.75rem;
+  right: 1.75rem;
+  height: 2px;
+  background: linear-gradient(90deg, var(--bs-primary), var(--bs-info));
+  border-radius: 1px;
+}
+
+.employee-info-card .card-body {
+  padding: 1.75rem;
+}
+
+.info-item {
+  margin-bottom: 1rem;
+}
+
+.info-label {
+  font-weight: 600;
+  color: #6c757d;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.info-value {
+  font-size: 1rem;
+  color: #495057;
+  font-weight: 500;
+}
+
+/* Enhanced Statistics Cards */
+.stats-card {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  border: none;
+  background: white;
+  overflow: hidden;
+  position: relative;
+}
+
+.stats-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--bs-primary), var(--bs-info));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.stats-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.stats-card:hover::before {
+  opacity: 1;
+}
+
+.icon-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-circle i {
+  font-size: 1.2rem;
+}
+
+/* Enhanced Table Styles */
+.table-responsive {
+  border-radius: 12px;
+  overflow: visible;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  background: white;
+  margin-bottom: 2rem;
+}
+
+.table > :not(caption) > * > * {
+  padding: 1.25rem 1rem;
+  border-bottom: 1px solid #f1f3f4;
+  vertical-align: middle;
+}
+
+.table-hover tbody tr {
+  transition: all 0.3s ease;
+  border-left: 3px solid transparent;
+}
+
+.table-hover tbody tr:hover {
+  background: linear-gradient(90deg, #f8f9ff 0%, #ffffff 100%);
+  border-left-color: #0d6efd;
+  transform: translateX(2px);
+  box-shadow: 0 2px 8px rgba(13, 110, 253, 0.1);
+}
+
+.table thead th {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-top: none;
+  border-bottom: 2px solid #dee2e6;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.8px;
+  color: #495057;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* Enhanced Form Controls */
+.form-control,
+.form-select {
+  border-radius: 12px;
+  border: 2px solid #e9ecef;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15), 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.form-label {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+}
+
+/* Enhanced Buttons */
+.btn {
+  border-radius: 12px;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.5s;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.btn:hover::before {
+  left: 100%;
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-group-sm > .btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* Enhanced Card Layouts */
+.card {
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background: white;
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+}
+
+.card-header {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-bottom: 1px solid #f1f3f4;
+  border-radius: 16px 16px 0 0;
+  padding: 1.5rem 1.75rem;
+  position: relative;
+}
+
+.card-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 1.75rem;
+  right: 1.75rem;
+  height: 2px;
+  background: linear-gradient(90deg, var(--bs-primary), var(--bs-info));
+  border-radius: 1px;
+}
+
+.card-body {
+  padding: 1.75rem;
+}
+
+/* No data state */
+.fa-calendar-xmark {
+  opacity: 0.5;
+}
+
+/* Loading States */
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Enhanced gradient effects for different status colors */
+.border-success {
+  border-color: #198754 !important;
+  background: linear-gradient(135deg, rgba(25, 135, 84, 0.05) 0%, rgba(255,255,255,1) 100%);
+}
+
+.border-danger {
+  border-color: #dc3545 !important;
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.05) 0%, rgba(255,255,255,1) 100%);
+}
+
+.border-warning {
+  border-color: #fd7e14 !important;
+  background: linear-gradient(135deg, rgba(253, 126, 20, 0.05) 0%, rgba(255,255,255,1) 100%);
+}
+
+.border-info {
+  border-color: #0dcaf0 !important;
+  background: linear-gradient(135deg, rgba(13, 202, 240, 0.05) 0%, rgba(255,255,255,1) 100%);
+}
+
+.border-primary {
+  border-color: #0d6efd !important;
+  background: linear-gradient(135deg, rgba(13, 110, 253, 0.05) 0%, rgba(255,255,255,1) 100%);
+}
+
+.border-secondary {
+  border-color: #6c757d !important;
+  background: linear-gradient(135deg, rgba(108, 117, 125, 0.05) 0%, rgba(255,255,255,1) 100%);
+}
+
+/* Status Badge Colors */
+.badge.bg-success {
+  background-color: #198754 !important;
+}
+
+.badge.bg-danger {
+  background-color: #dc3545 !important;
+}
+
+.badge.bg-warning {
+  background-color: #fd7e14 !important;
+  color: white;
+}
+
+.badge.bg-info {
+  background-color: #0dcaf0 !important;
+  color: #000;
+}
+
+.badge.bg-secondary {
+  background-color: #6c757d !important;
+}
+
+.badge.bg-primary {
+  background-color: #0d6efd !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .employee-attendance-detail {
+    padding: 1rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  .d-flex.justify-content-between {
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
+  .stats-card {
+    margin-bottom: 1rem;
+  }
+
+  .stats-card .d-flex {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+
+  .stats-card .icon-circle {
+    margin: 0 auto 0.75rem;
+    width: 56px;
+    height: 56px;
+  }
+
+  .table-responsive {
+    font-size: 0.85rem;
+    border-radius: 8px;
+    margin: 0 -0.5rem;
+  }
+
+  .table > :not(caption) > * > * {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .btn-group {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .form-control,
+  .form-select {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  .card-header {
+    padding: 1rem 1.25rem;
+  }
+
+  .card-body {
+    padding: 1.25rem;
+  }
+
+  .employee-info-card .card-body .row {
+    row-gap: 1rem;
+  }
+}

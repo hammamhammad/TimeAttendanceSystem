@@ -69,13 +69,13 @@ public class ShiftAssignmentConfiguration : IEntityTypeConfiguration<ShiftAssign
             .IsRequired(false)
             .HasComment("Branch ID for branch-level assignments (null for employee/department assignments)");
 
-        builder.Property(sa => sa.EffectiveDate)
+        builder.Property(sa => sa.EffectiveFromDate)
             .IsRequired()
             .HasColumnType("datetime2")
             .HasColumnName("EffectiveFromDate")
             .HasComment("Date when this assignment becomes active");
 
-        builder.Property(sa => sa.EndDate)
+        builder.Property(sa => sa.EffectiveToDate)
             .IsRequired(false)
             .HasColumnType("datetime2")
             .HasColumnName("EffectiveToDate")
@@ -154,20 +154,20 @@ public class ShiftAssignmentConfiguration : IEntityTypeConfiguration<ShiftAssign
         // Indexes for performance optimization
 
         // Primary query index for active assignments
-        builder.HasIndex(sa => new { sa.Status, sa.EffectiveDate, sa.EndDate })
+        builder.HasIndex(sa => new { sa.Status, sa.EffectiveFromDate, sa.EffectiveToDate })
             .HasDatabaseName("IX_ShiftAssignments_Status_EffectiveFromDate_EffectiveToDate")
             .HasFilter("[IsDeleted] = 0");
 
         // Assignment type specific indexes
-        builder.HasIndex(sa => new { sa.AssignmentType, sa.EmployeeId, sa.EffectiveDate })
+        builder.HasIndex(sa => new { sa.AssignmentType, sa.EmployeeId, sa.EffectiveFromDate })
             .HasDatabaseName("IX_ShiftAssignments_Employee_EffectiveFromDate")
             .HasFilter("[IsDeleted] = 0 AND [AssignmentType] = 1 AND [EmployeeId] IS NOT NULL");
 
-        builder.HasIndex(sa => new { sa.AssignmentType, sa.DepartmentId, sa.EffectiveDate })
+        builder.HasIndex(sa => new { sa.AssignmentType, sa.DepartmentId, sa.EffectiveFromDate })
             .HasDatabaseName("IX_ShiftAssignments_Department_EffectiveFromDate")
             .HasFilter("[IsDeleted] = 0 AND [AssignmentType] = 2 AND [DepartmentId] IS NOT NULL");
 
-        builder.HasIndex(sa => new { sa.AssignmentType, sa.BranchId, sa.EffectiveDate })
+        builder.HasIndex(sa => new { sa.AssignmentType, sa.BranchId, sa.EffectiveFromDate })
             .HasDatabaseName("IX_ShiftAssignments_Branch_EffectiveFromDate")
             .HasFilter("[IsDeleted] = 0 AND [AssignmentType] = 3 AND [BranchId] IS NOT NULL");
 
@@ -177,7 +177,7 @@ public class ShiftAssignmentConfiguration : IEntityTypeConfiguration<ShiftAssign
             .HasFilter("[IsDeleted] = 0");
 
         // Priority-based index for conflict resolution
-        builder.HasIndex(sa => new { sa.Priority, sa.Status, sa.EffectiveDate })
+        builder.HasIndex(sa => new { sa.Priority, sa.Status, sa.EffectiveFromDate })
             .HasDatabaseName("IX_ShiftAssignments_Priority_Status_EffectiveFromDate")
             .HasFilter("[IsDeleted] = 0");
 

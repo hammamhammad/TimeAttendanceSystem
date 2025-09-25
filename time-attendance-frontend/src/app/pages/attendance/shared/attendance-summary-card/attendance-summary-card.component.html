@@ -1,0 +1,57 @@
+<div class="card summary-card" [class]="cardClasses" (click)="onCardClick()">
+  <div class="card-body">
+    <!-- Loading State -->
+    @if (loading) {
+      <div class="text-center py-3">
+        <div class="spinner-border spinner-border-sm text-primary" role="status">
+          <span class="visually-hidden">{{ i18nService.t('app.loading') }}</span>
+        </div>
+      </div>
+    }
+
+    <!-- Card Content -->
+    @if (!loading) {
+      <div class="card-content">
+        <!-- Title -->
+        <h6 class="card-title text-uppercase text-muted mb-3">{{ data.title }}</h6>
+
+        <!-- Value -->
+        <div class="value-section mb-3">
+          <h1 class="display-value mb-0" [class]="'text-' + data.color">
+            {{ formatValue(data.value) }}
+          </h1>
+        </div>
+
+        <!-- Progress/Percentage Display -->
+        @if (showProgress && data.percentage !== undefined) {
+          <div class="percentage-display text-center mb-3">
+            <div class="percentage-box">
+              <span class="percentage-value">{{ data.percentage.toFixed(1) }}</span>
+              <span class="percentage-symbol">%</span>
+            </div>
+          </div>
+        }
+
+        <!-- Trend Indicator -->
+        @if (data.trend) {
+          <div class="trend-display text-center mb-3">
+            <span class="trend-indicator" [class]="trendClasses">
+              <i [class]="trendIcon"></i>
+              {{ data.trend.value }}%
+            </span>
+          </div>
+        }
+
+        <!-- Action Button -->
+        @if (data.link && data.actionLabel) {
+          <div class="action-section">
+            <a [routerLink]="data.link" class="btn btn-outline-primary btn-sm w-100 action-btn">
+              {{ data.actionLabel }}
+              <i class="fa-solid fa-arrow-right ms-1"></i>
+            </a>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

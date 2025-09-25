@@ -1,0 +1,316 @@
+/* Create Public Holiday Component Styles */
+
+.container-fluid {
+  padding: 0 1.5rem;
+}
+
+/* Page Header */
+.h3 {
+  color: var(--bs-gray-800);
+  font-weight: 600;
+}
+
+.text-muted {
+  color: var(--bs-gray-600) !important;
+}
+
+/* Form Sections */
+h5 {
+  color: var(--bs-gray-800);
+  font-weight: 600;
+  border-bottom: 2px solid var(--bs-primary);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem !important;
+}
+
+/* Form Elements */
+.form-label {
+  font-weight: 500;
+  color: var(--bs-gray-700);
+  margin-bottom: 0.5rem;
+}
+
+.form-label .text-danger {
+  color: var(--bs-danger) !important;
+}
+
+.form-control,
+.form-select {
+  border: 1px solid var(--bs-gray-300);
+  border-radius: 0.375rem;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+.form-control.is-invalid,
+.form-select.is-invalid {
+  border-color: var(--bs-danger);
+  box-shadow: 0 0 0 0.25rem rgba(var(--bs-danger-rgb), 0.25);
+}
+
+.invalid-feedback {
+  display: block;
+  width: 100%;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: var(--bs-danger);
+}
+
+.form-text {
+  font-size: 0.8rem;
+  color: var(--bs-gray-600);
+  margin-top: 0.25rem;
+}
+
+/* Switch Toggle */
+.form-check-input {
+  width: 2rem;
+  height: 1rem;
+  margin-top: 0.25rem;
+  margin-right: 0.5rem;
+  background-color: var(--bs-gray-300);
+  border: none;
+  border-radius: 1rem;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.form-check-input:checked {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+.form-check-input:focus {
+  box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+.form-check-label {
+  font-weight: 500;
+  color: var(--bs-gray-700);
+  margin-bottom: 0;
+}
+
+/* Card Styling */
+.card {
+  border: 1px solid var(--bs-gray-200);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.card-body {
+  padding: 2rem;
+}
+
+/* Button Styling */
+.btn {
+  border-radius: 0.375rem;
+  font-weight: 500;
+  padding: 0.625rem 1.25rem;
+  transition: all 0.15s ease-in-out;
+}
+
+.btn-primary {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-outline-secondary {
+  color: var(--bs-gray-600);
+  border-color: var(--bs-gray-300);
+}
+
+.btn-outline-secondary:hover:not(:disabled) {
+  background-color: var(--bs-gray-100);
+  border-color: var(--bs-gray-400);
+  color: var(--bs-gray-700);
+}
+
+/* Form Actions */
+.gap-2 {
+  gap: 0.5rem !important;
+}
+
+/* Input Number Styling */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Date Input Styling */
+input[type="date"] {
+  position: relative;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: var(--bs-gray-600);
+}
+
+/* Textarea Styling */
+textarea.form-control {
+  resize: vertical;
+  min-height: calc(2.25rem + 2px);
+}
+
+/* Loading State */
+.spinner-border-sm {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+/* Field Groups */
+.mb-3:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container-fluid {
+    padding: 0 1rem;
+  }
+
+  .card-body {
+    padding: 1.5rem;
+  }
+
+  .d-flex.gap-2 {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  h5 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .h3 {
+    font-size: 1.25rem;
+  }
+
+  .text-muted {
+    font-size: 0.875rem;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  .row > [class*="col-"] {
+    margin-bottom: 1rem;
+  }
+}
+
+/* Focus States for Accessibility */
+.btn:focus,
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+  outline: none;
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  .form-control,
+  .form-select {
+    border-width: 2px;
+  }
+
+  .btn {
+    border-width: 2px;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .form-control,
+  .form-select,
+  .form-check-input {
+    transition: none;
+  }
+}
+
+/* Form Row Spacing */
+.row + .row {
+  margin-top: 2rem;
+}
+
+/* Required Field Indicator */
+.text-danger {
+  font-weight: 600;
+}
+
+/* Help Text Styling */
+.form-text {
+  line-height: 1.4;
+}
+
+/* Invalid State Animation */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.is-invalid {
+  animation: shake 0.3s ease-in-out;
+}
+
+/* Success State for Valid Fields */
+.form-control:valid:not(:focus),
+.form-select:valid:not(:focus) {
+  border-color: var(--bs-success);
+}
+
+/* Custom Select Arrow */
+.form-select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e");
+}
+
+/* Form Section Spacing */
+.col-md-6 + .col-md-6 {
+  border-left: 1px solid var(--bs-gray-200);
+  padding-left: 2rem;
+}
+
+@media (max-width: 768px) {
+  .col-md-6 + .col-md-6 {
+    border-left: none;
+    border-top: 1px solid var(--bs-gray-200);
+    padding-left: 0;
+    padding-top: 2rem;
+    margin-top: 2rem;
+  }
+}

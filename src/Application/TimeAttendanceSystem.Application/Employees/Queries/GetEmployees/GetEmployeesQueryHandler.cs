@@ -93,20 +93,20 @@ public class GetEmployeesQueryHandler : BaseHandler<GetEmployeesQuery, Result<Pa
                     .Where(sa => sa.EmployeeId == e.Id &&
                                 sa.AssignmentType == ShiftAssignmentType.Employee &&
                                 sa.Status == ShiftAssignmentStatus.Active &&
-                                sa.EffectiveDate <= DateTime.UtcNow &&
-                                (sa.EndDate == null || sa.EndDate >= DateTime.UtcNow))
+                                sa.EffectiveFromDate <= DateTime.UtcNow &&
+                                (sa.EffectiveToDate == null || sa.EffectiveToDate >= DateTime.UtcNow))
                     .OrderByDescending(sa => sa.Priority)
-                    .ThenByDescending(sa => sa.EffectiveDate)
+                    .ThenByDescending(sa => sa.EffectiveFromDate)
                     .Select(sa => sa.ShiftId)
                     .FirstOrDefault(),
                 CurrentShiftName = Context.ShiftAssignments
                     .Where(sa => sa.EmployeeId == e.Id &&
                                 sa.AssignmentType == ShiftAssignmentType.Employee &&
                                 sa.Status == ShiftAssignmentStatus.Active &&
-                                sa.EffectiveDate <= DateTime.UtcNow &&
-                                (sa.EndDate == null || sa.EndDate >= DateTime.UtcNow))
+                                sa.EffectiveFromDate <= DateTime.UtcNow &&
+                                (sa.EffectiveToDate == null || sa.EffectiveToDate >= DateTime.UtcNow))
                     .OrderByDescending(sa => sa.Priority)
-                    .ThenByDescending(sa => sa.EffectiveDate)
+                    .ThenByDescending(sa => sa.EffectiveFromDate)
                     .Join(Context.Shifts, sa => sa.ShiftId, s => s.Id, (sa, s) => s.Name)
                     .FirstOrDefault(),
                 IsActive = !e.IsDeleted,

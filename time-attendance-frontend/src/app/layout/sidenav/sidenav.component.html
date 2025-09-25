@@ -38,7 +38,7 @@
             @if (!collapsed() && isSubmenuOpen(item.path) && hasVisibleChildren(item)) {
               <ul class="nav flex-column submenu ms-3">
                 @for (child of item.children; track child.path) {
-                  @if (!child.permission || hasPerm(child.permission)) {
+                  @if (hasChildMenuPermission(child)) {
                     <li class="nav-item">
                       <a class="nav-link d-flex align-items-center"
                          [routerLink]="child.path"

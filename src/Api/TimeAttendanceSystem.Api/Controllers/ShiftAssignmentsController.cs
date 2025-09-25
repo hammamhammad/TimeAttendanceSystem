@@ -74,6 +74,7 @@ public class ShiftAssignmentsController : ControllerBase
     /// <param name="maxPriority">Optional filter by maximum priority</param>
     /// <returns>Paginated list of shift assignments</returns>
     [HttpGet]
+    [Authorize(Policy = "ShiftRead")]
     public async Task<IActionResult> GetShiftAssignments(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10,
@@ -124,6 +125,7 @@ public class ShiftAssignmentsController : ControllerBase
     /// <param name="id">The unique identifier of the shift assignment</param>
     /// <returns>Shift assignment details</returns>
     [HttpGet("{id}")]
+    [Authorize(Policy = "ShiftRead")]
     public async Task<IActionResult> GetShiftAssignmentById(long id)
     {
         // For now, we'll use the list query with specific ID filter
@@ -156,6 +158,7 @@ public class ShiftAssignmentsController : ControllerBase
     /// <param name="request">The shift assignment creation request</param>
     /// <returns>Created assignment identifier</returns>
     [HttpPost]
+    [Authorize(Policy = "ShiftAssignment")]
     public async Task<IActionResult> CreateShiftAssignment([FromBody] CreateShiftAssignmentRequest request)
     {
         // Validate the request model
@@ -213,6 +216,7 @@ public class ShiftAssignmentsController : ControllerBase
     /// <param name="request">The update request data</param>
     /// <returns>Success response or error details</returns>
     [HttpPut("{id}")]
+    [Authorize(Policy = "ShiftAssignment")]
     public async Task<IActionResult> UpdateShiftAssignment(long id, [FromBody] CreateShiftAssignmentRequest request)
     {
         // Placeholder implementation
@@ -228,6 +232,7 @@ public class ShiftAssignmentsController : ControllerBase
     /// <param name="id">The identifier of the assignment to delete</param>
     /// <returns>Success response or error details</returns>
     [HttpDelete("{id}")]
+    [Authorize(Policy = "ShiftAssignment")]
     public async Task<IActionResult> DeleteShiftAssignment(long id)
     {
         // Placeholder implementation
@@ -241,6 +246,7 @@ public class ShiftAssignmentsController : ControllerBase
     /// </summary>
     /// <returns>Assignment creation options</returns>
     [HttpGet("options")]
+    [Authorize(Policy = "ShiftRead")]
     public async Task<IActionResult> GetAssignmentOptions()
     {
         // Placeholder implementation

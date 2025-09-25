@@ -4,6 +4,8 @@ using TimeAttendanceSystem.Domain.Branches;
 using TimeAttendanceSystem.Domain.Employees;
 using TimeAttendanceSystem.Domain.Users;
 using TimeAttendanceSystem.Domain.Shifts;
+using TimeAttendanceSystem.Domain.Attendance;
+using TimeAttendanceSystem.Domain.Settings;
 
 namespace TimeAttendanceSystem.Infrastructure.Persistence;
 
@@ -93,6 +95,12 @@ public class TimeAttendanceDbContext : DbContext
     public DbSet<Shift> Shifts => Set<Shift>();
     public DbSet<ShiftPeriod> ShiftPeriods => Set<ShiftPeriod>();
     public DbSet<ShiftAssignment> ShiftAssignments => Set<ShiftAssignment>();
+    public DbSet<AttendanceRecord> AttendanceRecords => Set<AttendanceRecord>();
+    public DbSet<AttendanceTransaction> AttendanceTransactions => Set<AttendanceTransaction>();
+    public DbSet<WorkingDay> WorkingDays => Set<WorkingDay>();
+    public DbSet<OvertimeConfiguration> OvertimeConfigurations => Set<OvertimeConfiguration>();
+    public DbSet<PublicHoliday> PublicHolidays => Set<PublicHoliday>();
+    public DbSet<OffDay> OffDays => Set<OffDay>();
 
     /// <summary>
     /// Configures the database model using Fluent API configurations from the current assembly.

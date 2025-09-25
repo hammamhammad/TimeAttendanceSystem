@@ -128,7 +128,7 @@
               @if (employee()?.isActive) {
                 <span class="badge bg-success">{{ t('common.active') }}</span>
               } @else {
-                <span class="badge bg-secondary">{{ t('common.inactive') }}</span>
+                <span class="badge bg-light text-dark border">{{ t('common.inactive') }}</span>
               }
             </div>
             
@@ -141,7 +141,17 @@
             <!-- Work Location -->
             <div class="mb-3">
               <h6 class="fw-semibold">{{ t('employees.work_location.title') }}</h6>
-              <span class="badge bg-secondary">{{ getWorkLocationTypeLabel(employee()!.workLocationType) }}</span>
+              <span class="badge bg-light text-dark border">{{ getWorkLocationTypeLabel(employee()!.workLocationType) }}</span>
+            </div>
+
+            <!-- Current Shift -->
+            <div class="mb-3">
+              <h6 class="fw-semibold">{{ t('employees.current_shift') }}</h6>
+              @if (employee()?.currentShiftName) {
+                <span class="badge bg-primary">{{ employee()?.currentShiftName }}</span>
+              } @else {
+                <span class="text-muted">{{ t('employees.no_shift_assigned') }}</span>
+              }
             </div>
 
             <!-- Gender -->
@@ -218,6 +228,351 @@
                   <i class="fa-solid fa-user-check me-2"></i>
                   {{ t('employees.activate') }}
                 </button>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Attendance Information Section -->
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="card-title mb-0">
+                <i class="fa-solid fa-calendar-check me-2"></i>
+                {{ t('attendance.employee_detail') }}
+              </h5>
+              <div class="d-flex gap-2">
+                <input
+                  type="date"
+                  class="form-control form-control-sm"
+                  [value]="selectedDateRange().start"
+                  (change)="onDateRangeChange($event.target.value, selectedDateRange().end)"
+                  style="width: auto;">
+                <span class="align-self-center">{{ t('common.to') }}</span>
+                <input
+                  type="date"
+                  class="form-control form-control-sm"
+                  [value]="selectedDateRange().end"
+                  (change)="onDateRangeChange(selectedDateRange().start, $event.target.value)"
+                  style="width: auto;">
+                <button
+                  type="button"
+                  class="btn btn-success btn-sm"
+                  (click)="exportAttendanceData()"
+                  [disabled]="attendanceRecords().length === 0">
+                  <i class="fa-solid fa-download"></i>
+                  {{ t('attendance.actions.export_data') }}
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <!-- Attendance Summary Cards -->
+            <div class="row mb-4">
+              <div class="col-md-3 mb-3">
+                <div class="card border-start border-primary border-4 h-100">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div>
+                        <h6 class="card-title text-muted small mb-1">{{ t('attendance.statistics.total_working_days') }}</h6>
+                        <h3 class="text-primary mb-0">{{ totalWorkingDays() }}</h3>
+                      </div>
+                      <div class="icon-circle bg-primary bg-opacity-10">
+                        <i class="fa-solid fa-calendar text-primary"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-3 mb-3">
+                <div class="card border-start border-success border-4 h-100">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div>
+                        <h6 class="card-title text-muted small mb-1">{{ t('attendance.stats.present_employees') }}</h6>
+                        <h3 class="text-success mb-0">{{ presentDays() }}</h3>
+                        <small class="text-muted">{{ attendanceRate() }}% {{ t('attendance.statistics.attendance_rate_short') }}</small>
+                      </div>
+                      <div class="icon-circle bg-success bg-opacity-10">
+                        <i class="fa-solid fa-user-check text-success"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-3 mb-3">
+                <div class="card border-start border-warning border-4 h-100">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div>
+                        <h6 class="card-title text-muted small mb-1">{{ t('attendance.stats.average_working_hours') }}</h6>
+                        <h3 class="text-warning mb-0">{{ averageWorkingHours() }}h</h3>
+                        <small class="text-muted">{{ totalOvertimeHours() }}h {{ t('attendance.statistics.total_overtime') }}</small>
+                      </div>
+                      <div class="icon-circle bg-warning bg-opacity-10">
+                        <i class="fa-solid fa-business-time text-warning"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-3 mb-3">
+                <div class="card border-start border-danger border-4 h-100">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div>
+                        <h6 class="card-title text-muted small mb-1">{{ t('attendance.stats.absent_employees') }}</h6>
+                        <h3 class="text-danger mb-0">{{ absentDays() }}</h3>
+                        <small class="text-muted">{{ lateDays() }} {{ t('attendance.statistics.late_days') }}</small>
+                      </div>
+                      <div class="icon-circle bg-danger bg-opacity-10">
+                        <i class="fa-solid fa-user-times text-danger"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Performance Indicator -->
+            <div class="row mb-4">
+              <div class="col-12">
+                <div class="card">
+                  <div class="card-body text-center">
+                    <h6 class="card-title">{{ t('attendance.stats.attendance_rate') }}</h6>
+                    <div class="performance-circle mb-3">
+                      <div class="circle-progress" [style.--progress]="attendanceRate() + '%'">
+                        <span class="percentage">{{ attendanceRate() }}%</span>
+                      </div>
+                    </div>
+                    <span [class]="'badge bg-' + getPerformanceColor(attendanceRate())">
+                      {{ attendanceRate() >= 95 ? 'Excellent' : attendanceRate() >= 90 ? 'Good' : attendanceRate() >= 80 ? 'Average' : 'Needs Improvement' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Attendance Tabs -->
+            <ul class="nav nav-tabs mb-3" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link"
+                  [class.active]="activeTab() === 'overview'"
+                  (click)="setActiveTab('overview')"
+                  type="button">
+                  <i class="fa-solid fa-chart-pie me-2"></i>
+                  {{ t('attendance.statistics.overview') }}
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link"
+                  [class.active]="activeTab() === 'records'"
+                  (click)="setActiveTab('records')"
+                  type="button">
+                  <i class="fa-solid fa-table me-2"></i>
+                  {{ t('attendance.statistics.records') }}
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link"
+                  [class.active]="activeTab() === 'transactions'"
+                  (click)="setActiveTab('transactions')"
+                  type="button">
+                  <i class="fa-solid fa-list me-2"></i>
+                  {{ t('attendance.statistics.transactions') }}
+                </button>
+              </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content">
+              <!-- Overview Tab -->
+              @if (activeTab() === 'overview') {
+                <div class="tab-pane fade show active">
+                @if (attendanceLoading()) {
+                  <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                      <span class="visually-hidden">{{ t('common.loading') }}</span>
+                    </div>
+                    <p class="mt-2 text-muted">{{ t('attendance.messages.loading_data') }}</p>
+                  </div>
+                } @else {
+                  <div class="row">
+                    <div class="col-md-6">
+                      <h6 class="fw-semibold mb-3">{{ t('attendance.statistics.attendance_breakdown') }}</h6>
+                      <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                          <span>
+                            <i class="fa-solid fa-user-check text-success me-2"></i>
+                            {{ t('attendance.status.present') }}
+                          </span>
+                          <span class="badge bg-success rounded-pill">{{ presentDays() }}</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                          <span>
+                            <i class="fa-solid fa-user-times text-danger me-2"></i>
+                            {{ t('attendance.status.absent') }}
+                          </span>
+                          <span class="badge bg-danger rounded-pill">{{ absentDays() }}</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                          <span>
+                            <i class="fa-solid fa-clock text-warning me-2"></i>
+                            {{ t('attendance.status.late') }}
+                          </span>
+                          <span class="badge bg-warning rounded-pill">{{ lateDays() }}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <h6 class="fw-semibold mb-3">{{ t('attendance.statistics.time_summary') }}</h6>
+                      <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                          <span>{{ t('attendance.stats.average_working_hours') }}</span>
+                          <span class="fw-medium">{{ averageWorkingHours() }}h</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                          <span>{{ t('attendance.stats.total_overtime_hours') }}</span>
+                          <span class="fw-medium">{{ totalOvertimeHours() }}h</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                          <span>{{ t('attendance.statistics.total_working_days') }}</span>
+                          <span class="fw-medium">{{ totalWorkingDays() }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
+                </div>
+              }
+
+              <!-- Records Tab -->
+              @if (activeTab() === 'records') {
+                <div class="tab-pane fade show active">
+                @if (attendanceLoading()) {
+                  <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                      <span class="visually-hidden">{{ t('common.loading') }}</span>
+                    </div>
+                  </div>
+                } @else if (attendanceRecords().length > 0) {
+                  <div class="table-responsive">
+                    <table class="table table-hover">
+                      <thead class="table-light">
+                        <tr>
+                          <th>{{ t('attendance.fields.attendance_date') }}</th>
+                          <th>{{ t('attendance.fields.check_in_time') }}</th>
+                          <th>{{ t('attendance.fields.check_out_time') }}</th>
+                          <th>{{ t('attendance.fields.work_duration') }}</th>
+                          <th>{{ t('attendance.fields.status') }}</th>
+                          <th>{{ t('attendance.fields.notes') }}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (record of attendanceRecords(); track record.attendanceDate) {
+                          <tr>
+                            <td>
+                            <span class="fw-medium">{{ formatDate(record.attendanceDate) }}</span>
+                          </td>
+                          <td>
+                            <span [class]="record.actualCheckInTime ? 'text-success fw-medium' : 'text-muted'">
+                              {{ formatTime(record.actualCheckInTime) }}
+                            </span>
+                          </td>
+                          <td>
+                            <span [class]="record.actualCheckOutTime ? 'text-info fw-medium' : 'text-muted'">
+                              {{ formatTime(record.actualCheckOutTime) }}
+                            </span>
+                          </td>
+                          <td>
+                            <span class="fw-medium">
+                              {{ calculateWorkDuration(record.actualCheckInTime, record.actualCheckOutTime) }}
+                            </span>
+                          </td>
+                          <td>
+                            <span [class]="getStatusBadgeClass(record.status)">
+                              {{ t('attendance.status.' + record.status.toString().toLowerCase()) }}
+                            </span>
+                          </td>
+                          <td>
+                            <span class="text-muted">{{ record.notes || '--' }}</span>
+                          </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                } @else {
+                  <div class="text-center py-4">
+                    <i class="fa-solid fa-calendar-xmark fa-3x text-muted mb-3"></i>
+                    <h6 class="text-muted">{{ t('attendance.no_records') }}</h6>
+                    <p class="text-muted">{{ t('attendance.no_records_description') }}</p>
+                  </div>
+                }
+                </div>
+              }
+
+              <!-- Transactions Tab -->
+              @if (activeTab() === 'transactions') {
+                <div class="tab-pane fade show active">
+                @if (recentTransactions().length > 0) {
+                  <div class="table-responsive">
+                    <table class="table table-hover">
+                      <thead class="table-light">
+                        <tr>
+                          <th>{{ t('attendance.fields.datetime') }}</th>
+                          <th>{{ t('attendance.fields.transaction_type') }}</th>
+                          <th>{{ t('attendance.fields.location') }}</th>
+                          <th>{{ t('attendance.fields.manual') }}</th>
+                          <th>{{ t('attendance.fields.notes') }}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (transaction of recentTransactions(); track transaction.transactionTimeLocal) {
+                          <tr>
+                            <td>
+                            <div class="fw-medium">{{ formatDate(transaction.transactionTimeLocal) }}</div>
+                            <small class="text-muted">{{ formatTime(transaction.transactionTimeLocal) }}</small>
+                          </td>
+                          <td>
+                            <span [class]="getTransactionTypeBadgeClass(transaction.transactionType)">
+                              {{ transaction.transactionTypeText }}
+                            </span>
+                          </td>
+                          <td>
+                            <span class="text-muted">{{ transaction.location || '--' }}</span>
+                          </td>
+                          <td>
+                            <span [class]="transaction.isManual ? 'badge bg-warning' : 'badge bg-success'">
+                              {{ transaction.isManual ? t('app.yes') : t('app.no') }}
+                            </span>
+                          </td>
+                          <td>
+                            <span class="text-muted">{{ transaction.notes || '--' }}</span>
+                          </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                } @else {
+                  <div class="text-center py-4">
+                    <i class="fa-solid fa-list fa-3x text-muted mb-3"></i>
+                    <h6 class="text-muted">{{ t('attendance.no_transactions') }}</h6>
+                    <p class="text-muted">{{ t('attendance.no_transactions_description') }}</p>
+                  </div>
+                }
+                </div>
               }
             </div>
           </div>

@@ -1,4 +1,4 @@
-/* Avatar styling */
+/* Avatar styling - component specific sizes */
 .avatar-sm {
   width: 2.5rem;
   height: 2.5rem;
@@ -15,4 +15,102 @@
   justify-content: center;
   font-weight: 600;
   font-size: 0.875rem;
+}
+
+/* Attendance Section Styles */
+.icon-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-circle i {
+  font-size: 1.2rem;
+}
+
+/* Performance Circle - component specific */
+.performance-circle {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+}
+
+.circle-progress {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: conic-gradient(
+    #198754 0deg,
+    #198754 calc(var(--progress) * 3.6deg),
+    #e9ecef calc(var(--progress) * 3.6deg),
+    #e9ecef 360deg
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 1s ease-in-out;
+}
+
+.circle-progress::before {
+  content: '';
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: white;
+}
+
+.percentage {
+  position: relative;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #198754;
+  z-index: 1;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .performance-circle {
+    width: 100px;
+    height: 100px;
+  }
+
+  .circle-progress {
+    width: 100px;
+    height: 100px;
+  }
+
+  .circle-progress::before {
+    width: 70px;
+    height: 70px;
+  }
+
+  .percentage {
+    font-size: 1.2rem;
+  }
+
+  .icon-circle {
+    width: 40px;
+    height: 40px;
+  }
+
+  .icon-circle i {
+    font-size: 1rem;
+  }
 }

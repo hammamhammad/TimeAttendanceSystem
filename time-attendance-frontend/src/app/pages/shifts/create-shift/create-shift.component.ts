@@ -88,6 +88,9 @@ export class CreateShiftComponent implements OnInit {
       this.shiftForm.gracePeriodMinutes = undefined;
       this.shiftForm.shiftPeriods = [];
 
+      // Business Rule 3: Night Shift not works with Hours Only
+      this.shiftForm.isNightShift = false;
+
       // Set default required hours
       if (!this.shiftForm.requiredHours) {
         this.shiftForm.requiredHours = 8;
@@ -121,7 +124,7 @@ export class CreateShiftComponent implements OnInit {
       this.shiftForm.flexMinutesBefore = undefined;
       this.shiftForm.flexMinutesAfter = undefined;
     } else {
-      // Clear grace period when flexible hours is enabled as they are mutually exclusive
+      // Business Rule 1: Grace Period should be disabled and empty when Allow Flexible Hours is selected
       this.shiftForm.gracePeriodMinutes = undefined;
     }
   }
@@ -133,6 +136,25 @@ export class CreateShiftComponent implements OnInit {
       this.shiftForm.allowFlexibleHours = false;
       this.shiftForm.flexMinutesBefore = undefined;
       this.shiftForm.flexMinutesAfter = undefined;
+    }
+  }
+
+  // Weekly Hours Change Handler
+  onWeeklyHoursChange(): void {
+    if (this.shiftForm.requiredWeeklyHours && this.shiftForm.requiredWeeklyHours > 0) {
+      // Business Rule 2: Core Hours is mandatory with Weekly Hours
+      if (!this.shiftForm.hasCoreHours) {
+        this.shiftForm.hasCoreHours = true;
+        this.onCoreHoursChange(); // Set default core hours
+      }
+    }
+  }
+
+  // Night Shift Change Handler
+  onNightShiftChange(): void {
+    if (this.shiftForm.isNightShift && this.shiftForm.shiftType === ShiftType.HoursOnly) {
+      // Business Rule 3: Night Shift not works with Hours Only
+      this.shiftForm.isNightShift = false;
     }
   }
 
@@ -262,7 +284,7 @@ export class CreateShiftComponent implements OnInit {
     }
 
     // Weekly hours validation
-    if (this.shiftForm.requiredWeeklyHours !== undefined) {
+    if (this.shiftForm.requiredWeeklyHours !== undefined && this.shiftForm.requiredWeeklyHours !== null) {
       if (this.shiftForm.requiredWeeklyHours <= 0) {
         errors.push(this.t('shifts.validation.weeklyHours.positive'));
       }
@@ -270,11 +292,21 @@ export class CreateShiftComponent implements OnInit {
       if (this.shiftForm.requiredWeeklyHours > 168) {
         errors.push(this.t('shifts.validation.weeklyHours.maxWeekly'));
       }
+
+      // Business Rule 2: Core Hours is mandatory with Weekly Hours
+      if (!this.shiftForm.hasCoreHours) {
+        errors.push(this.t('shifts.validation.weeklyHours.coreHoursRequired'));
+      }
     }
 
-    // Grace period and flexible hours conflict validation
+    // Business Rule 1: Grace Period should be disabled and empty when Allow Flexible Hours is selected
     if (this.shiftForm.allowFlexibleHours && this.shiftForm.gracePeriodMinutes && this.shiftForm.gracePeriodMinutes > 0) {
       errors.push(this.t('shifts.validation.flexible.noGracePeriod'));
+    }
+
+    // Business Rule 3: Night Shift not works with Hours Only
+    if (this.shiftForm.isNightShift && this.shiftForm.shiftType === ShiftType.HoursOnly) {
+      errors.push(this.t('shifts.validation.nightShift.notWithHoursOnly'));
     }
 
     // Existing business rules

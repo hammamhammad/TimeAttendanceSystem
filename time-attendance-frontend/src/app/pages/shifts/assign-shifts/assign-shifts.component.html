@@ -104,19 +104,24 @@
   <div class="card">
     <div class="card-body">
       <!-- Loading State -->
-      <div *ngIf="loading()" class="text-center py-4">
+      @if (loading()) {
+      <div class="text-center py-4">
         <div class="spinner-border text-primary" role="status">
           <span class="visually-hidden">{{ i18n.t('common.loading') }}</span>
         </div>
       </div>
+      }
 
       <!-- Error State -->
-      <div *ngIf="error()" class="alert alert-danger">
+      @if (error()) {
+      <div class="alert alert-danger">
         {{ error() }}
       </div>
+      }
 
       <!-- Table -->
-      <div *ngIf="!loading() && !error()" class="table-responsive">
+      @if (!loading() && !error()) {
+      <div class="table-responsive">
         <table class="table table-hover">
           <thead>
             <tr>
@@ -127,11 +132,14 @@
               <th>{{ i18n.t('shifts.assignments.endDate') }}</th>
               <th>{{ i18n.t('common.status') }}</th>
               <th>{{ i18n.t('shifts.assignments.priority') }}</th>
-              <th *appHasPermission="PERMISSIONS.SHIFT_ASSIGNMENT_MANAGE">{{ i18n.t('common.actions') }}</th>
+              @if (PERMISSIONS.SHIFT_ASSIGNMENT_MANAGE) {
+              <th>{{ i18n.t('common.actions') }}</th>
+              }
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let assignment of assignments()" [class.table-success]="isCurrentlyActive(assignment)">
+            @for (assignment of assignments(); track assignment.id) {
+            <tr [class.table-success]="isCurrentlyActive(assignment)">
               <td>
                 <div>
                   <strong>{{ assignment.shiftName }}</strong>
@@ -144,18 +152,26 @@
               <td>
                 <div>
                   <strong>{{ assignment.targetDisplayName }}</strong>
-                  <small *ngIf="assignment.employeeNumber" class="text-muted d-block">
+                  @if (assignment.employeeNumber) {
+                  <small class="text-muted d-block">
                     {{ i18n.t('employees.employeeNumber') }}: {{ assignment.employeeNumber }}
                   </small>
-                  <small *ngIf="assignment.branchCode" class="text-muted d-block">
+                  }
+                  @if (assignment.branchCode) {
+                  <small class="text-muted d-block">
                     {{ i18n.t('branches.code') }}: {{ assignment.branchCode }}
                   </small>
+                  }
                 </div>
               </td>
               <td>{{ formatDate(assignment.effectiveDate) }}</td>
               <td>
-                <span *ngIf="assignment.endDate">{{ formatDate(assignment.endDate) }}</span>
-                <span *ngIf="!assignment.endDate" class="text-muted">{{ i18n.t('common.indefinite') }}</span>
+                @if (assignment.endDate) {
+                <span>{{ formatDate(assignment.endDate) }}</span>
+                }
+                @if (!assignment.endDate) {
+                <span class="text-muted">{{ i18n.t('common.indefinite') }}</span>
+                }
               </td>
               <td>
                 <span class="badge" [ngClass]="getStatusBadgeClass(assignment.status)">
@@ -163,9 +179,10 @@
                 </span>
               </td>
               <td>
-                <span class="badge bg-secondary">{{ assignment.priority }}</span>
+                <span class="badge bg-info">{{ assignment.priority }}</span>
               </td>
-              <td *appHasPermission="PERMISSIONS.SHIFT_ASSIGNMENT_MANAGE">
+              @if (PERMISSIONS.SHIFT_ASSIGNMENT_MANAGE) {
+              <td>
                 <div class="btn-group btn-group-sm">
                   <button
                     type="button"
@@ -183,18 +200,24 @@
                   </button>
                 </div>
               </td>
+              }
             </tr>
-            <tr *ngIf="assignments().length === 0">
+            }
+            @if (assignments().length === 0) {
+            <tr>
               <td [attr.colspan]="8" class="text-center py-4 text-muted">
                 {{ i18n.t('shifts.assignments.noAssignments') }}
               </td>
             </tr>
+            }
           </tbody>
         </table>
       </div>
+      }
 
       <!-- Pagination -->
-      <nav *ngIf="totalPages() > 1" class="mt-4">
+      @if (totalPages() > 1) {
+      <nav class="mt-4">
         <div class="d-flex justify-content-between align-items-center">
           <div>
             <span class="text-muted">
@@ -213,12 +236,12 @@
                 {{ i18n.t('common.previous') }}
               </a>
             </li>
-            <li
-              *ngFor="let page of [].constructor(totalPages()); let i = index"
-              class="page-item"
-              [class.active]="currentPage() === i + 1">
+            @for (page of [].constructor(totalPages()); track i; let i = $index) {
+            <li class="page-item"
+                [class.active]="currentPage() === i + 1">
               <a class="page-link" (click)="onPageChanged(i + 1)">{{ i + 1 }}</a>
             </li>
+            }
             <li class="page-item" [class.disabled]="currentPage() === totalPages()">
               <a class="page-link" (click)="onPageChanged(currentPage() + 1)">
                 {{ i18n.t('common.next') }}
@@ -227,6 +250,7 @@
           </ul>
         </div>
       </nav>
+      }
     </div>
   </div>
 </div>
@@ -270,7 +294,8 @@
             </div>
 
             <!-- Employee Selection (if Employee type) -->
-            <div *ngIf="createForm().assignmentType === ShiftAssignmentType.Employee" class="col-md-6">
+            @if (createForm().assignmentType === ShiftAssignmentType.Employee) {
+            <div class="col-md-6">
               <label class="form-label">{{ i18n.t('employees.employee') }} <span class="text-danger">*</span></label>
               <app-searchable-select
                 [options]="employeeSelectOptions"
@@ -282,9 +307,11 @@
                 [clearable]="false"
               ></app-searchable-select>
             </div>
+            }
 
             <!-- Department Selection (if Department type) -->
-            <div *ngIf="createForm().assignmentType === ShiftAssignmentType.Department" class="col-md-6">
+            @if (createForm().assignmentType === ShiftAssignmentType.Department) {
+            <div class="col-md-6">
               <label class="form-label">{{ i18n.t('departments.department') }} <span class="text-danger">*</span></label>
               <app-searchable-select
                 [options]="departmentSelectOptions"
@@ -296,9 +323,11 @@
                 [clearable]="false"
               ></app-searchable-select>
             </div>
+            }
 
             <!-- Branch Selection (if Branch type) -->
-            <div *ngIf="createForm().assignmentType === ShiftAssignmentType.Branch" class="col-md-6">
+            @if (createForm().assignmentType === ShiftAssignmentType.Branch) {
+            <div class="col-md-6">
               <label class="form-label">{{ i18n.t('branches.branch') }} <span class="text-danger">*</span></label>
               <app-searchable-select
                 [options]="branchSelectOptions"
@@ -310,6 +339,7 @@
                 [clearable]="false"
               ></app-searchable-select>
             </div>
+            }
 
             <!-- Effective Date -->
             <div class="col-md-6">
@@ -395,4 +425,6 @@
 </div>
 
 <!-- Modal Backdrop -->
-<div *ngIf="showCreateModal() || showEditModal()" class="modal-backdrop fade show"></div>
+@if (showCreateModal() || showEditModal()) {
+<div class="modal-backdrop fade show"></div>
+}

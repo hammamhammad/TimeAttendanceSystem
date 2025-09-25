@@ -47,11 +47,14 @@ export class CreateEmployeeComponent implements OnInit {
   
   // Enum arrays for templates
   employmentStatusValues = [
+    EmploymentStatus.Active,
     EmploymentStatus.FullTime,
     EmploymentStatus.PartTime,
     EmploymentStatus.Contract,
     EmploymentStatus.Intern,
-    EmploymentStatus.Consultant
+    EmploymentStatus.Consultant,
+    EmploymentStatus.Terminated,
+    EmploymentStatus.Inactive
   ];
   
   genderValues = [Gender.Male, Gender.Female];
@@ -322,6 +325,7 @@ export class CreateEmployeeComponent implements OnInit {
     this.createForm.patchValue({ branchId: branchId || '' });
     this.onBranchChange(branchId);
   }
+
 
   onDepartmentSelectionChange(departmentIdStr: string) {
     const departmentId = departmentIdStr ? parseInt(departmentIdStr) : 0;

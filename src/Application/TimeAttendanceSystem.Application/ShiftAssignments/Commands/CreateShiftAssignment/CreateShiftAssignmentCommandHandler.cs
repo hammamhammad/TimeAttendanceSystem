@@ -68,6 +68,13 @@ public class CreateShiftAssignmentCommandHandler : BaseHandler<CreateShiftAssign
             return Result.Failure<long>(targetValidationResult.Error);
         }
 
+        // Validate effective date - must be greater than today's date
+        var dateValidationResult = ValidateEffectiveDate(request);
+        if (dateValidationResult.IsFailure)
+        {
+            return Result.Failure<long>(dateValidationResult.Error);
+        }
+
         // Create the assignment, ensuring only the correct ID is set based on assignment type
         var assignment = new ShiftAssignment
         {
@@ -76,8 +83,8 @@ public class CreateShiftAssignmentCommandHandler : BaseHandler<CreateShiftAssign
             EmployeeId = request.AssignmentType == ShiftAssignmentType.Employee ? request.EmployeeId : null,
             DepartmentId = request.AssignmentType == ShiftAssignmentType.Department ? request.DepartmentId : null,
             BranchId = request.AssignmentType == ShiftAssignmentType.Branch ? request.BranchId : null,
-            EffectiveDate = request.EffectiveDate,
-            EndDate = request.EndDate,
+            EffectiveFromDate = request.EffectiveDate,
+            EffectiveToDate = request.EndDate,
             Status = request.Status,
             Priority = request.Priority,
             Notes = request.Notes,
@@ -122,8 +129,8 @@ public class CreateShiftAssignmentCommandHandler : BaseHandler<CreateShiftAssign
                     ShiftAssignmentType.Branch => request.BranchId,
                     _ => null
                 },
-                EffectiveDate = request.EffectiveDate,
-                EndDate = request.EndDate,
+                EffectiveFromDate = request.EffectiveDate,
+                EffectiveToDate = request.EndDate,
                 Status = request.Status.ToString(),
                 Priority = request.Priority,
                 AssignedBy = CurrentUser.Username
@@ -193,6 +200,29 @@ public class CreateShiftAssignmentCommandHandler : BaseHandler<CreateShiftAssign
     }
 
     /// <summary>
+    /// Validates that the effective date is in the future (greater than today's date).
+    /// This ensures shift assignments are planned in advance and prevents backdating.
+    /// </summary>
+    private Result ValidateEffectiveDate(CreateShiftAssignmentCommand request)
+    {
+        var today = DateTime.Today;
+        var effectiveDate = request.EffectiveDate.Date;
+
+        if (effectiveDate <= today)
+        {
+            return Result.Failure("Effective date must be greater than today's date. Shift assignments must be planned in advance.");
+        }
+
+        // If an end date is specified, ensure it's after the effective date
+        if (request.EndDate.HasValue && request.EndDate.Value.Date <= effectiveDate)
+        {
+            return Result.Failure("End date must be after the effective date.");
+        }
+
+        return Result.Success();
+    }
+
+    /// <summary>
     /// Checks for conflicting assignments that would overlap with the new assignment.
     /// </summary>
     private async Task<Result> CheckForConflicts(ShiftAssignment newAssignment, CancellationToken cancellationToken)
@@ -220,8 +250,8 @@ public class CreateShiftAssignmentCommandHandler : BaseHandler<CreateShiftAssign
 
         // Check for date range overlaps
         query = query.Where(sa => sa.Status == ShiftAssignmentStatus.Active &&
-                                sa.EffectiveDate <= (newAssignment.EndDate ?? DateTime.MaxValue) &&
-                                (sa.EndDate == null || sa.EndDate >= newAssignment.EffectiveDate));
+                                sa.EffectiveFromDate <= (newAssignment.EffectiveToDate ?? DateTime.MaxValue) &&
+                                (sa.EffectiveToDate == null || sa.EffectiveToDate >= newAssignment.EffectiveFromDate));
 
         var conflictingAssignments = await query.ToListAsync(cancellationToken);
 

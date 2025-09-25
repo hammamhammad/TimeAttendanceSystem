@@ -86,7 +86,16 @@
   z-index: 998;
 }
 
-/* RTL Support - positioning handled by global styles now */
+/* RTL Support */
+:root[dir="rtl"] .topbar {
+  left: 0 !important;
+  right: 250px !important;
+}
+
+:root[dir="rtl"] .topbar.sidenav-collapsed {
+  right: 72px !important;
+}
+
 :root[dir="rtl"] .topbar-center {
   text-align: center; /* Keep center aligned */
 }
@@ -114,13 +123,13 @@
 /* Mobile responsiveness */
 @media (max-width: 767.98px) {
   .topbar {
-    left: 0;
-    right: 0;
+    left: 0 !important;
+    right: 0 !important;
   }
-  
+
   :root[dir="rtl"] .topbar {
-    left: 0;
-    right: 0;
+    left: 0 !important;
+    right: 0 !important;
   }
   
   .topbar-left {

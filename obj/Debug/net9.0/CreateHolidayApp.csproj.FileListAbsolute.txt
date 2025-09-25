@@ -1,0 +1,9 @@
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\CreateHolidayApp.csproj.AssemblyReference.cache
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\CreateHolidayApp.src.Shared.TimeAttendanceSystem.Shared.Localization.Resources.ValidationMessages.resources
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\CreateHolidayApp.src.Shared.TimeAttendanceSystem.Shared.Localization.Resources.ValidationMessages.ar.resources
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\CreateHolidayApp.csproj.GenerateResource.cache
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\CreateHolidayApp.GeneratedMSBuildEditorConfig.editorconfig
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\CreateHolidayApp.AssemblyInfoInputs.cache
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\CreateHolidayApp.AssemblyInfo.cs
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\CreateHolidayApp.csproj.CoreCompileInputs.cache
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\CreateHolidayApp.sourcelink.json

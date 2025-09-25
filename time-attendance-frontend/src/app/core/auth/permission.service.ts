@@ -116,4 +116,264 @@ export class PermissionService {
       'shift.import'
     ]);
   }
+
+
+  // ==== POLICY-BASED AUTHORIZATION METHODS (Mirroring Backend Policies) ====
+
+  // Employee Management Policies
+  canReadEmployees(): boolean {
+    return this.isSystemAdmin() ||
+           this.isAdmin() ||
+           this.isManager() ||
+           this.has('employee.read');
+  }
+
+  canManageEmployeesPolicy(): boolean {
+    return this.isSystemAdmin() ||
+           this.isAdmin() ||
+           this.hasAny([
+             'employee.create',
+             'employee.update',
+             'employee.delete',
+             'employee.manage'
+           ]);
+  }
+
+  canAssignEmployeeShifts(): boolean {
+    return this.isSystemAdmin() ||
+           this.isAdmin() ||
+           this.isManager() ||
+           this.has('employee.assign');
+  }
+
+  // User Management Policies
+  canReadUsers(): boolean {
+    return this.isSystemAdmin() ||
+           this.isAdmin() ||
+           this.has('user.read');
+  }
+
+  canManageUsersPolicy(): boolean {
+    return this.isSystemAdmin() ||
+           this.isAdmin() ||
+           this.hasAny([
+             'user.create',
+             'user.update',
+             'user.delete',
+             'user.manage'
+           ]);
+  }
+
+  canAssignUserRoles(): boolean {
+    return this.isSystemAdmin() ||
+           this.isAdmin() ||
+           this.hasAny([
+             'user.assignRole',
+             'user.removeRole'
+           ]);
+  }
+
+  canManageUserSessions(): boolean {
+    return this.isSystemAdmin() ||
+           this.isAdmin() ||
+           this.has('user.session.manage');
+  }
+
+  // Shift Management Policies
+  canReadShifts(): boolean {
+    return this.isSystemAdmin() ||
+           this.isAdmin() ||
+           this.isManager() ||
+           this.has('shift.read');
+  }
+
+  canManageShiftsPolicy(): boolean {
+    return this.isSystemAdmin() ||
+           this.isAdmin() ||
+           this.hasAny([
+             'shift.create',
+             'shift.update',
+             'shift.delete',
+             'shift.manage'
+           ]);
+  }
+
+  // Branch Management Policies
+  canReadBranches(): boolean {
+    return this.isSystemAdmin() ||
+           this.isAdmin() ||
+           this.isManager() ||
+           this.has('branch.read');
+  }
+
+  canManageBranches(): boolean {
+    return this.isSystemAdmin() ||
+           this.isAdmin() ||
+           this.hasAny([
+             'branch.create',
+             'branch.update',
+             'branch.delete',
+             'branch.manage'
+           ]);
+  }
+
+  // Department Management Policies
+  canReadDepartments(): boolean {
+    return this.isSystemAdmin() ||
+           this.isAdmin() ||
+           this.isManager() ||
+           this.has('department.read');
+  }
+
+  canManageDepartments(): boolean {
+    return this.isSystemAdmin() ||
+           this.isAdmin() ||
+           this.hasAny([
+             'department.create',
+             'department.update',
+             'department.delete',
+             'department.manage'
+           ]);
+  }
+
+  // Role and Permission Management Policies
+  canReadRoles(): boolean {
+    return this.isSystemAdmin() ||
+           this.isAdmin() ||
+           this.has('role.read');
+  }
+
+  canManageRolesPolicy(): boolean {
+    return this.isSystemAdmin() ||
+           this.isAdmin() ||
+           this.hasAny([
+             'role.create',
+             'role.update',
+             'role.delete',
+             'role.manage'
+           ]);
+  }
+
+  canManagePermissions(): boolean {
+    return this.isSystemAdmin() ||
+           this.isAdmin() ||
+           this.hasAny([
+             'permission.assign',
+             'permission.remove',
+             'permission.manage'
+           ]);
+  }
+
+  // Attendance Management Policies
+  canReadAttendance(): boolean {
+    return this.isSystemAdmin() ||
+           this.isAdmin() ||
+           this.isManager() ||
+           this.has('attendance.read');
+  }
+
+  canManageAttendance(): boolean {
+    return this.isSystemAdmin() ||
+           this.isAdmin() ||
+           this.hasAny([
+             'attendance.create',
+             'attendance.update',
+             'attendance.delete',
+             'attendance.manage'
+           ]);
+  }
+
+  // Settings Management Policies
+  canReadSettings(): boolean {
+    return this.isSystemAdmin() ||
+           this.isAdmin() ||
+           this.has('settings.read');
+  }
+
+  canManageSettings(): boolean {
+    return this.isSystemAdmin() ||
+           this.isAdmin() ||
+           this.hasAny([
+             'settings.create',
+             'settings.update',
+             'settings.delete',
+             'settings.manage'
+           ]);
+  }
+
+  // Report Access Policies
+  canAccessReports(): boolean {
+    return this.isSystemAdmin() ||
+           this.isAdmin() ||
+           this.isManager() ||
+           this.hasAny([
+             'report.read',
+             'report.view',
+             'report.access'
+           ]);
+  }
+
+  // Security and Audit Policies
+  canAccessSecurityAudit(): boolean {
+    return this.isSystemAdmin() ||
+           this.isAdmin() ||
+           this.hasAny([
+             'audit.read',
+             'audit.view',
+             'security.audit'
+           ]);
+  }
+
+  canSystemAdministration(): boolean {
+    return this.isSystemAdmin() ||
+           this.hasAny([
+             'system.admin',
+             'system.configure',
+             'system.manage'
+           ]);
+  }
+
+  // Public Holidays Management Policies
+  canReadPublicHolidays(): boolean {
+    return this.isSystemAdmin() ||
+           this.isAdmin() ||
+           this.has('publicHoliday.read');
+  }
+
+  canManagePublicHolidays(): boolean {
+    return this.isSystemAdmin() ||
+           this.isAdmin() ||
+           this.hasAny([
+             'publicHoliday.create',
+             'publicHoliday.update',
+             'publicHoliday.delete',
+             'publicHoliday.manage'
+           ]);
+  }
+
+  canExportPublicHolidays(): boolean {
+    return this.isSystemAdmin() ||
+           this.isAdmin() ||
+           this.has('publicHoliday.export');
+  }
+
+  canImportPublicHolidays(): boolean {
+    return this.isSystemAdmin() ||
+           this.isAdmin() ||
+           this.has('publicHoliday.import');
+  }
+
+
+  // Role-based Helper Methods
+  private isSystemAdmin(): boolean {
+    return this.hasRole('SystemAdmin');
+  }
+
+  private isManager(): boolean {
+    return this.hasRole('Manager');
+  }
+
+  private isEmployee(): boolean {
+    return this.hasRole('Employee');
+  }
 }

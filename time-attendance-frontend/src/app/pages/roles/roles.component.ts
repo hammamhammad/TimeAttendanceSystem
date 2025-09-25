@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -10,11 +10,12 @@ import { NotificationService } from '../../core/notifications/notification.servi
 import { ConfirmationService } from '../../core/confirmation/confirmation.service';
 import { PermissionService } from '../../core/auth/permission.service';
 import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
+import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table.component';
 
 @Component({
   selector: 'app-roles',
   standalone: true,
-  imports: [CommonModule, FormsModule, HasPermissionDirective],
+  imports: [CommonModule, FormsModule, HasPermissionDirective, DataTableComponent],
   templateUrl: './roles.component.html',
   styleUrls: ['./roles.component.css']
 })
@@ -53,7 +54,102 @@ export class RolesComponent implements OnInit {
   showPermissionsModal = signal(false);
   selectedRole = signal<Role | null>(null);
   managingPermissions = signal(false);
-  
+
+  // Data table configuration
+  tableColumns = computed<TableColumn[]>(() => [
+    {
+      key: 'name',
+      label: this.t('roles.name'),
+      sortable: true,
+      width: '200px',
+      priority: 'high',
+      mobileLabel: this.t('roles.name'),
+      renderHtml: true
+    },
+    {
+      key: 'permissions',
+      label: this.t('roles.permissions'),
+      sortable: false,
+      width: '300px',
+      priority: 'medium',
+      hideOnMobile: false,
+      mobileLabel: this.t('roles.permissions'),
+      renderHtml: true
+    },
+    {
+      key: 'userCount',
+      label: this.t('roles.users'),
+      sortable: true,
+      width: '100px',
+      align: 'center',
+      priority: 'medium',
+      mobileLabel: this.t('roles.users'),
+      renderHtml: true
+    },
+    {
+      key: 'type',
+      label: this.t('roles.type'),
+      sortable: false,
+      width: '120px',
+      align: 'center',
+      priority: 'low',
+      hideOnMobile: true,
+      mobileLabel: this.t('roles.type'),
+      renderHtml: true
+    },
+    {
+      key: 'createdAtUtc',
+      label: this.t('common.created'),
+      sortable: true,
+      width: '150px',
+      priority: 'low',
+      hideOnMobile: true,
+      mobileLabel: this.t('common.created')
+    }
+  ]);
+
+  tableActions = computed<TableAction[]>(() => [
+    {
+      key: 'view',
+      label: this.t('common.view'),
+      icon: 'fa-eye',
+      color: 'primary',
+      condition: () => this.permissionService.has(this.PERMISSIONS.ROLE_READ)
+    },
+    {
+      key: 'manage-permissions',
+      label: this.t('roles.manage_permissions'),
+      icon: 'fa-shield-alt',
+      color: 'info',
+      condition: (role: Role) => this.canManagePermissions(role) && this.permissionService.has(this.PERMISSIONS.ROLE_ASSIGN_PERMISSIONS)
+    },
+    {
+      key: 'edit',
+      label: this.t('common.edit'),
+      icon: 'fa-edit',
+      color: 'secondary',
+      condition: (role: Role) => this.canEditRole(role) && this.permissionService.has(this.PERMISSIONS.ROLE_UPDATE)
+    },
+    {
+      key: 'delete',
+      label: this.t('common.delete'),
+      icon: 'fa-trash',
+      color: 'danger',
+      condition: (role: Role) => this.canDeleteRole(role) && this.permissionService.has(this.PERMISSIONS.ROLE_DELETE)
+    }
+  ]);
+
+  // Transform roles data for data table
+  tableData = computed(() => {
+    return this.filteredRoles().map(role => ({
+      ...role,
+      name: this.formatRoleName(role),
+      permissions: this.formatRolePermissions(role),
+      userCount: this.formatUserCount(role),
+      type: this.formatRoleType(role),
+      createdAtUtc: this.formatDate(role.createdAtUtc)
+    }));
+  });
 
   ngOnInit(): void {
     this.loadRoles();
@@ -112,44 +208,6 @@ export class RolesComponent implements OnInit {
     });
   }
 
-  filteredRoles() {
-    let filtered = this.roles();
-
-    if (this.searchTerm) {
-      const search = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(role =>
-        role.name.toLowerCase().includes(search)
-      );
-    }
-
-    // Apply sorting
-    const column = this.sortColumn();
-    const direction = this.sortDirection();
-
-    filtered.sort((a, b) => {
-      let aVal = a[column];
-      let bVal = b[column];
-
-      // Handle null/undefined values
-      if (aVal == null && bVal == null) return 0;
-      if (aVal == null) return direction === 'asc' ? 1 : -1;
-      if (bVal == null) return direction === 'asc' ? -1 : 1;
-
-      // Convert to comparable values
-      if (typeof aVal === 'string' && typeof bVal === 'string') {
-        aVal = aVal.toLowerCase();
-        bVal = bVal.toLowerCase();
-      }
-
-      let comparison = 0;
-      if (aVal < bVal) comparison = -1;
-      else if (aVal > bVal) comparison = 1;
-
-      return direction === 'asc' ? comparison : -comparison;
-    });
-
-    return filtered;
-  }
 
   canEditRole(role: Role): boolean {
     // First check if user has permission to update roles
@@ -167,18 +225,10 @@ export class RolesComponent implements OnInit {
       return false;
     }
 
-    // Explicitly protect Systemadmin and admin roles
-    const protectedRoles = ['systemadmin', 'admin'];
-    const isProtectedRole = protectedRoles.includes(role.name.toLowerCase());
-    
-    // Allow deletion if not a protected role, not a system role, and has no users assigned
-    return !role.isSystem && !isProtectedRole && role.userCount === 0;
+    // Use the role's isDeletable property and check user count
+    return role.isDeletable && role.userCount === 0;
   }
 
-  isProtectedRole(role: Role): boolean {
-    const protectedRoles = ['systemadmin', 'admin'];
-    return protectedRoles.includes(role.name.toLowerCase()) || role.isSystem;
-  }
 
   canManagePermissions(role: Role): boolean {
     // First check if user has permission to assign permissions
@@ -191,12 +241,7 @@ export class RolesComponent implements OnInit {
   }
 
   private canEditRoleBusinessLogic(role: Role): boolean {
-    // Explicitly protect Systemadmin and admin roles
-    const protectedRoles = ['systemadmin', 'admin'];
-    const isProtectedRole = protectedRoles.includes(role.name.toLowerCase());
-    
-    // Allow editing if not a protected role and not a system role
-    return !role.isSystem && !isProtectedRole;
+    return role.isEditable;
   }
 
   onManagePermissions(role: Role): void {
@@ -266,6 +311,101 @@ export class RolesComponent implements OnInit {
       month: 'short',
       day: 'numeric'
     });
+  }
+
+  // Filtered roles computed signal
+  filteredRoles = computed(() => {
+    let filtered = this.roles();
+
+    if (this.searchTerm?.trim()) {
+      const searchLower = this.searchTerm.toLowerCase();
+      filtered = filtered.filter(role =>
+        role.name.toLowerCase().includes(searchLower) ||
+        role.permissions.some(p => p.key.toLowerCase().includes(searchLower))
+      );
+    }
+
+    // Apply sorting
+    const sortCol = this.sortColumn();
+    const sortDir = this.sortDirection();
+
+    return filtered.sort((a, b) => {
+      let aVal = a[sortCol] as any;
+      let bVal = b[sortCol] as any;
+
+      if (typeof aVal === 'string') {
+        aVal = aVal.toLowerCase();
+        bVal = bVal.toLowerCase();
+      }
+
+      if (aVal < bVal) return sortDir === 'asc' ? -1 : 1;
+      if (aVal > bVal) return sortDir === 'asc' ? 1 : -1;
+      return 0;
+    });
+  });
+
+  // Data table formatting methods
+  formatRoleName(role: Role): string {
+    let html = `<div><strong>${role.name}</strong>`;
+    if (role.isSystem) {
+      html += `<i class="fa-solid fa-shield-alt text-primary ms-1" title="${this.t('roles.system_role')}"></i>`;
+    }
+    html += '</div>';
+    return html;
+  }
+
+  formatRolePermissions(role: Role): string {
+    if (role.permissions.length === 0) {
+      return `<span class="text-muted">${this.t('roles.no_permissions')}</span>`;
+    }
+
+    let html = '<div class="d-flex flex-wrap gap-1">';
+    const visiblePermissions = role.permissions.slice(0, 3);
+
+    visiblePermissions.forEach(permission => {
+      html += `<span class="badge bg-secondary-subtle text-secondary small">${permission.key}</span>`;
+    });
+
+    if (role.permissions.length > 3) {
+      html += `<span class="badge bg-light text-dark small">+${role.permissions.length - 3} more</span>`;
+    }
+
+    html += '</div>';
+    return html;
+  }
+
+  formatUserCount(role: Role): string {
+    return `<span class="badge bg-primary-subtle text-primary">${role.userCount}</span>`;
+  }
+
+  formatRoleType(role: Role): string {
+    if (role.isSystem) {
+      return `<span class="badge bg-warning-subtle text-warning">${this.t('roles.system')}</span>`;
+    } else {
+      return `<span class="badge bg-success-subtle text-success">${this.t('roles.custom')}</span>`;
+    }
+  }
+
+  // Data table action handler
+  onActionClick(event: {action: string, item: Role}): void {
+    const { action, item } = event;
+
+    switch (action) {
+      case 'view':
+        this.onViewRole(item);
+        break;
+      case 'manage-permissions':
+        this.onManagePermissions(item);
+        break;
+      case 'edit':
+        this.onEditRole(item);
+        break;
+      case 'delete':
+        this.onDeleteRole(item);
+        break;
+      default:
+        console.warn('Unknown action:', action);
+    }
   }
 
   onSearchChange(): void {

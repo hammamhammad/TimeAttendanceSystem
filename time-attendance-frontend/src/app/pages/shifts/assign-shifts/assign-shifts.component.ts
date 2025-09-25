@@ -246,10 +246,14 @@ export class AssignShiftsComponent implements OnInit {
 
   // Create assignment methods
   openCreateModal(): void {
+    // Set effective date to tomorrow (today + 1 day) to meet the validation requirement
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
     this.createForm.set({
       shiftId: 0,
       assignmentType: ShiftAssignmentType.Employee,
-      effectiveDate: new Date().toISOString().split('T')[0],
+      effectiveDate: tomorrow.toISOString().split('T')[0],
       status: ShiftAssignmentStatus.Active,
       priority: 10
     });
@@ -280,7 +284,20 @@ export class AssignShiftsComponent implements OnInit {
     const form = this.createForm();
     return form.shiftId > 0 &&
            form.effectiveDate !== '' &&
+           this.isEffectiveDateValid(form.effectiveDate) &&
            this.isTargetValid(form.assignmentType, form.employeeId, form.departmentId, form.branchId);
+  }
+
+  private isEffectiveDateValid(effectiveDate: string): boolean {
+    if (!effectiveDate) return false;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const selectedDate = new Date(effectiveDate);
+    selectedDate.setHours(0, 0, 0, 0);
+
+    return selectedDate > today;
   }
 
   private isTargetValid(type: ShiftAssignmentType, empId?: number, deptId?: number, branchId?: number): boolean {

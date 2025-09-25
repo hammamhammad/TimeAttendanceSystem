@@ -73,18 +73,24 @@ public class CreateShiftCommandValidator : AbstractValidator<CreateShiftCommand>
             .WithMessage("Flex minutes after cannot exceed 8 hours (480 minutes)")
             .When(x => x.AllowFlexibleHours && x.FlexMinutesAfter.HasValue);
 
-        // Grace period validation: Only valid for time-based shifts, can be combined with flexible hours
+        // Grace period validation: Only valid for time-based shifts, cannot be combined with flexible hours
         RuleFor(x => x.GracePeriodMinutes)
             .Null()
             .WithMessage("Grace period is not valid for hours-only shifts")
             .When(x => x.ShiftType == ShiftType.HoursOnly);
+
+        // Business Rule: Grace Period should be disabled and empty when Allow Flexible Hours is selected
+        RuleFor(x => x.GracePeriodMinutes)
+            .Null()
+            .WithMessage("Grace period must be disabled when flexible hours are allowed")
+            .When(x => x.AllowFlexibleHours);
 
         RuleFor(x => x.GracePeriodMinutes)
             .GreaterThan(0)
             .WithMessage("Grace period must be greater than 0")
             .LessThanOrEqualTo(120)
             .WithMessage("Grace period cannot exceed 2 hours (120 minutes)")
-            .When(x => x.ShiftType == ShiftType.TimeBased && x.GracePeriodMinutes.HasValue);
+            .When(x => x.ShiftType == ShiftType.TimeBased && !x.AllowFlexibleHours && x.GracePeriodMinutes.HasValue);
 
         // Shift periods validation
         RuleFor(x => x.ShiftPeriods)
@@ -111,6 +117,37 @@ public class CreateShiftCommandValidator : AbstractValidator<CreateShiftCommand>
         RuleFor(x => new { x.IsCheckInRequired, x.IsAutoCheckOut })
             .Must(x => x.IsCheckInRequired || x.IsAutoCheckOut)
             .WithMessage("Either check-in must be required or auto check-out must be enabled");
+
+        // Business Rule: Core Hours is mandatory with Weekly Hours
+        RuleFor(x => x.HasCoreHours)
+            .Equal(true)
+            .WithMessage("Core hours must be enabled when weekly hours are specified")
+            .When(x => x.RequiredWeeklyHours.HasValue);
+
+        // Core hours validation
+        RuleFor(x => x.CoreStart)
+            .NotNull()
+            .WithMessage("Core start time is required when core hours are enabled")
+            .When(x => x.HasCoreHours);
+
+        RuleFor(x => x.CoreEnd)
+            .NotNull()
+            .WithMessage("Core end time is required when core hours are enabled")
+            .When(x => x.HasCoreHours);
+
+        // Business Rule: Night Shift not works with Hours Only
+        RuleFor(x => x.IsNightShift)
+            .Equal(false)
+            .WithMessage("Night shift is not compatible with hours-only shift type")
+            .When(x => x.ShiftType == ShiftType.HoursOnly);
+
+        // Weekly hours validation
+        RuleFor(x => x.RequiredWeeklyHours)
+            .GreaterThan(0)
+            .WithMessage("Required weekly hours must be greater than 0")
+            .LessThanOrEqualTo(168)
+            .WithMessage("Required weekly hours cannot exceed 168 hours per week")
+            .When(x => x.RequiredWeeklyHours.HasValue);
     }
 }
 

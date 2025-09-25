@@ -17,7 +17,8 @@ public static class PermissionResources
     public const string Audit = "audit";
     public const string Notification = "notification";
     public const string System = "system";
-    
+    public const string PublicHoliday = "publicHoliday";
+
     public static readonly Dictionary<string, string> ResourceDescriptions = new()
     {
         { User, "User accounts and profiles" },
@@ -34,7 +35,8 @@ public static class PermissionResources
         { Permission, "Permission management" },
         { Audit, "Audit logs and security tracking" },
         { Notification, "System notifications and alerts" },
-        { System, "Core system functions" }
+        { System, "Core system functions" },
+        { PublicHoliday, "Public holidays and calendar management" },
     };
     
     public static readonly Dictionary<string, string> ResourceIcons = new()
@@ -53,7 +55,8 @@ public static class PermissionResources
         { Permission, "fa-key" },
         { Audit, "fa-history" },
         { Notification, "fa-bell" },
-        { System, "fa-server" }
+        { System, "fa-server" },
+        { PublicHoliday, "fa-calendar-check" },
     };
     
     public static string GetResourceDescription(string resource)

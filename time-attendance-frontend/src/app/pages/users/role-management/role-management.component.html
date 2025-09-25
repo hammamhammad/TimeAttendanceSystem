@@ -98,10 +98,12 @@
           </div>
 
           <!-- No Permission Message -->
-          <div class="alert alert-warning mt-3" role="alert" *ngIf="!permissionService.has(PERMISSIONS.USER_ASSIGN_ROLE)">
-            <i class="fa-solid fa-lock me-2"></i>
-            <small>{{ t('users.no_role_assignment_permission') }}</small>
-          </div>
+          @if (!permissionService.has(PERMISSIONS.USER_ASSIGN_ROLE)) {
+            <div class="alert alert-warning mt-3" role="alert">
+              <i class="fa-solid fa-lock me-2"></i>
+              <small>{{ t('users.no_role_assignment_permission') }}</small>
+            </div>
+          }
         </div>
 
         <div class="modal-footer">

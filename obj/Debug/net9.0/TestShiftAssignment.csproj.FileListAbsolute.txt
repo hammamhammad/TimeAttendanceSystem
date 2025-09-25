@@ -1,0 +1,9 @@
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\TestShiftAssignment.csproj.AssemblyReference.cache
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\TestShiftAssignment.src.Shared.TimeAttendanceSystem.Shared.Localization.Resources.ValidationMessages.resources
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\TestShiftAssignment.src.Shared.TimeAttendanceSystem.Shared.Localization.Resources.ValidationMessages.ar.resources
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\TestShiftAssignment.csproj.GenerateResource.cache
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\TestShiftAssignment.GeneratedMSBuildEditorConfig.editorconfig
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\TestShiftAssignment.AssemblyInfoInputs.cache
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\TestShiftAssignment.AssemblyInfo.cs
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\TestShiftAssignment.csproj.CoreCompileInputs.cache
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\TestShiftAssignment.sourcelink.json

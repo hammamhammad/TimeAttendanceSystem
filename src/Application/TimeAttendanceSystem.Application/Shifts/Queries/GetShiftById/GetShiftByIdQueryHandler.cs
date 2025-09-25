@@ -19,7 +19,7 @@ public class GetShiftByIdQueryHandler : BaseHandler<GetShiftByIdQuery, Result<Sh
     {
         var shift = await Context.Shifts
             .Include(s => s.ShiftPeriods.OrderBy(sp => sp.PeriodOrder))
-            .Where(s => s.Id == request.Id)
+            .Where(s => s.Id == request.Id && !s.IsDeleted)
             .Select(s => new ShiftDto
             {
                 Id = s.Id,
@@ -50,6 +50,7 @@ public class GetShiftByIdQueryHandler : BaseHandler<GetShiftByIdQuery, Result<Sh
                 IsFriday = s.IsFriday,
                 IsSaturday = s.IsSaturday,
                 IsNightShift = s.IsNightShift,
+                IsDefault = s.IsDefault,
 
                 ShiftPeriods = s.ShiftPeriods.Select(sp => new ShiftPeriodDto
                 {

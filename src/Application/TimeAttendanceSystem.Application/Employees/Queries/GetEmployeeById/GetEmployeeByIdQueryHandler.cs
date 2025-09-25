@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using TimeAttendanceSystem.Application.Abstractions;
 using TimeAttendanceSystem.Application.Common;
+using TimeAttendanceSystem.Domain.Common;
+using TimeAttendanceSystem.Domain.Shifts;
 
 namespace TimeAttendanceSystem.Application.Employees.Queries.GetEmployeeById;
 
@@ -41,6 +43,18 @@ public class GetEmployeeByIdQueryHandler : BaseHandler<GetEmployeeByIdQuery, Res
             })
             .ToListAsync(cancellationToken);
 
+        // Get current shift assignment
+        var currentShiftAssignment = await Context.ShiftAssignments
+            .Where(sa => sa.EmployeeId == request.EmployeeId &&
+                        sa.AssignmentType == ShiftAssignmentType.Employee &&
+                        sa.Status == ShiftAssignmentStatus.Active &&
+                        sa.EffectiveFromDate <= DateTime.UtcNow &&
+                        (sa.EffectiveToDate == null || sa.EffectiveToDate >= DateTime.UtcNow))
+            .OrderByDescending(sa => sa.Priority)
+            .ThenByDescending(sa => sa.EffectiveFromDate)
+            .Include(sa => sa.Shift)
+            .FirstOrDefaultAsync(cancellationToken);
+
         var employeeDetail = new EmployeeDetailDto
         {
             Id = employee.Id,
@@ -68,6 +82,8 @@ public class GetEmployeeByIdQueryHandler : BaseHandler<GetEmployeeByIdQuery, Res
             ManagerEmployeeNumber = employee.Manager?.EmployeeNumber,
             WorkLocationType = employee.WorkLocationType,
             PhotoUrl = employee.PhotoUrl,
+            CurrentShiftId = currentShiftAssignment?.ShiftId,
+            CurrentShiftName = currentShiftAssignment?.Shift?.Name,
             IsActive = !employee.IsDeleted,
             CreatedAtUtc = employee.CreatedAtUtc,
             ModifiedAtUtc = employee.ModifiedAtUtc,

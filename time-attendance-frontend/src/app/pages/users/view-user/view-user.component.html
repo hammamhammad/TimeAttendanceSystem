@@ -101,7 +101,7 @@
                     } @else if (user()?.isActive) {
                       <span class="badge bg-success">{{ t('common.active') }}</span>
                     } @else {
-                      <span class="badge bg-secondary">{{ t('common.inactive') }}</span>
+                      <span class="badge bg-light text-dark border">{{ t('common.inactive') }}</span>
                     }
                   </dd>
                   
@@ -113,7 +113,7 @@
                     @if (user()?.twoFactorEnabled) {
                       <span class="badge bg-success">{{ t('common.enabled') }}</span>
                     } @else {
-                      <span class="badge bg-secondary">{{ t('common.disabled') }}</span>
+                      <span class="badge bg-light text-dark border">{{ t('common.disabled') }}</span>
                     }
                   </dd>
                   
@@ -153,7 +153,7 @@
               @if (user()?.branches && (user()?.branches?.length || 0) > 0) {
                 <div class="d-flex flex-wrap gap-1">
                   @for (branch of user()?.branches; track branch) {
-                    <span class="badge bg-secondary">{{ getBranchName(branch) }}</span>
+                    <span class="badge bg-light text-dark border">{{ getBranchName(branch) }}</span>
                   }
                 </div>
               } @else {

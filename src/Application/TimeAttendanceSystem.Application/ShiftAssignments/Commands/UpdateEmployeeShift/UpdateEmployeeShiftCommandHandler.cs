@@ -90,10 +90,10 @@ public class UpdateEmployeeShiftCommandHandler : BaseHandler<UpdateEmployeeShift
             .Where(sa => sa.EmployeeId == request.EmployeeId &&
                         sa.AssignmentType == ShiftAssignmentType.Employee &&
                         sa.Status == ShiftAssignmentStatus.Active &&
-                        sa.EffectiveDate <= DateTime.UtcNow &&
-                        (sa.EndDate == null || sa.EndDate >= DateTime.UtcNow))
+                        sa.EffectiveFromDate <= DateTime.UtcNow &&
+                        (sa.EffectiveToDate == null || sa.EffectiveToDate >= DateTime.UtcNow))
             .OrderByDescending(sa => sa.Priority)
-            .ThenByDescending(sa => sa.EffectiveDate)
+            .ThenByDescending(sa => sa.EffectiveFromDate)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (existingActiveAssignment?.ShiftId == request.NewShiftId)
@@ -111,7 +111,7 @@ public class UpdateEmployeeShiftCommandHandler : BaseHandler<UpdateEmployeeShift
         foreach (var assignment in activeAssignments)
         {
             assignment.Status = ShiftAssignmentStatus.Inactive;
-            assignment.EndDate = effectiveDate.AddDays(-1); // End the day before new assignment starts
+            assignment.EffectiveToDate = effectiveDate.AddDays(-1); // End the day before new assignment starts
             assignment.ModifiedAtUtc = DateTime.UtcNow;
             assignment.ModifiedBy = CurrentUser.Username ?? "SYSTEM";
         }
@@ -124,8 +124,8 @@ public class UpdateEmployeeShiftCommandHandler : BaseHandler<UpdateEmployeeShift
             EmployeeId = request.EmployeeId,
             DepartmentId = null,
             BranchId = null,
-            EffectiveDate = effectiveDate,
-            EndDate = null, // No end date - active until changed
+            EffectiveFromDate = effectiveDate,
+            EffectiveToDate = null, // No end date - active until changed
             Status = ShiftAssignmentStatus.Active,
             Priority = 10, // Standard priority for employee assignments
             Notes = request.Notes ?? "Shift assignment updated via employee management",

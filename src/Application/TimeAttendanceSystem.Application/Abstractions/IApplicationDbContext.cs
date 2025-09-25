@@ -4,6 +4,8 @@ using TimeAttendanceSystem.Domain.Common;
 using TimeAttendanceSystem.Domain.Employees;
 using TimeAttendanceSystem.Domain.Users;
 using TimeAttendanceSystem.Domain.Shifts;
+using TimeAttendanceSystem.Domain.Attendance;
+using TimeAttendanceSystem.Domain.Settings;
 
 namespace TimeAttendanceSystem.Application.Abstractions;
 
@@ -351,6 +353,67 @@ public interface IApplicationDbContext
     /// - Flexible assignment patterns supporting various business needs
     /// </remarks>
     DbSet<ShiftAssignment> ShiftAssignments { get; }
+
+    /// <summary>
+    /// Gets the database set for AttendanceRecord entities representing daily attendance records for employees.
+    /// Aggregates all attendance transactions for a specific date and calculates attendance status.
+    /// </summary>
+    /// <value>DbSet for querying and managing AttendanceRecord entities</value>
+    /// <remarks>
+    /// AttendanceRecord Entity Features:
+    /// - Daily attendance aggregation and status calculation
+    /// - Integration with assigned shifts for rule-based calculations
+    /// - Comprehensive working hours tracking and overtime calculation
+    /// - Break time management and tracking
+    /// - Late arrival and early departure detection
+    /// </remarks>
+    DbSet<AttendanceRecord> AttendanceRecords { get; }
+
+    /// <summary>
+    /// Gets the database set for AttendanceTransaction entities representing individual attendance events.
+    /// Records specific time-stamped events in an employee's daily attendance tracking.
+    /// </summary>
+    /// <value>DbSet for querying and managing AttendanceTransaction entities</value>
+    /// <remarks>
+    /// AttendanceTransaction Entity Features:
+    /// - Precise timestamp recording for all attendance events
+    /// - Support for manual and automatic transaction entry
+    /// - Location and device tracking for compliance and security
+    /// - Comprehensive audit trail with user attribution
+    /// - Integration with attendance calculation engine
+    /// </remarks>
+    DbSet<AttendanceTransaction> AttendanceTransactions { get; }
+
+    /// <summary>
+    /// Gets the database set for WorkingDay entities representing calculated working day analysis.
+    /// Provides comprehensive analysis of an employee's working time including core hours and break periods.
+    /// </summary>
+    /// <value>DbSet for querying and managing WorkingDay entities</value>
+    /// <remarks>
+    /// WorkingDay Entity Features:
+    /// - Detailed time period breakdown and analysis
+    /// - Core hours compliance tracking for flexible shifts
+    /// - Break time analysis and policy compliance
+    /// - Overtime calculations with different rates
+    /// - Working time distribution across periods
+    /// </remarks>
+    DbSet<WorkingDay> WorkingDays { get; }
+
+    /// <summary>
+    /// Gets the database set for PublicHoliday entities representing public holidays that affect overtime calculations.
+    /// Supports both one-time and recurring holidays with flexible configuration patterns.
+    /// </summary>
+    /// <value>DbSet for querying and managing PublicHoliday entities</value>
+    /// <remarks>
+    /// PublicHoliday Entity Features:
+    /// - One-time and recurring holiday patterns (annual, monthly, floating)
+    /// - National and regional holiday support with branch-specific configurations
+    /// - Active/inactive status for scheduling and overtime calculations
+    /// - Complex recurrence patterns including floating holidays
+    /// - Integration with overtime rate calculations and attendance processing
+    /// </remarks>
+    DbSet<PublicHoliday> PublicHolidays { get; }
+
 
     /// <summary>
     /// Asynchronously saves all pending changes to the database.

@@ -26,6 +26,20 @@ public class DeleteShiftCommandHandler : BaseHandler<DeleteShiftCommand, Result>
             return Result.Failure("Shift not found");
         }
 
+        // Check if shift is currently assigned to any active employees
+        var hasActiveAssignments = await Context.ShiftAssignments
+            .Where(sa => sa.ShiftId == request.Id &&
+                         !sa.IsDeleted &&
+                         sa.Status == Domain.Common.ShiftAssignmentStatus.Active &&
+                         sa.EffectiveFromDate <= DateTime.UtcNow &&
+                         (!sa.EffectiveToDate.HasValue || sa.EffectiveToDate >= DateTime.UtcNow))
+            .AnyAsync(cancellationToken);
+
+        if (hasActiveAssignments)
+        {
+            return Result.Failure("Cannot delete shift because it is currently assigned to active employees. Please remove all active assignments before deleting the shift.");
+        }
+
         // Soft delete the shift
         shift.IsDeleted = true;
         shift.ModifiedAtUtc = DateTime.UtcNow;

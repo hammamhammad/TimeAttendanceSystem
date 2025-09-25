@@ -25,7 +25,7 @@
 
 .modal-title {
   font-weight: 600;
-  color: var(--bs-dark);
+  color: var(--bs-primary);
 }
 
 .modal-body {
@@ -147,7 +147,7 @@
 
 h6 {
   font-weight: 600;
-  color: var(--bs-dark);
+  color: var(--bs-primary);
 }
 
 .text-muted {
@@ -165,7 +165,7 @@ h6 {
 
 .bg-warning {
   background-color: var(--bs-warning) !important;
-  color: var(--bs-dark) !important;
+  color: var(--bs-primary) !important;
 }
 
 .bg-info {
@@ -192,7 +192,7 @@ h6 {
 }
 
 .roles-list::-webkit-scrollbar-thumb:hover {
-  background: var(--bs-dark);
+  background: var(--bs-primary);
 }
 
 /* RTL Support */

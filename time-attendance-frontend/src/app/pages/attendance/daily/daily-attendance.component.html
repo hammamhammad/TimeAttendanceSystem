@@ -1,0 +1,343 @@
+<div class="container-fluid p-4">
+  <!-- Page Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <h2 class="mb-0">{{ i18n.t('attendance.daily_view') }}</h2>
+        <div>
+          <button
+            type="button"
+            class="btn btn-outline-secondary me-2"
+            (click)="clearFilters()"
+            [disabled]="loading() || !hasActiveFilters()"
+            [title]="i18n.t('attendance.actions.clear_filters')">
+            <i class="fa-solid fa-filter-circle-xmark me-2"></i>{{ i18n.t('attendance.actions.clear_filters') }}
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline-primary me-2"
+            (click)="onRefresh()"
+            [disabled]="loading()">
+            <i class="fa-solid fa-refresh me-2"></i>{{ i18n.t('app.refresh') }}
+          </button>
+          <button
+            type="button"
+            class="btn btn-success"
+            (click)="exportData()"
+            [disabled]="loading() || filteredRecords().length === 0">
+            <i class="fa-solid fa-download me-2"></i>{{ i18n.t('attendance.actions.export_data') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Manual Calculation Section (Admin only) -->
+  @if (canManuallyCalculate()) {
+    <div class="card mb-4 border-info">
+      <div class="card-header bg-light">
+        <div>
+          <h5 class="mb-1">
+            <i class="fa-solid fa-calculator me-2 text-info"></i>
+            {{ i18n.t('attendance.manual_calculation.title') }}
+          </h5>
+          <small class="text-muted">{{ i18n.t('attendance.manual_calculation.subtitle') }}</small>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row align-items-end">
+          <div class="col-md-3">
+            <label class="form-label">{{ i18n.t('attendance.manual_calculation.select_date') }}</label>
+            <input
+              type="date"
+              class="form-control"
+              [value]="manualCalculationDate()"
+              (change)="onManualCalculationDateChange($event)"
+              [disabled]="calculatingBulk()">
+          </div>
+          <div class="col-md-9">
+            <div class="d-flex gap-2">
+              <button
+                type="button"
+                class="btn btn-info"
+                (click)="generateMissingAttendanceForDate()"
+                [disabled]="calculatingBulk()"
+                [title]="i18n.t('attendance.manual_calculation.generate_missing_help')">
+                <i class="fa-solid me-2" [class.fa-plus]="!calculatingBulk()" [class.fa-spinner]="calculatingBulk()" [class.fa-spin]="calculatingBulk()"></i>{{ i18n.t('attendance.manual_calculation.generate_missing') }}
+              </button>
+              <button
+                type="button"
+                class="btn btn-warning"
+                (click)="forceRecalculateAllForDate()"
+                [disabled]="calculatingBulk()"
+                [title]="i18n.t('attendance.manual_calculation.recalculate_all_help')">
+                <i class="fa-solid me-2" [class.fa-calculator]="!calculatingBulk()" [class.fa-spinner]="calculatingBulk()" [class.fa-spin]="calculatingBulk()"></i>{{ i18n.t('attendance.manual_calculation.recalculate_all') }}
+              </button>
+            </div>
+            <small class="text-muted mt-1 d-block">
+              {{ i18n.t('attendance.manual_calculation.date_info').replace('{{date}}', manualCalculationDate()) }}
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Date Selection and Filters -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-2">
+          <label class="form-label">{{ i18n.t('attendance.filters.date') }}</label>
+          <input
+            type="date"
+            class="form-control"
+            [value]="selectedDate()"
+            (change)="onDateChange($event)"
+            [disabled]="loading()">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">{{ i18n.t('attendance.filters.branch') }}</label>
+          <app-searchable-select
+            [options]="branchSelectOptions()"
+            [loading]="loadingBranches()"
+            [disabled]="loading()"
+            [placeholder]="i18n.t('attendance.filters.all_branches')"
+            [clearable]="true"
+            [value]="selectedBranchId()"
+            (selectionChange)="onBranchSelectionChange($event)">
+          </app-searchable-select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">{{ i18n.t('attendance.filters.department') }}</label>
+          <app-searchable-select
+            [options]="departmentSelectOptions()"
+            [loading]="loadingDepartments()"
+            [disabled]="loading()"
+            [placeholder]="i18n.t('attendance.filters.all_departments')"
+            [clearable]="true"
+            [value]="selectedDepartmentId()"
+            (selectionChange)="onDepartmentSelectionChange($event)">
+          </app-searchable-select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">{{ i18n.t('attendance.filters.employee') }}</label>
+          <app-searchable-select
+            [options]="employeeSelectOptions()"
+            [loading]="loadingEmployees()"
+            [disabled]="loading()"
+            [placeholder]="i18n.t('attendance.filters.all_employees')"
+            [clearable]="true"
+            [searchable]="true"
+            [value]="selectedEmployeeId()"
+            (selectionChange)="onEmployeeSelectionChange($event)">
+          </app-searchable-select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">{{ i18n.t('attendance.filters.status') }}</label>
+          <select
+            class="form-select"
+            (change)="onStatusChange($event)"
+            [disabled]="loading()">
+            @for (status of availableStatuses; track status.value) {
+              <option
+                [value]="status.value === null ? '' : status.value">
+                {{ i18n.t(status.label) }}
+              </option>
+            }
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Statistics Cards -->
+  <div class="row mb-4">
+    <div class="col-md-3 mb-3">
+      <div class="card stats-card border-start border-primary border-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="card-title text-muted small">{{ i18n.t('attendance.statistics.total_employees') }}</h6>
+              <h3 class="text-primary mb-0">{{ totalEmployees() }}</h3>
+            </div>
+            <div class="icon-circle bg-primary bg-opacity-10">
+              <i class="fa-solid fa-users text-primary"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+      <div class="card stats-card border-start border-success border-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="card-title text-muted small">{{ i18n.t('attendance.statistics.present_employees') }}</h6>
+              <h3 class="text-success mb-0">{{ presentEmployees() }}</h3>
+            </div>
+            <div class="icon-circle bg-success bg-opacity-10">
+              <i class="fa-solid fa-user-check text-success"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+      <div class="card stats-card border-start border-danger border-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="card-title text-muted small">{{ i18n.t('attendance.statistics.absent_employees') }}</h6>
+              <h3 class="text-danger mb-0">{{ absentEmployees() }}</h3>
+            </div>
+            <div class="icon-circle bg-danger bg-opacity-10">
+              <i class="fa-solid fa-user-times text-danger"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+      <div class="card stats-card border-start border-warning border-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="card-title text-muted small">{{ i18n.t('attendance.statistics.late_employees') }}</h6>
+              <h3 class="text-warning mb-0">{{ lateEmployees() }}</h3>
+            </div>
+            <div class="icon-circle bg-warning bg-opacity-10">
+              <i class="fa-solid fa-clock text-warning"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">{{ i18n.t('app.loading') }}</span>
+      </div>
+      <p class="mt-2 text-muted">{{ i18n.t('attendance.messages.loading_data') }}</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error()) {
+    <div class="alert alert-danger">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <i class="fa-solid fa-exclamation-triangle me-2"></i>
+          {{ error() }}
+        </div>
+        @if (!hasActiveFilters()) {
+          <button
+            type="button"
+            class="btn btn-outline-danger btn-sm ms-2"
+            (click)="clearFilters()"
+            [title]="i18n.t('attendance.actions.try_with_filter')">
+            <i class="fa-solid fa-filter me-1"></i>
+            {{ i18n.t('attendance.actions.add_filter') }}
+          </button>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Filter Hint -->
+  @if (!loading() && !error() && filteredRecords().length === 0 && !hasActiveFilters()) {
+    <div class="alert alert-info">
+      <i class="fa-solid fa-info-circle me-2"></i>
+      {{ i18n.t('attendance.hints.better_performance') }}
+      <strong class="ms-1">{{ i18n.t('attendance.hints.use_filters') }}</strong>
+      <div class="mt-2">
+        <small class="text-muted">
+          {{ i18n.t('attendance.hints.filter_help') || 'Please select a Branch, Department, or Employee to view attendance records for today.' }}
+        </small>
+      </div>
+    </div>
+  }
+
+  <!-- Search Box -->
+  @if (!loading() && !error()) {
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label class="form-label">{{ i18n.t('attendance.filters.search') }}</label>
+        <input
+          type="text"
+          class="form-control"
+          [placeholder]="i18n.t('attendance.filters.search_placeholder')"
+          (input)="onSearchChange($event)"
+          [disabled]="loading()">
+      </div>
+    </div>
+  }
+
+  <!-- Attendance Records Table -->
+  @if (!loading() && !error()) {
+    <div class="card">
+      <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">
+            <i class="fa-solid fa-calendar-check me-2"></i>
+            {{ i18n.t('attendance.daily_records') }}
+          </h5>
+          <span class="badge bg-primary">{{ filteredRecords().length }} {{ i18n.t('attendance.records') }}</span>
+        </div>
+      </div>
+      <div class="card-body p-0">
+
+        <!-- No Records -->
+        @if (filteredRecords().length === 0) {
+          <div class="text-center py-5">
+            <i class="fa-solid fa-calendar-xmark fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">{{ i18n.t('attendance.no_records') }}</h5>
+            <p class="text-muted">{{ i18n.t('attendance.no_records_description') }}</p>
+          </div>
+        }
+
+        <!-- Data Table -->
+        @if (filteredRecords().length > 0) {
+          <div>
+            <app-data-table
+              [data]="tableData()"
+              [columns]="tableColumns()"
+              [actions]="tableActions()"
+              [loading]="loading"
+              [showPagination]="true"
+              [currentPage]="currentPage"
+              [totalPages]="tableTotalPages"
+              [totalItems]="tableTotalItems"
+              [pageSize]="pageSize"
+              [sortColumn]="sortColumn"
+              [sortDirection]="sortDirection"
+              [responsiveMode]="'horizontal-scroll'"
+              [emptyMessage]="i18n.t('attendance.daily.no_records')"
+              (sortChange)="onSort($event)"
+              (actionClick)="onActionClick($event)"
+              (pageChange)="onPageChange($event)"
+              (pageSizeChange)="onPageSizeChange($event)"
+              class="table-hover">
+            </app-data-table>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Change Attendance Shift Modal -->
+  <app-change-attendance-shift-modal
+    [show]="showChangeShiftModal()"
+    [attendanceRecord]="selectedAttendanceRecord()"
+    (close)="closeChangeShiftModal()"
+    (shiftChanged)="onAttendanceShiftChanged($event)">
+  </app-change-attendance-shift-modal>
+
+</div>

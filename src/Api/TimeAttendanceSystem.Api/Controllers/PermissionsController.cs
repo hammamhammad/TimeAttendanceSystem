@@ -18,6 +18,7 @@ public class PermissionsController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Policy = "PermissionManagement")]
     public async Task<IActionResult> GetPermissions([FromQuery] string? group = null)
     {
         var query = new GetPermissionsQuery(group);

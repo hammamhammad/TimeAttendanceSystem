@@ -62,6 +62,12 @@ import { I18nService } from '../../../core/i18n/i18n.service';
                 </div>
               </div>
 
+              <!-- Error message display -->
+              <div class="alert alert-danger" *ngIf="errorMessage()">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                {{ errorMessage() }}
+              </div>
+
               <!-- Change shift form -->
               <form [formGroup]="changeShiftForm" (ngSubmit)="onSubmit()">
                 <!-- New shift selection -->
@@ -84,12 +90,16 @@ import { I18nService } from '../../../core/i18n/i18n.service';
 
                 <!-- Effective date -->
                 <div class="mb-3">
-                  <label for="effectiveDate" class="form-label">Effective Date</label>
+                  <label for="effectiveDate" class="form-label">Effective Date *</label>
                   <input type="date"
                          id="effectiveDate"
                          class="form-control"
-                         formControlName="effectiveDate">
-                  <div class="form-text">Leave empty to apply immediately.</div>
+                         formControlName="effectiveDate"
+                         [class.is-invalid]="changeShiftForm.get('effectiveDate')?.invalid && changeShiftForm.get('effectiveDate')?.touched">
+                  <div class="invalid-feedback" *ngIf="changeShiftForm.get('effectiveDate')?.errors?.['futureDate'] && changeShiftForm.get('effectiveDate')?.touched">
+                    Effective date must be greater than today's date.
+                  </div>
+                  <div class="form-text">Shift assignments must be planned in advance.</div>
                 </div>
 
                 <!-- Notes -->
@@ -166,13 +176,18 @@ export class ChangeShiftModalComponent implements OnInit {
 
   availableShifts = signal<Shift[]>([]);
   submitting = signal(false);
+  errorMessage = signal<string | null>(null);
 
   changeShiftForm: FormGroup;
 
   constructor() {
+    // Set effective date to tomorrow to meet validation requirement
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
     this.changeShiftForm = this.fb.group({
       shiftId: ['', Validators.required],
-      effectiveDate: [new Date().toISOString().split('T')[0]],
+      effectiveDate: [tomorrow.toISOString().split('T')[0], this.futureDateValidator()],
       notes: ['']
     });
   }
@@ -206,12 +221,32 @@ export class ChangeShiftModalComponent implements OnInit {
     });
   }
 
+  private futureDateValidator() {
+    return (control: any) => {
+      if (!control.value) return null;
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const selectedDate = new Date(control.value);
+      selectedDate.setHours(0, 0, 0, 0);
+
+      return selectedDate > today ? null : { futureDate: true };
+    };
+  }
+
   private resetForm() {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
     this.changeShiftForm.reset({
       shiftId: '',
-      effectiveDate: new Date().toISOString().split('T')[0],
+      effectiveDate: tomorrow.toISOString().split('T')[0],
       notes: ''
     });
+
+    // Clear any error messages
+    this.clearError();
   }
 
   onSubmit() {
@@ -219,6 +254,8 @@ export class ChangeShiftModalComponent implements OnInit {
       return;
     }
 
+    // Clear any previous error messages
+    this.clearError();
     this.submitting.set(true);
     const formValue = this.changeShiftForm.value;
 
@@ -244,13 +281,34 @@ export class ChangeShiftModalComponent implements OnInit {
     return first + last;
   }
 
-  // Called from parent to reset submitting state
+  // Called from parent to reset submitting state and show errors
   resetSubmitting() {
     this.submitting.set(false);
   }
 
+  // Called from parent to show error message
+  showError(message: string) {
+    this.errorMessage.set(message);
+    this.submitting.set(false);
+  }
+
+  // Clear error message
+  clearError() {
+    this.errorMessage.set(null);
+  }
+
   getCurrentShiftDisplay(): string {
-    return 'Current shift details';
+    if (!this.employee?.currentShiftName) {
+      return 'No current shift assigned';
+    }
+
+    // Check if we have shift periods information
+    if (this.employee.currentShift?.startTime && this.employee.currentShift?.endTime) {
+      return `${this.employee.currentShift.startTime} - ${this.employee.currentShift.endTime}`;
+    }
+
+    // Fallback to just showing the shift name
+    return this.employee.currentShiftName;
   }
 
   getShiftTimeDisplay(shift: any): string {

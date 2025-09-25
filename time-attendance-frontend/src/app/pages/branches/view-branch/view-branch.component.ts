@@ -91,7 +91,7 @@ import { I18nService } from '../../../core/i18n/i18n.service';
                         @if (branch()?.isActive) {
                           <span class="badge bg-success">{{ i18n.t('common.active') }}</span>
                         } @else {
-                          <span class="badge bg-secondary">{{ i18n.t('common.inactive') }}</span>
+                          <span class="badge bg-light text-dark border">{{ i18n.t('common.inactive') }}</span>
                         }
                       </dd>
                     </dl>

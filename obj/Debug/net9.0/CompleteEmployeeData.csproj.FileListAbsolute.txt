@@ -1,0 +1,9 @@
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\CompleteEmployeeData.csproj.AssemblyReference.cache
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\CompleteEmployeeData.src.Shared.TimeAttendanceSystem.Shared.Localization.Resources.ValidationMessages.resources
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\CompleteEmployeeData.src.Shared.TimeAttendanceSystem.Shared.Localization.Resources.ValidationMessages.ar.resources
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\CompleteEmployeeData.csproj.GenerateResource.cache
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\CompleteEmployeeData.GeneratedMSBuildEditorConfig.editorconfig
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\CompleteEmployeeData.AssemblyInfoInputs.cache
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\CompleteEmployeeData.AssemblyInfo.cs
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\CompleteEmployeeData.csproj.CoreCompileInputs.cache
+D:\Work\AI Code\TimeAttendanceSystem\obj\Debug\net9.0\CompleteEmployeeData.sourcelink.json

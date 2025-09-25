@@ -22,6 +22,7 @@ public class DepartmentsController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Policy = "DepartmentRead")]
     public async Task<IActionResult> GetDepartments(
         [FromQuery] long? branchId = null,
         [FromQuery] bool includeTree = false,
@@ -46,6 +47,7 @@ public class DepartmentsController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [Authorize(Policy = "DepartmentRead")]
     public async Task<IActionResult> GetDepartmentById(long id)
     {
         var query = new GetDepartmentByIdQuery(id);
@@ -62,6 +64,7 @@ public class DepartmentsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "DepartmentManagement")]
     public async Task<IActionResult> CreateDepartment([FromBody] CreateDepartmentRequest request)
     {
         var command = new CreateDepartmentCommand(
@@ -92,6 +95,7 @@ public class DepartmentsController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Policy = "DepartmentManagement")]
     public async Task<IActionResult> UpdateDepartment(long id, [FromBody] UpdateDepartmentRequest request)
     {
         var command = new UpdateDepartmentCommand(
@@ -122,6 +126,7 @@ public class DepartmentsController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Policy = "DepartmentManagement")]
     public async Task<IActionResult> DeleteDepartment(long id)
     {
         var command = new DeleteDepartmentCommand(id);

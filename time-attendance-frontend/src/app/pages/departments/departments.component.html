@@ -18,45 +18,49 @@
   <div class="card">
     <div class="card-body">
       <!-- Info message when no branch is selected -->
-      <div class="alert alert-info" *ngIf="!selectedBranch() && !branchesLoading()">
-        <div class="d-flex align-items-center">
-          <i class="fas fa-info-circle me-3"></i>
-          <div>
-            <strong>{{ i18n.t('department.allDepartments') || 'All Departments' }}</strong><br>
-            <small>{{ i18n.t('department.showingAllDepartments') || 'Showing departments from all branches. Select a specific branch to filter.' }}</small>
+      @if (!selectedBranch() && !branchesLoading()) {
+        <div class="alert alert-info">
+          <div class="d-flex align-items-center">
+            <i class="fas fa-info-circle me-3"></i>
+            <div>
+              <strong>{{ i18n.t('department.allDepartments') || 'All Departments' }}</strong><br>
+              <small>{{ i18n.t('department.showingAllDepartments') || 'Showing departments from all branches. Select a specific branch to filter.' }}</small>
+            </div>
           </div>
         </div>
-      </div>
+      }
 
       <!-- Table View -->
-      <app-department-table
-        *ngIf="viewMode() === 'table'"
-        [selectedBranchId]="selectedBranch()?.id"
-        [allowSelection]="true"
-        [allowEdit]="true"
-        [allowDelete]="true"
-        [showControls]="true"
-        (departmentSelected)="onDepartmentSelected($event)"
-        (departmentView)="onDepartmentView($event)"
-        (departmentEdit)="onDepartmentEdit($event)"
-        (departmentDelete)="onDepartmentDelete($event)"
-        (departmentAdd)="onDepartmentAdd()"
-      ></app-department-table>
+      @if (viewMode() === 'table') {
+        <app-department-table
+          [selectedBranchId]="selectedBranch()?.id"
+          [allowSelection]="true"
+          [allowEdit]="true"
+          [allowDelete]="true"
+          [showControls]="true"
+          (departmentSelected)="onDepartmentSelected($event)"
+          (departmentView)="onDepartmentView($event)"
+          (departmentEdit)="onDepartmentEdit($event)"
+          (departmentDelete)="onDepartmentDelete($event)"
+          (departmentAdd)="onDepartmentAdd()"
+        ></app-department-table>
+      }
 
       <!-- Tree View -->
-      <app-department-tree
-        *ngIf="viewMode() === 'tree'"
-        [selectedBranchId]="selectedBranch()?.id"
-        [allowSelection]="true"
-        [allowEdit]="true"
-        [allowDelete]="true"
-        [showControls]="true"
-        (departmentSelected)="onDepartmentSelected($event)"
-        (departmentView)="onDepartmentView($event)"
-        (departmentEdit)="onDepartmentEdit($event)"
-        (departmentDelete)="onDepartmentDelete($event)"
-        (departmentAdd)="onDepartmentAdd($event)"
-      ></app-department-tree>
+      @if (viewMode() === 'tree') {
+        <app-department-tree
+          [selectedBranchId]="selectedBranch()?.id"
+          [allowSelection]="true"
+          [allowEdit]="true"
+          [allowDelete]="true"
+          [showControls]="true"
+          (departmentSelected)="onDepartmentSelected($event)"
+          (departmentView)="onDepartmentView($event)"
+          (departmentEdit)="onDepartmentEdit($event)"
+          (departmentDelete)="onDepartmentDelete($event)"
+          (departmentAdd)="onDepartmentAdd($event)"
+        ></app-department-tree>
+      }
     </div>
   </div>
 
@@ -69,4 +73,3 @@
     (closePanel)="onCloseInfoPanel()"
   ></app-department-info-panel>
 </div>
-

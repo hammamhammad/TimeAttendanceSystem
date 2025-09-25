@@ -1,0 +1,10 @@
+- Understand the project structure and follow this structure before implementing any new feature
+- Split the new components into three files (ts,html,css)
+- Compile the project and confirm no compilation errors before going to the next step
+- always give me the plan for implementation, then wait for me to confirm
+- use Coravel package for all background jobs
+- Always drop the DB and create it from the models and seed data
+- always run the frontend/4200 and backend/http/5099
+- allways use NotificationService and ConfirmationService in the frontend
+- always use DataTableComponent for the tables in the frontend
+- Always use the new Angular template syntax @if / @for instead of legacy structural directives, to maintain consistency with the latest Angular standards

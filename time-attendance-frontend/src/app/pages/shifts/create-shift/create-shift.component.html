@@ -224,12 +224,17 @@
                     type="checkbox"
                     id="nightShift"
                     [(ngModel)]="shiftForm.isNightShift"
-                    name="isNightShift">
+                    name="isNightShift"
+                    (change)="onNightShiftChange()"
+                    [disabled]="shiftForm.shiftType === ShiftType.HoursOnly">
                   <label class="form-check-label fw-medium" for="nightShift">
                     {{ t('shifts.isNightShift') }}
                   </label>
                 </div>
                 <small class="text-muted">{{ t('shifts.help.nightShift') }}</small>
+                @if (shiftForm.shiftType === ShiftType.HoursOnly) {
+                  <small class="text-warning d-block">{{ t('shifts.help.nightShiftDisabledHoursOnly') }}</small>
+                }
               </div>
             </div>
 
@@ -255,7 +260,7 @@
                       <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
                         <span class="fw-medium">{{ t('shifts.period') }} {{ period.periodOrder }}</span>
                         <div class="d-flex align-items-center gap-2">
-                          <span class="badge" [ngClass]="isNightShift(period.startTime, period.endTime) ? 'bg-dark' : 'bg-primary'">
+                          <span class="badge" [ngClass]="isNightShift(period.startTime, period.endTime) ? 'bg-info' : 'bg-primary'">
                             {{ getPeriodTypeText(period) }}
                           </span>
                           <span class="text-muted small">{{ formatHours(calculatePeriodHours(period.startTime, period.endTime)) }}</span>
@@ -374,12 +379,16 @@
                     id="requiredWeeklyHours"
                     [(ngModel)]="shiftForm.requiredWeeklyHours"
                     name="requiredWeeklyHours"
+                    (ngModelChange)="onWeeklyHoursChange()"
                     step="0.5"
                     min="0"
                     max="168">
                   <span class="input-group-text">{{ t('shifts.hours') }}</span>
                 </div>
                 <div class="form-text">{{ t('shifts.help.requiredWeeklyHours') }}</div>
+                @if (shiftForm.requiredWeeklyHours && shiftForm.requiredWeeklyHours > 0) {
+                  <small class="text-info d-block">{{ t('shifts.help.weeklyHoursCoreRequired') }}</small>
+                }
               </div>
 
               <!-- Check-in Required -->
@@ -426,11 +435,15 @@
                       [(ngModel)]="shiftForm.gracePeriodMinutes"
                       name="gracePeriodMinutes"
                       (ngModelChange)="onGracePeriodChange()"
+                      [disabled]="shiftForm.allowFlexibleHours"
                       min="0"
                       max="120">
                     <span class="input-group-text">{{ t('common.minutes') }}</span>
                   </div>
                   <div class="form-text">{{ t('shifts.help.gracePeriod') }}</div>
+                  @if (shiftForm.allowFlexibleHours) {
+                    <small class="text-warning d-block">{{ t('shifts.help.gracePeriodDisabledFlexible') }}</small>
+                  }
                 </div>
 
                 <!-- Flexible Hours -->

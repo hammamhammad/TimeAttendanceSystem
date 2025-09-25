@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { EmployeesService } from '../employees.service';
-import { Employee } from '../../../shared/models/employee.model';
+import { Employee, Gender, EmploymentStatus, WorkLocationType, DepartmentDto, EmployeeSelectOption } from '../../../shared/models/employee.model';
 import { Branch } from '../../../shared/models/branch.model';
 import { Department } from '../../../shared/models/department.model';
 import { I18nService } from '../../../core/i18n/i18n.service';
@@ -155,10 +155,15 @@ import { SearchableSelectComponent, SearchableSelectOption } from '../../../shar
                       class="form-select" 
                       formControlName="employmentStatus"
                       [class.is-invalid]="isFieldInvalid('employmentStatus')">
-                      <option value="Active">{{ i18n.t('employees.employment_status.active') }}</option>
-                      <option value="Inactive">{{ i18n.t('employees.employment_status.inactive') }}</option>
-                      <option value="OnLeave">{{ i18n.t('employees.employment_status.on_leave') }}</option>
-                      <option value="Terminated">{{ i18n.t('employees.employment_status.terminated') }}</option>
+                      <option value="">{{ i18n.t('common.select') }}</option>
+                      <option value="1">{{ i18n.t('employees.employment_status.active') }}</option>
+                      <option value="2">{{ i18n.t('employees.employment_status.fulltime') }}</option>
+                      <option value="3">{{ i18n.t('employees.employment_status.parttime') }}</option>
+                      <option value="4">{{ i18n.t('employees.employment_status.contract') }}</option>
+                      <option value="5">{{ i18n.t('employees.employment_status.intern') }}</option>
+                      <option value="6">{{ i18n.t('employees.employment_status.consultant') }}</option>
+                      <option value="7">{{ i18n.t('employees.employment_status.terminated') }}</option>
+                      <option value="8">{{ i18n.t('employees.employment_status.inactive') }}</option>
                     </select>
                     @if (isFieldInvalid('employmentStatus')) {
                       <div class="invalid-feedback">{{ getFieldError('employmentStatus') }}</div>
@@ -175,10 +180,10 @@ import { SearchableSelectComponent, SearchableSelectOption } from '../../../shar
                       class="form-select" 
                       formControlName="workLocationType"
                       [class.is-invalid]="isFieldInvalid('workLocationType')">
-                      <option value="OnSite">{{ i18n.t('employees.work_location.onsite') }}</option>
-                      <option value="Remote">{{ i18n.t('employees.work_location.remote') }}</option>
-                      <option value="Hybrid">{{ i18n.t('employees.work_location.hybrid') }}</option>
-                      <option value="Field">{{ i18n.t('employees.work_location.field') }}</option>
+                      <option value="">{{ i18n.t('common.select') }}</option>
+                      <option value="1">{{ i18n.t('employees.work_location.onsite') }}</option>
+                      <option value="2">{{ i18n.t('employees.work_location.remote') }}</option>
+                      <option value="3">{{ i18n.t('employees.work_location.hybrid') }}</option>
                     </select>
                     @if (isFieldInvalid('workLocationType')) {
                       <div class="invalid-feedback">{{ getFieldError('workLocationType') }}</div>
@@ -300,8 +305,8 @@ import { SearchableSelectComponent, SearchableSelectOption } from '../../../shar
                       formControlName="gender"
                       [class.is-invalid]="isFieldInvalid('gender')">
                       <option value="">{{ i18n.t('common.select') }}</option>
-                      <option value="Male">{{ i18n.t('employees.gender.male') }}</option>
-                      <option value="Female">{{ i18n.t('employees.gender.female') }}</option>
+                      <option value="1">{{ i18n.t('employees.gender.male') }}</option>
+                      <option value="2">{{ i18n.t('employees.gender.female') }}</option>
                     </select>
                     @if (isFieldInvalid('gender')) {
                       <div class="invalid-feedback">{{ getFieldError('gender') }}</div>
@@ -313,8 +318,7 @@ import { SearchableSelectComponent, SearchableSelectOption } from '../../../shar
                     <label class="form-label">{{ i18n.t('employees.department') }}</label>
                     <app-searchable-select
                       [options]="departmentSelectOptions"
-                      [value]="employeeForm.get('departmentId')?.value?.toString() || ''"
-                      (selectionChange)="onDepartmentSelectionChange($event)"
+                      formControlName="departmentId"
                       [placeholder]="i18n.t('common.select_department')"
                       [searchable]="true"
                       [clearable]="false"
@@ -330,8 +334,7 @@ import { SearchableSelectComponent, SearchableSelectOption } from '../../../shar
                     <label class="form-label">{{ i18n.t('employees.manager') }}</label>
                     <app-searchable-select
                       [options]="managerSelectOptions"
-                      [value]="employeeForm.get('managerEmployeeId')?.value?.toString() || ''"
-                      (selectionChange)="onManagerSelectionChange($event)"
+                      formControlName="managerEmployeeId"
                       [placeholder]="i18n.t('common.select_manager')"
                       [searchable]="true"
                       [clearable]="false"
@@ -383,8 +386,8 @@ export class EditEmployeeComponent implements OnInit {
   public i18n = inject(I18nService);
 
   employee = signal<Employee | null>(null);
-  departments = signal<Department[]>([]);
-  managers = signal<{id: string, name: string, employeeNumber: string}[]>([]);
+  departments = signal<DepartmentDto[]>([]);
+  managers = signal<EmployeeSelectOption[]>([]);
   loading = signal(true);
   saving = signal(false);
   error = signal('');
@@ -393,10 +396,11 @@ export class EditEmployeeComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeForm();
-    
+
     const employeeId = this.route.snapshot.paramMap.get('id');
     if (employeeId) {
-      this.loadEmployee(employeeId);
+      // Load departments first, then load employee and populate form
+      this.loadDepartmentsAndEmployee(employeeId);
     } else {
       this.error.set(this.i18n.t('employees.invalid_employee_id'));
       this.loading.set(false);
@@ -405,6 +409,7 @@ export class EditEmployeeComponent implements OnInit {
 
   initializeForm(): void {
     this.employeeForm = this.fb.group({
+      branchId: [''], // Add branchId field for department loading logic
       firstName: ['', [Validators.required, Validators.minLength(2)]],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
       firstNameAr: [''],
@@ -416,10 +421,54 @@ export class EditEmployeeComponent implements OnInit {
       nationalId: [''],
       dateOfBirth: [''],
       gender: [''],
-      employmentStatus: ['Active', Validators.required],
-      workLocationType: ['OnSite', Validators.required],
+      employmentStatus: ['', Validators.required],
+      workLocationType: ['', Validators.required],
       departmentId: [''],
       managerEmployeeId: ['']
+    });
+  }
+
+  loadDepartmentsAndEmployee(employeeId: string): void {
+    // First load all departments
+    this.employeesService.getDepartments().subscribe({
+      next: (departments) => {
+        this.departments.set(departments);
+
+        // Then load the employee
+        this.employeesService.getEmployeeById(+employeeId).subscribe({
+          next: (employee) => {
+            this.employee.set(employee);
+
+            // Load managers for the employee's branch
+            this.employeesService.getManagers(employee.branchId).subscribe({
+              next: (managers) => {
+                this.managers.set(managers);
+
+                // Finally populate the form with all data loaded
+                this.populateForm(employee);
+                this.loading.set(false);
+              },
+              error: (error) => {
+                console.error('Error loading managers:', error);
+                this.managers.set([]);
+                // Still populate form even if managers fail to load
+                this.populateForm(employee);
+                this.loading.set(false);
+              }
+            });
+          },
+          error: (error) => {
+            this.error.set(this.getErrorMessage(error));
+            this.loading.set(false);
+          }
+        });
+      },
+      error: (error) => {
+        console.error('Error loading departments:', error);
+        this.departments.set([]);
+        // Still try to load employee even if departments fail
+        this.loadEmployee(employeeId);
+      }
     });
   }
 
@@ -427,9 +476,9 @@ export class EditEmployeeComponent implements OnInit {
     this.employeesService.getEmployeeById(+employeeId).subscribe({
       next: (employee) => {
         this.employee.set(employee);
-        this.populateForm(employee);
-        this.loadDepartments(employee.branchId.toString());
+        // Load managers for the employee's branch
         this.loadManagers(employee.branchId.toString());
+        this.populateForm(employee);
         this.loading.set(false);
       },
       error: (error) => {
@@ -439,18 +488,22 @@ export class EditEmployeeComponent implements OnInit {
     });
   }
 
-  loadDepartments(branchId: string): void {
-    // Mock departments for now
-    this.departments.set([]);
-  }
 
   loadManagers(branchId: string): void {
-    // Mock managers for now
-    this.managers.set([]);
+    this.employeesService.getManagers(+branchId).subscribe({
+      next: (managers) => {
+        this.managers.set(managers);
+      },
+      error: (error) => {
+        console.error('Error loading managers:', error);
+        this.managers.set([]);
+      }
+    });
   }
 
   populateForm(employee: Employee): void {
     this.employeeForm.patchValue({
+      branchId: employee.branchId, // Set branchId for department loading logic
       firstName: employee.firstName,
       lastName: employee.lastName,
       firstNameAr: employee.firstNameAr || '',
@@ -491,8 +544,8 @@ export class EditEmployeeComponent implements OnInit {
       nationalId: formValue.nationalId || undefined,
       dateOfBirth: formValue.dateOfBirth || undefined,
       gender: formValue.gender ? +formValue.gender : undefined,
-      employmentStatus: formValue.employmentStatus,
-      workLocationType: formValue.workLocationType,
+      employmentStatus: +formValue.employmentStatus,
+      workLocationType: +formValue.workLocationType,
       departmentId: formValue.departmentId || undefined,
       managerEmployeeId: formValue.managerEmployeeId || undefined
     };
@@ -549,7 +602,7 @@ export class EditEmployeeComponent implements OnInit {
       options.push({
         value: dept.id.toString(),
         label: dept.name,
-        subLabel: dept.code
+        subLabel: dept.nameAr || ''
       });
     });
 
@@ -572,15 +625,7 @@ export class EditEmployeeComponent implements OnInit {
     return options;
   }
 
-  onDepartmentSelectionChange(departmentIdStr: string) {
-    const departmentId = departmentIdStr ? parseInt(departmentIdStr) : 0;
-    this.employeeForm.patchValue({ departmentId: departmentId || '' });
-  }
 
-  onManagerSelectionChange(managerIdStr: string) {
-    const managerId = managerIdStr ? parseInt(managerIdStr) : 0;
-    this.employeeForm.patchValue({ managerEmployeeId: managerId || '' });
-  }
 
   private getErrorMessage(error: any): string {
     if (error?.error?.error) {

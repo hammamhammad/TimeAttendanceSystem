@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -20,11 +20,12 @@ import { PermissionService } from '../../core/auth/permission.service';
 import { PermissionResources, PermissionActions } from '../../shared/utils/permission.utils';
 import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
 import { SearchableSelectComponent, SearchableSelectOption } from '../../shared/components/searchable-select/searchable-select.component';
+import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table.component';
 
 @Component({
   selector: 'app-shifts',
   standalone: true,
-  imports: [CommonModule, FormsModule, HasPermissionDirective, SearchableSelectComponent],
+  imports: [CommonModule, FormsModule, HasPermissionDirective, SearchableSelectComponent, DataTableComponent],
   templateUrl: './shifts.component.html',
   styleUrls: ['./shifts.component.css']
 })
@@ -71,6 +72,7 @@ export class ShiftsComponent implements OnInit {
   loading = signal(false);
   shifts = signal<Shift[]>([]);
   branches = signal<Branch[]>([]);
+  defaultShift = signal<Shift | null>(null);
 
   // Pagination
   currentPage = signal(1);
@@ -86,6 +88,7 @@ export class ShiftsComponent implements OnInit {
   showCreateModal = signal(false);
   showEditModal = signal(false);
   showDeleteModal = signal(false);
+  showDefaultShiftModal = signal(false);
   selectedShift = signal<Shift | null>(null);
 
   // Form state
@@ -111,9 +114,100 @@ export class ShiftsComponent implements OnInit {
 
   submitting = signal(false);
 
+  // Data table configuration
+  tableColumns = computed<TableColumn[]>(() => [
+    {
+      key: 'name',
+      label: this.t('shifts.fields.name'),
+      sortable: true,
+      width: '250px',
+      priority: 'high',
+      mobileLabel: this.t('shifts.fields.name'),
+      renderHtml: true
+    },
+    {
+      key: 'status',
+      label: this.t('shifts.fields.status'),
+      sortable: true,
+      width: '120px',
+      align: 'center',
+      priority: 'high',
+      mobileLabel: this.t('shifts.fields.status'),
+      renderHtml: true
+    },
+    {
+      key: 'type',
+      label: this.t('shifts.fields.type'),
+      sortable: false,
+      width: '120px',
+      align: 'center',
+      priority: 'medium',
+      hideOnMobile: false,
+      mobileLabel: this.t('shifts.fields.type'),
+      renderHtml: true
+    },
+    {
+      key: 'periods',
+      label: this.t('shifts.fields.periods'),
+      sortable: false,
+      width: '200px',
+      priority: 'medium',
+      hideOnMobile: false,
+      mobileLabel: 'Periods',
+      renderHtml: true
+    },
+    {
+      key: 'requirements',
+      label: this.t('shifts.fields.requirements'),
+      sortable: false,
+      width: '180px',
+      priority: 'low',
+      hideOnMobile: true,
+      mobileLabel: 'Rules',
+      renderHtml: true
+    }
+  ]);
+
+  tableActions = computed<TableAction[]>(() => [
+    {
+      key: 'set-default',
+      label: this.t('shifts.defaultShift.setDefault'),
+      icon: 'fa-star',
+      color: 'success',
+      condition: (shift: Shift) => this.canSetDefaultShift(shift)
+    },
+    {
+      key: 'edit',
+      label: this.t('common.edit'),
+      icon: 'fa-edit',
+      color: 'primary',
+      condition: () => this.permissionService.has(this.PERMISSIONS.SHIFT_UPDATE)
+    },
+    {
+      key: 'delete',
+      label: this.t('common.delete'),
+      icon: 'fa-trash',
+      color: 'danger',
+      condition: () => this.permissionService.has(this.PERMISSIONS.SHIFT_DELETE)
+    }
+  ]);
+
+  // Transform shifts data for data table
+  tableData = computed(() => {
+    return this.shifts().map(shift => ({
+      ...shift,
+      name: this.formatShiftName(shift),
+      status: this.formatShiftStatus(shift),
+      type: this.formatShiftType(shift),
+      periods: this.formatShiftPeriods(shift),
+      requirements: this.formatShiftRequirements(shift)
+    }));
+  });
+
   ngOnInit(): void {
     this.loadBranches();
     this.loadShifts();
+    this.loadDefaultShift();
   }
 
   t(key: string): string {
@@ -150,6 +244,18 @@ export class ShiftsComponent implements OnInit {
       error: (error) => {
         console.error('Failed to load shifts:', error);
         this.loading.set(false);
+      }
+    });
+  }
+
+  loadDefaultShift(): void {
+    this.shiftsService.getDefaultShift().subscribe({
+      next: (defaultShift) => {
+        this.defaultShift.set(defaultShift);
+      },
+      error: (error) => {
+        console.error('Failed to load default shift:', error);
+        this.defaultShift.set(null);
       }
     });
   }
@@ -205,11 +311,11 @@ export class ShiftsComponent implements OnInit {
       case ShiftStatus.Active:
         return 'bg-success';
       case ShiftStatus.Inactive:
-        return 'bg-secondary';
+        return 'bg-light text-dark border';
       case ShiftStatus.Draft:
         return 'bg-warning';
       case ShiftStatus.Archived:
-        return 'bg-dark';
+        return 'bg-light text-dark border';
       default:
         return 'bg-success';
     }
@@ -348,6 +454,16 @@ export class ShiftsComponent implements OnInit {
       error: (error) => {
         console.error('Failed to delete shift:', error);
         this.submitting.set(false);
+        // Show user-friendly error message for deletion constraints
+        let errorMessage = 'Failed to delete shift';
+        if (error?.error?.message) {
+          errorMessage = error.error.message;
+        } else if (error?.message) {
+          errorMessage = error.message;
+        }
+        // You can show this error message in a toast/alert component
+        // For now, we'll log it to console with a prefix
+        console.error('Deletion error:', errorMessage);
       }
     });
   }
@@ -356,8 +472,54 @@ export class ShiftsComponent implements OnInit {
     this.showCreateModal.set(false);
     this.showEditModal.set(false);
     this.showDeleteModal.set(false);
+    this.showDefaultShiftModal.set(false);
     this.selectedShift.set(null);
     this.submitting.set(false);
+  }
+
+  // Default Shift Management
+  onSetDefaultShift(shift: Shift): void {
+    // Check if there's already a default shift
+    if (this.defaultShift()) {
+      // Show confirmation modal for replacing existing default
+      this.selectedShift.set(shift);
+      this.showDefaultShiftModal.set(true);
+    } else {
+      // No existing default, set directly
+      this.setDefaultShift(shift, false);
+    }
+  }
+
+  onConfirmSetDefaultShift(): void {
+    if (!this.selectedShift()) return;
+    this.setDefaultShift(this.selectedShift()!, true);
+  }
+
+  private setDefaultShift(shift: Shift, forceReplace: boolean): void {
+    this.submitting.set(true);
+    this.shiftsService.setDefaultShift(shift.id, forceReplace).subscribe({
+      next: () => {
+        this.defaultShift.set(shift);
+        this.showDefaultShiftModal.set(false);
+        this.submitting.set(false);
+        console.log(`Successfully set "${shift.name}" as default shift`);
+      },
+      error: (error) => {
+        console.error('Failed to set default shift:', error);
+        this.submitting.set(false);
+      }
+    });
+  }
+
+  isDefaultShift(shift: Shift): boolean {
+    return this.defaultShift()?.id === shift.id;
+  }
+
+  canSetDefaultShift(shift: Shift): boolean {
+    // Only system admin can set default shifts and shift must be active
+    return this.permissionService.hasRole('SystemAdmin') &&
+           shift.status === ShiftStatus.Active &&
+           !this.isDefaultShift(shift);
   }
 
   // Shift Type Change Handler
@@ -631,5 +793,95 @@ export class ShiftsComponent implements OnInit {
 
   getEndCount(): number {
     return Math.min(this.currentPage() * this.pageSize(), this.totalCount());
+  }
+
+  // Data table formatting methods
+  formatShiftName(shift: Shift): string {
+    let html = `<div><strong>${shift.name}</strong>`;
+    if (this.isDefaultShift(shift)) {
+      html += `<span class="badge bg-success ms-2">${this.t('shifts.defaultShift.currentDefault')}</span>`;
+    }
+    if (shift.description) {
+      html += `<small class="d-block text-muted">${shift.description}</small>`;
+    }
+    html += '</div>';
+    return html;
+  }
+
+  formatShiftStatus(shift: Shift): string {
+    const statusText = this.getShiftStatusText(shift.status);
+    const statusClass = this.getShiftStatusClass(shift.status);
+    return `<span class="badge ${statusClass}">${statusText}</span>`;
+  }
+
+  formatShiftType(shift: Shift): string {
+    const typeText = this.getShiftTypeText(shift.shiftType);
+    const typeClass = shift.shiftType === ShiftType.TimeBased ? 'bg-primary' : 'bg-info';
+    return `<span class="badge ${typeClass}">${typeText}</span>`;
+  }
+
+  formatShiftPeriods(shift: Shift): string {
+    if (shift.shiftType === ShiftType.TimeBased && shift.shiftPeriods) {
+      let html = '<div>';
+      shift.shiftPeriods.forEach(period => {
+        html += `<div class="small">${this.formatTime(period.startTime)} - ${this.formatTime(period.endTime)}`;
+        if (period.isNightPeriod) {
+          html += `<span class="badge bg-warning ms-1">${this.t('shifts.nightShift')}</span>`;
+        }
+        html += '</div>';
+      });
+      html += '</div>';
+      return html;
+    } else if (shift.shiftType === ShiftType.HoursOnly) {
+      return `<div>${shift.requiredHours} ${this.t('shifts.hours')}</div>`;
+    }
+    return '<div>-</div>';
+  }
+
+  formatShiftRequirements(shift: Shift): string {
+    let html = '<div class="small">';
+    if (shift.isCheckInRequired) {
+      html += `<div><i class="fas fa-check text-success me-1"></i>${this.t('shifts.checkInRequired')}</div>`;
+    }
+    if (shift.isAutoCheckOut) {
+      html += `<div><i class="fas fa-check text-success me-1"></i>${this.t('shifts.autoCheckOut')}</div>`;
+    }
+    if (shift.allowFlexibleHours) {
+      html += `<div><i class="fas fa-check text-success me-1"></i>${this.t('shifts.flexibleHours')}</div>`;
+    }
+    if (shift.gracePeriodMinutes) {
+      html += `<div><i class="fas fa-clock text-info me-1"></i>${shift.gracePeriodMinutes}min ${this.t('shifts.gracePeriod')}</div>`;
+    }
+    html += '</div>';
+    return html;
+  }
+
+  // Data table action handler
+  onActionClick(event: {action: string, item: Shift}): void {
+    const { action, item } = event;
+
+    switch (action) {
+      case 'set-default':
+        this.onSetDefaultShift(item);
+        break;
+      case 'edit':
+        this.onEditShift(item);
+        break;
+      case 'delete':
+        this.onDeleteShift(item);
+        break;
+      default:
+        console.warn('Unknown action:', action);
+    }
+  }
+
+  // Data table event handlers
+  onTablePageChange(page: number): void {
+    this.onPageChange(page);
+  }
+
+  onTablePageSizeChange(size: number): void {
+    this.pageSize.set(size);
+    this.onPageSizeChange();
   }
 }

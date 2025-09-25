@@ -62,137 +62,18 @@
           }
         </div>
       } @else {
-        <!-- Table -->
-        <div class="table-responsive">
-          <table class="table table-hover">
-            <thead class="table-light">
-              <tr>
-                <th [class.sortable]="isSortable('name')" (click)="isSortable('name') && onSort('name')">
-                  {{ t('roles.name') }}
-                  <i *ngIf="isSortable('name')" [ngClass]="getSortIcon('name')" class="ms-1"></i>
-                </th>
-                <th>{{ t('roles.permissions') }}</th>
-                <th [class.sortable]="isSortable('userCount')" (click)="isSortable('userCount') && onSort('userCount')">
-                  {{ t('roles.user_count') }}
-                  <i *ngIf="isSortable('userCount')" [ngClass]="getSortIcon('userCount')" class="ms-1"></i>
-                </th>
-                <th>{{ t('roles.type') }}</th>
-                <th [class.sortable]="isSortable('createdAtUtc')" (click)="isSortable('createdAtUtc') && onSort('createdAtUtc')">
-                  {{ t('roles.created_at') }}
-                  <i *ngIf="isSortable('createdAtUtc')" [ngClass]="getSortIcon('createdAtUtc')" class="ms-1"></i>
-                </th>
-                <th width="120">{{ t('common.actions') }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (role of filteredRoles(); track role.id) {
-                <tr>
-                  <td>
-                    <div class="d-flex align-items-center">
-                      <div class="avatar-sm me-2">
-                        <div class="avatar-title bg-info-subtle text-info rounded-circle">
-                          <i class="fa-solid fa-user-shield"></i>
-                        </div>
-                      </div>
-                      <div>
-                        <div class="fw-medium">
-                          {{ role.name }}
-                          @if (role.isSystem) {
-                            <i class="fa-solid fa-shield-alt text-primary ms-1" [title]="t('roles.system_role')"></i>
-                          }
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    @if (role.permissions.length > 0) {
-                      <div class="d-flex flex-wrap gap-1">
-                        @for (permission of role.permissions | slice:0:3; track permission.key || permission.id) {
-                          <span class="badge bg-secondary-subtle text-secondary small">{{ permission.key }}</span>
-                        }
-                        @if (role.permissions.length > 3) {
-                          <span class="badge bg-light text-dark small">+{{ role.permissions.length - 3 }} more</span>
-                        }
-                      </div>
-                    } @else {
-                      <span class="text-muted">{{ t('roles.no_permissions') }}</span>
-                    }
-                  </td>
-                  <td>
-                    <span class="badge bg-primary-subtle text-primary">{{ role.userCount }}</span>
-                  </td>
-                  <td>
-                    @if (role.isSystem) {
-                      <span class="badge bg-warning-subtle text-warning">{{ t('roles.system') }}</span>
-                    } @else {
-                      <span class="badge bg-success-subtle text-success">{{ t('roles.custom') }}</span>
-                    }
-                  </td>
-                  <td>{{ formatDate(role.createdAtUtc) }}</td>
-                  <td>
-                    <div class="btn-group" role="group">
-                      <!-- View Role Button -->
-                      <button 
-                        *appHasPermission="PERMISSIONS.ROLE_READ"
-                        class="btn btn-sm btn-outline-primary"
-                        [title]="t('common.view')"
-                        (click)="onViewRole(role)"
-                      >
-                        <i class="fa-solid fa-eye"></i>
-                      </button>
-                      
-                      <!-- Manage Permissions Button -->
-                      @if (canManagePermissions(role)) {
-                        <button 
-                          *appHasPermission="PERMISSIONS.ROLE_ASSIGN_PERMISSIONS"
-                          class="btn btn-sm btn-outline-info"
-                          [title]="t('roles.manage_permissions')"
-                          (click)="onManagePermissions(role)"
-                        >
-                          <i class="fa-solid fa-key"></i>
-                        </button>
-                      }
-                      
-                      <!-- Edit Role Button -->
-                      @if (canEditRole(role)) {
-                        <button 
-                          *appHasPermission="PERMISSIONS.ROLE_UPDATE"
-                          class="btn btn-sm btn-outline-warning"
-                          [title]="t('common.edit')"
-                          (click)="onEditRole(role)"
-                        >
-                          <i class="fa-solid fa-edit"></i>
-                        </button>
-                      }
-                      
-                      <!-- Delete Role Button -->
-                      @if (canDeleteRole(role)) {
-                        <button 
-                          *appHasPermission="PERMISSIONS.ROLE_DELETE"
-                          class="btn btn-sm btn-outline-danger"
-                          [title]="t('common.delete')"
-                          (click)="onDeleteRole(role)"
-                        >
-                          <i class="fa-solid fa-trash"></i>
-                        </button>
-                      }
-                      
-                      <!-- Protected Role Indicator -->
-                      @if (isProtectedRole(role)) {
-                        <span 
-                          class="btn btn-sm btn-outline-secondary disabled"
-                          [title]="t('roles.protected_role')"
-                        >
-                          <i class="fa-solid fa-shield-alt"></i>
-                        </span>
-                      }
-                    </div>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
+        <!-- Unified Data Table -->
+        <app-data-table
+          [data]="tableData()"
+          [columns]="tableColumns()"
+          [actions]="tableActions()"
+          [loading]="loading"
+          [paginated]="true"
+          [emptyMessage]="t('roles.no_roles_found')"
+          [responsiveMode]="'auto'"
+          (actionClick)="onActionClick($event)"
+          class="table-hover">
+        </app-data-table>
       }
     </div>
   </div>

@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TimeAttendanceSystem.Application.Shifts.Queries.GetShifts;
 using TimeAttendanceSystem.Application.Shifts.Queries.GetShiftById;
+using TimeAttendanceSystem.Application.Shifts.Queries.GetDefaultShift;
 using TimeAttendanceSystem.Application.Shifts.Commands.CreateShift;
 using TimeAttendanceSystem.Application.Shifts.Commands.UpdateShift;
 using TimeAttendanceSystem.Application.Shifts.Commands.DeleteShift;
+using TimeAttendanceSystem.Application.Shifts.Commands.SetDefaultShift;
 using TimeAttendanceSystem.Domain.Shifts;
 using TimeAttendanceSystem.Domain.Common;
 using TimeAttendanceSystem.Api.Models;
@@ -25,6 +27,7 @@ public class ShiftsController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Policy = "ShiftRead")]
     public async Task<IActionResult> GetShifts(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10,
@@ -42,6 +45,7 @@ public class ShiftsController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [Authorize(Policy = "ShiftRead")]
     public async Task<IActionResult> GetShiftById(long id)
     {
         var query = new GetShiftByIdQuery(id);
@@ -61,6 +65,7 @@ public class ShiftsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "ShiftManagement")]
     public async Task<IActionResult> CreateShift([FromBody] CreateShiftRequest request)
     {
         var command = new CreateShiftCommand(
@@ -107,6 +112,7 @@ public class ShiftsController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Policy = "ShiftManagement")]
     public async Task<IActionResult> UpdateShift(long id, [FromBody] UpdateShiftRequest request)
     {
         var command = new UpdateShiftCommand(
@@ -155,6 +161,7 @@ public class ShiftsController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Policy = "ShiftManagement")]
     public async Task<IActionResult> DeleteShift(long id)
     {
         var command = new DeleteShiftCommand(id);
@@ -166,6 +173,60 @@ public class ShiftsController : ControllerBase
         }
 
         return NoContent();
+    }
+
+    /// <summary>
+    /// Gets the current default shift for newly created employees.
+    /// </summary>
+    [HttpGet("default")]
+    [Authorize(Policy = "ShiftRead")]
+    public async Task<IActionResult> GetDefaultShift()
+    {
+        var query = new GetDefaultShiftQuery();
+        var result = await _mediator.Send(query);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(new { error = result.Error });
+        }
+
+        if (result.Value == null)
+        {
+            return NotFound(new { message = "No default shift is currently set" });
+        }
+
+        return Ok(result.Value);
+    }
+
+    /// <summary>
+    /// Sets a shift as the default for newly created employees.
+    /// Requires SystemAdmin role. If a default shift already exists and forceReplace is false,
+    /// returns a conflict response requiring confirmation.
+    /// </summary>
+    [HttpPost("{id}/set-default")]
+    [Authorize(Policy = "ShiftManagement")]
+    public async Task<IActionResult> SetDefaultShift(long id, [FromBody] SetDefaultShiftRequest request)
+    {
+        var command = new SetDefaultShiftCommand
+        {
+            ShiftId = (int)id,
+            ForceReplace = request.ForceReplace
+        };
+
+        var result = await _mediator.Send(command);
+
+        if (result.IsFailure)
+        {
+            // Check if it's a conflict due to existing default shift
+            if (result.Error.Contains("A default shift already exists"))
+            {
+                return Conflict(new { error = result.Error, requiresConfirmation = true });
+            }
+
+            return BadRequest(new { error = result.Error });
+        }
+
+        return Ok(new { message = "Default shift set successfully" });
     }
 }
 

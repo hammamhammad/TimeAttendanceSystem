@@ -34,10 +34,6 @@
   border-left-color: var(--bs-warning) !important;
 }
 
-.text-xs {
-  font-size: 0.75rem;
-}
-
 /* Activity List */
 .activity-list {
   max-height: 400px;
@@ -120,17 +116,17 @@
   .welcome-card {
     text-align: center;
   }
-  
+
   .activity-icon {
     width: 30px;
     height: 30px;
     font-size: 0.75rem;
   }
-  
+
   .activity-content {
     margin-left: 0.75rem !important;
   }
-  
+
   :root[dir="rtl"] .activity-content {
     margin-right: 0.75rem !important;
     margin-left: 0 !important;

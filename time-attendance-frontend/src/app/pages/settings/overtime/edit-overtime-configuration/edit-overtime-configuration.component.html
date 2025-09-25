@@ -1,0 +1,516 @@
+<div class="container-fluid">
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="d-flex justify-content-center align-items-center" style="min-height: 200px;">
+      <div class="text-center">
+        <i class="fa-solid fa-spinner fa-spin fs-2 text-primary mb-3"></i>
+        <p class="text-muted">{{ t('common.loading') }}</p>
+      </div>
+    </div>
+  } @else {
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2 class="mb-1">{{ t('settings.overtime.editPolicy') }}</h2>
+        <p class="text-muted mb-0">{{ t('settings.overtime.editPolicySubtitle') }}</p>
+        @if (isConfigurationActive()) {
+          <div class="badge bg-success mt-2">
+            <i class="fa-solid fa-check-circle me-1"></i>
+            {{ t('settings.overtime.currentlyActive') }}
+          </div>
+        }
+      </div>
+      <div>
+        <button
+          type="button"
+          class="btn btn-outline-secondary me-2"
+          (click)="onCancel()"
+          [disabled]="submitting()">
+          <i class="fa-solid fa-times me-2"></i>
+          {{ t('common.cancel') }}
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="onReset()"
+          [disabled]="submitting()">
+          <i class="fa-solid fa-refresh me-2"></i>
+          {{ t('common.reset') }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Error Alert -->
+    @if (error()) {
+      <div class="alert alert-danger" role="alert">
+        <i class="fa-solid fa-exclamation-triangle me-2"></i>
+        {{ error() }}
+      </div>
+    }
+
+    <!-- Active Configuration Warning -->
+    @if (isConfigurationActive()) {
+      <div class="alert alert-warning" role="alert">
+        <i class="fa-solid fa-exclamation-triangle me-2"></i>
+        <strong>{{ t('settings.overtime.editActiveWarning') }}</strong>
+        {{ t('settings.overtime.editActiveWarningMessage') }}
+      </div>
+    }
+
+    <!-- Form -->
+    <form (ngSubmit)="onSubmit()" #formRef="ngForm">
+      <div class="row">
+        <!-- Main Configuration -->
+        <div class="col-lg-8">
+          <!-- Overtime Types Section -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="mb-0">
+                <i class="fa-solid fa-clock me-2"></i>
+                {{ t('settings.overtime.overtimeTypes') }}
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-check mb-3">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="enablePreShiftOvertime"
+                      [(ngModel)]="configForm.enablePreShiftOvertime"
+                      name="enablePreShiftOvertime">
+                    <label class="form-check-label" for="enablePreShiftOvertime">
+                      <strong>{{ t('settings.overtime.enablePreShift') }}</strong>
+                      <br>
+                      <small class="text-muted">{{ t('settings.overtime.enablePreShiftDescription') }}</small>
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-check mb-3">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="enablePostShiftOvertime"
+                      [(ngModel)]="configForm.enablePostShiftOvertime"
+                      name="enablePostShiftOvertime">
+                    <label class="form-check-label" for="enablePostShiftOvertime">
+                      <strong>{{ t('settings.overtime.enablePostShift') }}</strong>
+                      <br>
+                      <small class="text-muted">{{ t('settings.overtime.enablePostShiftDescription') }}</small>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              @if (hasError('general')) {
+                <div class="text-danger small">{{ getError('general') }}</div>
+              }
+            </div>
+          </div>
+
+          <!-- Overtime Rates Section -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="mb-0">
+                <i class="fa-solid fa-percentage me-2"></i>
+                {{ t('settings.overtime.overtimeRates') }}
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <label for="normalDayRate" class="form-label">
+                      {{ t('settings.overtime.normalDayRate') }} <span class="text-danger">*</span>
+                    </label>
+                    <div class="input-group">
+                      <input
+                        type="number"
+                        [class]="getFieldClasses('normalDayRate')"
+                        id="normalDayRate"
+                        [(ngModel)]="configForm.normalDayRate"
+                        name="normalDayRate"
+                        step="0.1"
+                        min="1"
+                        required>
+                      <span class="input-group-text">x</span>
+                    </div>
+                    @if (hasError('normalDayRate')) {
+                      <div class="invalid-feedback d-block">{{ getError('normalDayRate') }}</div>
+                    }
+                    <div class="form-text">{{ t('settings.overtime.normalDayRateDescription') }}</div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <label for="publicHolidayRate" class="form-label">
+                      {{ t('settings.overtime.publicHolidayRate') }} <span class="text-danger">*</span>
+                    </label>
+                    <div class="input-group">
+                      <input
+                        type="number"
+                        [class]="getFieldClasses('publicHolidayRate')"
+                        id="publicHolidayRate"
+                        [(ngModel)]="configForm.publicHolidayRate"
+                        name="publicHolidayRate"
+                        step="0.1"
+                        min="1"
+                        required>
+                      <span class="input-group-text">x</span>
+                    </div>
+                    @if (hasError('publicHolidayRate')) {
+                      <div class="invalid-feedback d-block">{{ getError('publicHolidayRate') }}</div>
+                    }
+                    <div class="form-text">{{ t('settings.overtime.publicHolidayRateDescription') }}</div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <label for="offDayRate" class="form-label">
+                      {{ t('settings.overtime.offDayRate') }} <span class="text-danger">*</span>
+                    </label>
+                    <div class="input-group">
+                      <input
+                        type="number"
+                        [class]="getFieldClasses('offDayRate')"
+                        id="offDayRate"
+                        [(ngModel)]="configForm.offDayRate"
+                        name="offDayRate"
+                        step="0.1"
+                        min="1"
+                        required>
+                      <span class="input-group-text">x</span>
+                    </div>
+                    @if (hasError('offDayRate')) {
+                      <div class="invalid-feedback d-block">{{ getError('offDayRate') }}</div>
+                    }
+                    <div class="form-text">{{ t('settings.overtime.offDayRateDescription') }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Overtime Limits Section -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="mb-0">
+                <i class="fa-solid fa-hourglass-half me-2"></i>
+                {{ t('settings.overtime.overtimeLimits') }}
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="maxPreShiftOvertimeHours" class="form-label">
+                      {{ t('settings.overtime.maxPreShiftHours') }}
+                    </label>
+                    <div class="input-group">
+                      <input
+                        type="number"
+                        [class]="getFieldClasses('maxPreShiftOvertimeHours')"
+                        id="maxPreShiftOvertimeHours"
+                        [(ngModel)]="configForm.maxPreShiftOvertimeHours"
+                        name="maxPreShiftOvertimeHours"
+                        step="0.5"
+                        min="0">
+                      <span class="input-group-text">{{ t('common.hours') }}</span>
+                    </div>
+                    @if (hasError('maxPreShiftOvertimeHours')) {
+                      <div class="invalid-feedback d-block">{{ getError('maxPreShiftOvertimeHours') }}</div>
+                    }
+                    <div class="form-text">{{ t('settings.overtime.maxPreShiftHoursDescription') }}</div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="maxPostShiftOvertimeHours" class="form-label">
+                      {{ t('settings.overtime.maxPostShiftHours') }}
+                    </label>
+                    <div class="input-group">
+                      <input
+                        type="number"
+                        [class]="getFieldClasses('maxPostShiftOvertimeHours')"
+                        id="maxPostShiftOvertimeHours"
+                        [(ngModel)]="configForm.maxPostShiftOvertimeHours"
+                        name="maxPostShiftOvertimeHours"
+                        step="0.5"
+                        min="0">
+                      <span class="input-group-text">{{ t('common.hours') }}</span>
+                    </div>
+                    @if (hasError('maxPostShiftOvertimeHours')) {
+                      <div class="invalid-feedback d-block">{{ getError('maxPostShiftOvertimeHours') }}</div>
+                    }
+                    <div class="form-text">{{ t('settings.overtime.maxPostShiftHoursDescription') }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Calculation Settings Section -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="mb-0">
+                <i class="fa-solid fa-calculator me-2"></i>
+                {{ t('settings.overtime.calculationSettings') }}
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <label for="minimumOvertimeMinutes" class="form-label">
+                      {{ t('settings.overtime.minimumOvertimeMinutes') }}
+                    </label>
+                    <div class="input-group">
+                      <input
+                        type="number"
+                        [class]="getFieldClasses('minimumOvertimeMinutes')"
+                        id="minimumOvertimeMinutes"
+                        [(ngModel)]="configForm.minimumOvertimeMinutes"
+                        name="minimumOvertimeMinutes"
+                        min="0">
+                      <span class="input-group-text">{{ t('common.minutes') }}</span>
+                    </div>
+                    @if (hasError('minimumOvertimeMinutes')) {
+                      <div class="invalid-feedback d-block">{{ getError('minimumOvertimeMinutes') }}</div>
+                    }
+                    <div class="form-text">{{ t('settings.overtime.minimumOvertimeMinutesDescription') }}</div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <label for="overtimeGracePeriodMinutes" class="form-label">
+                      {{ t('settings.overtime.gracePeriodMinutes') }}
+                    </label>
+                    <div class="input-group">
+                      <input
+                        type="number"
+                        [class]="getFieldClasses('overtimeGracePeriodMinutes')"
+                        id="overtimeGracePeriodMinutes"
+                        [(ngModel)]="configForm.overtimeGracePeriodMinutes"
+                        name="overtimeGracePeriodMinutes"
+                        min="0">
+                      <span class="input-group-text">{{ t('common.minutes') }}</span>
+                    </div>
+                    @if (hasError('overtimeGracePeriodMinutes')) {
+                      <div class="invalid-feedback d-block">{{ getError('overtimeGracePeriodMinutes') }}</div>
+                    }
+                    <div class="form-text">{{ t('settings.overtime.gracePeriodMinutesDescription') }}</div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <label for="roundingIntervalMinutes" class="form-label">
+                      {{ t('settings.overtime.roundingIntervalMinutes') }}
+                    </label>
+                    <div class="input-group">
+                      <input
+                        type="number"
+                        [class]="getFieldClasses('roundingIntervalMinutes')"
+                        id="roundingIntervalMinutes"
+                        [(ngModel)]="configForm.roundingIntervalMinutes"
+                        name="roundingIntervalMinutes"
+                        min="1">
+                      <span class="input-group-text">{{ t('common.minutes') }}</span>
+                    </div>
+                    @if (hasError('roundingIntervalMinutes')) {
+                      <div class="invalid-feedback d-block">{{ getError('roundingIntervalMinutes') }}</div>
+                    }
+                    <div class="form-text">{{ t('settings.overtime.roundingIntervalMinutesDescription') }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-check mb-3">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="considerFlexibleTime"
+                      [(ngModel)]="configForm.considerFlexibleTime"
+                      name="considerFlexibleTime">
+                    <label class="form-check-label" for="considerFlexibleTime">
+                      {{ t('settings.overtime.considerFlexibleTime') }}
+                      <br>
+                      <small class="text-muted">{{ t('settings.overtime.considerFlexibleTimeDescription') }}</small>
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-check mb-3">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="weekendAsOffDay"
+                      [(ngModel)]="configForm.weekendAsOffDay"
+                      name="weekendAsOffDay">
+                    <label class="form-check-label" for="weekendAsOffDay">
+                      {{ t('settings.overtime.weekendAsOffDay') }}
+                      <br>
+                      <small class="text-muted">{{ t('settings.overtime.weekendAsOffDayDescription') }}</small>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Policy Notes Section -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="mb-0">
+                <i class="fa-solid fa-sticky-note me-2"></i>
+                {{ t('settings.overtime.policyNotes') }}
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="mb-3">
+                <label for="policyNotes" class="form-label">
+                  {{ t('settings.overtime.policyNotesLabel') }}
+                </label>
+                <textarea
+                  class="form-control"
+                  id="policyNotes"
+                  [(ngModel)]="configForm.policyNotes"
+                  name="policyNotes"
+                  rows="4"
+                  [placeholder]="t('settings.overtime.policyNotesPlaceholder')">
+                </textarea>
+                <div class="form-text">{{ t('settings.overtime.policyNotesDescription') }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+          <!-- Configuration Info -->
+          @if (originalConfig) {
+            <div class="card mb-4">
+              <div class="card-header">
+                <h5 class="mb-0">
+                  <i class="fa-solid fa-info-circle me-2"></i>
+                  {{ t('settings.overtime.configurationInfo') }}
+                </h5>
+              </div>
+              <div class="card-body">
+                <div class="mb-2">
+                  <small class="text-muted">{{ t('common.created') }}:</small>
+                  <div>{{ originalConfig.createdBy }} on {{ originalConfig.createdAtUtc | date:'medium' }}</div>
+                </div>
+                @if (originalConfig.updatedAtUtc) {
+                  <div class="mb-2">
+                    <small class="text-muted">{{ t('common.lastModified') }}:</small>
+                    <div>{{ originalConfig.updatedBy }} on {{ originalConfig.updatedAtUtc | date:'medium' }}</div>
+                  </div>
+                }
+                <div class="mb-2">
+                  <small class="text-muted">{{ t('settings.overtime.status') }}:</small>
+                  <div>
+                    @if (originalConfig.isActive) {
+                      <span class="badge bg-success">{{ t('settings.overtime.active') }}</span>
+                    } @else {
+                      <span class="badge bg-light text-dark border">{{ t('settings.overtime.inactive') }}</span>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Effective Period Section -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="mb-0">
+                <i class="fa-solid fa-calendar me-2"></i>
+                {{ t('settings.overtime.effectivePeriod') }}
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="mb-3">
+                <label for="effectiveFromDate" class="form-label">
+                  {{ t('settings.overtime.effectiveFrom') }} <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="date"
+                  [class]="getFieldClasses('effectiveFromDate')"
+                  id="effectiveFromDate"
+                  [(ngModel)]="configForm.effectiveFromDate"
+                  name="effectiveFromDate"
+                  required>
+                @if (hasError('effectiveFromDate')) {
+                  <div class="invalid-feedback d-block">{{ getError('effectiveFromDate') }}</div>
+                }
+                <div class="form-text">{{ t('settings.overtime.effectiveFromDescription') }}</div>
+              </div>
+              <div class="mb-3">
+                <label for="effectiveToDate" class="form-label">
+                  {{ t('settings.overtime.effectiveTo') }}
+                </label>
+                <input
+                  type="date"
+                  [class]="getFieldClasses('effectiveToDate')"
+                  id="effectiveToDate"
+                  [(ngModel)]="configForm.effectiveToDate"
+                  name="effectiveToDate">
+                @if (hasError('effectiveToDate')) {
+                  <div class="invalid-feedback d-block">{{ getError('effectiveToDate') }}</div>
+                }
+                <div class="form-text">{{ t('settings.overtime.effectiveToDescription') }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Additional Settings Section -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="mb-0">
+                <i class="fa-solid fa-cogs me-2"></i>
+                {{ t('settings.overtime.additionalSettings') }}
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="form-check mb-3">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="requireApproval"
+                  [(ngModel)]="configForm.requireApproval"
+                  name="requireApproval">
+                <label class="form-check-label" for="requireApproval">
+                  {{ t('settings.overtime.requireApproval') }}
+                  <br>
+                  <small class="text-muted">{{ t('settings.overtime.requireApprovalDescription') }}</small>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Section -->
+          <div class="card">
+            <div class="card-body">
+              <div class="d-grid gap-2">
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  [disabled]="submitting()">
+                  @if (submitting()) {
+                    <i class="fa-solid fa-spinner fa-spin me-2"></i>
+                  } @else {
+                    <i class="fa-solid fa-save me-2"></i>
+                  }
+                  {{ submitting() ? t('common.saving') : t('settings.overtime.updatePolicy') }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  }
+</div>

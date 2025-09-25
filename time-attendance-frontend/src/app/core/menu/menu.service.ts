@@ -70,6 +70,32 @@ export class MenuService {
       ]
     },
     {
+      path: '/attendance',
+      titleKey: 'nav.attendance',
+      icon: 'fa-solid fa-calendar-check',
+      permission: undefined, // Special handling in sidenav component
+      children: [
+        {
+          path: '/attendance',
+          titleKey: 'attendance.dashboard_title',
+          icon: 'fa-solid fa-chart-line',
+          permission: 'attendance.read'
+        },
+        {
+          path: '/attendance/daily',
+          titleKey: 'attendance.daily_view',
+          icon: 'fa-solid fa-calendar-day',
+          permission: 'attendance.read'
+        },
+        {
+          path: '/attendance/monthly-report',
+          titleKey: 'attendance.monthly_report',
+          icon: 'fa-solid fa-calendar-alt',
+          permission: 'attendance.read'
+        }
+      ]
+    },
+    {
       path: '/reports',
       titleKey: 'nav.reports',
       icon: 'fa-solid fa-chart-bar',
@@ -79,7 +105,27 @@ export class MenuService {
       path: '/settings',
       titleKey: 'nav.settings',
       icon: 'fa-solid fa-cog',
-      permission: undefined // Settings accessible to all authenticated users
+      permission: undefined, // Settings accessible to all authenticated users
+      children: [
+        {
+          path: '/settings',
+          titleKey: 'settings.dashboard',
+          icon: 'fa-solid fa-cog',
+          permission: undefined
+        },
+        {
+          path: '/settings/overtime',
+          titleKey: 'settings.overtime.title',
+          icon: 'fa-solid fa-clock',
+          permission: 'settings.overtime.read'
+        },
+        {
+          path: '/settings/public-holidays',
+          titleKey: 'settings.holidays.title',
+          icon: 'fa-solid fa-calendar-check',
+          permission: 'publicHoliday.read'
+        }
+      ]
     }
   ]);
 

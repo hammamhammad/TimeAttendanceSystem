@@ -139,6 +139,12 @@ public class Shift : BaseEntity
     public bool IsNightShift { get; set; } = false;
 
     /// <summary>
+    /// Gets or sets whether this is the default shift for newly created employees.
+    /// Only one shift in the system can be marked as default.
+    /// </summary>
+    public bool IsDefault { get; set; } = false;
+
+    /// <summary>
     /// Gets or sets the collection of shift periods defining working time blocks.
     /// Single-period shifts have one period, multi-period shifts have up to two periods.
     /// </summary>
@@ -276,6 +282,12 @@ public class Shift : BaseEntity
                 errors.Add("Required weekly hours cannot exceed 168 hours per week");
             }
 
+            // Business Rule: Core Hours is mandatory with Weekly Hours
+            if (!HasCoreHours)
+            {
+                errors.Add("Core hours must be enabled when weekly hours are specified");
+            }
+
             // For hours-only shifts, weekly hours should be reasonable with daily hours
             if (ShiftType == ShiftType.HoursOnly && RequiredHours.HasValue)
             {
@@ -287,6 +299,12 @@ public class Shift : BaseEntity
                     errors.Add("Required weekly hours seems too high compared to daily hours and working days");
                 }
             }
+        }
+
+        // Business Rule: Night Shift not works with Hours Only
+        if (IsNightShift && ShiftType == ShiftType.HoursOnly)
+        {
+            errors.Add("Night shift is not compatible with hours-only shift type");
         }
 
         return (errors.Count == 0, errors);

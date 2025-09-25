@@ -78,8 +78,8 @@ public class GetShiftAssignmentsQueryHandler : BaseHandler<GetShiftAssignmentsQu
                 BranchName = sa.Branch != null ? sa.Branch.Name : null,
                 BranchCode = sa.Branch != null ? sa.Branch.Code : null,
                 TargetDisplayName = GetTargetDisplayName(sa),
-                EffectiveDate = sa.EffectiveDate,
-                EndDate = sa.EndDate,
+                EffectiveDate = sa.EffectiveFromDate,
+                EndDate = sa.EffectiveToDate,
                 Status = sa.Status,
                 StatusDisplay = GetStatusDisplay(sa.Status),
                 Priority = sa.Priority,
@@ -159,12 +159,12 @@ public class GetShiftAssignmentsQueryHandler : BaseHandler<GetShiftAssignmentsQu
         // Date range filters
         if (request.EffectiveFrom.HasValue)
         {
-            query = query.Where(sa => sa.EffectiveDate >= request.EffectiveFrom.Value);
+            query = query.Where(sa => sa.EffectiveFromDate >= request.EffectiveFrom.Value);
         }
 
         if (request.EffectiveTo.HasValue)
         {
-            query = query.Where(sa => sa.EffectiveDate <= request.EffectiveTo.Value);
+            query = query.Where(sa => sa.EffectiveFromDate <= request.EffectiveTo.Value);
         }
 
         // Currently active filter
@@ -172,8 +172,8 @@ public class GetShiftAssignmentsQueryHandler : BaseHandler<GetShiftAssignmentsQu
         {
             var now = DateTime.UtcNow.Date;
             query = query.Where(sa => sa.Status == ShiftAssignmentStatus.Active &&
-                                    sa.EffectiveDate.Date <= now &&
-                                    (sa.EndDate == null || sa.EndDate.Value.Date >= now));
+                                    sa.EffectiveFromDate.Date <= now &&
+                                    (sa.EffectiveToDate == null || sa.EffectiveToDate.Value.Date >= now));
         }
 
         // Priority range filters

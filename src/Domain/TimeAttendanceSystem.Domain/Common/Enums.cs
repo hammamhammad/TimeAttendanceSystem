@@ -2,12 +2,14 @@ namespace TimeAttendanceSystem.Domain.Common;
 
 public enum EmploymentStatus
 {
-    FullTime = 1,
-    PartTime = 2,
-    Contract = 3,
-    Intern = 4,
-    Consultant = 5,
-    Terminated = 6
+    Active = 1,
+    FullTime = 2,
+    PartTime = 3,
+    Contract = 4,
+    Intern = 5,
+    Consultant = 6,
+    Terminated = 7,
+    Inactive = 8
 }
 
 public enum Gender
@@ -84,6 +86,16 @@ public enum AuditAction
     ShiftAssignmentDeleted = 82,
     ShiftAssignmentActivated = 83,
     ShiftAssignmentDeactivated = 84,
+
+    // Vacation Management
+    VacationTypeCreated = 90,
+    VacationTypeUpdated = 91,
+    VacationTypeDeleted = 92,
+    VacationRequestCreated = 93,
+    VacationRequestUpdated = 94,
+    VacationRequestApproved = 95,
+    VacationRequestRejected = 96,
+    VacationRequestCancelled = 97,
 
     // Generic CRUD Operations
     Created = 200,

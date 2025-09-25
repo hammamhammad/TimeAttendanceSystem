@@ -36,6 +36,7 @@ public class ShiftDto
     public bool IsFriday { get; set; } = true;
     public bool IsSaturday { get; set; } = false;
     public bool IsNightShift { get; set; } = false;
+    public bool IsDefault { get; set; } = false;
 
     public List<ShiftPeriodDto> ShiftPeriods { get; set; } = new();
     public DateTime CreatedAtUtc { get; set; }

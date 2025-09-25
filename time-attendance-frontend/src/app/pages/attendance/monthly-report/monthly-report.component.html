@@ -1,0 +1,311 @@
+<div class="container-fluid p-4">
+  <!-- Page Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <h2 class="mb-0">{{ i18nService.t('attendance.monthly_report') }}</h2>
+        <div>
+          <button
+            type="button"
+            class="btn btn-outline-secondary me-2"
+            (click)="loadMonthlyReport()"
+            [disabled]="loading()">
+            <i class="fa-solid fa-refresh me-2" [class.fa-spin]="loading()"></i>{{ i18nService.t('app.refresh') }}
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline-success me-2"
+            (click)="exportToExcel()"
+            [disabled]="exporting() || loading()">
+            <i class="fa-solid fa-file-excel me-2" [class.fa-spin]="exporting()"></i>{{ i18nService.t('app.export_excel') }}
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline-danger"
+            (click)="exportToPDF()"
+            [disabled]="exporting() || loading()">
+            <i class="fa-solid fa-file-pdf me-2" [class.fa-spin]="exporting()"></i>{{ i18nService.t('app.export_pdf') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">{{ i18nService.t('app.loading') }}</span>
+      </div>
+      <p class="mt-2 text-muted">{{ i18nService.t('attendance.messages.loading_monthly_report') }}</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error()) {
+    <div class="alert alert-danger">
+      <i class="fa-solid fa-exclamation-triangle"></i>
+      {{ error() }}
+    </div>
+  }
+
+  <!-- Main Content -->
+  @if (!loading() && !error()) {
+    <div class="monthly-report-content">
+
+      <!-- Filters Panel -->
+      <div class="filters-section mb-4">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <i class="fa-solid fa-filter me-2"></i>
+              {{ i18nService.t('attendance.filters.title') }}
+            </h5>
+          </div>
+          <div class="card-body">
+            <form [formGroup]="filterForm" class="row g-3">
+              <!-- Month and Year Selection -->
+              <div class="col-md-3">
+                <label class="form-label">{{ i18nService.t('attendance.filters.month') }}</label>
+                <select class="form-select" formControlName="month">
+                  <option value="1">{{ i18nService.t('months.january') }}</option>
+                  <option value="2">{{ i18nService.t('months.february') }}</option>
+                  <option value="3">{{ i18nService.t('months.march') }}</option>
+                  <option value="4">{{ i18nService.t('months.april') }}</option>
+                  <option value="5">{{ i18nService.t('months.may') }}</option>
+                  <option value="6">{{ i18nService.t('months.june') }}</option>
+                  <option value="7">{{ i18nService.t('months.july') }}</option>
+                  <option value="8">{{ i18nService.t('months.august') }}</option>
+                  <option value="9">{{ i18nService.t('months.september') }}</option>
+                  <option value="10">{{ i18nService.t('months.october') }}</option>
+                  <option value="11">{{ i18nService.t('months.november') }}</option>
+                  <option value="12">{{ i18nService.t('months.december') }}</option>
+                </select>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">{{ i18nService.t('attendance.filters.year') }}</label>
+                <select class="form-select" formControlName="year">
+                  <option value="2024">2024</option>
+                  <option value="2025">2025</option>
+                  <option value="2026">2026</option>
+                </select>
+              </div>
+
+              <!-- Filter Actions -->
+              <div class="col-md-6 d-flex align-items-end">
+                <button
+                  type="button"
+                  class="btn btn-primary me-2"
+                  (click)="generateReport()"
+                  [disabled]="loading()">
+                  <i class="fa-solid fa-chart-bar me-1"></i>
+                  {{ i18nService.t('attendance.actions.generate_report') }}
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  (click)="filterForm.reset()"
+                  [disabled]="loading()">
+                  <i class="fa-solid fa-times me-1"></i>
+                  {{ i18nService.t('app.reset') }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Report Summary -->
+      @if (summaryStats()) {
+        <div class="report-summary mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="section-title">
+              <i class="fa-solid fa-chart-line me-2"></i>
+              {{ i18nService.t('attendance.monthly_summary') }}
+              - {{ getMonthName(currentFilters().month) }} {{ currentFilters().year }}
+            </h4>
+          </div>
+
+          <!-- Summary Cards -->
+          <div class="row mb-4">
+            @for (card of summaryCards(); track card.title) {
+              <div class="col-xl-2 col-lg-4 col-md-6 mb-3">
+                <app-attendance-summary-card
+                  [data]="card"
+                  [loading]="loading()"
+                  [showProgress]="!!card.percentage"
+                  [clickable]="false">
+                </app-attendance-summary-card>
+              </div>
+            }
+          </div>
+
+          <!-- Charts Section -->
+          <div class="row mb-4">
+            <!-- Monthly Overview Chart -->
+            <div class="col-lg-6 mb-4">
+              <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                  <h5 class="mb-0">
+                    <i class="fa-solid fa-chart-pie text-primary me-2"></i>
+                    {{ i18nService.t('attendance.charts.monthly_overview') }}
+                  </h5>
+                  <span class="badge bg-primary">{{ getMonthName(currentFilters().month) }}</span>
+                </div>
+                <div class="card-body">
+                  <p class="text-muted small mb-3">
+                    <i class="fa-solid fa-info-circle me-1"></i>
+                    {{ i18nService.t('attendance.chart.descriptions.monthly_overview') }}
+                  </p>
+                  <app-attendance-chart
+                    chartType="doughnut"
+                    [data]="attendanceOverviewChart()"
+                    [loading]="loading()"
+                    [height]="300">
+                  </app-attendance-chart>
+                </div>
+              </div>
+            </div>
+
+            <!-- Overtime Trend Chart -->
+            <div class="col-lg-6 mb-4">
+              <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                  <h5 class="mb-0">
+                    <i class="fa-solid fa-chart-line text-info me-2"></i>
+                    {{ i18nService.t('attendance.charts.overtime_trend') }}
+                  </h5>
+                  <span class="badge bg-info">{{ i18nService.t('attendance.dashboard.daily') }}</span>
+                </div>
+                <div class="card-body">
+                  <p class="text-muted small mb-3">
+                    <i class="fa-solid fa-info-circle me-1"></i>
+                    {{ i18nService.t('attendance.chart.descriptions.overtime_trend') }}
+                  </p>
+                  <app-attendance-chart
+                    chartType="line"
+                    [data]="overtimeTrendChart()"
+                    [loading]="loading()"
+                    [height]="300">
+                  </app-attendance-chart>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Employee Records Table -->
+      <div class="employee-records-section">
+        <div class="card">
+          <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">
+                <i class="fa-solid fa-table me-2"></i>
+                {{ i18nService.t('attendance.employee_records') }}
+              </h5>
+              <span class="badge bg-light text-dark">{{ reportData().length }} {{ i18nService.t('attendance.employees') }}</span>
+            </div>
+          </div>
+          <div class="card-body p-0">
+            <app-data-table
+              [data]="reportData()"
+              [columns]="tableColumns"
+              [loading]="loading()"
+              [searchable]="true"
+              [sortable]="true"
+              [paginated]="true"
+              [pageSize]="10"
+              [exportable]="true"
+              (actionClick)="onTableAction($event)">
+
+              <ng-template #cellTemplate let-item let-column="column">
+                @if (column.key === 'attendanceRate') {
+                  <span [class]="getAttendanceRateClass(item.attendanceRate)">
+                    {{ item.attendanceRate | number:'1.2-2' }}%
+                  </span>
+                } @else if (column.key === 'totalWorkingHours') {
+                  {{ item.totalWorkingHours | number:'1.2-2' }}
+                } @else if (column.key === 'totalOvertimeHours') {
+                  {{ item.totalOvertimeHours | number:'1.2-2' }}
+                } @else {
+                  {{ item[column.key] }}
+                }
+              </ng-template>
+            </app-data-table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Export Options -->
+      <div class="mt-4">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <i class="fa-solid fa-download me-2"></i>
+              {{ i18nService.t('attendance.export_options') }}
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-4">
+                <div class="export-option-card">
+                  <div class="export-icon text-success">
+                    <i class="fa-solid fa-file-excel fa-2x"></i>
+                  </div>
+                  <h6>{{ i18nService.t('app.export_excel') }}</h6>
+                  <p class="text-muted small">{{ i18nService.t('attendance.export.excel_description') }}</p>
+                  <button
+                    type="button"
+                    class="btn btn-success btn-sm"
+                    (click)="exportToExcel()"
+                    [disabled]="exporting()">
+                    <i class="fa-solid fa-download me-1"></i>
+                    {{ i18nService.t('app.download') }}
+                  </button>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="export-option-card">
+                  <div class="export-icon text-danger">
+                    <i class="fa-solid fa-file-pdf fa-2x"></i>
+                  </div>
+                  <h6>{{ i18nService.t('app.export_pdf') }}</h6>
+                  <p class="text-muted small">{{ i18nService.t('attendance.export.pdf_description') }}</p>
+                  <button
+                    type="button"
+                    class="btn btn-danger btn-sm"
+                    (click)="exportToPDF()"
+                    [disabled]="exporting()">
+                    <i class="fa-solid fa-download me-1"></i>
+                    {{ i18nService.t('app.download') }}
+                  </button>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="export-option-card">
+                  <div class="export-icon text-info">
+                    <i class="fa-solid fa-envelope fa-2x"></i>
+                  </div>
+                  <h6>{{ i18nService.t('attendance.export.email_report') }}</h6>
+                  <p class="text-muted small">{{ i18nService.t('attendance.export.email_description') }}</p>
+                  <button
+                    type="button"
+                    class="btn btn-info btn-sm"
+                    [disabled]="true">
+                    <i class="fa-solid fa-envelope me-1"></i>
+                    {{ i18nService.t('app.coming_soon') }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  }
+</div>

@@ -1,0 +1,80 @@
+.chart-container {
+  position: relative;
+  background: white;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.chart-header {
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.chart-title {
+  font-weight: 600;
+  color: #495057;
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.chart-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.attendance-chart {
+  max-width: 100%;
+  height: auto;
+}
+
+.chart-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+.no-data-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  color: #6c757d;
+}
+
+.no-data-state i {
+  opacity: 0.5;
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .chart-container {
+    padding: 0.75rem;
+  }
+
+  .chart-title {
+    font-size: 1rem;
+  }
+}
+
+/* Animation for chart loading */
+.chart-loading .spinner-border {
+  animation: chart-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes chart-pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}

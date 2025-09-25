@@ -44,8 +44,8 @@ public class GetBranchesQueryHandler : BaseHandler<GetBranchesQuery, Result<Page
                 Name = b.Name,
                 TimeZone = b.TimeZone,
                 IsActive = b.IsActive,
-                EmployeeCount = Context.Employees.Count(e => e.BranchId == b.Id),
-                DepartmentCount = Context.Departments.Count(d => d.BranchId == b.Id),
+                EmployeeCount = Context.Employees.Count(e => e.BranchId == b.Id && !e.IsDeleted),
+                DepartmentCount = Context.Departments.Count(d => d.BranchId == b.Id && !d.IsDeleted),
                 CreatedAtUtc = b.CreatedAtUtc
             })
             .ToListAsync(cancellationToken);

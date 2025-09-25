@@ -1,0 +1,294 @@
+<div class="filter-panel">
+  <!-- Header -->
+  <div class="filter-header" [class.collapsible]="collapsible" (click)="collapsible ? toggleCollapse() : null">
+    <div class="d-flex justify-content-between align-items-center">
+      <h6 class="filter-title mb-0">
+        <i class="fa-solid fa-filter me-2"></i>
+        {{ i18nService.t('attendance.filters.title') }}
+      </h6>
+      <div class="header-actions d-flex align-items-center gap-2">
+        <!-- Action buttons when not collapsible -->
+        @if (!collapsible) {
+          <div class="d-flex gap-2">
+            @if (showClearButton) {
+              <button
+                type="button"
+                class="btn btn-outline-secondary btn-sm"
+                (click)="clearFilters()">
+                <i class="fa-solid fa-times me-1"></i>
+                {{ i18nService.t('app.clear') }}
+              </button>
+            }
+            @if (showApplyButton) {
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                (click)="applyFilters()">
+                <i class="fa-solid fa-search me-1"></i>
+                {{ i18nService.t('app.search') }}
+              </button>
+            }
+          </div>
+        }
+
+        <!-- Collapse toggle -->
+        @if (collapsible) {
+          <button type="button" class="btn btn-link btn-sm p-0">
+            <i class="fa-solid" [class.fa-chevron-down]="isCollapsed" [class.fa-chevron-up]="!isCollapsed"></i>
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Content -->
+  <div class="filter-content" [class.collapsed]="isCollapsed" [class.show]="!isCollapsed">
+    <form [formGroup]="filterForm" class="filter-form">
+      <div class="row g-3">
+
+        <!-- Date Range -->
+        @if (config.dateRange?.enabled) {
+          <div class="col-12">
+            <div class="filter-group">
+              <label class="form-label">{{ i18nService.t('attendance.filters.date_range') }}</label>
+
+              <!-- Date Presets -->
+              @if (config.dateRange?.presets && (config.dateRange?.presets?.length || 0) > 0) {
+                <div class="date-presets mb-3">
+                  <div class="btn-group btn-group-sm" role="group">
+                    @for (preset of config.dateRange?.presets; track preset.label) {
+                      <button
+                        type="button"
+                        class="btn btn-outline-secondary"
+                        (click)="applyDatePreset(preset)">
+                        {{ preset.label }}
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
+
+              <!-- Date Inputs -->
+              <div class="row g-2">
+                <div class="col-md-6">
+                  <label class="form-label small">{{ i18nService.t('attendance.filters.start_date') }}</label>
+                  <input type="date"
+                         class="form-control"
+                         formControlName="startDate"
+                         [max]="filterForm.get('endDate')?.value">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small">{{ i18nService.t('attendance.filters.end_date') }}</label>
+                  <input type="date"
+                         class="form-control"
+                         formControlName="endDate"
+                         [min]="filterForm.get('startDate')?.value">
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Employees -->
+        @if (config.employees?.enabled) {
+          <div class="col-lg-4 col-md-6">
+            <div class="filter-group">
+              <label class="form-label">{{ i18nService.t('attendance.filters.employees') }}</label>
+              <select class="form-select"
+                      formControlName="employeeIds"
+                      [multiple]="isMultipleSelection('employees')">
+                <option value="">{{ i18nService.t('attendance.filters.all_employees') }}</option>
+                @for (option of getFieldOptions('employees'); track option.value) {
+                  <option
+                    [value]="option.value"
+                    [disabled]="option.disabled">
+                    {{ option.label }}
+                  </option>
+                }
+              </select>
+            </div>
+          </div>
+        }
+
+        <!-- Departments -->
+        @if (config.departments?.enabled) {
+          <div class="col-lg-4 col-md-6">
+            <div class="filter-group">
+              <label class="form-label">{{ i18nService.t('attendance.filters.departments') }}</label>
+              <select class="form-select"
+                      formControlName="departmentIds"
+                      [multiple]="isMultipleSelection('departments')">
+                <option value="">{{ i18nService.t('attendance.filters.all_departments') }}</option>
+                @for (option of getFieldOptions('departments'); track option.value) {
+                  <option
+                    [value]="option.value"
+                    [disabled]="option.disabled">
+                    {{ option.label }}
+                  </option>
+                }
+              </select>
+            </div>
+          </div>
+        }
+
+        <!-- Branches -->
+        @if (config.branches?.enabled) {
+          <div class="col-lg-4 col-md-6">
+            <div class="filter-group">
+              <label class="form-label">{{ i18nService.t('attendance.filters.branches') }}</label>
+              <select class="form-select"
+                      formControlName="branchIds"
+                      [multiple]="isMultipleSelection('branches')">
+                <option value="">{{ i18nService.t('attendance.filters.all_branches') }}</option>
+                @for (option of getFieldOptions('branches'); track option.value) {
+                  <option
+                    [value]="option.value"
+                    [disabled]="option.disabled">
+                    {{ option.label }}
+                  </option>
+                }
+              </select>
+            </div>
+          </div>
+        }
+
+        <!-- Status -->
+        @if (config.status?.enabled) {
+          <div class="col-lg-4 col-md-6">
+            <div class="filter-group">
+              <label class="form-label">{{ i18nService.t('attendance.filters.status') }}</label>
+              <select class="form-select"
+                      formControlName="statusFilter"
+                      [multiple]="isMultipleSelection('status')">
+                <option value="">{{ i18nService.t('attendance.filters.all_statuses') }}</option>
+                @for (option of getFieldOptions('status'); track option.value) {
+                  <option
+                    [value]="option.value"
+                    [disabled]="option.disabled">
+                    {{ option.label }}
+                  </option>
+                }
+              </select>
+            </div>
+          </div>
+        }
+
+        <!-- Report Type -->
+        @if (config.reportType?.enabled) {
+          <div class="col-lg-4 col-md-6">
+            <div class="filter-group">
+              <label class="form-label">{{ i18nService.t('attendance.filters.report_type') }}</label>
+              <select class="form-select" formControlName="reportType">
+                @for (option of config.reportType?.options; track option.value) {
+                  <option
+                    [value]="option.value"
+                    [disabled]="option.disabled">
+                    {{ option.label }}
+                  </option>
+                }
+              </select>
+            </div>
+          </div>
+        }
+
+        <!-- Custom Fields -->
+        @for (field of config.customFields; track field.key) {
+          <div class="col-lg-4 col-md-6">
+            <div class="filter-group">
+              <label class="form-label">{{ field.label }}</label>
+
+              <!-- Text Input -->
+              @if (field.type === 'text') {
+                <input
+                  type="text"
+                  class="form-control"
+                  [formControlName]="field.key"
+                  [placeholder]="field.placeholder">
+              }
+
+              <!-- Number Input -->
+              @if (field.type === 'number') {
+                <input
+                  type="number"
+                  class="form-control"
+                  [formControlName]="field.key"
+                  [placeholder]="field.placeholder">
+              }
+
+              <!-- Select -->
+              @if (field.type === 'select') {
+                <select
+                  class="form-select"
+                  [formControlName]="field.key">
+                  <option value="">{{ field.placeholder || 'Select option...' }}</option>
+                  @for (option of getCustomFieldOptions(field); track option.value) {
+                    <option
+                      [value]="option.value"
+                      [disabled]="option.disabled">
+                      {{ option.label }}
+                    </option>
+                  }
+                </select>
+              }
+
+              <!-- Multi-select -->
+              @if (field.type === 'multiselect') {
+                <select
+                  class="form-select"
+                  [formControlName]="field.key"
+                  multiple>
+                  @for (option of getCustomFieldOptions(field); track option.value) {
+                    <option
+                      [value]="option.value"
+                      [disabled]="option.disabled">
+                      {{ option.label }}
+                    </option>
+                  }
+                </select>
+              }
+
+              <!-- Checkbox -->
+              @if (field.type === 'checkbox') {
+                <div class="form-check">
+                  <input type="checkbox"
+                         class="form-check-input"
+                         [formControlName]="field.key"
+                         [id]="'checkbox-' + field.key">
+                  <label class="form-check-label" [for]="'checkbox-' + field.key">
+                    {{ field.placeholder || field.label }}
+                  </label>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Action Buttons (for collapsible panels) -->
+      @if (collapsible && !isCollapsed) {
+        <div class="filter-actions mt-3 pt-3 border-top">
+          <div class="d-flex justify-content-end gap-2">
+            @if (showClearButton) {
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                (click)="clearFilters()">
+                <i class="fa-solid fa-times me-1"></i>
+                {{ i18nService.t('app.clear') }}
+              </button>
+            }
+            @if (showApplyButton) {
+              <button
+                type="button"
+                class="btn btn-primary"
+                (click)="applyFilters()">
+                <i class="fa-solid fa-search me-1"></i>
+                {{ i18nService.t('app.search') }}
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </form>
+  </div>
+</div>

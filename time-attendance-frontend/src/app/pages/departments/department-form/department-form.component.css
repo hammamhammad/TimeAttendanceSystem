@@ -17,7 +17,7 @@
   color: #667eea;
 }
 
-/* Form Controls */
+/* Form Controls - component specific overrides */
 .form-label {
   font-weight: 500;
   color: #495057;
@@ -147,11 +147,6 @@ textarea.form-control {
 }
 
 /* Loading States */
-.spinner-border-sm {
-  width: 1rem;
-  height: 1rem;
-}
-
 .loading-overlay {
   position: absolute;
   top: 0;
@@ -185,16 +180,16 @@ textarea.form-control {
     align-items: stretch;
     gap: 1rem;
   }
-  
+
   .form-actions .d-flex > div {
     width: 100%;
   }
-  
+
   .form-actions .btn {
     width: 100%;
     margin-bottom: 0.5rem;
   }
-  
+
   .section-title {
     font-size: 1rem;
     margin-top: 1rem;
@@ -206,13 +201,13 @@ textarea.form-control {
   .form-select {
     font-size: 1rem; /* Prevent zoom on iOS */
   }
-  
+
   .section-title {
     flex-direction: column;
     align-items: flex-start;
     text-align: center;
   }
-  
+
   .section-title i {
     margin-bottom: 0.25rem;
   }
@@ -290,13 +285,13 @@ textarea.form-control {
   .form-actions {
     display: none;
   }
-  
+
   .form-control,
   .form-select {
     border: 1px solid #000 !important;
     box-shadow: none !important;
   }
-  
+
   .section-title {
     page-break-after: avoid;
   }

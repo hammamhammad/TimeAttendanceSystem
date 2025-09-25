@@ -415,4 +415,12 @@ export class AuthService {
       return null;
     }
   }
+
+  /**
+   * Checks if the current user has SystemAdmin role.
+   * @returns true if user has SystemAdmin role, false otherwise
+   */
+  isSystemAdmin(): boolean {
+    return this.currentUser()?.roles?.includes('SystemAdmin') || false;
+  }
 }

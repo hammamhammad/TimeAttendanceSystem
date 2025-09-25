@@ -1,0 +1,347 @@
+<!-- Loading State -->
+@if (loading()) {
+  <div class="d-flex justify-content-center align-items-center" style="min-height: 200px;">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">{{ i18n.t('common.loading') }}</span>
+    </div>
+  </div>
+}
+
+<!-- Error State -->
+@if (error()) {
+  <div class="alert alert-danger" role="alert">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    {{ error() }}
+  </div>
+}
+
+<!-- Main Content -->
+@if (!loading() && !error() && attendanceRecord()) {
+  <div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+      <div class="col">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h2 class="mb-1">{{ i18n.t('attendance.edit.title') }}</h2>
+            <nav aria-label="breadcrumb">
+              <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                  <a routerLink="/attendance">{{ i18n.t('attendance.title') }}</a>
+                </li>
+                <li class="breadcrumb-item">
+                  <a routerLink="/attendance/daily">{{ i18n.t('attendance.daily_view') }}</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">
+                  {{ i18n.t('attendance.edit.title') }}
+                </li>
+              </ol>
+            </nav>
+          </div>
+          <div>
+            <button type="button" class="btn btn-outline-secondary me-2" (click)="onCancel()">
+              <i class="fas fa-arrow-left me-2"></i>
+              {{ i18n.t('common.back') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Employee Information Card -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-4">
+                <strong>{{ i18n.t('attendance.fields.employee_name') }}:</strong>
+                {{ attendanceRecord()?.employeeName }}
+              </div>
+              <div class="col-md-4">
+                <strong>{{ i18n.t('attendance.fields.attendance_date') }}:</strong>
+                {{ attendanceRecord()?.attendanceDate | date: 'fullDate' }}
+              </div>
+              <div class="col-md-4">
+                <strong>{{ i18n.t('attendance.fields.status') }}:</strong>
+                <span [class]="getStatusBadgeClass(calculatedStatus())">
+                  {{ getStatusDisplayText(calculatedStatus()) }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Form -->
+    <form [formGroup]="editForm" (ngSubmit)="onSave()">
+      <div class="row">
+        <!-- Editable Time Fields -->
+        <div class="col-lg-6">
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="card-title mb-0">
+                <i class="fas fa-clock me-2"></i>
+                {{ i18n.t('attendance.edit.basic_info') }}
+              </h5>
+            </div>
+            <div class="card-body">
+              <!-- Check-in Time -->
+              <div class="mb-3">
+                <label for="actualCheckInTime" class="form-label">
+                  {{ i18n.t('attendance.fields.check_in_time') }}
+                </label>
+                <input
+                  type="time"
+                  id="actualCheckInTime"
+                  class="form-control"
+                  formControlName="actualCheckInTime"
+                  [class.is-invalid]="hasControlError('actualCheckInTime')">
+                <div class="form-text">
+                  {{ i18n.t('attendance.edit.original') }}:
+                  {{ attendanceRecord()?.actualCheckInTime ? (attendanceRecord()?.actualCheckInTime | date: 'HH:mm') : '--:--' }}
+                </div>
+                @if (hasControlError('actualCheckInTime')) {
+                  <div class="invalid-feedback">
+                    {{ getControlErrorMessage('actualCheckInTime') }}
+                  </div>
+                }
+              </div>
+
+              <!-- Check-out Time -->
+              <div class="mb-3">
+                <label for="actualCheckOutTime" class="form-label">
+                  {{ i18n.t('attendance.fields.check_out_time') }}
+                </label>
+                <input
+                  type="time"
+                  id="actualCheckOutTime"
+                  class="form-control"
+                  formControlName="actualCheckOutTime"
+                  [class.is-invalid]="hasControlError('actualCheckOutTime')">
+                <div class="form-text">
+                  {{ i18n.t('attendance.edit.original') }}:
+                  {{ attendanceRecord()?.actualCheckOutTime ? (attendanceRecord()?.actualCheckOutTime | date: 'HH:mm') : '--:--' }}
+                </div>
+                @if (hasControlError('actualCheckOutTime')) {
+                  <div class="invalid-feedback">
+                    {{ getControlErrorMessage('actualCheckOutTime') }}
+                  </div>
+                }
+              </div>
+
+              <!-- Break Hours - Only show if shift has break -->
+              @if (shiftHasBreak()) {
+                <div class="mb-3">
+                  <label for="breakHours" class="form-label">
+                    {{ i18n.t('attendance.fields.break_hours') }}
+                  </label>
+                  <input
+                    type="number"
+                    id="breakHours"
+                    class="form-control"
+                    formControlName="breakHours"
+                    step="0.1"
+                    [class.is-invalid]="hasControlError('breakHours')">
+                  <div class="form-text">
+                    {{ i18n.t('attendance.edit.original') }}: {{ attendanceRecord()?.breakHours || 0 }} {{ i18n.t('common.hours') }}
+                  </div>
+                  @if (hasControlError('breakHours')) {
+                    <div class="invalid-feedback">
+                      {{ getControlErrorMessage('breakHours') }}
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Calculated Fields (Read-only) -->
+        <div class="col-lg-6">
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="card-title mb-0">
+                <i class="fas fa-calculator me-2"></i>
+                {{ i18n.t('attendance.edit.hours_calculations') }}
+              </h5>
+              <small class="text-muted">{{ i18n.t('attendance.edit.calculated_automatically') }}</small>
+              <br>
+              <small class="text-info">Uses backend business logic including flexible hours</small>
+            </div>
+            <div class="card-body">
+              <!-- Calculated Working Hours -->
+              <div class="mb-3">
+                <label class="form-label">{{ i18n.t('attendance.fields.working_hours') }}</label>
+                <div class="form-control-plaintext bg-light p-2 rounded">
+                  <strong>{{ formatHoursAsTime(calculatedWorkingHours()) }}</strong>
+                  <small class="text-muted ms-2">
+                    ({{ i18n.t('attendance.edit.original') }}: {{ formatHoursAsTime(attendanceRecord()?.workingHours || 0) }})
+                  </small>
+                </div>
+              </div>
+
+              <!-- Calculated Overtime Hours -->
+              <div class="mb-3">
+                <label class="form-label">{{ i18n.t('attendance.fields.overtime_hours') }}</label>
+                <div class="form-control-plaintext bg-light p-2 rounded">
+                  <strong>{{ formatHoursAsTime(calculatedOvertimeHours()) }}</strong>
+                  <small class="text-muted ms-2">
+                    ({{ i18n.t('attendance.edit.original') }}: {{ formatHoursAsTime(attendanceRecord()?.overtimeHours || 0) }})
+                  </small>
+                </div>
+              </div>
+
+              <!-- Calculated Late Minutes -->
+              <div class="mb-3">
+                <label class="form-label">{{ i18n.t('attendance.fields.late_minutes') }}</label>
+                <div class="form-control-plaintext bg-light p-2 rounded">
+                  <strong>{{ calculatedLateMinutes() }} {{ i18n.t('common.minutes') }}</strong>
+                  <small class="text-muted ms-2">
+                    ({{ i18n.t('attendance.edit.original') }}: {{ attendanceRecord()?.lateMinutes || 0 }} {{ i18n.t('common.minutes') }})
+                  </small>
+                </div>
+              </div>
+
+              <!-- Calculated Early Leave Minutes -->
+              <div class="mb-3">
+                <label class="form-label">{{ i18n.t('attendance.fields.early_leave_minutes') }}</label>
+                <div class="form-control-plaintext bg-light p-2 rounded">
+                  <strong>{{ calculatedEarlyLeaveMinutes() }} {{ i18n.t('common.minutes') }}</strong>
+                  <small class="text-muted ms-2">
+                    ({{ i18n.t('attendance.edit.original') }}: {{ attendanceRecord()?.earlyLeaveMinutes || 0 }} {{ i18n.t('common.minutes') }})
+                  </small>
+                </div>
+              </div>
+
+              <!-- New Total Late Field -->
+              <div class="mb-3">
+                <label class="form-label">{{ i18n.t('attendance.fields.total_late') }}</label>
+                <div class="form-control-plaintext bg-warning bg-opacity-10 p-2 rounded border border-warning">
+                  <strong class="text-warning">{{ totalLateMinutes() }} {{ i18n.t('common.minutes') }}</strong>
+                  <small class="text-muted ms-2">{{ i18n.t('attendance.edit.total_late_help') }}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes and Approval Section -->
+      <div class="row">
+        <div class="col-12">
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="card-title mb-0">
+                <i class="fas fa-sticky-note me-2"></i>
+                {{ i18n.t('attendance.edit.notes') }}
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <!-- Approval -->
+                <div class="col-md-6">
+                  <div class="form-check mb-3">
+                    <input
+                      type="checkbox"
+                      id="isApproved"
+                      class="form-check-input"
+                      formControlName="isApproved">
+                    <label for="isApproved" class="form-check-label">
+                      {{ i18n.t('attendance.edit.approve_record') }}
+                    </label>
+                    <div class="form-text">
+                      {{ i18n.t('attendance.edit.approval_help') }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <!-- General Notes -->
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="notes" class="form-label">
+                      {{ i18n.t('attendance.fields.notes') }}
+                    </label>
+                    <textarea
+                      id="notes"
+                      class="form-control"
+                      formControlName="notes"
+                      rows="3"
+                      [class.is-invalid]="hasControlError('notes')"
+                      [placeholder]="i18n.t('attendance.edit.notes_help')">
+                    </textarea>
+                    @if (hasControlError('notes')) {
+                      <div class="invalid-feedback">
+                        {{ getControlErrorMessage('notes') }}
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <!-- Override Notes (Required) -->
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="overrideNotes" class="form-label">
+                      {{ i18n.t('attendance.edit.override_notes') }}
+                      <span class="text-danger">*</span>
+                    </label>
+                    <textarea
+                      id="overrideNotes"
+                      class="form-control"
+                      formControlName="overrideNotes"
+                      rows="3"
+                      [class.is-invalid]="hasControlError('overrideNotes')"
+                      [placeholder]="i18n.t('attendance.edit.override_notes_help')">
+                    </textarea>
+                    @if (hasControlError('overrideNotes')) {
+                      <div class="invalid-feedback">
+                        {{ getControlErrorMessage('overrideNotes') }}
+                      </div>
+                    }
+                    <div class="form-text">
+                      {{ i18n.t('attendance.edit.override_notes_help') }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <button type="button" class="btn btn-outline-secondary" (click)="onCancel()">
+                  <i class="fas fa-times me-2"></i>
+                  {{ i18n.t('attendance.edit.discard_changes') }}
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  [disabled]="saving() || editForm.invalid"
+                  [class.loading]="saving()">
+                  @if (!saving()) {
+                    <i class="fas fa-save me-2"></i>
+                  }
+                  @if (saving()) {
+                    <div class="spinner-border spinner-border-sm me-2" role="status">
+                      <span class="visually-hidden">{{ i18n.t('attendance.edit.saving') }}</span>
+                    </div>
+                  }
+                  {{ saving() ? i18n.t('attendance.edit.saving') : i18n.t('attendance.edit.save_changes') }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+}
