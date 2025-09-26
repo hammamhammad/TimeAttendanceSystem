@@ -42,7 +42,8 @@ export const PermissionResources = {
   PERMISSION: 'permission',
   AUDIT: 'audit',
   NOTIFICATION: 'notification',
-  SYSTEM: 'system'
+  SYSTEM: 'system',
+  VACATION_TYPE: 'vacationType'
 } as const;
 
 export const ActionDescriptions: Record<string, string> = {
@@ -89,7 +90,8 @@ export const ResourceDescriptions: Record<string, string> = {
   [PermissionResources.PERMISSION]: 'Permission management',
   [PermissionResources.AUDIT]: 'Audit logs and security tracking',
   [PermissionResources.NOTIFICATION]: 'System notifications and alerts',
-  [PermissionResources.SYSTEM]: 'Core system functions'
+  [PermissionResources.SYSTEM]: 'Core system functions',
+  [PermissionResources.VACATION_TYPE]: 'Vacation types and leave policies'
 };
 
 export const ActionColors: Record<string, string> = {
@@ -136,7 +138,8 @@ export const ResourceIcons: Record<string, string> = {
   [PermissionResources.PERMISSION]: 'fa-key',
   [PermissionResources.AUDIT]: 'fa-history',
   [PermissionResources.NOTIFICATION]: 'fa-bell',
-  [PermissionResources.SYSTEM]: 'fa-server'
+  [PermissionResources.SYSTEM]: 'fa-server',
+  [PermissionResources.VACATION_TYPE]: 'fa-calendar-times'
 };
 
 export interface PermissionInfo {

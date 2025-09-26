@@ -343,6 +343,25 @@ export const routes: Routes = [
         },
         canMatch: [adminGuard]
       },
+      // Vacation Types Routes
+      {
+        path: 'vacation-types',
+        loadComponent: () => import('./pages/vacation-types/vacation-types.component').then(m => m.VacationTypesComponent),
+        data: {
+          title: 'vacation_types.title',
+          permission: 'vacationType.read'
+        },
+        canMatch: [managerGuard]
+      },
+      {
+        path: 'vacation-types/:id',
+        loadComponent: () => import('./pages/vacation-types/view-vacation-type/view-vacation-type.component').then(m => m.ViewVacationTypeComponent),
+        data: {
+          title: 'vacation_types.view_details',
+          permission: 'vacationType.read'
+        },
+        canMatch: [managerGuard]
+      },
     ]
   },
   {

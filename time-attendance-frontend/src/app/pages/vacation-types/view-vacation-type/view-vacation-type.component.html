@@ -1,0 +1,205 @@
+<div class="view-vacation-type-page">
+  @if (loading()) {
+    <!-- Loading State -->
+    <div class="d-flex justify-content-center align-items-center py-5">
+      <div class="text-center">
+        <div class="spinner-border text-primary mb-3" role="status">
+          <span class="visually-hidden">{{ i18n.t('common.loading') }}...</span>
+        </div>
+        <p class="text-muted">{{ i18n.t('vacation_types.loading_details') }}</p>
+      </div>
+    </div>
+  } @else if (vacationType(); as vt) {
+    <!-- Page Header -->
+    <div class="d-flex align-items-center mb-4">
+      <button
+        type="button"
+        class="btn btn-outline-secondary me-3"
+        (click)="onGoBack()"
+        [title]="i18n.t('common.back')"
+      >
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <div class="flex-grow-1">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <h2 class="mb-1">{{ i18n.t('vacation_types.vacation_type_details') }}</h2>
+            <p class="text-muted mb-0">{{ i18n.t('vacation_types.view_subtitle') }}</p>
+          </div>
+          <div class="action-buttons">
+            @if (permissionService.has(PERMISSIONS.VACATION_TYPE_UPDATE) && vt.canBeModified) {
+              <button
+                type="button"
+                class="btn btn-outline-primary btn-sm me-2"
+                (click)="onEdit()"
+              >
+                <i class="fas fa-edit me-1"></i>
+                {{ i18n.t('common.edit') }}
+              </button>
+            }
+            @if (permissionService.has(PERMISSIONS.VACATION_TYPE_UPDATE)) {
+              <button
+                type="button"
+                class="btn btn-outline-warning btn-sm me-2"
+                (click)="onToggleStatus()"
+              >
+                <i [class]="vt.isActive ? 'fas fa-ban' : 'fas fa-check'"></i>
+                {{ vt.isActive ? i18n.t('common.deactivate') : i18n.t('common.activate') }}
+              </button>
+            }
+            @if (permissionService.has(PERMISSIONS.VACATION_TYPE_DELETE) && vt.canBeDeleted) {
+              <button
+                type="button"
+                class="btn btn-outline-danger btn-sm"
+                (click)="onDelete()"
+              >
+                <i class="fas fa-trash me-1"></i>
+                {{ i18n.t('common.delete') }}
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vacation Type Header Card -->
+    <div class="header-card mb-4">
+      <div class="d-flex align-items-center">
+        <div class="vacation-type-icon me-4">
+          <i class="fas fa-calendar-alt text-primary"></i>
+        </div>
+        <div class="flex-grow-1">
+          <div class="row">
+            <div class="col-md-8">
+              <h3 class="mb-1">{{ vt.name }}</h3>
+              @if (vt.nameAr) {
+                <h4 class="text-muted mb-2" dir="rtl">{{ vt.nameAr }}</h4>
+              }
+            </div>
+            <div class="col-md-4 text-md-end">
+              <div class="status-info">
+                <span
+                  class="badge fs-6 mb-2"
+                  [class]="getStatusBadgeClass(vt.isActive)"
+                >
+                  {{ getStatusText(vt.isActive) }}
+                </span>
+                <div class="text-muted small">
+                  <div>
+                    <i class="fas fa-building me-1"></i>
+                    {{ vt.branchName || i18n.t('common.not_specified') }}
+                  </div>
+                  <div class="mt-1">
+                    <i class="fas fa-clock me-1"></i>
+                    {{ i18n.t('vacation_types.created_at') }}: {{ vt.createdAtUtc | date:'medium' }}
+                  </div>
+                  @if (vt.modifiedAtUtc) {
+                    <div class="mt-1">
+                      <i class="fas fa-edit me-1"></i>
+                      {{ i18n.t('vacation_types.modified_at') }}: {{ vt.modifiedAtUtc | date:'medium' }}
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Basic Information -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-info-circle text-info me-2"></i>
+          {{ i18n.t('vacation_types.basic_information') }}
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="info-item mb-3">
+              <label class="info-label text-muted">{{ i18n.t('vacation_types.name') }}</label>
+              <div class="info-value fw-medium">{{ vt.name }}</div>
+            </div>
+          </div>
+          @if (vt.nameAr) {
+            <div class="col-md-6">
+              <div class="info-item mb-3">
+                <label class="info-label text-muted">{{ i18n.t('vacation_types.name_ar') }}</label>
+                <div class="info-value fw-medium" dir="rtl">{{ vt.nameAr }}</div>
+              </div>
+            </div>
+          }
+          <div class="col-md-6">
+            <div class="info-item mb-3">
+              <label class="info-label text-muted">{{ i18n.t('vacation_types.branch') }}</label>
+              <div class="info-value">
+                {{ vt.branchName || i18n.t('vacation_types.all_branches') }}
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="info-item mb-3">
+              <label class="info-label text-muted">{{ i18n.t('common.status') }}</label>
+              <div class="info-value">
+                <span
+                  class="badge"
+                  [class]="getStatusBadgeClass(vt.isActive)"
+                >
+                  {{ getStatusText(vt.isActive) }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Permissions and Actions -->
+    @if (!vt.canBeModified || !vt.canBeDeleted) {
+      <div class="card border-warning">
+        <div class="card-header bg-warning text-dark">
+          <h6 class="card-title mb-0">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            {{ i18n.t('vacation_types.restrictions') }}
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            @if (!vt.canBeModified) {
+              <div class="col-md-6">
+                <div class="restriction-item">
+                  <i class="fas fa-edit text-muted me-2"></i>
+                  <span>{{ i18n.t('vacation_types.restrictions.cannot_modify') }}</span>
+                </div>
+              </div>
+            }
+            @if (!vt.canBeDeleted) {
+              <div class="col-md-6">
+                <div class="restriction-item">
+                  <i class="fas fa-trash text-muted me-2"></i>
+                  <span>{{ i18n.t('vacation_types.restrictions.cannot_delete') }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  } @else {
+    <!-- Error State -->
+    <div class="text-center py-5">
+      <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+      <h4 class="text-muted">{{ i18n.t('vacation_types.vacation_type_not_found') }}</h4>
+      <p class="text-muted">{{ i18n.t('vacation_types.vacation_type_not_found_message') }}</p>
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="onGoBack()"
+      >
+        {{ i18n.t('vacation_types.back_to_list') }}
+      </button>
+    </div>
+  }
+</div>

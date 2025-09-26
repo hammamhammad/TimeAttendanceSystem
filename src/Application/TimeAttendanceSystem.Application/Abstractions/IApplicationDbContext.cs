@@ -6,6 +6,7 @@ using TimeAttendanceSystem.Domain.Users;
 using TimeAttendanceSystem.Domain.Shifts;
 using TimeAttendanceSystem.Domain.Attendance;
 using TimeAttendanceSystem.Domain.Settings;
+using TimeAttendanceSystem.Domain.VacationTypes;
 
 namespace TimeAttendanceSystem.Application.Abstractions;
 
@@ -414,6 +415,20 @@ public interface IApplicationDbContext
     /// </remarks>
     DbSet<PublicHoliday> PublicHolidays { get; }
 
+    /// <summary>
+    /// Gets the database set for VacationType entities representing vacation type configurations.
+    /// Enables comprehensive vacation policy management with flexible accrual and carryover rules.
+    /// </summary>
+    /// <value>DbSet for querying and managing VacationType entities</value>
+    /// <remarks>
+    /// VacationType Entity Features:
+    /// - Complete vacation policy configuration with approval workflows
+    /// - Flexible accrual systems supporting annual, monthly, and pro-rata calculations
+    /// - Carryover management with expiration and maximum limits
+    /// - Multi-tenant isolation through branch-based organization
+    /// - Bilingual support for English and Arabic organizational environments
+    /// </remarks>
+    DbSet<VacationType> VacationTypes { get; }
 
     /// <summary>
     /// Asynchronously saves all pending changes to the database.

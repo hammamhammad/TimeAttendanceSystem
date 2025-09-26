@@ -8,3 +8,4 @@
 - allways use NotificationService and ConfirmationService in the frontend
 - always use DataTableComponent for the tables in the frontend
 - Always use the new Angular template syntax @if / @for instead of legacy structural directives, to maintain consistency with the latest Angular standards
+- When applying the database migration, ensure that all existing data in the database is preserved

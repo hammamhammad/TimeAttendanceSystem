@@ -1361,6 +1361,117 @@
       }
     }
   },
+  "vacation_types": {
+    "title": "أنواع الإجازات",
+    "management_subtitle": "إدارة الإجازات",
+    "settings_description": "تكوين أنواع الإجازات",
+    "subtitle": "إدارة أنواع الإجازات لمؤسستك",
+    "loading": "جاري تحميل أنواع الإجازات...",
+    "loading_details": "جاري تحميل تفاصيل نوع الإجازة...",
+    "creating": "جاري إنشاء نوع الإجازة...",
+    "updating": "جاري تحديث نوع الإجازة...",
+    "deleting": "جاري حذف نوع الإجازة...",
+    "no_vacation_types": "لم يتم العثور على أنواع إجازات",
+    "no_vacation_types_message": "أنشئ أول نوع إجازة للبدء في إدارة الإجازات",
+    "search_placeholder": "البحث بواسطة اسم نوع الإجازة...",
+    "results": "النتائج",
+    "create_vacation_type": "إنشاء نوع إجازة",
+    "create_subtitle": "إنشاء نوع إجازة جديد",
+    "edit_vacation_type": "تعديل نوع الإجازة",
+    "delete_vacation_type": "حذف نوع الإجازة",
+    "activate_vacation_type": "تفعيل نوع الإجازة",
+    "deactivate_vacation_type": "إلغاء تفعيل نوع الإجازة",
+    "confirm_activate": "هل أنت متأكد من أنك تريد تفعيل نوع الإجازة \"{name}\"؟",
+    "confirm_deactivate": "هل أنت متأكد من أنك تريد إلغاء تفعيل نوع الإجازة \"{name}\"؟",
+    "view_details": "عرض التفاصيل",
+    "edit_details": "تعديل التفاصيل",
+    "vacation_type_details": "تفاصيل نوع الإجازة",
+    "view_subtitle": "عرض معلومات نوع الإجازة",
+    "edit_subtitle": "تعديل معلومات نوع الإجازة",
+    "basic_information": "المعلومات الأساسية",
+    "vacation_type_not_found": "نوع الإجازة غير موجود",
+    "vacation_type_not_found_message": "لا يمكن العثور على نوع الإجازة المطلوب أو ربما تم حذفه",
+    "back_to_list": "العودة إلى أنواع الإجازات",
+    "basic_info": "المعلومات الأساسية",
+    "last_modified": "آخر تعديل",
+    "created_at": "تم الإنشاء في",
+    "modified_at": "تم التعديل في",
+    "name": "اسم نوع الإجازة",
+    "name_placeholder": "أدخل اسم نوع الإجازة",
+    "name_ar": "الاسم العربي",
+    "name_ar_placeholder": "أدخل الاسم العربي",
+    "create_first_type": "إنشاء أول نوع إجازة",
+    "create_first_vacation_type": "إنشاء أول نوع إجازة",
+    "branch": "الفرع",
+    "all_branches": "جميع الفروع",
+    "column_status": "الحالة",
+    "save_vacation_type": "حفظ نوع الإجازة",
+    "update_vacation_type": "تحديث نوع الإجازة",
+    "form_validation": {
+      "name_required": "اسم نوع الإجازة مطلوب",
+      "name_min": "الاسم يجب أن يكون على الأقل حرفين",
+      "name_max": "الاسم لا يمكن أن يتجاوز 100 حرف"
+    },
+    "fields": {
+      "name": "الاسم",
+      "branch": "الفرع"
+    },
+    "actions": {
+      "create": "إنشاء",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "activate": "تفعيل",
+      "deactivate": "إلغاء تفعيل",
+      "view": "عرض"
+    },
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط"
+    },
+    "confirmations": {
+      "delete": "هل أنت متأكد من حذف هذا النوع من الإجازة؟",
+      "delete_message": "لا يمكن التراجع عن هذا الإجراء وقد يؤثر على سجلات الإجازات الموجودة.",
+      "activate": "هل أنت متأكد من تفعيل هذا النوع من الإجازة؟",
+      "deactivate": "هل أنت متأكد من إلغاء تفعيل هذا النوع من الإجازة؟"
+    },
+    "success": {
+      "created": "تم إنشاء نوع الإجازة بنجاح",
+      "updated": "تم تحديث نوع الإجازة بنجاح",
+      "deleted": "تم حذف نوع الإجازة بنجاح",
+      "activated": "تم تفعيل نوع الإجازة بنجاح",
+      "deactivated": "تم إلغاء تفعيل نوع الإجازة بنجاح"
+    },
+    "field_help": {
+      "name": "اختر اسماً وصفياً لنوع الإجازة هذا",
+      "name_ar": "قدم الترجمة العربية لاسم نوع الإجازة"
+    },
+    "validation_messages": {
+      "name_required": "اسم نوع الإجازة مطلوب",
+      "name_min_length": "الاسم يجب أن يكون على الأقل حرفين",
+      "name_max_length": "الاسم لا يمكن أن يتجاوز 100 حرف"
+    },
+    "restrictions": {
+      "cannot_modify": "لا يمكن تعديل نوع الإجازة هذا لأنه قيد الاستخدام حالياً",
+      "cannot_delete": "لا يمكن حذف نوع الإجازة هذا لأن له تخصيصات نشطة"
+    },
+    "errors": {
+      "create_failed": "فشل في إنشاء نوع الإجازة",
+      "update_failed": "فشل في تحديث نوع الإجازة",
+      "delete_failed": "فشل في حذف نوع الإجازة",
+      "load_failed": "فشل في تحميل أنواع الإجازات",
+      "not_found": "نوع الإجازة غير موجود",
+      "invalid_id": "معرف نوع الإجازة غير صحيح",
+      "status_toggle_failed": "فشل في تبديل حالة نوع الإجازة"
+    },
+    "warnings": {
+      "cannot_delete": "لا يمكن حذف نوع الإجازة هذا لأنه قيد الاستخدام",
+      "modification_restricted": "التعديل مقيد",
+      "modification_restricted_message": "هذا النوع من الإجازة له قيود وبعض الحقول لا يمكن تعديلها"
+    },
+    "confirm_delete": "هل أنت متأكد من حذف نوع الإجازة \"{{name}}\"؟",
+    "confirm_activate": "هل أنت متأكد من تفعيل نوع الإجازة \"{{name}}\"؟",
+    "confirm_deactivate": "هل أنت متأكد من إلغاء تفعيل نوع الإجازة \"{{name}}\"؟"
+  },
   "common": {
     "welcome": "مرحبا",
     "actions": "الإجراءات",
@@ -1373,6 +1484,8 @@
     "status": "الحالة",
     "active": "نشط",
     "inactive": "غير نشط",
+    "activate": "تفعيل",
+    "deactivate": "إلغاء تفعيل",
     "enabled": "مفعل",
     "disabled": "معطل",
     "type": "النوع",
@@ -1385,6 +1498,7 @@
     "clear": "مسح",
     "clear_filters": "مسح التصفيات",
     "all": "الكل",
+    "not_specified": "غير محدد",
     "role": "الدور",
     "loading": "جاري التحميل...",
     "saving": "جاري الحفظ...",
@@ -1395,6 +1509,7 @@
     "cancel": "إلغاء",
     "save": "حفظ",
     "select": "اختيار",
+    "showing_results": "عرض النتائج",
     "select_branch": "اختر الفرع",
     "select_department": "اختر القسم",
     "select_manager": "اختر المدير",
@@ -1454,7 +1569,9 @@
     "unsavedChanges": "تغييرات غير محفوظة",
     "unsavedChangesMessage": "لديك تغييرات غير محفوظة. هل أنت متأكد من أنك تريد تجاهلها؟",
     "discard": "تجاهل",
-    "stay": "البقاء"
+    "stay": "البقاء",
+    "items_per_page": "العناصر لكل صفحة",
+    "page_info": "الصفحة {{current}} من {{total}} ({{totalItems}} عنصر إجمالي)"
   },
   "validation": {
     "required": "هذا الحقل مطلوب",

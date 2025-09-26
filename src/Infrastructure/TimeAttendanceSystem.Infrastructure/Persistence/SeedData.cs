@@ -131,6 +131,12 @@ public static class SeedData
             PermissionActions.Configure, PermissionActions.Manage,
             PermissionActions.Activate, PermissionActions.Deactivate));
 
+        // Vacation Type Management - Managing vacation types and leave policies
+        permissions.AddRange(PermissionBuilder.CreateExtendedCrudPermissions(PermissionResources.VacationType, "Vacation Management"));
+        permissions.AddRange(PermissionBuilder.CreateResourcePermissions(PermissionResources.VacationType, "Vacation Management",
+            PermissionActions.Configure, PermissionActions.Manage,
+            PermissionActions.Activate, PermissionActions.Deactivate));
+
 
         // Get existing permission keys
         var existingKeys = await context.Permissions

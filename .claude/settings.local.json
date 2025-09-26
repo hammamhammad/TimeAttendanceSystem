@@ -16,7 +16,13 @@
       "Bash(find:*)",
       "Bash(curl:*)",
       "Bash(ng build:*)",
-      "Bash(if exist \".angular\\cache\" rmdir /s /q \".angular\\cache\")"
+      "Bash(if exist \".angular\\cache\" rmdir /s /q \".angular\\cache\")",
+      "Bash(tasklist)",
+      "Bash(cmd /c:*)",
+      "Bash(dotnet build:*)",
+      "Bash(Stop-Process -Id 36184 -Force)",
+      "Bash(Stop-Process -Id 28144 -Force)",
+      "Bash(ng serve:*)"
     ],
     "deny": [],
     "ask": []

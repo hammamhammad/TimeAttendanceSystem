@@ -124,6 +124,12 @@ export class MenuService {
           titleKey: 'settings.holidays.title',
           icon: 'fa-solid fa-calendar-check',
           permission: 'publicHoliday.read'
+        },
+        {
+          path: '/vacation-types',
+          titleKey: 'vacation_types.title',
+          icon: 'fa-solid fa-calendar-alt',
+          permission: 'vacationType.read'
         }
       ]
     }

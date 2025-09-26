@@ -292,13 +292,23 @@ public static class DependencyInjection
                     context.User.IsInRole("Employee") ||
                     context.User.HasClaim("permission", "vacation.create")));
 
+            // Define VacationTypeRead policy - users who can view vacation types
+            options.AddPolicy("VacationTypeRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.HasClaim("permission", "vacationType.read")));
+
             // Define VacationTypeManagement policy - users who can manage vacation types (admin level)
             options.AddPolicy("VacationTypeManagement", policy =>
                 policy.RequireAssertion(context =>
                     context.User.IsInRole("SystemAdmin") ||
                     context.User.IsInRole("Admin") ||
-                    context.User.HasClaim("permission", "vacation.manage") ||
-                    context.User.HasClaim("permission", "vacation.admin")));
+                    context.User.HasClaim("permission", "vacationType.create") ||
+                    context.User.HasClaim("permission", "vacationType.update") ||
+                    context.User.HasClaim("permission", "vacationType.delete") ||
+                    context.User.HasClaim("permission", "vacationType.manage")));
 
             // Define VacationApprove policy - users who can approve vacation requests
             options.AddPolicy("VacationApprove", policy =>

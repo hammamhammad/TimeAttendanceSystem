@@ -18,6 +18,7 @@ public static class PermissionResources
     public const string Notification = "notification";
     public const string System = "system";
     public const string PublicHoliday = "publicHoliday";
+    public const string VacationType = "vacationType";
 
     public static readonly Dictionary<string, string> ResourceDescriptions = new()
     {
@@ -37,6 +38,7 @@ public static class PermissionResources
         { Notification, "System notifications and alerts" },
         { System, "Core system functions" },
         { PublicHoliday, "Public holidays and calendar management" },
+        { VacationType, "Vacation types and leave policies" },
     };
     
     public static readonly Dictionary<string, string> ResourceIcons = new()
@@ -57,6 +59,7 @@ public static class PermissionResources
         { Notification, "fa-bell" },
         { System, "fa-server" },
         { PublicHoliday, "fa-calendar-check" },
+        { VacationType, "fa-calendar-alt" },
     };
     
     public static string GetResourceDescription(string resource)

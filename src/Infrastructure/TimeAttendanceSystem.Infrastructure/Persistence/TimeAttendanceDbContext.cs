@@ -6,6 +6,8 @@ using TimeAttendanceSystem.Domain.Users;
 using TimeAttendanceSystem.Domain.Shifts;
 using TimeAttendanceSystem.Domain.Attendance;
 using TimeAttendanceSystem.Domain.Settings;
+using TimeAttendanceSystem.Domain.VacationTypes;
+using TimeAttendanceSystem.Application.Abstractions;
 
 namespace TimeAttendanceSystem.Infrastructure.Persistence;
 
@@ -28,6 +30,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence;
 /// - Organizational: Branches, Departments for multi-tenant structure
 /// - Security: Users, Roles, Permissions, RefreshTokens for authentication/authorization
 /// - Employee Management: Employees, EmployeeUserLinks for HR operations
+/// - Vacation Management: VacationTypes for leave policy configuration
 /// - Audit & Compliance: AuditLogs, LoginAttempts, PasswordHistory for security monitoring
 /// - Session Management: UserSessions, BlacklistedTokens for secure session control
 /// - Two-Factor Authentication: TwoFactorBackupCodes for enhanced security
@@ -64,7 +67,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence;
 /// - Scalable multi-tenant design supporting organizational growth
 /// - Data security through tenant-scoped query filters and access controls
 /// </remarks>
-public class TimeAttendanceDbContext : DbContext
+public class TimeAttendanceDbContext : DbContext, IApplicationDbContext
 {
     /// <summary>
     /// Initializes a new instance of the TimeAttendanceDbContext with specified configuration options.
@@ -101,6 +104,7 @@ public class TimeAttendanceDbContext : DbContext
     public DbSet<OvertimeConfiguration> OvertimeConfigurations => Set<OvertimeConfiguration>();
     public DbSet<PublicHoliday> PublicHolidays => Set<PublicHoliday>();
     public DbSet<OffDay> OffDays => Set<OffDay>();
+    public DbSet<VacationType> VacationTypes => Set<VacationType>();
 
     /// <summary>
     /// Configures the database model using Fluent API configurations from the current assembly.

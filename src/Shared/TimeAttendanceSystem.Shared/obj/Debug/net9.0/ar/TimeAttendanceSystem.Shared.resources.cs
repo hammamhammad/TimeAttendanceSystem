@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TimeAttendanceSystem.Shared")]
 [assembly: System.Reflection.AssemblyCopyrightAttribute(" ")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+03d1d191671f8e25c1a345ba9852e932834b18f7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+92f6a70579c0608cd25720ce5ce35851b3686976")]
 [assembly: System.Reflection.AssemblyProductAttribute("TimeAttendanceSystem.Shared")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TimeAttendanceSystem.Shared")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

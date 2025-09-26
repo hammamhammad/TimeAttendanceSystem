@@ -7,6 +7,7 @@ using TimeAttendanceSystem.Domain.Users;
 using TimeAttendanceSystem.Domain.Shifts;
 using TimeAttendanceSystem.Domain.Attendance;
 using TimeAttendanceSystem.Domain.Settings;
+using TimeAttendanceSystem.Domain.VacationTypes;
 
 namespace TimeAttendanceSystem.Infrastructure.Persistence;
 
@@ -43,6 +44,7 @@ public class ApplicationDbContextAdapter : IApplicationDbContext
     public DbSet<AttendanceTransaction> AttendanceTransactions => _context.AttendanceTransactions;
     public DbSet<WorkingDay> WorkingDays => _context.WorkingDays;
     public DbSet<PublicHoliday> PublicHolidays => _context.PublicHolidays;
+    public DbSet<VacationType> VacationTypes => _context.VacationTypes;
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

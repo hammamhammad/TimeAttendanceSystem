@@ -2180,7 +2180,7 @@ namespace TimeAttendanceSystem.Infrastructure.Migrations
                     b.ToTable("UserSessions", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Vacations.VacationRequest", b =>
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.VacationTypes.VacationType", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -2188,147 +2188,27 @@ namespace TimeAttendanceSystem.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<long?>("ApprovedByUserId")
+                    b.Property<long?>("BranchId")
                         .HasColumnType("bigint");
-
-                    b.Property<DateTime?>("ApprovedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CancellationReason")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<long?>("CancelledByUserId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime?>("CancelledDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("EmployeeId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("ModifiedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Notes")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<string>("Reason")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<long?>("RejectedByUserId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime?>("RejectedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("RejectionReason")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<DateTime>("RequestedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TotalDays")
-                        .HasColumnType("int");
-
-                    b.Property<long>("VacationTypeId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApprovedByUserId");
-
-                    b.HasIndex("CancelledByUserId");
-
-                    b.HasIndex("RejectedByUserId");
-
-                    b.HasIndex("Status");
-
-                    b.HasIndex("VacationTypeId");
-
-                    b.HasIndex("EmployeeId", "StartDate", "EndDate");
-
-                    b.ToTable("VacationRequests", (string)null);
-                });
-
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Vacations.VacationType", b =>
-                {
-                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<bool>("AffectsAttendance")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Color")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
 
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("DescriptionAr")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsPaid")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("MaxDaysPerYear")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("MinDaysNotice")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<DateTime?>("ModifiedAtUtc")
                         .HasColumnType("datetime2");
@@ -2339,14 +2219,13 @@ namespace TimeAttendanceSystem.Infrastructure.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
+                        .IsUnicode(true)
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("NameAr")
                         .HasMaxLength(100)
+                        .IsUnicode(true)
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<bool>("RequiresApproval")
-                        .HasColumnType("bit");
 
                     b.Property<byte[]>("RowVersion")
                         .IsRequired()
@@ -2354,8 +2233,22 @@ namespace TimeAttendanceSystem.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Code")
-                        .IsUnique();
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("IX_VacationTypes_BranchId")
+                        .HasFilter("IsDeleted = 0");
+
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("IX_VacationTypes_IsActive")
+                        .HasFilter("IsDeleted = 0");
+
+                    b.HasIndex("BranchId", "IsActive")
+                        .HasDatabaseName("IX_VacationTypes_BranchId_IsActive")
+                        .HasFilter("IsDeleted = 0");
+
+                    b.HasIndex("BranchId", "Name")
+                        .IsUnique()
+                        .HasDatabaseName("IX_VacationTypes_BranchId_Name_Unique")
+                        .HasFilter("IsDeleted = 0");
 
                     b.ToTable("VacationTypes", (string)null);
                 });
@@ -2672,44 +2565,14 @@ namespace TimeAttendanceSystem.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Vacations.VacationRequest", b =>
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.VacationTypes.VacationType", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "ApprovedBy")
+                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Branch", "Branch")
                         .WithMany()
-                        .HasForeignKey("ApprovedByUserId")
+                        .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "CancelledBy")
-                        .WithMany()
-                        .HasForeignKey("CancelledByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "RejectedBy")
-                        .WithMany()
-                        .HasForeignKey("RejectedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("TimeAttendanceSystem.Domain.Vacations.VacationType", "VacationType")
-                        .WithMany("VacationRequests")
-                        .HasForeignKey("VacationTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("ApprovedBy");
-
-                    b.Navigation("CancelledBy");
-
-                    b.Navigation("Employee");
-
-                    b.Navigation("RejectedBy");
-
-                    b.Navigation("VacationType");
+                    b.Navigation("Branch");
                 });
 
             modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.AttendanceRecord", b =>
@@ -2768,11 +2631,6 @@ namespace TimeAttendanceSystem.Infrastructure.Migrations
                     b.Navigation("UserRoles");
 
                     b.Navigation("UserSessions");
-                });
-
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Vacations.VacationType", b =>
-                {
-                    b.Navigation("VacationRequests");
                 });
 #pragma warning restore 612, 618
         }
