@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { ShiftsService } from '../shifts.service';
+import { FormHeaderComponent } from '../../../shared/components/form-header/form-header.component';
 import {
   ShiftType,
   CreateShiftRequest,
@@ -13,7 +14,7 @@ import {
 @Component({
   selector: 'app-create-shift',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FormHeaderComponent],
   templateUrl: './create-shift.component.html',
   styleUrls: ['./create-shift.component.css']
 })

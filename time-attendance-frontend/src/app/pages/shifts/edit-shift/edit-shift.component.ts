@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { I18nService } from '../../../core/i18n/i18n.service';
+import { FormHeaderComponent } from '../../../shared/components/form-header/form-header.component';
 import { SearchableSelectComponent, SearchableSelectOption } from '../../../shared/components/searchable-select/searchable-select.component';
 import { ShiftsService } from '../shifts.service';
 import {
@@ -16,7 +17,7 @@ import {
 @Component({
   selector: 'app-edit-shift',
   standalone: true,
-  imports: [CommonModule, FormsModule, SearchableSelectComponent],
+  imports: [CommonModule, FormsModule, SearchableSelectComponent, FormHeaderComponent],
   templateUrl: './edit-shift.component.html',
   styleUrls: ['./edit-shift.component.css']
 })

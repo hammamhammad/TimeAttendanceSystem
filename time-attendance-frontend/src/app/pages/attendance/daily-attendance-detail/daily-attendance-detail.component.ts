@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -11,11 +11,14 @@ import { AttendanceRecord } from '../../../shared/models/attendance.model';
 import { Employee } from '../../../shared/models/employee.model';
 import { Shift, ShiftType } from '../../../shared/models/shift.model';
 import { AttendanceStatus } from '../../../shared/models/attendance.model';
+import { LeaveExcuseDetailsResponse } from '../../../shared/models/leave-excuse-details.model';
+import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 
 @Component({
   selector: 'app-daily-attendance-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, PageHeaderComponent, StatusBadgeComponent],
   templateUrl: './daily-attendance-detail.component.html',
   styleUrl: './daily-attendance-detail.component.css'
 })
@@ -36,10 +39,43 @@ export class DailyAttendanceDetailComponent implements OnInit {
   attendanceRecord = signal<AttendanceRecord | null>(null);
   employee = signal<Employee | null>(null);
   shift = signal<Shift | null>(null);
+  leaveExcuseDetails = signal<LeaveExcuseDetailsResponse | null>(null);
 
   // Route parameters
   employeeId!: number;
   attendanceDate!: string;
+
+  // Computed properties for status badge
+  statusBadge = computed(() => {
+    const record = this.attendanceRecord();
+    if (!record) return { label: '', variant: 'secondary' as const };
+
+    const status = record.status;
+    let variant: 'success' | 'warning' | 'danger' | 'info' | 'secondary' = 'secondary';
+
+    switch (status) {
+      case AttendanceStatus.Present:
+        variant = 'success';
+        break;
+      case AttendanceStatus.Late:
+        variant = 'warning';
+        break;
+      case AttendanceStatus.Absent:
+        variant = 'danger';
+        break;
+      case AttendanceStatus.OnLeave:
+        variant = 'info';
+        break;
+      case AttendanceStatus.Holiday:
+        variant = 'info';
+        break;
+    }
+
+    return {
+      label: this.getStatusDisplayText(status),
+      variant
+    };
+  });
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
@@ -54,10 +90,11 @@ export class DailyAttendanceDetailComponent implements OnInit {
     this.error.set(null);
 
     try {
-      // Load employee, attendance record, and shift data in parallel
-      const [employeeResponse, attendanceResponse] = await Promise.all([
+      // Load employee, attendance record, and leave/excuse details in parallel
+      const [employeeResponse, attendanceResponse, leaveExcuseResponse] = await Promise.all([
         this.employeesService.getEmployeeById(this.employeeId).toPromise(),
-        this.attendanceService.getEmployeeAttendanceRecord(this.employeeId, this.attendanceDate).toPromise()
+        this.attendanceService.getEmployeeAttendanceRecord(this.employeeId, this.attendanceDate).toPromise(),
+        this.attendanceService.getLeaveExcuseDetails(this.employeeId, this.attendanceDate).toPromise()
       ]);
 
       if (employeeResponse) {
@@ -70,6 +107,10 @@ export class DailyAttendanceDetailComponent implements OnInit {
         // Note: Shift information would need to be loaded differently
         // since AttendanceRecord doesn't include shiftId directly
         // This would require an additional API call or backend enhancement
+      }
+
+      if (leaveExcuseResponse) {
+        this.leaveExcuseDetails.set(leaveExcuseResponse);
       }
     } catch (error) {
       console.error('Error loading attendance details:', error);
@@ -165,5 +206,34 @@ export class DailyAttendanceDetailComponent implements OnInit {
 
   getShiftTypeDisplay(shift: Shift): string {
     return shift.shiftType === ShiftType.TimeBased ? 'Time Based' : 'Hours Only';
+  }
+
+  // Helper methods for leave/excuse details
+  hasLeaveExcuseData(): boolean {
+    const details = this.leaveExcuseDetails();
+    return details?.hasLeaveExcuseData || false;
+  }
+
+  formatDate(date: Date | string): string {
+    if (!date) return '';
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    return dateObj.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  }
+
+  getApprovalStatusBadgeClass(status: string): string {
+    switch (status.toLowerCase()) {
+      case 'approved':
+        return 'badge bg-success';
+      case 'pending':
+        return 'badge bg-warning';
+      case 'rejected':
+        return 'badge bg-danger';
+      default:
+        return 'badge bg-secondary';
+    }
   }
 }

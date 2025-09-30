@@ -130,8 +130,26 @@ export class MenuService {
           titleKey: 'vacation_types.title',
           icon: 'fa-solid fa-calendar-alt',
           permission: 'vacationType.read'
+        },
+        {
+          path: '/settings/excuse-policies',
+          titleKey: 'excuse_policies.title',
+          icon: 'fa-solid fa-cogs',
+          permission: 'settings.excusePolicy.read'
         }
       ]
+    },
+    {
+      path: '/employee-vacations',
+      titleKey: 'nav.employeeVacations',
+      icon: 'fa-solid fa-calendar-week',
+      permission: 'vacation.read'
+    },
+    {
+      path: '/employee-excuses',
+      titleKey: 'employee_excuses.title',
+      icon: 'fa-solid fa-clipboard-check',
+      permission: 'excuse.read'
     }
   ]);
 

@@ -4,6 +4,7 @@ using TimeAttendanceSystem.Application.Abstractions;
 using TimeAttendanceSystem.Domain.Attendance;
 using TimeAttendanceSystem.Domain.Shifts;
 using TimeAttendanceSystem.Domain.Common;
+using TimeAttendanceSystem.Domain.Vacations;
 
 namespace TimeAttendanceSystem.Application.Services;
 
@@ -250,6 +251,22 @@ public class AttendanceCalculationService : IAttendanceCalculationService
                 return AttendanceStatus.Holiday; // Public holiday - always mark as Holiday
             }
 
+            // Rule 1.5: Check for approved leave SECOND (higher priority than day off)
+            var isOnLeave = await _context.EmployeeVacations
+                .AsNoTracking()
+                .AnyAsync(ev => ev.EmployeeId == employeeId &&
+                              ev.IsApproved &&
+                              !ev.IsDeleted &&
+                              attendanceDate.Date >= ev.StartDate.Date &&
+                              attendanceDate.Date <= ev.EndDate.Date,
+                         cancellationToken);
+
+            if (isOnLeave)
+            {
+                _logger?.LogInformation("Approved leave detected for date {Date} and employee {EmployeeId}. Setting status to OnLeave.",
+                    attendanceDate.Date, employeeId);
+                return AttendanceStatus.OnLeave; // Approved leave - mark as OnLeave
+            }
 
             // Log if employee not found for debugging
             if (employee == null)
@@ -272,14 +289,15 @@ public class AttendanceCalculationService : IAttendanceCalculationService
         // Rule 2: If employee has no shift assignment
         if (shift == null)
         {
-            // No transactions = Absent, Has transactions = Present (manual entry scenario)
+            // No shift assignment means not scheduled to work = DayOff
             if (!transactionsList.Any())
             {
-                return AttendanceStatus.Absent;
+                return AttendanceStatus.DayOff;
             }
 
+            // If they have transactions despite no shift, they worked on their day off
             var hasCheckInNoShift = transactionsList.Any(t => t.TransactionType == TransactionType.CheckIn);
-            return hasCheckInNoShift ? AttendanceStatus.Present : AttendanceStatus.Incomplete;
+            return hasCheckInNoShift ? AttendanceStatus.Overtime : AttendanceStatus.Incomplete;
         }
 
         // Rule 2: Check if it's a working day for the employee's shift

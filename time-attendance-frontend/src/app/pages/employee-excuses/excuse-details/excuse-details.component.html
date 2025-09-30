@@ -1,0 +1,275 @@
+<div class="container-fluid">
+  <!-- Header -->
+  <app-form-header
+    mode="view"
+    [title]="i18n.t('employee_excuses.excuse_details')"
+    moduleName="employee-excuses"
+    moduleRoute="employee-excuses"
+    [entityId]="getExcuseId()"
+    [loading]="loading()">
+  </app-form-header>
+
+  @if (loading()) {
+    <div class="d-flex justify-content-center py-5">
+      <app-loading-spinner
+        [message]="i18n.t('common.loading')"
+        [centered]="true">
+      </app-loading-spinner>
+    </div>
+  } @else if (error()) {
+    <div class="alert alert-danger" role="alert">
+      <i class="fas fa-exclamation-triangle me-2"></i>
+      {{ error() }}
+    </div>
+  } @else if (excuse()) {
+    <!-- Excuse Details -->
+    <div class="row">
+      <!-- Main Information Card -->
+      <div class="col-lg-8">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">
+              <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                  <div class="avatar-sm me-3">
+                    <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+                      <i class="fas fa-clipboard-user"></i>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="fw-medium">{{ excuse()?.employeeName }}</div>
+                    <small class="text-muted">{{ i18n.t('employee_excuses.request_id') }}: #{{ excuse()?.id }}</small>
+                  </div>
+                </div>
+                <div class="text-end">
+                  <app-status-badge
+                    [label]="formatStatus(excuse()!.status)"
+                    [variant]="getStatusVariant(excuse()!.status)"
+                    [icon]="getStatusIcon(excuse()!.status)">
+                  </app-status-badge>
+                </div>
+              </div>
+            </h5>
+          </div>
+          <div class="card-body">
+            <!-- Basic Information Section -->
+            <div class="mb-4">
+              <h6 class="text-primary mb-3">
+                <i class="fa-solid fa-info-circle me-2"></i>
+                {{ i18n.t('employee_excuses.basic_information') }}
+              </h6>
+              <div class="row">
+                <div class="col-md-6">
+                  <app-definition-list
+                    [items]="basicInfoColumn1()"
+                    [labelWidth]="'5'"
+                    [valueWidth]="'7'">
+                  </app-definition-list>
+                </div>
+                <div class="col-md-6">
+                  <app-definition-list
+                    [items]="basicInfoColumn2()"
+                    [labelWidth]="'5'"
+                    [valueWidth]="'7'">
+                  </app-definition-list>
+                </div>
+              </div>
+            </div>
+
+            <!-- Reason Section -->
+            <div class="mb-4">
+              <h6 class="text-secondary mb-3">
+                <i class="fa-solid fa-comment me-2"></i>
+                {{ i18n.t('employee_excuses.reason') }}
+              </h6>
+              <div class="bg-light p-3 rounded">
+                {{ excuse()?.reason }}
+              </div>
+            </div>
+
+            <!-- Review Information Section -->
+            @if (excuse()!.reviewDate || excuse()!.reviewerComments) {
+              <div class="mb-4">
+                <h6 class="text-info mb-3">
+                  <i class="fa-solid fa-user-check me-2"></i>
+                  {{ i18n.t('employee_excuses.review_information') }}
+                </h6>
+                @if (reviewInfo().length > 0) {
+                  <app-definition-list
+                    [items]="reviewInfo()"
+                    [labelWidth]="'3'"
+                    [valueWidth]="'9'"
+                    layout="single">
+                  </app-definition-list>
+                }
+                @if (excuse()!.reviewerComments) {
+                  <div class="mt-2">
+                    <strong>{{ i18n.t('employee_excuses.reviewer_comments') }}:</strong>
+                    <div class="bg-light p-3 rounded mt-2">
+                      {{ excuse()?.reviewerComments }}
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Attachment Section -->
+            @if (excuse()!.attachmentUrl) {
+              <div class="mb-4">
+                <h6 class="text-secondary mb-3">
+                  <i class="fa-solid fa-paperclip me-2"></i>
+                  {{ i18n.t('employee_excuses.attachment') }}
+                </h6>
+                <div class="d-flex align-items-center justify-content-between bg-light p-3 rounded">
+                  <div class="d-flex align-items-center">
+                    <i class="fas fa-file text-primary me-2"></i>
+                    <span>{{ i18n.t('employee_excuses.attachment_available') }}</span>
+                  </div>
+                  @if (canDownload()) {
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-primary"
+                      (click)="downloadAttachment()">
+                      <i class="fas fa-download me-1"></i>
+                      {{ i18n.t('employee_excuses.download') }}
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions Sidebar -->
+      <div class="col-lg-4">
+        <!-- Actions Card -->
+        @if (hasActiveActions()) {
+          <div class="card mb-4">
+            <div class="card-header">
+              <h6 class="card-title mb-0">
+                <i class="fas fa-cogs me-2"></i>
+                {{ i18n.t('common.actions') }}
+              </h6>
+            </div>
+            <div class="card-body">
+              <div class="d-grid gap-2">
+                <!-- Edit Action -->
+                @if (canEdit()) {
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary"
+                    (click)="navigateToEdit()"
+                    [disabled]="processing()">
+                    <i class="fas fa-edit me-2"></i>
+                    {{ i18n.t('common.edit') }}
+                  </button>
+                }
+
+                <!-- Approve Action -->
+                @if (canApprove()) {
+                  <button
+                    type="button"
+                    class="btn btn-success"
+                    (click)="approveExcuse()"
+                    [disabled]="processing()">
+                    @if (processing()) {
+                      <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    } @else {
+                      <i class="fas fa-check me-2"></i>
+                    }
+                    {{ i18n.t('employee_excuses.approve') }}
+                  </button>
+                }
+
+                <!-- Reject Action -->
+                @if (canReject()) {
+                  <button
+                    type="button"
+                    class="btn btn-danger"
+                    (click)="rejectExcuse()"
+                    [disabled]="processing()">
+                    @if (processing()) {
+                      <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    } @else {
+                      <i class="fas fa-times me-2"></i>
+                    }
+                    {{ i18n.t('employee_excuses.reject') }}
+                  </button>
+                }
+
+                <!-- Cancel Action -->
+                @if (canCancel()) {
+                  <button
+                    type="button"
+                    class="btn btn-warning"
+                    (click)="cancelExcuse()"
+                    [disabled]="processing()">
+                    @if (processing()) {
+                      <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    } @else {
+                      <i class="fas fa-ban me-2"></i>
+                    }
+                    {{ i18n.t('employee_excuses.cancel') }}
+                  </button>
+                }
+
+                <!-- Download Action -->
+                @if (canDownload()) {
+                  <button
+                    type="button"
+                    class="btn btn-outline-info"
+                    (click)="downloadAttachment()">
+                    <i class="fas fa-download me-2"></i>
+                    {{ i18n.t('employee_excuses.download_attachment') }}
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Summary Card -->
+        <div class="card">
+          <div class="card-header">
+            <h6 class="card-title mb-0">
+              <i class="fas fa-chart-bar me-2"></i>
+              {{ i18n.t('employee_excuses.request_summary') }}
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="row text-center">
+              <div class="col-12 mb-3">
+                <div class="border rounded p-3">
+                  <div class="h5 mb-1 text-primary">{{ formatDuration(excuse()!.durationHours) }}</div>
+                  <div class="text-muted small">{{ i18n.t('employee_excuses.duration') }}</div>
+                </div>
+              </div>
+              <div class="col-12 mb-3">
+                <div class="border rounded p-3">
+                  <div class="h6 mb-1">
+                    <app-status-badge
+                      [label]="formatStatus(excuse()!.status)"
+                      [variant]="getStatusVariant(excuse()!.status)"
+                      [icon]="getStatusIcon(excuse()!.status)">
+                    </app-status-badge>
+                  </div>
+                  <div class="text-muted small">{{ i18n.t('employee_excuses.status') }}</div>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="border rounded p-3">
+                  <div class="h6 mb-1">
+                    <span [class]="excuse()?.isWithinPolicy ? 'text-success' : 'text-warning'">
+                      {{ excuse()?.isWithinPolicy ? i18n.t('employee_excuses.compliant') : i18n.t('employee_excuses.violation') }}
+                    </span>
+                  </div>
+                  <div class="text-muted small">{{ i18n.t('employee_excuses.policy_compliance') }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }

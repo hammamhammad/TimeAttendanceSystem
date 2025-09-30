@@ -8,14 +8,21 @@ import { PermissionService } from '../../core/auth/permission.service';
 import { PermissionResources, PermissionActions } from '../../shared/utils/permission.utils';
 import { NotificationService } from '../../core/notifications/notification.service';
 import { ConfirmationService } from '../../core/confirmation/confirmation.service';
-import { BranchFiltersComponent } from './branch-filters/branch-filters.component';
+import { UnifiedFilterComponent } from '../../shared/components/unified-filter/unified-filter.component';
 import { BranchTableComponent } from './branch-table/branch-table.component';
 import { BranchFormModalComponent } from './branch-form-modal/branch-form-modal.component';
+import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 
 @Component({
   selector: 'app-branches',
   standalone: true,
-  imports: [CommonModule, BranchFiltersComponent, BranchTableComponent, BranchFormModalComponent],
+  imports: [
+    CommonModule,
+    UnifiedFilterComponent,
+    BranchTableComponent,
+    BranchFormModalComponent,
+    PageHeaderComponent
+  ],
   templateUrl: './branches.component.html',
   styleUrls: ['./branches.component.css']
 })
@@ -54,6 +61,7 @@ export class BranchesComponent implements OnInit {
   // Modal state
   showBranchForm = signal(false);
   selectedBranch = signal<Branch | null>(null);
+
 
   ngOnInit(): void {
     this.loadBranches();
@@ -101,6 +109,15 @@ export class BranchesComponent implements OnInit {
   onAddBranch(): void {
     this.selectedBranch.set(null);
     this.showBranchForm.set(true);
+  }
+
+  onRefreshData(): void {
+    // Reset filters and pagination
+    this.currentFilter = {};
+    this.currentPage.set(1);
+
+    // Reload data
+    this.loadBranches();
   }
 
   // Table event handlers

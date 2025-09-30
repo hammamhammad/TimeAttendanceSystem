@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SearchableSelectComponent, SearchableSelectOption } from '../searchable-select/searchable-select.component';
@@ -6,9 +6,11 @@ import { SearchableSelectComponent, SearchableSelectOption } from '../searchable
 export interface FilterField {
   key: string;
   label: string;
-  type: 'text' | 'select' | 'date' | 'boolean';
+  type: 'text' | 'select' | 'date' | 'daterange' | 'boolean';
   options?: SearchableSelectOption[];
   placeholder?: string;
+  required?: boolean;
+  multiple?: boolean;
 }
 
 @Component({
@@ -87,17 +89,39 @@ export interface FilterField {
               <i class="fas fa-times me-1"></i>
               Clear
             </button>
+            <button type="button"
+                    *ngIf="showRefreshButton"
+                    class="btn btn-outline-info"
+                    [disabled]="refreshing"
+                    (click)="onRefresh()">
+              <i class="fas"
+                 [class.fa-sync-alt]="!refreshing"
+                 [class.fa-spinner]="refreshing"
+                 [class.fa-spin]="refreshing"
+                 [class.me-1]="true"></i>
+              Refresh
+            </button>
           </div>
         </div>
 
-        <!-- Add button -->
-        <div class="col-md-auto ms-auto" *ngIf="showAddButton">
-          <button type="button"
-                  class="btn btn-success"
-                  (click)="onAdd()">
-            <i class="fas fa-plus me-1"></i>
-            {{ addButtonText }}
-          </button>
+        <!-- Additional action buttons -->
+        <div class="col-md-auto ms-auto">
+          <div class="btn-group">
+            <button type="button"
+                    *ngIf="showBulkButton"
+                    class="btn btn-outline-primary"
+                    (click)="onBulkAction()">
+              <i class="fas fa-users me-1"></i>
+              {{ bulkButtonText }}
+            </button>
+            <button type="button"
+                    *ngIf="showAddButton"
+                    class="btn btn-success"
+                    (click)="onAdd()">
+              <i class="fas fa-plus me-1"></i>
+              {{ addButtonText }}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -142,21 +166,41 @@ export interface FilterField {
     }
   `]
 })
-export class SearchFilterComponent {
+export class SearchFilterComponent implements OnChanges {
   @Input() showSearch = true;
   @Input() searchPlaceholder = 'Search...';
   @Input() filterFields: FilterField[] = [];
+  @Input() currentFilters: any = {};
   @Input() showAddButton = false;
   @Input() addButtonText = 'Add New';
+  @Input() showBulkButton = false;
+  @Input() bulkButtonText = 'Bulk Action';
+  @Input() showRefreshButton = true;
+  @Input() refreshing = false;
 
   @Output() search = new EventEmitter<string>();
   @Output() filterChange = new EventEmitter<any>();
   @Output() add = new EventEmitter<void>();
+  @Output() bulkAction = new EventEmitter<void>();
+  @Output() refresh = new EventEmitter<void>();
 
   searchTerm = '';
   filterValues: any = {};
 
   private searchTimeout: any;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // Update filterValues when currentFilters change from parent
+    if (changes['currentFilters']) {
+      const newFilters = changes['currentFilters'].currentValue || {};
+      // Update filterValues with the new values
+      this.filterValues = { ...newFilters };
+      // Update searchTerm if provided
+      if (newFilters.search) {
+        this.searchTerm = newFilters.search;
+      }
+    }
+  }
 
   onSearchChange(): void {
     // Debounce search
@@ -191,6 +235,22 @@ export class SearchFilterComponent {
 
   onAdd(): void {
     this.add.emit();
+  }
+
+  onBulkAction(): void {
+    this.bulkAction.emit();
+  }
+
+  onRefresh(): void {
+    // Clear all filters and search
+    this.searchTerm = '';
+    this.filterValues = {};
+
+    // Emit refresh event for parent to handle data reload
+    this.refresh.emit();
+
+    // Also emit filter change to reset any active filters
+    this.emitFilterChange();
   }
 
   clearSearchTerm(): void {

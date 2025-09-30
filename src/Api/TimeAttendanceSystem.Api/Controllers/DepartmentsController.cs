@@ -139,6 +139,22 @@ public class DepartmentsController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpGet("dropdown")]
+    [Authorize(Policy = "DepartmentRead")]
+    public async Task<IActionResult> GetDepartmentsDropdown([FromQuery] long? branchId = null)
+    {
+        var query = new GetDepartmentsQuery(branchId, false, true, null, null, false); // Get all active departments
+        var result = await _mediator.Send(query);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(new { error = result.Error });
+        }
+
+        var dropdown = result.Value.Select(d => new { id = d.Id, name = d.Name }).ToList();
+        return Ok(dropdown);
+    }
 }
 
 public record CreateDepartmentRequest(

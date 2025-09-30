@@ -1,9 +1,11 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AttendanceService } from '../../../core/services/attendance.service';
 import { I18nService } from '../../../core/i18n/i18n.service';
+import { FormHeaderComponent } from '../../../shared/components/form-header/form-header.component';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 import { NotificationService } from '../../../core/notifications/notification.service';
 import {
   AttendanceRecord,
@@ -14,7 +16,7 @@ import {
 @Component({
   selector: 'app-edit-attendance',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormHeaderComponent, StatusBadgeComponent],
   templateUrl: './edit-attendance.component.html',
   styleUrls: ['./edit-attendance.component.css']
 })
@@ -49,7 +51,7 @@ export class EditAttendanceComponent implements OnInit {
     { value: AttendanceStatus.SickLeave, label: 'attendance.status.sick_leave' }
   ];
 
-  private recordId: number | null = null;
+  recordId: number | null = null;
   private returnDate: string | null = null;
 
   // Additional signals for business rules
@@ -60,6 +62,37 @@ export class EditAttendanceComponent implements OnInit {
   calculatedLateMinutes = signal(0);
   calculatedEarlyLeaveMinutes = signal(0);
   totalLateMinutes = signal(0);
+
+  /**
+   * Computed property for status badge
+   */
+  statusBadge = computed<{ label: string; variant: 'success' | 'danger' | 'warning' | 'info' | 'secondary' | 'primary' }>(() => {
+    const status = this.calculatedStatus();
+    if (!status) {
+      return { label: this.i18n.t('attendance.status.pending'), variant: 'secondary' };
+    }
+
+    const label = this.i18n.t(this.getStatusText(status));
+
+    switch (status) {
+      case AttendanceStatus.Present:
+        return { label, variant: 'success' };
+      case AttendanceStatus.Absent:
+        return { label, variant: 'danger' };
+      case AttendanceStatus.Late:
+      case AttendanceStatus.EarlyLeave:
+      case AttendanceStatus.SickLeave:
+        return { label, variant: 'warning' };
+      case AttendanceStatus.OnLeave:
+        return { label, variant: 'info' };
+      case AttendanceStatus.Overtime:
+        return { label, variant: 'primary' };
+      case AttendanceStatus.DayOff:
+      case AttendanceStatus.Holiday:
+      default:
+        return { label, variant: 'secondary' };
+    }
+  });
 
   constructor() {
     // Simplified form - only editable fields based on business rules

@@ -7,11 +7,12 @@ import { RolesService, CreateRoleRequest, PermissionGroupDto } from '../roles.se
 import { Permission } from '../../../shared/models/role.model';
 import { PermissionUtils } from '../../../shared/utils/permission.utils';
 import { NotificationService } from '../../../core/notifications/notification.service';
+import { FormHeaderComponent } from '../../../shared/components/form-header/form-header.component';
 
 @Component({
   selector: 'app-create-role',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, FormHeaderComponent],
   templateUrl: './create-role.component.html',
   styleUrls: ['./create-role.component.css']
 })

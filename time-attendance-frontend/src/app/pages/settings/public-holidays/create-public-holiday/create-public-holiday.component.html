@@ -1,19 +1,12 @@
 <div class="container-fluid">
   <!-- Page Header -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h1 class="h3 mb-1">{{ t('settings.holidays.createHoliday') }}</h1>
-      <p class="text-muted mb-0">{{ t('settings.holidays.createHolidayDescription') }}</p>
-    </div>
-    <div>
-      <button type="button"
-              class="btn btn-outline-secondary me-2"
-              (click)="onCancel()">
-        <i class="fas fa-arrow-left me-1"></i>
-        {{ t('common.back') }}
-      </button>
-    </div>
-  </div>
+  <app-form-header
+    mode="create"
+    [title]="t('settings.holidays.createHoliday')"
+    moduleName="settings"
+    moduleRoute="settings/public-holidays"
+    [loading]="submitting()">
+  </app-form-header>
 
   <!-- Form Card -->
   <div class="card">

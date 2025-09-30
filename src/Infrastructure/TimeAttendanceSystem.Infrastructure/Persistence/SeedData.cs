@@ -2,6 +2,8 @@ using TimeAttendanceSystem.Domain.Users;
 using TimeAttendanceSystem.Domain.Common;
 using TimeAttendanceSystem.Domain.Shifts;
 using TimeAttendanceSystem.Domain.Settings;
+using TimeAttendanceSystem.Domain.Branches;
+using TimeAttendanceSystem.Domain.Employees;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
@@ -38,6 +40,11 @@ public static class SeedData
             await SeedDefaultOvertimeConfigurationAsync(context);
         }
 
+        // Add sample employees with departments if none exist
+        if (!await context.Employees.AnyAsync())
+        {
+            await SeedSampleEmployeesAsync(context);
+        }
 
         await context.SaveChangesAsync();
 
@@ -136,6 +143,21 @@ public static class SeedData
         permissions.AddRange(PermissionBuilder.CreateResourcePermissions(PermissionResources.VacationType, "Vacation Management",
             PermissionActions.Configure, PermissionActions.Manage,
             PermissionActions.Activate, PermissionActions.Deactivate));
+
+        // Employee Vacation Management - Managing employee vacation records
+        permissions.AddRange(PermissionBuilder.CreateExtendedCrudPermissions(PermissionResources.Vacation, "Employee Vacation Management"));
+        permissions.AddRange(PermissionBuilder.CreateResourcePermissions(PermissionResources.Vacation, "Employee Vacation Management",
+            PermissionActions.Approve, PermissionActions.Reject, PermissionActions.View, PermissionActions.BulkCreate));
+
+        // Excuse Policy Management - Settings for excuse policies
+        permissions.AddRange(PermissionBuilder.CreateResourcePermissions("settings.excusePolicy", "Excuse Policy Management",
+            PermissionActions.Read, PermissionActions.Create, PermissionActions.Update, PermissionActions.Delete,
+            PermissionActions.Configure, PermissionActions.Manage, PermissionActions.Activate, PermissionActions.Deactivate));
+
+        // Employee Excuse Management - Managing employee excuse requests
+        permissions.AddRange(PermissionBuilder.CreateExtendedCrudPermissions(PermissionResources.Excuse, "Employee Excuse Management"));
+        permissions.AddRange(PermissionBuilder.CreateResourcePermissions(PermissionResources.Excuse, "Employee Excuse Management",
+            PermissionActions.Approve, PermissionActions.Reject, PermissionActions.View, PermissionActions.BulkCreate));
 
 
         // Get existing permission keys
@@ -391,6 +413,89 @@ public static class SeedData
         Console.WriteLine("✅ Default overtime configuration created: Post-shift overtime enabled (1.5x normal, 2.0x holiday, 2.5x off-day rates)");
     }
 
+    private static async Task SeedSampleEmployeesAsync(TimeAttendanceDbContext context)
+    {
+        // First create some sample branches and departments
+        var branch = new Branch
+        {
+            Code = "HQ001",
+            Name = "Head Office",
+            TimeZone = "Asia/Riyadh",
+            IsActive = true,
+            CreatedAtUtc = DateTime.UtcNow,
+            CreatedBy = "SYSTEM"
+        };
+
+        await context.Branches.AddAsync(branch);
+        await context.SaveChangesAsync();
+
+        var department = new Department
+        {
+            BranchId = branch.Id,
+            Code = "IT001",
+            Name = "Information Technology",
+            NameAr = "تكنولوجيا المعلومات",
+            Description = "IT Department",
+            DescriptionAr = "قسم تكنولوجيا المعلومات",
+            IsActive = true,
+            SortOrder = 1,
+            CreatedAtUtc = DateTime.UtcNow,
+            CreatedBy = "SYSTEM"
+        };
+
+        await context.Departments.AddAsync(department);
+        await context.SaveChangesAsync();
+
+        // Create sample employees with department assignment
+        var employees = new[]
+        {
+            new Employee
+            {
+                BranchId = branch.Id,
+                DepartmentId = department.Id,
+                EmployeeNumber = "EMP001",
+                FirstName = "Ahmed",
+                LastName = "Al-Rashid",
+                FirstNameAr = "أحمد",
+                LastNameAr = "الراشد",
+                Email = "ahmed.alrashid@company.com",
+                Phone = "+966551234567",
+                HireDate = DateTime.UtcNow.AddDays(-365),
+                EmploymentStatus = EmploymentStatus.FullTime,
+                JobTitle = "Software Developer",
+                JobTitleAr = "مطور برمجيات",
+                WorkLocationType = WorkLocationType.OnSite,
+                Gender = Gender.Male,
+                CreatedAtUtc = DateTime.UtcNow,
+                CreatedBy = "SYSTEM"
+            },
+            new Employee
+            {
+                BranchId = branch.Id,
+                DepartmentId = department.Id,
+                EmployeeNumber = "EMP002",
+                FirstName = "Fatima",
+                LastName = "Al-Zahra",
+                FirstNameAr = "فاطمة",
+                LastNameAr = "الزهراء",
+                Email = "fatima.alzahra@company.com",
+                Phone = "+966551234568",
+                HireDate = DateTime.UtcNow.AddDays(-200),
+                EmploymentStatus = EmploymentStatus.FullTime,
+                JobTitle = "IT Manager",
+                JobTitleAr = "مدير تكنولوجيا المعلومات",
+                WorkLocationType = WorkLocationType.OnSite,
+                Gender = Gender.Female,
+                CreatedAtUtc = DateTime.UtcNow,
+                CreatedBy = "SYSTEM"
+            }
+        };
+
+        await context.Employees.AddRangeAsync(employees);
+        await context.SaveChangesAsync();
+
+        Console.WriteLine("✅ Sample employees created with departments: Ahmed Al-Rashid, Fatima Al-Zahra");
+    }
 
     private static (string hash, string salt) HashPassword(string password)
     {

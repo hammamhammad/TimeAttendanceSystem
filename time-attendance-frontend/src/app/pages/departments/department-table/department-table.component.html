@@ -110,9 +110,10 @@
   <!-- Loading -->
   @if (loading()) {
     <div class="text-center p-4">
-      <div class="spinner-border" role="status">
-        <span class="visually-hidden">{{ i18n.t('common.loading') }}...</span>
-      </div>
+      <app-loading-spinner
+        [message]="i18n.t('common.loading')"
+        [centered]="true">
+      </app-loading-spinner>
     </div>
   }
 
@@ -221,7 +222,10 @@
 
                 <!-- Department Code -->
                 <td>
-                  <span class="badge bg-light text-dark border">{{ dept.code }}</span>
+                  <app-status-badge
+                    [status]="'secondary'"
+                    [label]="dept.code">
+                  </app-status-badge>
                 </td>
 
                 <!-- Department Path -->
@@ -246,13 +250,10 @@
 
                 <!-- Employee Count -->
                 <td class="text-center">
-                  <span class="badge"
-                        [class.bg-success]="dept.employeeCount > 0"
-                        [class.bg-light]="dept.employeeCount === 0"
-                        [class.text-dark]="dept.employeeCount === 0"
-                        [class.border]="dept.employeeCount === 0">
-                    {{ dept.employeeCount }}
-                  </span>
+                  <app-status-badge
+                    [status]="dept.employeeCount > 0 ? 'success' : 'secondary'"
+                    [label]="dept.employeeCount.toString()">
+                  </app-status-badge>
                 </td>
 
                 <!-- Location -->
@@ -270,13 +271,11 @@
 
                 <!-- Status -->
                 <td class="text-center">
-                  <span class="badge"
-                        [class.bg-success]="dept.isActive"
-                        [class.bg-light]="!dept.isActive"
-                        [class.text-dark]="!dept.isActive"
-                        [class.border]="!dept.isActive">
-                    {{ dept.isActive ? i18n.t('common.active') : i18n.t('common.inactive') }}
-                  </span>
+                  <app-status-badge
+                    [status]="dept.isActive ? 'active' : 'inactive'"
+                    [label]="dept.isActive ? i18n.t('common.active') : i18n.t('common.inactive')"
+                    [showIcon]="true">
+                  </app-status-badge>
                 </td>
 
                 <!-- Actions -->

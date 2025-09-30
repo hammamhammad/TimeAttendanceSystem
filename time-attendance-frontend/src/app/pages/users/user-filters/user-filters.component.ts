@@ -20,9 +20,11 @@ interface Role {
       [showAddButton]="showAddButton"
       [addButtonText]="addButtonText"
       [searchPlaceholder]="'Search users...'"
+      [refreshing]="refreshing"
       (search)="onSearch($event)"
       (filterChange)="onFilterChange($event)"
-      (add)="onAdd()">
+      (add)="onAdd()"
+      (refresh)="onRefresh()">
     </app-search-filter>
   `
 })
@@ -32,10 +34,12 @@ export class UserFiltersComponent {
   @Input() showAddButton = true;
   @Input() addButtonText = 'Add User';
   @Input() availableRoles = signal<Role[]>([]);
+  @Input() refreshing = false;
 
   @Output() searchChange = new EventEmitter<string>();
   @Output() filtersChange = new EventEmitter<any>();
   @Output() addUser = new EventEmitter<void>();
+  @Output() refreshData = new EventEmitter<void>();
 
   filterFields = signal<FilterField[]>([]);
 
@@ -88,5 +92,9 @@ export class UserFiltersComponent {
 
   onAdd() {
     this.addUser.emit();
+  }
+
+  onRefresh() {
+    this.refreshData.emit();
   }
 }

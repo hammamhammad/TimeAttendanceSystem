@@ -1,0 +1,255 @@
+<div class="app-view-page">
+  <!-- Standardized Page Header -->
+  <app-form-header
+    mode="view"
+    [title]="i18n.t('shifts.view_shift')"
+    moduleName="shifts"
+    moduleRoute="shifts"
+    [entityId]="shift()?.id"
+    [loading]="loading()">
+  </app-form-header>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="text-center py-5">
+      <app-loading-spinner
+        [message]="i18n.t('shifts.loading_details')"
+        [variant]="'primary'"
+        [centered]="true">
+      </app-loading-spinner>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error()) {
+    <div class="alert alert-danger" role="alert">
+      <i class="fas fa-exclamation-triangle me-2"></i>
+      {{ error() }}
+    </div>
+  }
+
+  <!-- Shift Details -->
+  @if (shift() && !loading()) {
+    <div class="app-desktop-sidebar">
+      <!-- Main Content -->
+      <div class="app-main-content">
+        <!-- Basic Information Card -->
+        <app-detail-card
+          [title]="i18n.t('shifts.basic_information')"
+          icon="fas fa-info-circle"
+          [fields]="basicInfoFields"
+          layout="two-column">
+        </app-detail-card>
+
+        <!-- Working Hours Card -->
+        @if (workingHoursFields.length > 0) {
+          <app-detail-card
+            [title]="i18n.t('shifts.working_hours')"
+            icon="fas fa-clock"
+            [fields]="workingHoursFields"
+            layout="two-column"
+            class="mt-4">
+          </app-detail-card>
+        }
+
+        <!-- Shift Periods Card -->
+        @if (shiftPeriods.length > 0) {
+          <div class="card mt-4">
+            <div class="card-header">
+              <h5 class="card-title mb-0">
+                <i class="fas fa-calendar-day me-2"></i>
+                {{ i18n.t('shifts.shift_periods') }}
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="shift-periods">
+                @for (period of shiftPeriods; track period.id) {
+                  <div class="period-item" [class.night-period]="period.isNightPeriod">
+                    <div class="period-header">
+                      <span class="period-order">#{{ period.periodOrder }}</span>
+                      <span class="period-time">{{ formatTime(period.startTime) }} - {{ formatTime(period.endTime) }}</span>
+                      @if (period.isNightPeriod) {
+                        <span class="badge bg-warning ms-2">{{ i18n.t('shifts.night_period') }}</span>
+                      }
+                    </div>
+                    <div class="period-duration">
+                      <i class="fas fa-clock me-1"></i>
+                      {{ calculatePeriodHours(period) }}
+                    </div>
+                  </div>
+                }
+              </div>
+              <div class="total-hours mt-3">
+                <strong>{{ i18n.t('shifts.total_shift_hours') }}: {{ getTotalShiftHours() }}</strong>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Working Days Card -->
+        <app-detail-card
+          [title]="i18n.t('shifts.working_days')"
+          icon="fas fa-calendar-week"
+          [fields]="workingDaysFields"
+          layout="two-column"
+          class="mt-4">
+        </app-detail-card>
+
+        <!-- Settings Card -->
+        <app-detail-card
+          [title]="i18n.t('shifts.shift_settings')"
+          icon="fas fa-cogs"
+          [fields]="settingsFields"
+          layout="two-column"
+          class="mt-4">
+        </app-detail-card>
+
+        <!-- Audit Information Card -->
+        <app-detail-card
+          [title]="i18n.t('shifts.audit_information')"
+          icon="fas fa-history"
+          [fields]="auditFields"
+          layout="two-column"
+          class="mt-4">
+        </app-detail-card>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="app-sidebar-content">
+        <!-- Actions Card -->
+        @if (hasActiveActions()) {
+          <div class="card mb-3">
+            <div class="card-header">
+              <h6 class="card-title mb-0">
+                <i class="fas fa-cogs me-2"></i>
+                {{ i18n.t('common.actions') }}
+              </h6>
+            </div>
+            <div class="card-body">
+              <div class="d-grid gap-2">
+
+                <!-- Set as Default Action -->
+                @if (canSetDefault()) {
+                  <button
+                    type="button"
+                    class="btn btn-warning"
+                    (click)="setAsDefault()"
+                    [disabled]="processing()">
+                    @if (processing()) {
+                      <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    } @else {
+                      <i class="fas fa-star me-2"></i>
+                    }
+                    {{ i18n.t('shifts.set_default') }}
+                  </button>
+                }
+
+                <!-- Delete Action -->
+                @if (canDelete()) {
+                  <button
+                    type="button"
+                    class="btn btn-outline-danger"
+                    (click)="deleteShift()"
+                    [disabled]="processing()">
+                    @if (processing()) {
+                      <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    } @else {
+                      <i class="fas fa-trash me-2"></i>
+                    }
+                    {{ i18n.t('common.delete') }}
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Shift Summary -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <h6 class="card-title mb-0">
+              <i class="fas fa-chart-pie me-2"></i>
+              {{ i18n.t('shifts.shift_summary') }}
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="shift-summary">
+              <!-- Shift Type -->
+              <div class="summary-item">
+                <div class="summary-label">{{ i18n.t('fields.type') }}</div>
+                <div class="summary-value">
+                  <app-status-badge
+                    [status]="shiftTypeBadge().label"
+                    [variant]="shiftTypeBadge().variant">
+                  </app-status-badge>
+                </div>
+              </div>
+
+              <!-- Status -->
+              <div class="summary-item">
+                <div class="summary-label">{{ i18n.t('fields.status') }}</div>
+                <div class="summary-value">
+                  <app-status-badge
+                    [status]="statusBadge().label"
+                    [variant]="statusBadge().variant">
+                  </app-status-badge>
+                </div>
+              </div>
+
+              <!-- Total Periods -->
+              <div class="summary-item">
+                <div class="summary-label">{{ i18n.t('shifts.total_periods') }}</div>
+                <div class="summary-value periods-count">{{ shiftPeriods.length }}</div>
+              </div>
+
+              <!-- Total Hours -->
+              @if (shiftPeriods.length > 0) {
+                <div class="summary-item">
+                  <div class="summary-label">{{ i18n.t('shifts.total_hours') }}</div>
+                  <div class="summary-value hours-value">{{ getTotalShiftHours() }}</div>
+                </div>
+              }
+
+              <!-- Flexibility -->
+              <div class="summary-item">
+                <div class="summary-label">{{ i18n.t('shifts.flexible_hours') }}</div>
+                <div class="summary-value">
+                  <app-status-badge
+                    [status]="flexibilityBadge().label"
+                    [variant]="flexibilityBadge().variant">
+                  </app-status-badge>
+                </div>
+              </div>
+
+              <!-- Night Shift -->
+              @if (nightShiftBadge().visible) {
+                <div class="summary-item">
+                  <div class="summary-label">{{ i18n.t('shifts.night_shift') }}</div>
+                  <div class="summary-value">
+                    <app-status-badge
+                      [status]="nightShiftBadge().label"
+                      [variant]="nightShiftBadge().variant"
+                      icon="fas fa-moon">
+                    </app-status-badge>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Back Navigation -->
+        <div class="card">
+          <div class="card-header">
+            <h6 class="card-title mb-0">
+              <i class="fas fa-arrow-left me-2"></i>
+              {{ i18n.t('common.navigation') }}
+            </h6>
+          </div>
+          <div class="card-body">
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

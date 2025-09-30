@@ -13,11 +13,13 @@ import {
 } from '../../shared/models/attendance.model';
 import { AttendanceChartComponent, ChartData } from './shared/attendance-chart/attendance-chart.component';
 import { AttendanceSummaryCardComponent, AttendanceSummaryData } from './shared/attendance-summary-card/attendance-summary-card.component';
+import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
+import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-attendance',
   standalone: true,
-  imports: [CommonModule, RouterModule, AttendanceChartComponent, AttendanceSummaryCardComponent],
+  imports: [CommonModule, RouterModule, AttendanceChartComponent, AttendanceSummaryCardComponent, PageHeaderComponent, LoadingSpinnerComponent],
   templateUrl: './attendance.component.html',
   styleUrls: ['./attendance.component.css']
 })

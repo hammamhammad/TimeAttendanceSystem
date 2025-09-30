@@ -1,6 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import {
   PublicHoliday,
@@ -221,6 +223,19 @@ export class PublicHolidaysService {
         description: 'Holiday occurs on a relative date (e.g., first Monday of March)'
       }
     ];
+  }
+
+  /**
+   * Get branches for dropdown selection
+   */
+  getBranches(): Observable<Array<{id: number, name: string}>> {
+    return this.http.get<any>(`${environment.apiUrl}/api/v1/branches/all`).pipe(
+      map(response => response.value as Array<{id: number, name: string}>),
+      catchError(error => {
+        console.error('Failed to load branches:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
   /**

@@ -96,6 +96,22 @@ public class BranchesController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpGet("dropdown")]
+    [Authorize(Policy = "BranchRead")]
+    public async Task<IActionResult> GetBranchesDropdown()
+    {
+        var query = new GetBranchesQuery(1, 1000, null, true); // Get all active branches
+        var result = await _mediator.Send(query);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(new { error = result.Error });
+        }
+
+        var dropdown = result.Value.Items.Select(b => new { id = b.Id, name = b.Name }).ToList();
+        return Ok(dropdown);
+    }
 }
 
 public record CreateBranchRequest(

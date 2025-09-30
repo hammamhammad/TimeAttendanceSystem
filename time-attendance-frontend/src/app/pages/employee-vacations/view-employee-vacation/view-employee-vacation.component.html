@@ -1,0 +1,212 @@
+<div class="container-fluid">
+  <!-- Header -->
+  <app-form-header
+    [mode]="getFormMode()"
+    [title]="i18n.t('employee_vacations.view_vacation')"
+    moduleName="employee-vacations"
+    moduleRoute="employee-vacations"
+    [entityId]="getVacationId()"
+    [loading]="loading()">
+  </app-form-header>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="text-center py-5">
+      <app-loading-spinner
+        [message]="i18n.t('employee_vacations.loading_details')"
+        [variant]="'primary'"
+        [centered]="true">
+      </app-loading-spinner>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error()) {
+    <div class="alert alert-danger" role="alert">
+      <i class="fas fa-exclamation-triangle me-2"></i>
+      {{ error() }}
+    </div>
+  }
+
+  <!-- Vacation Details -->
+  @if (vacation() && !loading()) {
+    <div class="row">
+      <!-- Main Information Card -->
+      <div class="col-lg-8">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">
+              <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                  <div class="avatar-sm me-3">
+                    <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+                      <i class="fas fa-calendar-alt"></i>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="fw-medium">{{ vacation()?.employeeName }}</div>
+                    <small class="text-muted">{{ i18n.t('employee_vacations.vacation_id') }}: #{{ vacation()?.id }}</small>
+                  </div>
+                </div>
+                <div class="text-end">
+                  <app-status-badge
+                    [status]="statusBadge().label"
+                    [variant]="statusBadge().variant">
+                  </app-status-badge>
+                </div>
+              </div>
+            </h5>
+          </div>
+          <div class="card-body">
+            <!-- Basic Information Section -->
+            <div class="mb-4">
+              <h6 class="text-primary mb-3">
+                <i class="fa-solid fa-info-circle me-2"></i>
+                {{ i18n.t('employee_vacations.basic_information') }}
+              </h6>
+              <div class="row">
+                <div class="col-md-6">
+                  <app-definition-list
+                    [items]="basicInfoColumn1()"
+                    [labelWidth]="'5'"
+                    [valueWidth]="'7'">
+                  </app-definition-list>
+                </div>
+                <div class="col-md-6">
+                  <app-definition-list
+                    [items]="basicInfoColumn2()"
+                    [labelWidth]="'5'"
+                    [valueWidth]="'7'">
+                  </app-definition-list>
+                </div>
+              </div>
+            </div>
+
+            <!-- Additional Information Section -->
+            @if (vacation()!.notes || vacation()!.createdAtUtc) {
+              <div class="mb-4">
+                <h6 class="text-secondary mb-3">
+                  <i class="fa-solid fa-list me-2"></i>
+                  {{ i18n.t('employee_vacations.additional_information') }}
+                </h6>
+                @if (vacation()!.notes) {
+                  <div class="mb-3">
+                    <strong>{{ i18n.t('fields.notes') }}:</strong>
+                    <div class="bg-light p-3 rounded mt-2">
+                      {{ vacation()?.notes }}
+                    </div>
+                  </div>
+                }
+                @if (vacation()!.createdAtUtc) {
+                  <div class="mb-2">
+                    <strong>{{ i18n.t('fields.createdAt') }}:</strong>
+                    <span class="ms-2">{{ formatDateTime(vacation()!.createdAtUtc) }}</span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions Sidebar -->
+      <div class="col-lg-4">
+        <!-- Actions Card -->
+        @if (hasActiveActions()) {
+          <div class="card mb-4">
+            <div class="card-header">
+              <h6 class="card-title mb-0">
+                <i class="fas fa-cogs me-2"></i>
+                {{ i18n.t('common.actions') }}
+              </h6>
+            </div>
+            <div class="card-body">
+              <div class="d-grid gap-2">
+                <!-- Edit Action -->
+                @if (canEdit()) {
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary"
+                    (click)="navigateToEdit()"
+                    [disabled]="processing()">
+                    <i class="fas fa-edit me-2"></i>
+                    {{ i18n.t('common.edit') }}
+                  </button>
+                }
+
+                <!-- Approve Action -->
+                @if (canApprove()) {
+                  <button
+                    type="button"
+                    class="btn btn-success"
+                    (click)="approveVacation()"
+                    [disabled]="processing()">
+                    @if (processing()) {
+                      <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    } @else {
+                      <i class="fas fa-check me-2"></i>
+                    }
+                    {{ i18n.t('employee_vacations.approve') }}
+                  </button>
+                }
+
+                <!-- Delete Action -->
+                @if (canDelete()) {
+                  <button
+                    type="button"
+                    class="btn btn-outline-danger"
+                    (click)="deleteVacation()"
+                    [disabled]="processing()">
+                    @if (processing()) {
+                      <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    } @else {
+                      <i class="fas fa-trash me-2"></i>
+                    }
+                    {{ i18n.t('common.delete') }}
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Summary Card -->
+        <div class="card">
+          <div class="card-header">
+            <h6 class="card-title mb-0">
+              <i class="fas fa-chart-bar me-2"></i>
+              {{ i18n.t('employee_vacations.vacation_summary') }}
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="row text-center">
+              <div class="col-12 mb-3">
+                <div class="border rounded p-3">
+                  <div class="h5 mb-1 text-primary">{{ vacation()?.totalDays }}</div>
+                  <div class="text-muted small">{{ vacation()?.totalDays === 1 ? i18n.t('fields.dayUnit') : i18n.t('fields.daysUnit') }}</div>
+                </div>
+              </div>
+              <div class="col-12 mb-3">
+                <div class="border rounded p-3">
+                  <div class="h6 mb-1">
+                    <app-status-badge
+                      [status]="statusBadge().label"
+                      [variant]="statusBadge().variant">
+                    </app-status-badge>
+                  </div>
+                  <div class="text-muted small">{{ i18n.t('fields.status') }}</div>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="border rounded p-3">
+                  <div class="h6 mb-1 text-info">{{ vacation()?.vacationTypeName }}</div>
+                  <div class="text-muted small">{{ i18n.t('fields.vacationType') }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

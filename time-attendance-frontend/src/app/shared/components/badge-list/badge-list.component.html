@@ -1,0 +1,36 @@
+@if (items.length > 0) {
+  <div [class]="getContainerClasses()">
+    @for (item of getVisibleItems(); track item.id || item.label) {
+      <span
+        [class]="getBadgeClasses(item)"
+        [title]="item.tooltip"
+        (click)="onBadgeClick(item)">
+        @if (item.icon) {
+          <i [class]="item.icon + ' me-1'"></i>
+        }
+        {{ item.label }}
+        @if (item.removable) {
+          <button
+            type="button"
+            class="badge-remove-btn"
+            (click)="onRemoveClick(item, $event)"
+            aria-label="Remove">
+            <i class="fa-solid fa-times"></i>
+          </button>
+        }
+      </span>
+    }
+
+    <!-- Show more indicator -->
+    @if (getHiddenCount() > 0) {
+      <span class="badge bg-secondary badge-more">
+        {{ getShowMoreText() }}
+      </span>
+    }
+  </div>
+} @else if (showEmptyMessage) {
+  <p class="text-muted mb-0">{{ emptyMessage }}</p>
+}
+
+<!-- Custom content slot -->
+<ng-content></ng-content>

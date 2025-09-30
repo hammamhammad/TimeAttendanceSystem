@@ -19,6 +19,9 @@ public static class PermissionResources
     public const string System = "system";
     public const string PublicHoliday = "publicHoliday";
     public const string VacationType = "vacationType";
+    public const string Vacation = "vacation";
+    public const string ExcusePolicy = "excusePolicy";
+    public const string Excuse = "excuse";
 
     public static readonly Dictionary<string, string> ResourceDescriptions = new()
     {
@@ -39,6 +42,9 @@ public static class PermissionResources
         { System, "Core system functions" },
         { PublicHoliday, "Public holidays and calendar management" },
         { VacationType, "Vacation types and leave policies" },
+        { Vacation, "Employee vacation records and management" },
+        { ExcusePolicy, "Excuse policies and organizational rules" },
+        { Excuse, "Employee excuse requests and management" },
     };
     
     public static readonly Dictionary<string, string> ResourceIcons = new()
@@ -60,6 +66,8 @@ public static class PermissionResources
         { System, "fa-server" },
         { PublicHoliday, "fa-calendar-check" },
         { VacationType, "fa-calendar-alt" },
+        { ExcusePolicy, "fa-gavel" },
+        { Excuse, "fa-file-alt" },
     };
     
     public static string GetResourceDescription(string resource)

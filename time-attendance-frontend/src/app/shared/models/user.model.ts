@@ -18,6 +18,7 @@ export interface User {
   permissions?: string[];
   branchIds?: number[];
   branches?: any[];
+  employeeId?: number;
   isActive?: boolean;
   createdAt?: string;
   createdAtUtc?: string;

@@ -6,11 +6,12 @@ import { I18nService } from '../../../../core/i18n/i18n.service';
 import { PublicHolidaysService } from '../public-holidays.service';
 import { NotificationService } from '../../../../core/notifications/notification.service';
 import { HolidayType, CreatePublicHolidayRequest } from '../../../../shared/models/public-holiday.model';
+import { FormHeaderComponent } from '../../../../shared/components/form-header/form-header.component';
 
 @Component({
   selector: 'app-create-public-holiday',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, FormHeaderComponent],
   templateUrl: './create-public-holiday.component.html',
   styleUrls: ['./create-public-holiday.component.css']
 })

@@ -18,41 +18,40 @@
 <!-- Main Content -->
 @if (!loading() && !error() && employee() && attendanceRecord()) {
   <div class="container-fluid">
-    <!-- Header -->
-    <div class="row mb-4">
-      <div class="col">
-        <div class="d-flex justify-content-between align-items-center">
-          <div>
-            <h2 class="mb-1">{{ i18n.t('attendance.daily_detail.title') }}</h2>
-            <nav aria-label="breadcrumb">
-              <ol class="breadcrumb">
-                <li class="breadcrumb-item">
-                  <a routerLink="/attendance">{{ i18n.t('attendance.title') }}</a>
-                </li>
-                <li class="breadcrumb-item">
-                  <a routerLink="/attendance/daily">{{ i18n.t('attendance.daily_view') }}</a>
-                </li>
-                <li class="breadcrumb-item active" aria-current="page">
-                  {{ i18n.t('attendance.daily_detail.title') }}
-                </li>
-              </ol>
-            </nav>
-          </div>
-          <div class="d-flex gap-2">
-            <button type="button" class="btn btn-outline-primary" (click)="onRefresh()">
-              <i class="fas fa-sync-alt me-2"></i>
-              {{ i18n.t('common.refresh') }}
-            </button>
-            <button type="button" class="btn btn-primary" (click)="onEdit()">
-              <i class="fas fa-edit me-2"></i>
-              {{ i18n.t('attendance.actions.edit') }}
-            </button>
-            <button type="button" class="btn btn-outline-secondary" (click)="onBack()">
-              <i class="fas fa-arrow-left me-2"></i>
-              {{ i18n.t('common.back') }}
-            </button>
-          </div>
-        </div>
+    <!-- Page Header -->
+    <app-page-header
+      [title]="i18n.t('attendance.daily_detail.title')">
+    </app-page-header>
+
+    <!-- Navigation and Controls -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item">
+            <a routerLink="/attendance">{{ i18n.t('attendance.title') }}</a>
+          </li>
+          <li class="breadcrumb-item">
+            <a routerLink="/attendance/daily">{{ i18n.t('attendance.daily_view') }}</a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">
+            {{ i18n.t('attendance.daily_detail.title') }}
+          </li>
+        </ol>
+      </nav>
+
+      <div class="d-flex gap-2">
+        <button type="button" class="btn btn-outline-primary" (click)="onRefresh()">
+          <i class="fas fa-sync-alt me-2"></i>
+          {{ i18n.t('common.refresh') }}
+        </button>
+        <button type="button" class="btn btn-primary" (click)="onEdit()">
+          <i class="fas fa-edit me-2"></i>
+          {{ i18n.t('attendance.actions.edit') }}
+        </button>
+        <button type="button" class="btn btn-outline-secondary" (click)="onBack()">
+          <i class="fas fa-arrow-left me-2"></i>
+          {{ i18n.t('common.back') }}
+        </button>
       </div>
     </div>
 
@@ -109,9 +108,11 @@
               <div class="col-md-2">
                 <div class="border rounded p-3">
                   <h6 class="text-muted small mb-1">{{ i18n.t('attendance.fields.status') }}</h6>
-                  <span [class]="getStatusBadgeClass(attendanceRecord()!.status)" class="fs-6">
-                    {{ getStatusDisplayText(attendanceRecord()!.status) }}
-                  </span>
+                  <app-status-badge
+                    [status]="statusBadge().label"
+                    [variant]="statusBadge().variant"
+                    class="fs-6">
+                  </app-status-badge>
                 </div>
               </div>
               <div class="col-md-2">
@@ -264,6 +265,216 @@
       </div>
     </div>
 
+    <!-- Leave & Excuse Details -->
+    @if (hasLeaveExcuseData()) {
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="card-title mb-0">
+                <i class="fas fa-calendar-times me-2"></i>
+                {{ i18n.t('attendance.daily_detail.leave_excuse_details') }}
+              </h5>
+            </div>
+            <div class="card-body">
+              <!-- Employee Vacations -->
+              @if (leaveExcuseDetails()?.vacations && leaveExcuseDetails()!.vacations.length > 0) {
+                <div class="mb-4">
+                  <h6 class="section-header vacation-header">
+                    <i class="fas fa-plane me-2"></i>
+                    {{ i18n.t('attendance.daily_detail.vacations') }}
+                  </h6>
+                  @for (vacation of leaveExcuseDetails()!.vacations; track vacation.id) {
+                    <div class="card leave-excuse-card vacation-card border-start border-primary border-3 mb-3">
+                      <div class="card-body">
+                        <div class="row">
+                          <div class="col-md-3">
+                            <strong>{{ i18n.t('vacation_types.fields.name') }}:</strong>
+                            <br>
+                            <span class="text-primary fw-bold">{{ vacation.vacationTypeName }}</span>
+                          </div>
+                          <div class="col-md-3">
+                            <strong>{{ i18n.t('employee_vacations.fields.period') }}:</strong>
+                            <br>
+                            <span class="text-muted">
+                              {{ formatDate(vacation.startDate) }} - {{ formatDate(vacation.endDate) }}
+                            </span>
+                          </div>
+                          <div class="col-md-2">
+                            <strong>{{ i18n.t('employee_vacations.fields.duration') }}:</strong>
+                            <br>
+                            <span class="text-info fw-bold">{{ vacation.durationDays }} {{ vacation.durationDays === 1 ? i18n.t('common.dayUnit') : i18n.t('common.days_text') }}</span>
+                          </div>
+                          <div class="col-md-2">
+                            <strong>{{ i18n.t('employee_vacations.fields.status') }}:</strong>
+                            <br>
+                            <app-status-badge
+                              [label]="vacation.isApproved ? i18n.t('employee_vacations.approved') : i18n.t('employee_vacations.pending')"
+                              [variant]="vacation.isApproved ? 'success' : 'warning'"
+                              [icon]="vacation.isApproved ? 'fas fa-check-circle' : 'fas fa-hourglass-half'">
+                            </app-status-badge>
+                          </div>
+                          <div class="col-md-2">
+                            <strong>{{ i18n.t('common.created_date') }}:</strong>
+                            <br>
+                            <small class="text-muted">{{ formatDate(vacation.createdAtUtc) }}</small>
+                          </div>
+                        </div>
+                        @if (vacation.notes) {
+                          <div class="row mt-2">
+                            <div class="col-12">
+                              <strong>{{ i18n.t('employee_vacations.fields.notes') }}:</strong>
+                              <p class="text-muted mb-0">{{ vacation.notes }}</p>
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- Employee Excuses -->
+              @if (leaveExcuseDetails()?.excuses && leaveExcuseDetails()!.excuses.length > 0) {
+                <div class="mb-4">
+                  <h6 class="section-header excuse-header">
+                    <i class="fas fa-clock me-2"></i>
+                    {{ i18n.t('attendance.daily_detail.excuses') }}
+                  </h6>
+                  @for (excuse of leaveExcuseDetails()!.excuses; track excuse.id) {
+                    <div class="card leave-excuse-card excuse-card border-start border-warning border-3 mb-3">
+                      <div class="card-body">
+                        <div class="row">
+                          <div class="col-md-3">
+                            <strong>{{ i18n.t('employee_excuses.fields.excuse_type') }}:</strong>
+                            <br>
+                            <span class="text-warning fw-bold">{{ excuse.excuseTypeDisplay }}</span>
+                          </div>
+                          <div class="col-md-3">
+                            <strong>{{ i18n.t('employee_excuses.fields.time_period') }}:</strong>
+                            <br>
+                            <span class="text-muted">{{ excuse.timeRangeDisplay }}</span>
+                          </div>
+                          <div class="col-md-2">
+                            <strong>{{ i18n.t('employee_excuses.fields.duration') }}:</strong>
+                            <br>
+                            <span class="text-info fw-bold">{{ excuse.durationDisplay }}</span>
+                          </div>
+                          <div class="col-md-2">
+                            <strong>{{ i18n.t('employee_excuses.fields.status') }}:</strong>
+                            <br>
+                            <span [class]="getApprovalStatusBadgeClass(excuse.approvalStatusDisplay)">
+                              {{ excuse.approvalStatusDisplay }}
+                            </span>
+                          </div>
+                          <div class="col-md-2">
+                            @if (excuse.hasAttachment) {
+                              <strong>{{ i18n.t('employee_excuses.fields.attachment') }}:</strong>
+                              <br>
+                              <app-status-badge
+                                [label]="i18n.t('employee_excuses.has_attachment')"
+                                [variant]="'info'"
+                                [icon]="'fas fa-paperclip'">
+                              </app-status-badge>
+                            }
+                          </div>
+                        </div>
+                        <div class="row mt-2">
+                          <div class="col-md-6">
+                            <strong>{{ i18n.t('employee_excuses.fields.reason') }}:</strong>
+                            <p class="text-muted mb-0">{{ excuse.reason }}</p>
+                          </div>
+                          @if (excuse.approvedByName) {
+                            <div class="col-md-6">
+                              <strong>{{ i18n.t('employee_excuses.fields.approved_by') }}:</strong>
+                              <br>
+                              <span class="text-success">{{ excuse.approvedByName }}</span>
+                              @if (excuse.approvedAt) {
+                                <br>
+                                <small class="text-muted">{{ formatDate(excuse.approvedAt) }}</small>
+                              }
+                            </div>
+                          }
+                        </div>
+                        @if (excuse.rejectionReason) {
+                          <div class="row mt-2">
+                            <div class="col-12">
+                              <strong>{{ i18n.t('employee_excuses.fields.rejection_reason') }}:</strong>
+                              <p class="text-danger mb-0">{{ excuse.rejectionReason }}</p>
+                            </div>
+                          </div>
+                        }
+                        @if (excuse.processingNotes) {
+                          <div class="row mt-2">
+                            <div class="col-12">
+                              <strong>{{ i18n.t('employee_excuses.fields.processing_notes') }}:</strong>
+                              <p class="text-muted mb-0">{{ excuse.processingNotes }}</p>
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- Remote Work (Future Implementation) -->
+              @if (leaveExcuseDetails()?.remoteWork && leaveExcuseDetails()!.remoteWork.length > 0) {
+                <div class="mb-4">
+                  <h6 class="section-header remote-work-header">
+                    <i class="fas fa-home me-2"></i>
+                    {{ i18n.t('attendance.daily_detail.remote_work') }}
+                  </h6>
+                  @for (remoteWork of leaveExcuseDetails()!.remoteWork; track remoteWork.id) {
+                    <div class="card leave-excuse-card remote-work-card border-start border-info border-3 mb-3">
+                      <div class="card-body">
+                        <div class="row">
+                          <div class="col-md-3">
+                            <strong>{{ i18n.t('attendance.remote_work.work_type') }}:</strong>
+                            <br>
+                            <span class="text-info fw-bold">{{ remoteWork.workType }}</span>
+                          </div>
+                          <div class="col-md-3">
+                            <strong>{{ i18n.t('attendance.remote_work.location') }}:</strong>
+                            <br>
+                            <span class="text-muted">{{ remoteWork.workLocation }}</span>
+                          </div>
+                          <div class="col-md-3">
+                            @if (remoteWork.startTime && remoteWork.endTime) {
+                              <strong>{{ i18n.t('attendance.remote_work.time_period') }}:</strong>
+                              <br>
+                              <span class="text-muted">{{ remoteWork.startTime }} - {{ remoteWork.endTime }}</span>
+                            }
+                          </div>
+                          <div class="col-md-3">
+                            <strong>{{ i18n.t('attendance.remote_work.status') }}:</strong>
+                            <br>
+                            <app-status-badge
+                              [label]="remoteWork.isApproved ? i18n.t('attendance.remote_work.approved') : i18n.t('attendance.remote_work.pending')"
+                              [variant]="remoteWork.isApproved ? 'success' : 'warning'"
+                              [icon]="remoteWork.isApproved ? 'fas fa-check-circle' : 'fas fa-hourglass-half'">
+                            </app-status-badge>
+                          </div>
+                        </div>
+                        @if (remoteWork.notes) {
+                          <div class="row mt-2">
+                            <div class="col-12">
+                              <strong>{{ i18n.t('attendance.remote_work.notes') }}:</strong>
+                              <p class="text-muted mb-0">{{ remoteWork.notes }}</p>
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
     <!-- Additional Information -->
     @if (attendanceRecord()!.notes || attendanceRecord()!.isApproved !== undefined) {
       <div class="row">
@@ -288,7 +499,11 @@
                   <div class="col-md-6">
                     <strong>{{ i18n.t('attendance.fields.manual_override') }}:</strong>
                     <br>
-                    <span class="badge bg-warning">{{ i18n.t('attendance.status.manual_override') }}</span>
+                    <app-status-badge
+                      [label]="i18n.t('attendance.status.manual_override')"
+                      [variant]="'warning'"
+                      [icon]="'fas fa-hand-paper'">
+                    </app-status-badge>
                   </div>
                 }
               </div>
@@ -297,9 +512,11 @@
                   <div class="col-12">
                     <strong>{{ i18n.t('attendance.fields.approval_status') }}:</strong>
                     <br>
-                    <span [class]="attendanceRecord()!.isApproved ? 'badge bg-success' : 'badge bg-warning'">
-                      {{ attendanceRecord()!.isApproved ? i18n.t('attendance.approved') : i18n.t('attendance.pending_approval') }}
-                    </span>
+                    <app-status-badge
+                      [label]="attendanceRecord()!.isApproved ? i18n.t('attendance.approved') : i18n.t('attendance.pending_approval')"
+                      [variant]="attendanceRecord()!.isApproved ? 'success' : 'warning'"
+                      [icon]="attendanceRecord()!.isApproved ? 'fas fa-check-circle' : 'fas fa-hourglass-half'">
+                    </app-status-badge>
                   </div>
                 </div>
               }

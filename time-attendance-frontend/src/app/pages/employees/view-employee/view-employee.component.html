@@ -1,44 +1,20 @@
 <div class="container-fluid">
   <!-- Header -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h2>{{ t('employees.view_details') }}</h2>
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item">
-            <a routerLink="/dashboard">{{ t('dashboard.title') }}</a>
-          </li>
-          <li class="breadcrumb-item">
-            <a routerLink="/employees">{{ t('employees.title') }}</a>
-          </li>
-          <li class="breadcrumb-item active">{{ t('employees.view_details') }}</li>
-        </ol>
-      </nav>
-    </div>
-    <div class="btn-group">
-      <button 
-        *appHasPermission="PERMISSIONS.EMPLOYEE_UPDATE"
-        type="button" 
-        class="btn btn-primary"
-        (click)="onEdit()">
-        <i class="fa-solid fa-edit me-2"></i>
-        {{ t('employees.edit') }}
-      </button>
-      <button 
-        type="button" 
-        class="btn btn-outline-secondary"
-        (click)="onBack()">
-        <i class="fa-solid fa-arrow-left me-2"></i>
-        {{ t('common.back') }}
-      </button>
-    </div>
-  </div>
+  <app-form-header
+    mode="view"
+    [title]="t('employees.view_details')"
+    moduleName="employees"
+    moduleRoute="employees"
+    [entityId]="employeeId"
+    [loading]="loading()">
+  </app-form-header>
 
   @if (loading()) {
     <div class="d-flex justify-content-center py-5">
-      <div class="spinner-border" role="status">
-        <span class="visually-hidden">{{ t('common.loading') }}</span>
-      </div>
+      <app-loading-spinner
+        [message]="t('common.loading')"
+        [centered]="true">
+      </app-loading-spinner>
     </div>
   } @else if (employee()) {
     <!-- Employee Details -->
@@ -65,50 +41,20 @@
             <div class="row">
               <!-- Basic Information -->
               <div class="col-md-6">
-                <dl class="row">
-                  <dt class="col-sm-5">{{ t('employees.employee_number') }}:</dt>
-                  <dd class="col-sm-7">{{ employee()?.employeeNumber }}</dd>
-                  
-                  <dt class="col-sm-5">{{ t('employees.first_name') }}:</dt>
-                  <dd class="col-sm-7">{{ employee()?.firstName }}</dd>
-                  
-                  <dt class="col-sm-5">{{ t('employees.last_name') }}:</dt>
-                  <dd class="col-sm-7">{{ employee()?.lastName }}</dd>
-                  
-                  <dt class="col-sm-5">{{ t('employees.email') }}:</dt>
-                  <dd class="col-sm-7">{{ employee()?.email || '-' }}</dd>
-                  
-                  <dt class="col-sm-5">{{ t('employees.phone') }}:</dt>
-                  <dd class="col-sm-7">{{ employee()?.phone || '-' }}</dd>
-                  
-                  <dt class="col-sm-5">{{ t('employees.national_id') }}:</dt>
-                  <dd class="col-sm-7">{{ employee()?.nationalId || '-' }}</dd>
-                </dl>
+                <app-definition-list
+                  [items]="basicInfoItems()"
+                  [labelWidth]="'5'"
+                  [valueWidth]="'7'">
+                </app-definition-list>
               </div>
 
               <!-- Employment Information -->
               <div class="col-md-6">
-                <dl class="row">
-                  <dt class="col-sm-5">{{ t('employees.job_title') }}:</dt>
-                  <dd class="col-sm-7">{{ employee()?.jobTitle }}</dd>
-                  
-                  <dt class="col-sm-5">{{ t('employees.branch') }}:</dt>
-                  <dd class="col-sm-7">{{ employee()?.branchName }}</dd>
-                  
-                  <dt class="col-sm-5">{{ t('employees.department') }}:</dt>
-                  <dd class="col-sm-7">{{ employee()?.departmentName || '-' }}</dd>
-                  
-                  <dt class="col-sm-5">{{ t('employees.manager') }}:</dt>
-                  <dd class="col-sm-7">{{ employee()?.managerName || '-' }}</dd>
-                  
-                  <dt class="col-sm-5">{{ t('employees.hire_date') }}:</dt>
-                  <dd class="col-sm-7">{{ formatDate(employee()!.hireDate) }}</dd>
-                  
-                  @if (employee()?.dateOfBirth) {
-                    <dt class="col-sm-5">{{ t('employees.date_of_birth') }}:</dt>
-                    <dd class="col-sm-7">{{ formatDate(employee()!.dateOfBirth!) }}</dd>
-                  }
-                </dl>
+                <app-definition-list
+                  [items]="employmentInfoItems()"
+                  [labelWidth]="'5'"
+                  [valueWidth]="'7'">
+                </app-definition-list>
               </div>
             </div>
           </div>
@@ -125,30 +71,40 @@
             <!-- Status -->
             <div class="mb-3">
               <h6 class="fw-semibold">{{ t('common.status') }}</h6>
-              @if (employee()?.isActive) {
-                <span class="badge bg-success">{{ t('common.active') }}</span>
-              } @else {
-                <span class="badge bg-light text-dark border">{{ t('common.inactive') }}</span>
-              }
+              <app-status-badge
+                [status]="employee()?.isActive ? 'active' : 'inactive'">
+              </app-status-badge>
             </div>
             
             <!-- Employment Status -->
             <div class="mb-3">
               <h6 class="fw-semibold">{{ t('employees.employment_status.title') }}</h6>
-              <span class="badge bg-info">{{ getEmploymentStatusLabel(employee()!.employmentStatus) }}</span>
+              <app-status-badge
+                [label]="getEmploymentStatusLabel(employee()!.employmentStatus)"
+                [variant]="'info'"
+                [icon]="'fas fa-briefcase'">
+              </app-status-badge>
             </div>
 
             <!-- Work Location -->
             <div class="mb-3">
               <h6 class="fw-semibold">{{ t('employees.work_location.title') }}</h6>
-              <span class="badge bg-light text-dark border">{{ getWorkLocationTypeLabel(employee()!.workLocationType) }}</span>
+              <app-status-badge
+                [label]="getWorkLocationTypeLabel(employee()!.workLocationType)"
+                [variant]="'light'"
+                [icon]="'fas fa-map-marker-alt'">
+              </app-status-badge>
             </div>
 
             <!-- Current Shift -->
             <div class="mb-3">
               <h6 class="fw-semibold">{{ t('employees.current_shift') }}</h6>
               @if (employee()?.currentShiftName) {
-                <span class="badge bg-primary">{{ employee()?.currentShiftName }}</span>
+                <app-status-badge
+                  [label]="employee()!.currentShiftName"
+                  [variant]="'primary'"
+                  [icon]="'fas fa-clock'">
+                </app-status-badge>
               } @else {
                 <span class="text-muted">{{ t('employees.no_shift_assigned') }}</span>
               }
@@ -158,7 +114,11 @@
             @if (employee()?.gender) {
               <div class="mb-3">
                 <h6 class="fw-semibold">{{ t('employees.gender.title') }}</h6>
-                <span class="badge bg-light text-dark">{{ getGenderLabel(employee()!.gender!) }}</span>
+                <app-status-badge
+                  [label]="getGenderLabel(employee()!.gender!)"
+                  [variant]="'light'"
+                  [showIcon]="false">
+                </app-status-badge>
               </div>
             }
 
@@ -206,14 +166,6 @@
           </div>
           <div class="card-body">
             <div class="d-grid gap-2">
-              <button 
-                *appHasPermission="PERMISSIONS.EMPLOYEE_UPDATE"
-                type="button" 
-                class="btn btn-outline-primary"
-                (click)="onEdit()">
-                <i class="fa-solid fa-edit me-2"></i>
-                {{ t('employees.edit') }}
-              </button>
               @if (employee()?.isActive) {
                 <button 
                   type="button" 
@@ -272,74 +224,12 @@
           </div>
           <div class="card-body">
             <!-- Attendance Summary Cards -->
-            <div class="row mb-4">
-              <div class="col-md-3 mb-3">
-                <div class="card border-start border-primary border-4 h-100">
-                  <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                      <div>
-                        <h6 class="card-title text-muted small mb-1">{{ t('attendance.statistics.total_working_days') }}</h6>
-                        <h3 class="text-primary mb-0">{{ totalWorkingDays() }}</h3>
-                      </div>
-                      <div class="icon-circle bg-primary bg-opacity-10">
-                        <i class="fa-solid fa-calendar text-primary"></i>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-md-3 mb-3">
-                <div class="card border-start border-success border-4 h-100">
-                  <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                      <div>
-                        <h6 class="card-title text-muted small mb-1">{{ t('attendance.stats.present_employees') }}</h6>
-                        <h3 class="text-success mb-0">{{ presentDays() }}</h3>
-                        <small class="text-muted">{{ attendanceRate() }}% {{ t('attendance.statistics.attendance_rate_short') }}</small>
-                      </div>
-                      <div class="icon-circle bg-success bg-opacity-10">
-                        <i class="fa-solid fa-user-check text-success"></i>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-md-3 mb-3">
-                <div class="card border-start border-warning border-4 h-100">
-                  <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                      <div>
-                        <h6 class="card-title text-muted small mb-1">{{ t('attendance.stats.average_working_hours') }}</h6>
-                        <h3 class="text-warning mb-0">{{ averageWorkingHours() }}h</h3>
-                        <small class="text-muted">{{ totalOvertimeHours() }}h {{ t('attendance.statistics.total_overtime') }}</small>
-                      </div>
-                      <div class="icon-circle bg-warning bg-opacity-10">
-                        <i class="fa-solid fa-business-time text-warning"></i>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-md-3 mb-3">
-                <div class="card border-start border-danger border-4 h-100">
-                  <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                      <div>
-                        <h6 class="card-title text-muted small mb-1">{{ t('attendance.stats.absent_employees') }}</h6>
-                        <h3 class="text-danger mb-0">{{ absentDays() }}</h3>
-                        <small class="text-muted">{{ lateDays() }} {{ t('attendance.statistics.late_days') }}</small>
-                      </div>
-                      <div class="icon-circle bg-danger bg-opacity-10">
-                        <i class="fa-solid fa-user-times text-danger"></i>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <app-stats-grid
+              [stats]="attendanceStats()"
+              [columns]="4"
+              [loading]="attendanceLoading()"
+              class="mb-4">
+            </app-stats-grid>
 
             <!-- Performance Indicator -->
             <div class="row mb-4">
@@ -352,9 +242,11 @@
                         <span class="percentage">{{ attendanceRate() }}%</span>
                       </div>
                     </div>
-                    <span [class]="'badge bg-' + getPerformanceColor(attendanceRate())">
-                      {{ attendanceRate() >= 95 ? 'Excellent' : attendanceRate() >= 90 ? 'Good' : attendanceRate() >= 80 ? 'Average' : 'Needs Improvement' }}
-                    </span>
+                    <app-status-badge
+                      [label]="getPerformanceLabel(attendanceRate())"
+                      [variant]="getPerformanceColor(attendanceRate())"
+                      [icon]="attendanceRate() >= 95 ? 'fas fa-star' : attendanceRate() >= 90 ? 'fas fa-thumbs-up' : attendanceRate() >= 80 ? 'fas fa-exclamation-triangle' : 'fas fa-times-circle'">
+                    </app-status-badge>
                   </div>
                 </div>
               </div>
@@ -401,10 +293,11 @@
                 <div class="tab-pane fade show active">
                 @if (attendanceLoading()) {
                   <div class="text-center py-4">
-                    <div class="spinner-border text-primary" role="status">
-                      <span class="visually-hidden">{{ t('common.loading') }}</span>
-                    </div>
-                    <p class="mt-2 text-muted">{{ t('attendance.messages.loading_data') }}</p>
+                    <app-loading-spinner
+                      [message]="t('attendance.messages.loading_data')"
+                      [variant]="'primary'"
+                      [centered]="true">
+                    </app-loading-spinner>
                   </div>
                 } @else {
                   <div class="row">
@@ -461,9 +354,10 @@
                 <div class="tab-pane fade show active">
                 @if (attendanceLoading()) {
                   <div class="text-center py-4">
-                    <div class="spinner-border text-primary" role="status">
-                      <span class="visually-hidden">{{ t('common.loading') }}</span>
-                    </div>
+                    <app-loading-spinner
+                      [variant]="'primary'"
+                      [centered]="true">
+                    </app-loading-spinner>
                   </div>
                 } @else if (attendanceRecords().length > 0) {
                   <div class="table-responsive">
@@ -513,11 +407,11 @@
                     </table>
                   </div>
                 } @else {
-                  <div class="text-center py-4">
-                    <i class="fa-solid fa-calendar-xmark fa-3x text-muted mb-3"></i>
-                    <h6 class="text-muted">{{ t('attendance.no_records') }}</h6>
-                    <p class="text-muted">{{ t('attendance.no_records_description') }}</p>
-                  </div>
+                  <app-empty-state
+                    [icon]="'fa-solid fa-calendar-xmark'"
+                    [title]="t('attendance.no_records')"
+                    [message]="t('attendance.no_records_description')">
+                  </app-empty-state>
                 }
                 </div>
               }
@@ -553,9 +447,12 @@
                             <span class="text-muted">{{ transaction.location || '--' }}</span>
                           </td>
                           <td>
-                            <span [class]="transaction.isManual ? 'badge bg-warning' : 'badge bg-success'">
-                              {{ transaction.isManual ? t('app.yes') : t('app.no') }}
-                            </span>
+                            <app-status-badge
+                              [label]="transaction.isManual ? t('app.yes') : t('app.no')"
+                              [variant]="transaction.isManual ? 'warning' : 'success'"
+                              [icon]="transaction.isManual ? 'fas fa-hand-paper' : 'fas fa-fingerprint'"
+                              [size]="'sm'">
+                            </app-status-badge>
                           </td>
                           <td>
                             <span class="text-muted">{{ transaction.notes || '--' }}</span>
@@ -566,11 +463,11 @@
                     </table>
                   </div>
                 } @else {
-                  <div class="text-center py-4">
-                    <i class="fa-solid fa-list fa-3x text-muted mb-3"></i>
-                    <h6 class="text-muted">{{ t('attendance.no_transactions') }}</h6>
-                    <p class="text-muted">{{ t('attendance.no_transactions_description') }}</p>
-                  </div>
+                  <app-empty-state
+                    [icon]="'fa-solid fa-list'"
+                    [title]="t('attendance.no_transactions')"
+                    [message]="t('attendance.no_transactions_description')">
+                  </app-empty-state>
                 }
                 </div>
               }

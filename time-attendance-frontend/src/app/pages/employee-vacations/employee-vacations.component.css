@@ -1,0 +1,263 @@
+/* Match Employee Management design consistency */
+.employee-vacations-page {
+  /* No background color override - use default Bootstrap styling */
+}
+
+.table th {
+  background-color: #f8f9fa;
+  border-top: none;
+  font-weight: 600;
+  color: #495057;
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+.btn-group-sm .btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+.modal {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.badge {
+  font-size: 0.75em;
+}
+
+.form-label {
+  font-weight: 500;
+  color: #495057;
+}
+
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.pagination {
+  margin-top: 1rem;
+  margin-bottom: 0;
+}
+
+.search-filters .form-control,
+.search-filters .form-select {
+  border-radius: 0.375rem;
+}
+
+.vacation-status.approved {
+  color: #198754;
+}
+
+.vacation-status.pending {
+  color: #ffc107;
+}
+
+.vacation-status.active {
+  color: #0d6efd;
+}
+
+.vacation-status.upcoming {
+  color: #6f42c1;
+}
+
+.vacation-status.completed {
+  color: #6c757d;
+}
+
+/* Avatar styling to match Employee Management */
+.avatar-sm {
+  width: 2rem;
+  height: 2rem;
+}
+
+.avatar-initial {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 50%;
+}
+
+/* Modal styling consistency */
+.modal-dialog {
+  margin: 1.75rem auto;
+  max-width: 800px;
+}
+
+.modal-content {
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  border-radius: 8px 8px 0 0;
+}
+
+.modal-title {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.modal-body {
+  padding: 2rem;
+}
+
+.modal-footer {
+  background-color: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+  border-radius: 0 0 8px 8px;
+}
+
+/* Form styling consistency */
+.form-control,
+.form-select {
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.form-control.is-invalid,
+.form-select.is-invalid {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.invalid-feedback {
+  display: block;
+  font-size: 0.875rem;
+  color: #dc3545;
+  margin-top: 0.25rem;
+}
+
+/* Button styling consistency */
+.btn {
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.15s ease-in-out;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #0056b3;
+  border-color: #0056b3;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+  background-color: #545b62;
+  border-color: #545b62;
+}
+
+.btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Text colors for consistency */
+.text-danger {
+  color: #dc3545 !important;
+}
+
+.text-muted {
+  color: #6c757d !important;
+}
+
+/* Badge colors matching Employee Management */
+.bg-success {
+  background-color: #28a745 !important;
+  color: white;
+}
+
+.bg-warning {
+  background-color: #ffc107 !important;
+  color: #212529;
+}
+
+.bg-info {
+  background-color: #17a2b8 !important;
+  color: white;
+}
+
+.bg-light {
+  background-color: #f8f9fa !important;
+  color: #495057;
+}
+
+.bg-secondary {
+  background-color: #6c757d !important;
+  color: white;
+}
+
+.bg-danger {
+  background-color: #dc3545 !important;
+  color: white;
+}
+
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Responsive design matching Employee Management */
+@media (max-width: 768px) {
+  .table-responsive {
+    font-size: 0.875rem;
+  }
+
+  .btn-group-sm .btn {
+    padding: 0.125rem 0.25rem;
+  }
+
+  .modal-lg {
+    max-width: 95%;
+  }
+
+  .avatar-sm {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .avatar-initial {
+    font-size: 0.75rem;
+  }
+}
+
+/* Animation for modal */
+.modal.fade.show {
+  animation: fadeIn 0.15s ease-out;
+}
+
+.modal-backdrop.fade.show {
+  animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

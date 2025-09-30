@@ -42,6 +42,10 @@ export class EmployeesService {
     return this.http.get<EmployeeDto>(`${this.baseUrl}/${id}`);
   }
 
+  getCurrentEmployee(): Observable<EmployeeDto> {
+    return this.http.get<EmployeeDto>(`${this.baseUrl}/current`);
+  }
+
   createEmployee(request: CreateEmployeeRequest): Observable<{ id: number }> {
     return this.http.post<{ id: number }>(this.baseUrl, request);
   }
@@ -56,6 +60,10 @@ export class EmployeesService {
 
   updateEmployeeShift(employeeId: number, request: UpdateEmployeeShiftRequest): Observable<{success: boolean, message: string}> {
     return this.http.post<{success: boolean, message: string}>(`${this.baseUrl}/${employeeId}/shift`, request);
+  }
+
+  changeEmployeeShift(shiftData: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/${shiftData.employeeId}/change-shift`, shiftData);
   }
 
   // Helper methods for dropdowns
@@ -97,16 +105,20 @@ export class EmployeesService {
       );
   }
 
+  getEmployeesDropdown(): Observable<Array<{id: number, name: string, employeeNumber: string}>> {
+    return this.http.get<Array<{id: number, name: string, employeeNumber: string}>>(`${this.baseUrl}/dropdown`);
+  }
+
   getManagers(branchId?: number): Observable<EmployeeSelectOption[]> {
     let httpParams = new HttpParams()
       .set('page', '1')
       .set('pageSize', '1000')
       .set('isActive', 'true');
-    
+
     if (branchId) {
       httpParams = httpParams.set('branchId', branchId.toString());
     }
-    
+
     return this.http.get<PagedResult<EmployeeDto>>(this.baseUrl, { params: httpParams })
       .pipe(
         map(result => result.items.map(emp => ({

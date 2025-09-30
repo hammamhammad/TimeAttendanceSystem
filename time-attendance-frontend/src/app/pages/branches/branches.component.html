@@ -1,17 +1,18 @@
-<div class="branches-page">
+<div class="app-list-page">
   <!-- Page Header -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>{{ i18n.t('branches.title') }}</h2>
-  </div>
+  <app-page-header
+    [title]="i18n.t('branches.title')">
+  </app-page-header>
 
   <!-- Filters Component -->
-  <app-branch-filters
-    [showAddButton]="permissionService.has(PERMISSIONS.BRANCH_CREATE)"
-    [addButtonText]="i18n.t('branches.create_branch')"
+  <app-unified-filter
+    moduleName="branches"
+    [refreshing]="loading()"
     (searchChange)="onSearchChange($event)"
     (filtersChange)="onFiltersChange($event)"
-    (addBranch)="onAddBranch()">
-  </app-branch-filters>
+    (add)="onAddBranch()"
+    (refresh)="onRefreshData()">
+  </app-unified-filter>
 
   <!-- Branches Table Component -->
   <app-branch-table

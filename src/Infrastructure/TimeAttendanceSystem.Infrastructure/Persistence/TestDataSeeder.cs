@@ -13,8 +13,8 @@ public static class TestDataSeeder
 {
     public static async Task SeedTestDataAsync(TimeAttendanceDbContext context)
     {
-        // Clear existing test data
-        await ClearTestDataAsync(context);
+        // Skip clearing to avoid foreign key constraint issues
+        // await ClearTestDataAsync(context);
 
         // Seed comprehensive test data
         await SeedBranchesAsync(context);
@@ -28,13 +28,13 @@ public static class TestDataSeeder
 
     private static async Task ClearTestDataAsync(TimeAttendanceDbContext context)
     {
-        // Delete in proper order to respect foreign key constraints
-        context.Employees.RemoveRange(context.Employees);
+        // Delete in proper order to respect foreign key constraints - only TestDataSeeder data
+        context.Employees.RemoveRange(context.Employees.Where(e => e.CreatedBy == "TestDataSeeder"));
         context.Departments.RemoveRange(context.Departments.Where(d => d.CreatedBy == "TestDataSeeder"));
         context.Branches.RemoveRange(context.Branches.Where(b => b.CreatedBy == "TestDataSeeder"));
 
         await context.SaveChangesAsync();
-        Console.WriteLine("🧹 Existing test data cleared");
+        Console.WriteLine("🧹 Existing TestDataSeeder data cleared");
     }
 
     private static async Task SeedBranchesAsync(TimeAttendanceDbContext context)

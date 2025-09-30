@@ -1,0 +1,80 @@
+.bulk-actions-toolbar {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.bulk-actions-info {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.bulk-actions-info .badge {
+  font-size: 0.875rem;
+  padding: 0.35em 0.65em;
+}
+
+.bulk-actions-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-link {
+  text-decoration: none;
+  font-size: 0.875rem;
+}
+
+.btn-link:hover {
+  text-decoration: underline;
+}
+
+.btn-group .btn {
+  white-space: nowrap;
+}
+
+.bulk-actions-custom:empty {
+  display: none;
+  margin-top: 0;
+}
+
+.bulk-actions-custom:not(:empty) {
+  border-top: 1px solid #dee2e6;
+  padding-top: 0.75rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .bulk-actions-toolbar > div {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+
+  .bulk-actions-buttons {
+    width: 100%;
+  }
+
+  .bulk-actions-buttons .btn-group {
+    width: 100%;
+    display: flex;
+  }
+
+  .bulk-actions-buttons .btn {
+    flex: 1;
+  }
+}

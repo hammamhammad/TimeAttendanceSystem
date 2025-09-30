@@ -1,0 +1,32 @@
+<div class="card">
+  @if (showTitle) {
+    <div class="card-header">
+      <h6 class="card-title mb-0">{{ title }}</h6>
+    </div>
+  }
+
+  <div class="card-body">
+    <div [class]="getContainerClasses()">
+      @for (action of getVisibleActions(); track action.id) {
+        <button
+          type="button"
+          [class]="getButtonClasses(action)"
+          [disabled]="action.disabled"
+          [title]="action.tooltip || action.label"
+          (click)="onActionClick(action)">
+          <i [class]="action.icon + ' me-2'"></i>
+          <span>{{ action.label }}</span>
+        </button>
+      }
+
+      @if (getVisibleActions().length === 0) {
+        <p class="text-muted mb-0 text-center">No actions available</p>
+      }
+    </div>
+
+    <!-- Custom content slot -->
+    <div class="quick-actions-custom mt-3">
+      <ng-content></ng-content>
+    </div>
+  </div>
+</div>

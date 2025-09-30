@@ -6,6 +6,7 @@ import { AttendanceService } from '../../../core/services/attendance.service';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { NotificationService } from '../../../core/notifications/notification.service';
 import { DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { FilterPanelComponent, FilterConfig, FilterValues } from '../shared/filter-panel/filter-panel.component';
 import { AttendanceChartComponent, ChartData } from '../shared/attendance-chart/attendance-chart.component';
 import { AttendanceSummaryCardComponent, AttendanceSummaryData } from '../shared/attendance-summary-card/attendance-summary-card.component';
@@ -13,6 +14,7 @@ import {
   AttendanceStatistics,
   AttendanceStatus
 } from '../../../shared/models/attendance.model';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 
 interface MonthlyReportFilters {
   month: number;
@@ -56,9 +58,11 @@ interface MonthlyEmployeeRecord {
     ReactiveFormsModule,
     RouterModule,
     DataTableComponent,
+    PageHeaderComponent,
     FilterPanelComponent,
     AttendanceChartComponent,
-    AttendanceSummaryCardComponent
+    AttendanceSummaryCardComponent,
+    StatusBadgeComponent
   ],
   templateUrl: './monthly-report.component.html',
   styleUrls: ['./monthly-report.component.css']

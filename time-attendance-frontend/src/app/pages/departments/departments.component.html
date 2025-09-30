@@ -1,18 +1,37 @@
-<div class="departments-page">
+<div class="app-list-page">
   <!-- Page Header -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>{{ i18n.t('department.departments') }}</h2>
-  </div>
+  <app-page-header
+    [title]="i18n.t('department.departments')">
+  </app-page-header>
 
   <!-- Filters Component -->
-  <app-department-filters
-    [viewMode]="viewMode()"
-    [selectedBranch]="selectedBranch()"
-    [branchesLoading]="branchesLoading()"
-    (viewModeChange)="onViewModeChange($event)"
-    (branchSelectionChange)="onBranchSelectionChange($event)"
-    (departmentAdd)="onDepartmentAdd()"
-  ></app-department-filters>
+  <app-unified-filter
+    moduleName="departments"
+    [refreshing]="branchesLoading()"
+    (searchChange)="onSearchChange($event)"
+    (filtersChange)="onFiltersChange($event)"
+    (add)="onDepartmentAdd()"
+    (refresh)="onRefreshData()">
+  </app-unified-filter>
+
+  <!-- View Mode Toggle -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="btn-group" role="group">
+      <input type="radio" class="btn-check" name="viewMode" id="tableMode"
+             [checked]="viewMode() === 'table'"
+             (change)="onViewModeChange('table')">
+      <label class="btn btn-outline-primary" for="tableMode">
+        <i class="fas fa-table me-2"></i>{{ i18n.t('common.table') || 'Table' }}
+      </label>
+
+      <input type="radio" class="btn-check" name="viewMode" id="treeMode"
+             [checked]="viewMode() === 'tree'"
+             (change)="onViewModeChange('tree')">
+      <label class="btn btn-outline-primary" for="treeMode">
+        <i class="fas fa-sitemap me-2"></i>{{ i18n.t('common.tree') || 'Tree' }}
+      </label>
+    </div>
+  </div>
 
   <!-- Departments Content Card -->
   <div class="card">

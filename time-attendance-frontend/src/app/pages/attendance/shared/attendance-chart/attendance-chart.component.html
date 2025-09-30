@@ -30,9 +30,10 @@
 
   <!-- No Data State -->
   @if (!loading && !hasData()) {
-    <div class="no-data-state text-center py-5">
-      <i class="fa-solid fa-chart-bar fa-3x text-muted mb-3"></i>
-      <p class="text-muted">{{ i18nService.t('attendance.chart.no_data') }}</p>
-    </div>
+    <app-empty-state
+      [icon]="'fa-solid fa-chart-bar'"
+      [message]="i18nService.t('attendance.chart.no_data')"
+      [size]="'md'">
+    </app-empty-state>
   }
 </div>

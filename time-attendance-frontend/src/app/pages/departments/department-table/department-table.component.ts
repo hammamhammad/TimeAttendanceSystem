@@ -7,6 +7,8 @@ import { DepartmentDto } from '../../../shared/models/department.model';
 import { PermissionService } from '../../../core/auth/permission.service';
 import { PermissionResources, PermissionActions } from '../../../shared/utils/permission.utils';
 import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
+import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
 interface SortConfig {
   column: keyof DepartmentDto;
@@ -16,7 +18,7 @@ interface SortConfig {
 @Component({
   selector: 'app-department-table',
   standalone: true,
-  imports: [CommonModule, FormsModule, HasPermissionDirective],
+  imports: [CommonModule, FormsModule, HasPermissionDirective, StatusBadgeComponent, LoadingSpinnerComponent],
   templateUrl: './department-table.component.html',
   styleUrls: ['./department-table.component.css']
 })

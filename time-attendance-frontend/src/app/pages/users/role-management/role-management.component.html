@@ -1,16 +1,12 @@
-@if (show && user) {
-  <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
-    <div class="modal-dialog modal-md">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">
-            <i class="fa-solid fa-user-tag me-2"></i>
-            {{ t('users.manage_roles') }}
-          </h5>
-          <button type="button" class="btn-close" (click)="closeModal()"></button>
-        </div>
-        
-        <div class="modal-body">
+<app-modal-wrapper
+  [show]="show && !!user"
+  [title]="t('users.manage_roles')"
+  [size]="'md'"
+  [centered]="true"
+  [loading]="loading()"
+  (close)="closeModal()">
+
+  <div class="modal-body">
           @if (error()) {
             <div class="alert alert-danger" role="alert">
               <i class="fa-solid fa-exclamation-triangle me-2"></i>
@@ -19,28 +15,29 @@
           }
 
           <!-- User Info -->
-          <div class="user-info mb-4">
-            <div class="d-flex align-items-center">
-              <div class="avatar-md me-3">
-                <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
-                  {{ user.username.charAt(0).toUpperCase() }}
+          @if (user) {
+            <div class="user-info mb-4">
+              <div class="d-flex align-items-center">
+                <div class="avatar-md me-3">
+                  <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+                    {{ (user.username?.charAt(0) || '').toUpperCase() }}
+                  </div>
+                </div>
+                <div>
+                  <h6 class="mb-1">{{ user?.username }}</h6>
+                  <p class="text-muted mb-0">{{ user?.email }}</p>
                 </div>
               </div>
-              <div>
-                <h6 class="mb-1">{{ user.username }}</h6>
-                <p class="text-muted mb-0">{{ user.email }}</p>
-              </div>
             </div>
-          </div>
 
-          <!-- Current Roles -->
-          <div class="current-roles mb-4">
-            <h6 class="mb-2">{{ t('users.current_roles') }}</h6>
-            @if (user.roles.length > 0) {
-              <div class="d-flex flex-wrap gap-2">
-                @for (roleName of user.roles; track roleName) {
-                  <span class="badge bg-primary">{{ roleName }}</span>
-                }
+            <!-- Current Roles -->
+            <div class="current-roles mb-4">
+              <h6 class="mb-2">{{ t('users.current_roles') }}</h6>
+              @if (user?.roles && user.roles.length > 0) {
+                <div class="d-flex flex-wrap gap-2">
+                  @for (roleName of user?.roles; track roleName) {
+                    <span class="badge bg-primary">{{ roleName }}</span>
+                  }
               </div>
             } @else {
               <p class="text-muted mb-0">{{ t('users.no_roles') }}</p>
@@ -104,14 +101,13 @@
               <small>{{ t('users.no_role_assignment_permission') }}</small>
             </div>
           }
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="closeModal()">
-            {{ t('common.close') }}
-          </button>
-        </div>
-      </div>
-    </div>
+        }
   </div>
-}
+
+  <div modal-footer class="d-flex gap-2 justify-content-end">
+    <button type="button" class="btn btn-secondary" (click)="closeModal()">
+      {{ t('common.close') }}
+    </button>
+  </div>
+
+</app-modal-wrapper>

@@ -1,4 +1,13 @@
 <div class="container-fluid">
+  <app-form-header
+    mode="edit"
+    [title]="t('settings.overtime.editPolicy')"
+    moduleName="settings"
+    moduleRoute="settings/overtime"
+    [entityId]="configurationId"
+    [loading]="submitting()">
+  </app-form-header>
+
   <!-- Loading State -->
   @if (loading()) {
     <div class="d-flex justify-content-center align-items-center" style="min-height: 200px;">
@@ -8,37 +17,13 @@
       </div>
     </div>
   } @else {
-    <!-- Header Section -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <div>
-        <h2 class="mb-1">{{ t('settings.overtime.editPolicy') }}</h2>
-        <p class="text-muted mb-0">{{ t('settings.overtime.editPolicySubtitle') }}</p>
-        @if (isConfigurationActive()) {
-          <div class="badge bg-success mt-2">
-            <i class="fa-solid fa-check-circle me-1"></i>
-            {{ t('settings.overtime.currentlyActive') }}
-          </div>
-        }
+    <!-- Active Configuration Badge -->
+    @if (isConfigurationActive()) {
+      <div class="alert alert-success mb-4">
+        <i class="fa-solid fa-check-circle me-2"></i>
+        {{ t('settings.overtime.currentlyActive') }}
       </div>
-      <div>
-        <button
-          type="button"
-          class="btn btn-outline-secondary me-2"
-          (click)="onCancel()"
-          [disabled]="submitting()">
-          <i class="fa-solid fa-times me-2"></i>
-          {{ t('common.cancel') }}
-        </button>
-        <button
-          type="button"
-          class="btn btn-secondary"
-          (click)="onReset()"
-          [disabled]="submitting()">
-          <i class="fa-solid fa-refresh me-2"></i>
-          {{ t('common.reset') }}
-        </button>
-      </div>
-    </div>
+    }
 
     <!-- Error Alert -->
     @if (error()) {

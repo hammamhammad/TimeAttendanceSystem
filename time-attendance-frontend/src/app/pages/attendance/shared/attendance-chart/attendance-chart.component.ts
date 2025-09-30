@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { I18nService } from '../../../../core/i18n/i18n.service';
+import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
 
 export interface ChartData {
   labels: string[];
@@ -40,7 +41,7 @@ export interface ChartOptions {
 @Component({
   selector: 'app-attendance-chart',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, EmptyStateComponent],
   templateUrl: './attendance-chart.component.html',
   styleUrls: ['./attendance-chart.component.css']
 })

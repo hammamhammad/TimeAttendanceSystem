@@ -6,6 +6,7 @@ import { UserDto, AssignRoleRequest } from '../../../shared/models/user.model';
 import { PermissionService } from '../../../core/auth/permission.service';
 import { PermissionResources, PermissionActions } from '../../../shared/utils/permission.utils';
 import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
+import { ModalWrapperComponent } from '../../../shared/components/modal-wrapper/modal-wrapper.component';
 
 interface Role {
   id: number;
@@ -16,7 +17,7 @@ interface Role {
 @Component({
   selector: 'app-role-management',
   standalone: true,
-  imports: [CommonModule, HasPermissionDirective],
+  imports: [CommonModule, HasPermissionDirective, ModalWrapperComponent],
   templateUrl: './role-management.component.html',
   styleUrls: ['./role-management.component.css']
 })

@@ -1,17 +1,21 @@
 <div class="employees-page">
   <!-- Page Header -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>{{ i18n.t('employees.title') }}</h2>
-  </div>
+  <app-page-header
+    [title]="i18n.t('employees.title')">
+  </app-page-header>
 
   <!-- Filters Component -->
-  <app-employee-filters
-    [showAddButton]="permissionService.has(PERMISSIONS.EMPLOYEE_CREATE)"
+  <app-unified-filter
+    [searchPlaceholder]="i18n.t('employees.search_placeholder')"
+    [showAddButton]="true"
     [addButtonText]="i18n.t('employees.add_employee')"
+    [showRefreshButton]="true"
+    [refreshButtonText]="i18n.t('common.refresh')"
+    [refreshing]="loading()"
     (searchChange)="onSearchChange($event)"
-    (filtersChange)="onFiltersChange($event)"
-    (addEmployee)="onAddEmployee()">
-  </app-employee-filters>
+    (add)="onAddEmployee()"
+    (refresh)="onRefreshData()">
+  </app-unified-filter>
 
   <!-- Employees Table Component -->
   <app-employee-table
@@ -31,12 +35,4 @@
     (sortChange)="onSortChange($event)">
   </app-employee-table>
 
-  <!-- Change Shift Modal Component -->
-  <app-change-shift-modal
-    #changeShiftModal
-    [show]="showChangeShiftModal()"
-    [employee]="selectedEmployee()"
-    (close)="onCloseChangeShiftModal()"
-    (shiftChanged)="onShiftChanged($event)">
-  </app-change-shift-modal>
 </div>

@@ -1,0 +1,49 @@
+<div [class]="getAlertClasses()" role="alert">
+  <div class="d-flex align-items-start">
+    <!-- Icon -->
+    <div class="alert-icon me-3">
+      <i [class]="getIconClass()"></i>
+    </div>
+
+    <!-- Content -->
+    <div class="flex-grow-1">
+      <!-- Title -->
+      @if (title) {
+        <h6 class="alert-heading mb-2">
+          {{ title }}
+        </h6>
+      }
+
+      <!-- Message -->
+      @if (message) {
+        <div class="alert-message">
+          {{ message }}
+        </div>
+      }
+
+      <!-- List -->
+      @if (list && list.length > 0) {
+        <ul class="alert-list" [class.mb-0]="!message">
+          @for (item of list; track $index) {
+            <li>{{ item }}</li>
+          }
+        </ul>
+      }
+
+      <!-- Custom content slot -->
+      <div class="alert-custom-content">
+        <ng-content></ng-content>
+      </div>
+    </div>
+
+    <!-- Dismiss Button -->
+    @if (dismissible) {
+      <button
+        type="button"
+        class="btn-close"
+        (click)="onDismiss()"
+        aria-label="Close">
+      </button>
+    }
+  </div>
+</div>

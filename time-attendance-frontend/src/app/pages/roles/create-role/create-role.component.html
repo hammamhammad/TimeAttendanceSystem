@@ -1,29 +1,12 @@
 <div class="container-fluid">
   <!-- Header -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h2>{{ t('roles.create_role') }}</h2>
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item">
-            <a routerLink="/dashboard">{{ t('dashboard.title') }}</a>
-          </li>
-          <li class="breadcrumb-item">
-            <a routerLink="/roles">{{ t('roles.title') }}</a>
-          </li>
-          <li class="breadcrumb-item active">{{ t('roles.create_role') }}</li>
-        </ol>
-      </nav>
-    </div>
-    <button 
-      type="button" 
-      class="btn btn-outline-secondary"
-      (click)="onCancel()"
-      [disabled]="submitting()">
-      <i class="fa-solid fa-arrow-left me-2"></i>
-      {{ t('common.back') }}
-    </button>
-  </div>
+  <app-form-header
+    mode="create"
+    [title]="t('roles.create_role')"
+    moduleName="roles"
+    moduleRoute="roles"
+    [loading]="submitting()">
+  </app-form-header>
 
   @if (loading()) {
     <div class="d-flex justify-content-center py-5">

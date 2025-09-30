@@ -48,13 +48,11 @@
               }
               <div class="col-6">
                 <small class="text-muted">{{ i18n.t('common.status') }}</small><br>
-                <span class="badge"
-                      [class.bg-success]="selectedDepartment.isActive"
-                      [class.bg-light]="!selectedDepartment.isActive"
-                      [class.text-dark]="!selectedDepartment.isActive"
-                      [class.border]="!selectedDepartment.isActive">
-                  {{ selectedDepartment.isActive ? i18n.t('common.active') : i18n.t('common.inactive') }}
-                </span>
+                <app-status-badge
+                  [status]="selectedDepartment.isActive ? 'active' : 'inactive'"
+                  [label]="selectedDepartment.isActive ? i18n.t('common.active') : i18n.t('common.inactive')"
+                  [showIcon]="true">
+                </app-status-badge>
               </div>
             </div>
           </div>

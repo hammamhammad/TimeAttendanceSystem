@@ -9,8 +9,9 @@ import { NotificationService } from '../../core/notifications/notification.servi
 import { ConfirmationService } from '../../core/confirmation/confirmation.service';
 import { PermissionService } from '../../core/auth/permission.service';
 import { PermissionResources, PermissionActions } from '../../shared/utils/permission.utils';
-import { UserFiltersComponent } from './user-filters/user-filters.component';
+import { UnifiedFilterComponent } from '../../shared/components/unified-filter/unified-filter.component';
 import { UserTableComponent } from './user-table/user-table.component';
+import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 
 interface Role {
   id: number;
@@ -20,7 +21,7 @@ interface Role {
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule, RoleManagementComponent, UserFiltersComponent, UserTableComponent],
+  imports: [CommonModule, RoleManagementComponent, UnifiedFilterComponent, UserTableComponent, PageHeaderComponent],
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.css']
 })
@@ -73,6 +74,7 @@ export class UsersComponent implements OnInit {
     USER_MANAGE: `${PermissionResources.USER}.${PermissionActions.MANAGE}`
   };
 
+
   ngOnInit(): void {
     this.loadUsers();
   }
@@ -120,6 +122,15 @@ export class UsersComponent implements OnInit {
 
   onAddUser(): void {
     this.router.navigate(['/users/create']);
+  }
+
+  onRefreshData(): void {
+    // Reset filters and pagination
+    this.currentFilter = {};
+    this.currentPage.set(1);
+
+    // Reload data
+    this.loadUsers();
   }
 
   // Table event handlers

@@ -1,0 +1,28 @@
+.time-range-input {
+  width: 100%;
+}
+
+.time-range-inline {
+  display: flex;
+  align-items: center;
+}
+
+.time-range-separator {
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+.form-label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.invalid-feedback {
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Time input styling */
+input[type="time"] {
+  min-width: 120px;
+}

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, signal, computed, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges, SimpleChanges, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR, AbstractControl } from '@angular/forms';
 import { I18nService } from '../../../core/i18n/i18n.service';
@@ -24,7 +24,7 @@ export interface SearchableSelectOption {
     }
   ]
 })
-export class SearchableSelectComponent implements OnInit, OnDestroy, ControlValueAccessor {
+export class SearchableSelectComponent implements OnInit, OnDestroy, OnChanges, ControlValueAccessor {
   public i18n = inject(I18nService);
 
   // Input properties
@@ -42,6 +42,7 @@ export class SearchableSelectComponent implements OnInit, OnDestroy, ControlValu
   @Input() allowCustomValue: boolean = false;
   @Input() customValueMessage: string = '';
   @Input() value: any = null;
+  @Input() isInvalid: boolean = false;
 
   // Output events
   @Output() selectionChange = new EventEmitter<any>();
@@ -135,6 +136,27 @@ export class SearchableSelectComponent implements OnInit, OnDestroy, ControlValu
     }
     if (!this.customValueMessage) {
       this.customValueMessage = this.i18n.t('common.create');
+    }
+
+    // Initialize value from input
+    if (this.value !== null && this.value !== undefined) {
+      this.writeValue(this.value);
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    // Handle value changes from parent component
+    if (changes['value'] && !changes['value'].firstChange) {
+      this.writeValue(changes['value'].currentValue);
+    }
+
+    // Handle options changes - update selected option if options change
+    if (changes['options'] && !changes['options'].firstChange) {
+      const currentValue = this.selectedValue();
+      if (currentValue !== null && currentValue !== undefined) {
+        const option = this.options.find(opt => opt.value === currentValue) || null;
+        this.selectedOption.set(option);
+      }
     }
   }
 

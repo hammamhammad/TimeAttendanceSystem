@@ -13,8 +13,13 @@ import { NotificationService } from '../../core/notifications/notification.servi
 import { ConfirmationService } from '../../core/confirmation/confirmation.service';
 import { PermissionService } from '../../core/auth/permission.service';
 import { VacationTypeModalComponent } from './vacation-type-modal/vacation-type-modal.component';
+import { UnifiedFilterComponent } from '../../shared/components/unified-filter/unified-filter.component';
 import { PermissionResources, PermissionActions } from '../../shared/utils/permission.utils';
 import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table.component';
+import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
+import { ErrorAlertComponent } from '../../shared/components/error-alert/error-alert.component';
+import { SectionCardComponent } from '../../shared/components/section-card/section-card.component';
+import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
 
 interface Branch {
   id: number;
@@ -25,7 +30,16 @@ interface Branch {
 @Component({
   selector: 'app-vacation-types',
   standalone: true,
-  imports: [CommonModule, VacationTypeModalComponent, DataTableComponent],
+  imports: [
+    CommonModule,
+    VacationTypeModalComponent,
+    DataTableComponent,
+    PageHeaderComponent,
+    UnifiedFilterComponent,
+    ErrorAlertComponent,
+    SectionCardComponent,
+    StatusBadgeComponent
+  ],
   templateUrl: './vacation-types.component.html',
   styleUrls: ['./vacation-types.component.css']
 })
@@ -101,6 +115,15 @@ export class VacationTypesComponent implements OnInit {
     }
   ];
 
+  // Permission constants
+  readonly PERMISSIONS = {
+    VACATION_TYPE_READ: `${PermissionResources.VACATION_TYPE}.${PermissionActions.READ}`,
+    VACATION_TYPE_CREATE: `${PermissionResources.VACATION_TYPE}.${PermissionActions.CREATE}`,
+    VACATION_TYPE_UPDATE: `${PermissionResources.VACATION_TYPE}.${PermissionActions.UPDATE}`,
+    VACATION_TYPE_DELETE: `${PermissionResources.VACATION_TYPE}.${PermissionActions.DELETE}`
+  };
+
+
   // Computed signals
   totalItems = computed(() => this.pagedResult()?.totalCount ?? 0);
   totalPages = computed(() => {
@@ -115,15 +138,6 @@ export class VacationTypesComponent implements OnInit {
     branchId: this.selectedBranchId() ?? undefined,
     isActive: this.selectedStatus() ?? undefined
   }));
-
-
-  // Permission constants
-  readonly PERMISSIONS = {
-    VACATION_TYPE_READ: `${PermissionResources.VACATION_TYPE}.${PermissionActions.READ}`,
-    VACATION_TYPE_CREATE: `${PermissionResources.VACATION_TYPE}.${PermissionActions.CREATE}`,
-    VACATION_TYPE_UPDATE: `${PermissionResources.VACATION_TYPE}.${PermissionActions.UPDATE}`,
-    VACATION_TYPE_DELETE: `${PermissionResources.VACATION_TYPE}.${PermissionActions.DELETE}`
-  };
 
   // Math reference for template use
   protected readonly Math = Math;
@@ -197,6 +211,32 @@ export class VacationTypesComponent implements OnInit {
   }
 
   /**
+   * Handle search input changes from unified filter
+   */
+  onSearchTermChange(searchTerm: string): void {
+    this.searchTerm.set(searchTerm);
+    this.currentPage.set(1);
+  }
+
+  /**
+   * Handle filters change from unified filter component
+   */
+  onFiltersChange(filters: any): void {
+    if (filters.search !== undefined) {
+      this.searchTerm.set(filters.search || '');
+    }
+    if (filters.branchId !== undefined) {
+      const branchId = filters.branchId ? parseInt(filters.branchId) : null;
+      this.selectedBranchId.set(branchId);
+    }
+    if (filters.isActive !== undefined) {
+      const isActive = filters.isActive === 'true' ? true : (filters.isActive === 'false' ? false : null);
+      this.selectedStatus.set(isActive);
+    }
+    this.currentPage.set(1); // Reset to first page when filtering
+  }
+
+  /**
    * Handle branch filter change
    */
   onBranchChange(branchId: number | null): void {
@@ -221,6 +261,14 @@ export class VacationTypesComponent implements OnInit {
     this.selectedBranchId.set(null);
     this.selectedStatus.set(null);
     this.currentPage.set(1);
+  }
+
+  /**
+   * Refresh data by clearing filters and reloading
+   */
+  onRefreshData(): void {
+    this.onClearFilters();
+    this.loadVacationTypes();
   }
 
   /**

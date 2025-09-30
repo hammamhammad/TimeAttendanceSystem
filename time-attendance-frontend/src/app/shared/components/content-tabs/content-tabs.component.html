@@ -1,0 +1,33 @@
+<div [class]="vertical ? 'row' : ''">
+  <!-- Nav Tabs -->
+  <div [class]="vertical ? 'col-md-3' : ''">
+    <ul [class]="getNavClasses()" role="tablist">
+      @for (tab of getVisibleTabs(); track tab.id) {
+        <li class="nav-item" role="presentation">
+          <button
+            type="button"
+            [class]="getTabClasses(tab)"
+            [disabled]="tab.disabled"
+            [attr.aria-selected]="isTabActive(tab.id)"
+            role="tab"
+            (click)="onTabClick(tab)">
+            @if (tab.icon) {
+              <i [class]="tab.icon + ' me-2'"></i>
+            }
+            <span>{{ tab.label }}</span>
+            @if (tab.badge !== undefined && tab.badge !== null) {
+              <span [class]="getBadgeClasses(tab)">{{ tab.badge }}</span>
+            }
+          </button>
+        </li>
+      }
+    </ul>
+  </div>
+
+  <!-- Tab Content -->
+  <div [class]="vertical ? 'col-md-9' : ''">
+    <div class="tab-content">
+      <ng-content></ng-content>
+    </div>
+  </div>
+</div>

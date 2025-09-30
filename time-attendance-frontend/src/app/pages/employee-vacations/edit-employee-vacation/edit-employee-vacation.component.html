@@ -1,0 +1,226 @@
+<div class="container-fluid">
+  <!-- Header -->
+  <app-form-header
+    [mode]="getFormMode()"
+    [title]="i18n.t('employee_vacations.edit_vacation')"
+    moduleName="employee-vacations"
+    moduleRoute="employee-vacations"
+    [entityId]="getVacationId()"
+    [loading]="loading()">
+  </app-form-header>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="text-center py-5">
+      <app-loading-spinner
+        [message]="i18n.t('employee_vacations.loading_details')"
+        [variant]="'primary'"
+        [centered]="true">
+      </app-loading-spinner>
+    </div>
+  }
+
+  <!-- Main Form Content -->
+  @if (!loading() && currentVacation()) {
+    <div class="row">
+      <!-- Main Content -->
+      <div class="col-lg-8">
+        <form [formGroup]="vacationForm" (ngSubmit)="onSubmit()">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="card-title mb-0">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div class="d-flex align-items-center">
+                    <div class="avatar-sm me-3">
+                      <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+                        <i class="fas fa-calendar-alt"></i>
+                      </div>
+                    </div>
+                    <div>
+                      <div class="fw-medium">{{ getEmployeeName() }}</div>
+                      <small class="text-muted">{{ i18n.t('employee_vacations.vacation_id') }}: #{{ getVacationId() }}</small>
+                    </div>
+                  </div>
+                </div>
+              </h5>
+            </div>
+            <div class="card-body">
+              <!-- Required Information Section -->
+              <div class="mb-4">
+                <h6 class="text-primary mb-3">
+                  <i class="fa-solid fa-asterisk me-2"></i>
+                  {{ i18n.t('employee_vacations.required_information') }}
+                </h6>
+                <div class="row">
+                  <!-- Vacation Type -->
+                  <div class="col-md-6 mb-3">
+                    <label for="vacationTypeId" class="form-label">
+                      {{ i18n.t('fields.vacationType') }} <span class="text-danger">*</span>
+                    </label>
+                    <app-searchable-select
+                      id="vacationTypeId"
+                      formControlName="vacationTypeId"
+                      [options]="vacationTypeOptions"
+                      [placeholder]="i18n.t('employee_vacations.placeholders.select_vacation_type')"
+                      [isInvalid]="isFieldInvalid('vacationTypeId')">
+                    </app-searchable-select>
+                    @if (hasError('vacationTypeId')) {
+                      <div class="invalid-feedback d-block">
+                        {{ getErrorMessage('vacationTypeId') }}
+                      </div>
+                    }
+                  </div>
+
+                  <!-- Approval Status -->
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">{{ i18n.t('employee_vacations.approval_status') }}</label>
+                    <div class="form-check">
+                      <input
+                        type="checkbox"
+                        id="isApproved"
+                        formControlName="isApproved"
+                        class="form-check-input">
+                      <label for="isApproved" class="form-check-label">
+                        {{ i18n.t('employee_vacations.is_approved') }}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <!-- Start Date -->
+                  <div class="col-md-6 mb-3">
+                    <label for="startDate" class="form-label">
+                      {{ i18n.t('fields.startDate') }} <span class="text-danger">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      id="startDate"
+                      formControlName="startDate"
+                      class="form-control"
+                      [class.is-invalid]="isFieldInvalid('startDate')"
+                      [disabled]="saving()"
+                      [placeholder]="i18n.t('employee_vacations.placeholders.select_start_date')">
+                    @if (hasError('startDate')) {
+                      <div class="invalid-feedback">
+                        {{ getErrorMessage('startDate') }}
+                      </div>
+                    }
+                  </div>
+
+                  <!-- End Date -->
+                  <div class="col-md-6 mb-3">
+                    <label for="endDate" class="form-label">
+                      {{ i18n.t('fields.endDate') }} <span class="text-danger">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      id="endDate"
+                      formControlName="endDate"
+                      class="form-control"
+                      [class.is-invalid]="isFieldInvalid('endDate')"
+                      [disabled]="saving()"
+                      [placeholder]="i18n.t('employee_vacations.placeholders.select_end_date')">
+                    @if (hasError('endDate')) {
+                      <div class="invalid-feedback">
+                        {{ getErrorMessage('endDate') }}
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <!-- Additional Information Section -->
+              <div class="mb-4">
+                <h6 class="text-secondary mb-3">
+                  <i class="fa-solid fa-list me-2"></i>
+                  {{ i18n.t('employee_vacations.additional_information') }}
+                </h6>
+                <!-- Notes -->
+                <div class="mb-3">
+                  <label for="notes" class="form-label">
+                    {{ i18n.t('fields.notes') }}
+                  </label>
+                  <textarea
+                    id="notes"
+                    formControlName="notes"
+                    class="form-control"
+                    rows="4"
+                    [disabled]="saving()"
+                    [placeholder]="i18n.t('employee_vacations.placeholders.enter_notes')">
+                  </textarea>
+                </div>
+              </div>
+
+              <!-- Submit Section -->
+              <div class="d-flex justify-content-end gap-2">
+                <button
+                  type="button"
+                  class="btn btn-outline-danger"
+                  (click)="onCancel()"
+                  [disabled]="saving()">
+                  <i class="fas fa-times me-2"></i>
+                  {{ i18n.t('common.cancel') }}
+                </button>
+
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  (click)="onReset()"
+                  [disabled]="saving()">
+                  <i class="fas fa-undo me-2"></i>
+                  {{ i18n.t('common.reset') }}
+                </button>
+
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  [disabled]="vacationForm.invalid || saving()">
+                  @if (saving()) {
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    {{ i18n.t('common.saving') }}
+                  } @else {
+                    <i class="fas fa-save me-2"></i>
+                    {{ i18n.t('common.save') }}
+                  }
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <!-- Help Card -->
+        <div class="card">
+          <div class="card-header">
+            <h6 class="card-title mb-0">
+              <i class="fas fa-info-circle me-2"></i>
+              {{ i18n.t('common.help') }}
+            </h6>
+          </div>
+          <div class="card-body">
+            <p class="card-text small text-muted mb-2">
+              {{ i18n.t('employee_vacations.help.edit_instructions') }}
+            </p>
+            <ul class="list-unstyled small text-muted mb-0">
+              <li class="mb-1">
+                <i class="fas fa-check-circle text-success me-1"></i>
+                {{ i18n.t('employee_vacations.help.required_fields') }}
+              </li>
+              <li class="mb-1">
+                <i class="fas fa-calendar text-info me-1"></i>
+                {{ i18n.t('employee_vacations.help.date_validation') }}
+              </li>
+              <li>
+                <i class="fas fa-shield-alt text-warning me-1"></i>
+                {{ i18n.t('employee_vacations.help.approval_info') }}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

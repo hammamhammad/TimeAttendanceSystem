@@ -5,13 +5,15 @@ import { DepartmentDto } from '../../../shared/models/department.model';
 import { PermissionService } from '../../../core/auth/permission.service';
 import { PermissionResources, PermissionActions } from '../../../shared/utils/permission.utils';
 import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 
 @Component({
   selector: 'app-department-info-panel',
   standalone: true,
   imports: [
     CommonModule,
-    HasPermissionDirective
+    HasPermissionDirective,
+    StatusBadgeComponent
   ],
   templateUrl: './department-info-panel.component.html',
   styleUrls: ['./department-info-panel.component.css']

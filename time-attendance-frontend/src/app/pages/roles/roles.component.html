@@ -1,66 +1,38 @@
-<div class="roles-page">
+<div class="app-list-page">
   <!-- Page Header -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>{{ t('roles.title') }}</h2>
-    <button 
-      *appHasPermission="PERMISSIONS.ROLE_CREATE"
-      class="btn btn-primary"
-      (click)="onCreateRole()">
-      <i class="fa-solid fa-plus me-2"></i>
-      {{ t('roles.create_role') }}
-    </button>
-  </div>
+  <app-page-header
+    [title]="t('roles.title')">
+  </app-page-header>
 
-  <!-- Filters Card -->
-  <div class="card mb-4">
-    <div class="card-body">
-      <div class="row g-3">
-        <div class="col-md-8">
-          <label class="form-label">{{ t('common.search') }}</label>
-          <div class="input-group">
-            <span class="input-group-text">
-              <i class="fa-solid fa-search"></i>
-            </span>
-            <input
-              type="text"
-              class="form-control"
-              [placeholder]="t('roles.search_placeholder')"
-              [(ngModel)]="searchTerm"
-              [ngModelOptions]="{standalone: true}"
-              (input)="onSearchChange()"
-            />
-          </div>
-        </div>
-        <div class="col-md-4 d-flex align-items-end">
-          <button class="btn btn-outline-secondary" (click)="onClearFilters()">
-            <i class="fa-solid fa-filter-circle-xmark me-1"></i>
-            {{ t('common.clear') }}
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- Standardized Filters Component -->
+  <app-unified-filter
+    moduleName="roles"
+    [refreshing]="loading()"
+    (searchChange)="onSearchTermChange($event)"
+    (filtersChange)="onFiltersChange($event)"
+    (add)="onCreateRole()"
+    (refresh)="onRefreshData()">
+  </app-unified-filter>
 
   <!-- Roles Table Card -->
   <div class="card">
     <div class="card-body">
       @if (loading()) {
         <div class="text-center py-4">
-          <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">{{ t('common.loading') }}</span>
-          </div>
-          <p class="mt-2 text-muted">{{ t('common.loading') }}</p>
+          <app-loading-spinner
+            [message]="t('common.loading')"
+            [variant]="'primary'"
+            [centered]="true">
+          </app-loading-spinner>
         </div>
       } @else if (filteredRoles().length === 0) {
-        <div class="text-center py-4">
-          <i class="fa-solid fa-user-shield fa-3x text-muted mb-3"></i>
-          <p class="text-muted">{{ t('roles.no_roles_found') }}</p>
-          @if (hasActiveFilters()) {
-            <button class="btn btn-outline-primary" (click)="onClearFilters()">
-              {{ t('common.clear_filters') }}
-            </button>
-          }
-        </div>
+        <app-empty-state
+          [icon]="'fa-solid fa-user-shield'"
+          [message]="t('roles.no_roles_found')"
+          [showClearFilters]="hasActiveFilters()"
+          [clearFiltersText]="t('common.clear_filters')"
+          (clearFilters)="onClearFilters()">
+        </app-empty-state>
       } @else {
         <!-- Unified Data Table -->
         <app-data-table
@@ -80,19 +52,15 @@
 </div>
 
 <!-- Permission Management Modal -->
-@if (showPermissionsModal()) {
-  <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
-    <div class="modal-dialog modal-xl">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">
-            <i class="fa-solid fa-key me-2"></i>
-            {{ t('roles.manage_permissions_for') }}: {{ selectedRole()?.name }}
-          </h5>
-          <button type="button" class="btn-close" (click)="closePermissionsModal()"></button>
-        </div>
-        
-        <div class="modal-body">
+<app-modal-wrapper
+  [show]="showPermissionsModal()"
+  [title]="t('roles.manage_permissions_for') + ': ' + (selectedRole()?.name || '')"
+  [size]="'xl'"
+  [centered]="true"
+  [loading]="managingPermissions()"
+  (close)="closePermissionsModal()">
+
+  <div class="modal-body">
           @if (selectedRole()) {
             <!-- Role Info -->
             <div class="role-info mb-4">
@@ -134,9 +102,11 @@
                             <label class="form-check-label fw-medium me-2" [for]="'permission-' + permission.id">
                               <small>{{ getPermissionResource(permission.key) }}</small>
                             </label>
-                            <span class="badge" [ngClass]="getActionBadgeClass(permission.key)" style="font-size: 0.65rem;">
-                              {{ getPermissionAction(permission.key) }}
-                            </span>
+                            <app-status-badge
+                              [status]="getPermissionBadgeStatus(permission.key)"
+                              [label]="getPermissionAction(permission.key)"
+                              [size]="'sm'">
+                            </app-status-badge>
                           </div>
                           <p class="text-muted small mb-0" style="font-size: 0.7rem; margin-left: 1.25rem;">
                             {{ getPermissionDescription(permission) }}
@@ -149,31 +119,32 @@
               </div>
               
               @if (allPermissions().length === 0) {
-                <div class="text-center py-4">
-                  <i class="fa-solid fa-key fa-2x text-muted mb-2"></i>
-                  <p class="text-muted mb-0">{{ t('roles.no_permissions_available') }}</p>
-                </div>
+                <app-empty-state
+                  [icon]="'fa-solid fa-key'"
+                  [message]="t('roles.no_permissions_available')"
+                  [size]="'sm'">
+                </app-empty-state>
               }
             </div>
 
             @if (managingPermissions()) {
               <div class="text-center py-3">
-                <div class="spinner-border spinner-border-sm text-primary" role="status">
-                  <span class="visually-hidden">{{ t('common.loading') }}</span>
-                </div>
-                <p class="text-muted mt-2 mb-0">{{ t('roles.updating_permissions') }}</p>
+                <app-loading-spinner
+                  [message]="t('roles.updating_permissions')"
+                  [variant]="'primary'"
+                  [size]="'sm'"
+                  [centered]="true">
+                </app-loading-spinner>
               </div>
             }
           }
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="closePermissionsModal()">
-            {{ t('common.close') }}
-          </button>
-        </div>
-      </div>
-    </div>
   </div>
-}
+
+  <div modal-footer class="d-flex gap-2 justify-content-end">
+    <button type="button" class="btn btn-secondary" (click)="closePermissionsModal()">
+      {{ t('common.close') }}
+    </button>
+  </div>
+
+</app-modal-wrapper>
 

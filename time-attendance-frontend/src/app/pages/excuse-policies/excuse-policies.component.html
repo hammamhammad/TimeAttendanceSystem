@@ -1,0 +1,45 @@
+<div class="app-list-page">
+  <!-- Page Header -->
+  <app-page-header
+    [title]="i18n.t('excuse_policies.title')">
+  </app-page-header>
+
+  <!-- Unified Filter Component -->
+  <app-unified-filter
+    moduleName="excuse-policies"
+    [refreshing]="loading()"
+    (searchChange)="onSearchTermChange($event)"
+    (filtersChange)="onFiltersChange($event)"
+    (add)="navigateToCreate()"
+    (refresh)="onRefreshData()">
+  </app-unified-filter>
+
+  <!-- Data Table -->
+  <div class="card">
+    <div class="card-body">
+      <app-data-table
+        [data]="excusePolicies()"
+        [columns]="tableColumns"
+        [actions]="tableActions"
+        [loading]="loading()"
+        [totalItems]="pagedResult()?.totalCount ?? 0"
+        [currentPage]="currentPage()"
+        [pageSize]="pageSize()"
+        [pageSizeOptions]="[10, 25, 50, 100]"
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
+        (actionClick)="onTableAction($event)"
+        [emptyMessage]="i18n.t('excuse_policies.no_policies_found')"
+      ></app-data-table>
+    </div>
+  </div>
+
+  <!-- Error Display -->
+  @if (error()) {
+    <div class="alert alert-danger mt-3" role="alert">
+      <i class="fas fa-exclamation-triangle me-2"></i>
+      {{ error() }}
+    </div>
+  }
+</div>
+

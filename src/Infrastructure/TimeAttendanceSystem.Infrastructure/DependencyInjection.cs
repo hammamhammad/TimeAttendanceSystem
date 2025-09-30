@@ -324,6 +324,100 @@ public static class DependencyInjection
                     context.User.IsInRole("SystemAdmin") ||
                     context.User.IsInRole("Admin") ||
                     context.User.HasClaim("permission", "vacation.manage")));
+
+            // Define VacationBulkCreate policy - users who can create bulk vacation assignments
+            options.AddPolicy("VacationBulkCreate", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.HasClaim("permission", "vacation.bulkCreate")));
+
+            // ===== EXCUSE POLICY MANAGEMENT POLICIES =====
+
+            // Define SettingsExcusePolicyRead policy - users who can view excuse policies
+            options.AddPolicy("SettingsExcusePolicyRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.HasClaim("permission", "settings.excusePolicy.read")));
+
+            // Define SettingsExcusePolicyCreate policy - users who can create excuse policies
+            options.AddPolicy("SettingsExcusePolicyCreate", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.HasClaim("permission", "settings.excusePolicy.create")));
+
+            // Define SettingsExcusePolicyUpdate policy - users who can update excuse policies
+            options.AddPolicy("SettingsExcusePolicyUpdate", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.HasClaim("permission", "settings.excusePolicy.update")));
+
+            // Define SettingsExcusePolicyDelete policy - users who can delete excuse policies
+            options.AddPolicy("SettingsExcusePolicyDelete", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.HasClaim("permission", "settings.excusePolicy.delete")));
+
+            // Define SettingsExcusePolicyManagement policy - comprehensive excuse policy management
+            options.AddPolicy("SettingsExcusePolicyManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.HasClaim("permission", "settings.excusePolicy.manage")));
+
+            // ===== EMPLOYEE EXCUSE MANAGEMENT POLICIES =====
+
+            // Define ExcuseRead policy - users who can view employee excuses
+            options.AddPolicy("ExcuseRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.IsInRole("Employee") ||
+                    context.User.HasClaim("permission", "excuse.read")));
+
+            // Define ExcuseCreate policy - users who can create excuse requests
+            options.AddPolicy("ExcuseCreate", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.IsInRole("Employee") ||
+                    context.User.HasClaim("permission", "excuse.create")));
+
+            // Define ExcuseUpdate policy - users who can update excuse requests
+            options.AddPolicy("ExcuseUpdate", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.HasClaim("permission", "excuse.update")));
+
+            // Define ExcuseDelete policy - users who can delete excuse requests
+            options.AddPolicy("ExcuseDelete", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.HasClaim("permission", "excuse.delete")));
+
+            // Define ExcuseApprove policy - users who can approve excuse requests
+            options.AddPolicy("ExcuseApprove", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.HasClaim("permission", "excuse.approve")));
+
+            // Define ExcuseManagement policy - comprehensive excuse management access
+            options.AddPolicy("ExcuseManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.HasClaim("permission", "excuse.manage")));
         });
         services.AddHttpContextAccessor();
 

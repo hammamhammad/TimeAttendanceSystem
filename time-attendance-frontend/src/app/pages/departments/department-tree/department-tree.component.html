@@ -76,9 +76,10 @@
   <!-- Loading -->
   @if (loading()) {
     <div class="text-center p-4">
-      <div class="spinner-border" role="status">
-        <span class="visually-hidden">{{ i18n.t('common.loading') }}...</span>
-      </div>
+      <app-loading-spinner
+        [message]="i18n.t('common.loading')"
+        [centered]="true">
+      </app-loading-spinner>
     </div>
   }
 

@@ -59,5 +59,15 @@ public enum AttendanceStatus
     /// <summary>
     /// Employee attendance is pending calculation or review.
     /// </summary>
-    Pending = 11
+    Pending = 11,
+
+    /// <summary>
+    /// Employee is on approved official duty.
+    /// </summary>
+    OnDuty = 12,
+
+    /// <summary>
+    /// Employee has approved personal excuse for time away.
+    /// </summary>
+    Excused = 13
 }

@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { ShiftsService } from './shifts.service';
 import { BranchesService } from '../branches/branches.service';
+import { ModalWrapperComponent } from '../../shared/components/modal-wrapper/modal-wrapper.component';
 import {
   Shift,
   ShiftType,
@@ -21,11 +22,14 @@ import { PermissionResources, PermissionActions } from '../../shared/utils/permi
 import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
 import { SearchableSelectComponent, SearchableSelectOption } from '../../shared/components/searchable-select/searchable-select.component';
 import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table.component';
+import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
+import { UnifiedFilterComponent } from '../../shared/components/unified-filter/unified-filter.component';
+import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
 
 @Component({
   selector: 'app-shifts',
   standalone: true,
-  imports: [CommonModule, FormsModule, HasPermissionDirective, SearchableSelectComponent, DataTableComponent],
+  imports: [CommonModule, FormsModule, HasPermissionDirective, SearchableSelectComponent, DataTableComponent, PageHeaderComponent, UnifiedFilterComponent, StatusBadgeComponent, ModalWrapperComponent],
   templateUrl: './shifts.component.html',
   styleUrls: ['./shifts.component.css']
 })
@@ -48,6 +52,7 @@ export class ShiftsComponent implements OnInit {
   // Enum references for template
   readonly ShiftType = ShiftType;
   readonly ShiftStatus = ShiftStatus;
+
 
   // Page size options for searchable select
   get pageSizeSelectOptions(): SearchableSelectOption[] {
@@ -170,6 +175,13 @@ export class ShiftsComponent implements OnInit {
 
   tableActions = computed<TableAction[]>(() => [
     {
+      key: 'view',
+      label: this.t('common.view'),
+      icon: 'fa-eye',
+      color: 'primary',
+      condition: () => this.permissionService.has(this.PERMISSIONS.SHIFT_READ)
+    },
+    {
       key: 'set-default',
       label: this.t('shifts.defaultShift.setDefault'),
       icon: 'fa-star',
@@ -180,7 +192,7 @@ export class ShiftsComponent implements OnInit {
       key: 'edit',
       label: this.t('common.edit'),
       icon: 'fa-edit',
-      color: 'primary',
+      color: 'secondary',
       condition: () => this.permissionService.has(this.PERMISSIONS.SHIFT_UPDATE)
     },
     {
@@ -265,6 +277,39 @@ export class ShiftsComponent implements OnInit {
     this.loadShifts();
   }
 
+  /**
+   * Handle search input changes from filters component
+   */
+  onSearchChange(searchTerm: string): void {
+    this.searchTerm = searchTerm;
+    this.currentPage.set(1);
+    this.loadShifts();
+  }
+
+  /**
+   * Handle filters change from filters component
+   */
+  onFiltersChange(filters: any): void {
+    if (filters.search !== undefined) {
+      this.searchTerm = filters.search || '';
+    }
+    if (filters.status !== undefined) {
+      // Handle status filter if needed
+    }
+    if (filters.shiftType !== undefined) {
+      // Handle shift type filter if needed
+    }
+    this.currentPage.set(1);
+    this.loadShifts();
+  }
+
+  /**
+   * Handle refresh data request
+   */
+  onRefreshData(): void {
+    this.loadShifts();
+  }
+
   onFilterChange(): void {
     this.currentPage.set(1);
     this.loadShifts();
@@ -321,6 +366,21 @@ export class ShiftsComponent implements OnInit {
     }
   }
 
+  getShiftStatusBadgeStatus(status: ShiftStatus): 'success' | 'info' | 'warning' | 'primary' | 'danger' | 'secondary' {
+    switch (status) {
+      case ShiftStatus.Active:
+        return 'success';
+      case ShiftStatus.Inactive:
+        return 'secondary';
+      case ShiftStatus.Draft:
+        return 'warning';
+      case ShiftStatus.Archived:
+        return 'secondary';
+      default:
+        return 'success';
+    }
+  }
+
   formatTime(timeString: string): string {
     return timeString; // Already in HH:mm format
   }
@@ -353,6 +413,10 @@ export class ShiftsComponent implements OnInit {
   // CRUD Operations
   onCreateShift(): void {
     this.router.navigate(['/shifts/create']);
+  }
+
+  onViewShift(shift: Shift): void {
+    this.router.navigate(['/shifts', shift.id, 'view']);
   }
 
   onEditShift(shift: Shift): void {
@@ -861,6 +925,9 @@ export class ShiftsComponent implements OnInit {
     const { action, item } = event;
 
     switch (action) {
+      case 'view':
+        this.onViewShift(item);
+        break;
       case 'set-default':
         this.onSetDefaultShift(item);
         break;

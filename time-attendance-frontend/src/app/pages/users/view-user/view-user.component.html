@@ -1,44 +1,20 @@
 <div class="container-fluid">
   <!-- Header -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h2>{{ t('users.view_details') }}</h2>
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item">
-            <a routerLink="/dashboard">{{ t('dashboard.title') }}</a>
-          </li>
-          <li class="breadcrumb-item">
-            <a routerLink="/users">{{ t('users.title') }}</a>
-          </li>
-          <li class="breadcrumb-item active">{{ t('users.view_details') }}</li>
-        </ol>
-      </nav>
-    </div>
-    <div class="btn-group">
-      <button 
-        *appHasPermission="PERMISSIONS.USER_UPDATE"
-        type="button" 
-        class="btn btn-primary"
-        (click)="onEdit()">
-        <i class="fa-solid fa-edit me-2"></i>
-        {{ t('users.edit') }}
-      </button>
-      <button 
-        type="button" 
-        class="btn btn-outline-secondary"
-        (click)="onBack()">
-        <i class="fa-solid fa-arrow-left me-2"></i>
-        {{ t('common.back') }}
-      </button>
-    </div>
-  </div>
+  <app-form-header
+    mode="view"
+    [title]="t('users.view_details')"
+    moduleName="users"
+    moduleRoute="users"
+    [entityId]="userId"
+    [loading]="loading()">
+  </app-form-header>
 
   @if (loading()) {
     <div class="d-flex justify-content-center py-5">
-      <div class="spinner-border" role="status">
-        <span class="visually-hidden">{{ t('common.loading') }}</span>
-      </div>
+      <app-loading-spinner
+        [message]="t('common.loading')"
+        [centered]="true">
+      </app-loading-spinner>
     </div>
   } @else if (user()) {
     <!-- User Details -->
@@ -70,56 +46,20 @@
             <div class="row">
               <!-- Basic Information -->
               <div class="col-md-6">
-                <dl class="row">
-                  <dt class="col-sm-4">{{ t('users.username') }}:</dt>
-                  <dd class="col-sm-8">{{ user()?.username }}</dd>
-                  
-                  <dt class="col-sm-4">{{ t('users.email') }}:</dt>
-                  <dd class="col-sm-8">{{ user()?.email }}</dd>
-                  
-                  <dt class="col-sm-4">{{ t('users.phone') }}:</dt>
-                  <dd class="col-sm-8">{{ user()?.phone || '-' }}</dd>
-                  
-                  <dt class="col-sm-4">{{ t('users.language') }}:</dt>
-                  <dd class="col-sm-8">
-                    @if (user()?.preferredLanguage === 'ar') {
-                      {{ t('common.language_arabic') }}
-                    } @else {
-                      {{ t('common.language_english') }}
-                    }
-                  </dd>
-                </dl>
+                <app-definition-list
+                  [items]="basicInfoItems()"
+                  [labelWidth]="'4'"
+                  [valueWidth]="'8'">
+                </app-definition-list>
               </div>
 
               <!-- Status Information -->
               <div class="col-md-6">
-                <dl class="row">
-                  <dt class="col-sm-4">{{ t('common.status') }}:</dt>
-                  <dd class="col-sm-8">
-                    @if (isUserLocked(user()?.lockoutEndUtc)) {
-                      <span class="badge bg-danger">{{ t('users.locked') }}</span>
-                    } @else if (user()?.isActive) {
-                      <span class="badge bg-success">{{ t('common.active') }}</span>
-                    } @else {
-                      <span class="badge bg-light text-dark border">{{ t('common.inactive') }}</span>
-                    }
-                  </dd>
-                  
-                  <dt class="col-sm-4">{{ t('users.created_at') }}:</dt>
-                  <dd class="col-sm-8">{{ formatDate(user()!.createdAtUtc!) }}</dd>
-                  
-                  <dt class="col-sm-4">{{ t('users.two_factor') }}:</dt>
-                  <dd class="col-sm-8">
-                    @if (user()?.twoFactorEnabled) {
-                      <span class="badge bg-success">{{ t('common.enabled') }}</span>
-                    } @else {
-                      <span class="badge bg-light text-dark border">{{ t('common.disabled') }}</span>
-                    }
-                  </dd>
-                  
-                  <dt class="col-sm-4">{{ t('users.login_attempts') }}:</dt>
-                  <dd class="col-sm-8">{{ user()?.accessFailedCount || 0 }}</dd>
-                </dl>
+                <app-definition-list
+                  [items]="statusInfoItems()"
+                  [labelWidth]="'4'"
+                  [valueWidth]="'8'">
+                </app-definition-list>
               </div>
             </div>
           </div>
@@ -136,29 +76,21 @@
             <!-- Roles -->
             <div class="mb-3">
               <h6 class="fw-semibold">{{ t('users.roles') }}</h6>
-              @if (user()?.roles && user()!.roles.length > 0) {
-                <div class="d-flex flex-wrap gap-1">
-                  @for (role of user()?.roles; track role) {
-                    <span class="badge bg-info">{{ getRoleName(role) }}</span>
-                  }
-                </div>
-              } @else {
-                <p class="text-muted mb-0">{{ t('users.no_roles') }}</p>
-              }
+              <app-badge-list
+                [items]="roleBadges()"
+                [gap]="'sm'"
+                [emptyMessage]="t('users.no_roles')">
+              </app-badge-list>
             </div>
-            
+
             <!-- Branches -->
             <div>
               <h6 class="fw-semibold">{{ t('users.branches') }}</h6>
-              @if (user()?.branches && (user()?.branches?.length || 0) > 0) {
-                <div class="d-flex flex-wrap gap-1">
-                  @for (branch of user()?.branches; track branch) {
-                    <span class="badge bg-light text-dark border">{{ getBranchName(branch) }}</span>
-                  }
-                </div>
-              } @else {
-                <p class="text-muted mb-0">{{ t('users.all_branches') }}</p>
-              }
+              <app-badge-list
+                [items]="branchBadges()"
+                [gap]="'sm'"
+                [emptyMessage]="t('users.all_branches')">
+              </app-badge-list>
             </div>
           </div>
         </div>
@@ -170,14 +102,6 @@
           </div>
           <div class="card-body">
             <div class="d-grid gap-2">
-              <button 
-                *appHasPermission="PERMISSIONS.USER_UPDATE"
-                type="button" 
-                class="btn btn-outline-primary"
-                (click)="onEdit()">
-                <i class="fa-solid fa-edit me-2"></i>
-                {{ t('users.edit') }}
-              </button>
               <button 
                 *appHasPermission="PERMISSIONS.USER_ASSIGN_ROLE"
                 type="button" 

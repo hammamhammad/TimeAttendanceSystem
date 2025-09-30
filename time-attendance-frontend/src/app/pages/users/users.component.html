@@ -1,18 +1,18 @@
-<div class="users-page">
+<div class="app-list-page">
   <!-- Page Header -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>{{ i18n.t('users.title') }}</h2>
-  </div>
+  <app-page-header
+    [title]="i18n.t('users.title')">
+  </app-page-header>
 
   <!-- Filters Component -->
-  <app-user-filters
-    [showAddButton]="permissionService.has(PERMISSIONS.USER_CREATE)"
-    [addButtonText]="i18n.t('users.create_user')"
-    [availableRoles]="availableRoles"
+  <app-unified-filter
+    moduleName="users"
+    [refreshing]="loading()"
     (searchChange)="onSearchChange($event)"
     (filtersChange)="onFiltersChange($event)"
-    (addUser)="onAddUser()">
-  </app-user-filters>
+    (add)="onAddUser()"
+    (refresh)="onRefreshData()">
+  </app-unified-filter>
 
   <!-- Users Table Component -->
   <app-user-table

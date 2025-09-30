@@ -1,0 +1,43 @@
+<div class="empty-state text-center" [class]="getPaddingClass()">
+  <!-- Icon -->
+  <i [class]="icon + ' ' + getIconSize() + ' text-muted mb-3'"></i>
+
+  <!-- Title -->
+  @if (title) {
+    <h5 class="empty-state-title mb-2">{{ title }}</h5>
+  }
+
+  <!-- Message -->
+  <p class="text-muted mb-3">{{ message }}</p>
+
+  <!-- Actions -->
+  <div class="empty-state-actions">
+    @if (actionText) {
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="onActionClick()">
+        @if (actionIcon) {
+          <i [class]="actionIcon + ' me-2'"></i>
+        }
+        {{ actionText }}
+      </button>
+    }
+
+    @if (showClearFilters) {
+      <button
+        type="button"
+        class="btn btn-outline-secondary"
+        [class.ms-2]="actionText"
+        (click)="onClearFiltersClick()">
+        <i class="fa-solid fa-filter-circle-xmark me-2"></i>
+        {{ clearFiltersText }}
+      </button>
+    }
+  </div>
+
+  <!-- Custom content slot -->
+  <div class="empty-state-custom mt-3">
+    <ng-content></ng-content>
+  </div>
+</div>

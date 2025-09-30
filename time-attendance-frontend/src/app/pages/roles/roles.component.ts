@@ -9,13 +9,19 @@ import { PermissionUtils, PermissionResources, PermissionActions } from '../../s
 import { NotificationService } from '../../core/notifications/notification.service';
 import { ConfirmationService } from '../../core/confirmation/confirmation.service';
 import { PermissionService } from '../../core/auth/permission.service';
-import { HasPermissionDirective } from '../../shared/directives/has-permission.directive';
 import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table.component';
+import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
+import { UnifiedFilterComponent } from '../../shared/components/unified-filter/unified-filter.component';
+import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
+import { BadgeListComponent } from '../../shared/components/badge-list/badge-list.component';
+import { ModalWrapperComponent } from '../../shared/components/modal-wrapper/modal-wrapper.component';
+import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
+import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-roles',
   standalone: true,
-  imports: [CommonModule, FormsModule, HasPermissionDirective, DataTableComponent],
+  imports: [CommonModule, FormsModule, DataTableComponent, PageHeaderComponent, UnifiedFilterComponent, StatusBadgeComponent, BadgeListComponent, ModalWrapperComponent, LoadingSpinnerComponent, EmptyStateComponent],
   templateUrl: './roles.component.html',
   styleUrls: ['./roles.component.css']
 })
@@ -36,6 +42,7 @@ export class RolesComponent implements OnInit {
     ROLE_MANAGE: `${PermissionResources.ROLE}.${PermissionActions.MANAGE}`,
     ROLE_ASSIGN_PERMISSIONS: `${PermissionResources.ROLE}.${PermissionActions.ASSIGN_PERMISSION}`
   };
+
 
   // Signals for state management
   loading = signal(false);
@@ -408,15 +415,25 @@ export class RolesComponent implements OnInit {
     }
   }
 
-  onSearchChange(): void {
-    // Debounce search
-    setTimeout(() => {
-      // Search is handled by filteredRoles() computed
-    }, 300);
+  onSearchTermChange(searchTerm: string): void {
+    this.searchTerm = searchTerm;
+  }
+
+  onFiltersChange(filters: any): void {
+    // Handle additional filters if needed in the future
+    console.log('Filters changed:', filters);
   }
 
   onClearFilters(): void {
     this.searchTerm = '';
+  }
+
+  onRefreshData(): void {
+    // Reset filters
+    this.searchTerm = '';
+
+    // Reload data
+    this.loadRoles();
   }
 
   hasActiveFilters(): boolean {
@@ -492,6 +509,19 @@ export class RolesComponent implements OnInit {
   getActionBadgeClass(permissionKey: string): string {
     const action = PermissionUtils.parsePermissionKey(permissionKey).action;
     return action ? PermissionUtils.getActionBadgeClass(action) : 'bg-light text-dark';
+  }
+
+  getPermissionBadgeStatus(permissionKey: string): 'success' | 'info' | 'warning' | 'primary' | 'danger' | 'secondary' {
+    const action = PermissionUtils.parsePermissionKey(permissionKey).action;
+    const badgeClass = action ? PermissionUtils.getActionBadgeClass(action) : 'bg-light text-dark';
+
+    // Map badge classes to status types
+    if (badgeClass.includes('bg-success')) return 'success';
+    if (badgeClass.includes('bg-info')) return 'info';
+    if (badgeClass.includes('bg-warning')) return 'warning';
+    if (badgeClass.includes('bg-primary')) return 'primary';
+    if (badgeClass.includes('bg-danger')) return 'danger';
+    return 'secondary';
   }
 
   getPermissionIcon(permissionKey: string): string {

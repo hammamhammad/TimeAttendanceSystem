@@ -1,0 +1,267 @@
+<div class="create-excuse-policy-page">
+  <!-- Page Header -->
+  <app-form-header
+    mode="create"
+    [title]="t('excuse_policies.create_policy')"
+    moduleName="excuse-policies"
+    moduleRoute="excuse-policies"
+    [loading]="submitting()">
+  </app-form-header>
+
+  <!-- Main Form Card -->
+  <div class="card">
+    <div class="card-body">
+      <form [formGroup]="excusePolicyForm" (ngSubmit)="onSubmit()">
+        <!-- Branch Selection -->
+        <div class="row mb-4">
+          <div class="col-md-12">
+            <label for="branchId" class="form-label">
+              {{ t('excuse_policies.branch') }}
+              <small class="text-muted ms-1">({{ t('common.optional') }})</small>
+            </label>
+            <select
+              id="branchId"
+              class="form-select"
+              formControlName="branchId"
+              [class.is-invalid]="isFieldInvalid('branchId')"
+            >
+              <option [value]="null">{{ t('excuse_policies.organization_wide') }}</option>
+              @for (branch of availableBranches(); track branch.id) {
+                <option [value]="branch.id">{{ branch.name }}</option>
+              }
+            </select>
+            @if (isFieldInvalid('branchId')) {
+              <div class="invalid-feedback">
+                {{ getFieldError('branchId') }}
+              </div>
+            }
+            <small class="form-text text-muted">
+              {{ t('excuse_policies.branch_help') }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Monthly Limits -->
+        <h5 class="mb-3 text-primary border-bottom pb-2">
+          <i class="fas fa-calendar-alt me-2"></i>
+          {{ t('excuse_policies.monthly_limits') }}
+        </h5>
+
+        <div class="row mb-4">
+          <div class="col-md-6 mb-3">
+            <label for="maxPersonalExcusesPerMonth" class="form-label">
+              {{ t('excuse_policies.max_excuses_month') }} *
+            </label>
+            <input
+              type="number"
+              id="maxPersonalExcusesPerMonth"
+              class="form-control"
+              formControlName="maxPersonalExcusesPerMonth"
+              [class.is-invalid]="isFieldInvalid('maxPersonalExcusesPerMonth')"
+              min="0"
+              max="100"
+              step="1"
+            />
+            @if (isFieldInvalid('maxPersonalExcusesPerMonth')) {
+              <div class="invalid-feedback">
+                {{ getFieldError('maxPersonalExcusesPerMonth') }}
+              </div>
+            }
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="maxPersonalExcuseHoursPerMonth" class="form-label">
+              {{ t('excuse_policies.max_hours_month') }} *
+            </label>
+            <input
+              type="number"
+              id="maxPersonalExcuseHoursPerMonth"
+              class="form-control"
+              formControlName="maxPersonalExcuseHoursPerMonth"
+              [class.is-invalid]="isFieldInvalid('maxPersonalExcuseHoursPerMonth')"
+              min="0"
+              max="744"
+              step="0.5"
+            />
+            @if (isFieldInvalid('maxPersonalExcuseHoursPerMonth')) {
+              <div class="invalid-feedback">
+                {{ getFieldError('maxPersonalExcuseHoursPerMonth') }}
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Daily and Per-Excuse Limits -->
+        <h5 class="mb-3 text-primary border-bottom pb-2">
+          <i class="fas fa-clock me-2"></i>
+          {{ t('excuse_policies.time_limits') }}
+        </h5>
+
+        <div class="row mb-4">
+          <div class="col-md-6 mb-3">
+            <label for="maxPersonalExcuseHoursPerDay" class="form-label">
+              {{ t('excuse_policies.max_hours_day') }} *
+            </label>
+            <input
+              type="number"
+              id="maxPersonalExcuseHoursPerDay"
+              class="form-control"
+              formControlName="maxPersonalExcuseHoursPerDay"
+              [class.is-invalid]="isFieldInvalid('maxPersonalExcuseHoursPerDay')"
+              min="0"
+              max="24"
+              step="0.5"
+            />
+            @if (isFieldInvalid('maxPersonalExcuseHoursPerDay')) {
+              <div class="invalid-feedback">
+                {{ getFieldError('maxPersonalExcuseHoursPerDay') }}
+              </div>
+            }
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="maxHoursPerExcuse" class="form-label">
+              {{ t('excuse_policies.max_hours_per_excuse') }} *
+            </label>
+            <input
+              type="number"
+              id="maxHoursPerExcuse"
+              class="form-control"
+              formControlName="maxHoursPerExcuse"
+              [class.is-invalid]="isFieldInvalid('maxHoursPerExcuse')"
+              min="0.5"
+              max="24"
+              step="0.5"
+            />
+            @if (isFieldInvalid('maxHoursPerExcuse')) {
+              <div class="invalid-feedback">
+                {{ getFieldError('maxHoursPerExcuse') }}
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Retroactive Settings -->
+        <div class="row mb-4">
+          <div class="col-md-6 mb-3">
+            <label for="maxRetroactiveDays" class="form-label">
+              {{ t('excuse_policies.max_retroactive_days') }} *
+            </label>
+            <input
+              type="number"
+              id="maxRetroactiveDays"
+              class="form-control"
+              formControlName="maxRetroactiveDays"
+              [class.is-invalid]="isFieldInvalid('maxRetroactiveDays')"
+              min="0"
+              max="365"
+              step="1"
+            />
+            @if (isFieldInvalid('maxRetroactiveDays')) {
+              <div class="invalid-feedback">
+                {{ getFieldError('maxRetroactiveDays') }}
+              </div>
+            }
+            <small class="form-text text-muted">
+              {{ t('excuse_policies.max_retroactive_days_help') }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Policy Options -->
+        <h5 class="mb-3 text-primary border-bottom pb-2">
+          <i class="fas fa-cogs me-2"></i>
+          {{ t('excuse_policies.policy_options') }}
+        </h5>
+
+        <div class="row mb-4">
+          <div class="col-md-6 mb-3">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="requiresApproval"
+                formControlName="requiresApproval"
+              />
+              <label class="form-check-label" for="requiresApproval">
+                {{ t('excuse_policies.requires_approval') }}
+              </label>
+            </div>
+            <small class="form-text text-muted">
+              {{ t('excuse_policies.requires_approval_help') }}
+            </small>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="allowPartialHourExcuses"
+                formControlName="allowPartialHourExcuses"
+              />
+              <label class="form-check-label" for="allowPartialHourExcuses">
+                {{ t('excuse_policies.allow_partial_hours') }}
+              </label>
+            </div>
+            <small class="form-text text-muted">
+              {{ t('excuse_policies.allow_partial_hours_help') }}
+            </small>
+          </div>
+        </div>
+
+        <div class="row mb-4">
+          <div class="col-md-6 mb-3">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="allowSelfServiceRequests"
+                formControlName="allowSelfServiceRequests"
+              />
+              <label class="form-check-label" for="allowSelfServiceRequests">
+                {{ t('excuse_policies.allow_self_service') }}
+              </label>
+            </div>
+            <small class="form-text text-muted">
+              {{ t('excuse_policies.allow_self_service_help') }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+          <button
+            type="button"
+            class="btn btn-outline-secondary"
+            (click)="goBack()"
+            [disabled]="submitting()">
+            <i class="fas fa-times me-2"></i>
+            {{ t('common.cancel') }}
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-outline-primary"
+            (click)="resetForm()"
+            [disabled]="submitting()">
+            <i class="fas fa-refresh me-2"></i>
+            {{ t('common.reset') }}
+          </button>
+
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="submitting() || excusePolicyForm.invalid">
+            @if (submitting()) {
+              <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            } @else {
+              <i class="fas fa-save me-2"></i>
+            }
+            {{ t('excuse_policies.create_policy') }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

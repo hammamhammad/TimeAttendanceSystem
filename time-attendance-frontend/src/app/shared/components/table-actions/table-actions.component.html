@@ -1,0 +1,48 @@
+@if (layout === 'buttons') {
+  <!-- Button Group Layout -->
+  <div class="btn-group" [class.btn-group-sm]="size === 'sm'" role="group">
+    @for (action of getVisibleActions(); track action.id) {
+      <button
+        type="button"
+        [class]="getButtonClasses(action)"
+        [disabled]="isActionDisabled(action)"
+        [title]="action.tooltip || action.label"
+        (click)="onActionClick(action)">
+        <i [class]="action.icon"></i>
+        <span class="visually-hidden">{{ action.label }}</span>
+      </button>
+    }
+  </div>
+} @else {
+  <!-- Dropdown Layout -->
+  <div class="dropdown">
+    <button
+      class="btn btn-outline-secondary"
+      [class.btn-sm]="size === 'sm'"
+      type="button"
+      data-bs-toggle="dropdown"
+      aria-expanded="false"
+      [disabled]="loading">
+      <i class="fa-solid fa-ellipsis-vertical"></i>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end">
+      @for (action of getVisibleActions(); track action.id) {
+        <li>
+          <button
+            class="dropdown-item"
+            [class.disabled]="isActionDisabled(action)"
+            [disabled]="isActionDisabled(action)"
+            (click)="onActionClick(action)">
+            <i [class]="action.icon + ' me-2'"></i>
+            {{ action.label }}
+          </button>
+        </li>
+      }
+      @if (getVisibleActions().length === 0) {
+        <li>
+          <span class="dropdown-item-text text-muted">No actions available</span>
+        </li>
+      }
+    </ul>
+  </div>
+}

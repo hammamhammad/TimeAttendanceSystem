@@ -767,6 +767,272 @@ namespace TimeAttendanceSystem.Infrastructure.Migrations
                     b.ToTable("EmployeeUserLinks", (string)null);
                 });
 
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Excuses.EmployeeExcuse", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("AffectsSalary")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<int>("ApprovalStatus")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("ApprovedById")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("AttachmentPath")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal>("DurationHours")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)")
+                        .HasComputedColumnSql("CAST(DATEDIFF(MINUTE, [StartTime], [EndTime]) AS DECIMAL(5,2)) / 60.0", true);
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("time");
+
+                    b.Property<DateTime>("ExcuseDate")
+                        .HasColumnType("date");
+
+                    b.Property<int>("ExcuseType")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime>("ModifiedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ProcessingNotes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApprovalStatus")
+                        .HasDatabaseName("IX_EmployeeExcuses_ApprovalStatus");
+
+                    b.HasIndex("ApprovedById")
+                        .HasDatabaseName("IX_EmployeeExcuses_ApprovedById");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_EmployeeExcuses_EmployeeId");
+
+                    b.HasIndex("ExcuseDate")
+                        .HasDatabaseName("IX_EmployeeExcuses_ExcuseDate");
+
+                    b.HasIndex("ExcuseType")
+                        .HasDatabaseName("IX_EmployeeExcuses_ExcuseType");
+
+                    b.HasIndex("EmployeeId", "ExcuseDate")
+                        .HasDatabaseName("IX_EmployeeExcuses_EmployeeId_ExcuseDate");
+
+                    b.HasIndex("ExcuseDate", "ApprovalStatus")
+                        .HasDatabaseName("IX_EmployeeExcuses_ExcuseDate_ApprovalStatus");
+
+                    b.HasIndex("EmployeeId", "ExcuseDate", "StartTime", "EndTime")
+                        .IsUnique()
+                        .HasDatabaseName("UQ_EmployeeExcuses_EmployeeId_ExcuseDate_TimeRange")
+                        .HasFilter("[IsDeleted] = 0 AND [ApprovalStatus] IN (1, 2)");
+
+                    b.ToTable("EmployeeExcuses", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_EmployeeExcuses_ApprovalData", "([ApprovalStatus] = 1 AND [ApprovedById] IS NULL AND [ApprovedAt] IS NULL) OR ([ApprovalStatus] IN (2, 3) AND [ApprovedById] IS NOT NULL AND [ApprovedAt] IS NOT NULL)");
+
+                            t.HasCheckConstraint("CK_EmployeeExcuses_ApprovalStatus", "[ApprovalStatus] IN (1, 2, 3)");
+
+                            t.HasCheckConstraint("CK_EmployeeExcuses_DurationHours", "[DurationHours] > 0 AND [DurationHours] <= 24");
+
+                            t.HasCheckConstraint("CK_EmployeeExcuses_EndTimeAfterStartTime", "[EndTime] > [StartTime]");
+
+                            t.HasCheckConstraint("CK_EmployeeExcuses_ExcuseDate", "[ExcuseDate] >= '2020-01-01' AND [ExcuseDate] <= DATEADD(day, 365, GETDATE())");
+
+                            t.HasCheckConstraint("CK_EmployeeExcuses_ExcuseType", "[ExcuseType] IN (1, 2)");
+
+                            t.HasCheckConstraint("CK_EmployeeExcuses_RejectionReason", "([ApprovalStatus] = 3 AND [RejectionReason] IS NOT NULL AND LEN([RejectionReason]) > 0) OR ([ApprovalStatus] IN (1, 2))");
+                        });
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Excuses.ExcusePolicy", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("AllowPartialHourExcuses")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("AllowSelfServiceRequests")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<long?>("BranchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<decimal>("MaxHoursPerExcuse")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)")
+                        .HasDefaultValue(2.0m);
+
+                    b.Property<decimal>("MaxPersonalExcuseHoursPerDay")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)")
+                        .HasDefaultValue(4.0m);
+
+                    b.Property<decimal>("MaxPersonalExcuseHoursPerMonth")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)")
+                        .HasDefaultValue(8.0m);
+
+                    b.Property<int>("MaxPersonalExcusesPerMonth")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(5);
+
+                    b.Property<int>("MaxRetroactiveDays")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(7);
+
+                    b.Property<decimal>("MinimumExcuseDuration")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)")
+                        .HasDefaultValue(0.5m);
+
+                    b.Property<DateTime>("ModifiedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("RequiresApproval")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("IX_ExcusePolicies_BranchId");
+
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("IX_ExcusePolicies_IsActive");
+
+                    b.HasIndex("BranchId", "IsActive")
+                        .HasDatabaseName("IX_ExcusePolicies_BranchId_IsActive");
+
+                    b.ToTable("ExcusePolicies", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_ExcusePolicies_DailyVsMonthlyLimits", "[MaxPersonalExcuseHoursPerDay] <= [MaxPersonalExcuseHoursPerMonth]");
+
+                            t.HasCheckConstraint("CK_ExcusePolicies_MaxHoursPerExcuse", "[MaxHoursPerExcuse] > 0");
+
+                            t.HasCheckConstraint("CK_ExcusePolicies_MaxPersonalExcuseHoursPerDay", "[MaxPersonalExcuseHoursPerDay] > 0");
+
+                            t.HasCheckConstraint("CK_ExcusePolicies_MaxPersonalExcuseHoursPerMonth", "[MaxPersonalExcuseHoursPerMonth] > 0");
+
+                            t.HasCheckConstraint("CK_ExcusePolicies_MaxPersonalExcusesPerMonth", "[MaxPersonalExcusesPerMonth] > 0");
+
+                            t.HasCheckConstraint("CK_ExcusePolicies_MaxRetroactiveDays", "[MaxRetroactiveDays] >= 0");
+
+                            t.HasCheckConstraint("CK_ExcusePolicies_MinimumExcuseDuration", "[MinimumExcuseDuration] > 0");
+
+                            t.HasCheckConstraint("CK_ExcusePolicies_MinimumVsMaximumDuration", "[MinimumExcuseDuration] <= [MaxHoursPerExcuse]");
+
+                            t.HasCheckConstraint("CK_ExcusePolicies_SingleVsDailyLimits", "[MaxHoursPerExcuse] <= [MaxPersonalExcuseHoursPerDay]");
+                        });
+                });
+
             modelBuilder.Entity("TimeAttendanceSystem.Domain.Settings.OffDay", b =>
                 {
                     b.Property<long>("Id")
@@ -2253,6 +2519,114 @@ namespace TimeAttendanceSystem.Infrastructure.Migrations
                     b.ToTable("VacationTypes", (string)null);
                 });
 
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Vacations.EmployeeVacation", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint")
+                        .HasComment("Employee identifier for vacation assignment");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2")
+                        .HasComment("End date of vacation period");
+
+                    b.Property<bool>("IsApproved")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true)
+                        .HasComment("Whether vacation is approved and affects attendance");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("datetime2")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(1000)")
+                        .HasComment("Optional notes about the vacation");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion")
+                        .HasComment("Concurrency control timestamp");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2")
+                        .HasComment("Start date of vacation period");
+
+                    b.Property<int>("TotalDays")
+                        .HasColumnType("int")
+                        .HasComment("Total number of vacation days");
+
+                    b.Property<long>("VacationTypeId")
+                        .HasColumnType("bigint")
+                        .HasComment("Vacation type identifier for categorization");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_EmployeeVacations_EmployeeId")
+                        .HasFilter("IsDeleted = 0");
+
+                    b.HasIndex("IsApproved")
+                        .HasDatabaseName("IX_EmployeeVacations_IsApproved")
+                        .HasFilter("IsDeleted = 0");
+
+                    b.HasIndex("VacationTypeId")
+                        .HasDatabaseName("IX_EmployeeVacations_VacationTypeId")
+                        .HasFilter("IsDeleted = 0");
+
+                    b.HasIndex("EmployeeId", "EndDate")
+                        .HasDatabaseName("IX_EmployeeVacations_Employee_EndDate")
+                        .HasFilter("IsDeleted = 0");
+
+                    b.HasIndex("EmployeeId", "StartDate")
+                        .HasDatabaseName("IX_EmployeeVacations_Employee_StartDate")
+                        .HasFilter("IsDeleted = 0");
+
+                    b.HasIndex("StartDate", "EndDate")
+                        .HasDatabaseName("IX_EmployeeVacations_DateRange")
+                        .HasFilter("IsDeleted = 0 AND IsApproved = 1");
+
+                    b.ToTable("EmployeeVacations", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_EmployeeVacations_PositiveTotalDays", "TotalDays > 0");
+
+                            t.HasCheckConstraint("CK_EmployeeVacations_ValidDateRange", "EndDate >= StartDate");
+                        });
+                });
+
             modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.AttendanceRecord", b =>
                 {
                     b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
@@ -2376,6 +2750,34 @@ namespace TimeAttendanceSystem.Infrastructure.Migrations
                     b.Navigation("Employee");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Excuses.EmployeeExcuse", b =>
+                {
+                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "ApprovedBy")
+                        .WithMany()
+                        .HasForeignKey("ApprovedById")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ApprovedBy");
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Excuses.ExcusePolicy", b =>
+                {
+                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Branch");
                 });
 
             modelBuilder.Entity("TimeAttendanceSystem.Domain.Settings.OffDay", b =>
@@ -2573,6 +2975,27 @@ namespace TimeAttendanceSystem.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Branch");
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Vacations.EmployeeVacation", b =>
+                {
+                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_EmployeeVacations_Employees");
+
+                    b.HasOne("TimeAttendanceSystem.Domain.VacationTypes.VacationType", "VacationType")
+                        .WithMany()
+                        .HasForeignKey("VacationTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_EmployeeVacations_VacationTypes");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("VacationType");
                 });
 
             modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.AttendanceRecord", b =>

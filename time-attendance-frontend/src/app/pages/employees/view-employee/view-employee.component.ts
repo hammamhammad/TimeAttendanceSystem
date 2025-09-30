@@ -11,11 +11,17 @@ import { AttendanceRecord, AttendanceStatistics, AttendanceStatus, AttendanceTra
 import { PermissionService } from '../../../core/auth/permission.service';
 import { PermissionResources, PermissionActions } from '../../../shared/utils/permission.utils';
 import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
+import { FormHeaderComponent } from '../../../shared/components/form-header/form-header.component';
+import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
+import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
+import { DefinitionListComponent, DefinitionItem } from '../../../shared/components/definition-list/definition-list.component';
+import { StatsGridComponent, StatGridItem } from '../../../shared/components/stats-grid/stats-grid.component';
 
 @Component({
   selector: 'app-view-employee',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, HasPermissionDirective],
+  imports: [CommonModule, FormsModule, HasPermissionDirective, FormHeaderComponent, LoadingSpinnerComponent, StatusBadgeComponent, EmptyStateComponent, DefinitionListComponent, StatsGridComponent],
   templateUrl: './view-employee.component.html',
   styleUrls: ['./view-employee.component.css']
 })
@@ -246,11 +252,21 @@ export class ViewEmployeeComponent implements OnInit {
   /**
    * Get performance color based on attendance rate
    */
-  getPerformanceColor(rate: number): string {
+  getPerformanceColor(rate: number): 'success' | 'primary' | 'warning' | 'danger' | 'info' | 'secondary' {
     if (rate >= 95) return 'success';
     if (rate >= 90) return 'primary';
     if (rate >= 80) return 'warning';
     return 'danger';
+  }
+
+  /**
+   * Get performance label based on attendance rate
+   */
+  getPerformanceLabel(rate: number): string {
+    if (rate >= 95) return 'Excellent';
+    if (rate >= 90) return 'Good';
+    if (rate >= 80) return 'Average';
+    return 'Needs Improvement';
   }
 
   /**
@@ -324,13 +340,6 @@ export class ViewEmployeeComponent implements OnInit {
     return this.i18n.t(`attendance.status.${status.toString().toLowerCase()}`);
   }
 
-  onEdit() {
-    this.router.navigate(['/employees', this.employeeId, 'edit']);
-  }
-
-  onBack() {
-    this.router.navigate(['/employees']);
-  }
 
   formatDate(dateString: string): string {
     return new Date(dateString).toLocaleDateString();
@@ -351,4 +360,75 @@ export class ViewEmployeeComponent implements OnInit {
   t(key: string): string {
     return this.i18n.t(key);
   }
+
+  // Computed properties for definition lists
+  basicInfoItems = computed<DefinitionItem[]>(() => {
+    const employee = this.employee();
+    if (!employee) return [];
+
+    return [
+      { label: this.t('employees.employee_number'), value: employee.employeeNumber },
+      { label: this.t('employees.first_name'), value: employee.firstName },
+      { label: this.t('employees.last_name'), value: employee.lastName },
+      { label: this.t('employees.email'), value: employee.email || '-' },
+      { label: this.t('employees.phone'), value: employee.phone || '-' },
+      { label: this.t('employees.national_id'), value: employee.nationalId || '-' }
+    ];
+  });
+
+  employmentInfoItems = computed<DefinitionItem[]>(() => {
+    const employee = this.employee();
+    if (!employee) return [];
+
+    const items: DefinitionItem[] = [
+      { label: this.t('employees.job_title'), value: employee.jobTitle },
+      { label: this.t('employees.branch'), value: employee.branchName },
+      { label: this.t('employees.department'), value: employee.departmentName || '-' },
+      { label: this.t('employees.manager'), value: employee.managerName || '-' },
+      { label: this.t('employees.hire_date'), value: this.formatDate(employee.hireDate), type: 'date' as const }
+    ];
+
+    if (employee.dateOfBirth) {
+      items.push({
+        label: this.t('employees.date_of_birth'),
+        value: this.formatDate(employee.dateOfBirth),
+        type: 'date' as const
+      });
+    }
+
+    return items;
+  });
+
+  // Computed property for attendance stats grid
+  attendanceStats = computed<StatGridItem[]>(() => {
+    return [
+      {
+        label: this.t('attendance.statistics.total_working_days'),
+        value: this.totalWorkingDays(),
+        icon: 'fa-solid fa-calendar',
+        variant: 'primary' as const
+      },
+      {
+        label: this.t('attendance.stats.present_employees'),
+        value: this.presentDays(),
+        icon: 'fa-solid fa-user-check',
+        variant: 'success' as const,
+        subtitle: `${this.attendanceRate()}% ${this.t('attendance.statistics.attendance_rate_short')}`
+      },
+      {
+        label: this.t('attendance.stats.average_working_hours'),
+        value: `${this.averageWorkingHours()}h`,
+        icon: 'fa-solid fa-business-time',
+        variant: 'warning' as const,
+        subtitle: `${this.totalOvertimeHours()}h ${this.t('attendance.statistics.total_overtime')}`
+      },
+      {
+        label: this.t('attendance.stats.absent_employees'),
+        value: this.absentDays(),
+        icon: 'fa-solid fa-user-times',
+        variant: 'danger' as const,
+        subtitle: `${this.lateDays()} ${this.t('attendance.statistics.late_days')}`
+      }
+    ];
+  });
 }

@@ -5,11 +5,13 @@ import { UserDto } from '../../../shared/models/user.model';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { PermissionService } from '../../../core/auth/permission.service';
 import { PermissionResources, PermissionActions } from '../../../shared/utils/permission.utils';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
+import { BadgeListComponent } from '../../../shared/components/badge-list/badge-list.component';
 
 @Component({
   selector: 'app-user-table',
   standalone: true,
-  imports: [CommonModule, DataTableComponent],
+  imports: [CommonModule, DataTableComponent, StatusBadgeComponent, BadgeListComponent],
   template: `
     <app-data-table
       [data]="users"
@@ -54,33 +56,29 @@ import { PermissionResources, PermissionActions } from '../../../shared/utils/pe
 
           <!-- Roles -->
           <div *ngSwitchCase="'roles'">
-            <span *ngFor="let role of user.roles" class="badge bg-light text-dark border me-1">
-              {{ role }}
-            </span>
-            <span *ngIf="user.roles.length === 0" class="text-muted">No roles assigned</span>
+            <app-badge-list
+              [items]="getRoleBadges(user.roles)"
+              [emptyMessage]="'No roles assigned'">
+            </app-badge-list>
           </div>
 
           <!-- Status -->
-          <span *ngSwitchCase="'status'"
-                class="badge"
-                [class.bg-success]="user.isActive"
-                [class.bg-danger]="!user.isActive">
-            <i class="fas"
-               [class.fa-check-circle]="user.isActive"
-               [class.fa-times-circle]="!user.isActive"></i>
-            {{ user.isActive ? 'Active' : 'Inactive' }}
+          <span *ngSwitchCase="'status'">
+            <app-status-badge
+              [status]="user.isActive ? 'active' : 'inactive'"
+              [label]="user.isActive ? 'Active' : 'Inactive'"
+              [showIcon]="true">
+            </app-status-badge>
           </span>
 
           <!-- Lock status -->
           <span *ngSwitchCase="'lockStatus'">
-            <span *ngIf="isUserLocked(user.lockoutEndUtc)" class="badge bg-warning">
-              <i class="fas fa-lock"></i>
-              Locked
-            </span>
-            <span *ngIf="!isUserLocked(user.lockoutEndUtc)" class="text-success">
-              <i class="fas fa-unlock"></i>
-              Unlocked
-            </span>
+            <app-status-badge
+              [status]="isUserLocked(user.lockoutEndUtc) ? 'warning' : 'success'"
+              [label]="isUserLocked(user.lockoutEndUtc) ? 'Locked' : 'Unlocked'"
+              [icon]="isUserLocked(user.lockoutEndUtc) ? 'fa-lock' : 'fa-unlock'"
+              [showIcon]="true">
+            </app-status-badge>
           </span>
 
           <!-- Created date -->
@@ -230,6 +228,13 @@ export class UserTableComponent {
 
   isSystemAdmin(user: UserDto): boolean {
     return user.username.toLowerCase() === 'systemadmin';
+  }
+
+  getRoleBadges(roles: string[]): Array<{label: string, variant: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info'}> {
+    return roles.map(role => ({
+      label: role,
+      variant: 'secondary' as const
+    }));
   }
 
   canEditUser(user: UserDto): boolean {

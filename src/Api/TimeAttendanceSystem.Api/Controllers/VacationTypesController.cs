@@ -248,4 +248,34 @@ public class VacationTypesController : ControllerBase
 
         return NoContent();
     }
+
+    /// <summary>
+    /// Gets vacation types for dropdown selection.
+    /// Returns a simplified list of active vacation types for form dropdowns.
+    /// </summary>
+    /// <returns>List of vacation types with id and name for dropdown options</returns>
+    /// <response code="200">Vacation types retrieved successfully for dropdown</response>
+    /// <response code="401">User not authenticated or invalid authentication token</response>
+    /// <response code="403">User lacks permission to view vacation types</response>
+    [HttpGet("dropdown")]
+    [Authorize(Policy = "VacationTypeRead")]
+    public async Task<IActionResult> GetVacationTypesForDropdown()
+    {
+        var query = new GetVacationTypesQuery(1, 1000, null, null, true); // Get all active vacation types
+        var result = await _mediator.Send(query);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(new { error = result.Error });
+        }
+
+        // Transform to simple dropdown format
+        var dropdownData = result.Value.Items.Select(vt => new
+        {
+            id = vt.Id,
+            name = vt.Name
+        });
+
+        return Ok(dropdownData);
+    }
 }

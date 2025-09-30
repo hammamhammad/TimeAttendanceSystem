@@ -1,0 +1,53 @@
+.stats-grid {
+  margin-bottom: 1.5rem;
+}
+
+.stats-grid-item {
+  margin-bottom: 0;
+}
+
+/* Skeleton Loader Styles */
+.skeleton-loader {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-line {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+  margin-bottom: 0.75rem;
+}
+
+.skeleton-title {
+  height: 14px;
+  width: 60%;
+}
+
+.skeleton-value {
+  height: 32px;
+  width: 40%;
+}
+
+.skeleton-subtitle {
+  height: 12px;
+  width: 50%;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}

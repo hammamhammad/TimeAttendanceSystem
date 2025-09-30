@@ -8,12 +8,15 @@ import { NotificationService } from '../../../core/notifications/notification.se
 import { ConfirmationService } from '../../../core/confirmation/confirmation.service';
 import { PermissionService } from '../../../core/auth/permission.service';
 import { DataTableComponent, TableColumn, TableAction } from '../../../shared/components/data-table/data-table.component';
+import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+import { UnifiedFilterComponent } from '../../../shared/components/unified-filter/unified-filter.component';
 import { PublicHoliday, HolidayType, HolidayTemplate } from '../../../shared/models/public-holiday.model';
+import { ModalWrapperComponent } from '../../../shared/components/modal-wrapper/modal-wrapper.component';
 
 @Component({
   selector: 'app-public-holidays',
   standalone: true,
-  imports: [CommonModule, FormsModule, DataTableComponent],
+  imports: [CommonModule, FormsModule, DataTableComponent, PageHeaderComponent, UnifiedFilterComponent, ModalWrapperComponent],
   templateUrl: './public-holidays.component.html',
   styleUrls: ['./public-holidays.component.css']
 })
@@ -136,6 +139,13 @@ export class PublicHolidaysComponent implements OnInit {
 
   tableActions = computed<TableAction[]>(() => [
     {
+      key: 'view',
+      label: this.t('common.view'),
+      icon: 'fa-eye',
+      color: 'primary',
+      condition: () => this.permissionService.has(this.PERMISSIONS.HOLIDAY_READ)
+    },
+    {
       key: 'edit',
       label: this.t('common.edit'),
       icon: 'fa-edit',
@@ -255,6 +265,9 @@ export class PublicHolidaysComponent implements OnInit {
     const { action, item } = event;
 
     switch (action) {
+      case 'view':
+        this.onViewHoliday(item);
+        break;
       case 'edit':
         this.onEditHoliday(item);
         break;
@@ -325,13 +338,41 @@ export class PublicHolidaysComponent implements OnInit {
     );
   }
 
+  // Unified filter handlers
+  onSearchTermChange(searchTerm: string): void {
+    this.searchTerm.set(searchTerm);
+    this.onSearchChange();
+  }
+
+  onFiltersChange(filters: any): void {
+    if (filters.branchId !== undefined) {
+      this.selectedBranchId.set(filters.branchId ? parseInt(filters.branchId) : undefined);
+    }
+    if (filters.isActive !== undefined) {
+      this.selectedActiveStatus.set(filters.isActive === 'true' ? true : filters.isActive === 'false' ? false : undefined);
+    }
+    if (filters.year !== undefined) {
+      this.selectedYear.set(filters.year ? parseInt(filters.year) : new Date().getFullYear());
+    }
+    this.currentPage.set(1);
+    this.loadHolidays();
+  }
+
+  onRefreshData(): void {
+    this.onClearFilters();
+  }
+
   // Holiday CRUD operations
   onCreateHoliday(): void {
     this.router.navigate(['/settings/public-holidays/create']);
   }
 
+  onViewHoliday(holiday: PublicHoliday): void {
+    this.router.navigate(['/settings/public-holidays', holiday.id, 'view']);
+  }
+
   onEditHoliday(holiday: PublicHoliday): void {
-    this.router.navigate(['/settings/public-holidays/edit', holiday.id]);
+    this.router.navigate(['/settings/public-holidays', holiday.id, 'edit']);
   }
 
   async onDeleteHoliday(holiday: PublicHoliday): Promise<void> {

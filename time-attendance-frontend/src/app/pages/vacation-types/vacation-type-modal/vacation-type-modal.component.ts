@@ -10,6 +10,8 @@ import {
   UpdateVacationTypeRequest,
   VacationTypeDetailDto
 } from '../../../shared/models/vacation-type.model';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
+import { ModalWrapperComponent } from '../../../shared/components/modal-wrapper/modal-wrapper.component';
 
 interface Branch {
   id: number;
@@ -19,22 +21,16 @@ interface Branch {
 @Component({
   selector: 'app-vacation-type-modal',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, StatusBadgeComponent, ModalWrapperComponent],
   template: `
-    <!-- Modal -->
-    <div class="modal fade" [class.show]="isOpen()" [style.display]="isOpen() ? 'block' : 'none'"
-         tabindex="-1" role="dialog" aria-labelledby="vacationTypeModalLabel" aria-hidden="true"
-         [class.d-block]="isOpen()">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="vacationTypeModalLabel">
-              {{ isView ? i18n.t('vacation_types.view_details') : (isEdit ? i18n.t('vacation_types.edit_vacation_type') : i18n.t('vacation_types.create_vacation_type')) }}
-            </h5>
-            <button type="button" class="btn-close" (click)="onCancel()" [disabled]="loading()"></button>
-          </div>
+    <app-modal-wrapper
+      [show]="isOpen()"
+      [title]="isView ? i18n.t('vacation_types.view_details') : (isEdit ? i18n.t('vacation_types.edit_vacation_type') : i18n.t('vacation_types.create_vacation_type'))"
+      [centered]="true"
+      [loading]="loading()"
+      (close)="onCancel()">
 
-          <div class="modal-body">
+      <div class="modal-body">
             @if (isView) {
               <!-- View Mode - Read-only display -->
               <div class="vacation-type-details">
@@ -61,12 +57,11 @@ interface Branch {
                   <div class="col-md-6 mb-3">
                     <label class="form-label fw-bold">{{ i18n.t('vacation_types.column_status') }}</label>
                     <p class="form-control-plaintext">
-                      <span
-                        class="badge"
-                        [class]="vacationType?.isActive ? 'bg-success' : 'bg-secondary'"
-                      >
-                        {{ vacationType?.isActive ? i18n.t('common.active') : i18n.t('common.inactive') }}
-                      </span>
+                      <app-status-badge
+                        [status]="vacationType?.isActive ? 'active' : 'inactive'"
+                        [label]="vacationType?.isActive ? i18n.t('common.active') : i18n.t('common.inactive')"
+                        [showIcon]="true">
+                      </app-status-badge>
                     </p>
                   </div>
 
@@ -140,58 +135,45 @@ interface Branch {
                 </div>
               </form>
             }
-          </div>
-
-          <div class="modal-footer">
-            @if (isView) {
-              <!-- View Mode - Only Close button -->
-              <button
-                type="button"
-                class="btn btn-secondary"
-                (click)="onCancel()"
-              >
-                {{ i18n.t('common.close') }}
-              </button>
-            } @else {
-              <!-- Edit/Create Mode - Cancel and Save buttons -->
-              <button
-                type="button"
-                class="btn btn-secondary"
-                (click)="onCancel()"
-                [disabled]="loading()"
-              >
-                {{ i18n.t('common.cancel') }}
-              </button>
-
-              <button
-                type="button"
-                class="btn btn-primary"
-                (click)="onSubmit()"
-                [disabled]="!isFormValid() || loading()"
-              >
-                @if (loading()) {
-                  <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                }
-                {{ isEdit ? i18n.t('common.update') : i18n.t('common.create') }}
-              </button>
-            }
-          </div>
-        </div>
       </div>
-    </div>
 
-    <!-- Modal Backdrop -->
-    @if (isOpen()) {
-      <div class="modal-backdrop fade show" (click)="onCancel()"></div>
-    }
+      <div modal-footer class="d-flex gap-2 justify-content-end">
+        @if (isView) {
+          <!-- View Mode - Only Close button -->
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="onCancel()"
+          >
+            {{ i18n.t('common.close') }}
+          </button>
+        } @else {
+          <!-- Edit/Create Mode - Cancel and Save buttons -->
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="onCancel()"
+            [disabled]="loading()"
+          >
+            {{ i18n.t('common.cancel') }}
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="onSubmit()"
+            [disabled]="!isFormValid() || loading()"
+          >
+            @if (loading()) {
+              <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+            }
+            {{ isEdit ? i18n.t('common.update') : i18n.t('common.create') }}
+          </button>
+        }
+      </div>
+    </app-modal-wrapper>
   `,
   styles: [`
-    .modal {
-      z-index: 1055;
-    }
-    .modal-backdrop {
-      z-index: 1050;
-    }
     .required::after {
       content: ' *';
       color: red;

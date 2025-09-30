@@ -4,11 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { SearchableSelectComponent, SearchableSelectOption } from '../../../shared/components/searchable-select/searchable-select.component';
+import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+import { UnifiedFilterComponent } from '../../../shared/components/unified-filter/unified-filter.component';
 import { ShiftAssignmentService } from '../../../core/services/shift-assignment.service';
 import { ShiftsService } from '../shifts.service';
 import { BranchesService } from '../../branches/branches.service';
 import { EmployeesService } from '../../employees/employees.service';
 import { DepartmentsService } from '../../departments/departments.service';
+import { ModalWrapperComponent } from '../../../shared/components/modal-wrapper/modal-wrapper.component';
 import {
   ShiftAssignment,
   ShiftAssignmentType,
@@ -30,7 +33,7 @@ import { HasPermissionDirective } from '../../../shared/directives/has-permissio
 @Component({
   selector: 'app-assign-shifts',
   standalone: true,
-  imports: [CommonModule, FormsModule, HasPermissionDirective, SearchableSelectComponent],
+  imports: [CommonModule, FormsModule, HasPermissionDirective, SearchableSelectComponent, PageHeaderComponent, UnifiedFilterComponent, ModalWrapperComponent],
   templateUrl: './assign-shifts.component.html',
   styleUrls: ['./assign-shifts.component.css']
 })
@@ -211,6 +214,13 @@ export class AssignShiftsComponent implements OnInit {
     this.loadAssignments();
   }
 
+  // Unified filter handlers
+  onSearchTermChange(searchTerm: string): void {
+    this.searchTerm.set(searchTerm);
+    this.currentPage.set(1);
+    this.loadAssignments();
+  }
+
   // Filter methods
   onSearchChanged(): void {
     this.currentPage.set(1);
@@ -222,6 +232,32 @@ export class AssignShiftsComponent implements OnInit {
     this.loadAssignments();
   }
 
+  onFiltersChange(filters: any): void {
+    if (filters.branchId !== undefined) {
+      const branchId = filters.branchId ? parseInt(filters.branchId) : null;
+      this.selectedBranchId.set(branchId);
+      this.onBranchFilterChanged(branchId);
+    }
+    if (filters.departmentId !== undefined) {
+      const departmentId = filters.departmentId ? parseInt(filters.departmentId) : null;
+      this.selectedDepartmentId.set(departmentId);
+    }
+    if (filters.shiftId !== undefined) {
+      const shiftId = filters.shiftId ? parseInt(filters.shiftId) : null;
+      this.selectedShiftId.set(shiftId);
+    }
+    if (filters.assignmentType !== undefined) {
+      const assignmentType = filters.assignmentType ? parseInt(filters.assignmentType) : null;
+      this.selectedAssignmentType.set(assignmentType);
+    }
+    if (filters.status !== undefined) {
+      const status = filters.status ? parseInt(filters.status) : null;
+      this.selectedStatus.set(status);
+    }
+    this.currentPage.set(1);
+    this.loadAssignments();
+  }
+
   onBranchFilterChanged(branchId: number | null): void {
     this.selectedBranchId.set(branchId);
     this.onFilterChanged();
@@ -229,6 +265,11 @@ export class AssignShiftsComponent implements OnInit {
     // Also update the dropdowns for create form based on selected filter branch
     this.loadEmployees(branchId || undefined);
     this.loadDepartments(branchId || undefined);
+  }
+
+  onRefreshData(): void {
+    this.clearFilters();
+    this.loadAssignments();
   }
 
   clearFilters(): void {

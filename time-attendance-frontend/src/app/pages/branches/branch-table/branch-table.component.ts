@@ -5,11 +5,12 @@ import { Branch } from '../../../shared/models/branch.model';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { PermissionService } from '../../../core/auth/permission.service';
 import { PermissionResources, PermissionActions } from '../../../shared/utils/permission.utils';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 
 @Component({
   selector: 'app-branch-table',
   standalone: true,
-  imports: [CommonModule, DataTableComponent],
+  imports: [CommonModule, DataTableComponent, StatusBadgeComponent],
   template: `
     <app-data-table
       [data]="branches"
@@ -49,19 +50,20 @@ import { PermissionResources, PermissionActions } from '../../../shared/utils/pe
           </div>
 
           <!-- Status -->
-          <span *ngSwitchCase="'status'"
-                class="badge"
-                [class.bg-success]="branch.isActive"
-                [class.bg-danger]="!branch.isActive">
-            <i class="fas"
-               [class.fa-check-circle]="branch.isActive"
-               [class.fa-times-circle]="!branch.isActive"></i>
-            {{ branch.isActive ? 'Active' : 'Inactive' }}
+          <span *ngSwitchCase="'status'">
+            <app-status-badge
+              [status]="branch.isActive ? 'active' : 'inactive'"
+              [label]="branch.isActive ? 'Active' : 'Inactive'"
+              [showIcon]="true">
+            </app-status-badge>
           </span>
 
           <!-- Employee count -->
           <span *ngSwitchCase="'employeeCount'">
-            <span class="badge bg-primary">{{ branch.employeeCount || 0 }}</span>
+            <app-status-badge
+              [status]="'primary'"
+              [label]="(branch.employeeCount || 0).toString()">
+            </app-status-badge>
           </span>
 
           <!-- Created date -->

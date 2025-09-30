@@ -1,29 +1,12 @@
 <div class="container-fluid">
   <!-- Header Section -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h2 class="mb-1">{{ t('settings.overtime.createPolicy') }}</h2>
-      <p class="text-muted mb-0">{{ t('settings.overtime.createPolicySubtitle') }}</p>
-    </div>
-    <div>
-      <button
-        type="button"
-        class="btn btn-outline-secondary me-2"
-        (click)="onCancel()"
-        [disabled]="submitting()">
-        <i class="fa-solid fa-times me-2"></i>
-        {{ t('common.cancel') }}
-      </button>
-      <button
-        type="button"
-        class="btn btn-secondary"
-        (click)="onReset()"
-        [disabled]="submitting()">
-        <i class="fa-solid fa-refresh me-2"></i>
-        {{ t('common.reset') }}
-      </button>
-    </div>
-  </div>
+  <app-form-header
+    mode="create"
+    [title]="t('settings.overtime.createPolicy')"
+    moduleName="settings"
+    moduleRoute="settings/overtime"
+    [loading]="submitting()">
+  </app-form-header>
 
   <!-- Error Alert -->
   @if (error()) {

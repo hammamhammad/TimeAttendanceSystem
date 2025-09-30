@@ -1,172 +1,74 @@
-<div class="vacation-types-page">
+<div class="app-list-page">
   <!-- Page Header -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h2 class="mb-1">{{ i18n.t('vacation_types.title') }}</h2>
-      <p class="text-muted mb-0">{{ i18n.t('vacation_types.subtitle') }}</p>
-    </div>
-    @if (permissionService.has(PERMISSIONS.VACATION_TYPE_CREATE)) {
-      <button
-        type="button"
-        class="btn btn-primary"
-        (click)="onCreateVacationType()">
-        <i class="fas fa-plus me-2"></i>
-        {{ i18n.t('vacation_types.create_vacation_type') }}
-      </button>
-    }
-  </div>
+  <app-page-header
+    [title]="i18n.t('vacation_types.title')">
+  </app-page-header>
 
-  <!-- Filters -->
-  <div class="card mb-4">
-    <div class="card-body">
-      <div class="row">
-        <!-- Search -->
-        <div class="col-md-3 mb-3">
-          <label class="form-label">{{ i18n.t('common.search') }}</label>
-          <div class="input-group">
-            <span class="input-group-text">
-              <i class="fas fa-search"></i>
-            </span>
-            <input
-              type="text"
-              class="form-control"
-              [placeholder]="i18n.t('vacation_types.search_placeholder')"
-              [value]="searchTerm()"
-              (input)="onSearchChange($any($event.target).value)"
-            />
-          </div>
-        </div>
+  <!-- Unified Filter Component -->
+  <app-unified-filter
+    moduleName="vacation-types"
+    [refreshing]="loading()"
+    (searchChange)="onSearchTermChange($event)"
+    (filtersChange)="onFiltersChange($event)"
+    (add)="onCreateVacationType()"
+    (refresh)="onRefreshData()">
+  </app-unified-filter>
 
-        <!-- Branch Filter -->
-        <div class="col-md-2 mb-3">
-          <label class="form-label">{{ i18n.t('vacation_types.branch') }}</label>
-          <select
-            class="form-select"
-            [value]="selectedBranchId() ?? ''"
-            (change)="onBranchChange($any($event.target).value ? +$any($event.target).value : null)"
-          >
-            <option value="">{{ i18n.t('common.all') }}</option>
-            @for (branch of availableBranches(); track branch.id) {
-              <option [value]="branch.id">{{ branch.name }}</option>
-            }
-          </select>
-        </div>
-
-        <!-- Status Filter -->
-        <div class="col-md-2 mb-3">
-          <label class="form-label">{{ i18n.t('common.status') }}</label>
-          <select
-            class="form-select"
-            [value]="selectedStatus() ?? ''"
-            (change)="onStatusChange($any($event.target).value === '' ? null : $any($event.target).value === 'true')"
-          >
-            <option value="">{{ i18n.t('common.all') }}</option>
-            <option value="true">{{ i18n.t('common.active') }}</option>
-            <option value="false">{{ i18n.t('common.inactive') }}</option>
-          </select>
-        </div>
-
-        <!-- Clear Filters -->
-        <div class="col-md-1 mb-3 d-flex align-items-end">
-          <button
-            type="button"
-            class="btn btn-outline-secondary"
-            (click)="onClearFilters()"
-            [title]="i18n.t('common.clear_filters')"
-          >
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Results Summary -->
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <div>
-      <span class="text-muted">
-        {{ i18n.t('common.showing_results') }}
-      </span>
-    </div>
-
-    <!-- Page Size Selector -->
-    <div class="d-flex align-items-center">
-      <label class="form-label me-2 mb-0">{{ i18n.t('common.items_per_page') }}:</label>
-      <select
-        class="form-select form-select-sm"
-        style="width: auto;"
-        [value]="pageSize()"
-        (change)="onPageSizeChange(+$any($event.target).value)"
-      >
-        <option value="10">10</option>
-        <option value="25">25</option>
-        <option value="50">50</option>
-        <option value="100">100</option>
-      </select>
-    </div>
-  </div>
-
-  <!-- Error Message -->
+  <!-- Error Message using ErrorAlertComponent -->
   @if (error(); as errorMessage) {
-    <div class="alert alert-danger" role="alert">
-      <i class="fas fa-exclamation-triangle me-2"></i>
-      {{ errorMessage }}
-      <button
-        type="button"
-        class="btn btn-sm btn-outline-danger ms-3"
-        (click)="loadVacationTypes()"
-      >
-        {{ i18n.t('common.retry') }}
-      </button>
-    </div>
+    <app-error-alert
+      [message]="errorMessage"
+      [showRetry]="true"
+      [retryText]="i18n.t('common.retry')"
+      (retry)="loadVacationTypes()">
+    </app-error-alert>
   }
 
-  <!-- Vacation Types Table using DataTableComponent -->
-  <div class="card">
-    <div class="card-body p-0">
-      <app-data-table
-        [data]="vacationTypes()"
-        [columns]="tableColumns"
-        [actions]="tableActions"
-        [loading]="loading"
-        [currentPage]="currentPage"
-        [totalPages]="totalPages"
-        [totalItems]="totalItems"
-        [pageSize]="pageSize"
-        [showPagination]="true"
-        [emptyMessage]="i18n.t('vacation_types.no_vacation_types')"
-        [emptyTitle]="i18n.t('vacation_types.no_vacation_types_message')"
-        (actionClick)="onTableAction($event)"
-        (pageChange)="onPageChange($event)"
-        (pageSizeChange)="onPageSizeChange($event)"
-      >
-        <!-- Custom cell template for vacation type name -->
-        <ng-template #cellTemplate let-item let-column="column">
-          @if (column.key === 'name') {
-            <div>
-              <div class="fw-medium">{{ item.name }}</div>
-              @if (item.nameAr) {
-                <div class="text-muted small">{{ item.nameAr }}</div>
-              }
-            </div>
-          } @else if (column.key === 'branchName') {
-            {{ item.branchName || i18n.t('common.not_specified') }}
-          } @else if (column.key === 'isActive') {
-            <span
-              class="badge"
-              [class]="item.isActive ? 'bg-success' : 'bg-secondary'"
-            >
-              {{ getStatusText(item.isActive) }}
-            </span>
-          } @else if (column.key === 'createdAtUtc') {
-            {{ item.createdAtUtc | date:'short' }}
-          } @else {
-            {{ item[column.key] }}
-          }
-        </ng-template>
-      </app-data-table>
-    </div>
-  </div>
+  <!-- Vacation Types Table using SectionCardComponent -->
+  <app-section-card
+    [title]="i18n.t('vacation_types.title')"
+    [showHeader]="false"
+    [bodyClass]="'p-0'">
+    <app-data-table
+      [data]="vacationTypes()"
+      [columns]="tableColumns"
+      [actions]="tableActions"
+      [loading]="loading"
+      [currentPage]="currentPage"
+      [totalPages]="totalPages"
+      [totalItems]="totalItems"
+      [pageSize]="pageSize"
+      [showPagination]="true"
+      [emptyMessage]="i18n.t('vacation_types.no_vacation_types')"
+      [emptyTitle]="i18n.t('vacation_types.no_vacation_types_message')"
+      (actionClick)="onTableAction($event)"
+      (pageChange)="onPageChange($event)"
+      (pageSizeChange)="onPageSizeChange($event)"
+    >
+      <!-- Custom cell template for vacation type name -->
+      <ng-template #cellTemplate let-item let-column="column">
+        @if (column.key === 'name') {
+          <div>
+            <div class="fw-medium">{{ item.name }}</div>
+            @if (item.nameAr) {
+              <div class="text-muted small">{{ item.nameAr }}</div>
+            }
+          </div>
+        } @else if (column.key === 'branchName') {
+          {{ item.branchName || i18n.t('common.not_specified') }}
+        } @else if (column.key === 'isActive') {
+          <app-status-badge
+            [status]="item.isActive ? 'active' : 'inactive'"
+            [label]="getStatusText(item.isActive)">
+          </app-status-badge>
+        } @else if (column.key === 'createdAtUtc') {
+          {{ item.createdAtUtc | date:'short' }}
+        } @else {
+          {{ item[column.key] }}
+        }
+      </ng-template>
+    </app-data-table>
+  </app-section-card>
 
   <!-- Vacation Type Modal -->
   <app-vacation-type-modal

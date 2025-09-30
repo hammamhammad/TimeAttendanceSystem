@@ -7,6 +7,8 @@ using TimeAttendanceSystem.Domain.Shifts;
 using TimeAttendanceSystem.Domain.Attendance;
 using TimeAttendanceSystem.Domain.Settings;
 using TimeAttendanceSystem.Domain.VacationTypes;
+using TimeAttendanceSystem.Domain.Vacations;
+using TimeAttendanceSystem.Domain.Excuses;
 
 namespace TimeAttendanceSystem.Application.Abstractions;
 
@@ -429,6 +431,53 @@ public interface IApplicationDbContext
     /// - Bilingual support for English and Arabic organizational environments
     /// </remarks>
     DbSet<VacationType> VacationTypes { get; }
+
+    /// <summary>
+    /// Gets the database set for EmployeeVacation entities representing employee vacation periods.
+    /// Enables tracking of approved vacation periods and integration with attendance calculations.
+    /// </summary>
+    /// <value>DbSet for querying and managing EmployeeVacation entities</value>
+    /// <remarks>
+    /// EmployeeVacation Entity Features:
+    /// - Simple vacation period tracking with start/end dates
+    /// - Integration with VacationTypes for categorization
+    /// - Approved status control for attendance integration
+    /// - Historical vacation records support (past dates allowed)
+    /// - Conflict detection to prevent overlapping vacations
+    /// - Business days calculation excluding weekends
+    /// </remarks>
+    DbSet<EmployeeVacation> EmployeeVacations { get; }
+
+    /// <summary>
+    /// Gets the database set for ExcusePolicy entities representing organizational excuse management policies.
+    /// Enables comprehensive policy configuration for personal excuses while exempting official duties.
+    /// </summary>
+    /// <value>DbSet for querying and managing ExcusePolicy entities</value>
+    /// <remarks>
+    /// ExcusePolicy Entity Features:
+    /// - Branch-scoped or organization-wide policy configuration
+    /// - Comprehensive limits for personal excuse usage
+    /// - Flexible configuration for partial hour excuses
+    /// - Active/inactive status for policy lifecycle management
+    /// - Role-based security through permission system
+    /// </remarks>
+    DbSet<ExcusePolicy> ExcusePolicies { get; }
+
+    /// <summary>
+    /// Gets the database set for EmployeeExcuse entities representing employee excuse requests.
+    /// Supports both personal excuses (subject to policy limits) and official duties (exempt from limits).
+    /// </summary>
+    /// <value>DbSet for querying and managing EmployeeExcuse entities</value>
+    /// <remarks>
+    /// EmployeeExcuse Entity Features:
+    /// - Comprehensive excuse request management with approval workflow
+    /// - Integration with attendance calculations and working hour adjustments
+    /// - Support for both personal excuses and official duties
+    /// - File attachment support for documentation requirements
+    /// - Audit trail for approval decisions and status changes
+    /// - Automatic duration calculation from start/end times
+    /// </remarks>
+    DbSet<EmployeeExcuse> EmployeeExcuses { get; }
 
     /// <summary>
     /// Asynchronously saves all pending changes to the database.

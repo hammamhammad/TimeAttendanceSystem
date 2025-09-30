@@ -1,9 +1,12 @@
 <div class="container-fluid p-4">
   <!-- Page Header -->
+  <app-page-header
+    [title]="i18nService.t('attendance.monthly_report')">
+  </app-page-header>
+
   <div class="row mb-4">
     <div class="col-12">
-      <div class="d-flex justify-content-between align-items-center">
-        <h2 class="mb-0">{{ i18nService.t('attendance.monthly_report') }}</h2>
+      <div class="d-flex justify-content-end align-items-center">
         <div>
           <button
             type="button"
@@ -151,7 +154,11 @@
                     <i class="fa-solid fa-chart-pie text-primary me-2"></i>
                     {{ i18nService.t('attendance.charts.monthly_overview') }}
                   </h5>
-                  <span class="badge bg-primary">{{ getMonthName(currentFilters().month) }}</span>
+                  <app-status-badge
+                    [label]="getMonthName(currentFilters().month)"
+                    [variant]="'primary'"
+                    [showIcon]="false">
+                  </app-status-badge>
                 </div>
                 <div class="card-body">
                   <p class="text-muted small mb-3">
@@ -176,7 +183,11 @@
                     <i class="fa-solid fa-chart-line text-info me-2"></i>
                     {{ i18nService.t('attendance.charts.overtime_trend') }}
                   </h5>
-                  <span class="badge bg-info">{{ i18nService.t('attendance.dashboard.daily') }}</span>
+                  <app-status-badge
+                    [label]="i18nService.t('attendance.dashboard.daily')"
+                    [variant]="'info'"
+                    [showIcon]="false">
+                  </app-status-badge>
                 </div>
                 <div class="card-body">
                   <p class="text-muted small mb-3">
@@ -205,7 +216,11 @@
                 <i class="fa-solid fa-table me-2"></i>
                 {{ i18nService.t('attendance.employee_records') }}
               </h5>
-              <span class="badge bg-light text-dark">{{ reportData().length }} {{ i18nService.t('attendance.employees') }}</span>
+              <app-status-badge
+                [label]="reportData().length + ' ' + i18nService.t('attendance.employees')"
+                [variant]="'light'"
+                [showIcon]="false">
+              </app-status-badge>
             </div>
           </div>
           <div class="card-body p-0">

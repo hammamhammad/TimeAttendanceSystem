@@ -9,11 +9,13 @@ import { ConfirmationService } from '../../../core/confirmation/confirmation.ser
 import { PermissionService } from '../../../core/auth/permission.service';
 import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
 import { DataTableComponent, TableColumn, TableAction } from '../../../shared/components/data-table/data-table.component';
+import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+import { UnifiedFilterComponent } from '../../../shared/components/unified-filter/unified-filter.component';
 
 @Component({
   selector: 'app-overtime-configurations',
   standalone: true,
-  imports: [CommonModule, FormsModule, DataTableComponent],
+  imports: [CommonModule, FormsModule, DataTableComponent, PageHeaderComponent, UnifiedFilterComponent],
   templateUrl: './overtime-configurations.component.html',
   styleUrls: ['./overtime-configurations.component.css']
 })
@@ -27,11 +29,11 @@ export class OvertimeConfigurationsComponent implements OnInit {
 
   // Permission constants for use in template
   readonly PERMISSIONS = {
-    OVERTIME_CREATE: 'settings.overtime.create',
-    OVERTIME_READ: 'settings.overtime.read',
-    OVERTIME_UPDATE: 'settings.overtime.update',
-    OVERTIME_DELETE: 'settings.overtime.delete',
-    OVERTIME_ACTIVATE: 'settings.overtime.activate'
+    OVERTIME_CREATE: 'settings.create',
+    OVERTIME_READ: 'settings.read',
+    OVERTIME_UPDATE: 'settings.update',
+    OVERTIME_DELETE: 'settings.delete',
+    OVERTIME_ACTIVATE: 'settings.configure'
   };
 
   // Signals for state management
@@ -106,6 +108,13 @@ export class OvertimeConfigurationsComponent implements OnInit {
   ]);
 
   tableActions = computed<TableAction[]>(() => [
+    {
+      key: 'view',
+      label: this.t('common.view'),
+      icon: 'fa-eye',
+      color: 'primary',
+      condition: () => this.permissionService.has(this.PERMISSIONS.OVERTIME_READ)
+    },
     {
       key: 'activate',
       label: this.t('settings.overtime.activate'),
@@ -250,6 +259,9 @@ export class OvertimeConfigurationsComponent implements OnInit {
     const { action, item } = event;
 
     switch (action) {
+      case 'view':
+        this.onViewConfiguration(item);
+        break;
       case 'activate':
         this.onActivateConfiguration(item);
         break;
@@ -282,9 +294,32 @@ export class OvertimeConfigurationsComponent implements OnInit {
     return !!this.searchTerm;
   }
 
+  // Unified filter handlers
+  onSearchTermChange(searchTerm: string): void {
+    this.searchTerm = searchTerm;
+  }
+
+  onFiltersChange(filters: any): void {
+    if (filters.branchId !== undefined) {
+      // Handle branch filter if needed
+    }
+    if (filters.isActive !== undefined) {
+      // Handle active status filter if needed
+    }
+  }
+
+  onRefreshData(): void {
+    this.onClearFilters();
+    this.loadConfigurations();
+  }
+
   // Configuration CRUD operations
   onCreateConfiguration(): void {
     this.router.navigate(['/settings/overtime/create']);
+  }
+
+  onViewConfiguration(config: OvertimeConfiguration): void {
+    this.router.navigate(['/settings/overtime', config.id, 'view']);
   }
 
   onEditConfiguration(config: OvertimeConfiguration): void {

@@ -1,0 +1,55 @@
+.alert {
+  margin-bottom: 1rem;
+}
+
+.alert-icon {
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.alert-heading {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.alert-message {
+  line-height: 1.5;
+}
+
+.alert-details {
+  margin-top: 0.75rem;
+}
+
+.alert-details-content {
+  max-height: 200px;
+  overflow-y: auto;
+  word-break: break-word;
+}
+
+.alert-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-close {
+  align-self: flex-start;
+}
+
+/* Make sure alert is accessible */
+.alert {
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+}
+
+.alert-danger {
+  color: #842029;
+  background-color: #f8d7da;
+  border-color: #f5c2c7;
+}
+
+.alert-warning {
+  color: #664d03;
+  background-color: #fff3cd;
+  border-color: #ffecb5;
+}

@@ -12,6 +12,8 @@ import { BranchesService } from '../../branches/branches.service';
 import { ShiftAssignmentService } from '../../../core/services/shift-assignment.service';
 import { SearchableSelectComponent, SearchableSelectOption } from '../../../shared/components/searchable-select/searchable-select.component';
 import { DataTableComponent, TableColumn, TableAction, SortEvent } from '../../../shared/components/data-table/data-table.component';
+import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import {
   AttendanceRecord,
   AttendanceTransaction,
@@ -20,12 +22,11 @@ import {
 } from '../../../shared/models/attendance.model';
 import { EmployeeSelectOption, DepartmentDto, EmployeeDto } from '../../../shared/models/employee.model';
 import { Branch } from '../../../shared/models/branch.model';
-import { ChangeAttendanceShiftModalComponent } from '../change-attendance-shift-modal/change-attendance-shift-modal.component';
 
 @Component({
   selector: 'app-daily-attendance',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, SearchableSelectComponent, DataTableComponent, ChangeAttendanceShiftModalComponent],
+  imports: [CommonModule, FormsModule, RouterModule, SearchableSelectComponent, DataTableComponent, PageHeaderComponent, LoadingSpinnerComponent],
   templateUrl: './daily-attendance.component.html',
   styleUrls: ['./daily-attendance.component.css']
 })
@@ -66,12 +67,6 @@ export class DailyAttendanceComponent implements OnInit, OnDestroy {
   loadingDepartments = signal(false);
   loadingBranches = signal(false);
 
-  // Shift change modal signals
-  showChangeShiftModal = signal(false);
-  selectedAttendanceRecord = signal<AttendanceRecord | null>(null);
-
-  // ViewChild reference to the modal component for proper error handling
-  @ViewChild(ChangeAttendanceShiftModalComponent) changeShiftModalComponent?: ChangeAttendanceShiftModalComponent;
 
   // Computed values
   filteredRecords = computed(() => {
@@ -908,7 +903,7 @@ export class DailyAttendanceComponent implements OnInit, OnDestroy {
         this.editAttendanceRecord(item);
         break;
       case 'change-shift':
-        this.openChangeShiftModal(item);
+        this.router.navigate(['/attendance', item.id, 'change-shift']);
         break;
       case 'recalculate':
         this.recalculateEmployeeAttendance(item.employeeId);
@@ -1277,104 +1272,5 @@ export class DailyAttendanceComponent implements OnInit, OnDestroy {
     return '';
   }
 
-  // ====================================================================
-  // SHIFT CHANGE FUNCTIONALITY
-  // ====================================================================
-
-  /**
-   * Open shift change modal for an attendance record
-   */
-  openChangeShiftModal(attendanceRecord: AttendanceRecord): void {
-    this.selectedAttendanceRecord.set(attendanceRecord);
-    this.showChangeShiftModal.set(true);
-  }
-
-  /**
-   * Close shift change modal
-   */
-  closeChangeShiftModal(): void {
-    this.showChangeShiftModal.set(false);
-    this.selectedAttendanceRecord.set(null);
-  }
-
-  /**
-   * Handle shift change for an attendance record
-   */
-  onAttendanceShiftChanged(event: {attendanceRecord: AttendanceRecord, shiftId: number, notes?: string}): void {
-    // Call the attendance shift change API
-    this.attendanceService.changeAttendanceShift(
-      event.attendanceRecord.id,
-      event.shiftId,
-      event.notes || 'Shift changed from Daily Attendance'
-    ).subscribe({
-      next: (updatedRecord) => {
-        this.notificationService.success(
-          `Shift has been successfully changed for ${event.attendanceRecord.employeeName}. Attendance has been recalculated.`
-        );
-
-        // Update the record in the current list
-        const records = this.attendanceRecords();
-        const index = records.findIndex(r => r.id === event.attendanceRecord.id);
-        if (index !== -1) {
-          const updatedRecords = [...records];
-          updatedRecords[index] = updatedRecord;
-          this.attendanceRecords.set(updatedRecords);
-        }
-
-        // Reset the modal state
-        this.closeChangeShiftModal();
-      },
-      error: (error) => {
-        console.error('Failed to change shift:', error);
-
-        // Extract meaningful error message from various error response formats
-        let errorMessage = 'An unexpected error occurred while changing shift';
-
-        if (error.error) {
-          if (typeof error.error === 'string') {
-            errorMessage = error.error;
-          } else if (error.error.message) {
-            errorMessage = error.error.message;
-          } else if (error.error.title) {
-            errorMessage = error.error.title;
-          } else if (error.error.errors) {
-            // Handle validation errors
-            const firstError = Object.values(error.error.errors)[0];
-            if (Array.isArray(firstError) && firstError.length > 0) {
-              errorMessage = firstError[0];
-            }
-          }
-        } else if (error.message) {
-          errorMessage = error.message;
-        } else if (error.status === 0) {
-          errorMessage = 'Unable to connect to the server. Please check your connection.';
-        } else if (error.status >= 500) {
-          errorMessage = 'A server error occurred. Please try again later.';
-        } else if (error.status === 404) {
-          errorMessage = 'The attendance record was not found.';
-        } else if (error.status === 403) {
-          errorMessage = 'You do not have permission to change shifts.';
-        } else if (error.status === 401) {
-          errorMessage = 'Your session has expired. Please log in again.';
-        }
-
-        // Show error message to user via the modal
-        const modalComponent = this.getModalComponent();
-        if (modalComponent) {
-          modalComponent.showError(errorMessage);
-        } else {
-          // Fallback to notification service
-          this.notificationService.error(errorMessage);
-        }
-      }
-    });
-  }
-
-  /**
-   * Get reference to the modal component for error handling
-   */
-  private getModalComponent(): ChangeAttendanceShiftModalComponent | undefined {
-    return this.changeShiftModalComponent;
-  }
 
 }

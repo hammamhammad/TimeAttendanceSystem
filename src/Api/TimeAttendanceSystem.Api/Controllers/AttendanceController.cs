@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using TimeAttendanceSystem.Api.Models;
 using TimeAttendanceSystem.Application.Abstractions;
 using TimeAttendanceSystem.Application.Attendance.Queries.GetMonthlyReport;
+using TimeAttendanceSystem.Application.Attendance.Queries.GetLeaveExcuseDetails;
 using TimeAttendanceSystem.Domain.Attendance;
 using TimeAttendanceSystem.Domain.Common;
 
@@ -1462,5 +1463,48 @@ public class AttendanceController : ControllerBase
         }
 
         return Ok(result.Value);
+    }
+
+    /// <summary>
+    /// Gets leave, excuse, and remote work details for a specific employee and date.
+    /// Used in the Daily Attendance Detail page to show comprehensive absence information.
+    /// </summary>
+    /// <param name="employeeId">The employee identifier</param>
+    /// <param name="date">The specific date to query leave/excuse details for</param>
+    /// <returns>Leave and excuse details for the specified employee and date</returns>
+    [HttpGet("employee/{employeeId}/leave-excuse-details")]
+    [Authorize(Policy = "AttendanceManagement")]
+    [ProducesResponseType(typeof(LeaveExcuseDetailsResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<LeaveExcuseDetailsResponse>> GetLeaveExcuseDetails(
+        long employeeId,
+        [FromQuery] DateTime date)
+    {
+        try
+        {
+            _logger.LogInformation("Getting leave/excuse details for employee {EmployeeId} on {Date}", employeeId, date.Date);
+
+            var query = new GetLeaveExcuseDetailsQuery(employeeId, date);
+            var result = await _mediator.Send(query);
+
+            if (!result.IsSuccess)
+            {
+                _logger.LogWarning("Failed to get leave/excuse details for employee {EmployeeId} on {Date}: {Error}",
+                    employeeId, date.Date, result.Error);
+                return BadRequest(result.Error);
+            }
+
+            _logger.LogInformation("Successfully retrieved leave/excuse details for employee {EmployeeId} on {Date}. " +
+                "Vacations: {VacationCount}, Excuses: {ExcuseCount}, RemoteWork: {RemoteWorkCount}",
+                employeeId, date.Date, result.Value.Vacations.Count, result.Value.Excuses.Count, result.Value.RemoteWork.Count);
+
+            return Ok(result.Value);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving leave/excuse details for employee {EmployeeId} on {Date}", employeeId, date);
+            return StatusCode(500, "An error occurred while retrieving leave and excuse details");
+        }
     }
 }

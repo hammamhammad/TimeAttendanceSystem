@@ -1,0 +1,69 @@
+/* Change Attendance Shift Component Styles */
+
+.avatar-sm {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.avatar-initial {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* Employee info card styling */
+.alert-info {
+  border-left: 4px solid var(--bs-info);
+}
+
+/* Current shift card styling */
+.card.bg-light {
+  border: 1px solid #e9ecef;
+}
+
+.card.bg-light .card-body {
+  background-color: #f8f9fa;
+}
+
+/* Warning alert styling */
+.alert-warning {
+  border-left: 4px solid var(--bs-warning);
+}
+
+/* Form validation styles */
+.form-control:invalid {
+  border-color: var(--bs-danger);
+}
+
+.form-control:valid {
+  border-color: var(--bs-success);
+}
+
+/* Action buttons */
+.btn-primary {
+  min-width: 120px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .avatar-sm {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .avatar-initial {
+    font-size: 0.875rem;
+  }
+
+  .alert-info h6 {
+    font-size: 1rem;
+  }
+
+  .alert-info small {
+    font-size: 0.8rem;
+  }
+}

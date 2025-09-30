@@ -7,6 +7,8 @@ using TimeAttendanceSystem.Domain.Shifts;
 using TimeAttendanceSystem.Domain.Attendance;
 using TimeAttendanceSystem.Domain.Settings;
 using TimeAttendanceSystem.Domain.VacationTypes;
+using TimeAttendanceSystem.Domain.Vacations;
+using TimeAttendanceSystem.Domain.Excuses;
 using TimeAttendanceSystem.Application.Abstractions;
 
 namespace TimeAttendanceSystem.Infrastructure.Persistence;
@@ -105,6 +107,9 @@ public class TimeAttendanceDbContext : DbContext, IApplicationDbContext
     public DbSet<PublicHoliday> PublicHolidays => Set<PublicHoliday>();
     public DbSet<OffDay> OffDays => Set<OffDay>();
     public DbSet<VacationType> VacationTypes => Set<VacationType>();
+    public DbSet<EmployeeVacation> EmployeeVacations => Set<EmployeeVacation>();
+    public DbSet<ExcusePolicy> ExcusePolicies => Set<ExcusePolicy>();
+    public DbSet<EmployeeExcuse> EmployeeExcuses => Set<EmployeeExcuse>();
 
     /// <summary>
     /// Configures the database model using Fluent API configurations from the current assembly.

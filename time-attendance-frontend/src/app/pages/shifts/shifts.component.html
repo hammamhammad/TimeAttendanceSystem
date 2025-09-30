@@ -1,55 +1,18 @@
-<div class="container-fluid p-4">
+<div class="app-list-page">
   <!-- Page Header -->
-  <div class="row mb-4">
-    <div class="col-12">
-      <div class="d-flex justify-content-between align-items-center">
-        <h2 class="mb-0">{{ t('shifts.title') }}</h2>
-        <button
-          *appHasPermission="PERMISSIONS.SHIFT_CREATE"
-          class="btn btn-primary"
-          type="button"
-          (click)="onCreateShift()">
-          <i class="fas fa-plus me-2"></i>{{ t('shifts.actions.create') }}
-        </button>
-      </div>
-    </div>
-  </div>
+  <app-page-header
+    [title]="t('shifts.title')">
+  </app-page-header>
 
-  <!-- Filters -->
-  <div class="card mb-4">
-    <div class="card-body">
-      <div class="row g-3">
-        <div class="col-md-4">
-          <label class="form-label">{{ t('common.search') }}</label>
-          <div class="input-group">
-            <input
-              type="text"
-              class="form-control"
-              [(ngModel)]="searchTerm"
-              [ngModelOptions]="{standalone: true}"
-              (keyup.enter)="onSearch()"
-              [placeholder]="t('shifts.searchPlaceholder')">
-            <button class="btn btn-outline-secondary" type="button" (click)="onSearch()">
-              <i class="fas fa-search"></i>
-            </button>
-          </div>
-        </div>
-
-        <div class="col-md-5">
-          <label class="form-label">{{ t('common.pageSize') }}</label>
-          <app-searchable-select
-            [options]="pageSizeSelectOptions"
-            [ngModel]="pageSize().toString()"
-            [ngModelOptions]="{standalone: true}"
-            (selectionChange)="onPageSizeSelectionChange($event)"
-            [placeholder]="t('common.select')"
-            [searchable]="false"
-            [clearable]="false"
-          ></app-searchable-select>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- Standardized Filters Component -->
+  <app-unified-filter
+    moduleName="shifts"
+    [refreshing]="loading()"
+    (searchChange)="onSearchChange($event)"
+    (filtersChange)="onFiltersChange($event)"
+    (add)="onCreateShift()"
+    (refresh)="onRefreshData()">
+  </app-unified-filter>
 
   <!-- Shifts Table -->
   <div class="card">
@@ -75,18 +38,16 @@
 </div>
 
 <!-- Create/Edit Modal -->
-<div class="modal fade" [class.show]="showCreateModal() || showEditModal()" [style.display]="showCreateModal() || showEditModal() ? 'block' : 'none'">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">
-          {{ showCreateModal() ? t('shifts.actions.create') : t('shifts.actions.edit') }}
-        </h5>
-        <button type="button" class="btn-close" (click)="onCloseModal()"></button>
-      </div>
+<app-modal-wrapper
+  [show]="showCreateModal() || showEditModal()"
+  [title]="showCreateModal() ? t('shifts.actions.create') : t('shifts.actions.edit')"
+  [size]="'lg'"
+  [centered]="true"
+  [loading]="submitting()"
+  (close)="onCloseModal()">
 
-      <div class="modal-body">
-        <form>
+  <div class="modal-body">
+    <form>
           <!-- Basic Information -->
           <div class="mb-3">
             <label class="form-label required">{{ t('shifts.fields.name') }}</label>
@@ -270,93 +231,82 @@
               </div>
             </div>
           </div>
-        </form>
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="onCloseModal()">
-          {{ t('common.cancel') }}
-        </button>
-        <button type="button" class="btn btn-primary"
-                (click)="showCreateModal() ? onSubmitCreate() : onSubmitEdit()"
-                [disabled]="!isFormValid() || submitting()">
-          @if (submitting()) {
-          <span class="spinner-border spinner-border-sm me-2"></span>
-          }
-          {{ showCreateModal() ? t('common.create') : t('common.update') }}
-        </button>
-      </div>
-    </div>
+    </form>
   </div>
-</div>
+
+  <div modal-footer class="d-flex gap-2 justify-content-end">
+    <button type="button" class="btn btn-secondary" (click)="onCloseModal()">
+      {{ t('common.cancel') }}
+    </button>
+    <button type="button" class="btn btn-primary"
+            (click)="showCreateModal() ? onSubmitCreate() : onSubmitEdit()"
+            [disabled]="!isFormValid() || submitting()">
+      @if (submitting()) {
+      <span class="spinner-border spinner-border-sm me-2"></span>
+      }
+      {{ showCreateModal() ? t('common.create') : t('common.update') }}
+    </button>
+  </div>
+
+</app-modal-wrapper>
 
 <!-- Delete Confirmation Modal -->
-<div class="modal fade" [class.show]="showDeleteModal()" [style.display]="showDeleteModal() ? 'block' : 'none'">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">{{ t('shifts.actions.delete') }}</h5>
-        <button type="button" class="btn-close" (click)="onCloseModal()"></button>
-      </div>
+<app-modal-wrapper
+  [show]="showDeleteModal()"
+  [title]="t('shifts.actions.delete')"
+  [centered]="true"
+  [loading]="submitting()"
+  (close)="onCloseModal()">
 
-      <div class="modal-body">
-        <p>{{ t('shifts.deleteConfirmation') }}</p>
-        @if (selectedShift()) {
-        <p><strong>{{ selectedShift()?.name }}</strong></p>
-        }
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="onCloseModal()">
-          {{ t('common.cancel') }}
-        </button>
-        <button type="button" class="btn btn-danger"
-                (click)="onConfirmDelete()"
-                [disabled]="submitting()">
-          @if (submitting()) {
-          <span class="spinner-border spinner-border-sm me-2"></span>
-          }
-          {{ t('common.delete') }}
-        </button>
-      </div>
-    </div>
+  <div class="modal-body">
+    <p>{{ t('shifts.deleteConfirmation') }}</p>
+    @if (selectedShift()) {
+    <p><strong>{{ selectedShift()?.name }}</strong></p>
+    }
   </div>
-</div>
+
+  <div modal-footer class="d-flex gap-2 justify-content-end">
+    <button type="button" class="btn btn-secondary" (click)="onCloseModal()">
+      {{ t('common.cancel') }}
+    </button>
+    <button type="button" class="btn btn-danger"
+            (click)="onConfirmDelete()"
+            [disabled]="submitting()">
+      @if (submitting()) {
+      <span class="spinner-border spinner-border-sm me-2"></span>
+      }
+      {{ t('common.delete') }}
+    </button>
+  </div>
+
+</app-modal-wrapper>
 
 <!-- Default Shift Confirmation Modal -->
-<div class="modal fade" [class.show]="showDefaultShiftModal()" [style.display]="showDefaultShiftModal() ? 'block' : 'none'">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">{{ t('shifts.defaultShift.confirmReplace') }}</h5>
-        <button type="button" class="btn-close" (click)="onCloseModal()"></button>
-      </div>
+<app-modal-wrapper
+  [show]="showDefaultShiftModal()"
+  [title]="t('shifts.defaultShift.confirmReplace')"
+  [centered]="true"
+  [loading]="submitting()"
+  (close)="onCloseModal()">
 
-      <div class="modal-body">
-        <p>{{ t('shifts.defaultShift.confirmReplaceMessage') }}</p>
-        <p><strong>{{ t('shifts.defaultShift.newShift') }}:</strong> {{ selectedShift()?.name }}</p>
-        <p><strong>{{ t('shifts.defaultShift.currentShift') }}:</strong> {{ defaultShift()?.name }}</p>
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="onCloseModal()">
-          {{ t('shifts.defaultShift.cancelButton') }}
-        </button>
-        <button type="button" class="btn btn-success"
-                (click)="onConfirmSetDefaultShift()"
-                [disabled]="submitting()">
-          @if (submitting()) {
-          <span class="spinner-border spinner-border-sm me-2"></span>
-          }
-          {{ t('shifts.defaultShift.confirmButton') }}
-        </button>
-      </div>
-    </div>
+  <div class="modal-body">
+    <p>{{ t('shifts.defaultShift.confirmReplaceMessage') }}</p>
+    <p><strong>{{ t('shifts.defaultShift.newShift') }}:</strong> {{ selectedShift()?.name }}</p>
+    <p><strong>{{ t('shifts.defaultShift.currentShift') }}:</strong> {{ defaultShift()?.name }}</p>
   </div>
-</div>
 
-<!-- Modal Backdrop -->
-@if (showCreateModal() || showEditModal() || showDeleteModal() || showDefaultShiftModal()) {
-<div class="modal-backdrop fade show"
-     (click)="onCloseModal()"></div>
-}
+  <div modal-footer class="d-flex gap-2 justify-content-end">
+    <button type="button" class="btn btn-secondary" (click)="onCloseModal()">
+      {{ t('shifts.defaultShift.cancelButton') }}
+    </button>
+    <button type="button" class="btn btn-success"
+            (click)="onConfirmSetDefaultShift()"
+            [disabled]="submitting()">
+      @if (submitting()) {
+      <span class="spinner-border spinner-border-sm me-2"></span>
+      }
+      {{ t('shifts.defaultShift.confirmButton') }}
+    </button>
+  </div>
+
+</app-modal-wrapper>

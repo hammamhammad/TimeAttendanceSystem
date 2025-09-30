@@ -8,11 +8,12 @@ import { EmployeesService } from '../../employees/employees.service';
 import { BranchesService } from '../../branches/branches.service';
 import { DepartmentDto, CreateDepartmentRequest, UpdateDepartmentRequest } from '../../../shared/models/department.model';
 import { EmployeeSelectOption, BranchDto } from '../../../shared/models/employee.model';
+import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-department-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, SearchableSelectComponent],
+  imports: [CommonModule, ReactiveFormsModule, SearchableSelectComponent, LoadingSpinnerComponent],
   templateUrl: './department-form.component.html',
   styleUrls: ['./department-form.component.css']
 })

@@ -5,11 +5,12 @@ import { EmployeeDto, EmploymentStatus, Gender, WorkLocationType } from '../../.
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { PermissionService } from '../../../core/auth/permission.service';
 import { PermissionResources, PermissionActions } from '../../../shared/utils/permission.utils';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 
 @Component({
   selector: 'app-employee-table',
   standalone: true,
-  imports: [CommonModule, DataTableComponent],
+  imports: [CommonModule, DataTableComponent, StatusBadgeComponent],
   template: `
     <app-data-table
       [data]="employees"
@@ -54,10 +55,11 @@ import { PermissionResources, PermissionActions } from '../../../shared/utils/pe
           </div>
 
           <!-- Employment status with badge -->
-          <span *ngSwitchCase="'employmentStatus'"
-                class="badge"
-                [class]="getEmploymentStatusClass(employee.employmentStatus)">
-            {{ getEmploymentStatusLabel(employee.employmentStatus) }}
+          <span *ngSwitchCase="'employmentStatus'">
+            <app-status-badge
+              [status]="getEmploymentStatusBadgeStatus(employee.employmentStatus)"
+              [label]="getEmploymentStatusLabel(employee.employmentStatus)">
+            </app-status-badge>
           </span>
 
           <!-- Gender -->
@@ -66,20 +68,20 @@ import { PermissionResources, PermissionActions } from '../../../shared/utils/pe
           </span>
 
           <!-- Work location -->
-          <span *ngSwitchCase="'workLocation'"
-                class="badge bg-info">
-            {{ getWorkLocationLabel(employee.workLocationType) }}
+          <span *ngSwitchCase="'workLocation'">
+            <app-status-badge
+              [status]="'info'"
+              [label]="getWorkLocationLabel(employee.workLocationType)">
+            </app-status-badge>
           </span>
 
           <!-- Status -->
-          <span *ngSwitchCase="'status'"
-                class="badge"
-                [class.bg-success]="employee.isActive"
-                [class.bg-danger]="!employee.isActive">
-            <i class="fas"
-               [class.fa-check-circle]="employee.isActive"
-               [class.fa-times-circle]="!employee.isActive"></i>
-            {{ employee.isActive ? 'Active' : 'Inactive' }}
+          <span *ngSwitchCase="'status'">
+            <app-status-badge
+              [status]="employee.isActive ? 'active' : 'inactive'"
+              [label]="employee.isActive ? 'Active' : 'Inactive'"
+              [showIcon]="true">
+            </app-status-badge>
           </span>
 
           <!-- Hire date -->
@@ -313,6 +315,20 @@ export class EmployeeTableComponent {
       [EmploymentStatus.Inactive]: 'bg-light text-dark border'
     };
     return classMap[status] || 'bg-light text-dark border';
+  }
+
+  getEmploymentStatusBadgeStatus(status: EmploymentStatus): 'success' | 'info' | 'warning' | 'primary' | 'danger' | 'secondary' {
+    const statusMap: { [key: number]: 'success' | 'info' | 'warning' | 'primary' | 'danger' | 'secondary' } = {
+      [EmploymentStatus.Active]: 'success',
+      [EmploymentStatus.FullTime]: 'success',
+      [EmploymentStatus.PartTime]: 'info',
+      [EmploymentStatus.Contract]: 'warning',
+      [EmploymentStatus.Intern]: 'primary',
+      [EmploymentStatus.Consultant]: 'secondary',
+      [EmploymentStatus.Terminated]: 'danger',
+      [EmploymentStatus.Inactive]: 'secondary'
+    };
+    return statusMap[status] || 'secondary';
   }
 
   getGenderLabel(gender: Gender): string {

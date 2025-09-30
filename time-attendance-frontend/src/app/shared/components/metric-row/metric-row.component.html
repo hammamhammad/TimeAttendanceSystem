@@ -1,0 +1,29 @@
+<div [class]="getRowClasses()">
+  <!-- Label Side -->
+  <div class="metric-label-container">
+    @if (icon) {
+      <i [class]="getIconClasses() + ' me-2'"></i>
+    }
+    <span [class]="getLabelClasses()">{{ label }}</span>
+  </div>
+
+  <!-- Value Side -->
+  <div class="metric-value-container">
+    <span [class]="getValueClasses()">
+      @if (prefix) {
+        <span class="metric-prefix">{{ prefix }}</span>
+      }
+      {{ value }}
+      @if (suffix) {
+        <span class="metric-suffix">{{ suffix }}</span>
+      }
+    </span>
+
+    @if (badge) {
+      <span [class]="getBadgeClasses() + ' ms-2'">{{ badge }}</span>
+    }
+  </div>
+
+  <!-- Custom content slot -->
+  <ng-content></ng-content>
+</div>

@@ -1,10 +1,21 @@
 <div class="container-fluid">
   <!-- Page Header -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h1 class="h3 mb-1">{{ t('settings.holidays.title') }}</h1>
-      <p class="text-muted mb-0">{{ t('settings.holidays.description') }}</p>
-    </div>
+  <app-page-header
+    [title]="t('settings.holidays.title')">
+  </app-page-header>
+
+  <!-- Unified Filter Component -->
+  <app-unified-filter
+    moduleName="public-holidays"
+    [refreshing]="loading()"
+    (searchChange)="onSearchTermChange($event)"
+    (filtersChange)="onFiltersChange($event)"
+    (add)="onCreateHoliday()"
+    (refresh)="onRefreshData()">
+  </app-unified-filter>
+
+  <!-- Additional Action Buttons -->
+  <div class="d-flex justify-content-end align-items-center mb-4">
     <div class="d-flex gap-2">
       <!-- Export Dropdown -->
       @if (canExportHolidays()) {
@@ -48,102 +59,9 @@
           {{ t('settings.holidays.import') }}
         </button>
       }
-
-      <!-- Create Holiday Button -->
-      @if (canCreateHolidays()) {
-        <button type="button"
-                class="btn btn-primary"
-                (click)="onCreateHoliday()">
-          <i class="fas fa-plus me-1"></i>
-          {{ t('settings.holidays.createHoliday') }}
-        </button>
-      }
     </div>
   </div>
 
-  <!-- Filters Section -->
-  <div class="card mb-4">
-    <div class="card-body">
-      <div class="row g-3">
-        <!-- Search -->
-        <div class="col-md-3">
-          <label for="search" class="form-label">{{ t('common.search') }}</label>
-          <input type="text"
-                 id="search"
-                 class="form-control"
-                 [(ngModel)]="searchTerm"
-                 (ngModelChange)="onSearchChange()"
-                 [placeholder]="t('settings.holidays.searchPlaceholder')">
-        </div>
-
-        <!-- Year Filter -->
-        <div class="col-md-2">
-          <label for="year" class="form-label">{{ t('settings.holidays.year') }}</label>
-          <select id="year"
-                  class="form-select"
-                  [ngModel]="selectedYear()"
-                  (ngModelChange)="selectedYear.set($event); onYearChange()">
-            <option [value]="undefined">{{ t('common.all') }}</option>
-            @for (year of getYearOptions(); track year) {
-              <option [value]="year">{{ year }}</option>
-            }
-          </select>
-        </div>
-
-        <!-- Holiday Type Filter -->
-        <div class="col-md-2">
-          <label for="holidayType" class="form-label">{{ t('settings.holidays.type') }}</label>
-          <select id="holidayType"
-                  class="form-select"
-                  [ngModel]="selectedHolidayType()"
-                  (ngModelChange)="selectedHolidayType.set($event); onHolidayTypeChange()">
-            <option [value]="undefined">{{ t('common.all') }}</option>
-            @for (type of holidayTypes(); track type.value) {
-              <option [value]="type.value">{{ type.label }}</option>
-            }
-          </select>
-        </div>
-
-        <!-- Active Status Filter -->
-        <div class="col-md-2">
-          <label for="activeStatus" class="form-label">{{ t('settings.holidays.status') }}</label>
-          <select id="activeStatus"
-                  class="form-select"
-                  [ngModel]="selectedActiveStatus()"
-                  (ngModelChange)="selectedActiveStatus.set($event); onActiveStatusChange()">
-            <option [value]="undefined">{{ t('common.all') }}</option>
-            <option [value]="true">{{ t('settings.holidays.active') }}</option>
-            <option [value]="false">{{ t('settings.holidays.inactive') }}</option>
-          </select>
-        </div>
-
-        <!-- National/Regional Filter -->
-        <div class="col-md-2">
-          <label for="nationalStatus" class="form-label">{{ t('settings.holidays.scope') }}</label>
-          <select id="nationalStatus"
-                  class="form-select"
-                  [ngModel]="selectedNationalStatus()"
-                  (ngModelChange)="selectedNationalStatus.set($event); onNationalStatusChange()">
-            <option [value]="undefined">{{ t('common.all') }}</option>
-            <option [value]="true">{{ t('settings.holidays.national') }}</option>
-            <option [value]="false">{{ t('settings.holidays.regional') }}</option>
-          </select>
-        </div>
-
-        <!-- Clear Filters -->
-        <div class="col-md-1 d-flex align-items-end">
-          @if (hasActiveFilters()) {
-            <button type="button"
-                    class="btn btn-outline-secondary w-100"
-                    (click)="onClearFilters()"
-                    [title]="t('common.clearFilters')">
-              <i class="fas fa-times"></i>
-            </button>
-          }
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- Data Table -->
   <div class="card">
@@ -165,20 +83,15 @@
   </div>
 
   <!-- Import Modal -->
-  @if (showImportModal()) {
-    <div class="modal fade show" style="display: block;" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">{{ t('settings.holidays.importTemplate') }}</h5>
-            <button type="button"
-                    class="btn-close"
-                    (click)="onHideImportModal()"
-                    aria-label="Close">
-            </button>
-          </div>
-          <div class="modal-body">
-            <form>
+  <app-modal-wrapper
+    [show]="showImportModal()"
+    [title]="t('settings.holidays.importTemplate')"
+    [centered]="true"
+    [loading]="importLoading()"
+    (close)="onHideImportModal()">
+
+    <div class="modal-body">
+      <form>
               <!-- Template Selection -->
               <div class="mb-3">
                 <label for="template" class="form-label">{{ t('settings.holidays.template') }}</label>
@@ -232,28 +145,26 @@
                 </div>
                 <div class="form-text">{{ t('settings.holidays.overwriteHelpText') }}</div>
               </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button"
-                    class="btn btn-secondary"
-                    (click)="onHideImportModal()"
-                    [disabled]="importLoading()">
-              {{ t('common.cancel') }}
-            </button>
-            <button type="button"
-                    class="btn btn-primary"
-                    (click)="onImportTemplate()"
-                    [disabled]="importLoading()">
-              @if (importLoading()) {
-                <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-              }
-              {{ t('settings.holidays.import') }}
-            </button>
-          </div>
-        </div>
-      </div>
+      </form>
     </div>
-    <div class="modal-backdrop fade show"></div>
-  }
+
+    <div modal-footer class="d-flex gap-2 justify-content-end">
+      <button type="button"
+              class="btn btn-secondary"
+              (click)="onHideImportModal()"
+              [disabled]="importLoading()">
+        {{ t('common.cancel') }}
+      </button>
+      <button type="button"
+              class="btn btn-primary"
+              (click)="onImportTemplate()"
+              [disabled]="importLoading()">
+        @if (importLoading()) {
+          <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+        }
+        {{ t('settings.holidays.import') }}
+      </button>
+    </div>
+
+  </app-modal-wrapper>
 </div>

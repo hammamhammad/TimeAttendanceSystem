@@ -9,10 +9,12 @@ export interface ConfirmationConfig {
   cancelButtonClass?: string;
   icon?: string;
   iconClass?: string;
+  requireComments?: boolean;
 }
 
 export interface ConfirmationResult {
   confirmed: boolean;
+  comments?: string;
 }
 
 @Injectable({
@@ -21,10 +23,12 @@ export interface ConfirmationResult {
 export class ConfirmationService {
   private isVisible = signal(false);
   private config = signal<ConfirmationConfig | null>(null);
+  private comments = signal<string>('');
   private resolvePromise: ((result: ConfirmationResult) => void) | null = null;
 
   readonly isVisible$ = this.isVisible.asReadonly();
   readonly config$ = this.config.asReadonly();
+  readonly comments$ = this.comments.asReadonly();
 
   /**
    * Show a confirmation dialog
@@ -42,10 +46,12 @@ export class ConfirmationService {
         confirmButtonClass: config.confirmButtonClass || 'btn-danger',
         cancelButtonClass: config.cancelButtonClass || 'btn-secondary',
         icon: config.icon || 'fa-question-circle',
-        iconClass: config.iconClass || 'text-warning'
+        iconClass: config.iconClass || 'text-warning',
+        requireComments: config.requireComments || false
       };
 
       this.config.set(defaultConfig);
+      this.comments.set('');
       this.isVisible.set(true);
     });
   }
@@ -55,7 +61,10 @@ export class ConfirmationService {
    */
   onConfirm(): void {
     if (this.resolvePromise) {
-      this.resolvePromise({ confirmed: true });
+      this.resolvePromise({
+        confirmed: true,
+        comments: this.comments() || undefined
+      });
     }
     this.close();
   }
@@ -71,11 +80,19 @@ export class ConfirmationService {
   }
 
   /**
+   * Update comments
+   */
+  setComments(comments: string): void {
+    this.comments.set(comments);
+  }
+
+  /**
    * Close the modal
    */
   private close(): void {
     this.isVisible.set(false);
     this.config.set(null);
+    this.comments.set('');
     this.resolvePromise = null;
   }
 

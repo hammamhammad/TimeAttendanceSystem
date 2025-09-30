@@ -16,9 +16,11 @@ import { SearchableSelectOption } from '../../../shared/components/searchable-se
       [showAddButton]="showAddButton"
       [addButtonText]="addButtonText"
       [searchPlaceholder]="'Search employees...'"
+      [refreshing]="refreshing"
       (search)="onSearch($event)"
       (filterChange)="onFilterChange($event)"
-      (add)="onAdd()">
+      (add)="onAdd()"
+      (refresh)="onRefresh()">
     </app-search-filter>
   `
 })
@@ -28,10 +30,12 @@ export class EmployeeFiltersComponent implements OnInit {
 
   @Input() showAddButton = true;
   @Input() addButtonText = 'Add Employee';
+  @Input() refreshing = false;
 
   @Output() searchChange = new EventEmitter<string>();
   @Output() filtersChange = new EventEmitter<any>();
   @Output() addEmployee = new EventEmitter<void>();
+  @Output() refreshData = new EventEmitter<void>();
 
   branches = signal<BranchDto[]>([]);
   departments = signal<DepartmentDto[]>([]);
@@ -146,5 +150,9 @@ export class EmployeeFiltersComponent implements OnInit {
 
   onAdd() {
     this.addEmployee.emit();
+  }
+
+  onRefresh() {
+    this.refreshData.emit();
   }
 }

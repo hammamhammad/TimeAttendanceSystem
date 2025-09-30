@@ -7,11 +7,13 @@ import { UsersService } from '../users.service';
 import { CreateUserRequest } from '../../../shared/models/user.model';
 import { Role } from '../../../shared/models/role.model';
 import { Branch } from '../../../shared/models/branch.model';
+import { FormHeaderComponent } from '../../../shared/components/form-header/form-header.component';
+import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-create-user',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, FormHeaderComponent, LoadingSpinnerComponent],
   templateUrl: './create-user.component.html',
   styleUrls: ['./create-user.component.css']
 })

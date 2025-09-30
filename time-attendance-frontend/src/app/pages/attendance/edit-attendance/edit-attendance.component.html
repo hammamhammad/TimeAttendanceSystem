@@ -1,52 +1,32 @@
-<!-- Loading State -->
-@if (loading()) {
-  <div class="d-flex justify-content-center align-items-center" style="min-height: 200px;">
-    <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">{{ i18n.t('common.loading') }}</span>
-    </div>
-  </div>
-}
+<div class="container-fluid">
+  <app-form-header
+    mode="edit"
+    [title]="i18n.t('attendance.edit.title')"
+    moduleName="attendance"
+    moduleRoute="attendance"
+    [entityId]="recordId || 0"
+    [loading]="saving()">
+  </app-form-header>
 
-<!-- Error State -->
-@if (error()) {
-  <div class="alert alert-danger" role="alert">
-    <i class="fas fa-exclamation-triangle me-2"></i>
-    {{ error() }}
-  </div>
-}
-
-<!-- Main Content -->
-@if (!loading() && !error() && attendanceRecord()) {
-  <div class="container-fluid">
-    <!-- Header -->
-    <div class="row mb-4">
-      <div class="col">
-        <div class="d-flex justify-content-between align-items-center">
-          <div>
-            <h2 class="mb-1">{{ i18n.t('attendance.edit.title') }}</h2>
-            <nav aria-label="breadcrumb">
-              <ol class="breadcrumb">
-                <li class="breadcrumb-item">
-                  <a routerLink="/attendance">{{ i18n.t('attendance.title') }}</a>
-                </li>
-                <li class="breadcrumb-item">
-                  <a routerLink="/attendance/daily">{{ i18n.t('attendance.daily_view') }}</a>
-                </li>
-                <li class="breadcrumb-item active" aria-current="page">
-                  {{ i18n.t('attendance.edit.title') }}
-                </li>
-              </ol>
-            </nav>
-          </div>
-          <div>
-            <button type="button" class="btn btn-outline-secondary me-2" (click)="onCancel()">
-              <i class="fas fa-arrow-left me-2"></i>
-              {{ i18n.t('common.back') }}
-            </button>
-          </div>
-        </div>
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="d-flex justify-content-center align-items-center" style="min-height: 200px;">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">{{ i18n.t('common.loading') }}</span>
       </div>
     </div>
+  }
+
+  <!-- Error State -->
+  @if (error()) {
+    <div class="alert alert-danger" role="alert">
+      <i class="fas fa-exclamation-triangle me-2"></i>
+      {{ error() }}
+    </div>
+  }
+
+  <!-- Main Content -->
+  @if (!loading() && !error() && attendanceRecord()) {
 
     <!-- Employee Information Card -->
     <div class="row mb-4">
@@ -64,9 +44,10 @@
               </div>
               <div class="col-md-4">
                 <strong>{{ i18n.t('attendance.fields.status') }}:</strong>
-                <span [class]="getStatusBadgeClass(calculatedStatus())">
-                  {{ getStatusDisplayText(calculatedStatus()) }}
-                </span>
+                <app-status-badge
+                  [status]="statusBadge().label"
+                  [variant]="statusBadge().variant">
+                </app-status-badge>
               </div>
             </div>
           </div>
@@ -343,5 +324,5 @@
         </div>
       </div>
     </form>
-  </div>
-}
+  }
+</div>

@@ -1,6 +1,15 @@
 <div class="container-fluid px-4">
   <div class="row">
     <div class="col-12">
+      <app-form-header
+        mode="edit"
+        [title]="t('shifts.edit')"
+        moduleName="shifts"
+        moduleRoute="shifts"
+        [entityId]="shiftId()"
+        [loading]="submitting()">
+      </app-form-header>
+
       <!-- Loading State -->
       @if (loading()) {
         <div class="d-flex justify-content-center align-items-center" style="height: 400px;">
@@ -12,19 +21,6 @@
           </div>
         </div>
       } @else {
-        <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <div>
-            <h2 class="h4 mb-1">{{ t('shifts.edit') }}</h2>
-            <p class="text-muted mb-0">{{ t('shifts.editDescription') }}</p>
-          </div>
-          <button
-            type="button"
-            class="btn btn-outline-secondary"
-            (click)="onCancel()">
-            <i class="bi bi-arrow-left me-2"></i>{{ t('common.back') }}
-          </button>
-        </div>
 
         <!-- Form Card -->
         <div class="card border-0 shadow-sm">

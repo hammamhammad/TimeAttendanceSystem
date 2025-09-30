@@ -1,8 +1,9 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, ActivatedRoute, RouterLink } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { I18nService } from '../../../core/i18n/i18n.service';
+import { FormHeaderComponent } from '../../../shared/components/form-header/form-header.component';
 import { UsersService } from '../users.service';
 import { UpdateUserRequest, User } from '../../../shared/models/user.model';
 import { Role } from '../../../shared/models/role.model';
@@ -11,7 +12,7 @@ import { Branch } from '../../../shared/models/branch.model';
 @Component({
   selector: 'app-edit-user',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, FormHeaderComponent],
   templateUrl: './edit-user.component.html',
   styleUrls: ['./edit-user.component.css']
 })

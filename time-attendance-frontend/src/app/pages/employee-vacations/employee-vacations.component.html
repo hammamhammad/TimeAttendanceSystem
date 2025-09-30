@@ -1,0 +1,38 @@
+<div class="app-list-page">
+  <!-- Page Header -->
+  <app-page-header
+    [title]="i18n.t('employee_vacations.title')">
+  </app-page-header>
+
+  <!-- Filters Component -->
+  <app-unified-filter
+    moduleName="employee-vacations"
+    [refreshing]="loading()"
+    (searchChange)="onSearchChange($event)"
+    (filtersChange)="onFiltersChange($event)"
+    (add)="onAddVacation()"
+    (refresh)="onRefreshData()">
+  </app-unified-filter>
+
+  <!-- Employee Vacations Table Component -->
+  <app-employee-vacation-table
+    [vacations]="vacations()"
+    [loading]="loading"
+    [currentPage]="currentPage"
+    [totalPages]="totalPages"
+    [totalItems]="totalItems"
+    [pageSize]="pageSize"
+    (viewVacation)="onViewVacation($event)"
+    (editVacation)="onEditVacation($event)"
+    (deleteVacation)="onDeleteVacation($event)"
+    (toggleStatus)="onToggleStatus($event)"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+  </app-employee-vacation-table>
+
+  <!-- Bulk Vacation Modal Component -->
+  <app-bulk-vacation-modal
+    #bulkVacationModal
+    (bulkVacationCreated)="onBulkVacationCreated()">
+  </app-bulk-vacation-modal>
+</div>

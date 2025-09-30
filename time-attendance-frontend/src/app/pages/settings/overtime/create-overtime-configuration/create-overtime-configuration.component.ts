@@ -6,11 +6,12 @@ import { I18nService } from '../../../../core/i18n/i18n.service';
 import { OvertimeConfigurationsService, CreateOvertimeConfigurationRequest } from '../overtime-configurations.service';
 import { NotificationService } from '../../../../core/notifications/notification.service';
 import { ConfirmationService } from '../../../../core/confirmation/confirmation.service';
+import { FormHeaderComponent } from '../../../../shared/components/form-header/form-header.component';
 
 @Component({
   selector: 'app-create-overtime-configuration',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, FormHeaderComponent],
   templateUrl: './create-overtime-configuration.component.html',
   styleUrls: ['./create-overtime-configuration.component.css']
 })

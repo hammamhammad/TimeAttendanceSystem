@@ -1,4 +1,4 @@
-import { Component, signal, inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, signal, inject, OnInit, OnDestroy, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil, switchMap } from 'rxjs';
@@ -8,11 +8,15 @@ import { ConfirmationService } from '../../../core/confirmation/confirmation.ser
 import { PermissionService } from '../../../core/auth/permission.service';
 import { VacationTypesService } from '../vacation-types.service';
 import { VacationTypeDetailDto } from '../../../shared/models/vacation-type.model';
+import { FormHeaderComponent } from '../../../shared/components/form-header/form-header.component';
+import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
+import { DefinitionListComponent, DefinitionItem } from '../../../shared/components/definition-list/definition-list.component';
 
 @Component({
   selector: 'app-view-vacation-type',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormHeaderComponent, LoadingSpinnerComponent, StatusBadgeComponent, DefinitionListComponent],
   templateUrl: './view-vacation-type.component.html',
   styleUrls: ['./view-vacation-type.component.css']
 })
@@ -85,22 +89,6 @@ export class ViewVacationTypeComponent implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * Navigate back to vacation types list
-   */
-  onGoBack(): void {
-    this.router.navigate(['/vacation-types']);
-  }
-
-  /**
-   * Navigate to edit page
-   */
-  onEdit(): void {
-    const id = this.vacationTypeId();
-    if (id && this.permissionService.has(this.PERMISSIONS.VACATION_TYPE_UPDATE)) {
-      this.router.navigate(['/vacation-types', id, 'edit']);
-    }
-  }
 
   /**
    * Toggle vacation type status
@@ -179,14 +167,55 @@ export class ViewVacationTypeComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Get status badge class
+   * Computed property for status badge
+   */
+  statusBadge = computed<{ label: string; variant: 'success' | 'secondary' }>(() => {
+    const vt = this.vacationType();
+    if (!vt) return { label: '', variant: 'secondary' };
+
+    return {
+      label: vt.isActive ? this.i18n.t('common.active') : this.i18n.t('common.inactive'),
+      variant: vt.isActive ? 'success' : 'secondary'
+    };
+  });
+
+  /**
+   * Computed property for basic information items
+   */
+  basicInfoItems = computed<DefinitionItem[]>(() => {
+    const vt = this.vacationType();
+    if (!vt) return [];
+
+    const items: DefinitionItem[] = [
+      { label: this.i18n.t('vacation_types.name'), value: vt.name }
+    ];
+
+    if (vt.nameAr) {
+      items.push({ label: this.i18n.t('vacation_types.name_ar'), value: vt.nameAr });
+    }
+
+    items.push(
+      { label: this.i18n.t('vacation_types.branch'), value: vt.branchName || this.i18n.t('vacation_types.all_branches') },
+      {
+        label: this.i18n.t('common.status'),
+        value: this.statusBadge().label,
+        type: 'badge' as const,
+        badgeVariant: this.statusBadge().variant
+      }
+    );
+
+    return items;
+  });
+
+  /**
+   * Get status badge class (kept for backward compatibility if needed elsewhere)
    */
   getStatusBadgeClass(isActive: boolean): string {
     return isActive ? 'bg-success' : 'bg-secondary';
   }
 
   /**
-   * Get status text
+   * Get status text (kept for backward compatibility if needed elsewhere)
    */
   getStatusText(isActive: boolean): string {
     return isActive ? this.i18n.t('common.active') : this.i18n.t('common.inactive');

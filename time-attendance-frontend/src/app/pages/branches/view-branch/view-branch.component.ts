@@ -4,142 +4,78 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BranchesService } from '../branches.service';
 import { Branch } from '../../../shared/models/branch.model';
 import { I18nService } from '../../../core/i18n/i18n.service';
+import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+import { DetailCardComponent, DetailField } from '../../../shared/components/detail-card/detail-card.component';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
+import { StatCardComponent } from '../../../shared/components/stat-card/stat-card.component';
+import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-view-branch',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    PageHeaderComponent,
+    DetailCardComponent,
+    StatusBadgeComponent,
+    StatCardComponent,
+    LoadingSpinnerComponent
+  ],
   template: `
-    <div class="container-fluid">
-      <!-- Header -->
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          <h2>{{ i18n.t('branches.view_details') }}</h2>
-          <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-              <li class="breadcrumb-item">
-                <a routerLink="/dashboard">{{ i18n.t('dashboard.title') }}</a>
-              </li>
-              <li class="breadcrumb-item">
-                <a routerLink="/branches">{{ i18n.t('branches.title') }}</a>
-              </li>
-              <li class="breadcrumb-item active">{{ i18n.t('branches.view_details') }}</li>
-            </ol>
-          </nav>
-        </div>
-        <div class="btn-group">
-          <button 
-            type="button" 
-            class="btn btn-primary"
-            (click)="onEdit()">
-            <i class="fa-solid fa-edit me-2"></i>
-            {{ i18n.t('branches.edit') }}
-          </button>
-          <button 
-            type="button" 
-            class="btn btn-outline-secondary"
-            (click)="onBack()">
-            <i class="fa-solid fa-arrow-left me-2"></i>
-            {{ i18n.t('common.back') }}
-          </button>
-        </div>
-      </div>
+    <div class="app-view-page">
+      <!-- Standardized Page Header -->
+      <app-page-header
+        [title]="i18n.t('branches.view_details')">
+      </app-page-header>
 
       @if (loading()) {
         <div class="d-flex justify-content-center py-5">
-          <div class="spinner-border" role="status">
-            <span class="visually-hidden">{{ i18n.t('common.loading') }}</span>
-          </div>
+          <app-loading-spinner
+            [message]="i18n.t('common.loading')"
+            [centered]="true">
+          </app-loading-spinner>
         </div>
       } @else if (branch()) {
-        <!-- Branch Details -->
-        <div class="row">
-          <!-- Main Information Card -->
-          <div class="col-lg-8">
-            <div class="card">
-              <div class="card-header">
-                <h5 class="card-title mb-0">
-                  <div class="d-flex align-items-center">
-                    <div class="avatar-sm me-3">
-                      <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
-                        <i class="fa-solid fa-building"></i>
-                      </div>
-                    </div>
-                    <div>
-                      <div class="fw-medium">{{ branch()?.name }}</div>
-                      <small class="text-muted">{{ branch()?.code }}</small>
-                    </div>
-                  </div>
-                </h5>
-              </div>
-              <div class="card-body">
-                <div class="row">
-                  <!-- Basic Information -->
-                  <div class="col-md-6">
-                    <dl class="row">
-                      <dt class="col-sm-5">{{ i18n.t('branches.name') }}:</dt>
-                      <dd class="col-sm-7">{{ branch()?.name }}</dd>
-                      
-                      <dt class="col-sm-5">{{ i18n.t('branches.code') }}:</dt>
-                      <dd class="col-sm-7">{{ branch()?.code }}</dd>
-                      
-                      <dt class="col-sm-5">{{ i18n.t('branches.timezone') }}:</dt>
-                      <dd class="col-sm-7">{{ branch()?.timeZone }}</dd>
-                      
-                      <dt class="col-sm-5">{{ i18n.t('common.status') }}:</dt>
-                      <dd class="col-sm-7">
-                        @if (branch()?.isActive) {
-                          <span class="badge bg-success">{{ i18n.t('common.active') }}</span>
-                        } @else {
-                          <span class="badge bg-light text-dark border">{{ i18n.t('common.inactive') }}</span>
-                        }
-                      </dd>
-                    </dl>
-                  </div>
-
-                  <!-- Contact Information -->
-                  <div class="col-md-6">
-                    <dl class="row">
-                      <dt class="col-sm-5">{{ i18n.t('common.phone') }}:</dt>
-                      <dd class="col-sm-7">-</dd>
-                      
-                      <dt class="col-sm-5">{{ i18n.t('common.email') }}:</dt>
-                      <dd class="col-sm-7">-</dd>
-                      
-                      <dt class="col-sm-5">{{ i18n.t('branches.created_at') }}:</dt>
-                      <dd class="col-sm-7">{{ formatDate(branch()!.createdAtUtc) }}</dd>
-                    </dl>
-                  </div>
-                </div>
-
-              </div>
-            </div>
+        <!-- Branch Details Layout -->
+        <div class="app-desktop-sidebar">
+          <!-- Main Content -->
+          <div class="app-main-content">
+            <!-- Branch Information Card -->
+            <app-detail-card
+              [title]="branch()?.name"
+              [subtitle]="branch()?.code"
+              icon="fas fa-building"
+              [fields]="branchFields"
+              layout="two-column">
+            </app-detail-card>
           </div>
 
-          <!-- Actions and Statistics Card -->
-          <div class="col-lg-4">
-            <div class="card">
+          <!-- Sidebar -->
+          <div class="app-sidebar-content">
+            <!-- Quick Actions Card -->
+            <div class="card mb-3">
               <div class="card-header">
                 <h6 class="card-title mb-0">{{ i18n.t('common.actions') }}</h6>
               </div>
               <div class="card-body">
                 <div class="d-grid gap-2">
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     class="btn btn-outline-primary"
                     (click)="onEdit()">
                     <i class="fa-solid fa-edit me-2"></i>
                     {{ i18n.t('branches.edit') }}
                   </button>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     class="btn btn-outline-info"
                     (click)="onViewEmployees()">
                     <i class="fa-solid fa-users me-2"></i>
                     {{ i18n.t('branches.view_employees') }}
                   </button>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     class="btn btn-outline-secondary"
                     (click)="onViewDepartments()">
                     <i class="fa-solid fa-sitemap me-2"></i>
@@ -149,25 +85,27 @@ import { I18nService } from '../../../core/i18n/i18n.service';
               </div>
             </div>
 
-            <!-- Statistics Card -->
-            <div class="card mt-3">
-              <div class="card-header">
-                <h6 class="card-title mb-0">{{ i18n.t('branches.statistics') }}</h6>
-              </div>
-              <div class="card-body">
-                <div class="row text-center">
-                  <div class="col-6">
-                    <div class="border-end">
-                      <h4 class="mb-1 text-primary">{{ statistics()?.employeeCount || 0 }}</h4>
-                      <p class="text-muted mb-0 small">{{ i18n.t('branches.employees') }}</p>
-                    </div>
-                  </div>
-                  <div class="col-6">
-                    <h4 class="mb-1 text-info">{{ statistics()?.departmentCount || 0 }}</h4>
-                    <p class="text-muted mb-0 small">{{ i18n.t('branches.departments') }}</p>
-                  </div>
-                </div>
-              </div>
+            <!-- Statistics Cards -->
+            <div class="d-flex flex-column gap-3">
+              <app-stat-card
+                [label]="i18n.t('branches.employees')"
+                [value]="statistics()?.employeeCount || 0"
+                icon="fas fa-users"
+                variant="primary"
+                [clickable]="true"
+                [clickableText]="i18n.t('branches.view_employees')"
+                (click)="onViewEmployees()">
+              </app-stat-card>
+
+              <app-stat-card
+                [label]="i18n.t('branches.departments')"
+                [value]="statistics()?.departmentCount || 0"
+                icon="fas fa-sitemap"
+                variant="info"
+                [clickable]="true"
+                [clickableText]="i18n.t('branches.view_departments')"
+                (click)="onViewDepartments()">
+              </app-stat-card>
             </div>
           </div>
         </div>
@@ -190,6 +128,47 @@ export class ViewBranchComponent implements OnInit {
   statistics = signal<{employeeCount: number, departmentCount: number} | null>(null);
   loading = signal(true);
   error = signal('');
+
+
+  get branchFields(): DetailField[] {
+    const branch = this.branch();
+    if (!branch) return [];
+
+    return [
+      {
+        label: this.i18n.t('branches.name'),
+        value: branch.name
+      },
+      {
+        label: this.i18n.t('branches.code'),
+        value: branch.code,
+        copyable: true
+      },
+      {
+        label: this.i18n.t('branches.timezone'),
+        value: branch.timeZone
+      },
+      {
+        label: this.i18n.t('common.status'),
+        value: branch.isActive ? this.i18n.t('common.active') : this.i18n.t('common.inactive'),
+        type: 'badge',
+        badgeVariant: branch.isActive ? 'success' : 'danger'
+      },
+      {
+        label: this.i18n.t('common.phone'),
+        value: '-'
+      },
+      {
+        label: this.i18n.t('common.email'),
+        value: '-'
+      },
+      {
+        label: this.i18n.t('branches.created_at'),
+        value: branch.createdAtUtc,
+        type: 'date'
+      }
+    ];
+  }
 
   ngOnInit(): void {
     const branchId = this.route.snapshot.paramMap.get('id');

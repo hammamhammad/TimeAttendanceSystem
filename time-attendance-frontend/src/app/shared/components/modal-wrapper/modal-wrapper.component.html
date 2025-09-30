@@ -1,0 +1,54 @@
+@if (show) {
+  <!-- Modal -->
+  <div class="modal fade show d-block"
+       tabindex="-1"
+       role="dialog"
+       (click)="onBackdropClick($event)">
+    <div [class]="getModalDialogClasses()" role="document">
+      <div class="modal-content">
+        <!-- Header -->
+        @if (showHeader) {
+          <div class="modal-header">
+            <h5 class="modal-title">{{ title }}</h5>
+            @if (showCloseButton) {
+              <button type="button"
+                      class="btn-close"
+                      [disabled]="loading"
+                      (click)="onCloseClick()"
+                      aria-label="Close">
+              </button>
+            }
+          </div>
+        }
+
+        <!-- Body -->
+        <div class="modal-body">
+          @if (loading) {
+            <div class="text-center py-4">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <p class="mt-2 text-muted">Loading...</p>
+            </div>
+          } @else {
+            <ng-content></ng-content>
+          }
+        </div>
+
+        <!-- Footer -->
+        @if (showFooter) {
+          <div class="modal-footer">
+            @if (footerTemplate) {
+              <ng-container [ngTemplateOutlet]="footerTemplate"></ng-container>
+            } @else {
+              <ng-content select="[modal-footer]"></ng-content>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Backdrop -->
+  <div class="modal-backdrop fade show"></div>
+}

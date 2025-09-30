@@ -376,4 +376,18 @@ export class PermissionService {
   private isEmployee(): boolean {
     return this.hasRole('Employee');
   }
+
+  /**
+   * Get current user
+   */
+  getCurrentUser() {
+    return this.authService.currentUser();
+  }
+
+  /**
+   * Get current employee (alias for getCurrentUser)
+   */
+  getCurrentEmployee() {
+    return this.authService.currentUser();
+  }
 }

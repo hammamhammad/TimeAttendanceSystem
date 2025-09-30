@@ -133,6 +133,60 @@ public class EmployeesController : ControllerBase
     }
 
     /// <summary>
+    /// Gets a count of employees that would be affected by bulk vacation assignment.
+    /// Returns the number of active employees in the specified branch or department.
+    /// </summary>
+    /// <param name="assignmentType">Type of assignment: "Branch" or "Department"</param>
+    /// <param name="branchId">Branch ID for branch-level assignment</param>
+    /// <param name="departmentId">Department ID for department-level assignment</param>
+    /// <returns>Count of affected employees</returns>
+    /// <response code="200">Employee count retrieved successfully</response>
+    /// <response code="400">Invalid assignment type or missing required parameters</response>
+    /// <response code="401">Unauthorized access - authentication required</response>
+    /// <response code="403">Forbidden - insufficient permissions for employee access</response>
+    [HttpGet("count-preview")]
+    [Authorize(Policy = "EmployeeRead")]
+    public async Task<IActionResult> GetEmployeeCountPreview(
+        [FromQuery] int assignmentType,
+        [FromQuery] long? branchId = null,
+        [FromQuery] long? departmentId = null)
+    {
+        var query = new GetEmployeesQuery(1, int.MaxValue, null, null, null, null, true, "Active");
+
+        // Apply filter based on assignment type (1 = Branch, 2 = Department)
+        switch (assignmentType)
+        {
+            case 1: // Branch
+                if (!branchId.HasValue)
+                {
+                    return BadRequest(new { error = "Branch ID is required for branch assignment" });
+                }
+                query = new GetEmployeesQuery(1, int.MaxValue, null, branchId, null, null, true, "Active");
+                break;
+
+            case 2: // Department
+                if (!departmentId.HasValue)
+                {
+                    return BadRequest(new { error = "Department ID is required for department assignment" });
+                }
+                query = new GetEmployeesQuery(1, int.MaxValue, null, null, departmentId, null, true, "Active");
+                break;
+
+            default:
+                return BadRequest(new { error = "Invalid assignment type. Must be 1 (Branch) or 2 (Department)" });
+        }
+
+        var result = await _mediator.Send(query);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(new { error = result.Error });
+        }
+
+        return Ok(new { count = result.Value.TotalCount });
+    }
+
+    /// <summary>
     /// Retrieves detailed information for a specific employee by their unique identifier.
     /// Returns comprehensive employee data including organizational relationships and employment details.
     /// </summary>
@@ -308,6 +362,36 @@ public class EmployeesController : ControllerBase
         }
 
         return Ok(new { success = true, message = "Employee shift updated successfully" });
+    }
+
+    /// <summary>
+    /// Gets employees for dropdown selection.
+    /// Returns a simplified list of active employees for form dropdowns.
+    /// </summary>
+    /// <returns>List of employees with id and name for dropdown options</returns>
+    /// <response code="200">Employees retrieved successfully for dropdown</response>
+    /// <response code="401">User not authenticated or invalid authentication token</response>
+    /// <response code="403">User lacks permission to view employees</response>
+    [HttpGet("dropdown")]
+    [Authorize(Policy = "EmployeeRead")]
+    public async Task<IActionResult> GetEmployeesForDropdown()
+    {
+        var query = new GetEmployeesQuery(1, 1000, null, null, null, null, true, "Active"); // Get all active employees
+        var result = await _mediator.Send(query);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(new { error = result.Error });
+        }
+
+        // Transform to simple dropdown format
+        var dropdownData = result.Value.Items.Select(emp => new
+        {
+            id = emp.Id,
+            name = $"{emp.FirstName} {emp.LastName}"
+        });
+
+        return Ok(dropdownData);
     }
 }
 

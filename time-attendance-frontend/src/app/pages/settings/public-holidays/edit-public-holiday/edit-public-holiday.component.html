@@ -1,0 +1,390 @@
+<div class="app-form-page">
+  <app-form-header
+    mode="edit"
+    [title]="i18n.t('public_holidays.edit_holiday')"
+    moduleName="settings"
+    moduleRoute="settings/public-holidays"
+    [entityId]="holidayId || 0"
+    [loading]="saving()">
+  </app-form-header>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">{{ i18n.t('common.loading') }}</span>
+      </div>
+      <p class="mt-3 text-muted">{{ i18n.t('public_holidays.loading_details') }}</p>
+    </div>
+  }
+
+  <!-- Main Form Content -->
+  @if (!loading() && currentHoliday()) {
+    <form [formGroup]="holidayForm" (ngSubmit)="onSubmit()">
+      <div class="app-desktop-sidebar">
+        <!-- Main Form Content -->
+        <div class="app-main-content">
+          <!-- Basic Information Section -->
+          <app-form-section [title]="i18n.t('public_holidays.basic_information')">
+            <div class="row">
+              <!-- Holiday Name -->
+              <div class="col-md-6 mb-3">
+                <label for="name" class="form-label">
+                  {{ i18n.t('fields.name') }} <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  formControlName="name"
+                  class="form-control"
+                  [class.is-invalid]="isFieldInvalid('name')"
+                  [placeholder]="i18n.t('public_holidays.placeholders.enter_name')">
+                @if (hasError('name')) {
+                  <div class="invalid-feedback">
+                    {{ getErrorMessage('name') }}
+                  </div>
+                }
+              </div>
+
+              <!-- Holiday Name (Arabic) -->
+              <div class="col-md-6 mb-3">
+                <label for="nameAr" class="form-label">
+                  {{ i18n.t('fields.nameAr') }}
+                </label>
+                <input
+                  type="text"
+                  id="nameAr"
+                  formControlName="nameAr"
+                  class="form-control"
+                  [class.is-invalid]="isFieldInvalid('nameAr')"
+                  [placeholder]="i18n.t('public_holidays.placeholders.enter_name_ar')">
+                @if (hasError('nameAr')) {
+                  <div class="invalid-feedback">
+                    {{ getErrorMessage('nameAr') }}
+                  </div>
+                }
+              </div>
+
+              <!-- Holiday Type -->
+              <div class="col-md-6 mb-3">
+                <label for="holidayType" class="form-label">
+                  {{ i18n.t('fields.holidayType') }} <span class="text-danger">*</span>
+                </label>
+                <app-searchable-select
+                  id="holidayType"
+                  formControlName="holidayType"
+                  [options]="holidayTypeOptions"
+                  [placeholder]="i18n.t('public_holidays.placeholders.select_type')"
+                  [isInvalid]="isFieldInvalid('holidayType')">
+                </app-searchable-select>
+                @if (hasError('holidayType')) {
+                  <div class="invalid-feedback d-block">
+                    {{ getErrorMessage('holidayType') }}
+                  </div>
+                }
+              </div>
+
+              <!-- Priority -->
+              <div class="col-md-6 mb-3">
+                <label for="priority" class="form-label">
+                  {{ i18n.t('fields.priority') }} <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="number"
+                  id="priority"
+                  formControlName="priority"
+                  class="form-control"
+                  [class.is-invalid]="isFieldInvalid('priority')"
+                  min="1"
+                  max="100"
+                  [placeholder]="i18n.t('public_holidays.placeholders.enter_priority')">
+                @if (hasError('priority')) {
+                  <div class="invalid-feedback">
+                    {{ getErrorMessage('priority') }}
+                  </div>
+                }
+                <div class="form-text">
+                  {{ i18n.t('public_holidays.help.priority_info') }}
+                </div>
+              </div>
+            </div>
+          </app-form-section>
+
+          <!-- Date Configuration Section -->
+          <app-form-section [title]="i18n.t('public_holidays.date_configuration')">
+            <div class="row">
+              <!-- One Time Date -->
+              @if (selectedHolidayType() === HolidayType.OneTime) {
+                <div class="col-md-6 mb-3">
+                  <label for="specificDate" class="form-label">
+                    {{ i18n.t('fields.specificDate') }} <span class="text-danger">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    id="specificDate"
+                    formControlName="specificDate"
+                    class="form-control"
+                    [class.is-invalid]="isFieldInvalid('specificDate')">
+                  @if (hasError('specificDate')) {
+                    <div class="invalid-feedback">
+                      {{ getErrorMessage('specificDate') }}
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- Annual/Monthly Date -->
+              @if (selectedHolidayType() === HolidayType.Annual || selectedHolidayType() === HolidayType.Floating) {
+                <div class="col-md-6 mb-3">
+                  <label for="month" class="form-label">
+                    {{ i18n.t('fields.month') }} <span class="text-danger">*</span>
+                  </label>
+                  <select
+                    id="month"
+                    formControlName="month"
+                    class="form-select"
+                    [class.is-invalid]="isFieldInvalid('month')">
+                    <option value="">{{ i18n.t('public_holidays.placeholders.select_month') }}</option>
+                    @for (month of [1,2,3,4,5,6,7,8,9,10,11,12]; track month) {
+                      <option [value]="month">{{ i18n.t('months.month_' + month) }}</option>
+                    }
+                  </select>
+                  @if (hasError('month')) {
+                    <div class="invalid-feedback">
+                      {{ getErrorMessage('month') }}
+                    </div>
+                  }
+                </div>
+              }
+
+              @if (selectedHolidayType() === HolidayType.Annual || selectedHolidayType() === HolidayType.Monthly) {
+                <div class="col-md-6 mb-3">
+                  <label for="day" class="form-label">
+                    {{ i18n.t('fields.day') }} <span class="text-danger">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    id="day"
+                    formControlName="day"
+                    class="form-control"
+                    [class.is-invalid]="isFieldInvalid('day')"
+                    min="1"
+                    max="31">
+                  @if (hasError('day')) {
+                    <div class="invalid-feedback">
+                      {{ getErrorMessage('day') }}
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- Floating Holiday Fields -->
+              @if (selectedHolidayType() === HolidayType.Floating) {
+                <div class="col-md-6 mb-3">
+                  <label for="weekOfMonth" class="form-label">
+                    {{ i18n.t('fields.weekOfMonth') }} <span class="text-danger">*</span>
+                  </label>
+                  <select
+                    id="weekOfMonth"
+                    formControlName="weekOfMonth"
+                    class="form-select"
+                    [class.is-invalid]="isFieldInvalid('weekOfMonth')">
+                    <option value="">{{ i18n.t('public_holidays.placeholders.select_week') }}</option>
+                    <option value="1">{{ i18n.t('public_holidays.first_week') }}</option>
+                    <option value="2">{{ i18n.t('public_holidays.second_week') }}</option>
+                    <option value="3">{{ i18n.t('public_holidays.third_week') }}</option>
+                    <option value="4">{{ i18n.t('public_holidays.fourth_week') }}</option>
+                    <option value="5">{{ i18n.t('public_holidays.last_week') }}</option>
+                  </select>
+                  @if (hasError('weekOfMonth')) {
+                    <div class="invalid-feedback">
+                      {{ getErrorMessage('weekOfMonth') }}
+                    </div>
+                  }
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="dayOfWeek" class="form-label">
+                    {{ i18n.t('fields.dayOfWeek') }} <span class="text-danger">*</span>
+                  </label>
+                  <select
+                    id="dayOfWeek"
+                    formControlName="dayOfWeek"
+                    class="form-select"
+                    [class.is-invalid]="isFieldInvalid('dayOfWeek')">
+                    <option value="">{{ i18n.t('public_holidays.placeholders.select_day') }}</option>
+                    <option value="0">{{ i18n.t('days.sunday') }}</option>
+                    <option value="1">{{ i18n.t('days.monday') }}</option>
+                    <option value="2">{{ i18n.t('days.tuesday') }}</option>
+                    <option value="3">{{ i18n.t('days.wednesday') }}</option>
+                    <option value="4">{{ i18n.t('days.thursday') }}</option>
+                    <option value="5">{{ i18n.t('days.friday') }}</option>
+                    <option value="6">{{ i18n.t('days.saturday') }}</option>
+                  </select>
+                  @if (hasError('dayOfWeek')) {
+                    <div class="invalid-feedback">
+                      {{ getErrorMessage('dayOfWeek') }}
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </app-form-section>
+
+          <!-- Scope and Settings Section -->
+          <app-form-section [title]="i18n.t('public_holidays.scope_settings')">
+            <div class="row">
+              <!-- Status -->
+              <div class="col-md-6 mb-3">
+                <div class="form-check form-switch">
+                  <input
+                    type="checkbox"
+                    id="isActive"
+                    formControlName="isActive"
+                    class="form-check-input">
+                  <label for="isActive" class="form-check-label">
+                    {{ i18n.t('public_holidays.is_active') }}
+                  </label>
+                </div>
+                <div class="form-text">
+                  {{ i18n.t('public_holidays.help.active_status') }}
+                </div>
+              </div>
+
+              <!-- National/Branch -->
+              <div class="col-md-6 mb-3">
+                <div class="form-check form-switch">
+                  <input
+                    type="checkbox"
+                    id="isNational"
+                    formControlName="isNational"
+                    class="form-check-input">
+                  <label for="isNational" class="form-check-label">
+                    {{ i18n.t('public_holidays.is_national') }}
+                  </label>
+                </div>
+                <div class="form-text">
+                  {{ i18n.t('public_holidays.help.national_scope') }}
+                </div>
+              </div>
+
+              <!-- Branch Selection (when not national) -->
+              @if (!holidayForm.get('isNational')?.value) {
+                <div class="col-md-6 mb-3">
+                  <label for="branchId" class="form-label">
+                    {{ i18n.t('fields.branch') }}
+                  </label>
+                  <app-searchable-select
+                    id="branchId"
+                    formControlName="branchId"
+                    [options]="branchOptions"
+                    [placeholder]="i18n.t('public_holidays.placeholders.select_branch')"
+                    [isInvalid]="isFieldInvalid('branchId')">
+                  </app-searchable-select>
+                  @if (hasError('branchId')) {
+                    <div class="invalid-feedback d-block">
+                      {{ getErrorMessage('branchId') }}
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- Description -->
+              <div class="col-12 mb-3">
+                <label for="description" class="form-label">
+                  {{ i18n.t('fields.description') }}
+                </label>
+                <textarea
+                  id="description"
+                  formControlName="description"
+                  class="form-control"
+                  rows="3"
+                  [placeholder]="i18n.t('public_holidays.placeholders.enter_description')">
+                </textarea>
+              </div>
+            </div>
+          </app-form-section>
+        </div>
+
+        <!-- Sidebar Actions -->
+        <div class="app-sidebar-content">
+          <!-- Form Actions Card -->
+          <div class="card mb-3">
+            <div class="card-header">
+              <h6 class="card-title mb-0">
+                <i class="fas fa-cogs me-2"></i>
+                {{ i18n.t('common.actions') }}
+              </h6>
+            </div>
+            <div class="card-body">
+              <div class="d-grid gap-2">
+                <!-- Save Button -->
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  [disabled]="holidayForm.invalid || saving()">
+                  @if (saving()) {
+                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    {{ i18n.t('common.saving') }}
+                  } @else {
+                    <i class="fas fa-save me-2"></i>
+                    {{ i18n.t('common.save') }}
+                  }
+                </button>
+
+                <!-- Reset Button -->
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  (click)="onReset()"
+                  [disabled]="saving()">
+                  <i class="fas fa-undo me-2"></i>
+                  {{ i18n.t('common.reset') }}
+                </button>
+
+                <!-- Cancel Button -->
+                <button
+                  type="button"
+                  class="btn btn-outline-danger"
+                  (click)="onCancel()"
+                  [disabled]="saving()">
+                  <i class="fas fa-times me-2"></i>
+                  {{ i18n.t('common.cancel') }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Help Card -->
+          <div class="card">
+            <div class="card-header">
+              <h6 class="card-title mb-0">
+                <i class="fas fa-info-circle me-2"></i>
+                {{ i18n.t('common.help') }}
+              </h6>
+            </div>
+            <div class="card-body">
+              <p class="card-text small text-muted mb-2">
+                {{ i18n.t('public_holidays.help.edit_instructions') }}
+              </p>
+              <ul class="list-unstyled small text-muted mb-0">
+                <li class="mb-1">
+                  <i class="fas fa-check-circle text-success me-1"></i>
+                  {{ i18n.t('public_holidays.help.required_fields') }}
+                </li>
+                <li class="mb-1">
+                  <i class="fas fa-calendar text-info me-1"></i>
+                  {{ i18n.t('public_holidays.help.date_patterns') }}
+                </li>
+                <li>
+                  <i class="fas fa-globe text-primary me-1"></i>
+                  {{ i18n.t('public_holidays.help.scope_info') }}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  }
+</div>

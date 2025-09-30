@@ -25,6 +25,7 @@ export const PermissionActions = {
   UNASSIGN: 'unassign',
   MANAGE: 'manage',
   CONFIGURE: 'configure',
+  BULK_CREATE: 'bulkCreate',
 } as const;
 
 export const PermissionResources = {
@@ -43,7 +44,9 @@ export const PermissionResources = {
   AUDIT: 'audit',
   NOTIFICATION: 'notification',
   SYSTEM: 'system',
-  VACATION_TYPE: 'vacationType'
+  VACATION_TYPE: 'vacationType',
+  VACATION: 'vacation',
+  EXCUSE: 'excuse'
 } as const;
 
 export const ActionDescriptions: Record<string, string> = {
@@ -73,6 +76,7 @@ export const ActionDescriptions: Record<string, string> = {
   [PermissionActions.UNASSIGN]: 'Remove resource assignments',
   [PermissionActions.MANAGE]: 'Full management capabilities',
   [PermissionActions.CONFIGURE]: 'Configure settings and parameters',
+  [PermissionActions.BULK_CREATE]: 'Create multiple records in bulk operations',
 };
 
 export const ResourceDescriptions: Record<string, string> = {
@@ -91,7 +95,9 @@ export const ResourceDescriptions: Record<string, string> = {
   [PermissionResources.AUDIT]: 'Audit logs and security tracking',
   [PermissionResources.NOTIFICATION]: 'System notifications and alerts',
   [PermissionResources.SYSTEM]: 'Core system functions',
-  [PermissionResources.VACATION_TYPE]: 'Vacation types and leave policies'
+  [PermissionResources.VACATION_TYPE]: 'Vacation types and leave policies',
+  [PermissionResources.VACATION]: 'Employee vacation records and management',
+  [PermissionResources.EXCUSE]: 'Employee excuse management and approval'
 };
 
 export const ActionColors: Record<string, string> = {
@@ -120,7 +126,8 @@ export const ActionColors: Record<string, string> = {
   [PermissionActions.ASSIGN]: 'info',
   [PermissionActions.UNASSIGN]: 'warning',
   [PermissionActions.MANAGE]: 'primary',
-  [PermissionActions.CONFIGURE]: 'primary'
+  [PermissionActions.CONFIGURE]: 'primary',
+  [PermissionActions.BULK_CREATE]: 'primary'
 };
 
 export const ResourceIcons: Record<string, string> = {
@@ -139,7 +146,9 @@ export const ResourceIcons: Record<string, string> = {
   [PermissionResources.AUDIT]: 'fa-history',
   [PermissionResources.NOTIFICATION]: 'fa-bell',
   [PermissionResources.SYSTEM]: 'fa-server',
-  [PermissionResources.VACATION_TYPE]: 'fa-calendar-times'
+  [PermissionResources.VACATION_TYPE]: 'fa-calendar-times',
+  [PermissionResources.VACATION]: 'fa-calendar-week',
+  [PermissionResources.EXCUSE]: 'fa-clipboard-check'
 };
 
 export interface PermissionInfo {

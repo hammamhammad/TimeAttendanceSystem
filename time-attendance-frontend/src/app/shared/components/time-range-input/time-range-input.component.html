@@ -1,0 +1,73 @@
+<div class="time-range-input" [class.time-range-inline]="inline">
+  <div [class]="inline ? 'd-flex align-items-center gap-2' : 'row g-3'">
+    <!-- Start Time -->
+    <div [class]="inline ? 'flex-fill' : 'col-md-6'">
+      @if (showLabels) {
+        <label class="form-label">
+          {{ startLabel }}
+          @if (required) {
+            <span class="text-danger">*</span>
+          }
+        </label>
+      }
+      <input
+        type="time"
+        [class]="getInputClasses()"
+        [class.is-invalid]="startError"
+        [placeholder]="startPlaceholder"
+        [disabled]="disabled"
+        [min]="minTime"
+        [max]="getMaxStartTime()"
+        [step]="getStepInSeconds()"
+        [value]="value.start"
+        (change)="onStartChange($any($event.target).value)"
+        (blur)="onTouched()"
+      />
+      @if (startError) {
+        <div class="invalid-feedback d-block">
+          {{ startError }}
+        </div>
+      }
+    </div>
+
+    <!-- Separator (inline only) -->
+    @if (inline && showLabels) {
+      <span class="time-range-separator align-self-end pb-2">
+        <i class="fa-solid fa-arrow-right"></i>
+      </span>
+    }
+
+    <!-- End Time -->
+    <div [class]="inline ? 'flex-fill' : 'col-md-6'">
+      @if (showLabels) {
+        <label class="form-label">
+          {{ endLabel }}
+          @if (required) {
+            <span class="text-danger">*</span>
+          }
+        </label>
+      }
+      <input
+        type="time"
+        [class]="getInputClasses()"
+        [class.is-invalid]="endError"
+        [placeholder]="endPlaceholder"
+        [disabled]="disabled"
+        [min]="getMinEndTime()"
+        [max]="maxTime"
+        [step]="getStepInSeconds()"
+        [value]="value.end"
+        (change)="onEndChange($any($event.target).value)"
+        (blur)="onTouched()"
+      />
+      @if (endError) {
+        <div class="invalid-feedback d-block">
+          {{ endError }}
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Custom content slot -->
+  <ng-content></ng-content>
+</div>

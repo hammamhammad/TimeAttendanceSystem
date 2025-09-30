@@ -4,11 +4,12 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { DepartmentsService } from '../departments.service';
 import { Department } from '../../../shared/models/department.model';
 import { I18nService } from '../../../core/i18n/i18n.service';
+import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-view-department',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, LoadingSpinnerComponent],
   template: `
     <div class="container-fluid">
       <!-- Header -->
@@ -47,9 +48,10 @@ import { I18nService } from '../../../core/i18n/i18n.service';
 
       @if (loading()) {
         <div class="d-flex justify-content-center py-5">
-          <div class="spinner-border" role="status">
-            <span class="visually-hidden">{{ i18n.t('common.loading') }}</span>
-          </div>
+          <app-loading-spinner
+            [message]="i18n.t('common.loading')"
+            [centered]="true">
+          </app-loading-spinner>
         </div>
       } @else if (department()) {
         <!-- Department Details -->

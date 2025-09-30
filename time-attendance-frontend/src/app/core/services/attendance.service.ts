@@ -16,6 +16,7 @@ import {
   BulkCalculationRequest,
   BulkCalculationResult
 } from '../../shared/models/attendance.model';
+import { LeaveExcuseDetailsResponse } from '../../shared/models/leave-excuse-details.model';
 
 @Injectable({
   providedIn: 'root'
@@ -131,6 +132,13 @@ export class AttendanceService {
     }
 
     return this.http.get<AttendanceDashboardData>(`${this.apiUrl}/dashboard`, { params });
+  }
+
+  /**
+   * Get attendance record by ID
+   */
+  getAttendanceById(attendanceId: number): Observable<AttendanceRecord> {
+    return this.http.get<AttendanceRecord>(`${this.apiUrl}/${attendanceId}`);
   }
 
   /**
@@ -329,12 +337,12 @@ export class AttendanceService {
    * Change shift for a specific attendance record
    * This creates a temporary shift assignment for the attendance date and recalculates attendance
    */
-  changeAttendanceShift(recordId: number, shiftId: number, notes?: string): Observable<AttendanceRecord> {
+  changeAttendanceShift(changeData: {attendanceId: number, shiftId: number, notes?: string}): Observable<AttendanceRecord> {
     const request = {
-      shiftId: shiftId,
-      notes: notes
+      shiftId: changeData.shiftId,
+      notes: changeData.notes
     };
-    return this.http.post<AttendanceRecord>(`${this.apiUrl}/${recordId}/change-shift`, request);
+    return this.http.post<AttendanceRecord>(`${this.apiUrl}/${changeData.attendanceId}/change-shift`, request);
   }
 
   /**
@@ -348,5 +356,14 @@ export class AttendanceService {
     employeeIds?: number[];
   }): Observable<any> {
     return this.http.post(`${this.apiUrl}/monthly-report`, request);
+  }
+
+  /**
+   * Get leave, excuse, and remote work details for a specific employee and date.
+   * Used in the Daily Attendance Detail page to show comprehensive absence information.
+   */
+  getLeaveExcuseDetails(employeeId: number, date: string): Observable<LeaveExcuseDetailsResponse> {
+    let params = new HttpParams().set('date', date);
+    return this.http.get<LeaveExcuseDetailsResponse>(`${this.apiUrl}/employee/${employeeId}/leave-excuse-details`, { params });
   }
 }

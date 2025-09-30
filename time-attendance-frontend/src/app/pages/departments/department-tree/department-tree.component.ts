@@ -5,11 +5,12 @@ import { I18nService } from '../../../core/i18n/i18n.service';
 import { DepartmentsService } from '../departments.service';
 import { DepartmentDto, DepartmentTreeNode } from '../../../shared/models/department.model';
 import { BranchDto } from '../../../shared/models/employee.model';
+import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-department-tree',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoadingSpinnerComponent],
   templateUrl: './department-tree.component.html',
   styleUrls: ['./department-tree.component.css']
 })

@@ -3,7 +3,7 @@
     <input
       type="text"
       class="form-control"
-      [class.is-invalid]="required && !selectedValue() && searchTerm().trim() === ''"
+      [class.is-invalid]="isInvalid || (required && !selectedValue() && searchTerm().trim() === '')"
       [value]="displayValue()"
       [placeholder]="placeholder"
       [disabled]="disabled"

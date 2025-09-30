@@ -28,6 +28,7 @@ public static class PermissionActions
     public const string Unassign = "unassign";
     public const string Manage = "manage";
     public const string Configure = "configure";
+    public const string BulkCreate = "bulkCreate";
     
     public static readonly Dictionary<string, string> ActionDescriptions = new()
     {
@@ -57,6 +58,7 @@ public static class PermissionActions
         { Unassign, "Remove resource assignments" },
         { Manage, "Full management capabilities" },
         { Configure, "Configure settings and parameters" },
+        { BulkCreate, "Create multiple records in bulk operations" },
     };
 
     public static readonly Dictionary<string, string> ActionColors = new()
@@ -87,6 +89,7 @@ public static class PermissionActions
         { Unassign, "warning" },
         { Manage, "primary" },
         { Configure, "primary" },
+        { BulkCreate, "primary" },
     };
     
     public static string GetActionDescription(string action)

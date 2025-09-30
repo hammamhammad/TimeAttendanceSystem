@@ -8,12 +8,13 @@ import { DepartmentDto } from '../../shared/models/department.model';
 import { BranchDto } from '../../shared/models/employee.model';
 import { DepartmentTableComponent } from './department-table/department-table.component';
 import { DepartmentTreeComponent } from './department-tree/department-tree.component';
-import { DepartmentFiltersComponent } from './department-filters/department-filters.component';
+import { UnifiedFilterComponent } from '../../shared/components/unified-filter/unified-filter.component';
 import { DepartmentInfoPanelComponent } from './department-info-panel/department-info-panel.component';
 import { ConfirmationService } from '../../core/confirmation/confirmation.service';
 import { PermissionService } from '../../core/auth/permission.service';
 import { PermissionResources, PermissionActions } from '../../shared/utils/permission.utils';
 import { SearchableSelectOption } from '../../shared/components/searchable-select/searchable-select.component';
+import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 
 type ViewMode = 'table' | 'tree';
 
@@ -25,8 +26,9 @@ type ViewMode = 'table' | 'tree';
     FormsModule,
     DepartmentTableComponent,
     DepartmentTreeComponent,
-    DepartmentFiltersComponent,
+    UnifiedFilterComponent,
     DepartmentInfoPanelComponent,
+    PageHeaderComponent,
   ],
   templateUrl: './departments.component.html',
   styleUrls: ['./departments.component.css']
@@ -47,12 +49,14 @@ export class DepartmentsComponent implements OnInit {
     DEPARTMENT_MANAGE: `${PermissionResources.DEPARTMENT}.${PermissionActions.MANAGE}`
   };
 
+
   // Signals
   viewMode = signal<ViewMode>('table');
   selectedBranch = signal<BranchDto | null>(null);
   selectedDepartment = signal<DepartmentDto | null>(null);
   branchesLoading = signal(false);
   branches = signal<BranchDto[]>([]);
+  currentFilter: any = {};
 
 
   ngOnInit() {
@@ -117,6 +121,29 @@ export class DepartmentsComponent implements OnInit {
     } else {
       this.router.navigate(['/departments/create']);
     }
+  }
+
+  // Unified filter event handlers
+  onSearchChange(searchTerm: string): void {
+    this.currentFilter = { ...this.currentFilter, search: searchTerm };
+    // Handle search functionality if needed
+  }
+
+  onFiltersChange(filters: any): void {
+    this.currentFilter = { ...filters };
+    // Handle branch filter changes
+    if (filters.branchId) {
+      this.onBranchChange(parseInt(filters.branchId));
+    } else {
+      this.selectedBranch.set(null);
+    }
+  }
+
+  onRefreshData(): void {
+    // Reset filters
+    this.currentFilter = {};
+    this.selectedBranch.set(null);
+    this.refreshData();
   }
 
 

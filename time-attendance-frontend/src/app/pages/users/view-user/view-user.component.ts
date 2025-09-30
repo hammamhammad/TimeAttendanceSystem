@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { I18nService } from '../../../core/i18n/i18n.service';
@@ -7,11 +7,16 @@ import { User } from '../../../shared/models/user.model';
 import { PermissionService } from '../../../core/auth/permission.service';
 import { PermissionResources, PermissionActions } from '../../../shared/utils/permission.utils';
 import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
+import { FormHeaderComponent } from '../../../shared/components/form-header/form-header.component';
+import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
+import { BadgeListComponent, BadgeItem } from '../../../shared/components/badge-list/badge-list.component';
+import { DefinitionListComponent, DefinitionItem } from '../../../shared/components/definition-list/definition-list.component';
 
 @Component({
   selector: 'app-view-user',
   standalone: true,
-  imports: [CommonModule, RouterLink, HasPermissionDirective],
+  imports: [CommonModule, HasPermissionDirective, FormHeaderComponent, LoadingSpinnerComponent, StatusBadgeComponent, BadgeListComponent, DefinitionListComponent],
   templateUrl: './view-user.component.html',
   styleUrls: ['./view-user.component.css']
 })
@@ -62,13 +67,6 @@ export class ViewUserComponent implements OnInit {
     });
   }
 
-  onEdit() {
-    this.router.navigate(['/users', this.userId, 'edit']);
-  }
-
-  onBack() {
-    this.router.navigate(['/users']);
-  }
 
   onManageRoles() {
     // Navigate to role management page or modal
@@ -110,4 +108,91 @@ export class ViewUserComponent implements OnInit {
     }
     return String(branch) || 'Unknown Branch';
   }
+
+  // Computed properties for badge lists
+  roleBadges = computed<BadgeItem[]>(() => {
+    const user = this.user();
+    if (!user?.roles || user.roles.length === 0) return [];
+
+    return user.roles.map((role, index) => ({
+      id: index,
+      label: this.getRoleName(role),
+      variant: 'info' as const
+    }));
+  });
+
+  branchBadges = computed<BadgeItem[]>(() => {
+    const user = this.user();
+    if (!user?.branches || user.branches.length === 0) return [];
+
+    return user.branches.map((branch, index) => ({
+      id: index,
+      label: this.getBranchName(branch),
+      variant: 'light' as const
+    }));
+  });
+
+  // Computed properties for status badges
+  userStatusBadge = computed<{ label: string; variant: 'success' | 'danger' | 'light' }>(() => {
+    const user = this.user();
+    if (this.isUserLocked(user?.lockoutEndUtc)) {
+      return { label: this.t('users.locked'), variant: 'danger' };
+    } else if (user?.isActive) {
+      return { label: this.t('common.active'), variant: 'success' };
+    } else {
+      return { label: this.t('common.inactive'), variant: 'light' };
+    }
+  });
+
+  twoFactorBadge = computed<{ label: string; variant: 'success' | 'light' }>(() => {
+    const user = this.user();
+    if (user?.twoFactorEnabled) {
+      return { label: this.t('common.enabled'), variant: 'success' };
+    } else {
+      return { label: this.t('common.disabled'), variant: 'light' };
+    }
+  });
+
+  // Computed properties for definition lists
+  basicInfoItems = computed<DefinitionItem[]>(() => {
+    const user = this.user();
+    if (!user) return [];
+
+    const language = user.preferredLanguage === 'ar'
+      ? this.t('common.language_arabic')
+      : this.t('common.language_english');
+
+    return [
+      { label: this.t('users.username'), value: user.username },
+      { label: this.t('users.email'), value: user.email },
+      { label: this.t('users.phone'), value: user.phone || '-' },
+      { label: this.t('users.language'), value: language }
+    ];
+  });
+
+  statusInfoItems = computed<DefinitionItem[]>(() => {
+    const user = this.user();
+    if (!user) return [];
+
+    return [
+      {
+        label: this.t('common.status'),
+        value: this.userStatusBadge().label,
+        type: 'badge' as const,
+        badgeVariant: this.userStatusBadge().variant
+      },
+      {
+        label: this.t('users.created_at'),
+        value: user.createdAtUtc!,
+        type: 'date' as const
+      },
+      {
+        label: this.t('users.two_factor'),
+        value: this.twoFactorBadge().label,
+        type: 'badge' as const,
+        badgeVariant: this.twoFactorBadge().variant
+      },
+      { label: this.t('users.login_attempts'), value: String(user.accessFailedCount || 0) }
+    ];
+  });
 }

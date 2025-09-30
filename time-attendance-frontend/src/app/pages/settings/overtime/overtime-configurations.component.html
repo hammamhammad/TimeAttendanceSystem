@@ -1,19 +1,18 @@
 <div class="container-fluid">
-  <!-- Header Section -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h2 class="mb-1">{{ t('settings.overtime.title') }}</h2>
-      <p class="text-muted mb-0">{{ t('settings.overtime.subtitle') }}</p>
-    </div>
-    <div>
-      <button
-        class="btn btn-primary"
-        (click)="onCreateConfiguration()">
-        <i class="fa-solid fa-plus me-2"></i>
-        {{ t('settings.overtime.createPolicy') }}
-      </button>
-    </div>
-  </div>
+  <!-- Page Header -->
+  <app-page-header
+    [title]="t('settings.overtime.title')">
+  </app-page-header>
+
+  <!-- Unified Filter Component -->
+  <app-unified-filter
+    moduleName="overtime-configurations"
+    [refreshing]="loading()"
+    (searchChange)="onSearchTermChange($event)"
+    (filtersChange)="onFiltersChange($event)"
+    (add)="onCreateConfiguration()"
+    (refresh)="onRefreshData()">
+  </app-unified-filter>
 
   <!-- Active Policy Info -->
   @if (configurations().length > 0) {
@@ -36,36 +35,6 @@
     }
   }
 
-  <!-- Search and Filters -->
-  <div class="card mb-4">
-    <div class="card-body">
-      <div class="row g-3">
-        <div class="col-md-6">
-          <div class="input-group">
-            <span class="input-group-text">
-              <i class="fa-solid fa-search"></i>
-            </span>
-            <input
-              type="text"
-              class="form-control"
-              [(ngModel)]="searchTerm"
-              (ngModelChange)="onSearchChange()"
-              [placeholder]="t('settings.overtime.searchPlaceholder')">
-          </div>
-        </div>
-        <div class="col-md-6 text-end">
-          @if (hasActiveFilters()) {
-            <button
-              class="btn btn-outline-secondary"
-              (click)="onClearFilters()">
-              <i class="fa-solid fa-times me-1"></i>
-              {{ t('common.clearFilters') }}
-            </button>
-          }
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- Data Table -->
   <div class="card">

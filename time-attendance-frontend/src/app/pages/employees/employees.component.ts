@@ -7,18 +7,15 @@ import { PermissionResources, PermissionActions } from '../../shared/utils/permi
 import { EmployeesService } from './employees.service';
 import { NotificationService } from '../../core/notifications/notification.service';
 import { ConfirmationService } from '../../core/confirmation/confirmation.service';
-import {
-  EmployeeDto,
-  EmployeesFilter
-} from '../../shared/models/employee.model';
-import { EmployeeFiltersComponent } from './employee-filters/employee-filters.component';
+import { EmployeeDto } from '../../shared/models/employee.model';
+import { UnifiedFilterComponent } from '../../shared/components/unified-filter/unified-filter.component';
 import { EmployeeTableComponent } from './employee-table/employee-table.component';
-import { ChangeShiftModalComponent } from './change-shift-modal/change-shift-modal.component';
+import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 
 @Component({
   selector: 'app-employees',
   standalone: true,
-  imports: [CommonModule, EmployeeFiltersComponent, EmployeeTableComponent, ChangeShiftModalComponent],
+  imports: [CommonModule, UnifiedFilterComponent, EmployeeTableComponent, PageHeaderComponent],
   templateUrl: './employees.component.html',
   styleUrls: ['./employees.component.css']
 })
@@ -30,8 +27,6 @@ export class EmployeesComponent implements OnInit {
   private confirmationService = inject(ConfirmationService);
   private router = inject(Router);
 
-  @ViewChild('changeShiftModal') changeShiftModal!: ChangeShiftModalComponent;
-
   // Signals
   employees = signal<EmployeeDto[]>([]);
   loading = signal(false);
@@ -40,12 +35,8 @@ export class EmployeesComponent implements OnInit {
   pageSize = signal(10);
   totalPages = signal(0);
 
-  // Modal states
-  showChangeShiftModal = signal(false);
-  selectedEmployee = signal<EmployeeDto | null>(null);
-
   // Filter
-  currentFilter: EmployeesFilter = {};
+  currentFilter: any = {};
 
   // Permission constants for use in template
   readonly PERMISSIONS = {
@@ -56,13 +47,14 @@ export class EmployeesComponent implements OnInit {
     EMPLOYEE_MANAGE: `${PermissionResources.EMPLOYEE}.${PermissionActions.MANAGE}`
   };
 
+
   ngOnInit() {
     this.loadEmployees();
   }
 
   loadEmployees() {
     this.loading.set(true);
-    const filter: EmployeesFilter = {
+    const filter: any = {
       page: this.currentPage(),
       pageSize: this.pageSize(),
       ...this.currentFilter
@@ -89,14 +81,17 @@ export class EmployeesComponent implements OnInit {
     this.loadEmployees();
   }
 
-  onFiltersChange(filters: any) {
-    this.currentFilter = { ...filters };
-    this.currentPage.set(1);
-    this.loadEmployees();
-  }
-
   onAddEmployee() {
     this.router.navigate(['/employees/create']);
+  }
+
+  onRefreshData() {
+    // Reset filters and pagination
+    this.currentFilter = {};
+    this.currentPage.set(1);
+
+    // Reload data
+    this.loadEmployees();
   }
 
   // Table event handlers
@@ -140,8 +135,7 @@ export class EmployeesComponent implements OnInit {
   }
 
   onChangeShift(employee: EmployeeDto) {
-    this.selectedEmployee.set(employee);
-    this.showChangeShiftModal.set(true);
+    this.router.navigate(['/employees', employee.id, 'change-shift']);
   }
 
   onPageChange(page: number) {
@@ -170,42 +164,4 @@ export class EmployeesComponent implements OnInit {
     this.loadEmployees();
   }
 
-  // Modal event handlers
-  onShiftChanged(event: {employee: EmployeeDto, shiftData: any}) {
-    this.employeesService.updateEmployeeShift(event.employee.id, event.shiftData).subscribe({
-      next: () => {
-        this.changeShiftModal.resetSubmitting();
-        this.showChangeShiftModal.set(false);
-        this.selectedEmployee.set(null);
-        this.loadEmployees();
-        this.notificationService.success(
-          this.i18n.t('app.success'),
-          'Employee shift updated successfully'
-        );
-      },
-      error: (error) => {
-        console.error('Failed to update employee shift:', error);
-
-        // Reset the modal loading state and show error
-        let errorMessage = 'Failed to update employee shift';
-        if (error?.error?.message) {
-          errorMessage = error.error.message;
-        } else if (typeof error?.error === 'string') {
-          errorMessage = error.error;
-        }
-
-        this.changeShiftModal.showError(errorMessage);
-
-        this.notificationService.error(
-          this.i18n.t('app.error'),
-          errorMessage
-        );
-      }
-    });
-  }
-
-  onCloseChangeShiftModal() {
-    this.showChangeShiftModal.set(false);
-    this.selectedEmployee.set(null);
-  }
 }

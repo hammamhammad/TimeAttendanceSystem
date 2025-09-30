@@ -96,6 +96,15 @@ export const routes: Routes = [
         canMatch: [adminGuard]
       },
       {
+        path: 'employees/:employeeId/change-shift',
+        loadComponent: () => import('./pages/employees/change-employee-shift/change-employee-shift.component').then(m => m.ChangeEmployeeShiftComponent),
+        data: {
+          title: 'employees.change_shift',
+          permission: 'employee.update'
+        },
+        canMatch: [managerGuard]
+      },
+      {
         path: 'roles',
         loadComponent: () => import('./pages/roles/roles.component').then(m => m.RolesComponent),
         data: {
@@ -213,6 +222,15 @@ export const routes: Routes = [
         canMatch: [adminGuard]
       },
       {
+        path: 'shifts/:id/view',
+        loadComponent: () => import('./pages/shifts/view-shift/view-shift.component').then(m => m.ViewShiftComponent),
+        data: {
+          title: 'shifts.view_details',
+          permission: 'shift.read'
+        },
+        canMatch: [managerGuard]
+      },
+      {
         path: 'shifts/:id/edit',
         loadComponent: () => import('./pages/shifts/edit-shift/edit-shift.component').then(m => m.EditShiftComponent),
         data: {
@@ -294,6 +312,15 @@ export const routes: Routes = [
         canMatch: [authGuard]
       },
       {
+        path: 'attendance/:attendanceId/change-shift',
+        loadComponent: () => import('./pages/attendance/change-attendance-shift/change-attendance-shift.component').then(m => m.ChangeAttendanceShiftComponent),
+        data: {
+          title: 'attendance.change_shift_title',
+          permission: 'attendance.update'
+        },
+        canMatch: [authGuard]
+      },
+      {
         path: 'settings',
         loadComponent: () => import('./pages/settings/settings.component').then(m => m.SettingsComponent),
         data: { title: 'settings.title' }
@@ -326,6 +353,15 @@ export const routes: Routes = [
         canMatch: [adminGuard]
       },
       {
+        path: 'settings/overtime/:id/view',
+        loadComponent: () => import('./pages/settings/overtime/view-overtime-configuration/view-overtime-configuration.component').then(m => m.ViewOvertimeConfigurationComponent),
+        data: {
+          title: 'settings.overtime.view_details',
+          permission: 'settings.overtime.read'
+        },
+        canMatch: [adminGuard]
+      },
+      {
         path: 'settings/public-holidays',
         loadComponent: () => import('./pages/settings/public-holidays/public-holidays.component').then(m => m.PublicHolidaysComponent),
         data: {
@@ -340,6 +376,24 @@ export const routes: Routes = [
         data: {
           title: 'settings.holidays.create',
           permission: 'publicHoliday.create'
+        },
+        canMatch: [adminGuard]
+      },
+      {
+        path: 'settings/public-holidays/:id/view',
+        loadComponent: () => import('./pages/settings/public-holidays/view-public-holiday/view-public-holiday.component').then(m => m.ViewPublicHolidayComponent),
+        data: {
+          title: 'settings.holidays.view_details',
+          permission: 'publicHoliday.read'
+        },
+        canMatch: [adminGuard]
+      },
+      {
+        path: 'settings/public-holidays/:id/edit',
+        loadComponent: () => import('./pages/settings/public-holidays/edit-public-holiday/edit-public-holiday.component').then(m => m.EditPublicHolidayComponent),
+        data: {
+          title: 'settings.holidays.edit',
+          permission: 'publicHoliday.update'
         },
         canMatch: [adminGuard]
       },
@@ -361,6 +415,116 @@ export const routes: Routes = [
           permission: 'vacationType.read'
         },
         canMatch: [managerGuard]
+      },
+      // Employee Vacations Routes
+      {
+        path: 'employee-vacations',
+        loadComponent: () => import('./pages/employee-vacations/employee-vacations.component').then(m => m.EmployeeVacationsComponent),
+        data: {
+          title: 'employee_vacations.title',
+          permission: 'vacation.read'
+        },
+        canMatch: [authGuard]
+      },
+      {
+        path: 'employee-vacations/create',
+        loadComponent: () => import('./pages/employee-vacations/create-employee-vacation/create-employee-vacation.component').then(m => m.CreateEmployeeVacationComponent),
+        data: {
+          title: 'employee_vacations.create_vacation',
+          permission: 'vacation.create'
+        },
+        canMatch: [authGuard]
+      },
+      {
+        path: 'employee-vacations/:id/view',
+        loadComponent: () => import('./pages/employee-vacations/view-employee-vacation/view-employee-vacation.component').then(m => m.ViewEmployeeVacationComponent),
+        data: {
+          title: 'employee_vacations.view_details',
+          permission: 'vacation.read'
+        },
+        canMatch: [authGuard]
+      },
+      {
+        path: 'employee-vacations/:id/edit',
+        loadComponent: () => import('./pages/employee-vacations/edit-employee-vacation/edit-employee-vacation.component').then(m => m.EditEmployeeVacationComponent),
+        data: {
+          title: 'employee_vacations.edit_vacation',
+          permission: 'vacation.update'
+        },
+        canMatch: [authGuard]
+      },
+      {
+        path: 'settings/excuse-policies',
+        loadComponent: () => import('./pages/excuse-policies/excuse-policies.component').then(m => m.ExcusePoliciesComponent),
+        data: {
+          title: 'excuse_policies.title',
+          permission: 'settings.excusePolicy.read'
+        },
+        canMatch: [adminGuard]
+      },
+      {
+        path: 'settings/excuse-policies/create',
+        loadComponent: () => import('./pages/excuse-policies/create-excuse-policy/create-excuse-policy.component').then(m => m.CreateExcusePolicyComponent),
+        data: {
+          title: 'excuse_policies.create_policy',
+          permission: 'settings.excusePolicy.create'
+        },
+        canMatch: [adminGuard]
+      },
+      {
+        path: 'settings/excuse-policies/:id/view',
+        loadComponent: () => import('./pages/excuse-policies/view-excuse-policy/view-excuse-policy.component').then(m => m.ViewExcusePolicyComponent),
+        data: {
+          title: 'excuse_policies.view_details',
+          permission: 'settings.excusePolicy.read'
+        },
+        canMatch: [adminGuard]
+      },
+      {
+        path: 'settings/excuse-policies/:id/edit',
+        loadComponent: () => import('./pages/excuse-policies/edit-excuse-policy/edit-excuse-policy.component').then(m => m.EditExcusePolicyComponent),
+        data: {
+          title: 'excuse_policies.edit_policy',
+          permission: 'settings.excusePolicy.update'
+        },
+        canMatch: [adminGuard]
+      },
+      // Employee Excuses Routes
+      {
+        path: 'employee-excuses',
+        loadComponent: () => import('./pages/employee-excuses/employee-excuses.component').then(m => m.EmployeeExcusesComponent),
+        data: {
+          title: 'employee_excuses.title',
+          permission: 'excuse.read'
+        },
+        canMatch: [authGuard]
+      },
+      {
+        path: 'employee-excuses/create',
+        loadComponent: () => import('./pages/employee-excuses/excuse-request-form/excuse-request-form.component').then(m => m.ExcuseRequestFormComponent),
+        data: {
+          title: 'employee_excuses.create_request',
+          permission: 'excuse.create'
+        },
+        canMatch: [authGuard]
+      },
+      {
+        path: 'employee-excuses/:id/view',
+        loadComponent: () => import('./pages/employee-excuses/excuse-details/excuse-details.component').then(m => m.ExcuseDetailsComponent),
+        data: {
+          title: 'employee_excuses.excuse_details',
+          permission: 'excuse.read'
+        },
+        canMatch: [authGuard]
+      },
+      {
+        path: 'employee-excuses/:id/edit',
+        loadComponent: () => import('./pages/employee-excuses/excuse-request-form/excuse-request-form.component').then(m => m.ExcuseRequestFormComponent),
+        data: {
+          title: 'employee_excuses.edit_request',
+          permission: 'excuse.update'
+        },
+        canMatch: [authGuard]
       },
     ]
   },

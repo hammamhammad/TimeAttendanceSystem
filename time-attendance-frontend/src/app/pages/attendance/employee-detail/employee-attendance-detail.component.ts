@@ -662,42 +662,37 @@ export class EmployeeAttendanceDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Get status badge variant for attendance status
+   */
+  getStatusBadgeVariant(status: AttendanceStatus): 'success' | 'danger' | 'warning' | 'info' | 'secondary' | 'primary' {
+    switch (status) {
+      case AttendanceStatus.Present:
+        return 'success';
+      case AttendanceStatus.Absent:
+      case AttendanceStatus.Incomplete:
+        return 'danger';
+      case AttendanceStatus.Late:
+      case AttendanceStatus.EarlyLeave:
+      case AttendanceStatus.SickLeave:
+        return 'warning';
+      case AttendanceStatus.OnLeave:
+        return 'info';
+      case AttendanceStatus.Overtime:
+        return 'primary';
+      case AttendanceStatus.DayOff:
+      case AttendanceStatus.Holiday:
+      default:
+        return 'secondary';
+    }
+  }
+
+  /**
    * Format status for table display with badge styling
    */
   formatStatusForTable(status: AttendanceStatus): string {
     const statusText = this.i18n.t(this.getStatusText(status));
-    const badgeClass = this.getStatusBadgeClass(status);
-    return `<span class="${badgeClass}">${statusText}</span>`;
-  }
-
-  /**
-   * Get status badge class for attendance status
-   */
-  getStatusBadgeClass(status: AttendanceStatus): string {
-    switch (status) {
-      case AttendanceStatus.Present:
-        return 'badge bg-success';
-      case AttendanceStatus.Absent:
-        return 'badge bg-danger';
-      case AttendanceStatus.Late:
-        return 'badge bg-warning';
-      case AttendanceStatus.EarlyLeave:
-        return 'badge bg-warning';
-      case AttendanceStatus.OnLeave:
-        return 'badge bg-info';
-      case AttendanceStatus.DayOff:
-        return 'badge bg-secondary';
-      case AttendanceStatus.Overtime:
-        return 'badge bg-primary';
-      case AttendanceStatus.Incomplete:
-        return 'badge bg-danger';
-      case AttendanceStatus.Holiday:
-        return 'badge bg-secondary';
-      case AttendanceStatus.SickLeave:
-        return 'badge bg-warning';
-      default:
-        return 'badge bg-secondary';
-    }
+    const variant = this.getStatusBadgeVariant(status);
+    return `<span class="badge bg-${variant}">${statusText}</span>`;
   }
 
   /**

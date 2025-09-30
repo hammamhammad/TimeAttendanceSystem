@@ -87,6 +87,15 @@ builder.Services.AddControllers(options =>
 {
     options.Filters.Add<SecurityHeadersFilter>();
     options.Filters.Add<AuditActionFilter>();
+}).ConfigureApiBehaviorOptions(options =>
+{
+    // Configure API behavior options if needed
+}).AddJsonOptions(options =>
+{
+    // Configure JSON serialization to use camelCase
+    options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+    options.JsonSerializerOptions.DictionaryKeyPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+    options.JsonSerializerOptions.WriteIndented = true;
 });
 builder.Services.AddOpenApi();
 
@@ -94,7 +103,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo { Title = "Time Attendance System API", Version = "v1" });
-    
+
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
@@ -117,6 +126,13 @@ builder.Services.AddSwaggerGen(options =>
             },
             Array.Empty<string>()
         }
+    });
+
+    // Configure support for file uploads
+    options.MapType<IFormFile>(() => new OpenApiSchema
+    {
+        Type = "string",
+        Format = "binary"
     });
 });
 
