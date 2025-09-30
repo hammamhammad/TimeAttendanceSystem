@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/shared/components/stats-grid/stats-grid.component.css"],
+  "sourcesContent": [".stats-grid {\r\n  margin-bottom: 1.5rem;\r\n}\r\n\r\n.stats-grid-item {\r\n  margin-bottom: 0;\r\n}\r\n\r\n/* Skeleton Loader Styles */\r\n.skeleton-loader {\r\n  animation: pulse 1.5s ease-in-out infinite;\r\n}\r\n\r\n.skeleton-line {\r\n  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);\r\n  background-size: 200% 100%;\r\n  animation: shimmer 1.5s infinite;\r\n  border-radius: 4px;\r\n  margin-bottom: 0.75rem;\r\n}\r\n\r\n.skeleton-title {\r\n  height: 14px;\r\n  width: 60%;\r\n}\r\n\r\n.skeleton-value {\r\n  height: 32px;\r\n  width: 40%;\r\n}\r\n\r\n.skeleton-subtitle {\r\n  height: 12px;\r\n  width: 50%;\r\n}\r\n\r\n@keyframes shimmer {\r\n  0% {\r\n    background-position: -200% 0;\r\n  }\r\n  100% {\r\n    background-position: 200% 0;\r\n  }\r\n}\r\n\r\n@keyframes pulse {\r\n  0%, 100% {\r\n    opacity: 1;\r\n  }\r\n  50% {\r\n    opacity: 0.8;\r\n  }\r\n}"],
+  "mappings": ";AAAA,CAAC;AACC,iBAAe;AACjB;AAEA,CAAC;AACC,iBAAe;AACjB;AAGA,CAAC;AACC,aAAW,MAAM,KAAK,YAAY;AACpC;AAEA,CAAC;AACC;AAAA,IAAY;AAAA,MAAgB,KAAhB;AAAA,MAAuB,QAAQ,GAA/B;AAAA,MAAoC,QAAQ,GAA5C;AAAA,MAAiD,QAAQ;AACrE,mBAAiB,KAAK;AACtB,aAAW,QAAQ,KAAK;AACxB,iBAAe;AACf,iBAAe;AACjB;AAEA,CAAC;AACC,UAAQ;AACR,SAAO;AACT;AAEA,CAAC;AACC,UAAQ;AACR,SAAO;AACT;AAEA,CAAC;AACC,UAAQ;AACR,SAAO;AACT;AAEA,WApBa;AAqBX;AACE,yBAAqB,MAAM;AAC7B;AACA;AACE,yBAAqB,KAAK;AAC5B;AACF;AAEA,WAnCa;AAoCX;AACE,aAAS;AACX;AACA;AACE,aAAS;AACX;AACF;",
+  "names": []
+}

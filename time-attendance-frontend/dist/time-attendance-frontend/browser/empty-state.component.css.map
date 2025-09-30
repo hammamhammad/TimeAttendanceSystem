@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/shared/components/empty-state/empty-state.component.css"],
+  "sourcesContent": [".empty-state {\r\n  display: flex;\r\n  flex-direction: column;\r\n  align-items: center;\r\n  justify-content: center;\r\n}\r\n\r\n.empty-state-title {\r\n  color: #6c757d;\r\n  font-weight: 600;\r\n}\r\n\r\n.empty-state-actions {\r\n  display: flex;\r\n  gap: 0.5rem;\r\n  flex-wrap: wrap;\r\n  justify-content: center;\r\n}"],
+  "mappings": ";AAAA,CAAC;AACC,WAAS;AACT,kBAAgB;AAChB,eAAa;AACb,mBAAiB;AACnB;AAEA,CAAC;AACC,SAAO;AACP,eAAa;AACf;AAEA,CAAC;AACC,WAAS;AACT,OAAK;AACL,aAAW;AACX,mBAAiB;AACnB;",
+  "names": []
+}

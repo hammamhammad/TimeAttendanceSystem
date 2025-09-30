@@ -40,7 +40,9 @@
       "Bash(for file in excuse-policies/view-excuse-policy/view-excuse-policy.component.html settings/public-holidays/view-public-holiday/view-public-holiday.component.html vacation-types/view-vacation-type/view-vacation-type.component.html)",
       "Bash(do echo \"=== $file ===\")",
       "Bash(done)",
-      "Bash(npx ng build:*)"
+      "Bash(npx ng build:*)",
+      "Bash(rm:*)",
+      "Bash(rmdir:*)"
     ],
     "deny": [],
     "ask": []

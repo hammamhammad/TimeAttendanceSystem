@@ -13,19 +13,14 @@ export type { TableActionItem } from './table-actions/table-actions.component';
 export * from './form-group/form-group.component';
 export * from './date-range-picker/date-range-picker.component';
 export * from './section-card/section-card.component';
-export * from './metric-row/metric-row.component';
 export * from './stats-grid/stats-grid.component';
 
 // Phase 3 - Enhancement Components
 export * from './definition-list/definition-list.component';
 export * from './badge-list/badge-list.component';
-export * from './action-dropdown/action-dropdown.component';
 export * from './error-alert/error-alert.component';
-export * from './info-alert/info-alert.component';
 
 // Phase 4 - Polish Components
-export * from './content-tabs/content-tabs.component';
-export * from './quick-actions-panel/quick-actions-panel.component';
 export * from './time-range-input/time-range-input.component';
 export * from './bulk-actions-toolbar/bulk-actions-toolbar.component';
 

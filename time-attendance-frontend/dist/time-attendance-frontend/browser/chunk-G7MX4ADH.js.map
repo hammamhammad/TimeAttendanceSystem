@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/shared/components/page-header/page-header.component.ts"],
+  "sourcesContent": ["import { Component, Input } from '@angular/core';\r\nimport { CommonModule } from '@angular/common';\r\n\r\n@Component({\r\n  selector: 'app-page-header',\r\n  standalone: true,\r\n  imports: [CommonModule],\r\n  template: `\r\n    <div class=\"d-flex justify-content-between align-items-center mb-4\">\r\n      <h2>{{ title }}</h2>\r\n    </div>\r\n  `\r\n})\r\nexport class PageHeaderComponent {\r\n  @Input() title!: string;\r\n}"],
+  "mappings": ";;;;;;;;;;;;;;;;;;;AAaM,IAAO,uBAAP,MAAO,qBAAmB;EACrB;;AADqB;cAAnB;mCAAA,sBAAmB;AAAA;cAAnB,uFAAA,sBAAmB,WAAA,CAAA,CAAA,iBAAA,CAAA,GAAA,QAAA,EAAA,OAAA,QAAA,GAAA,OAAA,GAAA,MAAA,GAAA,QAAA,CAAA,CAAA,GAAA,UAAA,2BAAA,sBAAA,MAAA,CAAA,GAAA,UAAA,gCAAA,6BAAA,IAAA,KAAA;AAAA,MAAA,KAAA,GAAA;AAL5B,IAAA,4BAAA,GAAA,OAAA,CAAA,EAAoE,GAAA,IAAA;AAC9D,IAAA,iBAAA,CAAA;AAAW,IAAA,0BAAA,EAAK;;;AAAhB,IAAA,oBAAA,CAAA;AAAA,IAAA,4BAAA,IAAA,KAAA;;GAIsB,gDAPpB,YAAY,GAAA,eAAA,EAAA,CAAA;AAOlB,IAAO,sBAAP;;sEAAO,qBAAmB,CAAA;UAV/B;WAAU;MACT,UAAU;MACV,YAAY;MACZ,SAAS,CAAC,YAAY;MACtB,UAAU;;;;;KAKX;cAEU,OAAK,CAAA;UAAb;;;;6EADU,qBAAmB,EAAA,WAAA,uBAAA,UAAA,kEAAA,YAAA,GAAA,CAAA;AAAA,GAAA;",
+  "names": []
+}
