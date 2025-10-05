@@ -132,6 +132,9 @@
             "projectReferences": {
               "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj": {
                 "projectPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj"
+              },
+              "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Shared\\TimeAttendanceSystem.Shared\\TimeAttendanceSystem.Shared.csproj": {
+                "projectPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Shared\\TimeAttendanceSystem.Shared\\TimeAttendanceSystem.Shared.csproj"
               }
             }
           }

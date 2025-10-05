@@ -12,6 +12,8 @@ import { BranchesService } from '../../branches/branches.service';
 import { EmployeesService } from '../../employees/employees.service';
 import { DepartmentsService } from '../../departments/departments.service';
 import { ModalWrapperComponent } from '../../../shared/components/modal-wrapper/modal-wrapper.component';
+import { DataTableComponent, TableColumn, TableAction } from '../../../shared/components/data-table/data-table.component';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 import {
   ShiftAssignment,
   ShiftAssignmentType,
@@ -29,11 +31,12 @@ import { DepartmentDto } from '../../../shared/models/department.model';
 import { PermissionService } from '../../../core/auth/permission.service';
 import { PermissionResources, PermissionActions } from '../../../shared/utils/permission.utils';
 import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
+import { computed } from '@angular/core';
 
 @Component({
   selector: 'app-assign-shifts',
   standalone: true,
-  imports: [CommonModule, FormsModule, HasPermissionDirective, SearchableSelectComponent, PageHeaderComponent, UnifiedFilterComponent, ModalWrapperComponent],
+  imports: [CommonModule, FormsModule, HasPermissionDirective, SearchableSelectComponent, PageHeaderComponent, UnifiedFilterComponent, ModalWrapperComponent, DataTableComponent, StatusBadgeComponent],
   templateUrl: './assign-shifts.component.html',
   styleUrls: ['./assign-shifts.component.css']
 })
@@ -104,6 +107,99 @@ export class AssignShiftsComponent implements OnInit {
   availableEmployees = signal<EmployeeSelectOption[]>([]);
   availableDepartments = signal<DepartmentDto[]>([]);
   selectedBranchForFilter = signal<number | null>(null);
+
+  // Table configuration
+  tableColumns = computed<TableColumn[]>(() => [
+    {
+      key: 'shift',
+      label: this.i18n.t('shifts.shift'),
+      sortable: false,
+      width: '200px',
+      priority: 'high',
+      renderHtml: true
+    },
+    {
+      key: 'assignmentType',
+      label: this.i18n.t('shifts.assignments.assignmentType'),
+      sortable: false,
+      width: '150px',
+      align: 'center',
+      priority: 'medium',
+      renderHtml: true
+    },
+    {
+      key: 'target',
+      label: this.i18n.t('shifts.assignments.target'),
+      sortable: false,
+      width: '250px',
+      priority: 'high',
+      renderHtml: true
+    },
+    {
+      key: 'effectiveDate',
+      label: this.i18n.t('shifts.assignments.effectiveDate'),
+      sortable: false,
+      width: '120px',
+      priority: 'medium'
+    },
+    {
+      key: 'endDate',
+      label: this.i18n.t('shifts.assignments.endDate'),
+      sortable: false,
+      width: '120px',
+      priority: 'low',
+      renderHtml: true
+    },
+    {
+      key: 'status',
+      label: this.i18n.t('common.status'),
+      sortable: false,
+      width: '120px',
+      align: 'center',
+      priority: 'medium',
+      renderHtml: true
+    },
+    {
+      key: 'priority',
+      label: this.i18n.t('shifts.assignments.priority'),
+      sortable: false,
+      width: '100px',
+      align: 'center',
+      priority: 'low',
+      renderHtml: true
+    }
+  ]);
+
+  tableActions = computed<TableAction[]>(() => [
+    {
+      key: 'edit',
+      label: this.i18n.t('common.edit'),
+      icon: 'fa-edit',
+      color: 'primary',
+      condition: () => this.permissionService.has(this.PERMISSIONS.SHIFT_ASSIGNMENT_MANAGE)
+    },
+    {
+      key: 'delete',
+      label: this.i18n.t('common.delete'),
+      icon: 'fa-trash',
+      color: 'danger',
+      condition: () => this.permissionService.has(this.PERMISSIONS.SHIFT_ASSIGNMENT_MANAGE)
+    }
+  ]);
+
+  // Transform assignments data for data table
+  tableData = computed(() => {
+    return this.assignments().map(assignment => ({
+      ...assignment,
+      shift: this.formatShift(assignment),
+      assignmentType: this.formatAssignmentType(assignment),
+      target: this.formatTarget(assignment),
+      effectiveDate: this.formatDate(assignment.effectiveDate),
+      endDate: this.formatEndDate(assignment),
+      status: this.formatStatus(assignment),
+      priority: this.formatPriority(assignment)
+    }));
+  });
 
   ngOnInit(): void {
     this.loadAssignments();
@@ -585,5 +681,72 @@ export class AssignShiftsComponent implements OnInit {
   onStatusSelectionChange(statusStr: string) {
     const status = statusStr ? parseInt(statusStr) : ShiftAssignmentStatus.Active;
     this.updateCreateForm('status', status);
+  }
+
+  // Table data formatting methods
+  formatShift(assignment: ShiftAssignment): string {
+    return `
+      <div>
+        <strong>${assignment.shiftName}</strong>
+        <small class="text-muted d-block">${assignment.shiftType || ''}</small>
+      </div>
+    `;
+  }
+
+  formatAssignmentType(assignment: ShiftAssignment): string {
+    return `<span class="badge bg-info-subtle text-info">${assignment.assignmentTypeDisplay}</span>`;
+  }
+
+  formatTarget(assignment: ShiftAssignment): string {
+    let html = `<div><strong>${assignment.targetDisplayName}</strong>`;
+    if (assignment.employeeNumber) {
+      html += `<small class="text-muted d-block">${this.i18n.t('employees.employeeNumber')}: ${assignment.employeeNumber}</small>`;
+    }
+    if (assignment.branchCode) {
+      html += `<small class="text-muted d-block">${this.i18n.t('branches.code')}: ${assignment.branchCode}</small>`;
+    }
+    html += '</div>';
+    return html;
+  }
+
+  formatEndDate(assignment: ShiftAssignment): string {
+    if (assignment.endDate) {
+      return this.formatDate(assignment.endDate);
+    }
+    return `<span class="text-muted">${this.i18n.t('common.indefinite')}</span>`;
+  }
+
+  formatStatus(assignment: ShiftAssignment): string {
+    const statusVariant = assignment.status === 1 ? 'success' : assignment.status === 2 ? 'warning' : 'secondary';
+    return `<span class="badge bg-${statusVariant}-subtle text-${statusVariant}">${assignment.statusDisplay}</span>`;
+  }
+
+  formatPriority(assignment: ShiftAssignment): string {
+    return `<span class="badge bg-info-subtle text-info">${assignment.priority}</span>`;
+  }
+
+  // Table action handler
+  onTableActionClick(event: {action: string, item: ShiftAssignment}): void {
+    const { action, item } = event;
+
+    switch (action) {
+      case 'edit':
+        this.editAssignment(item);
+        break;
+      case 'delete':
+        this.deleteAssignment(item);
+        break;
+      default:
+        console.warn('Unknown action:', action);
+    }
+  }
+
+  // Pagination handlers for data table
+  onTablePageChange(page: number): void {
+    this.onPageChanged(page);
+  }
+
+  onTablePageSizeChange(size: number): void {
+    this.onPageSizeChanged(size);
   }
 }

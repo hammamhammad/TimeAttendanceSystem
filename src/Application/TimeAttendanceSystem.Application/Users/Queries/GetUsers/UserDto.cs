@@ -73,12 +73,15 @@ public record UserDto(
     string Username,
     string Email,
     string? Phone,
+    string? FirstName,
+    string? LastName,
     bool TwoFactorEnabled,
     DateTime? LockoutEndUtc,
     bool MustChangePassword,
     string PreferredLanguage,
     bool IsActive,
     DateTime CreatedAtUtc,
+    DateTime? LastLoginAt,
     List<string> Roles,
     List<string> Branches
 );

@@ -4,6 +4,7 @@ using TimeAttendanceSystem.Domain.Shifts;
 using TimeAttendanceSystem.Domain.Settings;
 using TimeAttendanceSystem.Domain.Branches;
 using TimeAttendanceSystem.Domain.Employees;
+using TimeAttendanceSystem.Domain.RemoteWork;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
@@ -35,20 +36,14 @@ public static class SeedData
             await SeedDefaultShiftAsync(context);
         }
 
-        if (!await context.OvertimeConfigurations.AnyAsync())
+        if (!await context.RemoteWorkPolicies.AnyAsync())
         {
-            await SeedDefaultOvertimeConfigurationAsync(context);
-        }
-
-        // Add sample employees with departments if none exist
-        if (!await context.Employees.AnyAsync())
-        {
-            await SeedSampleEmployeesAsync(context);
+            await SeedDefaultRemoteWorkPolicyAsync(context);
         }
 
         await context.SaveChangesAsync();
 
-        Console.WriteLine("✅ Essential system data seeding completed (permissions, roles, users, default shift, overtime configuration)");
+        Console.WriteLine("✅ Essential system data seeding completed (permissions, roles, systemadmin user, default shift, remote work policy)");
     }
 
     private static async Task SeedPermissionsAsync(TimeAttendanceDbContext context)
@@ -159,6 +154,19 @@ public static class SeedData
         permissions.AddRange(PermissionBuilder.CreateResourcePermissions(PermissionResources.Excuse, "Employee Excuse Management",
             PermissionActions.Approve, PermissionActions.Reject, PermissionActions.View, PermissionActions.BulkCreate));
 
+        // Remote Work Policy Management - Settings for remote work policies
+        permissions.AddRange(PermissionBuilder.CreateResourcePermissions("remoteWork.policy", "Remote Work Policy Management",
+            PermissionActions.Read, PermissionActions.Create, PermissionActions.Update, PermissionActions.Delete,
+            PermissionActions.Configure, PermissionActions.Manage, PermissionActions.Activate, PermissionActions.Deactivate));
+
+        // Remote Work Request Management - Managing remote work requests
+        permissions.AddRange(PermissionBuilder.CreateExtendedCrudPermissions("remoteWork.request", "Remote Work Request Management"));
+        permissions.AddRange(PermissionBuilder.CreateResourcePermissions("remoteWork.request", "Remote Work Request Management",
+            PermissionActions.Approve, PermissionActions.Reject, PermissionActions.View, "cancel"));
+
+        // Session Management - Managing user sessions and security
+        permissions.AddRange(PermissionBuilder.CreateResourcePermissions(PermissionResources.Session, "Session Management",
+            PermissionActions.Read, PermissionActions.Delete, PermissionActions.Manage));
 
         // Get existing permission keys
         var existingKeys = await context.Permissions
@@ -378,123 +386,34 @@ public static class SeedData
         await context.ShiftPeriods.AddAsync(shiftPeriod);
         await context.SaveChangesAsync();
 
-        Console.WriteLine("✅ Default shift created: 'Flexible hour 7:30 - 9:00' (8:00-17:00)");
+        Console.WriteLine("✅ Default shift created: 'Flexible hour 7:30 - 9:00' (8:00-16:00)");
     }
 
-    private static async Task SeedDefaultOvertimeConfigurationAsync(TimeAttendanceDbContext context)
+    private static async Task SeedDefaultRemoteWorkPolicyAsync(TimeAttendanceDbContext context)
     {
-        // Create the default overtime configuration with standard business rules
-        var defaultOvertimeConfig = new OvertimeConfiguration
+        // Create a company-wide default remote work policy
+        var defaultPolicy = new RemoteWorkPolicy
         {
-            EnablePreShiftOvertime = false,
-            EnablePostShiftOvertime = true,
-            NormalDayRate = 1.5m,
-            PublicHolidayRate = 2.0m,
-            OffDayRate = 1.5m,
-            MinimumOvertimeMinutes = 15,
-            ConsiderFlexibleTime = true,
-            MaxPreShiftOvertimeHours = 2.0m,
-            MaxPostShiftOvertimeHours = 4.0m,
-            RequireApproval = false,
-            OvertimeGracePeriodMinutes = 5,
-            WeekendAsOffDay = true,
-            RoundingIntervalMinutes = 15,
-            PolicyNotes = "Default overtime configuration - Post-shift overtime enabled with 1.5x rate for normal days, 2.0x for holidays, and 2.5x for off days. Minimum 15 minutes threshold with 15-minute rounding.",
-            IsActive = true,
-            EffectiveFromDate = DateTime.UtcNow,
-            EffectiveToDate = null,
-            CreatedAtUtc = DateTime.UtcNow,
-            CreatedBy = "SYSTEM"
-        };
-
-        await context.OvertimeConfigurations.AddAsync(defaultOvertimeConfig);
-        await context.SaveChangesAsync();
-
-        Console.WriteLine("✅ Default overtime configuration created: Post-shift overtime enabled (1.5x normal, 2.0x holiday, 2.5x off-day rates)");
-    }
-
-    private static async Task SeedSampleEmployeesAsync(TimeAttendanceDbContext context)
-    {
-        // First create some sample branches and departments
-        var branch = new Branch
-        {
-            Code = "HQ001",
-            Name = "Head Office",
-            TimeZone = "Asia/Riyadh",
+            BranchId = null, // Company-wide policy
+            MaxDaysPerWeek = 3,
+            MaxDaysPerMonth = 10,
+            MaxDaysPerYear = 120,
+            RequiresManagerApproval = false,
+            AllowConsecutiveDays = true,
+            MaxConsecutiveDays = 3,
+            MinAdvanceNoticeDays = 1,
+            BlackoutPeriods = null,
+            CountForOvertime = true,
+            EnforceShiftTimes = false,
             IsActive = true,
             CreatedAtUtc = DateTime.UtcNow,
             CreatedBy = "SYSTEM"
         };
 
-        await context.Branches.AddAsync(branch);
+        await context.RemoteWorkPolicies.AddAsync(defaultPolicy);
         await context.SaveChangesAsync();
 
-        var department = new Department
-        {
-            BranchId = branch.Id,
-            Code = "IT001",
-            Name = "Information Technology",
-            NameAr = "تكنولوجيا المعلومات",
-            Description = "IT Department",
-            DescriptionAr = "قسم تكنولوجيا المعلومات",
-            IsActive = true,
-            SortOrder = 1,
-            CreatedAtUtc = DateTime.UtcNow,
-            CreatedBy = "SYSTEM"
-        };
-
-        await context.Departments.AddAsync(department);
-        await context.SaveChangesAsync();
-
-        // Create sample employees with department assignment
-        var employees = new[]
-        {
-            new Employee
-            {
-                BranchId = branch.Id,
-                DepartmentId = department.Id,
-                EmployeeNumber = "EMP001",
-                FirstName = "Ahmed",
-                LastName = "Al-Rashid",
-                FirstNameAr = "أحمد",
-                LastNameAr = "الراشد",
-                Email = "ahmed.alrashid@company.com",
-                Phone = "+966551234567",
-                HireDate = DateTime.UtcNow.AddDays(-365),
-                EmploymentStatus = EmploymentStatus.FullTime,
-                JobTitle = "Software Developer",
-                JobTitleAr = "مطور برمجيات",
-                WorkLocationType = WorkLocationType.OnSite,
-                Gender = Gender.Male,
-                CreatedAtUtc = DateTime.UtcNow,
-                CreatedBy = "SYSTEM"
-            },
-            new Employee
-            {
-                BranchId = branch.Id,
-                DepartmentId = department.Id,
-                EmployeeNumber = "EMP002",
-                FirstName = "Fatima",
-                LastName = "Al-Zahra",
-                FirstNameAr = "فاطمة",
-                LastNameAr = "الزهراء",
-                Email = "fatima.alzahra@company.com",
-                Phone = "+966551234568",
-                HireDate = DateTime.UtcNow.AddDays(-200),
-                EmploymentStatus = EmploymentStatus.FullTime,
-                JobTitle = "IT Manager",
-                JobTitleAr = "مدير تكنولوجيا المعلومات",
-                WorkLocationType = WorkLocationType.OnSite,
-                Gender = Gender.Female,
-                CreatedAtUtc = DateTime.UtcNow,
-                CreatedBy = "SYSTEM"
-            }
-        };
-
-        await context.Employees.AddRangeAsync(employees);
-        await context.SaveChangesAsync();
-
-        Console.WriteLine("✅ Sample employees created with departments: Ahmed Al-Rashid, Fatima Al-Zahra");
+        Console.WriteLine("✅ Default remote work policy created: Company-wide (3 days/week, 10 days/month, 120 days/year)");
     }
 
     private static (string hash, string salt) HashPassword(string password)

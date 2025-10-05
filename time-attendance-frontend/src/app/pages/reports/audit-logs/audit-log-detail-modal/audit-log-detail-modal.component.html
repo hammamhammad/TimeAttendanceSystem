@@ -1,0 +1,56 @@
+<app-modal-wrapper
+  [show]="show()"
+  [title]="i18n.t('audit_logs.detail_title')"
+  [size]="'lg'"
+  (close)="onClose()">
+
+  <div class="modal-body">
+    <!-- Basic Information -->
+    <div class="mb-4">
+      <h6 class="text-uppercase text-muted mb-3">{{ i18n.t('audit_logs.basic_information') }}</h6>
+      <app-definition-list
+        [items]="basicInfo()"
+        [labelWidth]="'4'"
+        [valueWidth]="'8'">
+      </app-definition-list>
+    </div>
+
+    <!-- Actor Information -->
+    <div class="mb-4">
+      <h6 class="text-uppercase text-muted mb-3">{{ i18n.t('audit_logs.actor_information') }}</h6>
+      <app-definition-list
+        [items]="actorInfo()"
+        [labelWidth]="'4'"
+        [valueWidth]="'8'">
+      </app-definition-list>
+    </div>
+
+    <!-- Technical Information -->
+    <div class="mb-4">
+      <h6 class="text-uppercase text-muted mb-3">{{ i18n.t('audit_logs.technical_information') }}</h6>
+      <app-definition-list
+        [items]="technicalInfo()"
+        [labelWidth]="'4'"
+        [valueWidth]="'8'">
+      </app-definition-list>
+    </div>
+
+    <!-- Payload Information -->
+    @if (hasPayload()) {
+      <div class="mb-4">
+        <h6 class="text-uppercase text-muted mb-3">{{ i18n.t('audit_logs.payload') }}</h6>
+        <div class="card bg-light">
+          <div class="card-body">
+            <pre class="mb-0" style="max-height: 300px; overflow-y: auto;"><code>{{ formattedPayload() }}</code></pre>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="onClose()">
+      {{ i18n.t('common.close') }}
+    </button>
+  </div>
+</app-modal-wrapper>

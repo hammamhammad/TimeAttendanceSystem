@@ -17,21 +17,11 @@
     </div>
   } @else {
     <!-- Main Form -->
-    <div class="card">
-      <div class="card-header">
-        <h5 class="card-title mb-0">
-          <i class="fa-solid fa-user-plus me-2"></i>
-          {{ t('employees.employee_information') }}
-        </h5>
-      </div>
+    <app-form-section [title]="t('employees.employee_information')">
       <div class="card-body">
         <form [formGroup]="createForm" (ngSubmit)="onSubmit()">
           <!-- Required Information Section -->
-          <div class="mb-4">
-            <h6 class="text-primary mb-3">
-              <i class="fa-solid fa-asterisk me-2"></i>
-              {{ t('employees.required_information') }}
-            </h6>
+          <app-form-section [title]="t('employees.required_information')">
             <div class="row g-3">
               <!-- Branch -->
               <div class="col-md-6">
@@ -176,16 +166,10 @@
                 }
               </div>
             </div>
-          </div>
-
-          <hr>
+          </app-form-section>
 
           <!-- Optional Information Section -->
-          <div class="mb-4">
-            <h6 class="text-secondary mb-3">
-              <i class="fa-solid fa-info-circle me-2"></i>
-              {{ t('employees.additional_information') }}
-            </h6>
+          <app-form-section [title]="t('employees.additional_information')">
             <div class="row g-3">
               <!-- Arabic Names -->
               <div class="col-md-6">
@@ -344,7 +328,7 @@
                 }
               </div>
             </div>
-          </div>
+          </app-form-section>
 
           <!-- Validation Rules Info -->
           <div class="alert alert-info">
@@ -386,5 +370,6 @@
           </div>
         </form>
       </div>
-    </div>
+    </app-form-section>
   }
+</div>

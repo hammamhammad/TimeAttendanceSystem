@@ -1,0 +1,229 @@
+<div class="edit-remote-work-policy-page">
+  <!-- Page Header -->
+  <app-form-header
+    mode="edit"
+    [title]="i18n.t('remoteWork.policy.edit_policy')"
+    moduleName="remote-work-policy"
+    moduleRoute="settings/remote-work-policy"
+    [entityId]="policyId() || undefined"
+    [loading]="submitting()">
+  </app-form-header>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="d-flex justify-content-center align-items-center py-5">
+      <app-loading-spinner
+        [message]="i18n.t('common.loading')"
+        [variant]="'primary'"
+        [centered]="true">
+      </app-loading-spinner>
+    </div>
+  } @else {
+    <!-- Policy Form -->
+    <form (ngSubmit)="onSubmit()" #policyFormElement="ngForm">
+      <!-- Basic Information -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-info-circle text-info me-2"></i>
+            {{ i18n.t('common.basic_information') }}
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <!-- Branch Selection -->
+            <div class="col-md-6 mb-3">
+              <label for="branchId" class="form-label required">
+                {{ i18n.t('remoteWork.policy.branch') }}
+              </label>
+              <app-searchable-select
+                [(ngModel)]="policyForm.branchId"
+                name="branchId"
+                [options]="branches()"
+                [placeholder]="i18n.t('remoteWork.policy.select_branch')"
+                [required]="true"
+                valueField="id"
+                labelField="name">
+              </app-searchable-select>
+            </div>
+
+            <!-- Active Status -->
+            <div class="col-md-6 mb-3">
+              <label for="isActive" class="form-label">
+                {{ i18n.t('common.status') }}
+              </label>
+              <div class="form-check form-switch mt-2">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="isActive"
+                  [(ngModel)]="policyForm.isActive"
+                  name="isActive">
+                <label class="form-check-label" for="isActive">
+                  {{ policyForm.isActive ? i18n.t('common.active') : i18n.t('common.inactive') }}
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quota Settings -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-calendar-check text-success me-2"></i>
+            {{ i18n.t('remoteWork.policy.quota_settings') }}
+          </h5>
+        </div>
+        <div class="card-body">
+          <p class="text-muted mb-3">
+            <i class="fas fa-info-circle me-1"></i>
+            {{ i18n.t('remoteWork.policy.quota_settings_help') }}
+          </p>
+          <div class="row">
+            <!-- Max Days Per Week -->
+            <div class="col-md-4 mb-3">
+              <label for="maxDaysPerWeek" class="form-label">
+                {{ i18n.t('remoteWork.policy.max_days_per_week') }}
+              </label>
+              <input
+                type="number"
+                class="form-control"
+                id="maxDaysPerWeek"
+                [(ngModel)]="policyForm.maxDaysPerWeek"
+                name="maxDaysPerWeek"
+                min="0"
+                max="7"
+                [placeholder]="i18n.t('remoteWork.policy.no_limit')">
+              <div class="form-text">{{ i18n.t('remoteWork.policy.max_7_days') }}</div>
+            </div>
+
+            <!-- Max Days Per Month -->
+            <div class="col-md-4 mb-3">
+              <label for="maxDaysPerMonth" class="form-label">
+                {{ i18n.t('remoteWork.policy.max_days_per_month') }}
+              </label>
+              <input
+                type="number"
+                class="form-control"
+                id="maxDaysPerMonth"
+                [(ngModel)]="policyForm.maxDaysPerMonth"
+                name="maxDaysPerMonth"
+                min="0"
+                max="31"
+                [placeholder]="i18n.t('remoteWork.policy.no_limit')">
+              <div class="form-text">{{ i18n.t('remoteWork.policy.max_31_days') }}</div>
+            </div>
+
+            <!-- Max Days Per Year -->
+            <div class="col-md-4 mb-3">
+              <label for="maxDaysPerYear" class="form-label">
+                {{ i18n.t('remoteWork.policy.max_days_per_year') }}
+              </label>
+              <input
+                type="number"
+                class="form-control"
+                id="maxDaysPerYear"
+                [(ngModel)]="policyForm.maxDaysPerYear"
+                name="maxDaysPerYear"
+                min="0"
+                max="365"
+                [placeholder]="i18n.t('remoteWork.policy.no_limit')">
+              <div class="form-text">{{ i18n.t('remoteWork.policy.max_365_days') }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Approval Settings -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-user-check text-warning me-2"></i>
+            {{ i18n.t('remoteWork.policy.approval_settings') }}
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <!-- Manager Approval Required -->
+            <div class="col-md-12 mb-3">
+              <div class="form-check form-switch">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="requiresManagerApproval"
+                  [(ngModel)]="policyForm.requiresManagerApproval"
+                  name="requiresManagerApproval">
+                <label class="form-check-label" for="requiresManagerApproval">
+                  {{ i18n.t('remoteWork.policy.requires_manager_approval') }}
+                </label>
+              </div>
+              <div class="form-text">
+                {{ policyForm.requiresManagerApproval
+                  ? i18n.t('remoteWork.policy.approval_required_help')
+                  : i18n.t('remoteWork.policy.approval_automatic_help') }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Advance Notice -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-bell text-primary me-2"></i>
+            {{ i18n.t('remoteWork.policy.advance_notice') }}
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <!-- Minimum Advance Notice Days -->
+            <div class="col-md-6 mb-3">
+              <label for="minAdvanceNoticeDays" class="form-label">
+                {{ i18n.t('remoteWork.policy.min_advance_notice_days') }}
+              </label>
+              <input
+                type="number"
+                class="form-control"
+                id="minAdvanceNoticeDays"
+                [(ngModel)]="policyForm.minAdvanceNoticeDays"
+                name="minAdvanceNoticeDays"
+                min="0"
+                [placeholder]="i18n.t('remoteWork.policy.no_advance_notice')">
+              <div class="form-text">{{ i18n.t('remoteWork.policy.advance_notice_help') }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-end gap-2">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              (click)="onCancel()"
+              [disabled]="submitting()">
+              <i class="fas fa-times me-2"></i>
+              {{ i18n.t('common.cancel') }}
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="submitting() || !policyFormElement.form.valid">
+              @if (submitting()) {
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              } @else {
+                <i class="fas fa-save me-2"></i>
+              }
+              {{ i18n.t('common.save') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  }
+</div>

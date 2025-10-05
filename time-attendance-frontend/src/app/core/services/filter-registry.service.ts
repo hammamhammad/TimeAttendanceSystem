@@ -16,7 +16,6 @@ import { EmployeesService } from '../../pages/employees/employees.service';
 import { ShiftsService } from '../../pages/shifts/shifts.service';
 import { VacationTypesService } from '../../pages/vacation-types/vacation-types.service';
 import { RolesService } from '../../pages/roles/roles.service';
-import { ExcusePoliciesService } from '../../pages/excuse-policies/excuse-policies.service';
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +29,6 @@ export class FilterRegistryService {
   private shiftsService = inject(ShiftsService);
   private vacationTypesService = inject(VacationTypesService);
   private rolesService = inject(RolesService);
-  private excusePoliciesService = inject(ExcusePoliciesService);
 
   private registry: ModuleFilterRegistry = {};
   private dataCache = new BehaviorSubject<FilterData>({});
@@ -161,21 +159,6 @@ export class FilterRegistryService {
     });
   }
 
-  loadExcusePolicies(branchId?: number): Observable<any[]> {
-    return this.excusePoliciesService.getExcusePolicies({ branchId }).pipe(
-      map(response => {
-        const excusePolicies = response.items || [];
-        const currentData = this.dataCache.value;
-        const cacheKey = branchId ? `excusePolicies_${branchId}` : 'excusePolicies_all';
-        this.dataCache.next({
-          ...currentData,
-          [cacheKey]: excusePolicies,
-          excusePolicies: excusePolicies
-        });
-        return excusePolicies;
-      })
-    );
-  }
 
   getCachedData(): Observable<FilterData> {
     return this.dataCache.asObservable();
@@ -269,18 +252,6 @@ export class FilterRegistryService {
             value: role.id.toString(),
             label: role.name,
             subLabel: role.type
-          }))
-        ];
-
-      case CommonFilterTypes.ExcusePolicy:
-        const excusePolicyKey = filterDef.dependsOn ?
-          `excusePolicies_${cachedData[filterDef.dependsOn]}` : 'excusePolicies_all';
-        return [
-          allOption,
-          ...(cachedData[excusePolicyKey] || cachedData.excusePolicies || []).map((policy: any) => ({
-            value: policy.id.toString(),
-            label: policy.branchName || 'Organization Wide',
-            subLabel: policy.maxExcusesPerMonth ? `${policy.maxExcusesPerMonth}/month` : ''
           }))
         ];
 

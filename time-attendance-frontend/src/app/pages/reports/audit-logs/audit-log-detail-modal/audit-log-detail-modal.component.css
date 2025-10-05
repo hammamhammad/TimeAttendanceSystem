@@ -1,0 +1,9 @@
+pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+code {
+  color: #333;
+  font-size: 0.875rem;
+}

@@ -39,5 +39,10 @@ public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
         RuleFor(x => x.BranchIds)
             .NotEmpty()
             .WithMessage("At least one branch scope must be assigned.");
+
+        RuleFor(x => x.EmployeeId)
+            .NotNull()
+            .When(x => x.Username?.ToLower() != "systemadmin")
+            .WithMessage("Employee selection is required for all users except SystemAdmin.");
     }
 }

@@ -18,10 +18,13 @@ public class GetUserSessionsQueryHandler : BaseHandler<GetUserSessionsQuery, Res
             return Result.Failure<GetUserSessionsResponse>("User not authenticated.");
 
         var sessions = await Context.UserSessions
+            .Include(s => s.User)
             .Where(s => s.UserId == currentUserId.Value)
             .OrderByDescending(s => s.LastAccessedAtUtc)
             .Select(s => new UserSessionDto(
                 s.SessionId,
+                s.User.Username,
+                s.User.Email,
                 s.DeviceName,
                 s.Platform,
                 s.Browser,

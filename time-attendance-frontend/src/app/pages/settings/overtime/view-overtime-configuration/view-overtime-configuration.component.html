@@ -2,7 +2,7 @@
   <!-- Standardized Page Header -->
   <app-form-header
     mode="view"
-    [title]="i18n.t('overtime_configs.view_configuration')"
+    [title]="i18n.t('settings.overtime.configurationInfo')"
     moduleName="settings"
     moduleRoute="settings/overtime"
     [entityId]="overtimeConfig()?.id"
@@ -13,7 +13,7 @@
   @if (loading()) {
     <div class="text-center py-5">
       <app-loading-spinner
-        [message]="i18n.t('overtime_configs.loading_details')"
+        [message]="i18n.t('common.loading')"
         [variant]="'primary'"
         [centered]="true">
       </app-loading-spinner>
@@ -34,168 +34,193 @@
       <!-- Main Content -->
       <div class="app-main-content">
         <!-- Basic Information Card -->
-        <app-detail-card
-          [title]="i18n.t('overtime_configs.basic_information')"
+        <app-section-card
+          [title]="i18n.t('settings.overtime.configurationInfo')"
           icon="fas fa-info-circle"
-          [fields]="basicInfoFields"
-          layout="two-column">
-        </app-detail-card>
+          headerClass="bg-light"
+          class="mb-4">
+          <app-definition-list
+            [items]="basicInfoItems()"
+            [labelWidth]="'4'"
+            [valueWidth]="'8'">
+          </app-definition-list>
+        </app-section-card>
 
         <!-- Overtime Settings Card -->
-        <app-detail-card
-          [title]="i18n.t('overtime_configs.overtime_settings')"
+        <app-section-card
+          [title]="i18n.t('settings.overtime.calculationSettings')"
           icon="fas fa-clock"
-          [fields]="overtimeSettingsFields"
-          layout="two-column"
-          class="mt-4">
-        </app-detail-card>
+          headerClass="bg-light"
+          class="mb-4">
+          <div class="row">
+            <div class="col-md-6">
+              <app-definition-list
+                [items]="overtimeSettingsLeftItems()"
+                [labelWidth]="'7'"
+                [valueWidth]="'5'">
+              </app-definition-list>
+            </div>
+            <div class="col-md-6">
+              <app-definition-list
+                [items]="overtimeSettingsRightItems()"
+                [labelWidth]="'7'"
+                [valueWidth]="'5'">
+              </app-definition-list>
+            </div>
+          </div>
+        </app-section-card>
 
         <!-- Overtime Rates Card -->
-        <app-detail-card
-          [title]="i18n.t('overtime_configs.overtime_rates')"
+        <app-section-card
+          [title]="i18n.t('settings.overtime.overtimeRates')"
           icon="fas fa-percentage"
-          [fields]="overtimeRatesFields"
-          layout="two-column"
-          class="mt-4">
-        </app-detail-card>
+          headerClass="bg-light"
+          class="mb-4">
+          <app-definition-list
+            [items]="overtimeRatesItems()"
+            [labelWidth]="'4'"
+            [valueWidth]="'8'">
+          </app-definition-list>
+        </app-section-card>
 
         <!-- Policy Settings Card -->
-        <app-detail-card
-          [title]="i18n.t('overtime_configs.policy_settings')"
+        <app-section-card
+          [title]="i18n.t('settings.overtime.additionalSettings')"
           icon="fas fa-cogs"
-          [fields]="policySettingsFields"
-          layout="two-column"
-          class="mt-4">
-        </app-detail-card>
+          headerClass="bg-light"
+          class="mb-4">
+          <app-definition-list
+            [items]="policySettingsItems()"
+            [labelWidth]="'5'"
+            [valueWidth]="'7'">
+          </app-definition-list>
+        </app-section-card>
 
         <!-- Audit Information Card -->
-        <app-detail-card
-          [title]="i18n.t('overtime_configs.audit_information')"
+        <app-section-card
+          [title]="i18n.t('common.audit_information')"
           icon="fas fa-history"
-          [fields]="auditFields"
-          layout="two-column"
-          class="mt-4">
-        </app-detail-card>
+          headerClass="bg-light"
+          class="mb-4">
+          <app-definition-list
+            [items]="auditItems()"
+            [labelWidth]="'3'"
+            [valueWidth]="'9'">
+          </app-definition-list>
+        </app-section-card>
       </div>
 
       <!-- Sidebar -->
       <div class="app-sidebar-content">
         <!-- Actions Card -->
         @if (hasActiveActions()) {
-          <div class="card mb-3">
-            <div class="card-header">
-              <h6 class="card-title mb-0">
-                <i class="fas fa-cogs me-2"></i>
-                {{ i18n.t('common.actions') }}
-              </h6>
-            </div>
-            <div class="card-body">
-              <div class="d-grid gap-2">
+          <app-section-card
+            [title]="i18n.t('common.actions')"
+            icon="fas fa-cogs"
+            headerClass="bg-light"
+            class="mb-3">
+            <div class="d-grid gap-2">
+              <!-- Toggle Status Action -->
+              @if (canToggleStatus()) {
+                <button
+                  type="button"
+                  class="btn"
+                  [class]="overtimeConfig()?.isActive ? 'btn-warning' : 'btn-success'"
+                  (click)="toggleStatus()"
+                  [disabled]="processing()">
+                  @if (processing()) {
+                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                  } @else {
+                    <i class="fas" [class]="overtimeConfig()?.isActive ? 'fa-pause' : 'fa-check'" [class.me-2]="true"></i>
+                  }
+                  {{ overtimeConfig()?.isActive ? i18n.t('common.deactivate') : i18n.t('common.activate') }}
+                </button>
+              }
 
-                <!-- Toggle Status Action -->
-                @if (canToggleStatus()) {
-                  <button
-                    type="button"
-                    class="btn"
-                    [class]="overtimeConfig()?.isActive ? 'btn-warning' : 'btn-success'"
-                    (click)="toggleStatus()"
-                    [disabled]="processing()">
-                    @if (processing()) {
-                      <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                    } @else {
-                      <i class="fas" [class]="overtimeConfig()?.isActive ? 'fa-pause' : 'fa-check'" [class.me-2]="true"></i>
-                    }
-                    {{ overtimeConfig()?.isActive ? i18n.t('common.deactivate') : i18n.t('common.activate') }}
-                  </button>
-                }
-
-                <!-- Delete Action -->
-                @if (canDelete()) {
-                  <button
-                    type="button"
-                    class="btn btn-outline-danger"
-                    (click)="deleteOvertimeConfiguration()"
-                    [disabled]="processing()">
-                    @if (processing()) {
-                      <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                    } @else {
-                      <i class="fas fa-trash me-2"></i>
-                    }
-                    {{ i18n.t('common.delete') }}
-                  </button>
-                }
-              </div>
+              <!-- Delete Action -->
+              @if (canDelete()) {
+                <button
+                  type="button"
+                  class="btn btn-outline-danger"
+                  (click)="deleteOvertimeConfiguration()"
+                  [disabled]="processing()">
+                  @if (processing()) {
+                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                  } @else {
+                    <i class="fas fa-trash me-2"></i>
+                  }
+                  {{ i18n.t('common.delete') }}
+                </button>
+              }
             </div>
-          </div>
+          </app-section-card>
         }
 
         <!-- Configuration Summary -->
-        <div class="card mb-3">
-          <div class="card-header">
-            <h6 class="card-title mb-0">
-              <i class="fas fa-chart-line me-2"></i>
-              {{ i18n.t('overtime_configs.configuration_summary') }}
-            </h6>
-          </div>
-          <div class="card-body">
-            <div class="config-summary">
-              <!-- Pre/Post Shift Status -->
-              <div class="summary-item">
-                <div class="summary-label">{{ i18n.t('overtime_configs.pre_shift_overtime') }}</div>
-                <div class="summary-value">
-                  <app-status-badge
-                    [status]="preShiftOvertimeBadge().label"
-                    [variant]="preShiftOvertimeBadge().variant">
-                  </app-status-badge>
-                </div>
+        <app-section-card
+          [title]="i18n.t('settings.overtime.configuration')"
+          icon="fas fa-chart-line"
+          headerClass="bg-light"
+          class="mb-3">
+          <div class="config-summary">
+            <!-- Pre/Post Shift Status -->
+            <div class="summary-item">
+              <div class="summary-label">{{ i18n.t('settings.overtime.preShift') }}</div>
+              <div class="summary-value">
+                <app-status-badge
+                  [status]="preShiftOvertimeBadge().label"
+                  [variant]="preShiftOvertimeBadge().variant">
+                </app-status-badge>
               </div>
+            </div>
 
-              <div class="summary-item">
-                <div class="summary-label">{{ i18n.t('overtime_configs.post_shift_overtime') }}</div>
-                <div class="summary-value">
-                  <app-status-badge
-                    [status]="postShiftOvertimeBadge().label"
-                    [variant]="postShiftOvertimeBadge().variant">
-                  </app-status-badge>
-                </div>
+            <div class="summary-item">
+              <div class="summary-label">{{ i18n.t('settings.overtime.postShift') }}</div>
+              <div class="summary-value">
+                <app-status-badge
+                  [status]="postShiftOvertimeBadge().label"
+                  [variant]="postShiftOvertimeBadge().variant">
+                </app-status-badge>
               </div>
+            </div>
 
-              <!-- Rates Summary -->
-              <div class="summary-item">
-                <div class="summary-label">{{ i18n.t('overtime_configs.normal_rate') }}</div>
-                <div class="summary-value rate-value">{{ overtimeConfig()?.normalDayRate }}x</div>
-              </div>
+            <!-- Rates Summary -->
+            <div class="summary-item">
+              <div class="summary-label">{{ i18n.t('settings.overtime.normalDay') }}</div>
+              <div class="summary-value rate-value">{{ overtimeConfig()?.normalDayRate }}x</div>
+            </div>
 
-              <div class="summary-item">
-                <div class="summary-label">{{ i18n.t('overtime_configs.holiday_rate') }}</div>
-                <div class="summary-value rate-value">{{ overtimeConfig()?.publicHolidayRate }}x</div>
-              </div>
+            <div class="summary-item">
+              <div class="summary-label">{{ i18n.t('settings.overtime.holiday') }}</div>
+              <div class="summary-value rate-value">{{ overtimeConfig()?.publicHolidayRate }}x</div>
+            </div>
 
-              <!-- Key Settings -->
-              <div class="summary-item">
-                <div class="summary-label">{{ i18n.t('overtime_configs.requires_approval') }}</div>
-                <div class="summary-value">
-                  <app-status-badge
-                    [status]="requiresApprovalBadge().label"
-                    [variant]="requiresApprovalBadge().variant">
-                  </app-status-badge>
-                </div>
+            <!-- Key Settings -->
+            <div class="summary-item">
+              <div class="summary-label">{{ i18n.t('settings.overtime.requiresApproval') }}</div>
+              <div class="summary-value">
+                <app-status-badge
+                  [status]="requiresApprovalBadge().label"
+                  [variant]="requiresApprovalBadge().variant">
+                </app-status-badge>
               </div>
             </div>
           </div>
-        </div>
+        </app-section-card>
 
         <!-- Back Navigation -->
-        <div class="card">
-          <div class="card-header">
-            <h6 class="card-title mb-0">
-              <i class="fas fa-arrow-left me-2"></i>
-              {{ i18n.t('common.navigation') }}
-            </h6>
+        <app-section-card
+          [title]="i18n.t('common.navigation')"
+          icon="fas fa-arrow-left"
+          headerClass="bg-light"
+          bodyClass="p-0">
+          <div class="list-group list-group-flush">
+            <a [routerLink]="['/settings/overtime']" class="list-group-item list-group-item-action">
+              <i class="fas fa-list me-2"></i>
+              {{ i18n.t('settings.overtime.title') }}
+            </a>
           </div>
-          <div class="card-body">
-          </div>
-        </div>
+        </app-section-card>
       </div>
     </div>
   }

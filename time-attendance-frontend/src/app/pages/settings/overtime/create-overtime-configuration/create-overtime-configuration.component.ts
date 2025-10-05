@@ -7,11 +7,12 @@ import { OvertimeConfigurationsService, CreateOvertimeConfigurationRequest } fro
 import { NotificationService } from '../../../../core/notifications/notification.service';
 import { ConfirmationService } from '../../../../core/confirmation/confirmation.service';
 import { FormHeaderComponent } from '../../../../shared/components/form-header/form-header.component';
+import { FormSectionComponent } from '../../../../shared/components/form-section/form-section.component';
 
 @Component({
   selector: 'app-create-overtime-configuration',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, FormHeaderComponent],
+  imports: [CommonModule, FormsModule, RouterModule, FormHeaderComponent, FormSectionComponent],
   templateUrl: './create-overtime-configuration.component.html',
   styleUrls: ['./create-overtime-configuration.component.css']
 })

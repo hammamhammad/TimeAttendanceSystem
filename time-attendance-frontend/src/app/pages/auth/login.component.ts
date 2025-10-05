@@ -146,12 +146,21 @@ export class LoginComponent {
     this.error.set('');
 
     this.authService.login(this.loginForm.value).subscribe({
-      next: () => {
-        this.notificationService.success(
-          this.t('auth.login_success'),
-          'Welcome back!'
-        );
-        this.router.navigate(['/dashboard']);
+      next: (response) => {
+        // Check if user must change password
+        if (response.mustChangePassword) {
+          this.notificationService.warning(
+            this.t('auth.must_change_password'),
+            'Please change your password to continue'
+          );
+          this.router.navigate(['/auth/change-password']);
+        } else {
+          this.notificationService.success(
+            this.t('auth.login_success'),
+            'Welcome back!'
+          );
+          this.router.navigate(['/dashboard']);
+        }
       },
       error: (error) => {
         this.loading.set(false);

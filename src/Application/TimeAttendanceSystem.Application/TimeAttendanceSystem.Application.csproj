@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Domain\TimeAttendanceSystem.Domain\TimeAttendanceSystem.Domain.csproj" />
+    <ProjectReference Include="..\..\Shared\TimeAttendanceSystem.Shared\TimeAttendanceSystem.Shared.csproj" />
   </ItemGroup>
 
 </Project>

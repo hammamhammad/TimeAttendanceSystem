@@ -5,6 +5,7 @@ using TimeAttendanceSystem.Domain.Attendance;
 using TimeAttendanceSystem.Domain.Shifts;
 using TimeAttendanceSystem.Domain.Common;
 using TimeAttendanceSystem.Domain.Vacations;
+using TimeAttendanceSystem.Domain.RemoteWork;
 
 namespace TimeAttendanceSystem.Application.Services;
 
@@ -266,6 +267,24 @@ public class AttendanceCalculationService : IAttendanceCalculationService
                 _logger?.LogInformation("Approved leave detected for date {Date} and employee {EmployeeId}. Setting status to OnLeave.",
                     attendanceDate.Date, employeeId);
                 return AttendanceStatus.OnLeave; // Approved leave - mark as OnLeave
+            }
+
+            // Rule 1.6: Check for approved remote work THIRD (higher priority than day off)
+            var attendanceDateOnly = DateOnly.FromDateTime(attendanceDate.Date);
+            var isRemoteWork = await _context.RemoteWorkRequests
+                .AsNoTracking()
+                .AnyAsync(rw => rw.EmployeeId == employeeId &&
+                              rw.Status == RemoteWorkRequestStatus.Approved &&
+                              !rw.IsDeleted &&
+                              attendanceDateOnly >= rw.StartDate &&
+                              attendanceDateOnly <= rw.EndDate,
+                         cancellationToken);
+
+            if (isRemoteWork)
+            {
+                _logger?.LogInformation("Approved remote work detected for date {Date} and employee {EmployeeId}. Setting status to RemoteWork.",
+                    attendanceDate.Date, employeeId);
+                return AttendanceStatus.RemoteWork; // Approved remote work - mark as RemoteWork
             }
 
             // Log if employee not found for debugging

@@ -6,6 +6,7 @@ using TimeAttendanceSystem.Application.Excuses.Commands.UpdateExcusePolicy;
 using TimeAttendanceSystem.Application.Excuses.Commands.ToggleExcusePolicyStatus;
 using TimeAttendanceSystem.Application.Excuses.Commands.DeleteExcusePolicy;
 using TimeAttendanceSystem.Application.Excuses.Queries.GetExcusePolicies;
+using TimeAttendanceSystem.Application.Excuses.Queries.GetExcusePolicyById;
 using TimeAttendanceSystem.Application.Common;
 
 namespace TimeAttendanceSystem.Api.Controllers;
@@ -58,6 +59,37 @@ public class ExcusePoliciesController : ControllerBase
         if (result.IsSuccess)
         {
             return Ok(result);
+        }
+
+        return BadRequest(result);
+    }
+
+    /// <summary>
+    /// Retrieves a single excuse policy by ID.
+    /// </summary>
+    /// <param name="id">Excuse policy ID</param>
+    /// <returns>Excuse policy details</returns>
+    [HttpGet("{id}")]
+    [Authorize(Policy = "SettingsExcusePolicyRead")]
+    [ProducesResponseType(typeof(Result<ExcusePolicyDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetExcusePolicyById(long id)
+    {
+        var query = new GetExcusePolicyByIdQuery(id);
+        var result = await _mediator.Send(query);
+
+        if (result.IsSuccess)
+        {
+            return Ok(result);
+        }
+
+        // Check if it's a not found error
+        if (result.Error.Contains("not found", StringComparison.OrdinalIgnoreCase))
+        {
+            return NotFound(result);
         }
 
         return BadRequest(result);

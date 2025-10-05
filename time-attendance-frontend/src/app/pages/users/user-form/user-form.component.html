@@ -26,13 +26,7 @@
   </div>
 
   <!-- Main Form Card -->
-  <div class="card">
-    <div class="card-header">
-      <h5 class="card-title mb-0">
-        <i class="fa-solid fa-user me-2"></i>
-        {{ t('users.user_information') }}
-      </h5>
-    </div>
+  <app-form-section [title]="t('users.user_information')">
     <div class="card-body">
       <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
             @if (error()) {
@@ -43,7 +37,30 @@
             }
 
             <div class="row g-3">
-              <!-- Username (only for create) -->
+              <!-- Employee Selection (only for create and not for SystemAdmin) -->
+              @if (!isEditMode() && !isSystemAdmin()) {
+                <div class="col-md-12">
+                  <label class="form-label">{{ t('users.employee') }} <span class="text-danger">*</span></label>
+                  <app-searchable-select
+                    [options]="employeeOptions()"
+                    [value]="userForm.get('employeeId')?.value"
+                    [placeholder]="t('common.select')"
+                    (selectionChange)="onEmployeeSelected($event); userForm.get('employeeId')?.setValue($event)"
+                  ></app-searchable-select>
+                  @if (isFieldInvalid('employeeId')) {
+                    <div class="text-danger small mt-1">
+                      <i class="fa-solid fa-exclamation-triangle me-1"></i>
+                      {{ getFieldError('employeeId') }}
+                    </div>
+                  }
+                  <small class="form-text text-muted">
+                    <i class="fa-solid fa-info-circle me-1"></i>
+                    {{ t('users.employee_help') || 'Select an employee to auto-fill username and email' }}
+                  </small>
+                </div>
+              }
+
+              <!-- Username (only for create) - Auto-filled from employee -->
               @if (!isEditMode()) {
                 <div class="col-md-6">
                   <label class="form-label">{{ t('users.username') }} <span class="text-danger">*</span></label>
@@ -53,6 +70,7 @@
                     formControlName="username"
                     [placeholder]="t('users.username')"
                     [class.is-invalid]="isFieldInvalid('username')"
+                    readonly
                   />
                   @if (isFieldInvalid('username')) {
                     <div class="invalid-feedback">{{ getFieldError('username') }}</div>
@@ -60,7 +78,7 @@
                 </div>
               }
 
-              <!-- Email -->
+              <!-- Email - Auto-filled from employee in create mode -->
               <div class="col-md-6">
                 <label class="form-label">{{ t('users.email') }} <span class="text-danger">*</span></label>
                 <input
@@ -69,6 +87,7 @@
                   formControlName="email"
                   [placeholder]="t('users.email')"
                   [class.is-invalid]="isFieldInvalid('email')"
+                  [readonly]="!isEditMode()"
                 />
                 @if (isFieldInvalid('email')) {
                   <div class="invalid-feedback">{{ getFieldError('email') }}</div>
@@ -161,13 +180,29 @@
                 </div>
               }
 
-              <!-- Permissions Section -->
-              <div class="col-12 mb-4">
-                <h6 class="text-primary mb-3 border-bottom pb-2">
-                  <i class="fa-solid fa-shield-alt me-2"></i>
-                  {{ t('users.permissions') }}
-                </h6>
-                
+              <!-- Must Change Password -->
+              <div class="col-md-6">
+                <label class="form-label">{{ t('users.password_status') }}</label>
+                <div class="form-check form-switch mt-2">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    id="mustChangePasswordSwitch"
+                    formControlName="mustChangePassword"
+                  />
+                  <label class="form-check-label" for="mustChangePasswordSwitch">
+                    {{ t('users.must_change_password') }}
+                  </label>
+                </div>
+                <small class="form-text text-muted">
+                  {{ t('users.must_change_password_hint') }}
+                </small>
+              </div>
+            </div>
+
+            <!-- Permissions Section -->
+              <app-form-section [title]="t('users.permissions')">
                 <!-- Roles -->
                 <div class="mb-3">
                   <label class="form-label">{{ t('users.roles') }} <span class="text-danger">*</span></label>
@@ -243,8 +278,7 @@
                     </small>
                   </div>
                 </div>
-              </div>
-            </div>
+              </app-form-section>
 
         <!-- Form Actions -->
         <div class="d-flex justify-content-end gap-2 mt-4">
@@ -271,5 +305,5 @@
         </div>
       </form>
     </div>
-  </div>
+  </app-form-section>
 </div>

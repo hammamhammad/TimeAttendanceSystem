@@ -2,14 +2,15 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { 
-  UserDto, 
-  CreateUserRequest, 
-  UpdateUserRequest, 
-  AssignRoleRequest, 
+import {
+  UserDto,
+  CreateUserRequest,
+  UpdateUserRequest,
+  AssignRoleRequest,
   AssignBranchRequest,
-  PagedResult 
+  PagedResult
 } from '../../shared/models/user.model';
+import { EmployeeDto } from '../../shared/models/employee.model';
 
 export interface UsersFilter {
   page?: number;
@@ -96,10 +97,22 @@ export class UsersService {
     const params = new HttpParams()
       .set('pageSize', '1000')
       .set('isActive', 'true');
-      
+
     return this.http.get<PagedResult<any>>(`${environment.apiUrl}/api/v1/branches`, { params })
       .pipe(
         map((result: PagedResult<any>) => result.items || [])
+      );
+  }
+
+  getAvailableEmployees(): Observable<EmployeeDto[]> {
+    // Get all employees - in the future, this should filter out employees with existing user accounts
+    const params = new HttpParams()
+      .set('page', '1')
+      .set('pageSize', '1000');
+
+    return this.http.get<PagedResult<EmployeeDto>>(`${environment.apiUrl}/api/v1/employees`, { params })
+      .pipe(
+        map((result: PagedResult<EmployeeDto>) => result.items || [])
       );
   }
 }

@@ -14,7 +14,7 @@
               <button type="button"
                       class="btn-close"
                       [disabled]="loading"
-                      (click)="onCloseClick()"
+                      (click)="onCloseClick(); $event.stopPropagation()"
                       aria-label="Close">
               </button>
             }

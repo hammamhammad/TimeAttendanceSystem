@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["angular:styles/component:css;b01443c16e75437b73dd8a728713eee6579ca4d4c02199e6657f116651c97be5;D:/Work/AI Code/TimeAttendanceSystem/time-attendance-frontend/src/app/pages/branches/branch-table/branch-table.component.ts"],
-  "sourcesContent": ["\n    .avatar-sm {\n      width: 2rem;\n      height: 2rem;\n    }\n\n    .avatar-initial {\n      display: flex;\n      align-items: center;\n      justify-content: center;\n      width: 100%;\n      height: 100%;\n      font-size: 0.875rem;\n      font-weight: 600;\n    }\n  "],
-  "mappings": ";AACI,CAAC;AACC,SAAO;AACP,UAAQ;AACV;AAEA,CAAC;AACC,WAAS;AACT,eAAa;AACb,mBAAiB;AACjB,SAAO;AACP,UAAQ;AACR,aAAW;AACX,eAAa;AACf;",
-  "names": []
-}

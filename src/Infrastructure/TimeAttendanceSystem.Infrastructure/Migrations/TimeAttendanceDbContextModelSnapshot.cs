@@ -135,6 +135,9 @@ namespace TimeAttendanceSystem.Infrastructure.Migrations
                         .HasColumnType("decimal(5,2)")
                         .HasDefaultValue(0m);
 
+                    b.Property<long?>("RemoteWorkRequestId")
+                        .HasColumnType("bigint");
+
                     b.Property<byte[]>("RowVersion")
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
@@ -154,6 +157,11 @@ namespace TimeAttendanceSystem.Infrastructure.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
+                    b.Property<int>("WorkLocation")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
                     b.Property<decimal>("WorkingHours")
                         .HasColumnType("decimal(5,2)");
 
@@ -168,10 +176,16 @@ namespace TimeAttendanceSystem.Infrastructure.Migrations
                     b.HasIndex("OvertimeDayType")
                         .HasDatabaseName("IX_AttendanceRecords_OvertimeDayType");
 
+                    b.HasIndex("RemoteWorkRequestId")
+                        .HasDatabaseName("IX_AttendanceRecords_RemoteWorkRequest");
+
                     b.HasIndex("ShiftAssignmentId");
 
                     b.HasIndex("Status")
                         .HasDatabaseName("IX_AttendanceRecords_Status");
+
+                    b.HasIndex("WorkLocation")
+                        .HasDatabaseName("IX_AttendanceRecords_WorkLocation");
 
                     b.HasIndex("EmployeeId", "AttendanceDate")
                         .IsUnique()
@@ -555,6 +569,63 @@ namespace TimeAttendanceSystem.Infrastructure.Migrations
                         .HasDatabaseName("IX_Departments_BranchId_IsActive_SortOrder");
 
                     b.ToTable("Departments", (string)null);
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Common.AuditChange", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("AuditLogId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("FieldName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("NewValue")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("OldValue")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuditLogId");
+
+                    b.HasIndex("FieldName");
+
+                    b.ToTable("AuditChanges", (string)null);
                 });
 
             modelBuilder.Entity("TimeAttendanceSystem.Domain.Common.AuditLog", b =>
@@ -1031,6 +1102,213 @@ namespace TimeAttendanceSystem.Infrastructure.Migrations
 
                             t.HasCheckConstraint("CK_ExcusePolicies_SingleVsDailyLimits", "[MaxHoursPerExcuse] <= [MaxPersonalExcuseHoursPerDay]");
                         });
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.RemoteWork.RemoteWorkPolicy", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("AllowConsecutiveDays")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("BlackoutPeriods")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<long?>("BranchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("CountForOvertime")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("EnforceShiftTimes")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int?>("MaxConsecutiveDays")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("MaxDaysPerMonth")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("MaxDaysPerWeek")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("MaxDaysPerYear")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("MinAdvanceNoticeDays")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("RequiresManagerApproval")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("IX_RemoteWorkPolicies_BranchId");
+
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("IX_RemoteWorkPolicies_IsActive");
+
+                    b.HasIndex("IsDeleted")
+                        .HasDatabaseName("IX_RemoteWorkPolicies_IsDeleted");
+
+                    b.HasIndex("BranchId", "IsActive", "IsDeleted")
+                        .HasDatabaseName("IX_RemoteWorkPolicies_BranchId_IsActive_IsDeleted")
+                        .HasFilter("[IsActive] = 1 AND [IsDeleted] = 0");
+
+                    b.ToTable("RemoteWorkPolicies", (string)null);
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.RemoteWork.RemoteWorkRequest", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("ApprovalComments")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("ApprovedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<long>("CreatedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<long>("RemoteWorkPolicyId")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date");
+
+                    b.Property<int>("Status")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("WorkingDaysCount")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApprovedByUserId")
+                        .HasDatabaseName("IX_RemoteWorkRequests_ApprovedByUserId");
+
+                    b.HasIndex("CreatedByUserId")
+                        .HasDatabaseName("IX_RemoteWorkRequests_CreatedByUserId");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_RemoteWorkRequests_EmployeeId");
+
+                    b.HasIndex("EndDate")
+                        .HasDatabaseName("IX_RemoteWorkRequests_EndDate");
+
+                    b.HasIndex("IsDeleted")
+                        .HasDatabaseName("IX_RemoteWorkRequests_IsDeleted");
+
+                    b.HasIndex("RemoteWorkPolicyId")
+                        .HasDatabaseName("IX_RemoteWorkRequests_RemoteWorkPolicyId");
+
+                    b.HasIndex("StartDate")
+                        .HasDatabaseName("IX_RemoteWorkRequests_StartDate");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_RemoteWorkRequests_Status");
+
+                    b.HasIndex("EmployeeId", "StartDate", "EndDate")
+                        .HasDatabaseName("IX_RemoteWorkRequests_Employee_Dates");
+
+                    b.HasIndex("EmployeeId", "Status", "StartDate")
+                        .HasDatabaseName("IX_RemoteWorkRequests_Employee_Status_StartDate");
+
+                    b.ToTable("RemoteWorkRequests", (string)null);
                 });
 
             modelBuilder.Entity("TimeAttendanceSystem.Domain.Settings.OffDay", b =>
@@ -2635,12 +2913,19 @@ namespace TimeAttendanceSystem.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("TimeAttendanceSystem.Domain.RemoteWork.RemoteWorkRequest", "RemoteWorkRequest")
+                        .WithMany()
+                        .HasForeignKey("RemoteWorkRequestId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("TimeAttendanceSystem.Domain.Shifts.ShiftAssignment", "ShiftAssignment")
                         .WithMany()
                         .HasForeignKey("ShiftAssignmentId")
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Employee");
+
+                    b.Navigation("RemoteWorkRequest");
 
                     b.Navigation("ShiftAssignment");
                 });
@@ -2702,6 +2987,17 @@ namespace TimeAttendanceSystem.Infrastructure.Migrations
                     b.Navigation("Branch");
 
                     b.Navigation("ParentDepartment");
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Common.AuditChange", b =>
+                {
+                    b.HasOne("TimeAttendanceSystem.Domain.Common.AuditLog", "AuditLog")
+                        .WithMany("Changes")
+                        .HasForeignKey("AuditLogId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AuditLog");
                 });
 
             modelBuilder.Entity("TimeAttendanceSystem.Domain.Employees.Employee", b =>
@@ -2778,6 +3074,50 @@ namespace TimeAttendanceSystem.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Branch");
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.RemoteWork.RemoteWorkPolicy", b =>
+                {
+                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Branch");
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.RemoteWork.RemoteWorkRequest", b =>
+                {
+                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "ApprovedByUser")
+                        .WithMany()
+                        .HasForeignKey("ApprovedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TimeAttendanceSystem.Domain.RemoteWork.RemoteWorkPolicy", "RemoteWorkPolicy")
+                        .WithMany("RemoteWorkRequests")
+                        .HasForeignKey("RemoteWorkPolicyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ApprovedByUser");
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("RemoteWorkPolicy");
                 });
 
             modelBuilder.Entity("TimeAttendanceSystem.Domain.Settings.OffDay", b =>
@@ -3015,11 +3355,21 @@ namespace TimeAttendanceSystem.Infrastructure.Migrations
                     b.Navigation("SubDepartments");
                 });
 
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Common.AuditLog", b =>
+                {
+                    b.Navigation("Changes");
+                });
+
             modelBuilder.Entity("TimeAttendanceSystem.Domain.Employees.Employee", b =>
                 {
                     b.Navigation("DirectReports");
 
                     b.Navigation("EmployeeUserLink");
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.RemoteWork.RemoteWorkPolicy", b =>
+                {
+                    b.Navigation("RemoteWorkRequests");
                 });
 
             modelBuilder.Entity("TimeAttendanceSystem.Domain.Shifts.Shift", b =>

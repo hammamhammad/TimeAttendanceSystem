@@ -194,7 +194,11 @@ export class SearchableSelectComponent implements OnInit, OnDestroy, OnChanges, 
     this.searchChange.emit(value);
   }
 
-  onSelectOption(option: SearchableSelectOption): void {
+  onSelectOption(option: SearchableSelectOption, event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     if (option.disabled) return;
 
     this.selectedValue.set(option.value);
@@ -206,7 +210,11 @@ export class SearchableSelectComponent implements OnInit, OnDestroy, OnChanges, 
     this.selectionChange.emit(option.value);
   }
 
-  onSelectCustomValue(): void {
+  onSelectCustomValue(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     if (!this.allowCustomValue || !this.searchTerm().trim()) return;
 
     const customValue = this.searchTerm().trim();

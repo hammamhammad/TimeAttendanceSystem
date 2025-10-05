@@ -1,75 +1,51 @@
 <div class="employee-excuses-page">
   <!-- Page Header -->
-  <app-page-header
-    [title]="i18n.t('employee_excuses.management_title')">
+  <app-page-header [title]="i18n.t('employee_excuses.management_title')">
   </app-page-header>
 
   <!-- Filters Component -->
-  <app-unified-filter
-    moduleName="employee-excuses"
-    [refreshing]="loading()"
-    (searchChange)="onSearchChange($event)"
-    (filtersChange)="onFiltersChange($event)"
-    (add)="onAddExcuse()"
-    (refresh)="onRefreshData()">
+  <app-unified-filter moduleName="employee-excuses" [refreshing]="loading()" (searchChange)="onSearchChange($event)"
+    (filtersChange)="onFiltersChange($event)" (add)="onAddExcuse()" (refresh)="onRefreshData()">
   </app-unified-filter>
 
   <!-- Data Table -->
-  <div class="card">
-    <div class="card-body">
-      <app-data-table
-        [data]="employeeExcuses() || []"
-        [columns]="tableColumns"
-        [actions]="tableActions"
-        [loading]="loading()"
-        [totalItems]="pagedResult()?.totalCount || 0"
-        [currentPage]="currentPage()"
-        [pageSize]="pageSize()"
-        [pageSizeOptions]="[10, 25, 50, 100]"
-        (pageChange)="onPageChange($event)"
-        (pageSizeChange)="onPageSizeChange($event)"
-        (actionClick)="onTableAction($event)"
-        [emptyMessage]="i18n.t('employee_excuses.no_requests_found')"
-      >
-        <!-- Custom templates for specific columns -->
-        <ng-template #durationTemplate let-item>
-          {{ formatDuration(item.durationHours) }}
-        </ng-template>
+  <app-data-table [data]="employeeExcuses() || []" [columns]="tableColumns" [actions]="tableActions" [loading]="loading"
+    [totalItems]="pagedResult()?.totalCount || 0" [currentPage]="currentPage()" [pageSize]="pageSize()"
+    [pageSizeOptions]="[10, 25, 50, 100]" [emptyMessage]="i18n.t('employee_excuses.no_requests_message')"
+    [emptyTitle]="i18n.t('employee_excuses.no_requests_found')" (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)" (actionClick)="onTableAction($event)">
+    <!-- Custom templates for specific columns -->
+    <ng-template #durationTemplate let-item>
+      {{ formatDuration(item.durationHours) }}
+    </ng-template>
 
-        <ng-template #reasonTemplate let-item>
-          <span
-            [title]="item.reason"
-            class="text-truncate d-inline-block"
-            style="max-width: 200px;">
-            {{ item.reason }}
-          </span>
-        </ng-template>
+    <ng-template #reasonTemplate let-item>
+      <span [title]="item.reason" class="text-truncate d-inline-block" style="max-width: 200px;">
+        {{ item.reason }}
+      </span>
+    </ng-template>
 
-        <ng-template #statusTemplate let-item>
-          <span [class]="getStatusClass(item.status)">
-            {{ formatStatus(item.status) }}
-          </span>
-          @if (!item.isWithinPolicy && item.policyViolationReason) {
-            <i
-              class="fas fa-exclamation-triangle text-warning ms-1"
-              [title]="item.policyViolationReason"
-              data-bs-toggle="tooltip">
-            </i>
-          }
-        </ng-template>
+    <ng-template #statusTemplate let-item>
+      <span [class]="getStatusClass(item.status)">
+        {{ formatStatus(item.status) }}
+      </span>
+      @if (!item.isWithinPolicy && item.policyViolationReason) {
+      <i class="fas fa-exclamation-triangle text-warning ms-1" [title]="item.policyViolationReason"
+        data-bs-toggle="tooltip">
+      </i>
+      }
+    </ng-template>
 
-        <ng-template #dateTemplate let-item let-column="column">
-          {{ (column === 'excuseDate' ? item.excuseDate : item.submissionDate) | date:'short' }}
-        </ng-template>
-      </app-data-table>
-    </div>
-  </div>
+    <ng-template #dateTemplate let-item let-column="column">
+      {{ (column === 'excuseDate' ? item.excuseDate : item.submissionDate) | date:'short' }}
+    </ng-template>
+  </app-data-table>
 
   <!-- Error Display -->
   @if (error()) {
-    <div class="alert alert-danger mt-3" role="alert">
-      <i class="fas fa-exclamation-triangle me-2"></i>
-      {{ error() }}
-    </div>
+  <div class="alert alert-danger mt-3" role="alert">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    {{ error() }}
+  </div>
   }
 </div>

@@ -8,6 +8,7 @@ import { EmployeeVacationsService } from '../employee-vacations.service';
 import { EmployeeVacation, UpdateEmployeeVacationRequest } from '../../../shared/models/employee-vacation.model';
 import { SearchableSelectComponent, SearchableSelectOption } from '../../../shared/components/searchable-select/searchable-select.component';
 import { FormHeaderComponent } from '../../../shared/components/form-header/form-header.component';
+import { FormSectionComponent } from '../../../shared/components/form-section/form-section.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 
@@ -20,6 +21,7 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
     ReactiveFormsModule,
     SearchableSelectComponent,
     FormHeaderComponent,
+    FormSectionComponent,
     LoadingSpinnerComponent,
     StatusBadgeComponent
   ],

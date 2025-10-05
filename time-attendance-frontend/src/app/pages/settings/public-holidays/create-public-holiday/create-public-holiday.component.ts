@@ -7,11 +7,12 @@ import { PublicHolidaysService } from '../public-holidays.service';
 import { NotificationService } from '../../../../core/notifications/notification.service';
 import { HolidayType, CreatePublicHolidayRequest } from '../../../../shared/models/public-holiday.model';
 import { FormHeaderComponent } from '../../../../shared/components/form-header/form-header.component';
+import { FormSectionComponent } from '../../../../shared/components/form-section/form-section.component';
 
 @Component({
   selector: 'app-create-public-holiday',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, FormHeaderComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, FormHeaderComponent, FormSectionComponent],
   templateUrl: './create-public-holiday.component.html',
   styleUrls: ['./create-public-holiday.component.css']
 })

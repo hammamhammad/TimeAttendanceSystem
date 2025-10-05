@@ -7,19 +7,23 @@ import { ConfirmationService } from '../../../../core/confirmation/confirmation.
 import { PermissionService } from '../../../../core/auth/permission.service';
 import { OvertimeConfigurationsService, OvertimeConfiguration } from '../overtime-configurations.service';
 import { PermissionActions } from '../../../../shared/utils/permission.utils';
+import { RouterModule } from '@angular/router';
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
-import { DetailCardComponent, DetailField } from '../../../../shared/components/detail-card/detail-card.component';
+import { DefinitionListComponent, DefinitionItem } from '../../../../shared/components/definition-list/definition-list.component';
 import { StatusBadgeComponent } from '../../../../shared/components/status-badge/status-badge.component';
 import { FormHeaderComponent } from '../../../../shared/components/form-header/form-header.component';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
+import { SectionCardComponent } from '../../../../shared/components/section-card/section-card.component';
 
 @Component({
   selector: 'app-view-overtime-configuration',
   standalone: true,
   imports: [
     CommonModule,
+    RouterModule,
     LoadingSpinnerComponent,
-    DetailCardComponent,
+    DefinitionListComponent,
+    SectionCardComponent,
     FormHeaderComponent,
     StatusBadgeComponent
   ],
@@ -41,7 +45,7 @@ export class ViewOvertimeConfigurationComponent implements OnInit {
   overtimeConfig = signal<OvertimeConfiguration | null>(null);
   error = signal<string | null>(null);
 
-  get basicInfoFields(): DetailField[] {
+  basicInfoItems = computed<DefinitionItem[]>(() => {
     const config = this.overtimeConfig();
     if (!config) return [];
 
@@ -53,97 +57,104 @@ export class ViewOvertimeConfigurationComponent implements OnInit {
         badgeVariant: config.isActive ? 'success' : 'secondary'
       },
       {
-        label: this.i18n.t('overtime_configs.effective_from'),
+        label: this.i18n.t('settings.overtime.effectiveFrom'),
         value: config.effectiveFromDate,
         type: 'date'
       },
       {
-        label: this.i18n.t('overtime_configs.effective_to'),
-        value: config.effectiveToDate || this.i18n.t('common.ongoing'),
-        type: config.effectiveToDate ? 'date' : undefined
+        label: this.i18n.t('settings.overtime.effectiveTo'),
+        value: config.effectiveToDate || this.i18n.t('settings.overtime.indefinite')
       }
     ];
-  }
+  });
 
-  get overtimeSettingsFields(): DetailField[] {
+  overtimeSettingsLeftItems = computed<DefinitionItem[]>(() => {
     const config = this.overtimeConfig();
     if (!config) return [];
 
     return [
       {
-        label: this.i18n.t('overtime_configs.enable_pre_shift'),
+        label: this.i18n.t('settings.overtime.enablePreShift'),
         value: config.enablePreShiftOvertime ? this.i18n.t('common.enabled') : this.i18n.t('common.disabled'),
         type: 'badge',
         badgeVariant: config.enablePreShiftOvertime ? 'success' : 'secondary'
       },
       {
-        label: this.i18n.t('overtime_configs.enable_post_shift'),
+        label: this.i18n.t('settings.overtime.enablePostShift'),
         value: config.enablePostShiftOvertime ? this.i18n.t('common.enabled') : this.i18n.t('common.disabled'),
         type: 'badge',
         badgeVariant: config.enablePostShiftOvertime ? 'success' : 'secondary'
       },
       {
-        label: this.i18n.t('overtime_configs.max_pre_shift_hours'),
-        value: `${config.maxPreShiftOvertimeHours} ${this.i18n.t('fields.hoursUnit')}`
+        label: this.i18n.t('settings.overtime.maxPreShiftHours'),
+        value: `${config.maxPreShiftOvertimeHours} ${this.i18n.t('common.hours')}`
       },
       {
-        label: this.i18n.t('overtime_configs.max_post_shift_hours'),
-        value: `${config.maxPostShiftOvertimeHours} ${this.i18n.t('fields.hoursUnit')}`
-      },
-      {
-        label: this.i18n.t('overtime_configs.minimum_overtime_minutes'),
-        value: `${config.minimumOvertimeMinutes} ${this.i18n.t('fields.minutesUnit')}`
-      },
-      {
-        label: this.i18n.t('overtime_configs.grace_period_minutes'),
-        value: `${config.overtimeGracePeriodMinutes} ${this.i18n.t('fields.minutesUnit')}`
-      },
-      {
-        label: this.i18n.t('overtime_configs.rounding_interval'),
-        value: `${config.roundingIntervalMinutes} ${this.i18n.t('fields.minutesUnit')}`
+        label: this.i18n.t('settings.overtime.maxPostShiftHours'),
+        value: `${config.maxPostShiftOvertimeHours} ${this.i18n.t('common.hours')}`
       }
     ];
-  }
+  });
 
-  get overtimeRatesFields(): DetailField[] {
+  overtimeSettingsRightItems = computed<DefinitionItem[]>(() => {
     const config = this.overtimeConfig();
     if (!config) return [];
 
     return [
       {
-        label: this.i18n.t('overtime_configs.normal_day_rate'),
-        value: `${config.normalDayRate}x`
+        label: this.i18n.t('settings.overtime.minimumOvertimeMinutes'),
+        value: `${config.minimumOvertimeMinutes} ${this.i18n.t('common.minutes')}`
       },
       {
-        label: this.i18n.t('overtime_configs.public_holiday_rate'),
-        value: `${config.publicHolidayRate}x`
+        label: this.i18n.t('settings.overtime.gracePeriodMinutes'),
+        value: `${config.overtimeGracePeriodMinutes} ${this.i18n.t('common.minutes')}`
       },
       {
-        label: this.i18n.t('overtime_configs.off_day_rate'),
-        value: `${config.offDayRate}x`
+        label: this.i18n.t('settings.overtime.roundingIntervalMinutes'),
+        value: `${config.roundingIntervalMinutes} ${this.i18n.t('common.minutes')}`
       }
     ];
-  }
+  });
 
-  get policySettingsFields(): DetailField[] {
+  overtimeRatesItems = computed<DefinitionItem[]>(() => {
     const config = this.overtimeConfig();
     if (!config) return [];
 
-    const fields: DetailField[] = [
+    return [
       {
-        label: this.i18n.t('overtime_configs.require_approval'),
+        label: this.i18n.t('settings.overtime.normalDayRate'),
+        value: `${config.normalDayRate}x`
+      },
+      {
+        label: this.i18n.t('settings.overtime.publicHolidayRate'),
+        value: `${config.publicHolidayRate}x`
+      },
+      {
+        label: this.i18n.t('settings.overtime.offDayRate'),
+        value: `${config.offDayRate}x`
+      }
+    ];
+  });
+
+  policySettingsItems = computed<DefinitionItem[]>(() => {
+    const config = this.overtimeConfig();
+    if (!config) return [];
+
+    const fields: DefinitionItem[] = [
+      {
+        label: this.i18n.t('settings.overtime.requireApproval'),
         value: config.requireApproval ? this.i18n.t('common.yes') : this.i18n.t('common.no'),
         type: 'badge',
         badgeVariant: config.requireApproval ? 'warning' : 'success'
       },
       {
-        label: this.i18n.t('overtime_configs.consider_flexible_time'),
+        label: this.i18n.t('settings.overtime.considerFlexibleTime'),
         value: config.considerFlexibleTime ? this.i18n.t('common.yes') : this.i18n.t('common.no'),
         type: 'badge',
         badgeVariant: config.considerFlexibleTime ? 'info' : 'secondary'
       },
       {
-        label: this.i18n.t('overtime_configs.weekend_as_off_day'),
+        label: this.i18n.t('settings.overtime.weekendAsOffDay'),
         value: config.weekendAsOffDay ? this.i18n.t('common.yes') : this.i18n.t('common.no'),
         type: 'badge',
         badgeVariant: config.weekendAsOffDay ? 'info' : 'secondary'
@@ -152,19 +163,19 @@ export class ViewOvertimeConfigurationComponent implements OnInit {
 
     if (config.policyNotes) {
       fields.push({
-        label: this.i18n.t('overtime_configs.policy_notes'),
+        label: this.i18n.t('settings.overtime.policyNotes'),
         value: config.policyNotes
       });
     }
 
     return fields;
-  }
+  });
 
-  get auditFields(): DetailField[] {
+  auditItems = computed<DefinitionItem[]>(() => {
     const config = this.overtimeConfig();
     if (!config) return [];
 
-    const fields: DetailField[] = [
+    const fields: DefinitionItem[] = [
       {
         label: this.i18n.t('fields.createdAt'),
         value: config.createdAtUtc,
@@ -191,7 +202,7 @@ export class ViewOvertimeConfigurationComponent implements OnInit {
     }
 
     return fields;
-  }
+  });
 
   ngOnInit(): void {
     this.loadOvertimeConfigurationDetails();
@@ -214,7 +225,7 @@ export class ViewOvertimeConfigurationComponent implements OnInit {
       },
       error: (error) => {
         console.error('Failed to load overtime configuration details:', error);
-        this.error.set(this.i18n.t('overtime_configs.errors.load_failed'));
+        this.error.set(this.i18n.t('common.errors.load_failed'));
         this.loading.set(false);
       }
     });
@@ -229,11 +240,11 @@ export class ViewOvertimeConfigurationComponent implements OnInit {
 
     const result = await this.confirmationService.confirm({
       title: isActivating
-        ? this.i18n.t('overtime_configs.activate_configuration')
-        : this.i18n.t('overtime_configs.deactivate_configuration'),
+        ? this.i18n.t('settings.overtime.activatePolicy')
+        : this.i18n.t('settings.overtime.deactivatePolicy'),
       message: isActivating
-        ? this.i18n.t('overtime_configs.confirm_activate')
-        : this.i18n.t('overtime_configs.confirm_deactivate'),
+        ? this.i18n.t('settings.overtime.activatePolicyConfirmation')
+        : this.i18n.t('settings.overtime.deactivatePolicyConfirmation'),
       confirmText: isActivating
         ? this.i18n.t('common.activate')
         : this.i18n.t('common.deactivate'),
@@ -254,8 +265,8 @@ export class ViewOvertimeConfigurationComponent implements OnInit {
         next: () => {
           this.notificationService.success(
             isActivating
-              ? this.i18n.t('overtime_configs.success.activated')
-              : this.i18n.t('overtime_configs.success.deactivated')
+              ? this.i18n.t('settings.overtime.policyActivatedSuccessfully')
+              : this.i18n.t('settings.overtime.policyDeactivatedSuccessfully')
           );
           this.loadOvertimeConfigurationDetails(); // Reload to show updated status
           this.processing.set(false);
@@ -263,7 +274,7 @@ export class ViewOvertimeConfigurationComponent implements OnInit {
         error: (error) => {
           console.error('Failed to toggle overtime configuration status:', error);
           this.notificationService.error(
-            this.i18n.t('overtime_configs.errors.toggle_status_failed')
+            this.i18n.t('common.errors.operation_failed')
           );
           this.processing.set(false);
         }
@@ -275,8 +286,8 @@ export class ViewOvertimeConfigurationComponent implements OnInit {
     if (!this.overtimeConfig()) return;
 
     const result = await this.confirmationService.confirm({
-      title: this.i18n.t('overtime_configs.delete_configuration'),
-      message: this.i18n.t('overtime_configs.confirm_delete'),
+      title: this.i18n.t('settings.overtime.deletePolicy'),
+      message: this.i18n.t('settings.overtime.deletePolicyConfirmation'),
       confirmText: this.i18n.t('common.delete'),
       cancelText: this.i18n.t('common.cancel'),
       confirmButtonClass: 'btn-danger',
@@ -290,14 +301,14 @@ export class ViewOvertimeConfigurationComponent implements OnInit {
       this.overtimeConfigurationsService.deleteOvertimeConfiguration(this.overtimeConfig()!.id).subscribe({
         next: () => {
           this.notificationService.success(
-            this.i18n.t('overtime_configs.success.deleted')
+            this.i18n.t('settings.overtime.policyDeletedSuccessfully')
           );
           this.router.navigate(['/settings/overtime']);
         },
         error: (error) => {
           console.error('Failed to delete overtime configuration:', error);
           this.notificationService.error(
-            this.i18n.t('overtime_configs.errors.delete_failed')
+            this.i18n.t('common.errors.delete_failed')
           );
           this.processing.set(false);
         }
@@ -326,7 +337,7 @@ export class ViewOvertimeConfigurationComponent implements OnInit {
     const config = this.overtimeConfig();
     if (!config) return '';
 
-    return `${this.i18n.t('overtime_configs.configuration')} #${config.id}`;
+    return `${this.i18n.t('settings.overtime.configuration')} #${config.id}`;
   }
 
   // Computed properties for status badges

@@ -29,3 +29,6 @@ D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Applic
 D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\obj\Debug\net9.0\refint\TimeAttendanceSystem.Application.dll
 D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\obj\Debug\net9.0\TimeAttendanceSystem.Application.pdb
 D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\obj\Debug\net9.0\ref\TimeAttendanceSystem.Application.dll
+D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\bin\Debug\net9.0\TimeAttendanceSystem.Shared.dll
+D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\bin\Debug\net9.0\TimeAttendanceSystem.Shared.pdb
+D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\bin\Debug\net9.0\ar\TimeAttendanceSystem.Shared.resources.dll

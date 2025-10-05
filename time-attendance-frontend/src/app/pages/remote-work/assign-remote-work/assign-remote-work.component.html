@@ -1,0 +1,143 @@
+<div class="container-fluid">
+  <!-- Form Header -->
+  <app-form-header
+    mode="create"
+    [title]="i18n.t('remoteWork.request.create')"
+    moduleName="remoteWork.request"
+    moduleRoute="remote-work">
+  </app-form-header>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <app-loading-spinner></app-loading-spinner>
+  }
+
+  <!-- Form Content -->
+  @if (!loading()) {
+    <div class="card">
+      <div class="card-body">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <!-- Employee Information Section -->
+          <app-form-section [title]="i18n.t('remoteWork.request.employee_information')">
+            <!-- Employee Selection -->
+            <div class="mb-3">
+              <label class="form-label required">{{ i18n.t('remoteWork.request.employee') }}</label>
+              <app-searchable-select
+                [options]="employeeOptions()"
+                [value]="form.get('employeeId')?.value"
+                (selectionChange)="onEmployeeSelectionChange($event)"
+                [placeholder]="i18n.t('remoteWork.request.select_employee')"
+                [searchable]="true"
+                [clearable]="false"
+                [class.is-invalid]="form.get('employeeId')?.invalid && form.get('employeeId')?.touched">
+              </app-searchable-select>
+              @if (form.get('employeeId')?.invalid && form.get('employeeId')?.touched) {
+                <div class="invalid-feedback">
+                  {{ i18n.t('remoteWork.request.validation.employee_required') }}
+                </div>
+              }
+            </div>
+          </app-form-section>
+
+          <!-- Remote Work Details Section -->
+          <app-form-section [title]="i18n.t('remoteWork.request.remote_work_details')">
+            <!-- Date Range -->
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label required">{{ i18n.t('remoteWork.request.startDate') }}</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  formControlName="startDate"
+                  [class.is-invalid]="form.get('startDate')?.invalid && form.get('startDate')?.touched">
+                @if (form.get('startDate')?.invalid && form.get('startDate')?.touched) {
+                  <div class="invalid-feedback">
+                    {{ i18n.t('remoteWork.request.validation.start_date_required') }}
+                  </div>
+                }
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label class="form-label required">{{ i18n.t('remoteWork.request.endDate') }}</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  formControlName="endDate"
+                  [class.is-invalid]="form.get('endDate')?.invalid && form.get('endDate')?.touched">
+                @if (form.get('endDate')?.invalid && form.get('endDate')?.touched) {
+                  <div class="invalid-feedback">
+                    {{ i18n.t('remoteWork.request.validation.end_date_required') }}
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Reason -->
+            <div class="mb-3">
+              <label class="form-label">{{ i18n.t('remoteWork.request.reason') }}</label>
+              <textarea
+                class="form-control"
+                formControlName="reason"
+                rows="3"
+                [placeholder]="i18n.t('remoteWork.request.reason_placeholder')">
+              </textarea>
+            </div>
+
+            <!-- Status -->
+            <div class="mb-3">
+              <label class="form-label required">{{ i18n.t('common.status') }}</label>
+              <select
+                class="form-select"
+                formControlName="status"
+                [class.is-invalid]="form.get('status')?.invalid && form.get('status')?.touched">
+                @for (option of statusOptions; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+              @if (form.get('status')?.invalid && form.get('status')?.touched) {
+                <div class="invalid-feedback">
+                  {{ i18n.t('remoteWork.request.validation.status_required') }}
+                </div>
+              }
+            </div>
+
+            <!-- Approval Comments -->
+            <div class="mb-3">
+              <label class="form-label">{{ i18n.t('remoteWork.request.approval_comments') }}</label>
+              <textarea
+                class="form-control"
+                formControlName="approvalComments"
+                rows="3"
+                maxlength="1000"
+                [placeholder]="i18n.t('remoteWork.request.approval_comments_placeholder')">
+              </textarea>
+              <div class="form-text">
+                {{ form.get('approvalComments')?.value?.length || 0 }}/1000 {{ i18n.t('common.characters') }}
+              </div>
+            </div>
+          </app-form-section>
+
+          <!-- Form Actions -->
+          <div class="d-flex justify-content-end gap-2 mt-4">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              (click)="onCancel()"
+              [disabled]="submitting()">
+              {{ i18n.t('common.cancel') }}
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="form.invalid || submitting()">
+              @if (submitting()) {
+                <span class="spinner-border spinner-border-sm me-2"></span>
+              }
+              {{ i18n.t('remoteWork.request.create') }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

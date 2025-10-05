@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { I18nService } from '../../../../core/i18n/i18n.service';
 import { FormHeaderComponent } from '../../../../shared/components/form-header/form-header.component';
+import { FormSectionComponent } from '../../../../shared/components/form-section/form-section.component';
 import { OvertimeConfigurationsService, UpdateOvertimeConfigurationRequest, OvertimeConfiguration } from '../overtime-configurations.service';
 import { NotificationService } from '../../../../core/notifications/notification.service';
 import { ConfirmationService } from '../../../../core/confirmation/confirmation.service';
@@ -11,7 +12,7 @@ import { ConfirmationService } from '../../../../core/confirmation/confirmation.
 @Component({
   selector: 'app-edit-overtime-configuration',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, FormHeaderComponent],
+  imports: [CommonModule, FormsModule, RouterModule, FormHeaderComponent, FormSectionComponent],
   templateUrl: './edit-overtime-configuration.component.html',
   styleUrls: ['./edit-overtime-configuration.component.css']
 })

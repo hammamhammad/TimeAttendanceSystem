@@ -69,5 +69,10 @@ public enum AttendanceStatus
     /// <summary>
     /// Employee has approved personal excuse for time away.
     /// </summary>
-    Excused = 13
+    Excused = 13,
+
+    /// <summary>
+    /// Employee is working remotely under an approved remote work request.
+    /// </summary>
+    RemoteWork = 14
 }

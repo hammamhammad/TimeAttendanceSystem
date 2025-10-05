@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/shared/components/form-group/form-group.component.css"],
-  "sourcesContent": [".form-label {\r\n  font-weight: 500;\r\n  margin-bottom: 0.5rem;\r\n}\r\n\r\n.invalid-feedback {\r\n  font-size: 0.875rem;\r\n  margin-top: 0.25rem;\r\n}\r\n\r\n.form-text {\r\n  font-size: 0.875rem;\r\n  margin-top: 0.25rem;\r\n  color: #6c757d;\r\n}"],
-  "mappings": ";AAAA,CAAC;AACC,eAAa;AACb,iBAAe;AACjB;AAEA,CAAC;AACC,aAAW;AACX,cAAY;AACd;AAEA,CAAC;AACC,aAAW;AACX,cAAY;AACZ,SAAO;AACT;",
-  "names": []
-}

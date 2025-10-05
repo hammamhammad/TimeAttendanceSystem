@@ -9,6 +9,8 @@ public record CreateUserCommand(
     string? Phone,
     string Password,
     string PreferredLanguage,
+    bool MustChangePassword,
     List<long> RoleIds,
-    List<long> BranchIds
+    List<long> BranchIds,
+    long? EmployeeId
 ) : IRequest<Result<long>>;

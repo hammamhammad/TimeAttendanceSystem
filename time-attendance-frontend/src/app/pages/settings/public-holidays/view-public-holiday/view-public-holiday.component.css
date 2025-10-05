@@ -1,39 +1,13 @@
 /* View Public Holiday specific styles */
-.detail-card {
-  border: 1px solid var(--bs-border-color);
-  border-radius: 0.5rem;
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+
+/* Config summary styles (similar to overtime configuration) */
+.config-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
-.detail-card .card-header {
-  background-color: var(--bs-light);
-  border-bottom: 1px solid var(--bs-border-color);
-  font-weight: 600;
-}
-
-.detail-card .card-body {
-  padding: 1.25rem;
-}
-
-.actions-card {
-  position: sticky;
-  top: 1rem;
-}
-
-.btn-group-vertical .btn {
-  margin-bottom: 0.5rem;
-}
-
-.btn-group-vertical .btn:last-child {
-  margin-bottom: 0;
-}
-
-.status-badge {
-  font-size: 0.875rem;
-  padding: 0.25rem 0.5rem;
-}
-
-.info-item {
+.summary-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -41,19 +15,24 @@
   border-bottom: 1px solid var(--bs-border-color);
 }
 
-.info-item:last-child {
+.summary-item:last-child {
   border-bottom: none;
 }
 
-.info-label {
+.summary-label {
   font-weight: 500;
   color: var(--bs-gray-700);
-  min-width: 140px;
+  font-size: 0.875rem;
 }
 
-.info-value {
-  text-align: right;
+.summary-value {
+  font-weight: 600;
   color: var(--bs-gray-900);
+}
+
+.rate-value {
+  font-size: 1.1rem;
+  color: var(--bs-primary);
 }
 
 /* Holiday specific styles */

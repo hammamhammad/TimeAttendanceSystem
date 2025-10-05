@@ -1,0 +1,57 @@
+<div class="app-list-page">
+  <!-- Page Header -->
+  <app-page-header
+    [title]="i18n.t('remoteWork.policy.title')">
+  </app-page-header>
+
+  <!-- Unified Filter Component -->
+  <app-unified-filter
+    moduleName="remote-work-policy"
+    [refreshing]="loading()"
+    (add)="onCreate()"
+    (refresh)="loadPolicies()">
+  </app-unified-filter>
+
+  <!-- Remote Work Policies Table -->
+  <app-section-card
+    [title]="i18n.t('remoteWork.policy.title')"
+    [showHeader]="false"
+    [bodyClass]="'p-0'">
+    <app-data-table
+      [data]="policies() || []"
+      [columns]="tableColumns"
+      [actions]="tableActions"
+      [loading]="loading"
+      [emptyTitle]="i18n.t('remoteWork.policy.noData')"
+      [emptyMessage]="i18n.t('remoteWork.policy.noDataMessage')"
+      (actionClick)="onTableAction($event)">
+      <!-- Custom cell template -->
+      <ng-template #cellTemplate let-item let-column="column">
+        @if (column.key === 'branchName') {
+          @if (item.branchId) {
+            {{ item.branchName || 'Branch ' + item.branchId }}
+          } @else {
+            {{ i18n.t('remoteWork.policy.company_wide') }}
+          }
+        } @else if (column.key === 'quotas') {
+          {{ formatQuotas(item) }}
+        } @else if (column.key === 'requiresManagerApproval') {
+          {{ item.requiresManagerApproval ? i18n.t('common.required') : i18n.t('common.automatic') }}
+        } @else if (column.key === 'isActive') {
+          <app-status-badge
+            [status]="item.isActive ? 'active' : 'inactive'"
+            [label]="item.isActive ? i18n.t('common.active') : i18n.t('common.inactive')">
+          </app-status-badge>
+        } @else {
+          {{ item[column.key] }}
+        }
+      </ng-template>
+    </app-data-table>
+  </app-section-card>
+
+  <!-- Policy Modal -->
+  <app-remote-work-policy-modal
+    (policyCreated)="onPolicyCreated()"
+    (policyUpdated)="onPolicyUpdated()"
+  />
+</div>

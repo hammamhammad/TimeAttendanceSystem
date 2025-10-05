@@ -1,13 +1,6 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
-  <div class="row g-3">
-    <!-- Basic Information -->
-    <div class="col-12">
-      <h6 class="section-title">
-        <i class="fas fa-info-circle me-2"></i>
-        {{ i18n.t('common.basicInformation') }}
-      </h6>
-    </div>
-
+  <app-form-section [title]="i18n.t('common.basicInformation')">
+    <div class="row g-3">
     <!-- Branch (only for create mode) -->
     @if (!isEditMode) {
       <div class="col-md-6">
@@ -142,15 +135,12 @@
         </div>
       }
     </div>
-
-    <!-- Additional Information -->
-    <div class="col-12">
-      <h6 class="section-title">
-        <i class="fas fa-cog me-2"></i>
-        {{ i18n.t('department.additionalInformation') }}
-      </h6>
     </div>
+  </app-form-section>
 
+  <!-- Additional Information -->
+  <app-form-section [title]="i18n.t('department.additionalInformation')">
+    <div class="row g-3">
     <!-- Manager -->
     <div class="col-md-6">
       <label class="form-label">{{ i18n.t('department.manager') }}</label>
@@ -316,15 +306,12 @@
         {{ i18n.t('common.sortOrderHelp') }}
       </small>
     </div>
-
-    <!-- Status -->
-    <div class="col-12">
-      <h6 class="section-title">
-        <i class="fas fa-toggle-on me-2"></i>
-        {{ i18n.t('common.status') }}
-      </h6>
     </div>
+  </app-form-section>
 
+  <!-- Status -->
+  <app-form-section [title]="i18n.t('common.status')">
+    <div class="row g-3">
     <!-- Active Status -->
     <div class="col-12">
       <div class="form-check form-switch">
@@ -342,7 +329,8 @@
         {{ i18n.t('department.isActiveHelp') }}
       </small>
     </div>
-  </div>
+    </div>
+  </app-form-section>
 
   <!-- Form Actions -->
   <div class="form-actions">

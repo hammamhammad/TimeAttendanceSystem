@@ -1,6 +1,8 @@
 import { Component, Input, Output, EventEmitter, signal, TemplateRef, ContentChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { LoadingSpinnerComponent } from '../loading-spinner/loading-spinner.component';
+import { EmptyStateComponent } from '../empty-state/empty-state.component';
 
 export interface TableColumn {
   key: string;
@@ -30,15 +32,11 @@ export interface SortEvent {
 @Component({
   selector: 'app-data-table',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoadingSpinnerComponent, EmptyStateComponent],
   template: `
     <div class="unified-data-table">
       <!-- Loading State -->
-      <div *ngIf="isLoading()" class="text-center p-4">
-        <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Loading...</span>
-        </div>
-      </div>
+      <app-loading-spinner *ngIf="isLoading()"></app-loading-spinner>
 
       <!-- Mobile Card View -->
       <div class="mobile-cards d-block d-md-none" *ngIf="!isLoading() && (responsiveMode === 'cards' || responsiveMode === 'auto')">
@@ -93,11 +91,12 @@ export interface SortEvent {
         </div>
 
         <!-- Empty state for mobile -->
-        <div *ngIf="data.length === 0" class="mobile-empty-state">
-          <i class="fas fa-inbox fa-3x mb-3"></i>
-          <h5>{{ emptyMessage || 'No Data' }}</h5>
-          <p>{{ emptyTitle || 'No data available' }}</p>
-        </div>
+        <app-empty-state
+          *ngIf="data.length === 0"
+          [icon]="'fa-inbox'"
+          [title]="emptyTitle || 'No Data'"
+          [message]="emptyMessage || 'No data available'">
+        </app-empty-state>
       </div>
 
       <!-- Desktop Table View -->
@@ -195,10 +194,12 @@ export interface SortEvent {
 
               <!-- Empty state -->
               <tr *ngIf="data.length === 0">
-                <td [attr.colspan]="getTotalColumns()" class="text-center py-4 text-muted">
-                  <i class="fas fa-inbox fa-3x mb-3"></i>
-                  <h5>{{ emptyMessage || 'No Data' }}</h5>
-                  <p>{{ emptyTitle || 'No data available' }}</p>
+                <td [attr.colspan]="getTotalColumns()" class="p-0">
+                  <app-empty-state
+                    [icon]="'fa-inbox'"
+                    [title]="emptyTitle || 'No Data'"
+                    [message]="emptyMessage || 'No data available'">
+                  </app-empty-state>
                 </td>
               </tr>
             </tbody>

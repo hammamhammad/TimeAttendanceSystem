@@ -34,12 +34,16 @@ export interface UserDto {
   username: string;
   email: string;
   phone?: string;
+  firstName?: string;
+  lastName?: string;
   twoFactorEnabled: boolean;
   lockoutEndUtc?: string;
   mustChangePassword: boolean;
   preferredLanguage: string;
   isActive: boolean;
-  createdAtUtc: string;
+  createdAt?: string;
+  createdAtUtc?: string;
+  lastLoginAt?: string;
   roles: string[];
   branches: string[];
   permissions?: string[];
@@ -53,8 +57,10 @@ export interface CreateUserRequest {
   phone?: string;
   password: string;
   preferredLanguage: string;
+  mustChangePassword: boolean;
   roleIds: number[];
   branchIds: number[];
+  employeeId?: number;
 }
 
 export interface UpdateUserRequest {
@@ -62,6 +68,7 @@ export interface UpdateUserRequest {
   phone?: string;
   preferredLanguage: string;
   isActive: boolean;
+  mustChangePassword: boolean;
   roleIds?: number[];
   branchIds?: number[];
 }

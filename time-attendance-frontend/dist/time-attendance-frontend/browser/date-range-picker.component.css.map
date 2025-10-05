@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/shared/components/date-range-picker/date-range-picker.component.css"],
-  "sourcesContent": [".date-range-picker {\r\n  width: 100%;\r\n}\r\n\r\n.date-range-inline {\r\n  display: flex;\r\n  align-items: center;\r\n}\r\n\r\n.date-range-separator {\r\n  color: #6c757d;\r\n  font-size: 0.875rem;\r\n}\r\n\r\n.form-label {\r\n  font-weight: 500;\r\n  margin-bottom: 0.5rem;\r\n}\r\n\r\n.invalid-feedback {\r\n  font-size: 0.875rem;\r\n  margin-top: 0.25rem;\r\n}"],
-  "mappings": ";AAAA,CAAC;AACC,SAAO;AACT;AAEA,CAAC;AACC,WAAS;AACT,eAAa;AACf;AAEA,CAAC;AACC,SAAO;AACP,aAAW;AACb;AAEA,CAAC;AACC,eAAa;AACb,iBAAe;AACjB;AAEA,CAAC;AACC,aAAW;AACX,cAAY;AACd;",
-  "names": []
-}

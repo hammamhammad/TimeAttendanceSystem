@@ -15,41 +15,20 @@
   </app-unified-filter>
 
   <!-- Roles Table Card -->
-  <div class="card">
-    <div class="card-body">
-      @if (loading()) {
-        <div class="text-center py-4">
-          <app-loading-spinner
-            [message]="t('common.loading')"
-            [variant]="'primary'"
-            [centered]="true">
-          </app-loading-spinner>
-        </div>
-      } @else if (filteredRoles().length === 0) {
-        <app-empty-state
-          [icon]="'fa-solid fa-user-shield'"
-          [message]="t('roles.no_roles_found')"
-          [showClearFilters]="hasActiveFilters()"
-          [clearFiltersText]="t('common.clear_filters')"
-          (clearFilters)="onClearFilters()">
-        </app-empty-state>
-      } @else {
-        <!-- Unified Data Table -->
-        <app-data-table
-          [data]="tableData()"
-          [columns]="tableColumns()"
-          [actions]="tableActions()"
-          [loading]="loading"
-          [paginated]="true"
-          [emptyMessage]="t('roles.no_roles_found')"
-          [responsiveMode]="'auto'"
-          (actionClick)="onActionClick($event)"
-          class="table-hover">
-        </app-data-table>
-      }
+      <!-- Unified Data Table -->
+      <app-data-table
+        [data]="tableData() || []"
+        [columns]="tableColumns()"
+        [actions]="tableActions()"
+        [loading]="loading"
+        [emptyTitle]="t('roles.no_roles_found')"
+        [emptyMessage]="hasActiveFilters() ? t('common.try_different_filters') : t('roles.no_roles_description')"
+        [paginated]="true"
+        [responsiveMode]="'auto'"
+        (actionClick)="onActionClick($event)"
+        class="table-hover">
+      </app-data-table>
     </div>
-  </div>
-</div>
 
 <!-- Permission Management Modal -->
 <app-modal-wrapper

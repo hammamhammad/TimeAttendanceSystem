@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AttendanceService } from '../../../core/services/attendance.service';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { FormHeaderComponent } from '../../../shared/components/form-header/form-header.component';
+import { FormSectionComponent } from '../../../shared/components/form-section/form-section.component';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 import { NotificationService } from '../../../core/notifications/notification.service';
 import {
@@ -16,7 +17,7 @@ import {
 @Component({
   selector: 'app-edit-attendance',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormHeaderComponent, StatusBadgeComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormHeaderComponent, FormSectionComponent, StatusBadgeComponent],
   templateUrl: './edit-attendance.component.html',
   styleUrls: ['./edit-attendance.component.css']
 })

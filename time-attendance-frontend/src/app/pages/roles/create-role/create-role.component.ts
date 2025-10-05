@@ -8,11 +8,12 @@ import { Permission } from '../../../shared/models/role.model';
 import { PermissionUtils } from '../../../shared/utils/permission.utils';
 import { NotificationService } from '../../../core/notifications/notification.service';
 import { FormHeaderComponent } from '../../../shared/components/form-header/form-header.component';
+import { FormSectionComponent } from '../../../shared/components/form-section/form-section.component';
 
 @Component({
   selector: 'app-create-role',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, FormHeaderComponent],
+  imports: [CommonModule, FormsModule, RouterModule, FormHeaderComponent, FormSectionComponent],
   templateUrl: './create-role.component.html',
   styleUrls: ['./create-role.component.css']
 })
@@ -37,6 +38,9 @@ export class CreateRoleComponent implements OnInit {
 
   // Filter state
   permissionSearchTerm = '';
+
+  // Collapse state for permission groups
+  collapsedGroups = new Set<string>();
 
   ngOnInit(): void {
     this.loadPermissions();
@@ -182,6 +186,52 @@ export class CreateRoleComponent implements OnInit {
 
   getPermissionDescription(permission: Permission): string {
     return permission.description || this.t('roles.no_description');
+  }
+
+  // Group management methods
+  toggleGroupCollapse(groupName: string): void {
+    if (this.collapsedGroups.has(groupName)) {
+      this.collapsedGroups.delete(groupName);
+    } else {
+      this.collapsedGroups.add(groupName);
+    }
+  }
+
+  isGroupCollapsed(groupName: string): boolean {
+    return this.collapsedGroups.has(groupName);
+  }
+
+  selectAllGroupPermissions(group: PermissionGroupDto): void {
+    group.permissions.forEach(permission => {
+      this.roleForm.selectedPermissions.add(permission.id);
+    });
+  }
+
+  deselectAllGroupPermissions(group: PermissionGroupDto): void {
+    group.permissions.forEach(permission => {
+      this.roleForm.selectedPermissions.delete(permission.id);
+    });
+  }
+
+  areAllGroupPermissionsSelected(group: PermissionGroupDto): boolean {
+    return group.permissions.every(permission =>
+      this.roleForm.selectedPermissions.has(permission.id)
+    );
+  }
+
+  areSomeGroupPermissionsSelected(group: PermissionGroupDto): boolean {
+    const selectedCount = group.permissions.filter(permission =>
+      this.roleForm.selectedPermissions.has(permission.id)
+    ).length;
+    return selectedCount > 0 && selectedCount < group.permissions.length;
+  }
+
+  toggleGroupSelection(group: PermissionGroupDto): void {
+    if (this.areAllGroupPermissionsSelected(group)) {
+      this.deselectAllGroupPermissions(group);
+    } else {
+      this.selectAllGroupPermissions(group);
+    }
   }
 
   private getErrorMessage(error: any): string {

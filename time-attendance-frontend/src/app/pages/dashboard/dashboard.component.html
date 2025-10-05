@@ -8,7 +8,7 @@
   <div class="dashboard-controls mb-4">
     <div class="d-flex justify-content-between align-items-start">
       <div class="welcome-section">
-        <p class="dashboard-subtitle mb-0">{{ t('dashboard.welcome') }}</p>
+        <p class="dashboard-subtitle mb-0">{{ t('dashboard.welcome', { username: currentUser()?.username || 'User' }) }}</p>
         @if (lastRefresh()) {
           <small class="text-muted">
             <i class="fa-solid fa-clock me-1"></i>

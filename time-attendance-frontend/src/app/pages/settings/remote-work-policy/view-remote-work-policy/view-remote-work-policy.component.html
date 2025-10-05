@@ -1,0 +1,152 @@
+<div class="view-remote-work-policy-page">
+  @if (loading()) {
+    <!-- Loading State -->
+    <div class="d-flex justify-content-center align-items-center py-5">
+      <app-loading-spinner
+        [message]="i18n.t('remoteWork.policy.loading_details')"
+        [variant]="'primary'"
+        [centered]="true">
+      </app-loading-spinner>
+    </div>
+  } @else if (policy(); as p) {
+    <!-- Page Header -->
+    <app-form-header
+      mode="view"
+      [title]="i18n.t('remoteWork.policy.policy_details')"
+      moduleName="remote-work-policy"
+      moduleRoute="settings/remote-work-policy"
+      [entityId]="policyId() || undefined"
+      [loading]="loading()">
+    </app-form-header>
+
+    <!-- Policy Header Card -->
+    <div class="header-card mb-4">
+      <div class="d-flex align-items-center">
+        <div class="policy-icon me-4">
+          <i class="fas fa-laptop-house text-primary fa-3x"></i>
+        </div>
+        <div class="flex-grow-1">
+          <div class="row">
+            <div class="col-md-8">
+              <h3 class="mb-1">
+                @if (p.branchId) {
+                  {{ p.branchName || 'Branch ' + p.branchId }}
+                } @else {
+                  {{ i18n.t('remoteWork.policy.company_wide') }}
+                }
+              </h3>
+              <p class="text-muted mb-0">
+                <i class="fas fa-building me-2"></i>
+                @if (p.branchId) {
+                  {{ i18n.t('remoteWork.policy.branch_policy') }}
+                } @else {
+                  {{ i18n.t('remoteWork.policy.company_wide_policy') }}
+                }
+              </p>
+            </div>
+            <div class="col-md-4 text-md-end">
+              <div class="status-info">
+                <app-status-badge
+                  [status]="statusBadge().label"
+                  [variant]="statusBadge().variant"
+                  class="fs-6 mb-2">
+                </app-status-badge>
+                <div class="text-muted small">
+                  <div>
+                    <i class="fas fa-clock me-1"></i>
+                    {{ i18n.t('common.created_at') }}: {{ p.createdAtUtc | date:'medium' }}
+                  </div>
+                  @if (p.modifiedAtUtc) {
+                    <div class="mt-1">
+                      <i class="fas fa-edit me-1"></i>
+                      {{ i18n.t('common.modified_at') }}: {{ p.modifiedAtUtc | date:'medium' }}
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Basic Information -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-info-circle text-info me-2"></i>
+          {{ i18n.t('common.basic_information') }}
+        </h5>
+      </div>
+      <div class="card-body">
+        <app-definition-list
+          [items]="basicInfoItems()"
+          [labelWidth]="'4'"
+          [valueWidth]="'8'"
+          layout="two-column">
+        </app-definition-list>
+      </div>
+    </div>
+
+    <!-- Quota Settings -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-calendar-check text-success me-2"></i>
+          {{ i18n.t('remoteWork.policy.quota_settings') }}
+        </h5>
+      </div>
+      <div class="card-body">
+        <app-definition-list
+          [items]="quotaInfoItems()"
+          [labelWidth]="'4'"
+          [valueWidth]="'8'"
+          layout="two-column">
+        </app-definition-list>
+      </div>
+    </div>
+
+    <!-- Approval Settings -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-user-check text-warning me-2"></i>
+          {{ i18n.t('remoteWork.policy.approval_settings') }}
+        </h5>
+      </div>
+      <div class="card-body">
+        <app-definition-list
+          [items]="approvalSettingsItems()"
+          [labelWidth]="'4'"
+          [valueWidth]="'8'"
+          layout="two-column">
+        </app-definition-list>
+      </div>
+    </div>
+
+    <!-- Advance Notice -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-bell text-primary me-2"></i>
+          {{ i18n.t('remoteWork.policy.advance_notice') }}
+        </h5>
+      </div>
+      <div class="card-body">
+        <app-definition-list
+          [items]="advanceNoticeItems()"
+          [labelWidth]="'4'"
+          [valueWidth]="'8'"
+          layout="two-column">
+        </app-definition-list>
+      </div>
+    </div>
+  } @else {
+    <!-- Error State -->
+    <div class="text-center py-5">
+      <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+      <h4 class="text-muted">{{ i18n.t('remoteWork.policy.policy_not_found') }}</h4>
+      <p class="text-muted">{{ i18n.t('remoteWork.policy.policy_not_found_message') }}</p>
+    </div>
+  }
+</div>

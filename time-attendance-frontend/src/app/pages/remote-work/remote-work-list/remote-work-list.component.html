@@ -1,0 +1,40 @@
+<div class="app-list-page">
+  <!-- Page Header -->
+  <app-page-header [title]="i18n.t('remoteWork.request.title')">
+  </app-page-header>
+
+  <!-- Unified Filter Component -->
+  <app-unified-filter moduleName="remote-work-requests" [refreshing]="loading()"
+    (searchChange)="onSearchChange($event)" (filtersChange)="onFiltersChange($event)" (add)="onCreate()"
+    (refresh)="onRefreshData()">
+  </app-unified-filter>
+
+  <!-- Remote Work Requests Table -->
+  <app-data-table
+    [data]="requests() || []"
+    [columns]="tableColumns"
+    [actions]="tableActions"
+    [loading]="loading"
+    [emptyTitle]="i18n.t('remoteWork.request.noData')"
+    [emptyMessage]="i18n.t('remoteWork.request.noDataMessage')"
+    (actionClick)="onActionClick($event)">
+
+    <!-- Custom cell template -->
+    <ng-template #cellTemplate let-request let-column="column">
+      @if (column.key === 'employeeName') {
+      {{ request.employeeName || 'N/A' }}
+      } @else if (column.key === 'startDate') {
+      {{ formatDate(request.startDate) }}
+      } @else if (column.key === 'endDate') {
+      {{ formatDate(request.endDate) }}
+      } @else if (column.key === 'workingDaysCount') {
+      {{ request.workingDaysCount }}
+      } @else if (column.key === 'status') {
+      <app-status-badge [status]="getStatusVariant(request.status)" [label]="getStatusText(request.status)">
+      </app-status-badge>
+      } @else {
+      {{ request[column.key] }}
+      }
+    </ng-template>
+  </app-data-table>
+</div>

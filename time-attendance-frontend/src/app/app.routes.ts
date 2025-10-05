@@ -14,6 +14,12 @@ export const routes: Routes = [
     data: { title: 'auth.login' }
   },
   {
+    path: 'auth/change-password',
+    loadComponent: () => import('./pages/auth/change-password.component').then(m => m.ChangePasswordComponent),
+    canMatch: [authGuard],
+    data: { title: 'auth.change_password' }
+  },
+  {
     path: '',
     loadComponent: () => import('./layout/layout.component').then(m => m.LayoutComponent),
     canMatch: [authGuard],
@@ -453,42 +459,6 @@ export const routes: Routes = [
         },
         canMatch: [authGuard]
       },
-      {
-        path: 'settings/excuse-policies',
-        loadComponent: () => import('./pages/excuse-policies/excuse-policies.component').then(m => m.ExcusePoliciesComponent),
-        data: {
-          title: 'excuse_policies.title',
-          permission: 'settings.excusePolicy.read'
-        },
-        canMatch: [adminGuard]
-      },
-      {
-        path: 'settings/excuse-policies/create',
-        loadComponent: () => import('./pages/excuse-policies/create-excuse-policy/create-excuse-policy.component').then(m => m.CreateExcusePolicyComponent),
-        data: {
-          title: 'excuse_policies.create_policy',
-          permission: 'settings.excusePolicy.create'
-        },
-        canMatch: [adminGuard]
-      },
-      {
-        path: 'settings/excuse-policies/:id/view',
-        loadComponent: () => import('./pages/excuse-policies/view-excuse-policy/view-excuse-policy.component').then(m => m.ViewExcusePolicyComponent),
-        data: {
-          title: 'excuse_policies.view_details',
-          permission: 'settings.excusePolicy.read'
-        },
-        canMatch: [adminGuard]
-      },
-      {
-        path: 'settings/excuse-policies/:id/edit',
-        loadComponent: () => import('./pages/excuse-policies/edit-excuse-policy/edit-excuse-policy.component').then(m => m.EditExcusePolicyComponent),
-        data: {
-          title: 'excuse_policies.edit_policy',
-          permission: 'settings.excusePolicy.update'
-        },
-        canMatch: [adminGuard]
-      },
       // Employee Excuses Routes
       {
         path: 'employee-excuses',
@@ -525,6 +495,135 @@ export const routes: Routes = [
           permission: 'excuse.update'
         },
         canMatch: [authGuard]
+      },
+      // Remote Work Routes
+      {
+        path: 'remote-work',
+        loadComponent: () => import('./pages/remote-work/remote-work-list/remote-work-list.component').then(m => m.RemoteWorkListComponent),
+        data: {
+          title: 'remoteWork.request.title',
+          permission: 'remoteWork.request.read'
+        },
+        canMatch: [managerGuard]
+      },
+      {
+        path: 'remote-work/create',
+        loadComponent: () => import('./pages/remote-work/assign-remote-work/assign-remote-work.component').then(m => m.AssignRemoteWorkComponent),
+        data: {
+          title: 'remoteWork.request.create',
+          permission: 'remoteWork.request.create'
+        },
+        canMatch: [managerGuard]
+      },
+      {
+        path: 'remote-work/:id/view',
+        loadComponent: () => import('./pages/remote-work/view-remote-work-assignment/view-remote-work-assignment.component').then(m => m.ViewRemoteWorkAssignmentComponent),
+        data: {
+          title: 'remoteWork.request.view_details',
+          permission: 'remoteWork.request.read'
+        },
+        canMatch: [managerGuard]
+      },
+      {
+        path: 'remote-work/edit/:id',
+        loadComponent: () => import('./pages/remote-work/edit-remote-work/edit-remote-work.component').then(m => m.EditRemoteWorkComponent),
+        data: {
+          title: 'remoteWork.request.edit',
+          permission: 'remoteWork.request.update'
+        },
+        canMatch: [managerGuard]
+      },
+      {
+        path: 'settings/remote-work-policy',
+        loadComponent: () => import('./pages/settings/remote-work-policy/remote-work-policy-list/remote-work-policy-list.component').then(m => m.RemoteWorkPolicyListComponent),
+        data: {
+          title: 'remoteWork.policy.title',
+          permission: 'remoteWork.policy.read'
+        },
+        canMatch: [adminGuard]
+      },
+      {
+        path: 'settings/remote-work-policy/create',
+        loadComponent: () => import('./pages/settings/remote-work-policy/create-remote-work-policy/create-remote-work-policy.component').then(m => m.CreateRemoteWorkPolicyComponent),
+        data: {
+          title: 'remoteWork.policy.create_policy',
+          permission: 'remoteWork.policy.create'
+        },
+        canMatch: [adminGuard]
+      },
+      {
+        path: 'settings/remote-work-policy/:id/view',
+        loadComponent: () => import('./pages/settings/remote-work-policy/view-remote-work-policy/view-remote-work-policy.component').then(m => m.ViewRemoteWorkPolicyComponent),
+        data: {
+          title: 'remoteWork.policy.policy_details',
+          permission: 'remoteWork.policy.read'
+        },
+        canMatch: [adminGuard]
+      },
+      {
+        path: 'settings/remote-work-policy/:id/edit',
+        loadComponent: () => import('./pages/settings/remote-work-policy/edit-remote-work-policy/edit-remote-work-policy.component').then(m => m.EditRemoteWorkPolicyComponent),
+        data: {
+          title: 'remoteWork.policy.edit_policy',
+          permission: 'remoteWork.policy.update'
+        },
+        canMatch: [adminGuard]
+      },
+      // Excuse Policies Routes
+      {
+        path: 'settings/excuse-policies',
+        loadComponent: () => import('./pages/settings/excuse-policies/excuse-policies.component').then(m => m.ExcusePoliciesComponent),
+        data: {
+          title: 'excuse_policies.title',
+          permission: 'settings.excusePolicy.read'
+        },
+        canMatch: [adminGuard]
+      },
+      {
+        path: 'settings/excuse-policies/create',
+        loadComponent: () => import('./pages/settings/excuse-policies/create-excuse-policy/create-excuse-policy.component').then(m => m.CreateExcusePolicyComponent),
+        data: {
+          title: 'excuse_policies.create_policy',
+          permission: 'settings.excusePolicy.create'
+        },
+        canMatch: [adminGuard]
+      },
+      {
+        path: 'settings/excuse-policies/:id/view',
+        loadComponent: () => import('./pages/settings/excuse-policies/view-excuse-policy/view-excuse-policy.component').then(m => m.ViewExcusePolicyComponent),
+        data: {
+          title: 'excuse_policies.view_policy',
+          permission: 'settings.excusePolicy.read'
+        },
+        canMatch: [adminGuard]
+      },
+      {
+        path: 'settings/excuse-policies/:id/edit',
+        loadComponent: () => import('./pages/settings/excuse-policies/edit-excuse-policy/edit-excuse-policy.component').then(m => m.EditExcusePolicyComponent),
+        data: {
+          title: 'excuse_policies.edit_policy',
+          permission: 'settings.excusePolicy.update'
+        },
+        canMatch: [adminGuard]
+      },
+      // Reports Routes
+      {
+        path: 'reports/sessions',
+        loadComponent: () => import('./pages/reports/sessions/sessions.component').then(m => m.SessionsComponent),
+        data: {
+          title: 'sessions.title',
+          permission: 'session.read'
+        },
+        canMatch: [authGuard]
+      },
+      {
+        path: 'reports/audit-logs',
+        loadComponent: () => import('./pages/reports/audit-logs/audit-logs.component').then(m => m.AuditLogsComponent),
+        data: {
+          title: 'audit_logs.title',
+          permission: 'audit.read'
+        },
+        canMatch: [adminGuard]
       },
     ]
   },

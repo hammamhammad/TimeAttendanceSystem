@@ -22,6 +22,7 @@ public static class PermissionResources
     public const string Vacation = "vacation";
     public const string ExcusePolicy = "excusePolicy";
     public const string Excuse = "excuse";
+    public const string Session = "session";
 
     public static readonly Dictionary<string, string> ResourceDescriptions = new()
     {
@@ -45,8 +46,9 @@ public static class PermissionResources
         { Vacation, "Employee vacation records and management" },
         { ExcusePolicy, "Excuse policies and organizational rules" },
         { Excuse, "Employee excuse requests and management" },
+        { Session, "User sessions and security management" },
     };
-    
+
     public static readonly Dictionary<string, string> ResourceIcons = new()
     {
         { User, "fa-user" },
@@ -68,6 +70,7 @@ public static class PermissionResources
         { VacationType, "fa-calendar-alt" },
         { ExcusePolicy, "fa-gavel" },
         { Excuse, "fa-file-alt" },
+        { Session, "fa-wifi" },
     };
     
     public static string GetResourceDescription(string resource)

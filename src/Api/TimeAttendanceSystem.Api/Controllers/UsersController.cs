@@ -153,8 +153,10 @@ public class UsersController : ControllerBase
             request.Phone,
             request.Password,
             request.PreferredLanguage,
+            request.MustChangePassword,
             request.RoleIds,
-            request.BranchIds
+            request.BranchIds,
+            request.EmployeeId
         );
 
         var result = await _mediator.Send(command);
@@ -192,7 +194,8 @@ public class UsersController : ControllerBase
             Email = request.Email,
             Phone = request.Phone,
             PreferredLanguage = request.PreferredLanguage,
-            IsActive = request.IsActive
+            IsActive = request.IsActive,
+            MustChangePassword = request.MustChangePassword
         };
 
         var result = await _mediator.Send(command);
@@ -287,15 +290,18 @@ public record CreateUserRequest(
     string? Phone,
     string Password,
     string PreferredLanguage,
+    bool MustChangePassword,
     List<long> RoleIds,
-    List<long> BranchIds
+    List<long> BranchIds,
+    long? EmployeeId
 );
 
 public record UpdateUserRequest(
     string Email,
     string? Phone,
     string PreferredLanguage,
-    bool IsActive
+    bool IsActive,
+    bool MustChangePassword
 );
 
 public record AssignRoleRequest(

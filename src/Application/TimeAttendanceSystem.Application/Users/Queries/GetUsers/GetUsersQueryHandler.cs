@@ -108,6 +108,7 @@ public class GetUsersQueryHandler : BaseHandler<GetUsersQuery, Result<PagedResul
                 .ThenInclude(ur => ur.Role)
             .Include(u => u.UserBranchScopes)
                 .ThenInclude(ubs => ubs.Branch)
+            .Include(u => u.UserSessions)
             .AsQueryable();
 
         // Apply multi-tenant branch filtering for non-system administrators
@@ -156,12 +157,20 @@ public class GetUsersQueryHandler : BaseHandler<GetUsersQuery, Result<PagedResul
                 u.Username,
                 u.Email,
                 u.Phone,
+                null, // FirstName - not available in User entity
+                null, // LastName - not available in User entity
                 u.TwoFactorEnabled,
                 u.LockoutEndUtc,
                 u.MustChangePassword,
                 u.PreferredLanguage,
                 u.IsActive,
                 u.CreatedAtUtc,
+                u.UserSessions.Any()
+                    ? u.UserSessions
+                        .OrderByDescending(s => s.LastAccessedAtUtc)
+                        .Select(s => (DateTime?)s.LastAccessedAtUtc)
+                        .FirstOrDefault()
+                    : null, // Last login from most recent session (nullable)
                 u.UserRoles.Select(ur => ur.Role.Name).ToList(), // Role names for display
                 u.UserBranchScopes.Select(ubs => ubs.Branch.Name).ToList() // Branch names for context
             ))

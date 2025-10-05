@@ -9,6 +9,7 @@ using TimeAttendanceSystem.Domain.Settings;
 using TimeAttendanceSystem.Domain.VacationTypes;
 using TimeAttendanceSystem.Domain.Vacations;
 using TimeAttendanceSystem.Domain.Excuses;
+using TimeAttendanceSystem.Domain.RemoteWork;
 
 namespace TimeAttendanceSystem.Application.Abstractions;
 
@@ -311,6 +312,21 @@ public interface IApplicationDbContext
     DbSet<AuditLog> AuditLogs { get; }
 
     /// <summary>
+    /// Gets the database set for AuditChange entities providing field-level change tracking.
+    /// Captures old and new values for each modified field within audit logs.
+    /// </summary>
+    /// <value>DbSet for querying and managing AuditChange entities</value>
+    /// <remarks>
+    /// AuditChange Features:
+    /// - Field-level change detection and tracking
+    /// - Old value and new value capture for compliance
+    /// - Integration with parent AuditLog entries
+    /// - Support for forensic analysis and data recovery
+    /// - Detailed change history for regulatory requirements
+    /// </remarks>
+    DbSet<AuditChange> AuditChanges { get; }
+
+    /// <summary>
     /// Gets the database set for Shift entities representing work shift definitions.
     /// Enables comprehensive shift management with flexible, multi-period, and hours-only support.
     /// </summary>
@@ -478,6 +494,37 @@ public interface IApplicationDbContext
     /// - Automatic duration calculation from start/end times
     /// </remarks>
     DbSet<EmployeeExcuse> EmployeeExcuses { get; }
+
+    /// <summary>
+    /// Gets the database set for RemoteWorkPolicy entities representing remote work policy configurations.
+    /// Manages remote work rules, quotas, and restrictions with branch-level organization.
+    /// </summary>
+    /// <value>DbSet for querying and managing RemoteWorkPolicy entities</value>
+    /// <remarks>
+    /// RemoteWorkPolicy Entity Features:
+    /// - Branch-scoped policy configuration for multi-tenant isolation
+    /// - Flexible quota system (weekly/monthly/yearly limits)
+    /// - Consecutive days restrictions and blackout periods
+    /// - Optional manager approval workflow
+    /// - Attendance integration settings (overtime and shift enforcement)
+    /// </remarks>
+    DbSet<RemoteWorkPolicy> RemoteWorkPolicies { get; }
+
+    /// <summary>
+    /// Gets the database set for RemoteWorkRequest entities representing remote work requests for employees.
+    /// Similar to vacation requests - individual, date-based requests managed by HR with approval workflow.
+    /// </summary>
+    /// <value>DbSet for querying and managing RemoteWorkRequest entities</value>
+    /// <remarks>
+    /// RemoteWorkRequest Entity Features:
+    /// - Individual employee requests (not bulk)
+    /// - Date range based (StartDate to EndDate)
+    /// - Status workflow (Pending, Approved, Rejected, Cancelled)
+    /// - Policy-based quota validation and tracking
+    /// - Affects attendance calculations when approved
+    /// - Integration with remote work policies and attendance records
+    /// </remarks>
+    DbSet<RemoteWorkRequest> RemoteWorkRequests { get; }
 
     /// <summary>
     /// Asynchronously saves all pending changes to the database.

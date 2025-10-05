@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { SearchableSelectComponent, SearchableSelectOption } from '../../../shared/components/searchable-select/searchable-select.component';
+import { FormSectionComponent } from '../../../shared/components/form-section/form-section.component';
 import { DepartmentsService } from '../departments.service';
 import { EmployeesService } from '../../employees/employees.service';
 import { BranchesService } from '../../branches/branches.service';
@@ -13,7 +14,7 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
 @Component({
   selector: 'app-department-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, SearchableSelectComponent, LoadingSpinnerComponent],
+  imports: [CommonModule, ReactiveFormsModule, SearchableSelectComponent, FormSectionComponent, LoadingSpinnerComponent],
   templateUrl: './department-form.component.html',
   styleUrls: ['./department-form.component.css']
 })

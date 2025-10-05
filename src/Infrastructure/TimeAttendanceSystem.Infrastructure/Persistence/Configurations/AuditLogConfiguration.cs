@@ -47,6 +47,12 @@ public class AuditLogConfiguration : IEntityTypeConfiguration<AuditLog>
         builder.HasIndex(x => x.EntityName);
         builder.HasIndex(x => x.CreatedAtUtc);
 
+        // Configure one-to-many relationship with AuditChanges
+        builder.HasMany(x => x.Changes)
+            .WithOne(x => x.AuditLog)
+            .HasForeignKey(x => x.AuditLogId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder.HasQueryFilter(x => !x.IsDeleted);
     }
 }

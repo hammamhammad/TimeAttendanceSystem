@@ -1,0 +1,39 @@
+<div class="app-list-page">
+  <!-- Page Header -->
+  <app-page-header [title]="i18n.t('audit_logs.title')"></app-page-header>
+
+  <!-- Unified Filter -->
+  <app-unified-filter
+    [searchPlaceholder]="i18n.t('audit_logs.search_placeholder')"
+    [showAddButton]="false"
+    [showRefreshButton]="true"
+    (searchChange)="onSearchChange($event)"
+    (refresh)="onRefresh()">
+  </app-unified-filter>
+
+  <!-- Audit Logs Table -->
+  <app-data-table
+    [columns]="tableColumns()"
+    [data]="tableData()"
+    [actions]="tableActions()"
+    [loading]="loading()"
+    [currentPage]="currentPage()"
+    [pageSize]="pageSize()"
+    [totalItems]="totalItems()"
+    [totalPages]="totalPages()"
+    [showPagination]="true"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)"
+    (sortChange)="onSortChange($event)"
+    (actionClick)="onActionClick($event)">
+  </app-data-table>
+
+  <!-- Audit Log Detail Modal -->
+  @if (selectedAuditLog()) {
+    <app-audit-log-detail-modal
+      [auditLog]="selectedAuditLog()!"
+      [show]="showDetailModal()"
+      (showChange)="onCloseDetailModal()">
+    </app-audit-log-detail-modal>
+  }
+</div>

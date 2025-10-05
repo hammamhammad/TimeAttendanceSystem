@@ -1,0 +1,122 @@
+<div class="edit-remote-work-page">
+  <!-- Form Header -->
+  <app-form-header
+    mode="edit"
+    [title]="i18n.t('remoteWork.request.edit')"
+    moduleName="remoteWork.request"
+    moduleRoute="remote-work"
+    [entityId]="requestId() ?? undefined">
+  </app-form-header>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <app-loading-spinner></app-loading-spinner>
+  }
+
+  <!-- Edit Form -->
+  @if (!loading()) {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <!-- Remote Work Details -->
+      <app-form-section [title]="i18n.t('remoteWork.request.details')">
+        <!-- Employee Selection (Disabled) -->
+        <div class="row mb-3">
+          <label class="col-sm-3 col-form-label">
+            {{ i18n.t('remoteWork.request.employee') }}
+            <span class="text-danger">*</span>
+          </label>
+          <div class="col-sm-9">
+            <app-searchable-select
+              [options]="employeeOptions()"
+              [value]="form.get('employeeId')?.value"
+              [placeholder]="i18n.t('remoteWork.request.select_employee')"
+              [searchable]="false"
+              [clearable]="false"
+              [required]="true"
+              [disabled]="true"
+              [isInvalid]="!!(form.get('employeeId')?.invalid && form.get('employeeId')?.touched)"
+              (selectionChange)="onEmployeeSelectionChange($event)">
+            </app-searchable-select>
+          </div>
+        </div>
+
+        <!-- Start Date -->
+        <div class="row mb-3">
+          <label for="startDate" class="col-sm-3 col-form-label">
+            {{ i18n.t('remoteWork.request.startDate') }}
+            <span class="text-danger">*</span>
+          </label>
+          <div class="col-sm-9">
+            <input
+              type="date"
+              id="startDate"
+              class="form-control"
+              formControlName="startDate"
+              [class.is-invalid]="form.get('startDate')?.invalid && form.get('startDate')?.touched">
+            @if (form.get('startDate')?.invalid && form.get('startDate')?.touched) {
+              <div class="invalid-feedback">
+                {{ i18n.t('remoteWork.request.errors.start_date_required') }}
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- End Date -->
+        <div class="row mb-3">
+          <label for="endDate" class="col-sm-3 col-form-label">
+            {{ i18n.t('remoteWork.request.endDate') }}
+            <span class="text-danger">*</span>
+          </label>
+          <div class="col-sm-9">
+            <input
+              type="date"
+              id="endDate"
+              class="form-control"
+              formControlName="endDate"
+              [class.is-invalid]="form.get('endDate')?.invalid && form.get('endDate')?.touched">
+            @if (form.get('endDate')?.invalid && form.get('endDate')?.touched) {
+              <div class="invalid-feedback">
+                {{ i18n.t('remoteWork.request.errors.end_date_required') }}
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Reason -->
+        <div class="row mb-3">
+          <label for="reason" class="col-sm-3 col-form-label">
+            {{ i18n.t('remoteWork.request.reason') }}
+          </label>
+          <div class="col-sm-9">
+            <textarea
+              id="reason"
+              class="form-control"
+              formControlName="reason"
+              rows="3"
+              [placeholder]="i18n.t('remoteWork.request.reason_placeholder')">
+            </textarea>
+          </div>
+        </div>
+      </app-form-section>
+
+      <!-- Form Actions -->
+      <div class="d-flex justify-content-end gap-2 mt-4">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="onCancel()"
+          [disabled]="submitting()">
+          {{ i18n.t('common.cancel') }}
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="submitting() || form.invalid">
+          @if (submitting()) {
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          }
+          {{ i18n.t('common.save') }}
+        </button>
+      </div>
+    </form>
+  }
+</div>

@@ -247,8 +247,10 @@ export class PublicHolidaysComponent implements OnInit {
   formatScope(holiday: PublicHoliday): string {
     if (holiday.isNational) {
       return `<span class="badge bg-success">${this.t('settings.holidays.national')}</span>`;
+    } else if (holiday.branchId) {
+      return `<span class="badge bg-info">${holiday.branchName || `Branch ${holiday.branchId}`}</span>`;
     } else {
-      return `<span class="badge bg-info">${holiday.branchName || this.t('settings.holidays.regional')}</span>`;
+      return `<span class="badge bg-info">${this.t('common.company_wide')}</span>`;
     }
   }
 

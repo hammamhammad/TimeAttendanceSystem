@@ -1,0 +1,11 @@
+/* Excuse Policies List Component Styles */
+
+.container-fluid {
+  padding: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .container-fluid {
+    padding: 1rem;
+  }
+}

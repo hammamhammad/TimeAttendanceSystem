@@ -24,23 +24,23 @@
     </app-error-alert>
   }
 
-  <!-- Vacation Types Table using SectionCardComponent -->
+  <!-- Vacation Types Table -->
   <app-section-card
     [title]="i18n.t('vacation_types.title')"
     [showHeader]="false"
     [bodyClass]="'p-0'">
     <app-data-table
-      [data]="vacationTypes()"
+      [data]="vacationTypes() || []"
       [columns]="tableColumns"
       [actions]="tableActions"
-      [loading]="loading"
       [currentPage]="currentPage"
       [totalPages]="totalPages"
       [totalItems]="totalItems"
       [pageSize]="pageSize"
+      [loading]="loading"
+      [emptyTitle]="i18n.t('vacation_types.no_vacation_types')"
+      [emptyMessage]="i18n.t('vacation_types.no_vacation_types_message')"
       [showPagination]="true"
-      [emptyMessage]="i18n.t('vacation_types.no_vacation_types')"
-      [emptyTitle]="i18n.t('vacation_types.no_vacation_types_message')"
       (actionClick)="onTableAction($event)"
       (pageChange)="onPageChange($event)"
       (pageSizeChange)="onPageSizeChange($event)"
@@ -55,7 +55,11 @@
             }
           </div>
         } @else if (column.key === 'branchName') {
-          {{ item.branchName || i18n.t('common.not_specified') }}
+          @if (item.branchId) {
+            {{ item.branchName || 'Branch ' + item.branchId }}
+          } @else {
+            {{ i18n.t('common.company_wide') }}
+          }
         } @else if (column.key === 'isActive') {
           <app-status-badge
             [status]="item.isActive ? 'active' : 'inactive'"

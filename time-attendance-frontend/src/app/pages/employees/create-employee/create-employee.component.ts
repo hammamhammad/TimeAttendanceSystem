@@ -5,10 +5,11 @@ import { Router, RouterLink } from '@angular/router';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { SearchableSelectComponent, SearchableSelectOption } from '../../../shared/components/searchable-select/searchable-select.component';
 import { FormHeaderComponent } from '../../../shared/components/form-header/form-header.component';
+import { FormSectionComponent } from '../../../shared/components/form-section/form-section.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { EmployeesService } from '../employees.service';
-import { 
-  BranchDto, 
+import {
+  BranchDto,
   DepartmentDto,
   EmploymentStatus,
   Gender,
@@ -20,7 +21,7 @@ import {
 @Component({
   selector: 'app-create-employee',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, SearchableSelectComponent, FormHeaderComponent, LoadingSpinnerComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, SearchableSelectComponent, FormHeaderComponent, FormSectionComponent, LoadingSpinnerComponent],
   templateUrl: './create-employee.component.html',
   styleUrls: ['./create-employee.component.css']
 })

@@ -1,0 +1,197 @@
+<div class="container-fluid">
+  <app-form-header
+    mode="create"
+    [title]="t('excuse_policies.create_policy')"
+    moduleName="excuse_policies"
+    moduleRoute="settings/excuse-policies">
+  </app-form-header>
+
+  <form #policyFormRef="ngForm" (ngSubmit)="onSubmit()">
+    <div class="row">
+      <!-- Scope Configuration -->
+      <div class="col-md-12 mb-4">
+        <app-form-section [title]="t('excuse_policies.scope_configuration')">
+            <div class="mb-3">
+              <label for="branchId" class="form-label">{{ t('excuse_policies.branch') }}</label>
+              <select id="branchId" class="form-select" [(ngModel)]="policyForm.branchId" name="branchId">
+                <option [ngValue]="null">{{ t('excuse_policies.organization_wide') }}</option>
+                @for (branch of branches(); track branch.id) {
+                  <option [ngValue]="branch.id">{{ branch.name }}</option>
+                }
+              </select>
+              <div class="form-text">{{ t('excuse_policies.branch_help') }}</div>
+            </div>
+        </app-form-section>
+      </div>
+
+      <!-- Monthly Limits -->
+      <div class="col-md-6 mb-4">
+        <app-form-section [title]="t('excuse_policies.monthly_limits')">
+            <div class="mb-3">
+              <label for="maxExcusesMonth" class="form-label">{{ t('excuse_policies.max_personal_excuses_per_month') }}</label>
+              <input
+                type="number"
+                id="maxExcusesMonth"
+                class="form-control"
+                [(ngModel)]="policyForm.maxPersonalExcusesPerMonth"
+                name="maxExcusesMonth"
+                min="1"
+                max="100"
+                required>
+              @if (validationErrors()['maxPersonalExcusesPerMonth']) {
+                <div class="text-danger small mt-1">{{ validationErrors()['maxPersonalExcusesPerMonth'] }}</div>
+              }
+              <div class="form-text">{{ t('excuse_policies.max_excuses_month_help') }}</div>
+            </div>
+            <div class="mb-3">
+              <label for="maxHoursMonth" class="form-label">{{ t('excuse_policies.max_personal_excuse_hours_per_month') }}</label>
+              <input
+                type="number"
+                id="maxHoursMonth"
+                class="form-control"
+                [(ngModel)]="policyForm.maxPersonalExcuseHoursPerMonth"
+                name="maxHoursMonth"
+                min="0.5"
+                step="0.5"
+                required>
+              @if (validationErrors()['maxPersonalExcuseHoursPerMonth']) {
+                <div class="text-danger small mt-1">{{ validationErrors()['maxPersonalExcuseHoursPerMonth'] }}</div>
+              }
+              <div class="form-text">{{ t('excuse_policies.max_hours_month_help') }}</div>
+            </div>
+        </app-form-section>
+      </div>
+
+      <!-- Time Limits -->
+      <div class="col-md-6 mb-4">
+        <app-form-section [title]="t('excuse_policies.time_limits')">
+            <div class="mb-3">
+              <label for="maxHoursDay" class="form-label">{{ t('excuse_policies.max_personal_excuse_hours_per_day') }}</label>
+              <input
+                type="number"
+                id="maxHoursDay"
+                class="form-control"
+                [(ngModel)]="policyForm.maxPersonalExcuseHoursPerDay"
+                name="maxHoursDay"
+                min="0.5"
+                step="0.5"
+                required>
+              @if (validationErrors()['maxPersonalExcuseHoursPerDay']) {
+                <div class="text-danger small mt-1">{{ validationErrors()['maxPersonalExcuseHoursPerDay'] }}</div>
+              }
+              <div class="form-text">{{ t('excuse_policies.max_hours_day_help') }}</div>
+            </div>
+            <div class="mb-3">
+              <label for="maxHoursPerExcuse" class="form-label">{{ t('excuse_policies.max_hours_per_excuse') }}</label>
+              <input
+                type="number"
+                id="maxHoursPerExcuse"
+                class="form-control"
+                [(ngModel)]="policyForm.maxHoursPerExcuse"
+                name="maxHoursPerExcuse"
+                min="0.5"
+                step="0.5"
+                required>
+              @if (validationErrors()['maxHoursPerExcuse']) {
+                <div class="text-danger small mt-1">{{ validationErrors()['maxHoursPerExcuse'] }}</div>
+              }
+              <div class="form-text">{{ t('excuse_policies.max_hours_per_excuse_help') }}</div>
+            </div>
+            <div class="mb-3">
+              <label for="minimumDuration" class="form-label">{{ t('excuse_policies.minimum_duration') }}</label>
+              <input
+                type="number"
+                id="minimumDuration"
+                class="form-control"
+                [(ngModel)]="policyForm.minimumExcuseDuration"
+                name="minimumDuration"
+                min="0.5"
+                step="0.5"
+                required>
+              @if (validationErrors()['minimumExcuseDuration']) {
+                <div class="text-danger small mt-1">{{ validationErrors()['minimumExcuseDuration'] }}</div>
+              }
+              <div class="form-text">{{ t('excuse_policies.minimum_duration_help') }}</div>
+            </div>
+        </app-form-section>
+      </div>
+
+      <!-- Policy Options -->
+      <div class="col-md-12 mb-4">
+        <app-form-section [title]="t('excuse_policies.policy_options')">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <div class="form-check form-switch">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    id="requiresApproval"
+                    [(ngModel)]="policyForm.requiresApproval"
+                    name="requiresApproval">
+                  <label class="form-check-label" for="requiresApproval">
+                    {{ t('excuse_policies.requires_approval') }}
+                  </label>
+                </div>
+                <div class="form-text">{{ t('excuse_policies.requires_approval_help') }}</div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <div class="form-check form-switch">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    id="allowPartialHours"
+                    [(ngModel)]="policyForm.allowPartialHourExcuses"
+                    name="allowPartialHours">
+                  <label class="form-check-label" for="allowPartialHours">
+                    {{ t('excuse_policies.allow_partial_hours') }}
+                  </label>
+                </div>
+                <div class="form-text">{{ t('excuse_policies.allow_partial_hours_help') }}</div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <div class="form-check form-switch">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    id="allowSelfService"
+                    [(ngModel)]="policyForm.allowSelfServiceRequests"
+                    name="allowSelfService">
+                  <label class="form-check-label" for="allowSelfService">
+                    {{ t('excuse_policies.allow_self_service') }}
+                  </label>
+                </div>
+                <div class="form-text">{{ t('excuse_policies.allow_self_service_help') }}</div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="maxRetroactiveDays" class="form-label">{{ t('excuse_policies.max_retroactive_days') }}</label>
+                <input
+                  type="number"
+                  id="maxRetroactiveDays"
+                  class="form-control"
+                  [(ngModel)]="policyForm.maxRetroactiveDays"
+                  name="maxRetroactiveDays"
+                  min="0"
+                  required>
+                <div class="form-text">{{ t('excuse_policies.max_retroactive_days_help') }}</div>
+              </div>
+            </div>
+        </app-form-section>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="col-12">
+        <div class="d-flex justify-content-end gap-2">
+          <button type="button" class="btn btn-outline-secondary" (click)="onCancel()" [disabled]="submitting()">
+            {{ t('common.cancel') }}
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="submitting()">
+            @if (submitting()) {
+              <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            }
+            {{ t('common.save') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

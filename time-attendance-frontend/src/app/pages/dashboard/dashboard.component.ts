@@ -247,8 +247,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   /**
    * Translation helper
    */
-  t(key: string): string {
-    return this.i18n.t(key);
+  t(key: string, params?: Record<string, any>): string {
+    return this.i18n.t(key, params);
   }
 
   /**

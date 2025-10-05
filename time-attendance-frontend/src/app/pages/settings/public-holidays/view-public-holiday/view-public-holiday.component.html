@@ -2,7 +2,7 @@
   <!-- Standardized Page Header -->
   <app-form-header
     mode="view"
-    [title]="i18n.t('public_holidays.view_holiday')"
+    [title]="i18n.t('settings.holidays.view_details')"
     moduleName="settings"
     moduleRoute="settings/public-holidays"
     [entityId]="holiday()?.id"
@@ -13,7 +13,7 @@
   @if (loading()) {
     <div class="text-center py-5">
       <app-loading-spinner
-        [message]="i18n.t('public_holidays.loading_details')"
+        [message]="i18n.t('common.loading')"
         [variant]="'primary'"
         [centered]="true">
       </app-loading-spinner>
@@ -34,118 +34,156 @@
       <!-- Main Content -->
       <div class="app-main-content">
         <!-- Basic Information Card -->
-        <app-detail-card
-          [title]="i18n.t('public_holidays.basic_information')"
+        <app-section-card
+          [title]="i18n.t('settings.holidays.basicInformation')"
           icon="fas fa-info-circle"
-          [fields]="basicInfoFields"
-          layout="two-column">
-        </app-detail-card>
+          headerClass="bg-light"
+          class="mb-4">
+          <app-definition-list
+            [items]="basicInfoItems()"
+            [labelWidth]="'4'"
+            [valueWidth]="'8'">
+          </app-definition-list>
+        </app-section-card>
 
         <!-- Date & Pattern Information Card -->
-        <app-detail-card
-          [title]="i18n.t('public_holidays.date_pattern_info')"
+        <app-section-card
+          [title]="i18n.t('settings.holidays.dateConfiguration')"
           icon="fas fa-calendar-alt"
-          [fields]="dateInfoFields"
-          layout="two-column"
-          class="mt-4">
-        </app-detail-card>
+          headerClass="bg-light"
+          class="mb-4">
+          <app-definition-list
+            [items]="dateInfoItems()"
+            [labelWidth]="'4'"
+            [valueWidth]="'8'">
+          </app-definition-list>
+        </app-section-card>
 
         <!-- Additional Information Card -->
-        @if (additionalInfoFields.length > 0) {
-          <app-detail-card
-            [title]="i18n.t('public_holidays.additional_information')"
+        @if (additionalInfoItems().length > 0) {
+          <app-section-card
+            [title]="i18n.t('settings.holidays.additionalSettings')"
             icon="fas fa-list-ul"
-            [fields]="additionalInfoFields"
-            layout="two-column"
-            class="mt-4">
-          </app-detail-card>
+            headerClass="bg-light"
+            class="mb-4">
+            <app-definition-list
+              [items]="additionalInfoItems()"
+              [labelWidth]="'4'"
+              [valueWidth]="'8'">
+            </app-definition-list>
+          </app-section-card>
         }
+
+        <!-- Audit Information Card -->
+        <app-section-card
+          [title]="i18n.t('common.audit_information')"
+          icon="fas fa-history"
+          headerClass="bg-light"
+          class="mb-4">
+          <app-definition-list
+            [items]="auditItems()"
+            [labelWidth]="'3'"
+            [valueWidth]="'9'">
+          </app-definition-list>
+        </app-section-card>
       </div>
 
       <!-- Sidebar -->
       <div class="app-sidebar-content">
         <!-- Actions Card -->
         @if (hasActiveActions()) {
-          <div class="card mb-3">
-            <div class="card-header">
-              <h6 class="card-title mb-0">
-                <i class="fas fa-cogs me-2"></i>
-                {{ i18n.t('common.actions') }}
-              </h6>
+          <app-section-card
+            [title]="i18n.t('common.actions')"
+            icon="fas fa-cogs"
+            headerClass="bg-light"
+            class="mb-3">
+            <div class="d-grid gap-2">
+              <!-- Delete Action -->
+              @if (canDelete()) {
+                <button
+                  type="button"
+                  class="btn btn-outline-danger"
+                  (click)="deleteHoliday()"
+                  [disabled]="processing()">
+                  @if (processing()) {
+                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                  } @else {
+                    <i class="fas fa-trash me-2"></i>
+                  }
+                  {{ i18n.t('common.delete') }}
+                </button>
+              }
             </div>
-            <div class="card-body">
-              <div class="d-grid gap-2">
-
-                <!-- Delete Action -->
-                @if (canDelete()) {
-                  <button
-                    type="button"
-                    class="btn btn-outline-danger"
-                    (click)="deleteHoliday()"
-                    [disabled]="processing()">
-                    @if (processing()) {
-                      <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                    } @else {
-                      <i class="fas fa-trash me-2"></i>
-                    }
-                    {{ i18n.t('common.delete') }}
-                  </button>
-                }
-              </div>
-            </div>
-          </div>
+          </app-section-card>
         }
 
         <!-- Conflicts Warning -->
         @if (holiday()?.hasConflicts) {
           <div class="alert alert-warning" role="alert">
             <i class="fas fa-exclamation-triangle me-2"></i>
-            <strong>{{ i18n.t('public_holidays.conflicts_detected') }}</strong>
+            <strong>{{ i18n.t('settings.holidays.conflicts_detected') }}</strong>
             <p class="mb-0 mt-2 small">
-              {{ i18n.t('public_holidays.conflicts_description') }}
+              {{ i18n.t('settings.holidays.conflicts_description') }}
             </p>
           </div>
         }
 
-        <!-- Holiday Status Info -->
-        <div class="card mb-3">
-          <div class="card-header">
-            <h6 class="card-title mb-0">
-              <i class="fas fa-info-circle me-2"></i>
-              {{ i18n.t('public_holidays.status_info') }}
-            </h6>
-          </div>
-          <div class="card-body">
-            <div class="d-flex align-items-center mb-2">
-              <i class="fas fa-circle me-2"
-                 [class]="holiday()?.isActive ? 'text-success' : 'text-secondary'"></i>
-              <span class="fw-medium">
-                {{ holiday()?.isActive ? i18n.t('common.active') : i18n.t('common.inactive') }}
-              </span>
+        <!-- Holiday Summary Card -->
+        <app-section-card
+          [title]="i18n.t('settings.holidays.summary')"
+          icon="fas fa-calendar-check"
+          headerClass="bg-light"
+          class="mb-3">
+          <div class="config-summary">
+            <!-- Status -->
+            <div class="summary-item">
+              <div class="summary-label">{{ i18n.t('fields.status') }}</div>
+              <div class="summary-value">
+                <app-status-badge
+                  [status]="statusBadge().label"
+                  [variant]="statusBadge().variant">
+                </app-status-badge>
+              </div>
             </div>
-            @if (holiday()?.isActive) {
-              <small class="text-success">
-                {{ i18n.t('public_holidays.status_active_description') }}
-              </small>
-            } @else {
-              <small class="text-muted">
-                {{ i18n.t('public_holidays.status_inactive_description') }}
-              </small>
-            }
+
+            <!-- Scope -->
+            <div class="summary-item">
+              <div class="summary-label">{{ i18n.t('fields.scope') }}</div>
+              <div class="summary-value">
+                <app-status-badge
+                  [status]="scopeBadge().label"
+                  [variant]="scopeBadge().variant">
+                </app-status-badge>
+              </div>
+            </div>
+
+            <!-- Priority -->
+            <div class="summary-item">
+              <div class="summary-label">{{ i18n.t('fields.priority') }}</div>
+              <div class="summary-value rate-value">{{ holiday()?.priority }}</div>
+            </div>
+
+            <!-- Holiday Type -->
+            <div class="summary-item">
+              <div class="summary-label">{{ i18n.t('fields.holidayType') }}</div>
+              <div class="summary-value">{{ getHolidayTypeLabel(holiday()!.holidayType) }}</div>
+            </div>
           </div>
-        </div>
+        </app-section-card>
 
         <!-- Back Navigation -->
-        <div class="card">
-          <div class="card-header">
-            <h6 class="card-title mb-0">
-              <i class="fas fa-arrow-left me-2"></i>
-              {{ i18n.t('common.navigation') }}
-            </h6>
+        <app-section-card
+          [title]="i18n.t('common.navigation')"
+          icon="fas fa-arrow-left"
+          headerClass="bg-light"
+          bodyClass="p-0">
+          <div class="list-group list-group-flush">
+            <a [routerLink]="['/settings/public-holidays']" class="list-group-item list-group-item-action">
+              <i class="fas fa-list me-2"></i>
+              {{ i18n.t('settings.holidays.title') }}
+            </a>
           </div>
-          <div class="card-body">
-          </div>
-        </div>
+        </app-section-card>
       </div>
     </div>
   }

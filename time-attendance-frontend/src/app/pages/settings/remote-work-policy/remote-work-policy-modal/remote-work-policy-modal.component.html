@@ -1,0 +1,300 @@
+<div class="modal fade" #modalElement tabindex="-1" aria-labelledby="policyModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="policyModalLabel">{{ getModalTitle() }}</h5>
+        <button type="button" class="btn-close" [attr.aria-label]="i18n.t('common.close')" (click)="closeModal()"></button>
+      </div>
+
+      <div class="modal-body">
+        @if (modalMode() === 'view' && currentPolicy()) {
+          <!-- View Mode -->
+          <div class="row g-3">
+            <!-- Branch -->
+            <div class="col-12">
+              <label class="form-label fw-bold">{{ i18n.t('remoteWork.policy.branch') }}</label>
+              <p class="mb-0">{{ getBranchName(currentPolicy()?.branchId) }}</p>
+            </div>
+
+            <!-- Quotas Section -->
+            <div class="col-12">
+              <h6 class="border-bottom pb-2">{{ i18n.t('remoteWork.policy.quotas') }}</h6>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label fw-bold">{{ i18n.t('remoteWork.policy.maxDaysPerWeek') }}</label>
+              <p class="mb-0">{{ currentPolicy()!.maxDaysPerWeek || i18n.t('common.unlimited') }}</p>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label fw-bold">{{ i18n.t('remoteWork.policy.maxDaysPerMonth') }}</label>
+              <p class="mb-0">{{ currentPolicy()!.maxDaysPerMonth || i18n.t('common.unlimited') }}</p>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label fw-bold">{{ i18n.t('remoteWork.policy.maxDaysPerYear') }}</label>
+              <p class="mb-0">{{ currentPolicy()!.maxDaysPerYear || i18n.t('common.unlimited') }}</p>
+            </div>
+
+            <!-- Rules Section -->
+            <div class="col-12 mt-4">
+              <h6 class="border-bottom pb-2">{{ i18n.t('remoteWork.policy.rules') }}</h6>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-bold">{{ i18n.t('remoteWork.policy.requiresManagerApproval') }}</label>
+              <p class="mb-0">
+                <app-status-badge
+                  [status]="currentPolicy()!.requiresManagerApproval ? i18n.t('common.yes') : i18n.t('common.no')"
+                  [variant]="currentPolicy()!.requiresManagerApproval ? 'warning' : 'secondary'">
+                </app-status-badge>
+              </p>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-bold">{{ i18n.t('remoteWork.policy.allowConsecutiveDays') }}</label>
+              <p class="mb-0">
+                <app-status-badge
+                  [status]="currentPolicy()!.allowConsecutiveDays ? i18n.t('common.yes') : i18n.t('common.no')"
+                  [variant]="currentPolicy()!.allowConsecutiveDays ? 'success' : 'secondary'">
+                </app-status-badge>
+              </p>
+            </div>
+
+            @if (!currentPolicy()!.allowConsecutiveDays && currentPolicy()!.maxConsecutiveDays) {
+              <div class="col-md-6">
+                <label class="form-label fw-bold">{{ i18n.t('remoteWork.policy.maxConsecutiveDays') }}</label>
+                <p class="mb-0">{{ currentPolicy()!.maxConsecutiveDays }}</p>
+              </div>
+            }
+
+            <div class="col-md-6">
+              <label class="form-label fw-bold">{{ i18n.t('remoteWork.policy.minAdvanceNoticeDays') }}</label>
+              <p class="mb-0">{{ currentPolicy()!.minAdvanceNoticeDays || 0 }} {{ i18n.t('common.days') }}</p>
+            </div>
+
+            <!-- Attendance Section -->
+            <div class="col-12 mt-4">
+              <h6 class="border-bottom pb-2">{{ i18n.t('remoteWork.policy.attendanceSettings') }}</h6>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-bold">{{ i18n.t('remoteWork.policy.countForOvertime') }}</label>
+              <p class="mb-0">
+                <app-status-badge
+                  [status]="currentPolicy()!.countForOvertime ? i18n.t('common.yes') : i18n.t('common.no')"
+                  [variant]="currentPolicy()!.countForOvertime ? 'success' : 'secondary'">
+                </app-status-badge>
+              </p>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-bold">{{ i18n.t('remoteWork.policy.enforceShiftTimes') }}</label>
+              <p class="mb-0">
+                <app-status-badge
+                  [status]="currentPolicy()!.enforceShiftTimes ? i18n.t('common.yes') : i18n.t('common.no')"
+                  [variant]="currentPolicy()!.enforceShiftTimes ? 'warning' : 'secondary'">
+                </app-status-badge>
+              </p>
+            </div>
+
+            <!-- Status -->
+            <div class="col-12 mt-4">
+              <label class="form-label fw-bold">{{ i18n.t('common.status') }}</label>
+              <p class="mb-0">
+                <app-status-badge
+                  [status]="currentPolicy()!.isActive ? i18n.t('common.active') : i18n.t('common.inactive')"
+                  [variant]="currentPolicy()!.isActive ? 'success' : 'secondary'">
+                </app-status-badge>
+              </p>
+            </div>
+          </div>
+        } @else {
+          <!-- Create/Edit Mode -->
+          <form [formGroup]="policyForm" (ngSubmit)="onSubmit()">
+            <div class="row g-3">
+              <!-- Branch -->
+              <div class="col-12">
+                <label for="branchId" class="form-label">
+                  {{ i18n.t('remoteWork.policy.branch') }} <span class="text-danger">*</span>
+                </label>
+                <select
+                  id="branchId"
+                  class="form-select"
+                  formControlName="branchId"
+                  [class.is-invalid]="hasError('branchId', 'required')">
+                  <option [ngValue]="null">{{ i18n.t('common.select') }}</option>
+                  @for (branch of availableBranches(); track branch.id) {
+                    <option [ngValue]="branch.id">{{ branch.name }}</option>
+                  }
+                </select>
+                @if (hasError('branchId', 'required')) {
+                  <div class="invalid-feedback">{{ i18n.t('validation.required') }}</div>
+                }
+              </div>
+
+              <!-- Quotas Section -->
+              <div class="col-12 mt-4">
+                <h6 class="border-bottom pb-2">{{ i18n.t('remoteWork.policy.quotas') }}</h6>
+              </div>
+
+              <div class="col-md-4">
+                <label for="maxDaysPerWeek" class="form-label">{{ i18n.t('remoteWork.policy.maxDaysPerWeek') }}</label>
+                <input
+                  type="number"
+                  id="maxDaysPerWeek"
+                  class="form-control"
+                  formControlName="maxDaysPerWeek"
+                  min="1"
+                  max="7"
+                  [placeholder]="i18n.t('common.unlimited')">
+              </div>
+
+              <div class="col-md-4">
+                <label for="maxDaysPerMonth" class="form-label">{{ i18n.t('remoteWork.policy.maxDaysPerMonth') }}</label>
+                <input
+                  type="number"
+                  id="maxDaysPerMonth"
+                  class="form-control"
+                  formControlName="maxDaysPerMonth"
+                  min="1"
+                  max="31"
+                  [placeholder]="i18n.t('common.unlimited')">
+              </div>
+
+              <div class="col-md-4">
+                <label for="maxDaysPerYear" class="form-label">{{ i18n.t('remoteWork.policy.maxDaysPerYear') }}</label>
+                <input
+                  type="number"
+                  id="maxDaysPerYear"
+                  class="form-control"
+                  formControlName="maxDaysPerYear"
+                  min="1"
+                  max="365"
+                  [placeholder]="i18n.t('common.unlimited')">
+              </div>
+
+              <!-- Rules Section -->
+              <div class="col-12 mt-4">
+                <h6 class="border-bottom pb-2">{{ i18n.t('remoteWork.policy.rules') }}</h6>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-check form-switch">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="requiresManagerApproval"
+                    formControlName="requiresManagerApproval">
+                  <label class="form-check-label" for="requiresManagerApproval">
+                    {{ i18n.t('remoteWork.policy.requiresManagerApproval') }}
+                  </label>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-check form-switch">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="allowConsecutiveDays"
+                    formControlName="allowConsecutiveDays">
+                  <label class="form-check-label" for="allowConsecutiveDays">
+                    {{ i18n.t('remoteWork.policy.allowConsecutiveDays') }}
+                  </label>
+                </div>
+              </div>
+
+              @if (!getFieldValue('allowConsecutiveDays')) {
+                <div class="col-md-6">
+                  <label for="maxConsecutiveDays" class="form-label">{{ i18n.t('remoteWork.policy.maxConsecutiveDays') }}</label>
+                  <input
+                    type="number"
+                    id="maxConsecutiveDays"
+                    class="form-control"
+                    formControlName="maxConsecutiveDays"
+                    min="1"
+                    max="31">
+                </div>
+              }
+
+              <div class="col-md-6">
+                <label for="minAdvanceNoticeDays" class="form-label">{{ i18n.t('remoteWork.policy.minAdvanceNoticeDays') }}</label>
+                <input
+                  type="number"
+                  id="minAdvanceNoticeDays"
+                  class="form-control"
+                  formControlName="minAdvanceNoticeDays"
+                  min="0"
+                  max="90">
+              </div>
+
+              <!-- Attendance Section -->
+              <div class="col-12 mt-4">
+                <h6 class="border-bottom pb-2">{{ i18n.t('remoteWork.policy.attendanceSettings') }}</h6>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-check form-switch">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="countForOvertime"
+                    formControlName="countForOvertime">
+                  <label class="form-check-label" for="countForOvertime">
+                    {{ i18n.t('remoteWork.policy.countForOvertime') }}
+                  </label>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-check form-switch">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="enforceShiftTimes"
+                    formControlName="enforceShiftTimes">
+                  <label class="form-check-label" for="enforceShiftTimes">
+                    {{ i18n.t('remoteWork.policy.enforceShiftTimes') }}
+                  </label>
+                </div>
+              </div>
+
+              <!-- Status -->
+              <div class="col-12 mt-4">
+                <div class="form-check form-switch">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="isActive"
+                    formControlName="isActive">
+                  <label class="form-check-label" for="isActive">
+                    {{ i18n.t('common.active') }}
+                  </label>
+                </div>
+              </div>
+            </div>
+          </form>
+        }
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">
+          {{ i18n.t('common.close') }}
+        </button>
+        @if (modalMode() !== 'view') {
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="onSubmit()"
+            [disabled]="submitting() || policyForm.invalid">
+            @if (submitting()) {
+              <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            }
+            {{ modalMode() === 'create' ? i18n.t('common.create') : i18n.t('common.save') }}
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+</div>

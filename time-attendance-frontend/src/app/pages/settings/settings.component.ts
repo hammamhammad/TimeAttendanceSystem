@@ -145,6 +145,31 @@ import { PermissionService } from '../../core/auth/permission.service';
                   </div>
                 </div>
               </div>
+            }
+
+            @if (hasPermission('settings.excusePolicy.read')) {
+              <div class="col-lg-4 col-md-6 mb-3">
+                <div class="card h-100 border-hover">
+                  <div class="card-body d-flex flex-column">
+                    <div class="d-flex align-items-center mb-3">
+                      <div class="bg-danger bg-gradient rounded-3 p-2 me-3">
+                        <i class="fa-solid fa-user-clock text-white" style="font-size: 1.5rem;"></i>
+                      </div>
+                      <div>
+                        <h6 class="mb-0">{{ t('excuse_policies.title') }}</h6>
+                        <small class="text-muted">{{ t('excuse_policies.subtitle') }}</small>
+                      </div>
+                    </div>
+                    <p class="text-muted flex-grow-1">{{ t('excuse_policies.settings_description') }}</p>
+                    <div class="mt-auto">
+                      <a routerLink="/settings/excuse-policies" class="btn btn-outline-danger btn-sm w-100">
+                        <i class="fa-solid fa-cog me-1"></i>
+                        {{ t('settings.configure') }}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
             }</div>
           </div>
         </div>

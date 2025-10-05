@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["angular:styles/component:css;fe06c7071c1d6323e13e13971f52c6bd5aead0dd48314d689c7dbb0af9174055;D:/Work/AI Code/TimeAttendanceSystem/time-attendance-frontend/src/app/shared/components/unified-filter/unified-filter.component.ts"],
-  "sourcesContent": ["\n    .search-filter {\n      margin-bottom: 1rem;\n    }\n  "],
-  "mappings": ";AACI,CAAC;AACC,iBAAe;AACjB;",
-  "names": []
-}

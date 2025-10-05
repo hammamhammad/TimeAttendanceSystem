@@ -7,7 +7,8 @@ export const API_CONFIG = {
       login: '/api/v1/auth/login',
       refresh: '/api/v1/auth/refresh',
       logout: '/api/v1/auth/logout',
-      profile: '/api/v1/auth/profile'
+      profile: '/api/v1/auth/profile',
+      changePassword: '/api/v1/auth/change-password'
     },
     users: {
       list: '/api/users',

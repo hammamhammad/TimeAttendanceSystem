@@ -2,6 +2,7 @@ using TimeAttendanceSystem.Domain.Common;
 using TimeAttendanceSystem.Domain.Employees;
 using TimeAttendanceSystem.Domain.Shifts;
 using TimeAttendanceSystem.Domain.Settings;
+using TimeAttendanceSystem.Domain.RemoteWork;
 
 namespace TimeAttendanceSystem.Domain.Attendance;
 
@@ -214,6 +215,25 @@ public class AttendanceRecord : BaseEntity
     /// Free-text field for additional context or explanations.
     /// </summary>
     public string? Notes { get; set; }
+
+    /// <summary>
+    /// Gets or sets the work location type for this attendance record.
+    /// Indicates where the employee performed their work (OnSite, Remote, Field).
+    /// Affects attendance calculations based on remote work policy settings.
+    /// </summary>
+    public WorkLocationType WorkLocation { get; set; } = WorkLocationType.OnSite;
+
+    /// <summary>
+    /// Gets or sets the remote work request identifier if WorkLocation is Remote.
+    /// Links to the approved remote work request that authorizes remote work for this date.
+    /// </summary>
+    public long? RemoteWorkRequestId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the remote work request entity if applicable.
+    /// Navigation property providing access to remote work request details.
+    /// </summary>
+    public RemoteWorkRequest? RemoteWorkRequest { get; set; }
 
     /// <summary>
     /// Calculates and updates the total overtime hours from pre-shift and post-shift overtime.

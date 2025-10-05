@@ -60,13 +60,7 @@
       <div class="row">
         <!-- Editable Time Fields -->
         <div class="col-lg-6">
-          <div class="card mb-4">
-            <div class="card-header">
-              <h5 class="card-title mb-0">
-                <i class="fas fa-clock me-2"></i>
-                {{ i18n.t('attendance.edit.basic_info') }}
-              </h5>
-            </div>
+          <app-form-section [title]="i18n.t('attendance.edit.basic_info')">
             <div class="card-body">
               <!-- Check-in Time -->
               <div class="mb-3">
@@ -136,17 +130,13 @@
                 </div>
               }
             </div>
-          </div>
+          </app-form-section>
         </div>
 
         <!-- Calculated Fields (Read-only) -->
         <div class="col-lg-6">
-          <div class="card mb-4">
+          <app-form-section [title]="i18n.t('attendance.edit.hours_calculations')">
             <div class="card-header">
-              <h5 class="card-title mb-0">
-                <i class="fas fa-calculator me-2"></i>
-                {{ i18n.t('attendance.edit.hours_calculations') }}
-              </h5>
               <small class="text-muted">{{ i18n.t('attendance.edit.calculated_automatically') }}</small>
               <br>
               <small class="text-info">Uses backend business logic including flexible hours</small>
@@ -205,20 +195,14 @@
                 </div>
               </div>
             </div>
-          </div>
+          </app-form-section>
         </div>
       </div>
 
       <!-- Notes and Approval Section -->
       <div class="row">
         <div class="col-12">
-          <div class="card mb-4">
-            <div class="card-header">
-              <h5 class="card-title mb-0">
-                <i class="fas fa-sticky-note me-2"></i>
-                {{ i18n.t('attendance.edit.notes') }}
-              </h5>
-            </div>
+          <app-form-section [title]="i18n.t('attendance.edit.notes')">
             <div class="card-body">
               <div class="row">
                 <!-- Approval -->
@@ -289,7 +273,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </app-form-section>
         </div>
       </div>
 

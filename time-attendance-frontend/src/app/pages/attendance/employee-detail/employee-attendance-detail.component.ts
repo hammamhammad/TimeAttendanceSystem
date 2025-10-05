@@ -676,8 +676,11 @@ export class EmployeeAttendanceDetailComponent implements OnInit, OnDestroy {
       case AttendanceStatus.SickLeave:
         return 'warning';
       case AttendanceStatus.OnLeave:
+      case AttendanceStatus.OnDuty:
+      case AttendanceStatus.Excused:
         return 'info';
       case AttendanceStatus.Overtime:
+      case AttendanceStatus.RemoteWork:
         return 'primary';
       case AttendanceStatus.DayOff:
       case AttendanceStatus.Holiday:
@@ -722,6 +725,12 @@ export class EmployeeAttendanceDetailComponent implements OnInit, OnDestroy {
         return 'attendance.status.sick_leave';
       case AttendanceStatus.Pending:
         return 'attendance.status.pending';
+      case AttendanceStatus.OnDuty:
+        return 'attendance.status.on_duty';
+      case AttendanceStatus.Excused:
+        return 'attendance.status.excused';
+      case AttendanceStatus.RemoteWork:
+        return 'attendance.status.remote_work';
       default:
         return 'attendance.status.pending';
     }

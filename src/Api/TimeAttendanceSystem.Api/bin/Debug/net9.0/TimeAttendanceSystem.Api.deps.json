@@ -1148,7 +1148,8 @@
           "Microsoft.EntityFrameworkCore": "9.0.0",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.0",
           "System.IdentityModel.Tokens.Jwt": "8.14.0",
-          "TimeAttendanceSystem.Domain": "1.0.0"
+          "TimeAttendanceSystem.Domain": "1.0.0",
+          "TimeAttendanceSystem.Shared": "1.0.0"
         },
         "runtime": {
           "TimeAttendanceSystem.Application.dll": {

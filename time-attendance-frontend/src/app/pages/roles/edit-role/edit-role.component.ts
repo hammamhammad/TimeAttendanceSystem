@@ -165,13 +165,46 @@ import { NotificationService } from '../../../core/notifications/notification.se
                 <div class="permissions-list border rounded p-3" style="max-height: 400px; overflow-y: auto;">
                   @for (group of getFilteredGroupedPermissions(); track group.group) {
                     <div class="permission-group mb-4">
-                      <h6 class="fw-bold text-primary mb-3 border-bottom pb-2">
-                        <i class="fas fa-layer-group me-2"></i>
-                        {{ group.group }}
-                        <small class="text-muted fw-normal">({{ group.permissions.length }} permissions)</small>
-                      </h6>
-                      
-                      <div class="row g-2">
+                      <!-- Group Header with Actions -->
+                      <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                        <div class="d-flex align-items-center">
+                          <!-- Collapse/Expand Button -->
+                          <button
+                            type="button"
+                            class="btn btn-sm btn-link text-decoration-none p-0 me-2"
+                            (click)="toggleGroupCollapse(group.group)"
+                            [disabled]="saving()"
+                            [title]="isGroupCollapsed(group.group) ? i18n.t('common.expand') : i18n.t('common.collapse')">
+                            <i class="fas" [ngClass]="isGroupCollapsed(group.group) ? 'fa-chevron-right' : 'fa-chevron-down'"></i>
+                          </button>
+
+                          <h6 class="fw-bold text-primary mb-0">
+                            <i class="fas fa-layer-group me-2"></i>
+                            {{ group.group }}
+                            <small class="text-muted fw-normal">({{ group.permissions.length }} {{ i18n.t('roles.permissions') }})</small>
+                          </h6>
+                        </div>
+
+                        <!-- Group Actions -->
+                        <div class="btn-group btn-group-sm" role="group">
+                          <button
+                            type="button"
+                            class="btn"
+                            [class.btn-primary]="areAllGroupPermissionsSelected(group)"
+                            [class.btn-outline-primary]="!areAllGroupPermissionsSelected(group)"
+                            (click)="toggleGroupSelection(group)"
+                            [disabled]="saving()"
+                            [title]="areAllGroupPermissionsSelected(group) ? i18n.t('roles.deselect_all_group') : i18n.t('roles.select_all_group')">
+                            <i class="fas"
+                               [ngClass]="areAllGroupPermissionsSelected(group) ? 'fa-check-square' : (areSomeGroupPermissionsSelected(group) ? 'fa-minus-square' : 'fa-square')"></i>
+                            {{ areAllGroupPermissionsSelected(group) ? i18n.t('roles.deselect_all') : i18n.t('roles.select_all') }}
+                          </button>
+                        </div>
+                      </div>
+
+                      <!-- Permissions Grid (Collapsible) -->
+                      @if (!isGroupCollapsed(group.group)) {
+                        <div class="row g-2">
                         @for (permission of group.permissions; track permission.id) {
                           <div class="col-md-6 col-lg-4">
                             <div class="permission-item border rounded p-2" 
@@ -203,7 +236,8 @@ import { NotificationService } from '../../../core/notifications/notification.se
                             </div>
                           </div>
                         }
-                      </div>
+                        </div>
+                      }
                     </div>
                   }
                   
@@ -262,6 +296,9 @@ export class EditRoleComponent implements OnInit {
   saving = signal(false);
   error = signal('');
   permissionSearchTerm = '';
+
+  // Collapse state for permission groups
+  collapsedGroups = new Set<string>();
 
   roleForm!: FormGroup;
 
@@ -461,6 +498,56 @@ export class EditRoleComponent implements OnInit {
   isFieldInvalid(fieldName: string): boolean {
     const field = this.roleForm.get(fieldName);
     return !!(field?.errors && field.touched);
+  }
+
+  // Group management methods
+  toggleGroupCollapse(groupName: string): void {
+    if (this.collapsedGroups.has(groupName)) {
+      this.collapsedGroups.delete(groupName);
+    } else {
+      this.collapsedGroups.add(groupName);
+    }
+  }
+
+  isGroupCollapsed(groupName: string): boolean {
+    return this.collapsedGroups.has(groupName);
+  }
+
+  selectAllGroupPermissions(group: any): void {
+    const selected = new Set(this.selectedPermissions());
+    group.permissions.forEach((permission: any) => {
+      selected.add(permission.id.toString());
+    });
+    this.selectedPermissions.set(selected);
+  }
+
+  deselectAllGroupPermissions(group: any): void {
+    const selected = new Set(this.selectedPermissions());
+    group.permissions.forEach((permission: any) => {
+      selected.delete(permission.id.toString());
+    });
+    this.selectedPermissions.set(selected);
+  }
+
+  areAllGroupPermissionsSelected(group: any): boolean {
+    return group.permissions.every((permission: any) =>
+      this.selectedPermissions().has(permission.id.toString())
+    );
+  }
+
+  areSomeGroupPermissionsSelected(group: any): boolean {
+    const selectedCount = group.permissions.filter((permission: any) =>
+      this.selectedPermissions().has(permission.id.toString())
+    ).length;
+    return selectedCount > 0 && selectedCount < group.permissions.length;
+  }
+
+  toggleGroupSelection(group: any): void {
+    if (this.areAllGroupPermissionsSelected(group)) {
+      this.deselectAllGroupPermissions(group);
+    } else {
+      this.selectAllGroupPermissions(group);
+    }
   }
 
   private getErrorMessage(error: any): string {

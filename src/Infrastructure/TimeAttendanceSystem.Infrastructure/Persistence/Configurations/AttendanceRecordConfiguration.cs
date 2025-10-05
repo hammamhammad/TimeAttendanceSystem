@@ -136,6 +136,14 @@ public class AttendanceRecordConfiguration : IEntityTypeConfiguration<Attendance
             .HasMaxLength(2000)
             .IsRequired(false);
 
+        builder.Property(ar => ar.WorkLocation)
+            .IsRequired()
+            .HasConversion<int>()
+            .HasDefaultValue(WorkLocationType.OnSite);
+
+        builder.Property(ar => ar.RemoteWorkRequestId)
+            .IsRequired(false);
+
         // Indexes
         builder.HasIndex(ar => new { ar.EmployeeId, ar.AttendanceDate })
             .IsUnique()
@@ -156,6 +164,12 @@ public class AttendanceRecordConfiguration : IEntityTypeConfiguration<Attendance
         builder.HasIndex(ar => ar.OvertimeDayType)
             .HasDatabaseName("IX_AttendanceRecords_OvertimeDayType");
 
+        builder.HasIndex(ar => ar.WorkLocation)
+            .HasDatabaseName("IX_AttendanceRecords_WorkLocation");
+
+        builder.HasIndex(ar => ar.RemoteWorkRequestId)
+            .HasDatabaseName("IX_AttendanceRecords_RemoteWorkRequest");
+
         // Relationships
         builder.HasOne(ar => ar.Employee)
             .WithMany()
@@ -171,5 +185,10 @@ public class AttendanceRecordConfiguration : IEntityTypeConfiguration<Attendance
             .WithOne()
             .HasForeignKey("AttendanceRecordId")
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(ar => ar.RemoteWorkRequest)
+            .WithMany()
+            .HasForeignKey(ar => ar.RemoteWorkRequestId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

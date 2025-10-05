@@ -297,29 +297,6 @@ export const FILTER_CONFIGURATIONS: { [key: string]: UnifiedFilterConfig } = {
     ]
   },
 
-  'excuse-policies': {
-    searchPlaceholder: 'excuse_policies.searchPlaceholder',
-    addButtonText: 'excuse_policies.create_policy',
-    addButtonPermission: `excuse.${PermissionActions.CREATE}`,
-    filters: [
-      {
-        key: 'branchId',
-        label: 'employees.branch',
-        type: CommonFilterTypes.Branch
-      },
-      {
-        key: 'isActive',
-        label: 'common.status',
-        type: CommonFilterTypes.Custom,
-        options: [
-          { value: '', label: 'common.all' },
-          { value: 'true', label: 'common.active' },
-          { value: 'false', label: 'common.inactive' }
-        ]
-      }
-    ]
-  },
-
   'shift-assignments': {
     searchPlaceholder: 'shifts.assignments.searchPlaceholder',
     addButtonText: 'shifts.assignments.createButton',

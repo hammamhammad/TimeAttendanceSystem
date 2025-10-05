@@ -61,7 +61,7 @@
             type="button"
             class="dropdown-item"
             [class.disabled]="option.disabled"
-            (click)="onSelectOption(option)"
+            (mousedown)="onSelectOption(option, $event)"
           >
             <div class="d-flex flex-column">
               <span class="fw-medium" [class.text-muted]="option.disabled">
@@ -81,7 +81,7 @@
         <button
           type="button"
           class="dropdown-item"
-          (click)="onSelectCustomValue()"
+          (mousedown)="onSelectCustomValue($event)"
         >
           <div class="d-flex align-items-center">
             <i class="fas fa-plus me-2 text-primary"></i>

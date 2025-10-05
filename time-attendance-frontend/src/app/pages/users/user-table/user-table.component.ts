@@ -81,9 +81,19 @@ import { BadgeListComponent } from '../../../shared/components/badge-list/badge-
             </app-status-badge>
           </span>
 
+          <!-- Must Change Password -->
+          <span *ngSwitchCase="'mustChangePassword'">
+            <app-status-badge
+              [status]="user.mustChangePassword ? 'warning' : 'success'"
+              [label]="user.mustChangePassword ? 'Must Change' : 'OK'"
+              [icon]="user.mustChangePassword ? 'fa-key' : 'fa-check'"
+              [showIcon]="true">
+            </app-status-badge>
+          </span>
+
           <!-- Created date -->
           <span *ngSwitchCase="'created'">
-            {{ formatDate(user.createdAt) }}
+            {{ formatDate(user.createdAtUtc || user.createdAt) }}
           </span>
 
           <!-- Last login -->
@@ -138,6 +148,7 @@ export class UserTableComponent {
     { key: 'roles', label: 'Roles', width: '200px' },
     { key: 'status', label: 'Status', width: '100px', align: 'center', sortable: true },
     { key: 'lockStatus', label: 'Access', width: '100px', align: 'center' },
+    { key: 'mustChangePassword', label: 'Password Status', width: '130px', align: 'center' },
     { key: 'created', label: 'Created', width: '120px', sortable: true },
     { key: 'lastLogin', label: 'Last Login', width: '120px', sortable: true }
   ];
@@ -250,8 +261,16 @@ export class UserTableComponent {
     return new Date(lockoutEndUtc) > new Date();
   }
 
-  formatDate(dateString: string): string {
+  formatDate(dateString: string | undefined): string {
+    if (!dateString) return 'N/A';
+
     const date = new Date(dateString);
+
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      return 'Invalid Date';
+    }
+
     return date.toLocaleDateString(this.i18n.getCurrentLocale(), {
       year: 'numeric',
       month: 'short',

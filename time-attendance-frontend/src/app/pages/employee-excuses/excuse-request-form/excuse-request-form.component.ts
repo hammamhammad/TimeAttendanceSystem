@@ -8,6 +8,7 @@ import { EmployeeExcusesService } from '../employee-excuses.service';
 import { EmployeesService } from '../../employees/employees.service';
 import { SearchableSelectComponent, SearchableSelectOption } from '../../../shared/components/searchable-select/searchable-select.component';
 import { FormHeaderComponent } from '../../../shared/components/form-header/form-header.component';
+import { FormSectionComponent } from '../../../shared/components/form-section/form-section.component';
 import {
   CreateEmployeeExcuseRequest,
   UpdateEmployeeExcuseRequest,
@@ -22,7 +23,8 @@ import {
     CommonModule,
     ReactiveFormsModule,
     SearchableSelectComponent,
-    FormHeaderComponent
+    FormHeaderComponent,
+    FormSectionComponent
   ],
   templateUrl: './excuse-request-form.component.html',
   styleUrls: ['./excuse-request-form.component.css']

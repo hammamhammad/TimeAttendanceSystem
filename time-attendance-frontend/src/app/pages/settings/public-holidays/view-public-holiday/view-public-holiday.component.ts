@@ -1,6 +1,6 @@
-import { Component, signal, inject, OnInit } from '@angular/core';
+import { Component, signal, inject, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { I18nService } from '../../../../core/i18n/i18n.service';
 import { NotificationService } from '../../../../core/notifications/notification.service';
 import { ConfirmationService } from '../../../../core/confirmation/confirmation.service';
@@ -9,8 +9,9 @@ import { PublicHolidaysService } from '../public-holidays.service';
 import { PublicHoliday, HolidayType } from '../../../../shared/models/public-holiday.model';
 import { PermissionActions } from '../../../../shared/utils/permission.utils';
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
-import { DetailCardComponent, DetailField } from '../../../../shared/components/detail-card/detail-card.component';
-import { StatusBadgeComponent } from '../../../../shared/components/status-badge/status-badge.component';
+import { SectionCardComponent } from '../../../../shared/components/section-card/section-card.component';
+import { DefinitionListComponent, DefinitionItem } from '../../../../shared/components/definition-list/definition-list.component';
+import { StatusBadgeComponent, StatusVariant } from '../../../../shared/components/status-badge/status-badge.component';
 import { FormHeaderComponent } from '../../../../shared/components/form-header/form-header.component';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 
@@ -19,8 +20,11 @@ import { LoadingSpinnerComponent } from '../../../../shared/components/loading-s
   standalone: true,
   imports: [
     CommonModule,
+    RouterModule,
     LoadingSpinnerComponent,
-    DetailCardComponent,
+    SectionCardComponent,
+    DefinitionListComponent,
+    StatusBadgeComponent,
     FormHeaderComponent
   ],
   templateUrl: './view-public-holiday.component.html',
@@ -41,7 +45,8 @@ export class ViewPublicHolidayComponent implements OnInit {
   holiday = signal<PublicHoliday | null>(null);
   error = signal<string | null>(null);
 
-  get basicInfoFields(): DetailField[] {
+  // Computed properties for reactive data
+  basicInfoItems = computed<DefinitionItem[]>(() => {
     const holiday = this.holiday();
     if (!holiday) return [];
 
@@ -59,38 +64,31 @@ export class ViewPublicHolidayComponent implements OnInit {
         value: this.getHolidayTypeLabel(holiday.holidayType)
       },
       {
-        label: this.i18n.t('fields.status'),
-        value: holiday.isActive ? this.i18n.t('common.active') : this.i18n.t('common.inactive'),
-        type: 'badge',
-        badgeVariant: holiday.isActive ? 'success' : 'secondary'
-      },
-      {
         label: this.i18n.t('fields.scope'),
         value: holiday.isNational
-          ? this.i18n.t('public_holidays.national')
-          : (holiday.branchName || this.i18n.t('public_holidays.branch_specific')),
-        type: 'badge',
-        badgeVariant: holiday.isNational ? 'primary' : 'info'
+          ? this.i18n.t('settings.holidays.national')
+          : holiday.branchId
+            ? (holiday.branchName || `Branch ${holiday.branchId}`)
+            : this.i18n.t('common.company_wide')
       }
     ];
-  }
+  });
 
-  get dateInfoFields(): DetailField[] {
+  dateInfoItems = computed<DefinitionItem[]>(() => {
     const holiday = this.holiday();
     if (!holiday) return [];
 
-    const fields: DetailField[] = [
+    const items: DefinitionItem[] = [
       {
-        label: this.i18n.t('public_holidays.pattern_description'),
+        label: this.i18n.t('settings.holidays.pattern_description'),
         value: holiday.patternDescription
       }
     ];
 
     if (holiday.nextOccurrence) {
-      fields.push({
-        label: this.i18n.t('public_holidays.next_occurrence'),
-        value: holiday.nextOccurrence,
-        type: 'date'
+      items.push({
+        label: this.i18n.t('settings.holidays.nextOccurrence'),
+        value: this.formatDate(holiday.nextOccurrence)
       });
     }
 
@@ -99,74 +97,97 @@ export class ViewPublicHolidayComponent implements OnInit {
       if (holiday.effectiveFromYear && holiday.effectiveToYear) {
         effectivePeriod = `${holiday.effectiveFromYear} - ${holiday.effectiveToYear}`;
       } else if (holiday.effectiveFromYear) {
-        effectivePeriod = `${this.i18n.t('public_holidays.from')} ${holiday.effectiveFromYear}`;
+        effectivePeriod = `${this.i18n.t('common.from')} ${holiday.effectiveFromYear}`;
       } else if (holiday.effectiveToYear) {
-        effectivePeriod = `${this.i18n.t('public_holidays.until')} ${holiday.effectiveToYear}`;
+        effectivePeriod = `${this.i18n.t('settings.holidays.until')} ${holiday.effectiveToYear}`;
       }
 
       if (effectivePeriod) {
-        fields.push({
-          label: this.i18n.t('public_holidays.effective_period'),
+        items.push({
+          label: this.i18n.t('settings.holidays.effective_period'),
           value: effectivePeriod
         });
       }
     }
 
-    fields.push({
+    items.push({
       label: this.i18n.t('fields.priority'),
       value: holiday.priority.toString()
     });
 
     if (holiday.hasConflicts) {
-      fields.push({
-        label: this.i18n.t('public_holidays.conflicts'),
-        value: this.i18n.t('common.yes'),
-        type: 'badge',
-        badgeVariant: 'warning'
+      items.push({
+        label: this.i18n.t('settings.holidays.conflicts'),
+        value: this.i18n.t('common.yes')
       });
     }
 
-    return fields;
-  }
+    return items;
+  });
 
-  get additionalInfoFields(): DetailField[] {
+  additionalInfoItems = computed<DefinitionItem[]>(() => {
     const holiday = this.holiday();
     if (!holiday) return [];
 
-    const fields: DetailField[] = [];
+    const items: DefinitionItem[] = [];
 
     if (holiday.description) {
-      fields.push({
+      items.push({
         label: this.i18n.t('fields.description'),
         value: holiday.description
       });
     }
 
     if (holiday.countryCode) {
-      fields.push({
+      items.push({
         label: this.i18n.t('fields.countryCode'),
         value: holiday.countryCode.toUpperCase()
       });
     }
 
-    fields.push(
+    return items;
+  });
+
+  auditItems = computed<DefinitionItem[]>(() => {
+    const holiday = this.holiday();
+    if (!holiday) return [];
+
+    const items: DefinitionItem[] = [
       {
         label: this.i18n.t('fields.createdAt'),
-        value: holiday.createdAt,
-        type: 'datetime'
+        value: this.formatDateTime(holiday.createdAt)
       }
-    );
+    ];
 
     if (holiday.updatedAt) {
-      fields.push({
+      items.push({
         label: this.i18n.t('fields.updatedAt'),
-        value: holiday.updatedAt,
-        type: 'datetime'
+        value: this.formatDateTime(holiday.updatedAt)
       });
     }
 
-    return fields;
-  }
+    return items;
+  });
+
+  // Status badge computed properties
+  statusBadge = computed<{ label: string; variant: StatusVariant }>(() => ({
+    label: this.holiday()?.isActive ? this.i18n.t('common.active') : this.i18n.t('common.inactive'),
+    variant: this.holiday()?.isActive ? 'success' : 'secondary'
+  }));
+
+  scopeBadge = computed<{ label: string; variant: StatusVariant }>(() => {
+    const holiday = this.holiday();
+    if (!holiday) return { label: '', variant: 'secondary' };
+
+    return {
+      label: holiday.isNational
+        ? this.i18n.t('settings.holidays.national')
+        : holiday.branchId
+          ? (holiday.branchName || `Branch ${holiday.branchId}`)
+          : this.i18n.t('common.company_wide'),
+      variant: holiday.isNational ? 'primary' : 'info'
+    };
+  });
 
   ngOnInit(): void {
     this.loadHolidayDetails();
@@ -189,7 +210,7 @@ export class ViewPublicHolidayComponent implements OnInit {
       },
       error: (error) => {
         console.error('Failed to load holiday details:', error);
-        this.error.set(this.i18n.t('public_holidays.errors.load_failed'));
+        this.error.set(this.i18n.t('common.errors.load_failed'));
         this.loading.set(false);
       }
     });
@@ -200,8 +221,8 @@ export class ViewPublicHolidayComponent implements OnInit {
     if (!this.holiday()) return;
 
     const result = await this.confirmationService.confirm({
-      title: this.i18n.t('public_holidays.delete_holiday'),
-      message: this.i18n.t('public_holidays.confirm_delete'),
+      title: this.i18n.t('settings.holidays.deleteHoliday'),
+      message: this.i18n.t('settings.holidays.deleteHolidayConfirmation'),
       confirmText: this.i18n.t('common.delete'),
       cancelText: this.i18n.t('common.cancel'),
       confirmButtonClass: 'btn-danger',
@@ -215,14 +236,14 @@ export class ViewPublicHolidayComponent implements OnInit {
       this.publicHolidaysService.deletePublicHoliday(this.holiday()!.id).subscribe({
         next: () => {
           this.notificationService.success(
-            this.i18n.t('public_holidays.success.deleted')
+            this.i18n.t('settings.holidays.holidayDeletedSuccessfully')
           );
           this.router.navigate(['/settings/public-holidays']);
         },
         error: (error) => {
           console.error('Failed to delete holiday:', error);
           this.notificationService.error(
-            this.i18n.t('public_holidays.errors.delete_failed')
+            this.i18n.t('common.errors.delete_failed')
           );
           this.processing.set(false);
         }
@@ -231,10 +252,32 @@ export class ViewPublicHolidayComponent implements OnInit {
   }
 
   // Helper methods
-  private getHolidayTypeLabel(holidayType: HolidayType): string {
+  getHolidayTypeLabel(holidayType: HolidayType): string {
     const types = this.publicHolidaysService.getHolidayTypes();
     const type = types.find(t => t.value === holidayType);
     return type ? type.label : holidayType.toString();
+  }
+
+  private formatDate(date: string | Date): string {
+    if (!date) return '';
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    }).format(dateObj);
+  }
+
+  private formatDateTime(dateTime: string | Date): string {
+    if (!dateTime) return '';
+    const dateObj = typeof dateTime === 'string' ? new Date(dateTime) : dateTime;
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(dateObj);
   }
 
   // Permission checks

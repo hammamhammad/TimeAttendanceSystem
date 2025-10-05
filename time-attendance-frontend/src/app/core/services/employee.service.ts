@@ -8,7 +8,7 @@ import { EmployeeDto, Employee } from '../../shared/models/employee.model';
   providedIn: 'root'
 })
 export class EmployeeService {
-  private readonly apiUrl = `${environment.apiUrl}/employees`;
+  private readonly apiUrl = `${environment.apiUrl}/api/v1/employees`;
 
   constructor(private http: HttpClient) {}
 

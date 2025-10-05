@@ -9,7 +9,10 @@ export enum AttendanceStatus {
   Incomplete = 8,
   Holiday = 9,
   SickLeave = 10,
-  Pending = 11
+  Pending = 11,
+  OnDuty = 12,
+  Excused = 13,
+  RemoteWork = 14
 }
 
 export enum TransactionType {

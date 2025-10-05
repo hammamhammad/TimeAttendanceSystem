@@ -22,13 +22,7 @@
       <!-- Main Configuration -->
       <div class="col-lg-8">
         <!-- Overtime Types Section -->
-        <div class="card mb-4">
-          <div class="card-header">
-            <h5 class="mb-0">
-              <i class="fa-solid fa-clock me-2"></i>
-              {{ t('settings.overtime.overtimeTypes') }}
-            </h5>
-          </div>
+        <app-form-section [title]="t('settings.overtime.overtimeTypes')">
           <div class="card-body">
             <div class="row">
               <div class="col-md-6">
@@ -66,16 +60,10 @@
               <div class="text-danger small">{{ getError('general') }}</div>
             }
           </div>
-        </div>
+        </app-form-section>
 
         <!-- Overtime Rates Section -->
-        <div class="card mb-4">
-          <div class="card-header">
-            <h5 class="mb-0">
-              <i class="fa-solid fa-percentage me-2"></i>
-              {{ t('settings.overtime.overtimeRates') }}
-            </h5>
-          </div>
+        <app-form-section [title]="t('settings.overtime.overtimeRates')">
           <div class="card-body">
             <div class="row">
               <div class="col-md-4">
@@ -149,16 +137,10 @@
               </div>
             </div>
           </div>
-        </div>
+        </app-form-section>
 
         <!-- Overtime Limits Section -->
-        <div class="card mb-4">
-          <div class="card-header">
-            <h5 class="mb-0">
-              <i class="fa-solid fa-hourglass-half me-2"></i>
-              {{ t('settings.overtime.overtimeLimits') }}
-            </h5>
-          </div>
+        <app-form-section [title]="t('settings.overtime.overtimeLimits')">
           <div class="card-body">
             <div class="row">
               <div class="col-md-6">
@@ -207,16 +189,10 @@
               </div>
             </div>
           </div>
-        </div>
+        </app-form-section>
 
         <!-- Calculation Settings Section -->
-        <div class="card mb-4">
-          <div class="card-header">
-            <h5 class="mb-0">
-              <i class="fa-solid fa-calculator me-2"></i>
-              {{ t('settings.overtime.calculationSettings') }}
-            </h5>
-          </div>
+        <app-form-section [title]="t('settings.overtime.calculationSettings')">
           <div class="card-body">
             <div class="row">
               <div class="col-md-4">
@@ -317,16 +293,10 @@
               </div>
             </div>
           </div>
-        </div>
+        </app-form-section>
 
         <!-- Policy Notes Section -->
-        <div class="card mb-4">
-          <div class="card-header">
-            <h5 class="mb-0">
-              <i class="fa-solid fa-sticky-note me-2"></i>
-              {{ t('settings.overtime.policyNotes') }}
-            </h5>
-          </div>
+        <app-form-section [title]="t('settings.overtime.policyNotes')">
           <div class="card-body">
             <div class="mb-3">
               <label for="policyNotes" class="form-label">
@@ -343,19 +313,13 @@
               <div class="form-text">{{ t('settings.overtime.policyNotesDescription') }}</div>
             </div>
           </div>
-        </div>
+        </app-form-section>
       </div>
 
       <!-- Sidebar -->
       <div class="col-lg-4">
         <!-- Effective Period Section -->
-        <div class="card mb-4">
-          <div class="card-header">
-            <h5 class="mb-0">
-              <i class="fa-solid fa-calendar me-2"></i>
-              {{ t('settings.overtime.effectivePeriod') }}
-            </h5>
-          </div>
+        <app-form-section [title]="t('settings.overtime.effectivePeriod')">
           <div class="card-body">
             <div class="mb-3">
               <label for="effectiveFromDate" class="form-label">
@@ -389,16 +353,10 @@
               <div class="form-text">{{ t('settings.overtime.effectiveToDescription') }}</div>
             </div>
           </div>
-        </div>
+        </app-form-section>
 
         <!-- Additional Settings Section -->
-        <div class="card mb-4">
-          <div class="card-header">
-            <h5 class="mb-0">
-              <i class="fa-solid fa-cogs me-2"></i>
-              {{ t('settings.overtime.additionalSettings') }}
-            </h5>
-          </div>
+        <app-form-section [title]="t('settings.overtime.additionalSettings')">
           <div class="card-body">
             <div class="form-check mb-3">
               <input
@@ -414,7 +372,7 @@
               </label>
             </div>
           </div>
-        </div>
+        </app-form-section>
 
         <!-- Submit Section -->
         <div class="card">

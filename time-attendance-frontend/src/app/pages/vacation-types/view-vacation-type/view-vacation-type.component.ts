@@ -195,7 +195,12 @@ export class ViewVacationTypeComponent implements OnInit, OnDestroy {
     }
 
     items.push(
-      { label: this.i18n.t('vacation_types.branch'), value: vt.branchName || this.i18n.t('vacation_types.all_branches') },
+      {
+        label: this.i18n.t('vacation_types.branch'),
+        value: vt.branchId
+          ? (vt.branchName || `Branch ${vt.branchId}`)
+          : this.i18n.t('common.company_wide')
+      },
       {
         label: this.i18n.t('common.status'),
         value: this.statusBadge().label,

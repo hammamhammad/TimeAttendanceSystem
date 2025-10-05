@@ -9,7 +9,9 @@ using TimeAttendanceSystem.Domain.Settings;
 using TimeAttendanceSystem.Domain.VacationTypes;
 using TimeAttendanceSystem.Domain.Vacations;
 using TimeAttendanceSystem.Domain.Excuses;
+using TimeAttendanceSystem.Domain.RemoteWork;
 using TimeAttendanceSystem.Application.Abstractions;
+using TimeAttendanceSystem.Application.Services;
 
 namespace TimeAttendanceSystem.Infrastructure.Persistence;
 
@@ -97,6 +99,7 @@ public class TimeAttendanceDbContext : DbContext, IApplicationDbContext
     public DbSet<TwoFactorBackupCode> TwoFactorBackupCodes => Set<TwoFactorBackupCode>();
     public DbSet<UserSession> UserSessions => Set<UserSession>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<AuditChange> AuditChanges => Set<AuditChange>();
     public DbSet<Shift> Shifts => Set<Shift>();
     public DbSet<ShiftPeriod> ShiftPeriods => Set<ShiftPeriod>();
     public DbSet<ShiftAssignment> ShiftAssignments => Set<ShiftAssignment>();
@@ -110,6 +113,8 @@ public class TimeAttendanceDbContext : DbContext, IApplicationDbContext
     public DbSet<EmployeeVacation> EmployeeVacations => Set<EmployeeVacation>();
     public DbSet<ExcusePolicy> ExcusePolicies => Set<ExcusePolicy>();
     public DbSet<EmployeeExcuse> EmployeeExcuses => Set<EmployeeExcuse>();
+    public DbSet<RemoteWorkPolicy> RemoteWorkPolicies => Set<RemoteWorkPolicy>();
+    public DbSet<RemoteWorkRequest> RemoteWorkRequests => Set<RemoteWorkRequest>();
 
     /// <summary>
     /// Configures the database model using Fluent API configurations from the current assembly.
@@ -180,6 +185,12 @@ public class TimeAttendanceDbContext : DbContext, IApplicationDbContext
     /// </remarks>
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
+        var changeTrackingService = new ChangeTrackingService();
+
+        // Capture changes for modified entities BEFORE saving
+        // This allows us to access original values from the change tracker
+        var modifiedEntitiesWithChanges = new List<(Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry Entry, List<AuditChange> Changes)>();
+
         var entries = ChangeTracker
             .Entries()
             .Where(e => e.Entity is BaseEntity && (
@@ -194,12 +205,63 @@ public class TimeAttendanceDbContext : DbContext, IApplicationDbContext
             {
                 entity.CreatedAtUtc = DateTime.UtcNow;
             }
-            else
+            else if (entityEntry.State == EntityState.Modified)
             {
                 entity.ModifiedAtUtc = DateTime.UtcNow;
+
+                // Capture field-level changes for modified entities
+                // Skip AuditLog and AuditChange entities to avoid circular dependencies
+                if (entity is not AuditLog && entity is not AuditChange)
+                {
+                    var changes = changeTrackingService.GetChanges(entityEntry);
+                    if (changes.Any())
+                    {
+                        modifiedEntitiesWithChanges.Add((entityEntry, changes));
+                    }
+                }
             }
         }
 
-        return await base.SaveChangesAsync(cancellationToken);
+        // Save changes first to generate IDs for new entities
+        var result = await base.SaveChangesAsync(cancellationToken);
+
+        // After save, attach changes to any audit logs that were created in this save operation
+        // The AuditActionFilter or command handlers may have added AuditLog entries
+        if (modifiedEntitiesWithChanges.Any())
+        {
+            var newAuditLogs = ChangeTracker
+                .Entries<AuditLog>()
+                .Where(e => e.State == EntityState.Added)
+                .Select(e => e.Entity)
+                .ToList();
+
+            // Match audit logs to their corresponding entity changes
+            // This is a simple approach - match by entity type and ID
+            foreach (var (entry, changes) in modifiedEntitiesWithChanges)
+            {
+                var entityType = entry.Entity.GetType().Name;
+                var entityId = ((BaseEntity)entry.Entity).Id.ToString();
+
+                var matchingAuditLog = newAuditLogs.FirstOrDefault(al =>
+                    al.EntityName == entityType && al.EntityId == entityId);
+
+                if (matchingAuditLog != null)
+                {
+                    foreach (var change in changes)
+                    {
+                        change.AuditLogId = matchingAuditLog.Id;
+                        matchingAuditLog.Changes.Add(change);
+                    }
+                }
+            }
+
+            // Save the audit changes if any were added
+            if (newAuditLogs.Any(al => al.Changes.Any()))
+            {
+                await base.SaveChangesAsync(cancellationToken);
+            }
+        }
+
+        return result;
     }
 }

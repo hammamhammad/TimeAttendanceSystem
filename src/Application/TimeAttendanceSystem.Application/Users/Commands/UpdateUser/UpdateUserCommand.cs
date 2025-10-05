@@ -10,4 +10,5 @@ public record UpdateUserCommand : IRequest<Result<Unit>>
     public string? Phone { get; init; }
     public string PreferredLanguage { get; init; } = "en";
     public bool IsActive { get; init; }
+    public bool MustChangePassword { get; init; }
 }

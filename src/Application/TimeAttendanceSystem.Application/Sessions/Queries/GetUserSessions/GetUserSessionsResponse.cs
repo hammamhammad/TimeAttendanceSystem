@@ -6,6 +6,8 @@ public record GetUserSessionsResponse(
 
 public record UserSessionDto(
     string SessionId,
+    string Username,
+    string Email,
     string DeviceName,
     string Platform,
     string Browser,

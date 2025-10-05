@@ -10,6 +10,7 @@ using TimeAttendanceSystem.Domain.Settings;
 using TimeAttendanceSystem.Domain.VacationTypes;
 using TimeAttendanceSystem.Domain.Vacations;
 using TimeAttendanceSystem.Domain.Excuses;
+using TimeAttendanceSystem.Domain.RemoteWork;
 
 namespace TimeAttendanceSystem.Infrastructure.Persistence;
 
@@ -39,6 +40,7 @@ public class ApplicationDbContextAdapter : IApplicationDbContext
     public DbSet<TwoFactorBackupCode> TwoFactorBackupCodes => _context.TwoFactorBackupCodes;
     public DbSet<UserSession> UserSessions => _context.UserSessions;
     public DbSet<AuditLog> AuditLogs => _context.AuditLogs;
+    public DbSet<AuditChange> AuditChanges => _context.AuditChanges;
     public DbSet<Shift> Shifts => _context.Shifts;
     public DbSet<ShiftPeriod> ShiftPeriods => _context.ShiftPeriods;
     public DbSet<ShiftAssignment> ShiftAssignments => _context.ShiftAssignments;
@@ -50,6 +52,8 @@ public class ApplicationDbContextAdapter : IApplicationDbContext
     public DbSet<EmployeeVacation> EmployeeVacations => _context.EmployeeVacations;
     public DbSet<ExcusePolicy> ExcusePolicies => _context.ExcusePolicies;
     public DbSet<EmployeeExcuse> EmployeeExcuses => _context.EmployeeExcuses;
+    public DbSet<RemoteWorkPolicy> RemoteWorkPolicies => _context.RemoteWorkPolicies;
+    public DbSet<RemoteWorkRequest> RemoteWorkRequests => _context.RemoteWorkRequests;
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

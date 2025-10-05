@@ -3,8 +3,11 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { I18nService } from '../../../core/i18n/i18n.service';
+import { FormSectionComponent } from '../../../shared/components/form-section/form-section.component';
+import { SearchableSelectComponent, SearchableSelectOption } from '../../../shared/components/searchable-select/searchable-select.component';
 import { UsersService } from '../users.service';
 import { UserDto, CreateUserRequest, UpdateUserRequest } from '../../../shared/models/user.model';
+import { EmployeeDto } from '../../../shared/models/employee.model';
 
 interface Role {
   id: number;
@@ -19,7 +22,7 @@ interface Branch {
 @Component({
   selector: 'app-user-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, FormSectionComponent, SearchableSelectComponent],
   templateUrl: './user-form.component.html',
   styleUrls: ['./user-form.component.css']
 })
@@ -41,19 +44,31 @@ export class UserFormComponent implements OnInit {
   
   availableRoles = signal<Role[]>([]);
   availableBranches = signal<Branch[]>([]);
+  availableEmployees = signal<EmployeeDto[]>([]);
+  selectedEmployee = signal<EmployeeDto | null>(null);
 
   isEditMode = computed(() => !!this.user);
   isSystemAdmin = computed(() => {
     return this.user?.username?.toLowerCase() === 'systemadmin';
   });
-  modalTitle = computed(() => 
+  modalTitle = computed(() =>
     this.isEditMode() ? this.t('users.edit_user') : this.t('users.create_user')
+  );
+
+  // Transform employees to SearchableSelectOption format
+  employeeOptions = computed<SearchableSelectOption[]>(() =>
+    this.availableEmployees().map(emp => ({
+      value: emp.id,
+      label: emp.fullName || `${emp.employeeNumber}`,
+      subLabel: emp.email || emp.employeeNumber
+    }))
   );
 
   ngOnInit(): void {
     this.initializeForm();
     this.loadRoles();
     this.loadBranches();
+    this.loadAvailableEmployees();
   }
 
   ngOnChanges(): void {
@@ -72,11 +87,11 @@ export class UserFormComponent implements OnInit {
     
     this.userForm = this.fb.group({
       username: [
-        { value: '', disabled: this.isEditMode() || isSystemAdminUser }, 
+        { value: '', disabled: this.isEditMode() || isSystemAdminUser || isCreateMode },
         [Validators.required, Validators.minLength(3)]
       ],
       email: [
-        { value: '', disabled: isSystemAdminUser },
+        { value: '', disabled: isSystemAdminUser || isCreateMode },
         [Validators.required, Validators.email]
       ],
       phone: [{ value: '', disabled: isSystemAdminUser }],
@@ -100,7 +115,12 @@ export class UserFormComponent implements OnInit {
         { value: [], disabled: isSystemAdminUser },
         Validators.required
       ],
-      branchIds: [{ value: [], disabled: isSystemAdminUser }]
+      branchIds: [{ value: [], disabled: isSystemAdminUser }],
+      employeeId: [
+        { value: null, disabled: this.isEditMode() || isSystemAdminUser },
+        isCreateMode && !isSystemAdminUser ? [Validators.required] : []
+      ],
+      mustChangePassword: [{ value: false, disabled: isSystemAdminUser }]
     });
 
     // Add password confirmation validator
@@ -143,8 +163,34 @@ export class UserFormComponent implements OnInit {
       preferredLanguage: this.user.preferredLanguage,
       roleIds: roleIds,
       branchIds: branchIds,
-      isActive: this.user.isActive
+      isActive: this.user.isActive,
+      mustChangePassword: this.user.mustChangePassword
     });
+  }
+
+  onEmployeeSelected(employeeId: number | null): void {
+    if (employeeId) {
+      const employee = this.availableEmployees().find(e => e.id === employeeId);
+      if (employee) {
+        this.selectedEmployee.set(employee);
+        // Extract username from email (remove @domain.com part)
+        let username = employee.employeeNumber || '';
+        if (employee.email) {
+          username = employee.email.split('@')[0];
+        }
+        // Auto-fill username and email from employee
+        this.userForm.patchValue({
+          username: username,
+          email: employee.email || ''
+        });
+      }
+    } else {
+      this.selectedEmployee.set(null);
+      this.userForm.patchValue({
+        username: '',
+        email: ''
+      });
+    }
   }
 
   onSubmit(): void {
@@ -162,7 +208,7 @@ export class UserFormComponent implements OnInit {
     this.loading.set(true);
     this.error.set('');
 
-    const formValue = this.userForm.value;
+    const formValue = this.userForm.getRawValue();
 
     if (this.isEditMode()) {
       this.updateUser(formValue);
@@ -178,8 +224,10 @@ export class UserFormComponent implements OnInit {
       phone: formValue.phone || undefined,
       password: formValue.password,
       preferredLanguage: formValue.preferredLanguage,
+      mustChangePassword: formValue.mustChangePassword || false,
       roleIds: formValue.roleIds,
-      branchIds: formValue.branchIds
+      branchIds: formValue.branchIds,
+      employeeId: formValue.employeeId || undefined
     };
 
     this.usersService.createUser(request).subscribe({
@@ -207,7 +255,8 @@ export class UserFormComponent implements OnInit {
       email: formValue.email,
       phone: formValue.phone || undefined,
       preferredLanguage: formValue.preferredLanguage,
-      isActive: formValue.isActive
+      isActive: formValue.isActive,
+      mustChangePassword: formValue.mustChangePassword || false
     };
 
     this.usersService.updateUser(this.user.id, request).subscribe({
@@ -323,6 +372,19 @@ export class UserFormComponent implements OnInit {
       },
       error: (error) => {
         console.error('Failed to load branches:', error);
+      }
+    });
+  }
+
+  private loadAvailableEmployees(): void {
+    // TODO: This should fetch only employees that don't have user accounts
+    // For now, we'll fetch all employees
+    this.usersService.getAvailableEmployees().subscribe({
+      next: (employees) => {
+        this.availableEmployees.set(employees);
+      },
+      error: (error) => {
+        console.error('Failed to load employees:', error);
       }
     });
   }

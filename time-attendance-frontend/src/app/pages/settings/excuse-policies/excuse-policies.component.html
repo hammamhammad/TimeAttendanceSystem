@@ -1,0 +1,32 @@
+<div class="container-fluid">
+  <!-- Page Header -->
+  <app-page-header
+    [title]="t('excuse_policies.title')">
+  </app-page-header>
+
+  <!-- Unified Filter Component -->
+  <app-unified-filter
+    moduleName="excuse_policies"
+    [refreshing]="loading()"
+    (filtersChange)="onFiltersChange($event)"
+    (add)="onCreatePolicy()"
+    (refresh)="onRefreshData()">
+  </app-unified-filter>
+
+  <!-- Data Table -->
+  <app-data-table
+    [columns]="tableColumns()"
+    [data]="tableData() || []"
+    [actions]="tableActions()"
+    [currentPage]="currentPage()"
+    [pageSize]="pageSize()"
+    [totalItems]="totalCount()"
+    [totalPages]="totalPages()"
+    [loading]="loading"
+    [emptyTitle]="t('excuse_policies.no_policies_found')"
+    [emptyMessage]="hasActiveFilters() ? t('common.try_different_filters') : t('excuse_policies.subtitle')"
+    (actionClick)="onActionClick($event)"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+  </app-data-table>
+</div>

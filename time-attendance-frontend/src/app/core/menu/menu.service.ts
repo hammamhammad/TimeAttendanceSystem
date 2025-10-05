@@ -99,7 +99,21 @@ export class MenuService {
       path: '/reports',
       titleKey: 'nav.reports',
       icon: 'fa-solid fa-chart-bar',
-      permission: 'employee.read'
+      permission: undefined, // Show if user has any report access
+      children: [
+        {
+          path: '/reports/sessions',
+          titleKey: 'sessions.title',
+          icon: 'fa-solid fa-wifi',
+          permission: 'session.read'
+        },
+        {
+          path: '/reports/audit-logs',
+          titleKey: 'audit_logs.title',
+          icon: 'fa-solid fa-history',
+          permission: 'audit.read'
+        }
+      ]
     },
     {
       path: '/settings',
@@ -134,8 +148,14 @@ export class MenuService {
         {
           path: '/settings/excuse-policies',
           titleKey: 'excuse_policies.title',
-          icon: 'fa-solid fa-cogs',
+          icon: 'fa-solid fa-user-clock',
           permission: 'settings.excusePolicy.read'
+        },
+        {
+          path: '/settings/remote-work-policy',
+          titleKey: 'remoteWork.policy.title',
+          icon: 'fa-solid fa-laptop-house',
+          permission: 'remoteWork.policy.read'
         }
       ]
     },
@@ -150,6 +170,12 @@ export class MenuService {
       titleKey: 'employee_excuses.title',
       icon: 'fa-solid fa-clipboard-check',
       permission: 'excuse.read'
+    },
+    {
+      path: '/remote-work',
+      titleKey: 'remoteWork.request.title',
+      icon: 'fa-solid fa-laptop-house',
+      permission: 'remoteWork.request.read'
     }
   ]);
 

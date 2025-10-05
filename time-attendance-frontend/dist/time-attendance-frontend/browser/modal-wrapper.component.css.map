@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/shared/components/modal-wrapper/modal-wrapper.component.css"],
-  "sourcesContent": ["/* Modal wrapper styles */\r\n.modal {\r\n  background-color: rgba(0, 0, 0, 0.5);\r\n}\r\n\r\n.modal-backdrop {\r\n  z-index: 1040;\r\n}\r\n\r\n.modal {\r\n  z-index: 1050;\r\n}"],
-  "mappings": ";AACA,CAAC;AACC,oBAAkB,KAAK,CAAC,EAAE,CAAC,EAAE,CAAC,EAAE;AAClC;AAEA,CAAC;AACC,WAAS;AACX;AAEA,CARC;AASC,WAAS;AACX;",
-  "names": []
-}

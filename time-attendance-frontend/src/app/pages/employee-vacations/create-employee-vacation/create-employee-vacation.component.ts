@@ -8,6 +8,7 @@ import { EmployeeVacationsService } from '../employee-vacations.service';
 import { CreateEmployeeVacationRequest } from '../../../shared/models/employee-vacation.model';
 import { SearchableSelectComponent, SearchableSelectOption } from '../../../shared/components/searchable-select/searchable-select.component';
 import { FormHeaderComponent } from '../../../shared/components/form-header/form-header.component';
+import { FormSectionComponent } from '../../../shared/components/form-section/form-section.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
@@ -19,6 +20,7 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
     ReactiveFormsModule,
     SearchableSelectComponent,
     FormHeaderComponent,
+    FormSectionComponent,
     LoadingSpinnerComponent
   ],
   templateUrl: './create-employee-vacation.component.html',

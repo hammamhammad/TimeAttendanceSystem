@@ -26,32 +26,9 @@
       <!-- Main Content -->
       <div class="col-lg-8">
         <form [formGroup]="vacationForm" (ngSubmit)="onSubmit()">
-          <div class="card">
-            <div class="card-header">
-              <h5 class="card-title mb-0">
-                <div class="d-flex align-items-center justify-content-between">
-                  <div class="d-flex align-items-center">
-                    <div class="avatar-sm me-3">
-                      <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
-                        <i class="fas fa-calendar-alt"></i>
-                      </div>
-                    </div>
-                    <div>
-                      <div class="fw-medium">{{ getEmployeeName() }}</div>
-                      <small class="text-muted">{{ i18n.t('employee_vacations.vacation_id') }}: #{{ getVacationId() }}</small>
-                    </div>
-                  </div>
-                </div>
-              </h5>
-            </div>
-            <div class="card-body">
-              <!-- Required Information Section -->
-              <div class="mb-4">
-                <h6 class="text-primary mb-3">
-                  <i class="fa-solid fa-asterisk me-2"></i>
-                  {{ i18n.t('employee_vacations.required_information') }}
-                </h6>
-                <div class="row">
+          <!-- Required Information Section -->
+          <app-form-section [title]="i18n.t('employee_vacations.required_information')">
+            <div class="row">
                   <!-- Vacation Type -->
                   <div class="col-md-6 mb-3">
                     <label for="vacationTypeId" class="form-label">
@@ -128,15 +105,11 @@
                     }
                   </div>
                 </div>
-              </div>
+          </app-form-section>
 
-              <!-- Additional Information Section -->
-              <div class="mb-4">
-                <h6 class="text-secondary mb-3">
-                  <i class="fa-solid fa-list me-2"></i>
-                  {{ i18n.t('employee_vacations.additional_information') }}
-                </h6>
-                <!-- Notes -->
+          <!-- Additional Information Section -->
+          <app-form-section [title]="i18n.t('employee_vacations.additional_information')">
+            <!-- Notes -->
                 <div class="mb-3">
                   <label for="notes" class="form-label">
                     {{ i18n.t('fields.notes') }}
@@ -149,43 +122,41 @@
                     [disabled]="saving()"
                     [placeholder]="i18n.t('employee_vacations.placeholders.enter_notes')">
                   </textarea>
-                </div>
-              </div>
-
-              <!-- Submit Section -->
-              <div class="d-flex justify-content-end gap-2">
-                <button
-                  type="button"
-                  class="btn btn-outline-danger"
-                  (click)="onCancel()"
-                  [disabled]="saving()">
-                  <i class="fas fa-times me-2"></i>
-                  {{ i18n.t('common.cancel') }}
-                </button>
-
-                <button
-                  type="button"
-                  class="btn btn-outline-secondary"
-                  (click)="onReset()"
-                  [disabled]="saving()">
-                  <i class="fas fa-undo me-2"></i>
-                  {{ i18n.t('common.reset') }}
-                </button>
-
-                <button
-                  type="submit"
-                  class="btn btn-primary"
-                  [disabled]="vacationForm.invalid || saving()">
-                  @if (saving()) {
-                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    {{ i18n.t('common.saving') }}
-                  } @else {
-                    <i class="fas fa-save me-2"></i>
-                    {{ i18n.t('common.save') }}
-                  }
-                </button>
-              </div>
             </div>
+          </app-form-section>
+
+          <!-- Submit Section -->
+          <div class="d-flex justify-content-end gap-2 mt-4">
+            <button
+              type="button"
+              class="btn btn-outline-danger"
+              (click)="onCancel()"
+              [disabled]="saving()">
+              <i class="fas fa-times me-2"></i>
+              {{ i18n.t('common.cancel') }}
+            </button>
+
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              (click)="onReset()"
+              [disabled]="saving()">
+              <i class="fas fa-undo me-2"></i>
+              {{ i18n.t('common.reset') }}
+            </button>
+
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="vacationForm.invalid || saving()">
+              @if (saving()) {
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                {{ i18n.t('common.saving') }}
+              } @else {
+                <i class="fas fa-save me-2"></i>
+                {{ i18n.t('common.save') }}
+              }
+            </button>
           </div>
         </form>
       </div>

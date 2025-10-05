@@ -16,13 +16,7 @@
     </div>
   } @else {
     <!-- Main Form -->
-    <div class="card">
-      <div class="card-header">
-        <h5 class="card-title mb-0">
-          <i class="fa-solid fa-user-shield me-2"></i>
-          {{ t('roles.role_information') }}
-        </h5>
-      </div>
+    <app-form-section [title]="t('roles.role_information')">
       <div class="card-body">
         @if (error()) {
           <div class="alert alert-danger" role="alert">
@@ -33,12 +27,7 @@
 
         <form (ngSubmit)="onSubmit()">
           <!-- Basic Information Section -->
-          <div class="mb-4">
-            <h6 class="text-primary mb-3">
-              <i class="fa-solid fa-info-circle me-2"></i>
-              {{ t('roles.basic_information') }}
-            </h6>
-            
+          <app-form-section [title]="t('roles.basic_information')">
             <!-- Role Name -->
             <div class="row g-3">
               <div class="col-md-6">
@@ -57,17 +46,13 @@
                 />
               </div>
             </div>
-          </div>
+          </app-form-section>
 
           <hr>
 
           <!-- Permissions Section -->
-          <div class="mb-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <h6 class="mb-0">
-                <i class="fa-solid fa-key me-2 text-primary"></i>
-                {{ t('roles.select_permissions') }}
-              </h6>
+          <app-form-section [title]="t('roles.select_permissions')">
+            <div class="d-flex justify-content-end align-items-center mb-3">
               <div class="btn-group btn-group-sm" role="group">
                 <button 
                   type="button" 
@@ -119,13 +104,46 @@
             <div class="permissions-list border rounded p-3" style="max-height: 500px; overflow-y: auto;">
               @for (group of getFilteredGroupedPermissions(); track group.group) {
                 <div class="permission-group mb-4">
-                  <h6 class="fw-bold text-primary mb-3 border-bottom pb-2">
-                    <i class="fas fa-layer-group me-2"></i>
-                    {{ group.group }}
-                    <small class="text-muted fw-normal">({{ group.permissions.length }} permissions)</small>
-                  </h6>
-                  
-                  <div class="row g-3">
+                  <!-- Group Header with Actions -->
+                  <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                    <div class="d-flex align-items-center">
+                      <!-- Collapse/Expand Button -->
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-link text-decoration-none p-0 me-2"
+                        (click)="toggleGroupCollapse(group.group)"
+                        [disabled]="submitting()"
+                        [title]="isGroupCollapsed(group.group) ? t('common.expand') : t('common.collapse')">
+                        <i class="fas" [ngClass]="isGroupCollapsed(group.group) ? 'fa-chevron-right' : 'fa-chevron-down'"></i>
+                      </button>
+
+                      <h6 class="fw-bold text-primary mb-0">
+                        <i class="fas fa-layer-group me-2"></i>
+                        {{ group.group }}
+                        <small class="text-muted fw-normal">({{ group.permissions.length }} {{ t('roles.permissions') }})</small>
+                      </h6>
+                    </div>
+
+                    <!-- Group Actions -->
+                    <div class="btn-group btn-group-sm" role="group">
+                      <button
+                        type="button"
+                        class="btn"
+                        [class.btn-primary]="areAllGroupPermissionsSelected(group)"
+                        [class.btn-outline-primary]="!areAllGroupPermissionsSelected(group)"
+                        (click)="toggleGroupSelection(group)"
+                        [disabled]="submitting()"
+                        [title]="areAllGroupPermissionsSelected(group) ? t('roles.deselect_all_group') : t('roles.select_all_group')">
+                        <i class="fas"
+                           [ngClass]="areAllGroupPermissionsSelected(group) ? 'fa-check-square' : (areSomeGroupPermissionsSelected(group) ? 'fa-minus-square' : 'fa-square')"></i>
+                        {{ areAllGroupPermissionsSelected(group) ? t('roles.deselect_all') : t('roles.select_all') }}
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Permissions Grid (Collapsible) -->
+                  @if (!isGroupCollapsed(group.group)) {
+                    <div class="row g-3">
                     @for (permission of group.permissions; track permission.id) {
                       <div class="col-md-6 col-lg-4">
                         <div class="permission-item border rounded p-3" 
@@ -158,7 +176,8 @@
                         </div>
                       </div>
                     }
-                  </div>
+                    </div>
+                  }
                 </div>
               }
               
@@ -169,7 +188,7 @@
                 </div>
               }
             </div>
-          </div>
+          </app-form-section>
 
           <!-- Form Actions -->
           <div class="d-flex justify-content-end gap-2">
@@ -195,6 +214,6 @@
           </div>
         </form>
       </div>
-    </div>
+    </app-form-section>
   }
 </div>

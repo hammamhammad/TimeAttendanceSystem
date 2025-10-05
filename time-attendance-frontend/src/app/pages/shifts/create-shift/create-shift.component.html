@@ -16,483 +16,468 @@
           <form (ngSubmit)="onSubmit()" #formRef="ngForm">
 
             <!-- Basic Information Section -->
-            <div class="row mb-4">
-              <div class="col-12">
-                <h5 class="card-title mb-3">{{ t('common.basicInformation') }}</h5>
-                <hr class="mt-0 mb-3">
-              </div>
+            <app-form-section [title]="t('common.basicInformation')">
+              <div class="row mb-4">
+                <!-- Shift Name -->
+                <div class="col-md-6 mb-3">
+                  <label for="name" class="form-label">
+                    {{ t('shifts.name') }} <span class="text-danger">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="name"
+                    [(ngModel)]="shiftForm.name"
+                    name="name"
+                    required
+                    maxlength="200"
+                    placeholder="{{ t('shifts.namePlaceholder') }}">
+                </div>
 
-              <!-- Shift Name -->
-              <div class="col-md-6 mb-3">
-                <label for="name" class="form-label">
-                  {{ t('shifts.name') }} <span class="text-danger">*</span>
-                </label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="name"
-                  [(ngModel)]="shiftForm.name"
-                  name="name"
-                  required
-                  maxlength="200"
-                  placeholder="{{ t('shifts.namePlaceholder') }}">
+                <!-- Description -->
+                <div class="col-12 mb-3">
+                  <label for="description" class="form-label">{{ t('shifts.description') }}</label>
+                  <textarea
+                    class="form-control"
+                    id="description"
+                    [(ngModel)]="shiftForm.description"
+                    name="description"
+                    rows="3"
+                    maxlength="1000"
+                    placeholder="{{ t('shifts.descriptionPlaceholder') }}"></textarea>
+                </div>
               </div>
-
-              <!-- Description -->
-              <div class="col-12 mb-3">
-                <label for="description" class="form-label">{{ t('shifts.description') }}</label>
-                <textarea
-                  class="form-control"
-                  id="description"
-                  [(ngModel)]="shiftForm.description"
-                  name="description"
-                  rows="3"
-                  maxlength="1000"
-                  placeholder="{{ t('shifts.descriptionPlaceholder') }}"></textarea>
-              </div>
-            </div>
+            </app-form-section>
 
             <!-- Shift Type Section -->
-            <div class="row mb-4">
-              <div class="col-12">
-                <h5 class="card-title mb-3">{{ t('shifts.type') }}</h5>
-                <hr class="mt-0 mb-3">
-              </div>
-
-              <!-- Shift Type Selection -->
-              <div class="col-12 mb-3">
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="form-check p-3 border rounded">
-                      <input
-                        class="form-check-input"
-                        type="radio"
-                        name="shiftType"
-                        id="timeBased"
-                        [value]="ShiftType.TimeBased"
-                        [(ngModel)]="shiftForm.shiftType"
-                        (change)="onShiftTypeChange()">
-                      <label class="form-check-label w-100" for="timeBased">
-                        <div class="fw-medium">{{ t('shifts.types.timeBased') }}</div>
-                        <small class="text-muted">{{ t('shifts.help.shiftType.timeBased') }}</small>
-                      </label>
+            <app-form-section [title]="t('shifts.type')">
+              <div class="row mb-4">
+                <!-- Shift Type Selection -->
+                <div class="col-12 mb-3">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-check p-3 border rounded">
+                        <input
+                          class="form-check-input"
+                          type="radio"
+                          name="shiftType"
+                          id="timeBased"
+                          [value]="ShiftType.TimeBased"
+                          [(ngModel)]="shiftForm.shiftType"
+                          (change)="onShiftTypeChange()">
+                        <label class="form-check-label w-100" for="timeBased">
+                          <div class="fw-medium">{{ t('shifts.types.timeBased') }}</div>
+                          <small class="text-muted">{{ t('shifts.help.shiftType.timeBased') }}</small>
+                        </label>
+                      </div>
                     </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-check p-3 border rounded">
-                      <input
-                        class="form-check-input"
-                        type="radio"
-                        name="shiftType"
-                        id="hoursOnly"
-                        [value]="ShiftType.HoursOnly"
-                        [(ngModel)]="shiftForm.shiftType"
-                        (change)="onShiftTypeChange()">
-                      <label class="form-check-label w-100" for="hoursOnly">
-                        <div class="fw-medium">{{ t('shifts.types.hoursOnly') }}</div>
-                        <small class="text-muted">{{ t('shifts.help.shiftType.hoursOnly') }}</small>
-                      </label>
+                    <div class="col-md-6">
+                      <div class="form-check p-3 border rounded">
+                        <input
+                          class="form-check-input"
+                          type="radio"
+                          name="shiftType"
+                          id="hoursOnly"
+                          [value]="ShiftType.HoursOnly"
+                          [(ngModel)]="shiftForm.shiftType"
+                          (change)="onShiftTypeChange()">
+                        <label class="form-check-label w-100" for="hoursOnly">
+                          <div class="fw-medium">{{ t('shifts.types.hoursOnly') }}</div>
+                          <small class="text-muted">{{ t('shifts.help.shiftType.hoursOnly') }}</small>
+                        </label>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <!-- Required Hours (Hours-Only) -->
-              @if (shiftForm.shiftType === ShiftType.HoursOnly) {
-                <div class="col-md-6 mb-3">
-                  <label for="requiredHours" class="form-label">
-                    {{ t('shifts.requiredHours') }} <span class="text-danger">*</span>
-                  </label>
-                  <div class="input-group">
-                    <input
-                      type="number"
-                      class="form-control"
-                      id="requiredHours"
-                      [(ngModel)]="shiftForm.requiredHours"
-                      name="requiredHours"
-                      step="0.5"
-                      min="0.5"
-                      max="24"
-                      required>
-                    <span class="input-group-text">{{ t('shifts.hours') }}</span>
-                  </div>
-                  <div class="form-text">{{ t('shifts.help.requiredHours') }}</div>
-                </div>
-              }
-            </div>
-
-            <!-- Working Days Section -->
-            <div class="row mb-4">
-              <div class="col-12">
-                <h5 class="card-title mb-3">{{ t('shifts.workingDays') }}</h5>
-                <hr class="mt-0 mb-3">
-              </div>
-
-              <div class="col-12 mb-3">
-                <div class="row">
-                  <div class="col-md-3 col-6 mb-2">
-                    <div class="form-check">
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        id="sunday"
-                        [(ngModel)]="shiftForm.isSunday"
-                        name="isSunday">
-                      <label class="form-check-label" for="sunday">{{ t('common.days.sunday') }}</label>
-                    </div>
-                  </div>
-                  <div class="col-md-3 col-6 mb-2">
-                    <div class="form-check">
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        id="monday"
-                        [(ngModel)]="shiftForm.isMonday"
-                        name="isMonday">
-                      <label class="form-check-label" for="monday">{{ t('common.days.monday') }}</label>
-                    </div>
-                  </div>
-                  <div class="col-md-3 col-6 mb-2">
-                    <div class="form-check">
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        id="tuesday"
-                        [(ngModel)]="shiftForm.isTuesday"
-                        name="isTuesday">
-                      <label class="form-check-label" for="tuesday">{{ t('common.days.tuesday') }}</label>
-                    </div>
-                  </div>
-                  <div class="col-md-3 col-6 mb-2">
-                    <div class="form-check">
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        id="wednesday"
-                        [(ngModel)]="shiftForm.isWednesday"
-                        name="isWednesday">
-                      <label class="form-check-label" for="wednesday">{{ t('common.days.wednesday') }}</label>
-                    </div>
-                  </div>
-                  <div class="col-md-3 col-6 mb-2">
-                    <div class="form-check">
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        id="thursday"
-                        [(ngModel)]="shiftForm.isThursday"
-                        name="isThursday">
-                      <label class="form-check-label" for="thursday">{{ t('common.days.thursday') }}</label>
-                    </div>
-                  </div>
-                  <div class="col-md-3 col-6 mb-2">
-                    <div class="form-check">
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        id="friday"
-                        [(ngModel)]="shiftForm.isFriday"
-                        name="isFriday">
-                      <label class="form-check-label" for="friday">{{ t('common.days.friday') }}</label>
-                    </div>
-                  </div>
-                  <div class="col-md-3 col-6 mb-2">
-                    <div class="form-check">
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        id="saturday"
-                        [(ngModel)]="shiftForm.isSaturday"
-                        name="isSaturday">
-                      <label class="form-check-label" for="saturday">{{ t('common.days.saturday') }}</label>
-                    </div>
-                  </div>
-                </div>
-                <small class="text-muted">{{ t('shifts.help.workingDays') }}</small>
-              </div>
-
-              <!-- Night Shift -->
-              <div class="col-12 mt-3">
-                <div class="form-check">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    id="nightShift"
-                    [(ngModel)]="shiftForm.isNightShift"
-                    name="isNightShift"
-                    (change)="onNightShiftChange()"
-                    [disabled]="shiftForm.shiftType === ShiftType.HoursOnly">
-                  <label class="form-check-label fw-medium" for="nightShift">
-                    {{ t('shifts.isNightShift') }}
-                  </label>
-                </div>
-                <small class="text-muted">{{ t('shifts.help.nightShift') }}</small>
+                <!-- Required Hours (Hours-Only) -->
                 @if (shiftForm.shiftType === ShiftType.HoursOnly) {
-                  <small class="text-warning d-block">{{ t('shifts.help.nightShiftDisabledHoursOnly') }}</small>
+                  <div class="col-md-6 mb-3">
+                    <label for="requiredHours" class="form-label">
+                      {{ t('shifts.requiredHours') }} <span class="text-danger">*</span>
+                    </label>
+                    <div class="input-group">
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="requiredHours"
+                        [(ngModel)]="shiftForm.requiredHours"
+                        name="requiredHours"
+                        step="0.5"
+                        min="0.5"
+                        max="24"
+                        required>
+                      <span class="input-group-text">{{ t('shifts.hours') }}</span>
+                    </div>
+                    <div class="form-text">{{ t('shifts.help.requiredHours') }}</div>
+                  </div>
                 }
               </div>
-            </div>
+            </app-form-section>
+
+            <!-- Working Days Section -->
+            <app-form-section [title]="t('shifts.workingDays')">
+              <div class="row mb-4">
+                <div class="col-12 mb-3">
+                  <div class="row">
+                    <div class="col-md-3 col-6 mb-2">
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          id="sunday"
+                          [(ngModel)]="shiftForm.isSunday"
+                          name="isSunday">
+                        <label class="form-check-label" for="sunday">{{ t('common.days.sunday') }}</label>
+                      </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-2">
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          id="monday"
+                          [(ngModel)]="shiftForm.isMonday"
+                          name="isMonday">
+                        <label class="form-check-label" for="monday">{{ t('common.days.monday') }}</label>
+                      </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-2">
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          id="tuesday"
+                          [(ngModel)]="shiftForm.isTuesday"
+                          name="isTuesday">
+                        <label class="form-check-label" for="tuesday">{{ t('common.days.tuesday') }}</label>
+                      </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-2">
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          id="wednesday"
+                          [(ngModel)]="shiftForm.isWednesday"
+                          name="isWednesday">
+                        <label class="form-check-label" for="wednesday">{{ t('common.days.wednesday') }}</label>
+                      </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-2">
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          id="thursday"
+                          [(ngModel)]="shiftForm.isThursday"
+                          name="isThursday">
+                        <label class="form-check-label" for="thursday">{{ t('common.days.thursday') }}</label>
+                      </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-2">
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          id="friday"
+                          [(ngModel)]="shiftForm.isFriday"
+                          name="isFriday">
+                        <label class="form-check-label" for="friday">{{ t('common.days.friday') }}</label>
+                      </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-2">
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          id="saturday"
+                          [(ngModel)]="shiftForm.isSaturday"
+                          name="isSaturday">
+                        <label class="form-check-label" for="saturday">{{ t('common.days.saturday') }}</label>
+                      </div>
+                    </div>
+                  </div>
+                  <small class="text-muted">{{ t('shifts.help.workingDays') }}</small>
+                </div>
+
+                <!-- Night Shift -->
+                <div class="col-12 mt-3">
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="nightShift"
+                      [(ngModel)]="shiftForm.isNightShift"
+                      name="isNightShift"
+                      (change)="onNightShiftChange()"
+                      [disabled]="shiftForm.shiftType === ShiftType.HoursOnly">
+                    <label class="form-check-label fw-medium" for="nightShift">
+                      {{ t('shifts.isNightShift') }}
+                    </label>
+                  </div>
+                  <small class="text-muted">{{ t('shifts.help.nightShift') }}</small>
+                  @if (shiftForm.shiftType === ShiftType.HoursOnly) {
+                    <small class="text-warning d-block">{{ t('shifts.help.nightShiftDisabledHoursOnly') }}</small>
+                  }
+                </div>
+              </div>
+            </app-form-section>
 
             <!-- Work Periods Section (Time-Based Only) -->
             @if (shiftForm.shiftType === ShiftType.TimeBased) {
-              <div class="row mb-4">
-                <div class="col-12">
-                  <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="card-title mb-0">{{ t('shifts.periods') }}</h5>
-                    @if (shiftForm.shiftPeriods.length < 2) {
-                      <button
-                        type="button"
-                        class="btn btn-outline-primary btn-sm"
-                        (click)="addShiftPeriod()">
-                        <i class="bi bi-plus-circle me-1"></i>{{ t('shifts.addPeriod') }}
-                      </button>
-                    }
-                  </div>
-                  <hr class="mt-0 mb-3">
-
-                  @for (period of shiftForm.shiftPeriods; track $index) {
-                    <div class="card border mb-3">
-                      <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
-                        <span class="fw-medium">{{ t('shifts.period') }} {{ period.periodOrder }}</span>
-                        <div class="d-flex align-items-center gap-2">
-                          <span class="badge" [ngClass]="isNightShift(period.startTime, period.endTime) ? 'bg-info' : 'bg-primary'">
-                            {{ getPeriodTypeText(period) }}
-                          </span>
-                          <span class="text-muted small">{{ formatHours(calculatePeriodHours(period.startTime, period.endTime)) }}</span>
-                          @if (shiftForm.shiftPeriods.length > 1) {
-                            <button
-                              type="button"
-                              class="btn btn-outline-danger btn-sm"
-                              (click)="removeShiftPeriod($index)">
-                              <i class="bi bi-trash"></i>
-                            </button>
-                          }
-                        </div>
-                      </div>
-                      <div class="card-body">
-                        <div class="row">
-                          <div class="col-md-6">
-                            <label class="form-label">{{ t('shifts.startTime') }}</label>
-                            <input
-                              type="time"
-                              class="form-control"
-                              [(ngModel)]="period.startTime"
-                              [name]="'startTime_' + $index"
-                              required>
-                          </div>
-                          <div class="col-md-6">
-                            <label class="form-label">{{ t('shifts.endTime') }}</label>
-                            <input
-                              type="time"
-                              class="form-control"
-                              [(ngModel)]="period.endTime"
-                              [name]="'endTime_' + $index"
-                              required>
-                          </div>
-                        </div>
-                      </div>
+              <app-form-section [title]="t('shifts.periods')">
+                <div class="row mb-4">
+                  <div class="col-12">
+                    <div class="d-flex justify-content-end mb-3">
+                      @if (shiftForm.shiftPeriods.length < 2) {
+                        <button
+                          type="button"
+                          class="btn btn-outline-primary btn-sm"
+                          (click)="addShiftPeriod()">
+                          <i class="bi bi-plus-circle me-1"></i>{{ t('shifts.addPeriod') }}
+                        </button>
+                      }
                     </div>
-                  }
 
-                  <!-- Total Hours Display -->
-                  <div class="alert alert-info d-flex align-items-center">
-                    <i class="bi bi-info-circle me-2"></i>
-                    <span>{{ t('shifts.totalHours') }}: <strong>{{ formatHours(getTotalShiftHours()) }}</strong></span>
+                    @for (period of shiftForm.shiftPeriods; track $index) {
+                      <div class="card border mb-3">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+                          <span class="fw-medium">{{ t('shifts.period') }} {{ period.periodOrder }}</span>
+                          <div class="d-flex align-items-center gap-2">
+                            <span class="badge" [ngClass]="isNightShift(period.startTime, period.endTime) ? 'bg-info' : 'bg-primary'">
+                              {{ getPeriodTypeText(period) }}
+                            </span>
+                            <span class="text-muted small">{{ formatHours(calculatePeriodHours(period.startTime, period.endTime)) }}</span>
+                            @if (shiftForm.shiftPeriods.length > 1) {
+                              <button
+                                type="button"
+                                class="btn btn-outline-danger btn-sm"
+                                (click)="removeShiftPeriod($index)">
+                                <i class="bi bi-trash"></i>
+                              </button>
+                            }
+                          </div>
+                        </div>
+                        <div class="card-body">
+                          <div class="row">
+                            <div class="col-md-6">
+                              <label class="form-label">{{ t('shifts.startTime') }}</label>
+                              <input
+                                type="time"
+                                class="form-control"
+                                [(ngModel)]="period.startTime"
+                                [name]="'startTime_' + $index"
+                                required>
+                            </div>
+                            <div class="col-md-6">
+                              <label class="form-label">{{ t('shifts.endTime') }}</label>
+                              <input
+                                type="time"
+                                class="form-control"
+                                [(ngModel)]="period.endTime"
+                                [name]="'endTime_' + $index"
+                                required>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    }
+
+                    <!-- Total Hours Display -->
+                    <div class="alert alert-info d-flex align-items-center">
+                      <i class="bi bi-info-circle me-2"></i>
+                      <span>{{ t('shifts.totalHours') }}: <strong>{{ formatHours(getTotalShiftHours()) }}</strong></span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </app-form-section>
             }
 
             <!-- Core Hours Section -->
-            <div class="row mb-4">
-              <div class="col-12">
-                <h5 class="card-title mb-3">{{ t('shifts.coreHours') }}</h5>
-                <hr class="mt-0 mb-3">
-              </div>
-
-              <!-- Enable Core Hours -->
-              <div class="col-12 mb-3">
-                <div class="form-check form-switch">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    id="hasCoreHours"
-                    [(ngModel)]="shiftForm.hasCoreHours"
-                    name="hasCoreHours"
-                    (change)="onCoreHoursChange()">
-                  <label class="form-check-label" for="hasCoreHours">
-                    {{ t('shifts.hasCoreHours') }}
-                  </label>
-                </div>
-                <div class="form-text">{{ t('shifts.help.coreHours') }}</div>
-              </div>
-
-              <!-- Core Hours Times -->
-              @if (shiftForm.hasCoreHours) {
-                <div class="col-md-6 mb-3">
-                  <label for="coreStart" class="form-label">
-                    {{ t('shifts.coreStart') }} <span class="text-danger">*</span>
-                  </label>
-                  <input
-                    type="time"
-                    class="form-control"
-                    id="coreStart"
-                    [(ngModel)]="shiftForm.coreStart"
-                    name="coreStart"
-                    required>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                  <label for="coreEnd" class="form-label">
-                    {{ t('shifts.coreEnd') }} <span class="text-danger">*</span>
-                  </label>
-                  <input
-                    type="time"
-                    class="form-control"
-                    id="coreEnd"
-                    [(ngModel)]="shiftForm.coreEnd"
-                    name="coreEnd"
-                    required>
-                </div>
-              }
-            </div>
-
-            <!-- Advanced Options Section -->
-            <div class="row mb-4">
-              <div class="col-12">
-                <h5 class="card-title mb-3">{{ t('shifts.advancedOptions') }}</h5>
-                <hr class="mt-0 mb-3">
-              </div>
-
-              <!-- Weekly Hours -->
-              <div class="col-md-6 mb-3">
-                <label for="requiredWeeklyHours" class="form-label">{{ t('shifts.requiredWeeklyHours') }}</label>
-                <div class="input-group">
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="requiredWeeklyHours"
-                    [(ngModel)]="shiftForm.requiredWeeklyHours"
-                    name="requiredWeeklyHours"
-                    (ngModelChange)="onWeeklyHoursChange()"
-                    step="0.5"
-                    min="0"
-                    max="168">
-                  <span class="input-group-text">{{ t('shifts.hours') }}</span>
-                </div>
-                <div class="form-text">{{ t('shifts.help.requiredWeeklyHours') }}</div>
-                @if (shiftForm.requiredWeeklyHours && shiftForm.requiredWeeklyHours > 0) {
-                  <small class="text-info d-block">{{ t('shifts.help.weeklyHoursCoreRequired') }}</small>
-                }
-              </div>
-
-              <!-- Check-in Required -->
-              <div class="col-md-6 mb-3">
-                <div class="form-check form-switch">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    id="checkInRequired"
-                    [(ngModel)]="shiftForm.isCheckInRequired"
-                    name="isCheckInRequired">
-                  <label class="form-check-label" for="checkInRequired">
-                    {{ t('shifts.checkInRequired') }}
-                  </label>
-                </div>
-                <div class="form-text">{{ t('shifts.help.checkInRequired') }}</div>
-              </div>
-
-              <!-- Auto Check-out -->
-              <div class="col-md-6 mb-3">
-                <div class="form-check form-switch">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    id="autoCheckOut"
-                    [(ngModel)]="shiftForm.isAutoCheckOut"
-                    name="isAutoCheckOut">
-                  <label class="form-check-label" for="autoCheckOut">
-                    {{ t('shifts.autoCheckOut') }}
-                  </label>
-                </div>
-                <div class="form-text">{{ t('shifts.help.autoCheckOut') }}</div>
-              </div>
-
-              <!-- Grace Period (Time-Based Only) -->
-              @if (shiftForm.shiftType === ShiftType.TimeBased) {
-                <div class="col-md-6 mb-3">
-                  <label for="gracePeriod" class="form-label">{{ t('shifts.gracePeriodMinutes') }}</label>
-                  <div class="input-group">
-                    <input
-                      type="number"
-                      class="form-control"
-                      id="gracePeriod"
-                      [(ngModel)]="shiftForm.gracePeriodMinutes"
-                      name="gracePeriodMinutes"
-                      (ngModelChange)="onGracePeriodChange()"
-                      [disabled]="shiftForm.allowFlexibleHours"
-                      min="0"
-                      max="120">
-                    <span class="input-group-text">{{ t('common.minutes') }}</span>
-                  </div>
-                  <div class="form-text">{{ t('shifts.help.gracePeriod') }}</div>
-                  @if (shiftForm.allowFlexibleHours) {
-                    <small class="text-warning d-block">{{ t('shifts.help.gracePeriodDisabledFlexible') }}</small>
-                  }
-                </div>
-
-                <!-- Flexible Hours -->
+            <app-form-section [title]="t('shifts.coreHours')">
+              <div class="row mb-4">
+                <!-- Enable Core Hours -->
                 <div class="col-12 mb-3">
                   <div class="form-check form-switch">
                     <input
                       class="form-check-input"
                       type="checkbox"
-                      id="flexibleHours"
-                      [(ngModel)]="shiftForm.allowFlexibleHours"
-                      name="allowFlexibleHours"
-                      (change)="onFlexibleHoursChange()">
-                    <label class="form-check-label" for="flexibleHours">
-                      {{ t('shifts.allowFlexibleHours') }}
+                      id="hasCoreHours"
+                      [(ngModel)]="shiftForm.hasCoreHours"
+                      name="hasCoreHours"
+                      (change)="onCoreHoursChange()">
+                    <label class="form-check-label" for="hasCoreHours">
+                      {{ t('shifts.hasCoreHours') }}
                     </label>
                   </div>
-                  <div class="form-text">{{ t('shifts.help.flexibleHours') }}</div>
+                  <div class="form-text">{{ t('shifts.help.coreHours') }}</div>
                 </div>
 
-                @if (shiftForm.allowFlexibleHours) {
+                <!-- Core Hours Times -->
+                @if (shiftForm.hasCoreHours) {
                   <div class="col-md-6 mb-3">
-                    <label for="flexBefore" class="form-label">{{ t('shifts.flexMinutesBefore') }}</label>
-                    <div class="input-group">
-                      <input
-                        type="number"
-                        class="form-control"
-                        id="flexBefore"
-                        [(ngModel)]="shiftForm.flexMinutesBefore"
-                        name="flexMinutesBefore"
-                        min="1"
-                        max="480">
-                      <span class="input-group-text">{{ t('common.minutes') }}</span>
-                    </div>
-                    <div class="form-text">{{ t('shifts.help.flexBefore') }}</div>
+                    <label for="coreStart" class="form-label">
+                      {{ t('shifts.coreStart') }} <span class="text-danger">*</span>
+                    </label>
+                    <input
+                      type="time"
+                      class="form-control"
+                      id="coreStart"
+                      [(ngModel)]="shiftForm.coreStart"
+                      name="coreStart"
+                      required>
                   </div>
 
                   <div class="col-md-6 mb-3">
-                    <label for="flexAfter" class="form-label">{{ t('shifts.flexMinutesAfter') }}</label>
+                    <label for="coreEnd" class="form-label">
+                      {{ t('shifts.coreEnd') }} <span class="text-danger">*</span>
+                    </label>
+                    <input
+                      type="time"
+                      class="form-control"
+                      id="coreEnd"
+                      [(ngModel)]="shiftForm.coreEnd"
+                      name="coreEnd"
+                      required>
+                  </div>
+                }
+              </div>
+            </app-form-section>
+
+            <!-- Advanced Options Section -->
+            <app-form-section [title]="t('shifts.advancedOptions')">
+              <div class="row mb-4">
+                <!-- Weekly Hours -->
+                <div class="col-md-6 mb-3">
+                  <label for="requiredWeeklyHours" class="form-label">{{ t('shifts.requiredWeeklyHours') }}</label>
+                  <div class="input-group">
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="requiredWeeklyHours"
+                      [(ngModel)]="shiftForm.requiredWeeklyHours"
+                      name="requiredWeeklyHours"
+                      (ngModelChange)="onWeeklyHoursChange()"
+                      step="0.5"
+                      min="0"
+                      max="168">
+                    <span class="input-group-text">{{ t('shifts.hours') }}</span>
+                  </div>
+                  <div class="form-text">{{ t('shifts.help.requiredWeeklyHours') }}</div>
+                  @if (shiftForm.requiredWeeklyHours && shiftForm.requiredWeeklyHours > 0) {
+                    <small class="text-info d-block">{{ t('shifts.help.weeklyHoursCoreRequired') }}</small>
+                  }
+                </div>
+
+                <!-- Check-in Required -->
+                <div class="col-md-6 mb-3">
+                  <div class="form-check form-switch">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="checkInRequired"
+                      [(ngModel)]="shiftForm.isCheckInRequired"
+                      name="isCheckInRequired">
+                    <label class="form-check-label" for="checkInRequired">
+                      {{ t('shifts.checkInRequired') }}
+                    </label>
+                  </div>
+                  <div class="form-text">{{ t('shifts.help.checkInRequired') }}</div>
+                </div>
+
+                <!-- Auto Check-out -->
+                <div class="col-md-6 mb-3">
+                  <div class="form-check form-switch">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="autoCheckOut"
+                      [(ngModel)]="shiftForm.isAutoCheckOut"
+                      name="isAutoCheckOut">
+                    <label class="form-check-label" for="autoCheckOut">
+                      {{ t('shifts.autoCheckOut') }}
+                    </label>
+                  </div>
+                  <div class="form-text">{{ t('shifts.help.autoCheckOut') }}</div>
+                </div>
+
+                <!-- Grace Period (Time-Based Only) -->
+                @if (shiftForm.shiftType === ShiftType.TimeBased) {
+                  <div class="col-md-6 mb-3">
+                    <label for="gracePeriod" class="form-label">{{ t('shifts.gracePeriodMinutes') }}</label>
                     <div class="input-group">
                       <input
                         type="number"
                         class="form-control"
-                        id="flexAfter"
-                        [(ngModel)]="shiftForm.flexMinutesAfter"
-                        name="flexMinutesAfter"
-                        min="1"
-                        max="480">
+                        id="gracePeriod"
+                        [(ngModel)]="shiftForm.gracePeriodMinutes"
+                        name="gracePeriodMinutes"
+                        (ngModelChange)="onGracePeriodChange()"
+                        [disabled]="shiftForm.allowFlexibleHours"
+                        min="0"
+                        max="120">
                       <span class="input-group-text">{{ t('common.minutes') }}</span>
                     </div>
-                    <div class="form-text">{{ t('shifts.help.flexAfter') }}</div>
+                    <div class="form-text">{{ t('shifts.help.gracePeriod') }}</div>
+                    @if (shiftForm.allowFlexibleHours) {
+                      <small class="text-warning d-block">{{ t('shifts.help.gracePeriodDisabledFlexible') }}</small>
+                    }
                   </div>
+
+                  <!-- Flexible Hours -->
+                  <div class="col-12 mb-3">
+                    <div class="form-check form-switch">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="flexibleHours"
+                        [(ngModel)]="shiftForm.allowFlexibleHours"
+                        name="allowFlexibleHours"
+                        (change)="onFlexibleHoursChange()">
+                      <label class="form-check-label" for="flexibleHours">
+                        {{ t('shifts.allowFlexibleHours') }}
+                      </label>
+                    </div>
+                    <div class="form-text">{{ t('shifts.help.flexibleHours') }}</div>
+                  </div>
+
+                  @if (shiftForm.allowFlexibleHours) {
+                    <div class="col-md-6 mb-3">
+                      <label for="flexBefore" class="form-label">{{ t('shifts.flexMinutesBefore') }}</label>
+                      <div class="input-group">
+                        <input
+                          type="number"
+                          class="form-control"
+                          id="flexBefore"
+                          [(ngModel)]="shiftForm.flexMinutesBefore"
+                          name="flexMinutesBefore"
+                          min="1"
+                          max="480">
+                        <span class="input-group-text">{{ t('common.minutes') }}</span>
+                      </div>
+                      <div class="form-text">{{ t('shifts.help.flexBefore') }}</div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                      <label for="flexAfter" class="form-label">{{ t('shifts.flexMinutesAfter') }}</label>
+                      <div class="input-group">
+                        <input
+                          type="number"
+                          class="form-control"
+                          id="flexAfter"
+                          [(ngModel)]="shiftForm.flexMinutesAfter"
+                          name="flexMinutesAfter"
+                          min="1"
+                          max="480">
+                        <span class="input-group-text">{{ t('common.minutes') }}</span>
+                      </div>
+                      <div class="form-text">{{ t('shifts.help.flexAfter') }}</div>
+                    </div>
+                  }
                 }
-              }
-            </div>
+              </div>
+            </app-form-section>
 
             <!-- Validation Errors -->
             @if (!isFormValid() && shiftForm.name) {

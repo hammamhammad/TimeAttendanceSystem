@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["angular:styles/component:css;dc0a349979398d6fe43a9decb2c6eb58f8884b7a6b2c8ddac56f5a2b8478c5b4;D:/Work/AI Code/TimeAttendanceSystem/time-attendance-frontend/src/app/core/notifications/notification.component.ts"],
-  "sourcesContent": ["\n    .toast {\n      min-width: 300px;\n      margin-bottom: 0.5rem;\n    }\n    \n    .toast-success .toast-header {\n      background-color: #d1e7dd;\n      border-color: #badbcc;\n    }\n    \n    .toast-error .toast-header {\n      background-color: #f8d7da;\n      border-color: #f5c6cb;\n    }\n    \n    .toast-warning .toast-header {\n      background-color: #fff3cd;\n      border-color: #ffecb5;\n    }\n    \n    .toast-info .toast-header {\n      background-color: #d1ecf1;\n      border-color: #bee5eb;\n    }\n  "],
-  "mappings": ";AACI,CAAC;AACC,aAAW;AACX,iBAAe;AACjB;AAEA,CAAC,cAAc,CAAC;AACd,oBAAkB;AAClB,gBAAc;AAChB;AAEA,CAAC,YAAY,CALG;AAMd,oBAAkB;AAClB,gBAAc;AAChB;AAEA,CAAC,cAAc,CAVC;AAWd,oBAAkB;AAClB,gBAAc;AAChB;AAEA,CAAC,WAAW,CAfI;AAgBd,oBAAkB;AAClB,gBAAc;AAChB;",
-  "names": []
-}

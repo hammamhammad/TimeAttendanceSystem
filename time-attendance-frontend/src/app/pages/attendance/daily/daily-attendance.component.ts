@@ -650,6 +650,12 @@ export class DailyAttendanceComponent implements OnInit, OnDestroy {
         return 'badge bg-secondary';
       case AttendanceStatus.SickLeave:
         return 'badge bg-warning';
+      case AttendanceStatus.OnDuty:
+        return 'badge bg-info';
+      case AttendanceStatus.Excused:
+        return 'badge bg-info';
+      case AttendanceStatus.RemoteWork:
+        return 'badge bg-primary';
       default:
         return 'badge bg-secondary';
     }
@@ -682,6 +688,12 @@ export class DailyAttendanceComponent implements OnInit, OnDestroy {
         return 'attendance.status.sick_leave';
       case AttendanceStatus.Pending:
         return 'attendance.status.pending';
+      case AttendanceStatus.OnDuty:
+        return 'attendance.status.on_duty';
+      case AttendanceStatus.Excused:
+        return 'attendance.status.excused';
+      case AttendanceStatus.RemoteWork:
+        return 'attendance.status.remote_work';
       default:
         return 'attendance.status.pending';
     }

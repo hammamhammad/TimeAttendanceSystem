@@ -1,32 +1,24 @@
 <div class="app-list-page">
   <!-- Page Header -->
-  <app-page-header
-    [title]="i18n.t('department.departments')">
+  <app-page-header [title]="i18n.t('department.departments')">
   </app-page-header>
 
   <!-- Filters Component -->
-  <app-unified-filter
-    moduleName="departments"
-    [refreshing]="branchesLoading()"
-    (searchChange)="onSearchChange($event)"
-    (filtersChange)="onFiltersChange($event)"
-    (add)="onDepartmentAdd()"
-    (refresh)="onRefreshData()">
+  <app-unified-filter moduleName="departments" [refreshing]="branchesLoading()" (searchChange)="onSearchChange($event)"
+    (filtersChange)="onFiltersChange($event)" (add)="onDepartmentAdd()" (refresh)="onRefreshData()">
   </app-unified-filter>
 
   <!-- View Mode Toggle -->
   <div class="d-flex justify-content-between align-items-center mb-3">
     <div class="btn-group" role="group">
-      <input type="radio" class="btn-check" name="viewMode" id="tableMode"
-             [checked]="viewMode() === 'table'"
-             (change)="onViewModeChange('table')">
+      <input type="radio" class="btn-check" name="viewMode" id="tableMode" [checked]="viewMode() === 'table'"
+        (change)="onViewModeChange('table')">
       <label class="btn btn-outline-primary" for="tableMode">
         <i class="fas fa-table me-2"></i>{{ i18n.t('common.table') || 'Table' }}
       </label>
 
-      <input type="radio" class="btn-check" name="viewMode" id="treeMode"
-             [checked]="viewMode() === 'tree'"
-             (change)="onViewModeChange('tree')">
+      <input type="radio" class="btn-check" name="viewMode" id="treeMode" [checked]="viewMode() === 'tree'"
+        (change)="onViewModeChange('tree')">
       <label class="btn btn-outline-primary" for="treeMode">
         <i class="fas fa-sitemap me-2"></i>{{ i18n.t('common.tree') || 'Tree' }}
       </label>
@@ -34,61 +26,40 @@
   </div>
 
   <!-- Departments Content Card -->
-  <div class="card">
-    <div class="card-body">
-      <!-- Info message when no branch is selected -->
-      @if (!selectedBranch() && !branchesLoading()) {
-        <div class="alert alert-info">
-          <div class="d-flex align-items-center">
-            <i class="fas fa-info-circle me-3"></i>
-            <div>
-              <strong>{{ i18n.t('department.allDepartments') || 'All Departments' }}</strong><br>
-              <small>{{ i18n.t('department.showingAllDepartments') || 'Showing departments from all branches. Select a specific branch to filter.' }}</small>
-            </div>
-          </div>
-        </div>
-      }
 
-      <!-- Table View -->
-      @if (viewMode() === 'table') {
-        <app-department-table
-          [selectedBranchId]="selectedBranch()?.id"
-          [allowSelection]="true"
-          [allowEdit]="true"
-          [allowDelete]="true"
-          [showControls]="true"
-          (departmentSelected)="onDepartmentSelected($event)"
-          (departmentView)="onDepartmentView($event)"
-          (departmentEdit)="onDepartmentEdit($event)"
-          (departmentDelete)="onDepartmentDelete($event)"
-          (departmentAdd)="onDepartmentAdd()"
-        ></app-department-table>
-      }
-
-      <!-- Tree View -->
-      @if (viewMode() === 'tree') {
-        <app-department-tree
-          [selectedBranchId]="selectedBranch()?.id"
-          [allowSelection]="true"
-          [allowEdit]="true"
-          [allowDelete]="true"
-          [showControls]="true"
-          (departmentSelected)="onDepartmentSelected($event)"
-          (departmentView)="onDepartmentView($event)"
-          (departmentEdit)="onDepartmentEdit($event)"
-          (departmentDelete)="onDepartmentDelete($event)"
-          (departmentAdd)="onDepartmentAdd($event)"
-        ></app-department-tree>
-      }
+  <!-- Info message when no branch is selected -->
+  @if (!selectedBranch() && !branchesLoading()) {
+  <div class="alert alert-info">
+    <div class="d-flex align-items-center">
+      <i class="fas fa-info-circle me-3"></i>
+      <div>
+        <strong>{{ i18n.t('department.allDepartments') || 'All Departments' }}</strong><br>
+        <small>{{ i18n.t('department.showingAllDepartments') || 'Showing departments from all branches. Select a
+          specific branch to filter.' }}</small>
+      </div>
     </div>
   </div>
+  }
+
+  <!-- Table View -->
+  @if (viewMode() === 'table') {
+  <app-department-table [selectedBranchId]="selectedBranch()?.id" [allowSelection]="true" [allowEdit]="true"
+    [allowDelete]="true" [showControls]="true" (departmentSelected)="onDepartmentSelected($event)"
+    (departmentView)="onDepartmentView($event)" (departmentEdit)="onDepartmentEdit($event)"
+    (departmentDelete)="onDepartmentDelete($event)" (departmentAdd)="onDepartmentAdd()"></app-department-table>
+  }
+
+  <!-- Tree View -->
+  @if (viewMode() === 'tree') {
+  <app-department-tree [selectedBranchId]="selectedBranch()?.id" [allowSelection]="true" [allowEdit]="true"
+    [allowDelete]="true" [showControls]="true" (departmentSelected)="onDepartmentSelected($event)"
+    (departmentView)="onDepartmentView($event)" (departmentEdit)="onDepartmentEdit($event)"
+    (departmentDelete)="onDepartmentDelete($event)" (departmentAdd)="onDepartmentAdd($event)"></app-department-tree>
+  }
+
 
   <!-- Department Info Panel Component -->
-  <app-department-info-panel
-    [selectedDepartment]="selectedDepartment()"
-    (departmentView)="onDepartmentView($event)"
-    (departmentEdit)="onDepartmentEdit($event)"
-    (departmentDelete)="onDepartmentDelete($event)"
-    (closePanel)="onCloseInfoPanel()"
-  ></app-department-info-panel>
+  <app-department-info-panel [selectedDepartment]="selectedDepartment()" (departmentView)="onDepartmentView($event)"
+    (departmentEdit)="onDepartmentEdit($event)" (departmentDelete)="onDepartmentDelete($event)"
+    (closePanel)="onCloseInfoPanel()"></app-department-info-panel>
 </div>

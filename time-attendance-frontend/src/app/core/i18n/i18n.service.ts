@@ -117,13 +117,25 @@ export class I18nService {
   /**
    * Translates a key to the current locale's text with fallback to the key itself.
    * Supports nested key notation with dot separation for hierarchical organization.
-   * 
+   * Supports parameter interpolation using {{paramName}} syntax.
+   *
    * @param key - The translation key to translate
+   * @param params - Optional parameters to interpolate into the translation
    * @returns The translated text or the key itself if translation is not found
    */
-  public t(key: string): string {
+  public t(key: string, params?: Record<string, any>): string {
     const translations = this.translations();
-    return this.getNestedValue(translations, key) || key;
+    let text = this.getNestedValue(translations, key) || key;
+
+    // Interpolate parameters if provided
+    if (params) {
+      Object.keys(params).forEach(paramKey => {
+        const regex = new RegExp(`\\{\\{\\s*${paramKey}\\s*\\}\\}`, 'g');
+        text = text.replace(regex, String(params[paramKey]));
+      });
+    }
+
+    return text;
   }
 
   /**

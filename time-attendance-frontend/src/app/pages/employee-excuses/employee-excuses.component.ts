@@ -16,7 +16,6 @@ import { PermissionActions } from '../../shared/utils/permission.utils';
 import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table.component';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 import { UnifiedFilterComponent } from '../../shared/components/unified-filter/unified-filter.component';
-
 @Component({
   selector: 'app-employee-excuses',
   standalone: true,

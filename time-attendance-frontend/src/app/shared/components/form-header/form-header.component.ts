@@ -174,7 +174,6 @@ export class FormHeaderComponent {
       'vacation-types': 'vacationType.update',
       'public-holidays': 'publicHoliday.update',
       'overtime-configurations': 'settings.update',
-      'excuse-policies': 'excuse.update',
       'employee-vacations': 'vacation.update',
       'employee-excuses': 'excuse.update'
     };

@@ -15,7 +15,7 @@
   </app-unified-filter>
 
   <!-- Active Policy Info -->
-  @if (configurations().length > 0) {
+  @if (!loading() && configurations().length > 0) {
     @for (config of configurations(); track config.id) {
       @if (config.isActive) {
         <div class="alert alert-info d-flex align-items-center mb-4">
@@ -35,38 +35,19 @@
     }
   }
 
-
   <!-- Data Table -->
   <div class="card">
     <div class="card-body">
       <app-data-table
-        [data]="tableData()"
+        [data]="tableData() || []"
         [columns]="tableColumns()"
         [actions]="tableActions()"
         [loading]="loading"
+        [emptyTitle]="t('settings.overtime.noConfigurationsTitle')"
+        [emptyMessage]="t('settings.overtime.noConfigurationsMessage')"
         [paginated]="true"
-        [emptyMessage]="t('settings.overtime.noConfigurations')"
         (actionClick)="onActionClick($event)">
       </app-data-table>
     </div>
   </div>
-
-  <!-- Empty State -->
-  @if (!loading() && configurations().length === 0) {
-    <div class="card">
-      <div class="card-body text-center py-5">
-        <div class="mb-4">
-          <i class="fa-solid fa-clock display-1 text-muted"></i>
-        </div>
-        <h4 class="text-muted mb-3">{{ t('settings.overtime.noConfigurationsTitle') }}</h4>
-        <p class="text-muted mb-4">{{ t('settings.overtime.noConfigurationsMessage') }}</p>
-        <button
-          class="btn btn-primary"
-          (click)="onCreateConfiguration()">
-          <i class="fa-solid fa-plus me-2"></i>
-          {{ t('settings.overtime.createFirstPolicy') }}
-        </button>
-      </div>
-    </div>
-  }
 </div>

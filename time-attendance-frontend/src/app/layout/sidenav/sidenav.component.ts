@@ -58,6 +58,10 @@ export class SidenavComponent {
              this.permissionService.has('attendance.calculate');
     }
 
+    // Special case for reports menu - show if user has access to any child report
+    if (item.path === '/reports') {
+      return this.hasVisibleChildren(item);
+    }
 
     if (!item.permission) return true;
 

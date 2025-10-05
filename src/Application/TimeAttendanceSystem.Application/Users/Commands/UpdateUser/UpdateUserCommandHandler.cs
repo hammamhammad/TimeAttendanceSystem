@@ -45,6 +45,7 @@ public class UpdateUserCommandHandler : BaseHandler<UpdateUserCommand, Result<Un
         user.Phone = request.Phone;
         user.PreferredLanguage = request.PreferredLanguage;
         user.IsActive = request.IsActive;
+        user.MustChangePassword = request.MustChangePassword;
         user.ModifiedAtUtc = DateTime.UtcNow;
         user.ModifiedBy = CurrentUser.Username;
 
@@ -60,7 +61,8 @@ public class UpdateUserCommandHandler : BaseHandler<UpdateUserCommand, Result<Un
                 request.Email,
                 request.Phone,
                 request.PreferredLanguage,
-                request.IsActive
+                request.IsActive,
+                request.MustChangePassword
             }),
             CreatedAtUtc = DateTime.UtcNow
         });

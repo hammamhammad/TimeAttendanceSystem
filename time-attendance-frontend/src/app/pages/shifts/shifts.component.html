@@ -1,236 +1,202 @@
 <div class="app-list-page">
   <!-- Page Header -->
-  <app-page-header
-    [title]="t('shifts.title')">
+  <app-page-header [title]="t('shifts.title')">
   </app-page-header>
 
   <!-- Standardized Filters Component -->
-  <app-unified-filter
-    moduleName="shifts"
-    [refreshing]="loading()"
-    (searchChange)="onSearchChange($event)"
-    (filtersChange)="onFiltersChange($event)"
-    (add)="onCreateShift()"
-    (refresh)="onRefreshData()">
+  <app-unified-filter moduleName="shifts" [refreshing]="loading()" (searchChange)="onSearchChange($event)"
+    (filtersChange)="onFiltersChange($event)" (add)="onCreateShift()" (refresh)="onRefreshData()">
   </app-unified-filter>
 
   <!-- Shifts Table -->
-  <div class="card">
-    <div class="card-body">
-      <app-data-table
-        [data]="tableData()"
-        [columns]="tableColumns()"
-        [actions]="tableActions()"
-        [loading]="loading"
-        [currentPage]="currentPage"
-        [totalPages]="totalPages"
-        [totalItems]="totalCount"
-        [pageSize]="pageSize"
-        [emptyMessage]="t('shifts.noShifts')"
-        [emptyTitle]="t('shifts.noShiftsDescription')"
-        [responsiveMode]="'auto'"
-        (actionClick)="onActionClick($event)"
-        (pageChange)="onTablePageChange($event)"
-        (pageSizeChange)="onTablePageSizeChange($event)">
-      </app-data-table>
-    </div>
-  </div>
+
+  <app-data-table [data]="tableData() || []" [columns]="tableColumns()" [actions]="tableActions()"
+    [currentPage]="currentPage" [totalPages]="totalPages" [totalItems]="totalCount" [pageSize]="pageSize"
+    [loading]="loading" [emptyTitle]="t('shifts.noShifts')" [emptyMessage]="t('shifts.noShiftsDescription')"
+    [responsiveMode]="'auto'" (actionClick)="onActionClick($event)" (pageChange)="onTablePageChange($event)"
+    (pageSizeChange)="onTablePageSizeChange($event)">
+  </app-data-table>
+
 </div>
 
 <!-- Create/Edit Modal -->
-<app-modal-wrapper
-  [show]="showCreateModal() || showEditModal()"
-  [title]="showCreateModal() ? t('shifts.actions.create') : t('shifts.actions.edit')"
-  [size]="'lg'"
-  [centered]="true"
-  [loading]="submitting()"
-  (close)="onCloseModal()">
+<app-modal-wrapper [show]="showCreateModal() || showEditModal()"
+  [title]="showCreateModal() ? t('shifts.actions.create') : t('shifts.actions.edit')" [size]="'lg'" [centered]="true"
+  [loading]="submitting()" (close)="onCloseModal()">
 
   <div class="modal-body">
     <form>
-          <!-- Basic Information -->
-          <div class="mb-3">
-            <label class="form-label required">{{ t('shifts.fields.name') }}</label>
-            <input type="text" class="form-control" [(ngModel)]="shiftForm.name" name="name" required>
-          </div>
+      <!-- Basic Information -->
+      <div class="mb-3">
+        <label class="form-label required">{{ t('shifts.fields.name') }}</label>
+        <input type="text" class="form-control" [(ngModel)]="shiftForm.name" name="name" required>
+      </div>
 
-          <div class="mb-3">
-            <label class="form-label">{{ t('shifts.fields.description') }}</label>
-            <textarea class="form-control" rows="2" [(ngModel)]="shiftForm.description" name="description"></textarea>
-          </div>
+      <div class="mb-3">
+        <label class="form-label">{{ t('shifts.fields.description') }}</label>
+        <textarea class="form-control" rows="2" [(ngModel)]="shiftForm.description" name="description"></textarea>
+      </div>
 
-          <!-- Status -->
-          <div class="mb-3">
-            <label class="form-label required">{{ t('shifts.fields.status') }}</label>
-            <app-searchable-select
-              [options]="statusSelectOptions"
-              [(ngModel)]="shiftForm.status"
-              name="status"
-              [placeholder]="t('common.select')"
-              [required]="true"
-              [searchable]="true"
-              [clearable]="false"
-            ></app-searchable-select>
-          </div>
+      <!-- Status -->
+      <div class="mb-3">
+        <label class="form-label required">{{ t('shifts.fields.status') }}</label>
+        <app-searchable-select [options]="statusSelectOptions" [(ngModel)]="shiftForm.status" name="status"
+          [placeholder]="t('common.select')" [required]="true" [searchable]="true"
+          [clearable]="false"></app-searchable-select>
+      </div>
 
-          <!-- Shift Type -->
-          <div class="mb-3">
-            <label class="form-label required">{{ t('shifts.fields.type') }}</label>
-            <div class="row">
-              <div class="col-md-6">
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="shiftType"
-                         [value]="ShiftType.TimeBased" [(ngModel)]="shiftForm.shiftType"
-                         (change)="onShiftTypeChange()">
-                  <label class="form-check-label">
-                    {{ t('shifts.types.timeBased') }}
-                  </label>
-                  <small class="form-text text-muted d-block">{{ t('shifts.types.timeBasedDescription') }}</small>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="shiftType"
-                         [value]="ShiftType.HoursOnly" [(ngModel)]="shiftForm.shiftType"
-                         (change)="onShiftTypeChange()">
-                  <label class="form-check-label">
-                    {{ t('shifts.types.hoursOnly') }}
-                  </label>
-                  <small class="form-text text-muted d-block">{{ t('shifts.types.hoursOnlyDescription') }}</small>
-                </div>
-              </div>
+      <!-- Shift Type -->
+      <div class="mb-3">
+        <label class="form-label required">{{ t('shifts.fields.type') }}</label>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="shiftType" [value]="ShiftType.TimeBased"
+                [(ngModel)]="shiftForm.shiftType" (change)="onShiftTypeChange()">
+              <label class="form-check-label">
+                {{ t('shifts.types.timeBased') }}
+              </label>
+              <small class="form-text text-muted d-block">{{ t('shifts.types.timeBasedDescription') }}</small>
             </div>
           </div>
-
-          <!-- Hours Only Configuration -->
-          @if (shiftForm.shiftType === ShiftType.HoursOnly) {
-          <div class="mb-3">
-            <label class="form-label required">{{ t('shifts.fields.requiredHours') }}</label>
-            <div class="input-group">
-              <input type="number" class="form-control" [(ngModel)]="shiftForm.requiredHours"
-                     name="requiredHours" min="0.5" max="24" step="0.5">
-              <span class="input-group-text">{{ t('shifts.hours') }}</span>
+          <div class="col-md-6">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="shiftType" [value]="ShiftType.HoursOnly"
+                [(ngModel)]="shiftForm.shiftType" (change)="onShiftTypeChange()">
+              <label class="form-check-label">
+                {{ t('shifts.types.hoursOnly') }}
+              </label>
+              <small class="form-text text-muted d-block">{{ t('shifts.types.hoursOnlyDescription') }}</small>
             </div>
           </div>
-          }
+        </div>
+      </div>
 
-          <!-- Time-Based Configuration -->
-          @if (shiftForm.shiftType === ShiftType.TimeBased) {
-          <div>
-            <!-- Shift Periods -->
-            <div class="mb-3">
+      <!-- Hours Only Configuration -->
+      @if (shiftForm.shiftType === ShiftType.HoursOnly) {
+      <div class="mb-3">
+        <label class="form-label required">{{ t('shifts.fields.requiredHours') }}</label>
+        <div class="input-group">
+          <input type="number" class="form-control" [(ngModel)]="shiftForm.requiredHours" name="requiredHours" min="0.5"
+            max="24" step="0.5">
+          <span class="input-group-text">{{ t('shifts.hours') }}</span>
+        </div>
+      </div>
+      }
+
+      <!-- Time-Based Configuration -->
+      @if (shiftForm.shiftType === ShiftType.TimeBased) {
+      <div>
+        <!-- Shift Periods -->
+        <div class="mb-3">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <label class="form-label required">{{ t('shifts.fields.periods') }}</label>
+            <button type="button" class="btn btn-sm btn-outline-primary" (click)="addShiftPeriod()"
+              [disabled]="shiftForm.shiftPeriods.length >= 2">
+              <i class="fas fa-plus me-1"></i>{{ t('shifts.addPeriod') }}
+            </button>
+          </div>
+
+          @for (period of shiftForm.shiftPeriods; track i; let i = $index) {
+          <div class="card mb-2">
+            <div class="card-body p-3">
               <div class="d-flex justify-content-between align-items-center mb-2">
-                <label class="form-label required">{{ t('shifts.fields.periods') }}</label>
-                <button type="button" class="btn btn-sm btn-outline-primary"
-                        (click)="addShiftPeriod()"
-                        [disabled]="shiftForm.shiftPeriods.length >= 2">
-                  <i class="fas fa-plus me-1"></i>{{ t('shifts.addPeriod') }}
+                <h6 class="mb-0">{{ t('shifts.period') }} {{ period.periodOrder }}</h6>
+                <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeShiftPeriod(i)"
+                  [disabled]="shiftForm.shiftPeriods.length <= 1">
+                  <i class="fas fa-trash"></i>
                 </button>
               </div>
-
-              @for (period of shiftForm.shiftPeriods; track i; let i = $index) {
-              <div class="card mb-2">
-                <div class="card-body p-3">
-                  <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="mb-0">{{ t('shifts.period') }} {{ period.periodOrder }}</h6>
-                    <button type="button" class="btn btn-sm btn-outline-danger"
-                            (click)="removeShiftPeriod(i)"
-                            [disabled]="shiftForm.shiftPeriods.length <= 1">
-                      <i class="fas fa-trash"></i>
-                    </button>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-6">
-                      <label class="form-label">{{ t('shifts.fields.startTime') }}</label>
-                      <input type="time" class="form-control" [(ngModel)]="period.startTime"
-                             [name]="'startTime' + i" required>
-                    </div>
-                    <div class="col-md-6">
-                      <label class="form-label">{{ t('shifts.fields.endTime') }}</label>
-                      <input type="time" class="form-control" [(ngModel)]="period.endTime"
-                             [name]="'endTime' + i" required>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              }
-            </div>
-
-            <!-- Flexible Hours -->
-            <div class="mb-3">
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox"
-                       [(ngModel)]="shiftForm.allowFlexibleHours" name="allowFlexibleHours"
-                       (change)="onFlexibleHoursChange()">
-                <label class="form-check-label">
-                  {{ t('shifts.fields.allowFlexibleHours') }}
-                </label>
-                <small class="form-text text-muted d-block">{{ t('shifts.flexibleHoursDescription') }}</small>
-              </div>
-
-              @if (shiftForm.allowFlexibleHours) {
               <div class="row">
                 <div class="col-md-6">
-                  <label class="form-label">{{ t('shifts.fields.flexMinutesBefore') }}</label>
-                  <div class="input-group">
-                    <input type="number" class="form-control" [(ngModel)]="shiftForm.flexMinutesBefore"
-                           name="flexMinutesBefore" min="1" max="480">
-                    <span class="input-group-text">{{ t('common.minutes') }}</span>
-                  </div>
+                  <label class="form-label">{{ t('shifts.fields.startTime') }}</label>
+                  <input type="time" class="form-control" [(ngModel)]="period.startTime" [name]="'startTime' + i"
+                    required>
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label">{{ t('shifts.fields.flexMinutesAfter') }}</label>
-                  <div class="input-group">
-                    <input type="number" class="form-control" [(ngModel)]="shiftForm.flexMinutesAfter"
-                           name="flexMinutesAfter" min="1" max="480">
-                    <span class="input-group-text">{{ t('common.minutes') }}</span>
-                  </div>
+                  <label class="form-label">{{ t('shifts.fields.endTime') }}</label>
+                  <input type="time" class="form-control" [(ngModel)]="period.endTime" [name]="'endTime' + i" required>
                 </div>
               </div>
-              }
-            </div>
-
-            <!-- Grace Period -->
-            <div class="mb-3">
-              <label class="form-label">{{ t('shifts.fields.gracePeriod') }}</label>
-              <div class="input-group">
-                <input type="number" class="form-control" [(ngModel)]="shiftForm.gracePeriodMinutes"
-                       name="gracePeriodMinutes" min="1" max="120">
-                <span class="input-group-text">{{ t('common.minutes') }}</span>
-              </div>
-              <small class="form-text text-muted">{{ t('shifts.gracePeriodDescription') }}</small>
-              @if (shiftForm.allowFlexibleHours && shiftForm.gracePeriodMinutes) {
-              <small class="form-text text-info d-block">
-                <i class="fas fa-info-circle me-1"></i>{{ t('shifts.validation.flexibleHoursAndGraceCombined') }}
-              </small>
-              }
             </div>
           </div>
           }
+        </div>
 
-          <!-- Check-in/Check-out Options -->
-          <div class="row mb-3">
+        <!-- Flexible Hours -->
+        <div class="mb-3">
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" [(ngModel)]="shiftForm.allowFlexibleHours"
+              name="allowFlexibleHours" (change)="onFlexibleHoursChange()">
+            <label class="form-check-label">
+              {{ t('shifts.fields.allowFlexibleHours') }}
+            </label>
+            <small class="form-text text-muted d-block">{{ t('shifts.flexibleHoursDescription') }}</small>
+          </div>
+
+          @if (shiftForm.allowFlexibleHours) {
+          <div class="row">
             <div class="col-md-6">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox"
-                       [(ngModel)]="shiftForm.isCheckInRequired" name="isCheckInRequired">
-                <label class="form-check-label">
-                  {{ t('shifts.fields.checkInRequired') }}
-                </label>
-                <small class="form-text text-muted d-block">{{ t('shifts.checkInRequiredDescription') }}</small>
+              <label class="form-label">{{ t('shifts.fields.flexMinutesBefore') }}</label>
+              <div class="input-group">
+                <input type="number" class="form-control" [(ngModel)]="shiftForm.flexMinutesBefore"
+                  name="flexMinutesBefore" min="1" max="480">
+                <span class="input-group-text">{{ t('common.minutes') }}</span>
               </div>
             </div>
             <div class="col-md-6">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox"
-                       [(ngModel)]="shiftForm.isAutoCheckOut" name="isAutoCheckOut">
-                <label class="form-check-label">
-                  {{ t('shifts.fields.autoCheckOut') }}
-                </label>
-                <small class="form-text text-muted d-block">{{ t('shifts.autoCheckOutDescription') }}</small>
+              <label class="form-label">{{ t('shifts.fields.flexMinutesAfter') }}</label>
+              <div class="input-group">
+                <input type="number" class="form-control" [(ngModel)]="shiftForm.flexMinutesAfter"
+                  name="flexMinutesAfter" min="1" max="480">
+                <span class="input-group-text">{{ t('common.minutes') }}</span>
               </div>
             </div>
           </div>
+          }
+        </div>
+
+        <!-- Grace Period -->
+        <div class="mb-3">
+          <label class="form-label">{{ t('shifts.fields.gracePeriod') }}</label>
+          <div class="input-group">
+            <input type="number" class="form-control" [(ngModel)]="shiftForm.gracePeriodMinutes"
+              name="gracePeriodMinutes" min="1" max="120">
+            <span class="input-group-text">{{ t('common.minutes') }}</span>
+          </div>
+          <small class="form-text text-muted">{{ t('shifts.gracePeriodDescription') }}</small>
+          @if (shiftForm.allowFlexibleHours && shiftForm.gracePeriodMinutes) {
+          <small class="form-text text-info d-block">
+            <i class="fas fa-info-circle me-1"></i>{{ t('shifts.validation.flexibleHoursAndGraceCombined') }}
+          </small>
+          }
+        </div>
+      </div>
+      }
+
+      <!-- Check-in/Check-out Options -->
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" [(ngModel)]="shiftForm.isCheckInRequired"
+              name="isCheckInRequired">
+            <label class="form-check-label">
+              {{ t('shifts.fields.checkInRequired') }}
+            </label>
+            <small class="form-text text-muted d-block">{{ t('shifts.checkInRequiredDescription') }}</small>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" [(ngModel)]="shiftForm.isAutoCheckOut"
+              name="isAutoCheckOut">
+            <label class="form-check-label">
+              {{ t('shifts.fields.autoCheckOut') }}
+            </label>
+            <small class="form-text text-muted d-block">{{ t('shifts.autoCheckOutDescription') }}</small>
+          </div>
+        </div>
+      </div>
     </form>
   </div>
 
@@ -238,9 +204,8 @@
     <button type="button" class="btn btn-secondary" (click)="onCloseModal()">
       {{ t('common.cancel') }}
     </button>
-    <button type="button" class="btn btn-primary"
-            (click)="showCreateModal() ? onSubmitCreate() : onSubmitEdit()"
-            [disabled]="!isFormValid() || submitting()">
+    <button type="button" class="btn btn-primary" (click)="showCreateModal() ? onSubmitCreate() : onSubmitEdit()"
+      [disabled]="!isFormValid() || submitting()">
       @if (submitting()) {
       <span class="spinner-border spinner-border-sm me-2"></span>
       }
@@ -251,12 +216,8 @@
 </app-modal-wrapper>
 
 <!-- Delete Confirmation Modal -->
-<app-modal-wrapper
-  [show]="showDeleteModal()"
-  [title]="t('shifts.actions.delete')"
-  [centered]="true"
-  [loading]="submitting()"
-  (close)="onCloseModal()">
+<app-modal-wrapper [show]="showDeleteModal()" [title]="t('shifts.actions.delete')" [centered]="true"
+  [loading]="submitting()" (close)="onCloseModal()">
 
   <div class="modal-body">
     <p>{{ t('shifts.deleteConfirmation') }}</p>
@@ -269,9 +230,7 @@
     <button type="button" class="btn btn-secondary" (click)="onCloseModal()">
       {{ t('common.cancel') }}
     </button>
-    <button type="button" class="btn btn-danger"
-            (click)="onConfirmDelete()"
-            [disabled]="submitting()">
+    <button type="button" class="btn btn-danger" (click)="onConfirmDelete()" [disabled]="submitting()">
       @if (submitting()) {
       <span class="spinner-border spinner-border-sm me-2"></span>
       }
@@ -282,12 +241,8 @@
 </app-modal-wrapper>
 
 <!-- Default Shift Confirmation Modal -->
-<app-modal-wrapper
-  [show]="showDefaultShiftModal()"
-  [title]="t('shifts.defaultShift.confirmReplace')"
-  [centered]="true"
-  [loading]="submitting()"
-  (close)="onCloseModal()">
+<app-modal-wrapper [show]="showDefaultShiftModal()" [title]="t('shifts.defaultShift.confirmReplace')" [centered]="true"
+  [loading]="submitting()" (close)="onCloseModal()">
 
   <div class="modal-body">
     <p>{{ t('shifts.defaultShift.confirmReplaceMessage') }}</p>
@@ -299,9 +254,7 @@
     <button type="button" class="btn btn-secondary" (click)="onCloseModal()">
       {{ t('shifts.defaultShift.cancelButton') }}
     </button>
-    <button type="button" class="btn btn-success"
-            (click)="onConfirmSetDefaultShift()"
-            [disabled]="submitting()">
+    <button type="button" class="btn btn-success" (click)="onConfirmSetDefaultShift()" [disabled]="submitting()">
       @if (submitting()) {
       <span class="spinner-border spinner-border-sm me-2"></span>
       }

@@ -51,7 +51,15 @@
     "new_password": "كلمة المرور الجديدة",
     "confirm_password": "تأكيد كلمة المرور",
     "password_changed": "تم تغيير كلمة المرور بنجاح",
-    "password_requirements": "يجب أن تحتوي على 8 أحرف على الأقل مع حرف كبير وصغير ورقم ورمز خاص."
+    "password_requirements": "يجب أن تحتوي على 8 أحرف على الأقل مع حرف كبير وصغير ورقم ورمز خاص.",
+    "change_password_required": "تغيير كلمة المرور مطلوب",
+    "change_password_message": "لأسباب أمنية، يجب عليك تغيير كلمة المرور قبل المتابعة.",
+    "confirm_new_password": "تأكيد كلمة المرور الجديدة",
+    "must_change_password": "تغيير كلمة المرور مطلوب",
+    "password_changed_success": "تم تغيير كلمة المرور بنجاح",
+    "password_change_failed": "فشل تغيير كلمة المرور",
+    "passwords_dont_match": "كلمات المرور غير متطابقة",
+    "password_min_length": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل"
   },
   "navigation": {
     "dashboard": "لوحة التحكم",
@@ -151,7 +159,9 @@
     "auto_refresh_disabled": "تم إلغاء التحديث التلقائي",
     "refresh_interval_updated": "تم تحديث فترة التحديث",
     "export_not_implemented": "وظيفة التصدير قادمة قريباً",
-    "today_attendance": "حضور اليوم"
+    "today_attendance": "حضور اليوم",
+    "today_late": "متأخرون اليوم",
+    "pending_vacations": "الإجازات المعلقة"
   },
   "employees": {
     "title": "إدارة الموظفين",
@@ -289,7 +299,10 @@
     "confirm_delete": "هل أنت متأكد من حذف هذا الدور؟ لا يمكن التراجع عن هذا الإجراء.",
     "protected_role": "هذا دور نظام محمي",
     "select_all": "تحديد الكل",
+    "deselect_all": "إلغاء تحديد الكل",
     "clear_all": "إلغاء الكل",
+    "select_all_group": "تحديد الكل في هذه المجموعة",
+    "deselect_all_group": "إلغاء تحديد الكل في هذه المجموعة",
     "permissions_selected": "صلاحية محددة",
     "search_permissions_placeholder": "البحث في الصلاحيات...",
     "select_all_in_group": "تحديد الكل في هذه المجموعة",
@@ -456,6 +469,7 @@
     "namePlaceholder": "أدخل اسم الوردیة",
     "descriptionPlaceholder": "أدخل وصف الوردیة (اختیاري)",
     "hours": "ساعات",
+    "shift": "الوردیة",
     "name": "اسم الوردیة",
     "description": "الوصف",
     "branch": "الفرع",
@@ -826,6 +840,9 @@
       "sick_leave": "إجازة مرضية",
       "pending": "في الانتظار",
       "manual_override": "تعديل يدوي",
+      "on_duty": "في مهمة رسمية",
+      "excused": "معذور",
+      "remote_work": "عمل عن بعد",
       "1": "حاضر",
       "2": "غائب",
       "3": "متأخر",
@@ -838,7 +855,8 @@
       "10": "إجازة مرضية",
       "11": "في الانتظار",
       "12": "في مهمة رسمية",
-      "13": "معذور"
+      "13": "معذور",
+      "14": "عمل عن بعد"
     },
     "transaction_types": {
       "check_in": "تسجيل الحضور",
@@ -1527,7 +1545,15 @@
     "title": "إجازات الموظفين",
     "subtitle": "إدارة سجلات إجازات الموظفين والجداول",
     "loading": "جاري تحميل إجازات الموظفين...",
+    "employee": "الموظف",
+    "total_days": "إجمالي الأيام",
+    "current_status": "الحالة الحالية",
+    "toggle_status": "تبديل الحالة",
+    "active": "نشط",
+    "upcoming": "قادم",
+    "past": "منتهي",
     "no_vacations": "لم يتم العثور على سجلات إجازات",
+    "no_vacations_found": "لم يتم العثور على سجلات إجازات",
     "no_vacations_message": "لم يتم العثور على سجلات إجازات للمعايير المحددة",
     "search_placeholder": "البحث باسم الموظف أو الملاحظات...",
     "create_vacation": "إنشاء إجازة",
@@ -1752,6 +1778,8 @@
     "deleteSelected": "حذف المحدد",
     "clearSelection": "مسح التحديد",
     "pageSize": "حجم الصفحة",
+    "expand": "توسيع",
+    "collapse": "طي",
     "expandAll": "توسيع الكل",
     "collapseAll": "طي الكل",
     "language_english": "English",
@@ -1814,8 +1842,11 @@
   "excuse_policies": {
     "title": "سياسات الأعذار",
     "subtitle": "إدارة سياسات الأعذار وإعدادات التكوين",
+    "settings_description": "تكوين سياسات طلبات الأعذار للموظفين بما في ذلك الحدود ومتطلبات الموافقة",
+    "create": "إنشاء سياسة عذر",
     "create_policy": "إنشاء سياسة",
     "create_subtitle": "تحديد إعدادات سياسة الأعذار لمؤسستك أو فروع محددة",
+    "edit": "تعديل سياسة عذر",
     "edit_policy": "تعديل سياسة",
     "delete_policy": "حذف سياسة",
     "no_policies_found": "لم يتم العثور على سياسات أعذار",
@@ -1920,6 +1951,7 @@
 
     "search_placeholder": "البحث بالاسم أو رقم الموظف أو السبب...",
     "no_requests_found": "لم يتم العثور على طلبات أعذار",
+    "no_requests_message": "لا توجد طلبات أعذار للعرض. قم بإنشاء طلب عذر جديد للبدء.",
     "quick_filters": "المرشحات السريعة",
     "last_7_days": "آخر 7 أيام",
     "last_30_days": "آخر 30 يوماً",
@@ -1995,6 +2027,127 @@
       "approved_by": "معتمد من قبل",
       "rejection_reason": "سبب الرفض",
       "processing_notes": "ملاحظات المعالجة"
+    }
+  },
+  "remoteWork": {
+    "policy": {
+      "title": "سياسات العمل عن بعد",
+      "create": "إنشاء سياسة",
+      "company_wide": "على مستوى الشركة"
+    },
+    "request": {
+      "title": "العمل عن بعد",
+      "create": "إنشاء طلب عمل عن بعد",
+      "employee": "الموظف",
+      "startDate": "تاريخ البداية",
+      "endDate": "تاريخ النهاية",
+      "workingDays": "أيام العمل",
+      "noData": "لا توجد طلبات عمل عن بعد",
+      "noDataMessage": "ابدأ بإنشاء طلب عمل عن بعد",
+      "loadError": "فشل في تحميل طلبات العمل عن بعد",
+      "cancelConfirm": "إلغاء العمل عن بعد",
+      "cancelMessage": "هل أنت متأكد من إلغاء طلب العمل عن بعد هذا؟",
+      "cancel": "إلغاء الطلب",
+      "view_details": "عرض تفاصيل الطلب",
+      "employee_information": "معلومات الموظف",
+      "remote_work_details": "تفاصيل العمل عن بعد",
+      "basic_information": "المعلومات الأساسية",
+      "approval_information": "معلومات الموافقة",
+      "policy": "سياسة العمل عن بعد",
+      "created_by": "تم الإنشاء بواسطة",
+      "approved_by": "تمت الموافقة بواسطة",
+      "approval_date": "تاريخ الموافقة",
+      "rejection_reason": "سبب الرفض",
+      "reason": "السبب",
+      "reason_placeholder": "أضف سبب طلب العمل عن بعد...",
+      "approval_comments": "تعليقات الموافقة",
+      "approval_comments_placeholder": "أضف تعليقات أو ملاحظات الموافقة...",
+      "select_employee": "اختر موظف",
+      "select_policy": "اختر سياسة العمل عن بعد",
+      "success": {
+        "cancelled": "تم إلغاء طلب العمل عن بعد بنجاح",
+        "created": "تم إنشاء طلب العمل عن بعد بنجاح"
+      },
+      "errors": {
+        "cancel_failed": "فشل في إلغاء طلب العمل عن بعد",
+        "create_failed": "فشل في إنشاء طلب العمل عن بعد",
+        "load_failed": "فشل في تحميل طلبات العمل عن بعد",
+        "load_employees_failed": "فشل في تحميل الموظفين",
+        "load_policies_failed": "فشل في تحميل سياسات العمل عن بعد",
+        "not_found": "طلب العمل عن بعد غير موجود",
+        "cannot_cancel": "يمكن إلغاء الطلبات المعلقة فقط"
+      },
+      "validation": {
+        "employee_required": "يرجى اختيار موظف",
+        "policy_required": "يرجى اختيار سياسة العمل عن بعد",
+        "start_date_required": "تاريخ البداية مطلوب",
+        "end_date_required": "تاريخ النهاية مطلوب",
+        "status_required": "الحالة مطلوبة"
+      }
+    },
+    "status": {
+      "pending": "قيد الانتظار",
+      "approved": "موافق عليه",
+      "rejected": "مرفوض",
+      "cancelled": "ملغى",
+      "autoApproved": "موافق عليه تلقائياً"
+    }
+  },
+  "sessions": {
+    "title": "الجلسات النشطة",
+    "subtitle": "إدارة ومراقبة جلسات المستخدمين النشطة",
+    "search_placeholder": "البحث باسم المستخدم، البريد الإلكتروني، IP، الجهاز...",
+    "user": "المستخدم",
+    "device": "الجهاز",
+    "ip_address": "عنوان IP",
+    "login_time": "وقت تسجيل الدخول",
+    "last_activity": "آخر نشاط",
+    "status": "الحالة",
+    "current_session": "الجلسة الحالية",
+    "active": "نشط",
+    "total_sessions": "إجمالي الجلسات",
+    "no_sessions": "لم يتم العثور على جلسات نشطة",
+    "no_sessions_message": "لا توجد حالياً جلسات مستخدمين نشطة في النظام",
+    "terminate": "إنهاء",
+    "terminate_session": "إنهاء الجلسة",
+    "terminate_all": "إنهاء جميع الجلسات الأخرى",
+    "confirm_terminate": "هل أنت متأكد من إنهاء هذه الجلسة؟ سيتم تسجيل خروج المستخدم.",
+    "confirm_terminate_all": "هل أنت متأكد من إنهاء جميع الجلسات الأخرى؟ ستبقى مسجلاً للدخول، ولكن سيتم إنهاء جميع الجلسات النشطة الأخرى.",
+    "success": {
+      "terminated": "تم إنهاء الجلسة بنجاح",
+      "all_terminated": "تم إنهاء جميع الجلسات الأخرى بنجاح"
+    },
+    "errors": {
+      "load_failed": "فشل تحميل الجلسات",
+      "terminate_failed": "فشل إنهاء الجلسة",
+      "terminate_all_failed": "فشل إنهاء جميع الجلسات",
+      "cannot_terminate_current": "لا يمكن إنهاء جلستك الحالية"
+    }
+  },
+  "audit_logs": {
+    "title": "سجلات التدقيق",
+    "subtitle": "عرض وتحليل سجل تدقيق النظام",
+    "search_placeholder": "البحث بمعرف الكيان، عنوان IP، وكيل المستخدم...",
+    "actor": "الفاعل",
+    "actor_id": "معرف الفاعل",
+    "actor_username": "اسم المستخدم",
+    "actor_email": "البريد الإلكتروني",
+    "action": "الإجراء",
+    "entity": "الكيان",
+    "ip_address": "عنوان IP",
+    "user_agent": "وكيل المستخدم",
+    "timestamp": "الطابع الزمني",
+    "created_by": "أنشئ بواسطة",
+    "payload": "بيانات الحمولة",
+    "detail_title": "تفاصيل سجل التدقيق",
+    "basic_information": "المعلومات الأساسية",
+    "actor_information": "معلومات الفاعل",
+    "technical_information": "المعلومات التقنية",
+    "no_logs": "لم يتم العثور على سجلات تدقيق",
+    "no_logs_message": "لا توجد سجلات تدقيق تطابق معاييرك",
+    "total_logs": "إجمالي السجلات",
+    "errors": {
+      "load_failed": "فشل تحميل سجلات التدقيق"
     }
   },
   "errors": {

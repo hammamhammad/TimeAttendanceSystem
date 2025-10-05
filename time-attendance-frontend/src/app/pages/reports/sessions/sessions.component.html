@@ -1,0 +1,38 @@
+<div class="app-list-page">
+  <!-- Page Header -->
+  <app-page-header [title]="i18n.t('sessions.title')">
+  </app-page-header>
+
+  <!-- Unified Filter -->
+  <app-unified-filter
+    searchPlaceholder="{{ i18n.t('sessions.search_placeholder') }}"
+    [showAddButton]="false"
+    [refreshing]="loading()"
+    (searchChange)="onSearchChange($event)"
+    (refresh)="onRefresh()">
+  </app-unified-filter>
+
+  <!-- Terminate All Button -->
+  <div class="mb-3">
+    <button
+      class="btn btn-outline-danger"
+      type="button"
+      [disabled]="loading()"
+      (click)="onTerminateAllOtherSessions()">
+      <i class="fas fa-power-off me-2"></i>
+      {{ i18n.t('sessions.terminate_all') }}
+    </button>
+  </div>
+
+  <!-- Sessions Table -->
+  <app-data-table
+    [data]="tableData() || []"
+    [columns]="tableColumns()"
+    [actions]="tableActions()"
+    [loading]="loading"
+    [emptyTitle]="i18n.t('sessions.no_sessions')"
+    [emptyMessage]="i18n.t('sessions.no_sessions_message')"
+    [responsiveMode]="'auto'"
+    (actionClick)="onActionClick($event)">
+  </app-data-table>
+</div>

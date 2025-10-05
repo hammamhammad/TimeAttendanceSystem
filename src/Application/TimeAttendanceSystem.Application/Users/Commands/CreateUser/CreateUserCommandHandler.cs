@@ -143,6 +143,20 @@ public class CreateUserCommandHandler : BaseHandler<CreateUserCommand, Result<lo
                 return Result.Failure<long>("One or more branches do not exist.");
         }
 
+        // Validate employee exists and is not already linked (except for SystemAdmin)
+        if (request.EmployeeId.HasValue)
+        {
+            var employee = await Context.Employees
+                .Include(e => e.EmployeeUserLink)
+                .FirstOrDefaultAsync(e => e.Id == request.EmployeeId.Value, cancellationToken);
+
+            if (employee == null)
+                return Result.Failure<long>("Selected employee does not exist.");
+
+            if (employee.EmployeeUserLink != null)
+                return Result.Failure<long>("Selected employee is already linked to another user account.");
+        }
+
         // Hash the provided password
         var (hash, salt) = HashPassword(request.Password);
 
@@ -153,7 +167,7 @@ public class CreateUserCommandHandler : BaseHandler<CreateUserCommand, Result<lo
             Phone = request.Phone,
             PasswordHash = hash,
             PasswordSalt = salt,
-            MustChangePassword = true, // New users must change password on first login
+            MustChangePassword = request.MustChangePassword,
             PreferredLanguage = request.PreferredLanguage,
             IsActive = true,
             CreatedAtUtc = DateTime.UtcNow,
@@ -185,6 +199,18 @@ public class CreateUserCommandHandler : BaseHandler<CreateUserCommand, Result<lo
             }).ToArray();
 
             Context.UserBranchScopes.AddRange(userBranchScopes);
+        }
+
+        // Create employee-user link (if employee is provided)
+        if (request.EmployeeId.HasValue)
+        {
+            var employeeUserLink = new TimeAttendanceSystem.Domain.Employees.EmployeeUserLink
+            {
+                EmployeeId = request.EmployeeId.Value,
+                UserId = user.Id
+            };
+
+            Context.EmployeeUserLinks.Add(employeeUserLink);
         }
 
         await Context.SaveChangesAsync(cancellationToken);
