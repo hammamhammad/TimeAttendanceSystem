@@ -1,4 +1,5 @@
 using Microsoft.OpenApi.Models;
+using Microsoft.EntityFrameworkCore;
 using Coravel;
 using TimeAttendanceSystem.Api.Configuration;
 using TimeAttendanceSystem.Api.Filters;
@@ -144,6 +145,12 @@ try
     using (var scope = app.Services.CreateScope())
     {
         var context = scope.ServiceProvider.GetRequiredService<TimeAttendanceDbContext>();
+
+        // For PostgreSQL: Use EnsureCreated() to create schema directly from configurations
+        // This avoids SQL Server migration compatibility issues
+        // Note: EnsureCreated() does not use migrations - creates schema from entity configs
+        await context.Database.EnsureCreatedAsync();
+
         await SeedData.SeedAsync(context);
     }
 }

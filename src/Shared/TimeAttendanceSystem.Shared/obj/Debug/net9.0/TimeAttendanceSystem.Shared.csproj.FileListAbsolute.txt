@@ -29,9 +29,9 @@ D:\Work\AI Code\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\obj\
 D:\Work\AI Code\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\obj\Debug\net9.0\TimeAttendanceSystem.Shared.AssemblyInfo.cs
 D:\Work\AI Code\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\obj\Debug\net9.0\TimeAttendanceSystem.Shared.csproj.CoreCompileInputs.cache
 D:\Work\AI Code\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\obj\Debug\net9.0\TimeAttendanceSystem.Shared.sourcelink.json
-D:\Work\AI Code\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\obj\Debug\net9.0\ar\TimeAttendanceSystem.Shared.resources.cs
 D:\Work\AI Code\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\obj\Debug\net9.0\ar\TimeAttendanceSystem.Shared.resources.dll
 D:\Work\AI Code\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\obj\Debug\net9.0\TimeAttendanceSystem.Shared.dll
 D:\Work\AI Code\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\obj\Debug\net9.0\refint\TimeAttendanceSystem.Shared.dll
 D:\Work\AI Code\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\obj\Debug\net9.0\TimeAttendanceSystem.Shared.pdb
 D:\Work\AI Code\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\obj\Debug\net9.0\ref\TimeAttendanceSystem.Shared.dll
+D:\Work\AI Code\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\obj\Debug\net9.0\ar\TimeAttendanceSystem.Shared.resources.cs

@@ -39,7 +39,7 @@
 
 | Username | Password | Role | Must Change Password | Purpose |
 |----------|----------|------|---------------------|----------|
-| admin | Admin@123 | Administrator | No | Full system access testing |
+| systemadmin | TempP@ssw0rd123! | SystemAdmin | No | Full system access testing |
 | tariq.albalushi | TempPass@123 | Manager | Yes | Password change flow testing |
 | test.user1 | User@123 | Employee | No | Standard user testing |
 | test.user2 | User@123 | HR Manager | No | HR operations testing |
@@ -56,8 +56,8 @@
 
 **Test Steps:**
 1. Navigate to http://localhost:4200
-2. Enter valid username: `admin`
-3. Enter valid password: `Admin@123`
+2. Enter valid username: `systemadmin`
+3. Enter valid password: `TempP@ssw0rd123!`
 4. Click "Login" button
 
 **Expected Results:**
@@ -70,8 +70,8 @@
 **Test Data:**
 ```json
 {
-  "username": "admin",
-  "password": "Admin@123"
+  "username": "systemadmin",
+  "password": "TempP@ssw0rd123!"
 }
 ```
 
@@ -84,7 +84,7 @@
 
 **Test Steps:**
 1. Navigate to login page
-2. Enter username: `admin`
+2. Enter username: `systemadmin`
 3. Enter wrong password: `WrongPassword123`
 4. Click "Login" button
 
@@ -320,7 +320,7 @@
 
 **Test Steps:**
 1. Navigate to create user form
-2. Enter username that already exists: `admin`
+2. Enter username that already exists: `systemadmin`
 3. Fill other required fields
 4. Attempt to save
 
@@ -3512,7 +3512,7 @@ When reporting defects, include:
 ### Users
 ```json
 [
-  {"username": "admin", "password": "Admin@123", "role": "Administrator"},
+  {"username": "systemadmin", "password": "TempP@ssw0rd123!", "role": "SystemAdmin"},
   {"username": "tariq.albalushi", "password": "TempPass@123", "role": "Manager", "mustChangePassword": true},
   {"username": "test.user1", "password": "User@123", "role": "Employee"},
   {"username": "hr.manager", "password": "HR@123", "role": "HR Manager"}

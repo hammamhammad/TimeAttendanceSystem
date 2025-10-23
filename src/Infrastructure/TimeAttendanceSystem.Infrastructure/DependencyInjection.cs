@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Coravel;
@@ -18,8 +19,9 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<TimeAttendanceDbContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+        // Configure database based on provider selection
+        ConfigureDatabase(services, configuration);
+
 
         services.AddScoped<IApplicationDbContext, ApplicationDbContextAdapter>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
@@ -422,5 +424,135 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
 
         return services;
+    }
+
+    /// <summary>
+    /// Configures the database provider based on configuration settings.
+    /// Supports both SQL Server and PostgreSQL with provider-specific optimizations.
+    /// </summary>
+    /// <param name="services">Service collection for dependency injection</param>
+    /// <param name="configuration">Application configuration</param>
+    private static void ConfigureDatabase(IServiceCollection services, IConfiguration configuration)
+    {
+        // Get database provider from configuration (default to SQL Server for backward compatibility)
+        var databaseProvider = configuration["DatabaseProvider"] ?? "SqlServer";
+
+        services.AddDbContext<TimeAttendanceDbContext>(options =>
+        {
+            ConfigureDatabaseOptions(options, configuration, databaseProvider);
+
+            // Suppress "pending model changes" warning which can occur when switching between providers
+            options.ConfigureWarnings(warnings => warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+        });
+    }
+
+    /// <summary>
+    /// Configures database context options for the selected provider with retry policies and logging.
+    /// </summary>
+    /// <param name="options">DbContext options builder</param>
+    /// <param name="configuration">Application configuration</param>
+    /// <param name="provider">Database provider name (SqlServer or PostgreSql)</param>
+    private static void ConfigureDatabaseOptions(
+        DbContextOptionsBuilder options,
+        IConfiguration configuration,
+        string provider)
+    {
+        switch (provider.ToLowerInvariant())
+        {
+            case "sqlserver":
+            case "mssql":
+                ConfigureSqlServer(options, configuration);
+                break;
+
+            case "postgresql":
+            case "postgres":
+            case "npgsql":
+                ConfigurePostgreSql(options, configuration);
+                break;
+
+            default:
+                throw new InvalidOperationException(
+                    $"Unsupported database provider: '{provider}'. " +
+                    $"Supported providers: SqlServer, PostgreSql");
+        }
+
+        // Common options for all providers
+        var enableSensitiveDataLogging = configuration.GetValue<bool>("Logging:EnableSensitiveDataLogging");
+        var enableDetailedErrors = configuration.GetValue<bool>("Logging:EnableDetailedErrors");
+
+        if (enableSensitiveDataLogging)
+        {
+            options.EnableSensitiveDataLogging();
+        }
+
+        if (enableDetailedErrors)
+        {
+            options.EnableDetailedErrors();
+        }
+    }
+
+    /// <summary>
+    /// Configures SQL Server specific options with connection resiliency and performance optimizations.
+    /// </summary>
+    private static void ConfigureSqlServer(
+        DbContextOptionsBuilder options,
+        IConfiguration configuration)
+    {
+        var connectionString = configuration.GetConnectionString("SqlServerConnection")
+            ?? configuration.GetConnectionString("DefaultConnection");
+
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            throw new InvalidOperationException(
+                "SQL Server connection string not found. " +
+                "Please ensure 'SqlServerConnection' or 'DefaultConnection' is configured in appsettings.json");
+        }
+
+        options.UseSqlServer(connectionString, sqlOptions =>
+        {
+            // Enable connection resiliency (automatic retry on transient failures)
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorNumbersToAdd: null);
+
+            // Set command timeout (30 seconds)
+            sqlOptions.CommandTimeout(30);
+
+            // Specify migrations assembly
+            sqlOptions.MigrationsAssembly(typeof(TimeAttendanceDbContext).Assembly.FullName);
+        });
+    }
+
+    /// <summary>
+    /// Configures PostgreSQL specific options with connection resiliency and performance optimizations.
+    /// </summary>
+    private static void ConfigurePostgreSql(
+        DbContextOptionsBuilder options,
+        IConfiguration configuration)
+    {
+        var connectionString = configuration.GetConnectionString("PostgreSqlConnection");
+
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            throw new InvalidOperationException(
+                "PostgreSQL connection string not found. " +
+                "Please ensure 'PostgreSqlConnection' is configured in appsettings.json or appsettings.PostgreSql.json");
+        }
+
+        options.UseNpgsql(connectionString, npgsqlOptions =>
+        {
+            // Enable connection resiliency (automatic retry on transient failures)
+            npgsqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorCodesToAdd: null);
+
+            // Set command timeout (30 seconds)
+            npgsqlOptions.CommandTimeout(30);
+
+            // Specify migrations assembly
+            npgsqlOptions.MigrationsAssembly(typeof(TimeAttendanceDbContext).Assembly.FullName);
+        });
     }
 }
