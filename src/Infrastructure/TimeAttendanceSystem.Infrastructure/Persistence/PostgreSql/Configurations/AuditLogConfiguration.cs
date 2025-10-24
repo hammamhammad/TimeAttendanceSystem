@@ -25,7 +25,7 @@ public class AuditLogConfiguration : IEntityTypeConfiguration<AuditLog>
             .IsRequired();
 
         builder.Property(x => x.PayloadJson)
-            .HasColumnType("nvarchar(max)");
+            .HasColumnType("text");
 
         builder.Property(x => x.IpAddress)
             .HasMaxLength(45);
@@ -41,7 +41,9 @@ public class AuditLogConfiguration : IEntityTypeConfiguration<AuditLog>
             .HasMaxLength(100);
 
         builder.Property(x => x.RowVersion)
-            .IsConcurrencyToken().ValueGeneratedOnAddOrUpdate();
+            .IsConcurrencyToken()
+            .IsRowVersion()
+            .HasDefaultValueSql("E'\\\\x01'::bytea");
 
         builder.HasIndex(x => x.ActorUserId);
         builder.HasIndex(x => x.EntityName);

@@ -28,11 +28,11 @@ public class AttendanceTransactionConfiguration : IEntityTypeConfiguration<Atten
 
         builder.Property(at => at.TransactionTimeUtc)
             .IsRequired()
-            .HasColumnType("datetime2");
+            .HasColumnType("timestamp with time zone");
 
         builder.Property(at => at.TransactionTimeLocal)
             .IsRequired()
-            .HasColumnType("datetime2");
+            .HasColumnType("timestamp with time zone");
 
         builder.Property(at => at.AttendanceDate)
             .IsRequired()
@@ -69,7 +69,7 @@ public class AttendanceTransactionConfiguration : IEntityTypeConfiguration<Atten
             .IsRequired(false);
 
         builder.Property(at => at.VerifiedAtUtc)
-            .HasColumnType("datetime2")
+            .HasColumnType("timestamp with time zone")
             .IsRequired(false);
 
         // Indexes

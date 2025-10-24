@@ -23,11 +23,11 @@ public class WorkingDayConfiguration : IEntityTypeConfiguration<WorkingDay>
             .IsRequired();
 
         builder.Property(wd => wd.WorkStartTime)
-            .HasColumnType("datetime2")
+            .HasColumnType("timestamp with time zone")
             .IsRequired(false);
 
         builder.Property(wd => wd.WorkEndTime)
-            .HasColumnType("datetime2")
+            .HasColumnType("timestamp with time zone")
             .IsRequired(false);
 
         builder.Property(wd => wd.TotalTimeOnPremises)

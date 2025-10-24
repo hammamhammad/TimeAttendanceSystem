@@ -112,12 +112,7 @@ public class OffDayConfiguration : IEntityTypeConfiguration<OffDay>
         builder.HasIndex(x => x.Priority)
             .HasDatabaseName("IX_OffDays_Priority");
 
-        // Constraints
-        builder.ToTable(t => t.HasCheckConstraint("CK_OffDays_Priority", "[Priority] >= 1"));
-        builder.ToTable(t => t.HasCheckConstraint("CK_OffDays_EffectiveDates", "[EffectiveToDate] IS NULL OR [EffectiveToDate] > [EffectiveFromDate]"));
-        builder.ToTable(t => t.HasCheckConstraint("CK_OffDays_CustomPeriodDates", "[OffDayType] != 1 OR ([StartDate] IS NOT NULL AND [EndDate] IS NOT NULL AND [EndDate] > [StartDate])"));
-        builder.ToTable(t => t.HasCheckConstraint("CK_OffDays_BranchSpecific", "([IsCompanyWide] = 1 AND [BranchId] IS NULL) OR ([IsCompanyWide] = 0 AND [BranchId] IS NOT NULL)"));
-        builder.ToTable(t => t.HasCheckConstraint("CK_OffDays_WeeklyPattern", "[OffDayType] != 0 OR ([IsSunday] = 1 OR [IsMonday] = 1 OR [IsTuesday] = 1 OR [IsWednesday] = 1 OR [IsThursday] = 1 OR [IsFriday] = 1 OR [IsSaturday] = 1)"));
+        // Constraints handled by domain model validation
 
         // Foreign key relationships
         builder.HasOne<Domain.Branches.Branch>()

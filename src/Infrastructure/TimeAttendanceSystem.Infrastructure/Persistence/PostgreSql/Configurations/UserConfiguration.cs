@@ -44,7 +44,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasMaxLength(100);
 
         builder.Property(x => x.RowVersion)
-            .IsConcurrencyToken().ValueGeneratedOnAddOrUpdate();
+            .IsConcurrencyToken()
+            .IsRowVersion()
+            .HasDefaultValueSql("E'\\\\x01'::bytea");
 
         builder.HasIndex(x => x.Username)
             .IsUnique()

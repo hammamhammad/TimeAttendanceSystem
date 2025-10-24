@@ -49,7 +49,9 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
             .HasMaxLength(100);
 
         builder.Property(x => x.RowVersion)
-            .IsConcurrencyToken().ValueGeneratedOnAddOrUpdate();
+            .IsConcurrencyToken()
+            .IsRowVersion()
+            .HasDefaultValueSql("E'\\\\x01'::bytea");
 
         // Indexes for performance
         builder.HasIndex(x => new { x.BranchId, x.Code })

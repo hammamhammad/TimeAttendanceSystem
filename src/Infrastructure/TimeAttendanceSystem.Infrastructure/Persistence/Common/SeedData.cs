@@ -180,8 +180,16 @@ public static class SeedData
         if (newPermissions.Any())
         {
             Console.WriteLine($"Adding {newPermissions.Count} new permissions");
-            await context.Permissions.AddRangeAsync(newPermissions);
-            await context.SaveChangesAsync();
+
+            // Insert in batches to avoid PostgreSQL parameter limit (each permission has ~8 properties)
+            const int batchSize = 20;
+            for (int i = 0; i < newPermissions.Count; i += batchSize)
+            {
+                var batch = newPermissions.Skip(i).Take(batchSize).ToList();
+                await context.Permissions.AddRangeAsync(batch);
+                await context.SaveChangesAsync();
+                Console.WriteLine($"Inserted {Math.Min(i + batchSize, newPermissions.Count)}/{newPermissions.Count} permissions");
+            }
         }
     }
 

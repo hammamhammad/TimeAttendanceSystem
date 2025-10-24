@@ -93,13 +93,7 @@ public class PublicHolidayConfiguration : IEntityTypeConfiguration<PublicHoliday
         builder.HasIndex(x => new { x.EffectiveFromYear, x.EffectiveToYear })
             .HasDatabaseName("IX_PublicHolidays_EffectiveYears");
 
-        // Constraints
-        builder.ToTable(t => t.HasCheckConstraint("CK_PublicHolidays_Month", "[Month] IS NULL OR ([Month] >= 1 AND [Month] <= 12)"));
-        builder.ToTable(t => t.HasCheckConstraint("CK_PublicHolidays_Day", "[Day] IS NULL OR ([Day] >= 1 AND [Day] <= 31)"));
-        builder.ToTable(t => t.HasCheckConstraint("CK_PublicHolidays_WeekOccurrence", "[WeekOccurrence] IS NULL OR ([WeekOccurrence] BETWEEN -1 AND 5 AND [WeekOccurrence] != 0)"));
-        builder.ToTable(t => t.HasCheckConstraint("CK_PublicHolidays_Priority", "[Priority] >= 1"));
-        builder.ToTable(t => t.HasCheckConstraint("CK_PublicHolidays_EffectiveYears", "[EffectiveToYear] IS NULL OR [EffectiveToYear] > [EffectiveFromYear]"));
-        builder.ToTable(t => t.HasCheckConstraint("CK_PublicHolidays_BranchSpecific", "([IsNational] = 1 AND [BranchId] IS NULL) OR ([IsNational] = 0 AND [BranchId] IS NOT NULL)"));
+        // Constraints handled by domain model validation
 
         // Foreign key relationships
         builder.HasOne<Domain.Branches.Branch>()

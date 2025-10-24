@@ -84,34 +84,7 @@ public class ExcusePolicyConfiguration : IEntityTypeConfiguration<ExcusePolicy>
         builder.HasIndex(e => new { e.BranchId, e.IsActive })
             .HasDatabaseName("IX_ExcusePolicies_BranchId_IsActive");
 
-        // Check constraints for business rules
-        builder.HasCheckConstraint("CK_ExcusePolicies_MaxPersonalExcusesPerMonth",
-            "[MaxPersonalExcusesPerMonth] > 0");
-
-        builder.HasCheckConstraint("CK_ExcusePolicies_MaxPersonalExcuseHoursPerMonth",
-            "[MaxPersonalExcuseHoursPerMonth] > 0");
-
-        builder.HasCheckConstraint("CK_ExcusePolicies_MaxPersonalExcuseHoursPerDay",
-            "[MaxPersonalExcuseHoursPerDay] > 0");
-
-        builder.HasCheckConstraint("CK_ExcusePolicies_MaxHoursPerExcuse",
-            "[MaxHoursPerExcuse] > 0");
-
-        builder.HasCheckConstraint("CK_ExcusePolicies_MinimumExcuseDuration",
-            "[MinimumExcuseDuration] > 0");
-
-        builder.HasCheckConstraint("CK_ExcusePolicies_MaxRetroactiveDays",
-            "[MaxRetroactiveDays] >= 0");
-
-        // Business rule constraints
-        builder.HasCheckConstraint("CK_ExcusePolicies_DailyVsMonthlyLimits",
-            "[MaxPersonalExcuseHoursPerDay] <= [MaxPersonalExcuseHoursPerMonth]");
-
-        builder.HasCheckConstraint("CK_ExcusePolicies_SingleVsDailyLimits",
-            "[MaxHoursPerExcuse] <= [MaxPersonalExcuseHoursPerDay]");
-
-        builder.HasCheckConstraint("CK_ExcusePolicies_MinimumVsMaximumDuration",
-            "[MinimumExcuseDuration] <= [MaxHoursPerExcuse]");
+        // Constraints handled by domain model validation
 
         // Soft delete filter
         builder.HasQueryFilter(e => !e.IsDeleted);
@@ -125,11 +98,11 @@ public class ExcusePolicyConfiguration : IEntityTypeConfiguration<ExcusePolicy>
         // Configure audit fields from BaseEntity
         builder.Property("CreatedAtUtc")
             .IsRequired()
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql("NOW()");
 
         builder.Property("ModifiedAtUtc")
             .IsRequired()
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql("NOW()");
 
         builder.Property("CreatedBy")
             .HasMaxLength(100);
@@ -143,6 +116,8 @@ public class ExcusePolicyConfiguration : IEntityTypeConfiguration<ExcusePolicy>
 
         builder.Property("RowVersion")
             .IsRequired()
-            .IsConcurrencyToken().ValueGeneratedOnAddOrUpdate();
+            .IsConcurrencyToken()
+            .IsRowVersion()
+            .HasDefaultValueSql("E'\\\\x01'::bytea");
     }
 }

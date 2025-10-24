@@ -81,7 +81,9 @@ public class RemoteWorkPolicyConfiguration : IEntityTypeConfiguration<RemoteWork
             .HasDefaultValue(false);
 
         builder.Property(p => p.RowVersion)
-            .IsConcurrencyToken().ValueGeneratedOnAddOrUpdate();
+            .IsConcurrencyToken()
+            .IsRowVersion()
+            .HasDefaultValueSql("E'\\\\x01'::bytea");
 
         // Indexes
         builder.HasIndex(p => p.BranchId)

@@ -139,25 +139,24 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-// Seed database
+// Apply migrations and seed database
 try
 {
     using (var scope = app.Services.CreateScope())
     {
         var context = scope.ServiceProvider.GetRequiredService<TimeAttendanceDbContext>();
 
-        // For PostgreSQL: Use EnsureCreated() to create schema directly from configurations
-        // This avoids SQL Server migration compatibility issues
-        // Note: EnsureCreated() does not use migrations - creates schema from entity configs
-        await context.Database.EnsureCreatedAsync();
+        // Apply any pending migrations
+        await context.Database.MigrateAsync();
 
+        // Seed initial data
         await SeedData.SeedAsync(context);
     }
 }
 catch (Exception ex)
 {
     var logger = app.Services.GetService<ILogger<Program>>();
-    logger?.LogError(ex, "Failed to seed database. Application will continue without seeding.");
+    logger?.LogError(ex, "Failed to apply migrations or seed database. Application will continue without seeding.");
 }
 
 // Configure Coravel background jobs

@@ -42,11 +42,11 @@ public class AttendanceRecordConfiguration : IEntityTypeConfiguration<Attendance
             .IsRequired(false);
 
         builder.Property(ar => ar.ActualCheckInTime)
-            .HasColumnType("datetime2")
+            .HasColumnType("timestamp with time zone")
             .IsRequired(false);
 
         builder.Property(ar => ar.ActualCheckOutTime)
-            .HasColumnType("datetime2")
+            .HasColumnType("timestamp with time zone")
             .IsRequired(false);
 
         builder.Property(ar => ar.ScheduledHours)
@@ -110,7 +110,7 @@ public class AttendanceRecordConfiguration : IEntityTypeConfiguration<Attendance
             .IsRequired(false);
 
         builder.Property(ar => ar.OverrideAtUtc)
-            .HasColumnType("datetime2")
+            .HasColumnType("timestamp with time zone")
             .IsRequired(false);
 
         builder.Property(ar => ar.OverrideNotes)
@@ -125,7 +125,7 @@ public class AttendanceRecordConfiguration : IEntityTypeConfiguration<Attendance
             .IsRequired(false);
 
         builder.Property(ar => ar.ApprovedAtUtc)
-            .HasColumnType("datetime2")
+            .HasColumnType("timestamp with time zone")
             .IsRequired(false);
 
         builder.Property(ar => ar.IsFinalized)

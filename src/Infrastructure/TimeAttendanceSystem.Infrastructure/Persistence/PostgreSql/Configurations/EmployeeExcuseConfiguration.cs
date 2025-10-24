@@ -55,7 +55,7 @@ public class EmployeeExcuseConfiguration : IEntityTypeConfiguration<EmployeeExcu
         builder.Property(e => e.DurationHours)
             .IsRequired()
             .HasPrecision(5, 2)
-            .HasComputedColumnSql("CAST(DATEDIFF(MINUTE, [StartTime], [EndTime]) AS DECIMAL(5,2)) / 60.0", stored: true);
+            .HasComputedColumnSql("EXTRACT(EPOCH FROM (\"EndTime\" - \"StartTime\")) / 3600.0", stored: true);
 
         builder.Property(e => e.Reason)
             .IsRequired()
@@ -71,7 +71,7 @@ public class EmployeeExcuseConfiguration : IEntityTypeConfiguration<EmployeeExcu
 
         builder.Property(e => e.ApprovedAt)
             .IsRequired(false)
-            .HasColumnType("datetime2");
+            .HasColumnType("timestamp with time zone");
 
         builder.Property(e => e.RejectionReason)
             .IsRequired(false)
@@ -116,30 +116,7 @@ public class EmployeeExcuseConfiguration : IEntityTypeConfiguration<EmployeeExcu
             .HasDatabaseName("IX_EmployeeExcuses_EmployeeId_ExcuseDate_TimeRange")
             .HasFilter("\"IsDeleted\" = false AND \"ApprovalStatus\" IN (1, 2)"); // Pending or Approved
 
-        // Check constraints for business rules
-        builder.HasCheckConstraint("CK_EmployeeExcuses_EndTimeAfterStartTime",
-            "[EndTime] > [StartTime]");
-
-        builder.HasCheckConstraint("CK_EmployeeExcuses_DurationHours",
-            "[DurationHours] > 0 AND [DurationHours] <= 24");
-
-        builder.HasCheckConstraint("CK_EmployeeExcuses_ExcuseType",
-            "[ExcuseType] IN (1, 2)"); // PersonalExcuse = 1, OfficialDuty = 2
-
-        builder.HasCheckConstraint("CK_EmployeeExcuses_ApprovalStatus",
-            "[ApprovalStatus] IN (1, 2, 3)"); // Pending = 1, Approved = 2, Rejected = 3
-
-        builder.HasCheckConstraint("CK_EmployeeExcuses_ExcuseDate",
-            "[ExcuseDate] >= '2020-01-01' AND [ExcuseDate] <= DATEADD(day, 365, GETDATE())");
-
-        // Conditional constraints for approval workflow
-        builder.HasCheckConstraint("CK_EmployeeExcuses_ApprovalData",
-            "([ApprovalStatus] = 1 AND [ApprovedById] IS NULL AND [ApprovedAt] IS NULL) OR " +
-            "([ApprovalStatus] IN (2, 3) AND [ApprovedById] IS NOT NULL AND [ApprovedAt] IS NOT NULL)");
-
-        builder.HasCheckConstraint("CK_EmployeeExcuses_RejectionReason",
-            "([ApprovalStatus] = 3 AND [RejectionReason] IS NOT NULL AND LEN([RejectionReason]) > 0) OR " +
-            "([ApprovalStatus] IN (1, 2))");
+        // Constraints handled by domain model validation
 
         // Unique constraint to prevent overlapping excuses for the same employee on the same date
         builder.HasIndex(e => new { e.EmployeeId, e.ExcuseDate, e.StartTime, e.EndTime })
@@ -159,11 +136,11 @@ public class EmployeeExcuseConfiguration : IEntityTypeConfiguration<EmployeeExcu
         // Configure audit fields from BaseEntity
         builder.Property("CreatedAtUtc")
             .IsRequired()
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql("NOW()");
 
         builder.Property("ModifiedAtUtc")
             .IsRequired()
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasDefaultValueSql("NOW()");
 
         builder.Property("CreatedBy")
             .HasMaxLength(100);
@@ -177,6 +154,8 @@ public class EmployeeExcuseConfiguration : IEntityTypeConfiguration<EmployeeExcu
 
         builder.Property("RowVersion")
             .IsRequired()
-            .IsConcurrencyToken().ValueGeneratedOnAddOrUpdate();
+            .IsConcurrencyToken()
+            .IsRowVersion()
+            .HasDefaultValueSql("E'\\\\x01'::bytea");
     }
 }

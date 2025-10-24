@@ -103,7 +103,9 @@ public class ShiftConfiguration : IEntityTypeConfiguration<Shift>
             .HasMaxLength(100);
 
         builder.Property(x => x.RowVersion)
-            .IsConcurrencyToken().ValueGeneratedOnAddOrUpdate();
+            .IsConcurrencyToken()
+            .IsRowVersion()
+            .HasDefaultValueSql("E'\\\\x01'::bytea");
 
         builder.HasIndex(x => x.Name)
             .IsUnique()

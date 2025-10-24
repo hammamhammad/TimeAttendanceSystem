@@ -71,13 +71,13 @@ public class ShiftAssignmentConfiguration : IEntityTypeConfiguration<ShiftAssign
 
         builder.Property(sa => sa.EffectiveFromDate)
             .IsRequired()
-            .HasColumnType("datetime2")
+            .HasColumnType("timestamp with time zone")
             .HasColumnName("EffectiveFromDate")
             .HasComment("Date when this assignment becomes active");
 
         builder.Property(sa => sa.EffectiveToDate)
             .IsRequired(false)
-            .HasColumnType("datetime2")
+            .HasColumnType("timestamp with time zone")
             .HasColumnName("EffectiveToDate")
             .HasComment("Optional end date for temporary assignments");
 
@@ -121,7 +121,9 @@ public class ShiftAssignmentConfiguration : IEntityTypeConfiguration<ShiftAssign
             .HasMaxLength(100);
 
         builder.Property(sa => sa.RowVersion)
-            .IsConcurrencyToken().ValueGeneratedOnAddOrUpdate();
+            .IsConcurrencyToken()
+            .IsRowVersion()
+            .HasDefaultValueSql("E'\\\\x01'::bytea");
 
         // Relationships
         builder.HasOne(sa => sa.Shift)
@@ -181,34 +183,7 @@ public class ShiftAssignmentConfiguration : IEntityTypeConfiguration<ShiftAssign
             .HasDatabaseName("IX_ShiftAssignments_Priority_Status_EffectiveFromDate")
             .HasFilter("\"IsDeleted\" = false");
 
-        // Check constraints for data integrity
-
-        // Ensure only one target type is specified
-        builder.HasCheckConstraint("CK_ShiftAssignments_SingleTargetType",
-            @"(CASE WHEN [AssignmentType] = 1 THEN 1 ELSE 0 END) +
-              (CASE WHEN [AssignmentType] = 2 THEN 1 ELSE 0 END) +
-              (CASE WHEN [AssignmentType] = 3 THEN 1 ELSE 0 END) = 1");
-
-        // Ensure target ID matches assignment type
-        builder.HasCheckConstraint("CK_ShiftAssignments_EmployeeTypeMatch",
-            @"([AssignmentType] = 1 AND [EmployeeId] IS NOT NULL AND [DepartmentId] IS NULL AND [BranchId] IS NULL) OR
-              ([AssignmentType] != 1)");
-
-        builder.HasCheckConstraint("CK_ShiftAssignments_DepartmentTypeMatch",
-            @"([AssignmentType] = 2 AND [DepartmentId] IS NOT NULL AND [EmployeeId] IS NULL AND [BranchId] IS NULL) OR
-              ([AssignmentType] != 2)");
-
-        builder.HasCheckConstraint("CK_ShiftAssignments_BranchTypeMatch",
-            @"([AssignmentType] = 3 AND [BranchId] IS NOT NULL AND [EmployeeId] IS NULL AND [DepartmentId] IS NULL) OR
-              ([AssignmentType] != 3)");
-
-        // Ensure end date is after effective date when specified
-        builder.HasCheckConstraint("CK_ShiftAssignments_EndDateAfterEffectiveDate",
-            "[EffectiveToDate] IS NULL OR [EffectiveToDate] > [EffectiveFromDate]");
-
-        // Ensure priority is within valid range
-        builder.HasCheckConstraint("CK_ShiftAssignments_ValidPriority",
-            "[Priority] >= 0 AND [Priority] <= 100");
+        // Constraints handled by domain model validation
 
         // Global query filter for soft delete
         builder.HasQueryFilter(sa => !sa.IsDeleted);

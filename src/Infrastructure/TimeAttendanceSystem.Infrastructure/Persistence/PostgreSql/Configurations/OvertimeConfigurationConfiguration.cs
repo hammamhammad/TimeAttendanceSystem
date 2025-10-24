@@ -89,15 +89,6 @@ public class OvertimeConfigurationConfiguration : IEntityTypeConfiguration<Overt
         builder.HasIndex(x => new { x.EffectiveFromDate, x.EffectiveToDate })
             .HasDatabaseName("IX_OvertimeConfigurations_EffectiveDates");
 
-        // Constraints
-        builder.ToTable(t => t.HasCheckConstraint("CK_OvertimeConfigurations_NormalDayRate", "[NormalDayRate] > 0"));
-        builder.ToTable(t => t.HasCheckConstraint("CK_OvertimeConfigurations_PublicHolidayRate", "[PublicHolidayRate] > 0"));
-        builder.ToTable(t => t.HasCheckConstraint("CK_OvertimeConfigurations_OffDayRate", "[OffDayRate] > 0"));
-        builder.ToTable(t => t.HasCheckConstraint("CK_OvertimeConfigurations_MinimumOvertimeMinutes", "[MinimumOvertimeMinutes] >= 0"));
-        builder.ToTable(t => t.HasCheckConstraint("CK_OvertimeConfigurations_MaxPreShiftOvertimeHours", "[MaxPreShiftOvertimeHours] >= 0"));
-        builder.ToTable(t => t.HasCheckConstraint("CK_OvertimeConfigurations_MaxPostShiftOvertimeHours", "[MaxPostShiftOvertimeHours] >= 0"));
-        builder.ToTable(t => t.HasCheckConstraint("CK_OvertimeConfigurations_OvertimeGracePeriodMinutes", "[OvertimeGracePeriodMinutes] >= 0"));
-        builder.ToTable(t => t.HasCheckConstraint("CK_OvertimeConfigurations_RoundingIntervalMinutes", "[RoundingIntervalMinutes] >= 0"));
-        builder.ToTable(t => t.HasCheckConstraint("CK_OvertimeConfigurations_EffectiveDates", "[EffectiveToDate] IS NULL OR [EffectiveToDate] > [EffectiveFromDate]"));
+        // Constraints handled by domain model validation
     }
 }

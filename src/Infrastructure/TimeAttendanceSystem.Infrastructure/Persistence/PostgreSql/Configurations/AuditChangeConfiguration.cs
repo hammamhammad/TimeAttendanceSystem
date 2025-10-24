@@ -54,7 +54,9 @@ public class AuditChangeConfiguration : IEntityTypeConfiguration<AuditChange>
             .HasMaxLength(100);
 
         builder.Property(x => x.RowVersion)
-            .IsConcurrencyToken().ValueGeneratedOnAddOrUpdate();
+            .IsConcurrencyToken()
+            .IsRowVersion()
+            .HasDefaultValueSql("E'\\\\x01'::bytea");
 
         // Foreign key relationship is configured in AuditLogConfiguration
         // Index for efficient queries

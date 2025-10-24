@@ -73,21 +73,21 @@ public class VacationTypeConfiguration : IEntityTypeConfiguration<VacationType>
         builder.HasIndex(vt => new { vt.BranchId, vt.Name })
             .IsUnique()
             .HasDatabaseName("IX_VacationTypes_BranchId_Name_Unique")
-            .HasFilter("IsDeleted = 0"); // Only enforce uniqueness for non-deleted records
+            .HasFilter("\"IsDeleted\" = false"); // Only enforce uniqueness for non-deleted records
 
         // Performance Indexes
         builder.HasIndex(vt => vt.IsActive)
             .HasDatabaseName("IX_VacationTypes_IsActive")
-            .HasFilter("IsDeleted = 0");
+            .HasFilter("\"IsDeleted\" = false");
 
         builder.HasIndex(vt => vt.BranchId)
             .HasDatabaseName("IX_VacationTypes_BranchId")
-            .HasFilter("IsDeleted = 0");
+            .HasFilter("\"IsDeleted\" = false");
 
         // Composite Index for Common Query Patterns
         builder.HasIndex(vt => new { vt.BranchId, vt.IsActive })
             .HasDatabaseName("IX_VacationTypes_BranchId_IsActive")
-            .HasFilter("IsDeleted = 0");
+            .HasFilter("\"IsDeleted\" = false");
 
         // Query Filter for Soft Delete (inherited from BaseEntity)
         builder.HasQueryFilter(vt => !vt.IsDeleted);
@@ -96,12 +96,12 @@ public class VacationTypeConfiguration : IEntityTypeConfiguration<VacationType>
         // These are typically handled by a base configuration, but included for completeness
         builder.Property(vt => vt.CreatedAtUtc)
             .IsRequired()
-            .HasColumnType("datetime2")
-            .HasDefaultValueSql("GETUTCDATE()");
+            .HasColumnType("timestamp with time zone")
+            .HasDefaultValueSql("NOW()");
 
         builder.Property(vt => vt.ModifiedAtUtc)
             .IsRequired(false)
-            .HasColumnType("datetime2");
+            .HasColumnType("timestamp with time zone");
 
         builder.Property(vt => vt.IsDeleted)
             .IsRequired()

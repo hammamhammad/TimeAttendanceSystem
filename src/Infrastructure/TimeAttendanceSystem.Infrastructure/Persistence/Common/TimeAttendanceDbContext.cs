@@ -119,12 +119,11 @@ public class TimeAttendanceDbContext : DbContext, IApplicationDbContext
     /// <summary>
     /// Configures the database model using Fluent API configurations from the current assembly.
     /// Applies entity configurations, relationships, constraints, and indexes for comprehensive data modeling.
-    /// Supports multiple database providers (SQL Server, PostgreSQL) through provider-specific configurations.
+    /// Uses PostgreSQL as the database provider.
     /// </summary>
     /// <param name="modelBuilder">Entity Framework model builder for database schema configuration</param>
     /// <remarks>
     /// Model Configuration Features:
-    /// - Database provider detection and provider-specific configuration loading
     /// - Automatic discovery and application of IEntityTypeConfiguration implementations
     /// - Comprehensive entity relationship mapping with foreign key constraints
     /// - Index creation for query performance optimization
@@ -133,43 +132,18 @@ public class TimeAttendanceDbContext : DbContext, IApplicationDbContext
     /// - Audit field configuration for automatic timestamp management
     ///
     /// Configuration Assembly Scanning:
-    /// - Detects database provider at runtime (SQL Server or PostgreSQL)
-    /// - Loads provider-specific configurations from appropriate namespace
+    /// - Loads PostgreSQL-specific configurations from Persistence.PostgreSql.Configurations namespace
     /// - Maintains separation of concerns through dedicated configuration classes
     /// - Supports modular configuration management and maintainability
     /// - Enables consistent configuration patterns across all entities
-    ///
-    /// Supported Providers:
-    /// - Microsoft SQL Server: Persistence.SqlServer.Configurations namespace
-    /// - PostgreSQL: Persistence.PostgreSql.Configurations namespace
     /// </remarks>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Detect which database provider is being used
-        var provider = Database.ProviderName;
-
-        if (provider == "Microsoft.EntityFrameworkCore.SqlServer")
-        {
-            // Apply SQL Server specific configurations
-            modelBuilder.ApplyConfigurationsFromAssembly(
-                typeof(TimeAttendanceDbContext).Assembly,
-                type => type.Namespace?.Contains("Persistence.SqlServer.Configurations") == true
-            );
-        }
-        else if (provider == "Npgsql.EntityFrameworkCore.PostgreSQL")
-        {
-            // Apply PostgreSQL specific configurations
-            modelBuilder.ApplyConfigurationsFromAssembly(
-                typeof(TimeAttendanceDbContext).Assembly,
-                type => type.Namespace?.Contains("Persistence.PostgreSql.Configurations") == true
-            );
-        }
-        else
-        {
-            throw new NotSupportedException(
-                $"Database provider '{provider}' is not supported. " +
-                $"Supported providers: Microsoft.EntityFrameworkCore.SqlServer, Npgsql.EntityFrameworkCore.PostgreSQL");
-        }
+        // Apply PostgreSQL specific configurations
+        modelBuilder.ApplyConfigurationsFromAssembly(
+            typeof(TimeAttendanceDbContext).Assembly,
+            type => type.Namespace?.Contains("Persistence.PostgreSql.Configurations") == true
+        );
 
         base.OnModelCreating(modelBuilder);
     }

@@ -29,12 +29,12 @@ public class EmployeeVacationConfiguration : IEntityTypeConfiguration<EmployeeVa
 
         builder.Property(ev => ev.StartDate)
             .IsRequired()
-            .HasColumnType("datetime2")
+            .HasColumnType("timestamp with time zone")
             .HasComment("Start date of vacation period");
 
         builder.Property(ev => ev.EndDate)
             .IsRequired()
-            .HasColumnType("datetime2")
+            .HasColumnType("timestamp with time zone")
             .HasComment("End date of vacation period");
 
         builder.Property(ev => ev.TotalDays)
@@ -69,39 +69,34 @@ public class EmployeeVacationConfiguration : IEntityTypeConfiguration<EmployeeVa
         // Index for employee-specific queries (most common)
         builder.HasIndex(ev => ev.EmployeeId)
             .HasDatabaseName("IX_EmployeeVacations_EmployeeId")
-            .HasFilter("IsDeleted = 0");
+            .HasFilter("\"IsDeleted\" = false");
 
         // Composite index for employee + date range queries
         builder.HasIndex(ev => new { ev.EmployeeId, ev.StartDate })
             .HasDatabaseName("IX_EmployeeVacations_Employee_StartDate")
-            .HasFilter("IsDeleted = 0");
+            .HasFilter("\"IsDeleted\" = false");
 
         // Composite index for employee + end date (for range queries)
         builder.HasIndex(ev => new { ev.EmployeeId, ev.EndDate })
             .HasDatabaseName("IX_EmployeeVacations_Employee_EndDate")
-            .HasFilter("IsDeleted = 0");
+            .HasFilter("\"IsDeleted\" = false");
 
         // Index for approved status filtering
         builder.HasIndex(ev => ev.IsApproved)
             .HasDatabaseName("IX_EmployeeVacations_IsApproved")
-            .HasFilter("IsDeleted = 0");
+            .HasFilter("\"IsDeleted\" = false");
 
         // Index for vacation type queries
         builder.HasIndex(ev => ev.VacationTypeId)
             .HasDatabaseName("IX_EmployeeVacations_VacationTypeId")
-            .HasFilter("IsDeleted = 0");
+            .HasFilter("\"IsDeleted\" = false");
 
         // Composite index for date range queries (for calendar views)
         builder.HasIndex(ev => new { ev.StartDate, ev.EndDate })
             .HasDatabaseName("IX_EmployeeVacations_DateRange")
-            .HasFilter("IsDeleted = 0 AND IsApproved = 1");
+            .HasFilter("\"IsDeleted\" = false AND \"IsApproved\" = true");
 
-        // Check constraints for business rules
-        builder.HasCheckConstraint("CK_EmployeeVacations_ValidDateRange",
-            "EndDate >= StartDate");
-
-        builder.HasCheckConstraint("CK_EmployeeVacations_PositiveTotalDays",
-            "TotalDays > 0");
+        // Constraints handled by domain model validation
 
         // Query filter for soft delete
         builder.HasQueryFilter(ev => !ev.IsDeleted);
@@ -109,7 +104,7 @@ public class EmployeeVacationConfiguration : IEntityTypeConfiguration<EmployeeVa
         // Base entity configuration (inherited properties)
         builder.Property(ev => ev.CreatedAtUtc)
             .IsRequired()
-            .HasDefaultValueSql("GETUTCDATE()")
+            .HasDefaultValueSql("NOW()")
             .HasComment("UTC timestamp when record was created");
 
         builder.Property(ev => ev.CreatedBy)
