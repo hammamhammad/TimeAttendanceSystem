@@ -462,6 +462,9 @@ public static class DependencyInjection
                     "Please ensure 'PostgreSqlConnection' or 'DefaultConnection' is configured in appsettings.json");
             }
 
+            // Configure Npgsql to handle DateTime without timezone automatically
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
             options.UseNpgsql(connectionString, npgsqlOptions =>
             {
                 // Enable connection resiliency (automatic retry on transient failures)
@@ -475,11 +478,7 @@ public static class DependencyInjection
 
                 // Specify migrations assembly
                 npgsqlOptions.MigrationsAssembly(typeof(TimeAttendanceDbContext).Assembly.FullName);
-            })
-            .UseSnakeCaseNamingConvention();
-
-            // Configure Npgsql to handle DateTime without timezone automatically
-            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+            });
 
             // Common options
             var enableSensitiveDataLogging = configuration.GetValue<bool>("Logging:EnableSensitiveDataLogging");

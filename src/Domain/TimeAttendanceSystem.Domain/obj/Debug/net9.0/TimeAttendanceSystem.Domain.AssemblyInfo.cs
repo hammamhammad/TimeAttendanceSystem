@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TimeAttendanceSystem.Domain")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9f5b94cf1d1735b5b23d861d2120b1e3d9059b86")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4a5cb462bb86760839cd80052ce240a3a621c58c")]
 [assembly: System.Reflection.AssemblyProductAttribute("TimeAttendanceSystem.Domain")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TimeAttendanceSystem.Domain")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -12,7 +12,9 @@
       "Bash(Start-Process -NoNewWindow -FilePath \"dotnet\" -ArgumentList \"run\")",
       "Bash(npm run build)",
       "Bash(Select-Object -First 50)",
-      "Bash(Select-Object -Last 15)"
+      "Bash(Select-Object -Last 15)",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet publish:*)"
     ],
     "deny": [],
     "ask": []
