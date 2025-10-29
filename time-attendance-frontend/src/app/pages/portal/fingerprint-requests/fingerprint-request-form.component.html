@@ -1,0 +1,151 @@
+<!-- Page Header -->
+<app-page-header
+  [title]="isEditMode() ? i18n.t('portal.edit_fingerprint_request') : i18n.t('portal.new_fingerprint_request')">
+  <div header-actions>
+    <button
+      class="btn btn-outline-secondary btn-sm"
+      (click)="cancel()"
+      [disabled]="submitting()"
+      type="button">
+      <i class="fa-solid fa-arrow-left me-1"></i>
+      {{ i18n.t('common.back') }}
+    </button>
+  </div>
+</app-page-header>
+
+<!-- Loading State -->
+@if (loading()) {
+  <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+}
+
+<!-- Form -->
+@if (!loading()) {
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header bg-white">
+          <h5 class="card-title mb-0">
+            <i class="fa-solid fa-fingerprint me-2"></i>
+            {{ isEditMode() ? i18n.t('portal.edit_request') : i18n.t('portal.create_request') }}
+          </h5>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="requestForm" (ngSubmit)="submitForm()">
+            <!-- Request Type -->
+            <div class="mb-3">
+              <label class="form-label required">{{ i18n.t('portal.request_type') }}</label>
+              <select
+                class="form-select"
+                formControlName="requestType"
+                [class.is-invalid]="requestForm.get('requestType')?.invalid && requestForm.get('requestType')?.touched"
+                [disabled]="isEditMode()">
+                @for (type of requestTypes; track type.value) {
+                  <option [value]="type.value">{{ type.label }}</option>
+                }
+              </select>
+              @if (requestForm.get('requestType')?.invalid && requestForm.get('requestType')?.touched) {
+                <div class="invalid-feedback">{{ getFieldError('requestType') }}</div>
+              }
+              @if (isEditMode()) {
+                <div class="form-text">{{ i18n.t('portal.request_type_cannot_be_changed') }}</div>
+              }
+            </div>
+
+            <!-- Issue Description -->
+            <div class="mb-3">
+              <label class="form-label required">{{ i18n.t('portal.issue_description') }}</label>
+              <textarea
+                class="form-control"
+                formControlName="issueDescription"
+                [class.is-invalid]="requestForm.get('issueDescription')?.invalid && requestForm.get('issueDescription')?.touched"
+                rows="4"
+                [placeholder]="i18n.t('portal.describe_issue_placeholder')"></textarea>
+              @if (requestForm.get('issueDescription')?.invalid && requestForm.get('issueDescription')?.touched) {
+                <div class="invalid-feedback">{{ getFieldError('issueDescription') }}</div>
+              }
+              <div class="form-text">
+                {{ i18n.t('portal.min_10_characters') }}
+                ({{ requestForm.get('issueDescription')?.value?.length || 0 }}/500)
+              </div>
+            </div>
+
+            <!-- Affected Fingers -->
+            <div class="mb-3">
+              <label class="form-label">{{ i18n.t('portal.affected_fingers') }}</label>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="affectedFingers"
+                [placeholder]="i18n.t('portal.affected_fingers_placeholder')">
+              <div class="form-text">{{ i18n.t('portal.optional_field') }}</div>
+            </div>
+
+            <!-- Preferred Date -->
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">{{ i18n.t('portal.preferred_date') }}</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  formControlName="preferredDate">
+                <div class="form-text">{{ i18n.t('portal.when_you_available') }}</div>
+              </div>
+
+              <!-- Preferred Time -->
+              <div class="col-md-6 mb-3">
+                <label class="form-label">{{ i18n.t('portal.preferred_time') }}</label>
+                <input
+                  type="time"
+                  class="form-control"
+                  formControlName="preferredTime">
+                <div class="form-text">{{ i18n.t('portal.optional_field') }}</div>
+              </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                (click)="cancel()"
+                [disabled]="submitting()">
+                <i class="fa-solid fa-times me-1"></i>
+                {{ i18n.t('common.cancel') }}
+              </button>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="submitting() || requestForm.invalid">
+                @if (submitting()) {
+                  <i class="fa-solid fa-spinner fa-spin me-1"></i>
+                  {{ i18n.t('common.saving') }}
+                } @else {
+                  <i class="fa-solid fa-save me-1"></i>
+                  {{ isEditMode() ? i18n.t('common.update') : i18n.t('common.submit') }}
+                }
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Help Card -->
+      <div class="card mt-3">
+        <div class="card-body">
+          <div class="d-flex align-items-start">
+            <i class="fa-solid fa-info-circle text-info me-3 mt-1" style="font-size: 1.5rem;"></i>
+            <div>
+              <h6 class="mb-2">{{ i18n.t('portal.request_help_title') }}</h6>
+              <ul class="text-muted mb-0 small ps-3">
+                <li>{{ i18n.t('portal.request_help_1') }}</li>
+                <li>{{ i18n.t('portal.request_help_2') }}</li>
+                <li>{{ i18n.t('portal.request_help_3') }}</li>
+                <li>{{ i18n.t('portal.request_help_4') }}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}

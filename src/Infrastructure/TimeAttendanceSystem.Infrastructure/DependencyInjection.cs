@@ -420,6 +420,23 @@ public static class DependencyInjection
                     context.User.IsInRole("SystemAdmin") ||
                     context.User.IsInRole("Admin") ||
                     context.User.HasClaim("permission", "excuse.manage")));
+
+            // ===== PORTAL & SELF-SERVICE POLICIES =====
+
+            // Define ManagerAccess policy - users with manager role who can access manager dashboard
+            options.AddPolicy("ManagerAccess", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.HasClaim("permission", "portal.manager")));
+
+            // Define AdminAccess policy - users with admin privileges for fingerprint request completion
+            options.AddPolicy("AdminAccess", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.HasClaim("permission", "fingerprint.complete")));
         });
         services.AddHttpContextAccessor();
 
@@ -458,7 +475,11 @@ public static class DependencyInjection
 
                 // Specify migrations assembly
                 npgsqlOptions.MigrationsAssembly(typeof(TimeAttendanceDbContext).Assembly.FullName);
-            });
+            })
+            .UseSnakeCaseNamingConvention();
+
+            // Configure Npgsql to handle DateTime without timezone automatically
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
             // Common options
             var enableSensitiveDataLogging = configuration.GetValue<bool>("Logging:EnableSensitiveDataLogging");

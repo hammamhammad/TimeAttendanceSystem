@@ -1,0 +1,198 @@
+<!-- Page Header -->
+<app-page-header
+  [title]="request() ? i18n.t('portal.fingerprint_request_details') + ' #' + request()!.id : i18n.t('portal.fingerprint_request_details')">
+  <div header-actions>
+    @if (canEdit()) {
+      <button
+        class="btn btn-warning btn-sm me-2"
+        (click)="editRequest()"
+        [disabled]="loading()"
+        type="button">
+        <i class="fa-solid fa-edit me-1"></i>
+        {{ i18n.t('common.edit') }}
+      </button>
+    }
+    @if (canCancel()) {
+      <button
+        class="btn btn-danger btn-sm me-2"
+        (click)="cancelRequest()"
+        [disabled]="loading()"
+        type="button">
+        <i class="fa-solid fa-times me-1"></i>
+        {{ i18n.t('common.cancel') }}
+      </button>
+    }
+    <button
+      class="btn btn-outline-primary btn-sm me-2"
+      (click)="refresh()"
+      [disabled]="loading()"
+      type="button">
+      <i class="fa-solid fa-sync-alt" [class.fa-spin]="loading()"></i>
+      {{ i18n.t('common.refresh') }}
+    </button>
+    <button
+      class="btn btn-outline-secondary btn-sm"
+      (click)="backToList()"
+      type="button">
+      <i class="fa-solid fa-arrow-left me-1"></i>
+      {{ i18n.t('common.back') }}
+    </button>
+  </div>
+</app-page-header>
+
+<!-- Loading State -->
+@if (loading() && !request()) {
+  <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+}
+
+<!-- Error State -->
+@if (error() && !request()) {
+  <div class="alert alert-danger" role="alert">
+    <i class="fa-solid fa-exclamation-triangle me-2"></i>
+    {{ error() }}
+    <button class="btn btn-sm btn-outline-danger ms-3" (click)="refresh()" type="button">
+      {{ i18n.t('common.retry') }}
+    </button>
+  </div>
+}
+
+<!-- Request Details -->
+@if (request()) {
+  <div class="row g-4">
+    <!-- Main Information -->
+    <div class="col-lg-8">
+      <!-- Request Information Card -->
+      <div class="card mb-3">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">
+            <i class="fa-solid fa-info-circle me-2"></i>
+            {{ i18n.t('portal.request_information') }}
+          </h5>
+          <app-status-badge
+            [status]="statusBadge().label"
+            [variant]="statusBadge().variant">
+          </app-status-badge>
+        </div>
+        <div class="card-body">
+          <app-definition-list
+            [items]="requestInfoItems()"
+            [labelWidth]="'4'"
+            [valueWidth]="'8'">
+          </app-definition-list>
+        </div>
+      </div>
+
+      <!-- Request Details Card -->
+      <div class="card mb-3">
+        <div class="card-header bg-white">
+          <h5 class="card-title mb-0">
+            <i class="fa-solid fa-file-alt me-2"></i>
+            {{ i18n.t('portal.request_details') }}
+          </h5>
+        </div>
+        <div class="card-body">
+          <app-definition-list
+            [items]="detailsItems()"
+            [labelWidth]="'4'"
+            [valueWidth]="'8'">
+          </app-definition-list>
+        </div>
+      </div>
+
+      <!-- Scheduling Information Card (if scheduled/completed) -->
+      @if (schedulingItems().length > 0) {
+        <div class="card mb-3">
+          <div class="card-header bg-white">
+            <h5 class="card-title mb-0">
+              <i class="fa-solid fa-calendar-check me-2"></i>
+              {{ i18n.t('portal.scheduling_information') }}
+            </h5>
+          </div>
+          <div class="card-body">
+            <app-definition-list
+              [items]="schedulingItems()"
+              [labelWidth]="'4'"
+              [valueWidth]="'8'">
+            </app-definition-list>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Status Timeline -->
+    <div class="col-lg-4">
+      <div class="card">
+        <div class="card-header bg-white">
+          <h5 class="card-title mb-0">
+            <i class="fa-solid fa-list-check me-2"></i>
+            {{ i18n.t('portal.request_status') }}
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="status-timeline">
+            <!-- Pending -->
+            <div class="timeline-item" [class.active]="true">
+              <div class="timeline-marker" [class.completed]="request()!.status !== FingerprintRequestStatus.Pending">
+                <i class="fa-solid fa-clock"></i>
+              </div>
+              <div class="timeline-content">
+                <h6>{{ i18n.t('portal.pending') }}</h6>
+                <small class="text-muted">{{ i18n.t('portal.request_submitted') }}</small>
+              </div>
+            </div>
+
+            <!-- Scheduled -->
+            <div class="timeline-item" [class.active]="request()!.status === FingerprintRequestStatus.Scheduled || request()!.status === FingerprintRequestStatus.Completed">
+              <div class="timeline-marker" [class.completed]="request()!.status === FingerprintRequestStatus.Completed">
+                <i class="fa-solid fa-calendar"></i>
+              </div>
+              <div class="timeline-content">
+                <h6>{{ i18n.t('portal.scheduled') }}</h6>
+                <small class="text-muted">{{ i18n.t('portal.appointment_scheduled') }}</small>
+              </div>
+            </div>
+
+            <!-- Completed -->
+            <div class="timeline-item" [class.active]="request()!.status === FingerprintRequestStatus.Completed">
+              <div class="timeline-marker" [class.completed]="request()!.status === FingerprintRequestStatus.Completed">
+                <i class="fa-solid fa-check"></i>
+              </div>
+              <div class="timeline-content">
+                <h6>{{ i18n.t('portal.completed') }}</h6>
+                <small class="text-muted">{{ i18n.t('portal.request_completed') }}</small>
+              </div>
+            </div>
+
+            <!-- Cancelled/Rejected -->
+            @if (request()!.status === FingerprintRequestStatus.Cancelled || request()!.status === FingerprintRequestStatus.Rejected) {
+              <div class="timeline-item active">
+                <div class="timeline-marker cancelled">
+                  <i class="fa-solid fa-times"></i>
+                </div>
+                <div class="timeline-content">
+                  <h6>{{ request()!.status }}</h6>
+                  <small class="text-muted">{{ i18n.t('portal.request_terminated') }}</small>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Help Card -->
+      <div class="card mt-3">
+        <div class="card-body">
+          <div class="d-flex align-items-start">
+            <i class="fa-solid fa-question-circle text-primary me-3 mt-1" style="font-size: 1.5rem;"></i>
+            <div>
+              <h6 class="mb-2">{{ i18n.t('portal.need_help') }}</h6>
+              <p class="text-muted mb-0 small">
+                {{ i18n.t('portal.contact_hr_support') }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}

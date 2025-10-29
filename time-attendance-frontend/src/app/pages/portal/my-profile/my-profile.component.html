@@ -1,0 +1,234 @@
+<!-- Page Header -->
+<app-page-header
+  [title]="i18n.t('portal.my_profile')">
+  <div header-actions>
+    <button
+      class="btn btn-outline-secondary btn-sm me-2"
+      (click)="changePassword()"
+      type="button">
+      <i class="fa-solid fa-key me-1"></i>
+      {{ i18n.t('auth.change_password') }}
+    </button>
+    @if (!isEditMode()) {
+      <button
+        class="btn btn-primary btn-sm me-2"
+        (click)="toggleEditMode()"
+        [disabled]="loading()"
+        type="button">
+        <i class="fa-solid fa-edit me-1"></i>
+        {{ i18n.t('common.edit') }}
+      </button>
+    }
+    <button
+      class="btn btn-outline-primary btn-sm"
+      (click)="refresh()"
+      [disabled]="loading()"
+      type="button">
+      <i class="fa-solid fa-sync-alt" [class.fa-spin]="loading()"></i>
+      {{ i18n.t('common.refresh') }}
+    </button>
+  </div>
+</app-page-header>
+
+<!-- Loading State -->
+@if (loading() && !profile()) {
+  <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+}
+
+<!-- Error State -->
+@if (error() && !profile()) {
+  <div class="alert alert-danger" role="alert">
+    <i class="fa-solid fa-exclamation-triangle me-2"></i>
+    {{ error() }}
+    <button class="btn btn-sm btn-outline-danger ms-3" (click)="refresh()" type="button">
+      {{ i18n.t('common.retry') }}
+    </button>
+  </div>
+}
+
+<!-- Profile Content -->
+@if (profile()) {
+  <div class="row g-4">
+    <!-- Profile Card -->
+    <div class="col-lg-4">
+      <div class="card profile-card">
+        <div class="card-body text-center">
+          <!-- Profile Photo -->
+          <div class="profile-photo-wrapper mb-3">
+            @if (profile()!.photoUrl) {
+              <img [src]="profile()!.photoUrl" alt="Profile Photo" class="profile-photo">
+            } @else {
+              <div class="profile-photo-placeholder">
+                <i class="fa-solid fa-user"></i>
+              </div>
+            }
+          </div>
+
+          <!-- Profile Name -->
+          <h4 class="mb-1">{{ profile()!.displayName || profile()!.userName }}</h4>
+          <p class="text-muted mb-3">{{ profile()!.employeeInfo?.position || 'Employee' }}</p>
+
+          <!-- Quick Stats -->
+          <div class="quick-stats">
+            <div class="stat-item">
+              <i class="fa-solid fa-building text-primary"></i>
+              <span>{{ profile()!.employeeInfo?.department || 'N/A' }}</span>
+            </div>
+            <div class="stat-item">
+              <i class="fa-solid fa-map-marker-alt text-danger"></i>
+              <span>{{ profile()!.employeeInfo?.branch || 'N/A' }}</span>
+            </div>
+            <div class="stat-item">
+              @if (profile()!.isActive) {
+                <span class="badge bg-success">
+                  <i class="fa-solid fa-circle me-1"></i>
+                  {{ i18n.t('common.active') }}
+                </span>
+              } @else {
+                <span class="badge bg-danger">
+                  <i class="fa-solid fa-circle me-1"></i>
+                  {{ i18n.t('common.inactive') }}
+                </span>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Details -->
+    <div class="col-lg-8">
+      <!-- View Mode -->
+      @if (!isEditMode()) {
+        @for (section of displayFields(); track section.section) {
+          <div class="card mb-3">
+            <div class="card-header bg-white">
+              <h5 class="card-title mb-0">{{ section.section }}</h5>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                @for (field of section.fields; track field.label) {
+                  <div class="col-md-6">
+                    <div class="info-item">
+                      <div class="info-icon">
+                        <i [class]="'fa-solid ' + field.icon"></i>
+                      </div>
+                      <div class="info-content">
+                        <label class="info-label">{{ field.label }}</label>
+                        @if (field.badgeClass) {
+                          <span [class]="field.badgeClass">{{ field.value }}</span>
+                        } @else {
+                          <div class="info-value">{{ field.value }}</div>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      }
+
+      <!-- Edit Mode -->
+      @if (isEditMode()) {
+        <div class="card">
+          <div class="card-header bg-white">
+            <h5 class="card-title mb-0">
+              <i class="fa-solid fa-edit me-2"></i>
+              {{ i18n.t('common.edit_profile') }}
+            </h5>
+          </div>
+          <div class="card-body">
+            <form [formGroup]="editForm" (ngSubmit)="saveProfile()">
+              <div class="row g-3">
+                <!-- Phone Number -->
+                <div class="col-md-6">
+                  <label class="form-label">{{ i18n.t('common.phone') }}</label>
+                  <input
+                    type="tel"
+                    class="form-control"
+                    formControlName="phoneNumber"
+                    [placeholder]="i18n.t('common.phone')">
+                </div>
+
+                <!-- Email -->
+                <div class="col-md-6">
+                  <label class="form-label">{{ i18n.t('common.email') }}</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    formControlName="email"
+                    [class.is-invalid]="editForm.get('email')?.invalid && editForm.get('email')?.touched"
+                    [placeholder]="i18n.t('common.email')">
+                  @if (editForm.get('email')?.invalid && editForm.get('email')?.touched) {
+                    <div class="invalid-feedback">{{ getFieldError('email') }}</div>
+                  }
+                </div>
+
+                <!-- Display Name -->
+                <div class="col-md-6">
+                  <label class="form-label">{{ i18n.t('common.display_name') }}</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    formControlName="displayName"
+                    [placeholder]="i18n.t('common.display_name')">
+                </div>
+
+                <!-- Address -->
+                <div class="col-md-6">
+                  <label class="form-label">{{ i18n.t('common.address') }}</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    formControlName="address"
+                    [placeholder]="i18n.t('common.address')">
+                </div>
+
+                <!-- Emergency Contact -->
+                <div class="col-md-6">
+                  <label class="form-label">{{ i18n.t('common.emergency_contact') }}</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    formControlName="emergencyContact"
+                    [placeholder]="i18n.t('common.emergency_contact')">
+                </div>
+
+                <!-- Emergency Phone -->
+                <div class="col-md-6">
+                  <label class="form-label">{{ i18n.t('common.emergency_phone') }}</label>
+                  <input
+                    type="tel"
+                    class="form-control"
+                    formControlName="emergencyPhone"
+                    [placeholder]="i18n.t('common.emergency_phone')">
+                </div>
+              </div>
+
+              <!-- Form Actions -->
+              <div class="d-flex justify-content-end gap-2 mt-4">
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  (click)="toggleEditMode()"
+                  [disabled]="loading()">
+                  <i class="fa-solid fa-times me-1"></i>
+                  {{ i18n.t('common.cancel') }}
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  [disabled]="loading() || editForm.invalid">
+                  <i class="fa-solid fa-save me-1"></i>
+                  {{ i18n.t('common.save') }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}

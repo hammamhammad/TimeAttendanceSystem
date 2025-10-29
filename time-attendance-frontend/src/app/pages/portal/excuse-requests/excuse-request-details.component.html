@@ -1,0 +1,117 @@
+<!-- Loading State -->
+@if (loading()) {
+  <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+}
+
+<!-- Error State -->
+@if (error() && !loading()) {
+  <div class="alert alert-danger">
+    <i class="fa-solid fa-exclamation-triangle me-2"></i>
+    {{ error() }}
+    <button class="btn btn-sm btn-outline-danger ms-3" (click)="onBack()" type="button">
+      {{ i18n.t('common.back') }}
+    </button>
+  </div>
+}
+
+<!-- Details View -->
+@if (excuse() && !loading() && !error()) {
+  <div class="excuse-details">
+    <!-- Page Header -->
+    <app-page-header [title]="i18n.t('portal.excuse_details')">
+      <div header-actions>
+        @if (canEdit()) {
+          <button
+            class="btn btn-primary btn-sm me-2"
+            (click)="onEdit()"
+            type="button">
+            <i class="fa-solid fa-edit me-1"></i>
+            {{ i18n.t('common.edit') }}
+          </button>
+        }
+        @if (canCancel()) {
+          <button
+            class="btn btn-danger btn-sm me-2"
+            (click)="onCancel()"
+            type="button">
+            <i class="fa-solid fa-times me-1"></i>
+            {{ i18n.t('common.cancel') }}
+          </button>
+        }
+        <button
+          class="btn btn-outline-secondary btn-sm"
+          (click)="onBack()"
+          type="button">
+          <i class="fa-solid fa-arrow-left me-1"></i>
+          {{ i18n.t('common.back') }}
+        </button>
+      </div>
+    </app-page-header>
+
+    <!-- Status Badge -->
+    <div class="status-section mb-4">
+      <label class="status-label">{{ i18n.t('portal.status') }}</label>
+      <app-status-badge
+        [status]="statusBadge().label"
+        [variant]="statusBadge().variant">
+      </app-status-badge>
+    </div>
+
+    <!-- Request Details Card -->
+    <app-detail-card [title]="i18n.t('portal.request_details')">
+      <app-definition-list
+        [items]="basicInfoItems()"
+        [labelWidth]="'4'"
+        [valueWidth]="'8'">
+      </app-definition-list>
+    </app-detail-card>
+
+    <!-- Submission Information Card -->
+    <app-detail-card
+      [title]="i18n.t('portal.submission_information')"
+      class="mt-3">
+      <app-definition-list
+        [items]="submissionInfoItems()"
+        [labelWidth]="'4'"
+        [valueWidth]="'8'">
+      </app-definition-list>
+    </app-detail-card>
+
+    <!-- Attachment Section -->
+    @if (excuse()!.attachmentUrl) {
+      <app-detail-card
+        [title]="i18n.t('portal.attachment')"
+        class="mt-3">
+        <div class="attachment-section">
+          <i class="fa-solid fa-file me-2 text-primary"></i>
+          <a
+            [href]="excuse()!.attachmentUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="attachment-link">
+            {{ i18n.t('portal.view_attachment') }}
+            <i class="fa-solid fa-external-link-alt ms-1"></i>
+          </a>
+        </div>
+      </app-detail-card>
+    }
+
+    <!-- Status Information -->
+    @if (excuse()!.status === 'Approved') {
+      <div class="alert alert-success mt-3">
+        <i class="fa-solid fa-check-circle me-2"></i>
+        {{ i18n.t('portal.excuse_approved_message') }}
+      </div>
+    } @else if (excuse()!.status === 'Rejected') {
+      <div class="alert alert-danger mt-3">
+        <i class="fa-solid fa-times-circle me-2"></i>
+        {{ i18n.t('portal.excuse_rejected_message') }}
+      </div>
+    } @else if (excuse()!.status === 'Pending') {
+      <div class="alert alert-warning mt-3">
+        <i class="fa-solid fa-clock me-2"></i>
+        {{ i18n.t('portal.excuse_pending_message') }}
+      </div>
+    }
+  </div>
+}

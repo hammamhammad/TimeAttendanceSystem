@@ -1,0 +1,130 @@
+<!-- Loading State -->
+@if (loading()) {
+  <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+}
+
+<!-- Form -->
+@if (!loading()) {
+  <div class="remote-work-request-form">
+    <app-page-header
+      [title]="isEditMode() ? i18n.t('portal.edit_remote_work') : i18n.t('portal.new_remote_work')">
+      <div header-actions>
+        <button
+          type="button"
+          class="btn btn-outline-secondary btn-sm"
+          (click)="onCancel()">
+          <i class="fa-solid fa-arrow-left me-1"></i>
+          {{ i18n.t('common.back') }}
+        </button>
+      </div>
+    </app-page-header>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="mt-4">
+      <!-- Request Details Section -->
+      <app-form-section [title]="i18n.t('portal.remote_work_details')">
+        <div class="row">
+          <!-- Start Date -->
+          <div class="col-md-6 mb-3">
+            <label for="startDate" class="form-label">
+              {{ i18n.t('portal.start_date') }}
+              <span class="text-danger">*</span>
+            </label>
+            <input
+              type="date"
+              id="startDate"
+              formControlName="startDate"
+              class="form-control"
+              [class.is-invalid]="hasError('startDate', 'required')">
+            @if (hasError('startDate', 'required')) {
+              <div class="invalid-feedback">
+                {{ getErrorMessage('startDate') }}
+              </div>
+            }
+          </div>
+
+          <!-- End Date -->
+          <div class="col-md-6 mb-3">
+            <label for="endDate" class="form-label">
+              {{ i18n.t('portal.end_date') }}
+              <span class="text-danger">*</span>
+            </label>
+            <input
+              type="date"
+              id="endDate"
+              formControlName="endDate"
+              class="form-control"
+              [class.is-invalid]="hasError('endDate', 'required')">
+            @if (hasError('endDate', 'required')) {
+              <div class="invalid-feedback">
+                {{ getErrorMessage('endDate') }}
+              </div>
+            }
+          </div>
+
+          <!-- Calculated Working Days -->
+          @if (calculatedDays() > 0) {
+            <div class="col-12 mb-3">
+              <div class="alert alert-info">
+                <i class="fa-solid fa-calendar-days me-2"></i>
+                <strong>{{ i18n.t('portal.working_days') }}:</strong>
+                {{ calculatedDays() }} {{ calculatedDays() === 1 ? i18n.t('common.day') : i18n.t('common.days') }}
+                <span class="text-muted ms-2">({{ i18n.t('portal.weekdays_only') }})</span>
+              </div>
+            </div>
+          }
+
+          <!-- Reason -->
+          <div class="col-12 mb-3">
+            <label for="reason" class="form-label">
+              {{ i18n.t('portal.reason') }}
+              <span class="text-muted">({{ i18n.t('common.optional') }})</span>
+            </label>
+            <textarea
+              id="reason"
+              formControlName="reason"
+              class="form-control"
+              rows="4"
+              maxlength="500"
+              [class.is-invalid]="hasError('reason', 'maxlength')"
+              placeholder="{{ i18n.t('portal.remote_work_reason_placeholder') }}">
+            </textarea>
+            <div class="form-text">
+              {{ form.get('reason')?.value?.length || 0 }} / 500 characters
+            </div>
+            @if (hasError('reason', 'maxlength')) {
+              <div class="invalid-feedback">
+                {{ getErrorMessage('reason') }}
+              </div>
+            }
+          </div>
+        </div>
+      </app-form-section>
+
+      <!-- Info Card -->
+      <div class="alert alert-info mt-3">
+        <i class="fa-solid fa-info-circle me-2"></i>
+        {{ i18n.t('portal.remote_work_form_info') }}
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions mt-4">
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="saving() || form.invalid">
+          @if (saving()) {
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          }
+          {{ isEditMode() ? i18n.t('common.update') : i18n.t('common.submit') }}
+        </button>
+        <button
+          type="button"
+          class="btn btn-outline-secondary ms-2"
+          (click)="onCancel()"
+          [disabled]="saving()">
+          {{ i18n.t('common.cancel') }}
+        </button>
+      </div>
+    </form>
+  </div>
+}

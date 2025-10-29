@@ -1077,6 +1077,97 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("ExcusePolicies", (string)null);
                 });
 
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.FingerprintRequests.FingerprintRequest", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("AffectedFingers")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime?>("CompletedDate")
+                        .HasColumnType("timestamp");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("IssueDescription")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("PreferredDate")
+                        .HasColumnType("date");
+
+                    b.Property<TimeSpan?>("PreferredTime")
+                        .HasColumnType("time");
+
+                    b.Property<string>("RequestType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.Property<DateTime?>("ScheduledDate")
+                        .HasColumnType("date");
+
+                    b.Property<TimeSpan?>("ScheduledTime")
+                        .HasColumnType("time");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<long?>("TechnicianId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("TechnicianNotes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_FingerprintRequests_EmployeeId");
+
+                    b.HasIndex("ScheduledDate")
+                        .HasDatabaseName("IX_FingerprintRequests_ScheduledDate");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_FingerprintRequests_Status");
+
+                    b.HasIndex("TechnicianId");
+
+                    b.HasIndex("EmployeeId", "Status")
+                        .HasDatabaseName("IX_FingerprintRequests_EmployeeId_Status");
+
+                    b.ToTable("FingerprintRequests", (string)null);
+                });
+
             modelBuilder.Entity("TimeAttendanceSystem.Domain.RemoteWork.RemoteWorkPolicy", b =>
                 {
                     b.Property<long>("Id")
@@ -2913,6 +3004,24 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Branch");
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.FingerprintRequests.FingerprintRequest", b =>
+                {
+                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "Technician")
+                        .WithMany()
+                        .HasForeignKey("TechnicianId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Technician");
                 });
 
             modelBuilder.Entity("TimeAttendanceSystem.Domain.RemoteWork.RemoteWorkPolicy", b =>

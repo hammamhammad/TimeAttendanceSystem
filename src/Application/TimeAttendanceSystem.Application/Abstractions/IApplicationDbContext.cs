@@ -10,6 +10,7 @@ using TimeAttendanceSystem.Domain.VacationTypes;
 using TimeAttendanceSystem.Domain.Vacations;
 using TimeAttendanceSystem.Domain.Excuses;
 using TimeAttendanceSystem.Domain.RemoteWork;
+using TimeAttendanceSystem.Domain.FingerprintRequests;
 
 namespace TimeAttendanceSystem.Application.Abstractions;
 
@@ -525,6 +526,22 @@ public interface IApplicationDbContext
     /// - Integration with remote work policies and attendance records
     /// </remarks>
     DbSet<RemoteWorkRequest> RemoteWorkRequests { get; }
+
+    /// <summary>
+    /// Gets the database set for FingerprintRequest entities representing fingerprint enrollment or update requests.
+    /// Enables employees to request fingerprint re-enrollment or report fingerprint reader issues.
+    /// </summary>
+    /// <value>DbSet for querying and managing FingerprintRequest entities</value>
+    /// <remarks>
+    /// FingerprintRequest Entity Features:
+    /// - Employee self-service fingerprint management
+    /// - Multiple request types (NewEnrollment, Update, Issue, AdditionalFingers, LocationChange)
+    /// - Status workflow (Pending, Scheduled, Completed, Cancelled, Rejected)
+    /// - Scheduling system with preferred and scheduled date/time
+    /// - Technician assignment and notes for completion tracking
+    /// - One active request limit per employee for process control
+    /// </remarks>
+    DbSet<FingerprintRequest> FingerprintRequests { get; }
 
     /// <summary>
     /// Asynchronously saves all pending changes to the database.

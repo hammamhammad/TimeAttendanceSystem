@@ -1,0 +1,146 @@
+/* Portal Navigation Styles */
+
+.portal-navigation {
+  padding: 2rem 0;
+}
+
+.nav-card {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem;
+  background: white;
+  border: 2px solid var(--bs-border-color);
+  border-radius: 0.5rem;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--bs-primary);
+  transform: scaleY(0);
+  transition: transform 0.3s ease;
+}
+
+.nav-card:hover {
+  border-color: var(--bs-primary);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.nav-card:hover::before {
+  transform: scaleY(1);
+}
+
+.nav-card.active {
+  border-color: var(--bs-primary);
+  background: rgba(13, 110, 253, 0.05);
+}
+
+.nav-card.active::before {
+  transform: scaleY(1);
+}
+
+.nav-card-icon {
+  flex-shrink: 0;
+  width: 3.5rem;
+  height: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(13, 110, 253, 0.1);
+  border-radius: 0.5rem;
+  margin-right: 1.25rem;
+}
+
+.nav-card-icon i {
+  font-size: 1.75rem;
+  color: var(--bs-primary);
+}
+
+.nav-card-content {
+  flex: 1;
+}
+
+.nav-card-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  color: var(--bs-dark);
+}
+
+.nav-card-description {
+  font-size: 0.875rem;
+  color: var(--bs-secondary);
+  margin-bottom: 0;
+}
+
+.nav-card-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: var(--bs-danger);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 1rem;
+  min-width: 1.5rem;
+  text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .nav-card {
+    padding: 1rem;
+  }
+
+  .nav-card-icon {
+    width: 3rem;
+    height: 3rem;
+    margin-right: 1rem;
+  }
+
+  .nav-card-icon i {
+    font-size: 1.5rem;
+  }
+
+  .nav-card-title {
+    font-size: 1rem;
+  }
+
+  .nav-card-description {
+    font-size: 0.8rem;
+  }
+}
+
+/* Animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.nav-card {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+.nav-card:nth-child(1) { animation-delay: 0.1s; }
+.nav-card:nth-child(2) { animation-delay: 0.2s; }
+.nav-card:nth-child(3) { animation-delay: 0.3s; }
+.nav-card:nth-child(4) { animation-delay: 0.4s; }
+.nav-card:nth-child(5) { animation-delay: 0.5s; }
+.nav-card:nth-child(6) { animation-delay: 0.6s; }

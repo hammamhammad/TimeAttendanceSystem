@@ -1,8 +1,18 @@
 {
   "permissions": {
     "allow": [
-      "Bash(for file in *.cs)",
-      "Bash(do sed -i 's/.IsRowVersion();/.IsRowVersion()\\n            .HasDefaultValueSql(\"\"E''''\\\\\\\\\\\\\\\\x01''''::bytea\"\");/g' \"$file\")"
+      "Bash(mkdir -p \"D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\FingerprintRequests\")",
+      "Bash(dotnet ef migrations add AddFingerprintRequests --startup-project \"../../Api/TimeAttendanceSystem.Api\" --context TimeAttendanceDbContext --output-dir Persistence/PostgreSql/Migrations)",
+      "Bash(dotnet build)",
+      "Bash(dotnet build TimeAttendanceSystem.sln)",
+      "Bash(Select-String -Pattern \"error|succeeded|failed\")",
+      "Bash(Select-Object -Last 20)",
+      "Bash(dotnet ef database update --startup-project \"../../Api/TimeAttendanceSystem.Api\" --context TimeAttendanceDbContext)",
+      "Bash(timeout 10 dotnet run)",
+      "Bash(Start-Process -NoNewWindow -FilePath \"dotnet\" -ArgumentList \"run\")",
+      "Bash(npm run build)",
+      "Bash(Select-Object -First 50)",
+      "Bash(Select-Object -Last 15)"
     ],
     "deny": [],
     "ask": []

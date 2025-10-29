@@ -11,6 +11,7 @@ using TimeAttendanceSystem.Domain.VacationTypes;
 using TimeAttendanceSystem.Domain.Vacations;
 using TimeAttendanceSystem.Domain.Excuses;
 using TimeAttendanceSystem.Domain.RemoteWork;
+using TimeAttendanceSystem.Domain.FingerprintRequests;
 
 namespace TimeAttendanceSystem.Infrastructure.Persistence;
 
@@ -54,6 +55,7 @@ public class ApplicationDbContextAdapter : IApplicationDbContext
     public DbSet<EmployeeExcuse> EmployeeExcuses => _context.EmployeeExcuses;
     public DbSet<RemoteWorkPolicy> RemoteWorkPolicies => _context.RemoteWorkPolicies;
     public DbSet<RemoteWorkRequest> RemoteWorkRequests => _context.RemoteWorkRequests;
+    public DbSet<FingerprintRequest> FingerprintRequests => _context.FingerprintRequests;
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

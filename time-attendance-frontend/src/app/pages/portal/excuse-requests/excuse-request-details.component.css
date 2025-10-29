@@ -1,0 +1,91 @@
+/* Excuse Request Details Component Styles */
+
+.excuse-details {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+/* Status Section */
+.status-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: var(--bs-light);
+  border-radius: 0.5rem;
+}
+
+.status-label {
+  font-weight: 600;
+  margin-bottom: 0;
+  color: var(--bs-secondary);
+}
+
+/* Attachment Section */
+.attachment-section {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  background-color: var(--bs-light);
+  border-radius: 0.375rem;
+}
+
+.attachment-link {
+  color: var(--bs-primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.attachment-link:hover {
+  color: var(--bs-primary);
+  text-decoration: underline;
+}
+
+/* Alert Styling */
+.alert {
+  display: flex;
+  align-items: center;
+  border-radius: 0.5rem;
+}
+
+.alert i {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .excuse-details {
+    padding: 1rem;
+  }
+
+  .status-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.excuse-details {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Button Hover Effects */
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}

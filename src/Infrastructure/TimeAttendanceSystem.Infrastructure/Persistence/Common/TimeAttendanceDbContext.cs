@@ -10,6 +10,7 @@ using TimeAttendanceSystem.Domain.VacationTypes;
 using TimeAttendanceSystem.Domain.Vacations;
 using TimeAttendanceSystem.Domain.Excuses;
 using TimeAttendanceSystem.Domain.RemoteWork;
+using TimeAttendanceSystem.Domain.FingerprintRequests;
 using TimeAttendanceSystem.Application.Abstractions;
 using TimeAttendanceSystem.Application.Services;
 
@@ -115,6 +116,7 @@ public class TimeAttendanceDbContext : DbContext, IApplicationDbContext
     public DbSet<EmployeeExcuse> EmployeeExcuses => Set<EmployeeExcuse>();
     public DbSet<RemoteWorkPolicy> RemoteWorkPolicies => Set<RemoteWorkPolicy>();
     public DbSet<RemoteWorkRequest> RemoteWorkRequests => Set<RemoteWorkRequest>();
+    public DbSet<FingerprintRequest> FingerprintRequests => Set<FingerprintRequest>();
 
     /// <summary>
     /// Configures the database model using Fluent API configurations from the current assembly.

@@ -1,0 +1,22 @@
+<div class="portal-navigation">
+  <div class="container-fluid">
+    <div class="row g-3">
+      @for (item of menuItems; track item.id) {
+        <div class="col-md-6 col-lg-4">
+          <a [routerLink]="item.route" class="nav-card" routerLinkActive="active">
+            <div class="nav-card-icon">
+              <i [class]="item.icon"></i>
+            </div>
+            <div class="nav-card-content">
+              <h5 class="nav-card-title">{{ item.label }}</h5>
+              <p class="nav-card-description">{{ item.description }}</p>
+            </div>
+            @if (item.badge) {
+              <span class="nav-card-badge">{{ item.badge }}</span>
+            }
+          </a>
+        </div>
+      }
+    </div>
+  </div>
+</div>
