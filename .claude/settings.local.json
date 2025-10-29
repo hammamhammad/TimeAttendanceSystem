@@ -14,7 +14,8 @@
       "Bash(Select-Object -First 50)",
       "Bash(Select-Object -Last 15)",
       "Bash(dotnet build:*)",
-      "Bash(dotnet publish:*)"
+      "Bash(dotnet publish:*)",
+      "Bash(ssh root@20.196.112.66 \"cd /opt/timeattendance/app && find . -type d -name ''bin'' -exec rm -rf {} + 2>/dev/null || true\")"
     ],
     "deny": [],
     "ask": []

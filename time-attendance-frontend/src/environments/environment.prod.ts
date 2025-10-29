@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://20.196.112.66'
+  apiUrl: 'https://clockn.net'
 };
