@@ -68,12 +68,12 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
 
           <!-- Created date -->
           <span *ngSwitchCase="'created'">
-            {{ formatDate(branch.createdAt) }}
+            {{ formatDate(branch.createdAtUtc) }}
           </span>
 
           <!-- Last updated -->
           <span *ngSwitchCase="'updated'">
-            {{ formatDate(branch.updatedAt) }}
+            {{ formatDate(branch.modifiedAtUtc) }}
           </span>
         </ng-container>
       </ng-template>
@@ -203,8 +203,14 @@ export class BranchTableComponent {
     }
   }
 
-  formatDate(dateString: string): string {
+  formatDate(dateString?: string): string {
+    if (!dateString) {
+      return '-';
+    }
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      return '-';
+    }
     return date.toLocaleDateString(this.i18n.getCurrentLocale(), {
       year: 'numeric',
       month: 'short',

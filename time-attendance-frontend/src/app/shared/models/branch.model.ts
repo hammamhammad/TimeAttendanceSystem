@@ -7,6 +7,7 @@ export interface Branch {
   employeeCount: number;
   departmentCount: number;
   createdAtUtc: string;
+  modifiedAtUtc?: string;
 }
 
 export interface PagedResult<T> {
