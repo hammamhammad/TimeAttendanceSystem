@@ -11,7 +11,7 @@ import { PermissionActions } from '../../../shared/utils/permission.utils';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { DetailCardComponent, DetailField } from '../../../shared/components/detail-card/detail-card.component';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
-import { FormHeaderComponent } from '../../../shared/components/form-header/form-header.component';
+import { FormHeaderComponent, FormHeaderAction } from '../../../shared/components/form-header/form-header.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
@@ -52,27 +52,27 @@ export class ViewShiftComponent implements OnInit {
 
     return [
       {
-        label: this.i18n.t('fields.name'),
+        label: this.i18n.t('shifts.name'),
         value: shift.name
       },
       {
-        label: this.i18n.t('fields.description'),
+        label: this.i18n.t('shifts.description'),
         value: shift.description || this.i18n.t('common.not_specified')
       },
       {
-        label: this.i18n.t('fields.shiftType'),
+        label: this.i18n.t('shifts.type'),
         value: this.getShiftTypeLabel(shift.shiftType),
         type: 'badge',
         badgeVariant: shift.shiftType === ShiftType.TimeBased ? 'info' : 'secondary'
       },
       {
-        label: this.i18n.t('fields.status'),
+        label: this.i18n.t('common.status'),
         value: this.getShiftStatusLabel(shift.status),
         type: 'badge',
         badgeVariant: this.getStatusBadgeVariant(shift.status) as 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark'
       },
       {
-        label: this.i18n.t('shifts.is_night_shift'),
+        label: this.i18n.t('shifts.night_shift'),
         value: shift.isNightShift ? this.i18n.t('common.yes') : this.i18n.t('common.no'),
         type: 'badge',
         badgeVariant: shift.isNightShift ? 'warning' : 'secondary'
@@ -269,7 +269,7 @@ export class ViewShiftComponent implements OnInit {
       this.shiftsService.setDefaultShift(this.shift()!.id).subscribe({
         next: () => {
           this.notificationService.success(
-            this.i18n.t('shifts.success.set_as_default')
+            this.i18n.t('shifts.success.defaultSet')
           );
           this.processing.set(false);
         },
@@ -440,5 +440,26 @@ export class ViewShiftComponent implements OnInit {
       variant: 'warning' as const,
       visible: shift?.isNightShift || false
     };
+  });
+
+  // Header actions computed property
+  headerActions = computed<FormHeaderAction[]>(() => {
+    const shift = this.shift();
+    if (!shift) return [];
+
+    const actions: FormHeaderAction[] = [];
+
+    // Edit action
+    if (this.canEdit()) {
+      actions.push({
+        label: this.i18n.t('common.edit'),
+        icon: 'fas fa-edit',
+        route: `/shifts/edit/${shift.id}`,
+        type: 'primary',
+        action: () => {}
+      });
+    }
+
+    return actions;
   });
 }

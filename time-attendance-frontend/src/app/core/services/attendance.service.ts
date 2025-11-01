@@ -301,10 +301,13 @@ export class AttendanceService {
    * Manually calculate attendance for all employees on a specific date.
    * This forces recalculation/generation for all active employees.
    */
-  calculateAttendanceForDate(date: string, forceRecalculate: boolean = false): Observable<AttendanceGenerationResult> {
+  calculateAttendanceForDate(date: string, forceRecalculate: boolean = false, branchId?: number | null): Observable<AttendanceGenerationResult> {
     let params = new HttpParams();
     if (forceRecalculate) {
       params = params.set('forceRecalculate', forceRecalculate.toString());
+    }
+    if (branchId) {
+      params = params.set('branchId', branchId.toString());
     }
 
     return this.http.post<AttendanceGenerationResult>(`${this.apiUrl}/calculate/date/${date}`, {}, { params });

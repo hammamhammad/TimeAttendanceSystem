@@ -1184,7 +1184,9 @@ export class DailyAttendanceComponent implements OnInit, OnDestroy {
 
     this.calculatingBulk.set(true);
 
-    this.attendanceService.calculateAttendanceForDate(date, forceRecalculate).subscribe({
+    // Pass the selected branchId to the service to generate attendance only for that branch
+    const branchId = this.selectedBranchId();
+    this.attendanceService.calculateAttendanceForDate(date, forceRecalculate, branchId).subscribe({
       next: (result) => {
         this.calculatingBulk.set(false);
 

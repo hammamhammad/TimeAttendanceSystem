@@ -58,6 +58,10 @@ export class EmployeesService {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 
+  toggleEmployeeStatus(id: number): Observable<{ isActive: boolean; message: string }> {
+    return this.http.post<{ isActive: boolean; message: string }>(`${this.baseUrl}/${id}/toggle-status`, {});
+  }
+
   updateEmployeeShift(employeeId: number, request: UpdateEmployeeShiftRequest): Observable<{success: boolean, message: string}> {
     return this.http.post<{success: boolean, message: string}>(`${this.baseUrl}/${employeeId}/shift`, request);
   }

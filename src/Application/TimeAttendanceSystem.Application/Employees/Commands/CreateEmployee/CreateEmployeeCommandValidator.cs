@@ -167,11 +167,14 @@ public class CreateEmployeeCommandValidator : AbstractValidator<CreateEmployeeCo
             .WithMessage("Phone number cannot exceed 20 characters")
             .When(x => !string.IsNullOrEmpty(x.Phone));
 
-        // Date of birth validation: Optional demographic information
+        // Date of birth validation: Required for minimum age verification
         RuleFor(x => x.DateOfBirth)
+            .NotEmpty()
+            .WithMessage("Date of birth is required")
             .LessThan(DateTime.Today)
             .WithMessage("Date of birth must be in the past")
-            .When(x => x.DateOfBirth.HasValue);
+            .Must(dob => dob.HasValue && CalculateAge(dob.Value) >= 16)
+            .WithMessage("Employee must be at least 16 years old");
 
         // Hire date validation: Required employment start date
         RuleFor(x => x.HireDate)
@@ -204,5 +207,24 @@ public class CreateEmployeeCommandValidator : AbstractValidator<CreateEmployeeCo
             .GreaterThan(0)
             .WithMessage("Manager Employee ID must be a valid positive number")
             .When(x => x.ManagerEmployeeId.HasValue);
+    }
+
+    /// <summary>
+    /// Calculates the age of a person based on their date of birth.
+    /// </summary>
+    /// <param name="dateOfBirth">The date of birth</param>
+    /// <returns>The age in years</returns>
+    private static int CalculateAge(DateTime dateOfBirth)
+    {
+        var today = DateTime.Today;
+        var age = today.Year - dateOfBirth.Year;
+
+        // Subtract one year if birthday hasn't occurred yet this year
+        if (dateOfBirth.Date > today.AddYears(-age))
+        {
+            age--;
+        }
+
+        return age;
     }
 }

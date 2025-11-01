@@ -6,6 +6,7 @@ import { I18nService } from '../../../core/i18n/i18n.service';
 import { EmployeesService } from '../employees.service';
 import { AttendanceService } from '../../../core/services/attendance.service';
 import { NotificationService } from '../../../core/notifications/notification.service';
+import { ConfirmationService } from '../../../core/confirmation/confirmation.service';
 import { EmployeeDto, Gender, EmploymentStatus, WorkLocationType } from '../../../shared/models/employee.model';
 import { AttendanceRecord, AttendanceStatistics, AttendanceStatus, AttendanceTransaction } from '../../../shared/models/attendance.model';
 import { PermissionService } from '../../../core/auth/permission.service';
@@ -31,6 +32,7 @@ export class ViewEmployeeComponent implements OnInit {
   private employeesService = inject(EmployeesService);
   private attendanceService = inject(AttendanceService);
   private notificationService = inject(NotificationService);
+  private confirmationService = inject(ConfirmationService);
   public i18n = inject(I18nService);
   public permissionService = inject(PermissionService);
 
@@ -359,6 +361,47 @@ export class ViewEmployeeComponent implements OnInit {
 
   t(key: string): string {
     return this.i18n.t(key);
+  }
+
+  /**
+   * Toggle employee active/inactive status
+   */
+  async toggleEmployeeStatus(): Promise<void> {
+    const employee = this.employee();
+    if (!employee) return;
+
+    const isActive = employee.isActive;
+    const actionKey = isActive ? 'employees.deactivate' : 'employees.activate';
+    const confirmKey = isActive ? 'employees.confirm_deactivate' : 'employees.confirm_activate';
+
+    const iconClass = isActive ? 'text-danger' : 'text-success';
+    const confirmButtonClass = isActive ? 'btn-danger' : 'btn-success';
+
+    const result = await this.confirmationService.confirm({
+      title: this.t(actionKey),
+      message: this.t(confirmKey),
+      confirmText: this.t('common.confirm'),
+      cancelText: this.t('common.cancel'),
+      confirmButtonClass: confirmButtonClass,
+      icon: 'fa-user',
+      iconClass: iconClass
+    });
+
+    if (result.confirmed) {
+      this.employeesService.toggleEmployeeStatus(employee.id).subscribe({
+        next: (response) => {
+          this.notificationService.success(response.message);
+          // Reload employee data to reflect the change
+          this.loadEmployee();
+        },
+        error: (error) => {
+          console.error('Error toggling employee status:', error);
+          this.notificationService.error(
+            error.error?.error || this.t('common.error_occurred')
+          );
+        }
+      });
+    }
   }
 
   // Computed properties for definition lists

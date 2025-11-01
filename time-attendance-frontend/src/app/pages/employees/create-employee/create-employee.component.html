@@ -258,10 +258,11 @@
               <!-- Date of Birth -->
               <div class="col-md-6">
                 <label class="form-label">{{ t('employees.date_of_birth') }}</label>
-                <input 
-                  type="date" 
-                  class="form-control" 
+                <input
+                  type="date"
+                  class="form-control"
                   formControlName="dateOfBirth"
+                  [max]="maxDateOfBirth"
                   [class.is-invalid]="hasError('dateOfBirth')">
                 @if (hasError('dateOfBirth')) {
                   <div class="invalid-feedback">{{ getError('dateOfBirth') }}</div>

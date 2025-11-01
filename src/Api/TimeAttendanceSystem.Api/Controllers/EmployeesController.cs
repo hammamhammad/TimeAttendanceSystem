@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using TimeAttendanceSystem.Application.Employees.Commands.CreateEmployee;
 using TimeAttendanceSystem.Application.Employees.Commands.UpdateEmployee;
 using TimeAttendanceSystem.Application.Employees.Commands.DeleteEmployee;
+using TimeAttendanceSystem.Application.Employees.Commands.ToggleEmployeeStatus;
 using TimeAttendanceSystem.Application.Employees.Queries.GetEmployees;
 using TimeAttendanceSystem.Application.Employees.Queries.GetEmployeeById;
 using TimeAttendanceSystem.Application.ShiftAssignments.Commands.UpdateEmployeeShift;
@@ -332,6 +333,32 @@ public class EmployeesController : ControllerBase
     }
 
     /// <summary>
+    /// Toggles the active/inactive status of an employee.
+    /// Changes an active employee to inactive or an inactive employee to active.
+    /// </summary>
+    /// <param name="id">Unique identifier of the employee whose status is being toggled</param>
+    /// <returns>The new active status of the employee</returns>
+    /// <response code="200">Employee status toggled successfully with new status returned</response>
+    /// <response code="400">Invalid status toggle request or validation errors</response>
+    /// <response code="404">Employee not found or access denied</response>
+    /// <response code="401">Unauthorized access - authentication required</response>
+    /// <response code="403">Forbidden - insufficient permissions for employee status modification</response>
+    [HttpPost("{id}/toggle-status")]
+    [Authorize(Policy = "EmployeeManagement")]
+    public async Task<IActionResult> ToggleEmployeeStatus(long id)
+    {
+        var command = new ToggleEmployeeStatusCommand { Id = id };
+        var result = await _mediator.Send(command);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(new { error = result.Error });
+        }
+
+        return Ok(new { isActive = result.Value, message = result.Value ? "Employee activated successfully" : "Employee deactivated successfully" });
+    }
+
+    /// <summary>
     /// Updates the current shift assignment for a specific employee.
     /// Deactivates any existing active shift assignments and creates a new active assignment.
     /// </summary>
@@ -376,7 +403,10 @@ public class EmployeesController : ControllerBase
     [Authorize(Policy = "EmployeeRead")]
     public async Task<IActionResult> GetEmployeesForDropdown()
     {
-        var query = new GetEmployeesQuery(1, 1000, null, null, null, null, true, "Active"); // Get all active employees
+        // Get all non-deleted employees (IsActive=true filters by !IsDeleted)
+        // Don't filter by EmploymentStatus to include all types (FullTime, PartTime, Contract, etc.)
+        // Only exclude Terminated and Inactive employees
+        var query = new GetEmployeesQuery(1, 1000, null, null, null, null, true, null);
         var result = await _mediator.Send(query);
 
         if (result.IsFailure)
@@ -384,12 +414,16 @@ public class EmployeesController : ControllerBase
             return BadRequest(new { error = result.Error });
         }
 
-        // Transform to simple dropdown format
-        var dropdownData = result.Value.Items.Select(emp => new
-        {
-            id = emp.Id,
-            name = $"{emp.FirstName} {emp.LastName}"
-        });
+        // Transform to simple dropdown format, excluding Terminated and Inactive
+        var dropdownData = result.Value.Items
+            .Where(emp => emp.EmploymentStatus != Domain.Common.EmploymentStatus.Terminated &&
+                         emp.EmploymentStatus != Domain.Common.EmploymentStatus.Inactive)
+            .Select(emp => new
+            {
+                id = emp.Id,
+                name = $"{emp.FirstName} {emp.LastName}",
+                employeeNumber = emp.EmployeeNumber
+            });
 
         return Ok(dropdownData);
     }

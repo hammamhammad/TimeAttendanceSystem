@@ -47,6 +47,13 @@ export class CreateEmployeeComponent implements OnInit {
   EmploymentStatus = EmploymentStatus;
   Gender = Gender;
   WorkLocationType = WorkLocationType;
+
+  // Maximum date for date of birth (16 years ago from today, for minimum working age)
+  get maxDateOfBirth(): string {
+    const today = new Date();
+    const sixteenYearsAgo = new Date(today.getFullYear() - 16, today.getMonth(), today.getDate());
+    return sixteenYearsAgo.toISOString().split('T')[0];
+  }
   
   // Enum arrays for templates
   employmentStatusValues = [

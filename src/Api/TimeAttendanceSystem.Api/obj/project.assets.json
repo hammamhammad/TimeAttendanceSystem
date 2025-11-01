@@ -4440,11 +4440,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Api\\TimeAttendanceSystem.Api\\TimeAttendanceSystem.Api.csproj",
+      "projectUniqueName": "d:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Api\\TimeAttendanceSystem.Api\\TimeAttendanceSystem.Api.csproj",
       "projectName": "TimeAttendanceSystem.Api",
-      "projectPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Api\\TimeAttendanceSystem.Api\\TimeAttendanceSystem.Api.csproj",
+      "projectPath": "d:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Api\\TimeAttendanceSystem.Api\\TimeAttendanceSystem.Api.csproj",
       "packagesPath": "C:\\Users\\hhammad\\.nuget\\packages\\",
-      "outputPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Api\\TimeAttendanceSystem.Api\\obj\\",
+      "outputPath": "d:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Api\\TimeAttendanceSystem.Api\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

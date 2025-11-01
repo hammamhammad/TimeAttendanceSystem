@@ -11,10 +11,12 @@ public record UpdateEmployeeCommand : IRequest<Result<Unit>>
     public string LastName { get; init; } = string.Empty;
     public string? FirstNameAr { get; init; }
     public string? LastNameAr { get; init; }
+    public string? NationalId { get; init; }
     public string? Email { get; init; }
     public string? Phone { get; init; }
     public DateTime? DateOfBirth { get; init; }
     public Gender? Gender { get; init; }
+    public DateTime HireDate { get; init; }
     public EmploymentStatus EmploymentStatus { get; init; }
     public string JobTitle { get; init; } = string.Empty;
     public string? JobTitleAr { get; init; }

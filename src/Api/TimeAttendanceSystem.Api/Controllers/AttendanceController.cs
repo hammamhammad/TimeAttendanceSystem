@@ -1139,12 +1139,12 @@ public class AttendanceController : ControllerBase
     [HttpPost("calculate/date/{date:datetime}")]
     [Authorize(Policy = "SystemAdmin")]
     public async Task<ActionResult<Models.AttendanceGenerationResult>> CalculateAttendanceForDate(
-        DateTime date, [FromQuery] bool forceRecalculate = false)
+        DateTime date, [FromQuery] bool forceRecalculate = false, [FromQuery] long? branchId = null)
     {
         try
         {
-            _logger.LogInformation("Manual attendance calculation requested for date {Date} (force recalculate: {ForceRecalculate}) by user {UserId}",
-                date.Date, forceRecalculate, _currentUser.UserId);
+            _logger.LogInformation("Manual attendance calculation requested for date {Date} (force recalculate: {ForceRecalculate}, branch: {BranchId}) by user {UserId}",
+                date.Date, forceRecalculate, branchId, _currentUser.UserId);
 
             var result = new Models.AttendanceGenerationResult
             {
@@ -1162,20 +1162,29 @@ public class AttendanceController : ControllerBase
             }
 
             // Generate attendance for any employees missing records
-            var generatedCount = await _generatorService.GenerateAttendanceRecordsAsync(date);
+            // Use branch-specific generation if branchId is provided
+            int generatedCount;
+            if (branchId.HasValue)
+            {
+                generatedCount = await _generatorService.GenerateAttendanceRecordsForBranchAsync(branchId.Value, date);
+            }
+            else
+            {
+                generatedCount = await _generatorService.GenerateAttendanceRecordsAsync(date);
+            }
             result.RecordsGenerated = generatedCount;
 
             stopwatch.Stop();
             result.Duration = stopwatch.ElapsedMilliseconds;
 
-            _logger.LogInformation("Manual attendance calculation completed for {Date}. Generated: {Generated}, Updated: {Updated}",
-                date.Date, result.RecordsGenerated, result.RecordsUpdated);
+            _logger.LogInformation("Manual attendance calculation completed for {Date} (branch: {BranchId}). Generated: {Generated}, Updated: {Updated}",
+                date.Date, branchId, result.RecordsGenerated, result.RecordsUpdated);
 
             return Ok(result);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error calculating attendance for date {Date}", date);
+            _logger.LogError(ex, "Error calculating attendance for date {Date} (branch: {BranchId})", date, branchId);
             return StatusCode(500, "An error occurred while calculating attendance for the specified date");
         }
     }

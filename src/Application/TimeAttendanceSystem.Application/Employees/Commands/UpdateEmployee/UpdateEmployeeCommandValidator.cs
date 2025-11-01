@@ -32,6 +32,11 @@ public class UpdateEmployeeCommandValidator : AbstractValidator<UpdateEmployeeCo
             .WithMessage("Arabic last name cannot exceed 100 characters")
             .When(x => !string.IsNullOrEmpty(x.LastNameAr));
 
+        RuleFor(x => x.NationalId)
+            .MaximumLength(50)
+            .WithMessage("National ID cannot exceed 50 characters")
+            .When(x => !string.IsNullOrEmpty(x.NationalId));
+
         RuleFor(x => x.Email)
             .EmailAddress()
             .WithMessage("Invalid email format")
@@ -45,9 +50,12 @@ public class UpdateEmployeeCommandValidator : AbstractValidator<UpdateEmployeeCo
             .When(x => !string.IsNullOrEmpty(x.Phone));
 
         RuleFor(x => x.DateOfBirth)
+            .NotEmpty()
+            .WithMessage("Date of birth is required")
             .LessThan(DateTime.Today)
             .WithMessage("Date of birth must be in the past")
-            .When(x => x.DateOfBirth.HasValue);
+            .Must(dob => dob.HasValue && CalculateAge(dob.Value) >= 16)
+            .WithMessage("Employee must be at least 16 years old");
 
         RuleFor(x => x.JobTitle)
             .NotEmpty()
@@ -69,5 +77,24 @@ public class UpdateEmployeeCommandValidator : AbstractValidator<UpdateEmployeeCo
             .GreaterThan(0)
             .WithMessage("Manager employee ID must be greater than 0")
             .When(x => x.ManagerEmployeeId.HasValue);
+    }
+
+    /// <summary>
+    /// Calculates the age of a person based on their date of birth.
+    /// </summary>
+    /// <param name="dateOfBirth">The date of birth</param>
+    /// <returns>The age in years</returns>
+    private static int CalculateAge(DateTime dateOfBirth)
+    {
+        var today = DateTime.Today;
+        var age = today.Year - dateOfBirth.Year;
+
+        // Subtract one year if birthday hasn't occurred yet this year
+        if (dateOfBirth.Date > today.AddYears(-age))
+        {
+            age--;
+        }
+
+        return age;
     }
 }

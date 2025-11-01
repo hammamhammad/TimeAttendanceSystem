@@ -70,10 +70,12 @@ public class UpdateEmployeeCommandHandler : BaseHandler<UpdateEmployeeCommand, R
         employee.LastName = request.LastName;
         employee.FirstNameAr = request.FirstNameAr;
         employee.LastNameAr = request.LastNameAr;
+        employee.NationalId = request.NationalId;
         employee.Email = request.Email;
         employee.Phone = request.Phone;
         employee.DateOfBirth = request.DateOfBirth;
         employee.Gender = request.Gender;
+        employee.HireDate = request.HireDate;
         employee.EmploymentStatus = request.EmploymentStatus;
         employee.JobTitle = request.JobTitle;
         employee.JobTitleAr = request.JobTitleAr;

@@ -434,7 +434,8 @@ export class AssignShiftsComponent implements OnInit {
     const selectedDate = new Date(effectiveDate);
     selectedDate.setHours(0, 0, 0, 0);
 
-    return selectedDate > today;
+    // Allow today and future dates (not past dates)
+    return selectedDate >= today;
   }
 
   private isTargetValid(type: ShiftAssignmentType, empId?: number, deptId?: number, branchId?: number): boolean {
