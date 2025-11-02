@@ -200,17 +200,18 @@ public class CreateShiftAssignmentCommandHandler : BaseHandler<CreateShiftAssign
     }
 
     /// <summary>
-    /// Validates that the effective date is in the future (greater than today's date).
-    /// This ensures shift assignments are planned in advance and prevents backdating.
+    /// Validates that the effective date is today or in the future.
+    /// This prevents backdating shift assignments while allowing immediate effect.
     /// </summary>
     private Result ValidateEffectiveDate(CreateShiftAssignmentCommand request)
     {
         var today = DateTime.Today;
         var effectiveDate = request.EffectiveDate.Date;
 
-        if (effectiveDate <= today)
+        // Allow today and future dates (greater than or equal to today)
+        if (effectiveDate < today)
         {
-            return Result.Failure("Effective date must be greater than today's date. Shift assignments must be planned in advance.");
+            return Result.Failure("Effective date cannot be in the past. Please select today or a future date.");
         }
 
         // If an end date is specified, ensure it's after the effective date

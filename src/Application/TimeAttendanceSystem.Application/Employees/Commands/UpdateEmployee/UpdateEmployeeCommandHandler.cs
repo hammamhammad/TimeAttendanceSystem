@@ -75,7 +75,7 @@ public class UpdateEmployeeCommandHandler : BaseHandler<UpdateEmployeeCommand, R
         employee.Phone = request.Phone;
         employee.DateOfBirth = request.DateOfBirth;
         employee.Gender = request.Gender;
-        employee.HireDate = request.HireDate;
+        // HireDate is immutable and should not be updated
         employee.EmploymentStatus = request.EmploymentStatus;
         employee.JobTitle = request.JobTitle;
         employee.JobTitleAr = request.JobTitleAr;

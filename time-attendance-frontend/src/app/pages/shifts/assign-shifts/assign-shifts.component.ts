@@ -383,14 +383,13 @@ export class AssignShiftsComponent implements OnInit {
 
   // Create assignment methods
   openCreateModal(): void {
-    // Set effective date to tomorrow (today + 1 day) to meet the validation requirement
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    // Set effective date to today (can also select future dates)
+    const today = new Date();
 
     this.createForm.set({
       shiftId: 0,
       assignmentType: ShiftAssignmentType.Employee,
-      effectiveDate: tomorrow.toISOString().split('T')[0],
+      effectiveDate: today.toISOString().split('T')[0],
       status: ShiftAssignmentStatus.Active,
       priority: 10
     });

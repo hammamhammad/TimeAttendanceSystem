@@ -27,14 +27,15 @@ public class ToggleEmployeeStatusCommandHandler : BaseHandler<ToggleEmployeeStat
             return Result.Failure<bool>("Employee not found");
         }
 
-        // Toggle the EmploymentStatus between Active and Inactive
-        var isCurrentlyActive = employee.EmploymentStatus == EmploymentStatus.Active;
-        employee.EmploymentStatus = isCurrentlyActive ? EmploymentStatus.Inactive : EmploymentStatus.Active;
+        // Toggle the IsDeleted flag (which maps to IsActive in DTOs)
+        // IsActive = !IsDeleted, so toggling IsDeleted toggles the active status
+        var isCurrentlyActive = !employee.IsDeleted;
+        employee.IsDeleted = isCurrentlyActive; // If currently active (IsDeleted=false), set to true (inactive)
         employee.ModifiedAtUtc = DateTime.UtcNow;
         employee.ModifiedBy = CurrentUser.Username;
 
         // Determine the audit action
-        var auditAction = employee.EmploymentStatus == EmploymentStatus.Active
+        var auditAction = !employee.IsDeleted // Now active (IsDeleted=false)
             ? AuditAction.EmployeeActivated
             : AuditAction.EmployeeDeactivated;
 
@@ -51,7 +52,7 @@ public class ToggleEmployeeStatusCommandHandler : BaseHandler<ToggleEmployeeStat
                 EmployeeNumber = employee.EmployeeNumber,
                 FullName = employee.FullName,
                 EmploymentStatus = employee.EmploymentStatus.ToString(),
-                IsActive = employee.EmploymentStatus == EmploymentStatus.Active
+                IsActive = !employee.IsDeleted
             }),
             CreatedAtUtc = DateTime.UtcNow
         });
@@ -59,6 +60,6 @@ public class ToggleEmployeeStatusCommandHandler : BaseHandler<ToggleEmployeeStat
         await Context.SaveChangesAsync(cancellationToken);
 
         // Return true if now active, false if now inactive
-        return Result.Success(employee.EmploymentStatus == EmploymentStatus.Active);
+        return Result.Success(!employee.IsDeleted);
     }
 }

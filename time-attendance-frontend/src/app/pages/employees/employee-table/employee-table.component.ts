@@ -344,7 +344,20 @@ export class EmployeeTableComponent {
     return typeMap[type] || 'Unknown';
   }
 
-  formatDate(dateString: string): string {
+  formatDate(dateString: string | null | undefined): string {
+    if (!dateString) return '';
+
+    // Parse date string as "YYYY-MM-DD" without timezone conversion
+    // This prevents the date from shifting by one day due to timezone differences
+    const dateMatch = dateString.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (dateMatch) {
+      const [, year, month, day] = dateMatch;
+      // Create date using local timezone to prevent shifting
+      const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      return date.toLocaleDateString();
+    }
+
+    // Fallback for other date formats
     const date = new Date(dateString);
     return date.toLocaleDateString();
   }

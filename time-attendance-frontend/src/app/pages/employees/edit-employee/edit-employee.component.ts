@@ -502,6 +502,15 @@ export class EditEmployeeComponent implements OnInit {
   }
 
   populateForm(employee: Employee): void {
+    // Parse dateOfBirth without timezone conversion to prevent date shifting
+    let dateOfBirthValue = '';
+    if (employee.dateOfBirth) {
+      const dateMatch = employee.dateOfBirth.toString().match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (dateMatch) {
+        dateOfBirthValue = `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}`;
+      }
+    }
+
     this.employeeForm.patchValue({
       branchId: employee.branchId, // Set branchId for department loading logic
       firstName: employee.firstName,
@@ -513,7 +522,7 @@ export class EditEmployeeComponent implements OnInit {
       email: employee.email || '',
       phone: employee.phone || '',
       nationalId: employee.nationalId || '',
-      dateOfBirth: employee.dateOfBirth ? new Date(employee.dateOfBirth).toISOString().split('T')[0] : '',
+      dateOfBirth: dateOfBirthValue,
       gender: employee.gender || '',
       employmentStatus: employee.employmentStatus,
       workLocationType: employee.workLocationType,
@@ -535,19 +544,20 @@ export class EditEmployeeComponent implements OnInit {
     const updateRequest = {
       firstName: formValue.firstName,
       lastName: formValue.lastName,
-      firstNameAr: formValue.firstNameAr || undefined,
-      lastNameAr: formValue.lastNameAr || undefined,
+      firstNameAr: formValue.firstNameAr || null,
+      lastNameAr: formValue.lastNameAr || null,
       jobTitle: formValue.jobTitle,
-      jobTitleAr: formValue.jobTitleAr || undefined,
-      email: formValue.email || undefined,
-      phone: formValue.phone || undefined,
-      nationalId: formValue.nationalId || undefined,
-      dateOfBirth: formValue.dateOfBirth || undefined,
-      gender: formValue.gender ? +formValue.gender : undefined,
+      jobTitleAr: formValue.jobTitleAr || null,
+      email: formValue.email || null,
+      phone: formValue.phone || null,
+      nationalId: formValue.nationalId || null,
+      dateOfBirth: formValue.dateOfBirth || null,
+      gender: formValue.gender ? +formValue.gender : null,
       employmentStatus: +formValue.employmentStatus,
       workLocationType: +formValue.workLocationType,
-      departmentId: formValue.departmentId || undefined,
-      managerEmployeeId: formValue.managerEmployeeId || undefined
+      departmentId: formValue.departmentId ? +formValue.departmentId : null,
+      managerEmployeeId: formValue.managerEmployeeId ? +formValue.managerEmployeeId : null,
+      photoUrl: null
     };
 
     this.employeesService.updateEmployee(this.employee()!.id, updateRequest).subscribe({

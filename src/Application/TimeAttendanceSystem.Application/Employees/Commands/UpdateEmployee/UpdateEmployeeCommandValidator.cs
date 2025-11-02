@@ -50,12 +50,11 @@ public class UpdateEmployeeCommandValidator : AbstractValidator<UpdateEmployeeCo
             .When(x => !string.IsNullOrEmpty(x.Phone));
 
         RuleFor(x => x.DateOfBirth)
-            .NotEmpty()
-            .WithMessage("Date of birth is required")
             .LessThan(DateTime.Today)
             .WithMessage("Date of birth must be in the past")
-            .Must(dob => dob.HasValue && CalculateAge(dob.Value) >= 16)
-            .WithMessage("Employee must be at least 16 years old");
+            .Must(dob => !dob.HasValue || CalculateAge(dob.Value) >= 16)
+            .WithMessage("Employee must be at least 16 years old")
+            .When(x => x.DateOfBirth.HasValue);
 
         RuleFor(x => x.JobTitle)
             .NotEmpty()

@@ -60,19 +60,20 @@ export interface CreateEmployeeRequest {
 export interface UpdateEmployeeRequest {
   firstName: string;
   lastName: string;
-  firstNameAr?: string;
-  lastNameAr?: string;
-  email?: string;
-  phone?: string;
-  dateOfBirth?: string;
-  gender?: Gender;
+  firstNameAr?: string | null;
+  lastNameAr?: string | null;
+  nationalId?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  dateOfBirth?: string | null;
+  gender?: Gender | null;
   employmentStatus: EmploymentStatus;
   jobTitle: string;
-  jobTitleAr?: string;
-  departmentId?: number;
-  managerEmployeeId?: number;
+  jobTitleAr?: string | null;
+  departmentId?: number | null;
+  managerEmployeeId?: number | null;
   workLocationType: WorkLocationType;
-  photoUrl?: string;
+  photoUrl?: string | null;
 }
 
 export interface EmployeesFilter {

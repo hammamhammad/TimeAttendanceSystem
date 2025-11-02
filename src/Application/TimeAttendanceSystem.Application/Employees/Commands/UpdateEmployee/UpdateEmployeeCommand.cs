@@ -16,7 +16,7 @@ public record UpdateEmployeeCommand : IRequest<Result<Unit>>
     public string? Phone { get; init; }
     public DateTime? DateOfBirth { get; init; }
     public Gender? Gender { get; init; }
-    public DateTime HireDate { get; init; }
+    // Note: HireDate is immutable and should not be updated after employee creation
     public EmploymentStatus EmploymentStatus { get; init; }
     public string JobTitle { get; init; } = string.Empty;
     public string? JobTitleAr { get; init; }
