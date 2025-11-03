@@ -18,7 +18,11 @@
       "Bash(ssh root@20.196.112.66 \"cd /opt/timeattendance/app && find . -type d -name ''bin'' -exec rm -rf {} + 2>/dev/null || true\")",
       "Bash(dir:*)",
       "Bash(mkdir:*)",
-      "Bash(Select-Object -Last 30)"
+      "Bash(Select-Object -Last 30)",
+      "Bash(npm start)",
+      "Bash(dotnet run:*)",
+      "Bash(dotnet ef migrations add:*)",
+      "Bash(tree:*)"
     ],
     "deny": [],
     "ask": []

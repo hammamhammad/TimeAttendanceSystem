@@ -526,8 +526,8 @@ export class EditEmployeeComponent implements OnInit {
       gender: employee.gender || '',
       employmentStatus: employee.employmentStatus,
       workLocationType: employee.workLocationType,
-      departmentId: employee.departmentId || '',
-      managerEmployeeId: employee.managerEmployeeId || ''
+      departmentId: employee.departmentId ? employee.departmentId.toString() : '',
+      managerEmployeeId: employee.managerEmployeeId ? employee.managerEmployeeId.toString() : ''
     });
   }
 

@@ -84,7 +84,7 @@ public class GetEmployeeByIdQueryHandler : BaseHandler<GetEmployeeByIdQuery, Res
             PhotoUrl = employee.PhotoUrl,
             CurrentShiftId = currentShiftAssignment?.ShiftId,
             CurrentShiftName = currentShiftAssignment?.Shift?.Name,
-            IsActive = !employee.IsDeleted,
+            IsActive = employee.IsActive,
             CreatedAtUtc = employee.CreatedAtUtc,
             ModifiedAtUtc = employee.ModifiedAtUtc,
             CreatedBy = employee.CreatedBy,

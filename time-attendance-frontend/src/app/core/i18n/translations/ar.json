@@ -217,10 +217,36 @@
     "select_branch_first": "يرجى اختيار الفرع أولاً",
     "no_employees_found": "لم يتم العثور على موظفين",
     "search_placeholder": "البحث بالاسم أو رقم الموظف أو البريد الإلكتروني...",
+    "view_details": "عرض التفاصيل",
+    "edit": "تعديل موظف",
+    "employment_details": "تفاصيل التوظيف",
+    "arabic_names": "الأسماء العربية",
+    "employee_not_found": "الموظف غير موجود",
+    "activate": "تفعيل الموظف",
+    "deactivate": "إلغاء تفعيل الموظف",
+    "delete": "حذف الموظف",
+    "confirm_deactivate": "هل أنت متأكد من إلغاء تفعيل هذا الموظف؟",
+    "confirm_delete_title": "حذف الموظف",
+    "confirm_delete_message": "هل أنت متأكد من حذف هذا الموظف نهائياً؟ لا يمكن التراجع عن هذا الإجراء.",
     "delete_confirmation": "هل أنت متأكد من حذف هذا الموظف؟ لا يمكن التراجع عن هذا الإجراء.",
     "employee_added": "تم إضافة الموظف بنجاح",
     "employee_updated": "تم تحديث الموظف بنجاح",
     "employee_deleted": "تم حذف الموظف بنجاح",
+    "delete_success": "تم حذف الموظف بنجاح",
+    "loading_details": "جاري تحميل تفاصيل الموظف...",
+    "new_shift_assignment": "تعيين نوبة جديدة",
+    "changing_shift": "جاري تغيير النوبة...",
+    "help": {
+      "shift_advance_planning": "يمكنك جدولة تغييرات النوبة مسبقاً عن طريق اختيار تاريخ سريان مستقبلي.",
+      "shift_change_instructions": "اتبع هذه الخطوات لتغيير نوبة الموظف:",
+      "select_new_shift": "اختر النوبة الجديدة من القائمة المنسدلة",
+      "future_date_required": "اختر تاريخ السريان (اليوم أو تاريخ مستقبلي)",
+      "optional_notes": "أضف ملاحظات اختيارية حول سبب تغيير النوبة"
+    },
+    "placeholders": {
+      "select_shift": "اختر نوبة...",
+      "shift_change_notes": "سبب تغيير النوبة..."
+    },
     "validation_rules": {
       "title": "قواعد وإرشادات إنشاء الموظف",
       "employee_number": "رقم الموظف يجب أن يكون 3-20 حرف يحتوي على أحرف وأرقام وشرطات فقط",
@@ -372,6 +398,10 @@
     "unlock_account": "إلغاء قفل الحساب",
     "user_not_found": "المستخدم غير موجود"
   },
+  "branch": {
+    "title": "الفرع",
+    "select": "اختر الفرع"
+  },
   "department": {
     "title": "إدارة الأقسام",
     "departments": "الأقسام",
@@ -432,6 +462,7 @@
   },
   "departments": {
     "title": "الأقسام",
+    "create": "إنشاء قسم",
     "view_details": "عرض تفاصيل القسم",
     "edit": "تعديل القسم",
     "name": "اسم القسم",
@@ -1666,6 +1697,8 @@
     "status": "الحالة",
     "isApproved": "معتمدة",
     "notes": "الملاحظات",
+    "newShift": "النوبة الجديدة",
+    "effectiveDate": "تاريخ السريان",
     "search": "بحث",
     "createdAt": "تاريخ الإنشاء",
     "daysUnit": "أيام",

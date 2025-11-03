@@ -228,10 +228,29 @@
     "employee_not_found": "Employee not found",
     "activate": "Activate Employee",
     "deactivate": "Deactivate Employee",
+    "delete": "Delete Employee",
+    "confirm_deactivate": "Are you sure you want to deactivate this employee?",
+    "confirm_delete_title": "Delete Employee",
+    "confirm_delete_message": "Are you sure you want to permanently delete this employee? This action cannot be undone.",
     "delete_confirmation": "Are you sure you want to delete this employee? This action cannot be undone.",
     "employee_added": "Employee added successfully",
     "employee_updated": "Employee updated successfully",
     "employee_deleted": "Employee deleted successfully",
+    "delete_success": "Employee deleted successfully",
+    "loading_details": "Loading employee details...",
+    "new_shift_assignment": "New Shift Assignment",
+    "changing_shift": "Changing shift...",
+    "help": {
+      "shift_advance_planning": "You can schedule shift changes in advance by selecting a future effective date.",
+      "shift_change_instructions": "Follow these steps to change an employee's shift:",
+      "select_new_shift": "Select the new shift from the dropdown menu",
+      "future_date_required": "Choose an effective date (today or future date)",
+      "optional_notes": "Optionally add notes about the reason for the shift change"
+    },
+    "placeholders": {
+      "select_shift": "Select a shift...",
+      "shift_change_notes": "Reason for shift change..."
+    },
     "validation_rules": {
       "title": "Employee Creation Rules & Guidelines",
       "employee_number": "Employee number must be 3-20 characters with letters, numbers, and hyphens only",
@@ -332,6 +351,10 @@
     "edit": "Edit",
     "system_role_name_readonly": "System role name cannot be modified",
     "name_placeholder": "Enter role name"
+  },
+  "branch": {
+    "title": "Branch",
+    "select": "Select Branch"
   },
   "branches": {
     "title": "Branch Management",
@@ -464,6 +487,7 @@
   },
   "departments": {
     "title": "Departments",
+    "create": "Create Department",
     "view_details": "View Department Details",
     "edit": "Edit Department",
     "name": "Department Name",
@@ -1709,6 +1733,8 @@
     "status": "Status",
     "isApproved": "Approved",
     "notes": "Notes",
+    "newShift": "New Shift",
+    "effectiveDate": "Effective Date",
     "search": "Search",
     "createdAt": "Created At",
     "createdBy": "Created By",

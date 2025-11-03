@@ -50,7 +50,7 @@ public class GetEmployeesQueryHandler : BaseHandler<GetEmployeesQuery, Result<Pa
 
         if (request.IsActive.HasValue)
         {
-            query = query.Where(e => !e.IsDeleted == request.IsActive.Value);
+            query = query.Where(e => e.IsActive == request.IsActive.Value);
         }
 
         if (!string.IsNullOrEmpty(request.EmploymentStatus) && 
@@ -109,7 +109,7 @@ public class GetEmployeesQueryHandler : BaseHandler<GetEmployeesQuery, Result<Pa
                     .ThenByDescending(sa => sa.EffectiveFromDate)
                     .Join(Context.Shifts, sa => sa.ShiftId, s => s.Id, (sa, s) => s.Name)
                     .FirstOrDefault(),
-                IsActive = !e.IsDeleted,
+                IsActive = e.IsActive,
                 HasUserAccount = Context.EmployeeUserLinks.Any(eul => eul.EmployeeId == e.Id),
                 CreatedAtUtc = e.CreatedAtUtc
             })

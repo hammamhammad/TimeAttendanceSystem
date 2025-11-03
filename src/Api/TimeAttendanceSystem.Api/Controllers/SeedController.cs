@@ -14,6 +14,24 @@ public class SeedController : ControllerBase
         _context = context;
     }
 
+    [HttpPost("essential-data")]
+    public async Task<IActionResult> SeedEssentialData()
+    {
+        try
+        {
+            await SeedData.SeedAsync(_context);
+            return Ok(new { message = "✅ Essential data seeded successfully! Permissions, roles, and system users updated." });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new {
+                error = $"❌ Error seeding essential data: {ex.Message}",
+                innerError = ex.InnerException?.Message,
+                fullException = ex.ToString()
+            });
+        }
+    }
+
     [HttpPost("test-data")]
     public async Task<IActionResult> SeedTestData()
     {

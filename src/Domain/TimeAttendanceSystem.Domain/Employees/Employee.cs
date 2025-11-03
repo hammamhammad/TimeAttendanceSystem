@@ -119,6 +119,15 @@ public class Employee : BaseEntity
     public WorkLocationType WorkLocationType { get; set; }
     public string? PhotoUrl { get; set; }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether this employee is active in the system.
+    /// Active employees can access the system and are visible in normal operations.
+    /// Inactive employees are hidden from normal operations but data is preserved.
+    /// This is separate from IsDeleted (soft delete) which marks records for permanent removal.
+    /// </summary>
+    /// <value>Boolean flag indicating active status (true = active, false = inactive)</value>
+    public bool IsActive { get; set; } = true;
+
     public Branch Branch { get; set; } = null!;
     public Department? Department { get; set; }
     public Employee? Manager { get; set; }

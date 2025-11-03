@@ -18,7 +18,7 @@ public class ToggleEmployeeStatusCommandHandler : BaseHandler<ToggleEmployeeStat
 
     public override async Task<Result<bool>> Handle(ToggleEmployeeStatusCommand request, CancellationToken cancellationToken)
     {
-        // Find the employee
+        // Find the employee - no need to ignore query filters since we're using IsActive now
         var employee = await Context.Employees
             .FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken);
 
@@ -27,15 +27,13 @@ public class ToggleEmployeeStatusCommandHandler : BaseHandler<ToggleEmployeeStat
             return Result.Failure<bool>("Employee not found");
         }
 
-        // Toggle the IsDeleted flag (which maps to IsActive in DTOs)
-        // IsActive = !IsDeleted, so toggling IsDeleted toggles the active status
-        var isCurrentlyActive = !employee.IsDeleted;
-        employee.IsDeleted = isCurrentlyActive; // If currently active (IsDeleted=false), set to true (inactive)
+        // Toggle the IsActive flag
+        employee.IsActive = !employee.IsActive;
         employee.ModifiedAtUtc = DateTime.UtcNow;
         employee.ModifiedBy = CurrentUser.Username;
 
         // Determine the audit action
-        var auditAction = !employee.IsDeleted // Now active (IsDeleted=false)
+        var auditAction = employee.IsActive
             ? AuditAction.EmployeeActivated
             : AuditAction.EmployeeDeactivated;
 
@@ -52,14 +50,14 @@ public class ToggleEmployeeStatusCommandHandler : BaseHandler<ToggleEmployeeStat
                 EmployeeNumber = employee.EmployeeNumber,
                 FullName = employee.FullName,
                 EmploymentStatus = employee.EmploymentStatus.ToString(),
-                IsActive = !employee.IsDeleted
+                IsActive = employee.IsActive
             }),
             CreatedAtUtc = DateTime.UtcNow
         });
 
         await Context.SaveChangesAsync(cancellationToken);
 
-        // Return true if now active, false if now inactive
-        return Result.Success(!employee.IsDeleted);
+        // Return the new active status
+        return Result.Success(employee.IsActive);
     }
 }
