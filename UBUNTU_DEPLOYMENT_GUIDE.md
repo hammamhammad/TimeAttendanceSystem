@@ -378,8 +378,8 @@ cat > appsettings.Production.json << 'EOF'
   "Cors": {
     "PolicyName": "ProductionCorsPolicy",
     "AllowedOrigins": [
-      "http://20.196.112.66",
-      "http://20.196.112.66:4200",
+      "https://www.clockn.net",
+      "https://clockn.net",
       "http://localhost:4200"
     ],
     "AllowedMethods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
@@ -425,7 +425,7 @@ cat appsettings.Production.json
 - **Database**: PostgreSQL 18 (Docker) with `postgres` user and password `P@ssw0rd@3213`
 - **Database Name**: `TimeAttendanceSystem` (matches development environment)
 - **JWT Secret**: Pre-generated secure 256-bit key (can regenerate with `openssl rand -base64 64`)
-- **CORS**: Configured for server IP `20.196.112.66` (update if using domain name)
+- **CORS**: Configured for production domain `https://www.clockn.net` and `https://clockn.net`
 - **Important**: The `DatabaseProvider` field is required for the application to use PostgreSQL
 
 ### 3. Build Backend
@@ -495,7 +495,7 @@ vim src/environments/environment.prod.ts
 ```typescript
 export const environment = {
   production: true,
-  apiUrl: 'http://20.196.112.66'  // No trailing /api - services append /api/v1/...
+  apiUrl: 'https://www.clockn.net'  // No trailing /api - services append /api/v1/...
 };
 ```
 
@@ -550,7 +550,7 @@ upstream backend {
 server {
     listen 80;
     listen [::]:80;
-    server_name 20.196.112.66;
+    server_name www.clockn.net clockn.net;
 
     # Allow Let's Encrypt challenges
     location /.well-known/acme-challenge/ {
@@ -567,11 +567,11 @@ server {
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name 20.196.112.66;
+    server_name www.clockn.net clockn.net;
 
     # SSL Certificates (will be configured after Let's Encrypt setup)
-    ssl_certificate /etc/letsencrypt/live/20.196.112.66/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/20.196.112.66/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/www.clockn.net/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/www.clockn.net/privkey.pem;
 
     # SSL Configuration (Strong Security)
     ssl_protocols TLSv1.2 TLSv1.3;
@@ -588,7 +588,7 @@ server {
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-XSS-Protection "1; mode=block" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://20.196.112.66;" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://www.clockn.net https://clockn.net;" always;
 
     # Logging
     access_log /var/log/nginx/timeattendance_access.log;
@@ -1740,7 +1740,7 @@ sudo systemctl reload nginx
 
 #### 4. API Endpoints Return 404 Not Found
 
-**Problem:** API calls return 404 errors: `GET http://20.196.112.66/api/v1/branches 404 (Not Found)`
+**Problem:** API calls return 404 errors: `GET https://www.clockn.net/api/v1/branches 404 (Not Found)`
 
 **Common Causes:**
 1. Double `/api/` in URL (e.g., `/api/api/v1/...`)
@@ -1751,7 +1751,7 @@ sudo systemctl reload nginx
 
 **A. Check for Double /api/ in Browser Network Tab**
 ```bash
-# If you see URLs like: http://20.196.112.66/api/api/v1/branches
+# If you see URLs like: https://www.clockn.net/api/api/v1/branches
 # The frontend environment.prod.ts has wrong apiUrl
 
 # On Ubuntu server, fix the frontend configuration:
@@ -1761,7 +1761,7 @@ cd /opt/timeattendance/app/time-attendance-frontend
 cat > src/environments/environment.prod.ts << 'EOF'
 export const environment = {
   production: true,
-  apiUrl: 'http://20.196.112.66'
+  apiUrl: 'https://www.clockn.net'
 };
 EOF
 
@@ -1804,7 +1804,7 @@ curl -v http://localhost:5099/api/v1/branches
 curl -v http://localhost/api/v1/branches
 
 # 3. Check from browser network tab - URL should be:
-# http://20.196.112.66/api/v1/branches (single /api/, not double)
+# https://www.clockn.net/api/v1/branches (single /api/, not double)
 ```
 
 #### 5. SSL Certificate Issues
@@ -1989,5 +1989,644 @@ For ongoing support:
 
 ---
 
+## Deploying New Versions from GitHub
+
+This section covers the complete process of deploying new versions of both backend and frontend from GitHub to your production server.
+
+### Prerequisites
+
+Before deploying, ensure:
+- You have SSH access to the server
+- Git is configured on the server
+- All services are running properly
+- You have committed and pushed changes to GitHub
+
+### Complete Deployment Process
+
+#### Step 1: Connect to Server
+
+```bash
+# SSH into your production server
+ssh timeattendance@20.196.112.66
+
+# Optional: Switch to application user if not already
+sudo su - timeattendance
+```
+
+**Note:** The production domain is `https://www.clockn.net` but SSH still uses the server IP address.
+
+#### Step 2: Backup Current State (Recommended)
+
+```bash
+# Create a quick backup before deployment
+DATE=$(date +"%Y%m%d_%H%M%S")
+cd /opt/timeattendance
+
+# Backup current published backend
+sudo cp -r publish publish.backup.$DATE
+
+# Backup current frontend
+sudo cp -r /var/www/timeattendance /var/www/timeattendance.backup.$DATE
+
+echo "Backup created with timestamp: $DATE"
+```
+
+#### Step 3: Pull Latest Changes from GitHub
+
+```bash
+# Navigate to application directory
+cd /opt/timeattendance/app
+
+# Fetch latest changes
+git fetch origin
+
+# Check current branch
+git branch
+
+# Pull latest changes from main branch
+git pull origin main
+
+# Verify the pull was successful
+git log -1 --oneline
+```
+
+**If you encounter merge conflicts:**
+```bash
+# Stash local changes (if any)
+git stash
+
+# Pull again
+git pull origin main
+
+# Review what was stashed
+git stash list
+```
+
+#### Step 4: Deploy Backend (.NET)
+
+##### A. Build and Publish
+
+```bash
+# Navigate to API project
+cd /opt/timeattendance/app/src/Api/TimeAttendanceSystem.Api
+
+# Restore dependencies
+dotnet restore
+
+# Build in Release mode
+dotnet build --configuration Release
+
+# Check for build errors
+if [ $? -eq 0 ]; then
+    echo "Build successful!"
+else
+    echo "Build failed! Check errors above."
+    exit 1
+fi
+
+# Publish to production directory
+dotnet publish --configuration Release --output /opt/timeattendance/publish
+
+echo "Backend published successfully!"
+```
+
+##### B. Apply Database Migrations (if any)
+
+```bash
+# Navigate to Infrastructure project
+cd /opt/timeattendance/app/src/Infrastructure/TimeAttendanceSystem.Infrastructure
+
+# Check for pending migrations
+ASPNETCORE_ENVIRONMENT=Production dotnet ef migrations list \
+  --startup-project ../../Api/TimeAttendanceSystem.Api \
+  --context TimeAttendanceDbContext
+
+# Apply migrations
+ASPNETCORE_ENVIRONMENT=Production dotnet ef database update \
+  --startup-project ../../Api/TimeAttendanceSystem.Api \
+  --context TimeAttendanceDbContext \
+  --verbose
+
+# Verify migration was successful
+if [ $? -eq 0 ]; then
+    echo "Database migrations applied successfully!"
+else
+    echo "Database migration failed! Check errors above."
+    exit 1
+fi
+```
+
+##### C. Restart Backend Service
+
+```bash
+# Restart the backend service
+sudo systemctl restart timeattendance.service
+
+# Wait a few seconds for service to start
+sleep 5
+
+# Check service status
+sudo systemctl status timeattendance.service
+
+# View recent logs to ensure no errors
+sudo journalctl -u timeattendance.service -n 50 --no-pager
+
+# Test backend is responding
+curl -i http://localhost:5099/api/v1/branches
+```
+
+**If service fails to start:**
+```bash
+# Check detailed logs
+sudo journalctl -u timeattendance.service -n 100 --no-pager
+
+# Check if port is already in use
+sudo netstat -tlnp | grep 5099
+
+# Try running manually to see errors
+cd /opt/timeattendance/publish
+ASPNETCORE_ENVIRONMENT=Production dotnet TimeAttendanceSystem.Api.dll
+```
+
+#### Step 5: Deploy Frontend (Angular)
+
+##### A. Update Environment Configuration (if needed)
+
+```bash
+# Navigate to frontend directory
+cd /opt/timeattendance/app/time-attendance-frontend
+
+# Verify production environment settings
+cat src/environments/environment.prod.ts
+
+# Should show:
+# export const environment = {
+#   production: true,
+#   apiUrl: 'https://www.clockn.net'
+# };
+
+# If incorrect, update it:
+cat > src/environments/environment.prod.ts << 'EOF'
+export const environment = {
+  production: true,
+  apiUrl: 'https://www.clockn.net'
+};
+EOF
+```
+
+##### B. Install Dependencies (if package.json changed)
+
+```bash
+# Check if package.json was updated
+git diff HEAD~1 HEAD package.json
+
+# If package.json changed, reinstall dependencies
+if [ $? -eq 0 ]; then
+    echo "package.json changed, reinstalling dependencies..."
+    rm -rf node_modules package-lock.json
+    npm install
+else
+    echo "No package.json changes detected"
+fi
+```
+
+##### C. Build Frontend
+
+```bash
+# Clean previous build artifacts
+rm -rf dist/ .angular/cache node_modules/.cache
+
+# Build for production
+npm run build -- --configuration production
+
+# Verify build was successful
+if [ $? -eq 0 ]; then
+    echo "Frontend build successful!"
+    ls -lh dist/time-attendance-frontend/browser/
+else
+    echo "Frontend build failed! Check errors above."
+    exit 1
+fi
+```
+
+##### D. Deploy Frontend Files
+
+```bash
+# Remove old frontend files
+sudo rm -rf /var/www/timeattendance/*
+
+# Copy new build files
+sudo cp -r dist/time-attendance-frontend/browser/* /var/www/timeattendance/
+
+# Set correct permissions
+sudo chown -R www-data:www-data /var/www/timeattendance
+sudo chmod -R 755 /var/www/timeattendance
+
+# Verify files were copied
+ls -lh /var/www/timeattendance/
+
+echo "Frontend deployed successfully!"
+```
+
+##### E. Clear Nginx Cache and Reload
+
+```bash
+# Test Nginx configuration
+sudo nginx -t
+
+# Reload Nginx (not restart, to avoid downtime)
+sudo systemctl reload nginx
+
+# Check Nginx status
+sudo systemctl status nginx
+
+echo "Nginx reloaded successfully!"
+```
+
+#### Step 6: Post-Deployment Verification
+
+##### A. Test Backend API
+
+```bash
+# Test backend directly
+curl -i http://localhost:5099/api/v1/branches
+
+# Test through Nginx
+curl -i http://localhost/api/v1/branches
+
+# Check if expected response (should return JSON data or require authentication)
+```
+
+##### B. Test Frontend
+
+```bash
+# Test frontend home page
+curl -I http://localhost/
+
+# Should return 200 OK and Content-Type: text/html
+```
+
+##### C. Check All Services
+
+```bash
+# Check all service statuses
+sudo systemctl status timeattendance nginx
+
+# Check PostgreSQL container
+sudo docker ps | grep timeattendance-postgres
+
+# Check listening ports
+sudo netstat -tlnp | grep -E '5099|80|443|5432'
+```
+
+##### D. Monitor Logs for Errors
+
+```bash
+# Monitor backend logs (Ctrl+C to exit)
+sudo journalctl -u timeattendance.service -f
+
+# In another terminal, monitor Nginx errors
+sudo tail -f /var/log/nginx/timeattendance_error.log
+
+# Check for any PostgreSQL errors
+sudo docker logs --tail 50 timeattendance-postgres
+```
+
+#### Step 7: Test in Browser
+
+1. **Clear browser cache**: Press `Ctrl+Shift+R` (or `Cmd+Shift+R` on Mac)
+2. **Navigate to**: `https://www.clockn.net`
+3. **Test login**: Use credentials `admin` / `Admin@123`
+4. **Test key features**:
+   - Navigation between pages
+   - Data loading (employees, branches, etc.)
+   - Create/Edit/Delete operations
+   - Check for console errors (F12 → Console)
+   - Check network requests (F12 → Network)
+
+#### Step 8: Rollback (if needed)
+
+If something goes wrong, you can quickly rollback:
+
+```bash
+# Stop the service
+sudo systemctl stop timeattendance.service
+
+# Restore backend from backup
+DATE=YYYYMMDD_HHMMSS  # Replace with your backup timestamp
+sudo rm -rf /opt/timeattendance/publish
+sudo mv /opt/timeattendance/publish.backup.$DATE /opt/timeattendance/publish
+
+# Restore frontend from backup
+sudo rm -rf /var/www/timeattendance
+sudo mv /var/www/timeattendance.backup.$DATE /var/www/timeattendance
+sudo chown -R www-data:www-data /var/www/timeattendance
+
+# Restart services
+sudo systemctl start timeattendance.service
+sudo systemctl reload nginx
+
+echo "Rollback completed!"
+```
+
+**Database Rollback (if migration was applied):**
+```bash
+# Navigate to Infrastructure project
+cd /opt/timeattendance/app/src/Infrastructure/TimeAttendanceSystem.Infrastructure
+
+# List all migrations
+ASPNETCORE_ENVIRONMENT=Production dotnet ef migrations list \
+  --startup-project ../../Api/TimeAttendanceSystem.Api \
+  --context TimeAttendanceDbContext
+
+# Rollback to previous migration
+ASPNETCORE_ENVIRONMENT=Production dotnet ef database update PreviousMigrationName \
+  --startup-project ../../Api/TimeAttendanceSystem.Api \
+  --context TimeAttendanceDbContext
+```
+
+### Quick Deployment Script
+
+Create a deployment script for faster deployments:
+
+```bash
+# Create deployment script
+sudo vim /opt/timeattendance/deploy.sh
+```
+
+```bash
+#!/bin/bash
+
+# Time Attendance System - Deployment Script
+# Usage: ./deploy.sh [backend|frontend|both]
+
+set -e  # Exit on any error
+
+DEPLOY_TYPE=${1:-both}
+APP_DIR="/opt/timeattendance/app"
+PUBLISH_DIR="/opt/timeattendance/publish"
+FRONTEND_DIR="/var/www/timeattendance"
+DATE=$(date +"%Y%m%d_%H%M%S")
+
+echo "=========================================="
+echo "Time Attendance System Deployment"
+echo "Deploy Type: $DEPLOY_TYPE"
+echo "Timestamp: $DATE"
+echo "=========================================="
+
+# Function: Create backup
+backup() {
+    echo "[1/7] Creating backup..."
+    if [ "$DEPLOY_TYPE" = "backend" ] || [ "$DEPLOY_TYPE" = "both" ]; then
+        sudo cp -r $PUBLISH_DIR $PUBLISH_DIR.backup.$DATE
+        echo "  ✓ Backend backup created"
+    fi
+
+    if [ "$DEPLOY_TYPE" = "frontend" ] || [ "$DEPLOY_TYPE" = "both" ]; then
+        sudo cp -r $FRONTEND_DIR $FRONTEND_DIR.backup.$DATE
+        echo "  ✓ Frontend backup created"
+    fi
+}
+
+# Function: Pull latest code
+pull_code() {
+    echo "[2/7] Pulling latest code from GitHub..."
+    cd $APP_DIR
+    git fetch origin
+    git pull origin main
+    echo "  ✓ Code pulled successfully"
+}
+
+# Function: Deploy backend
+deploy_backend() {
+    echo "[3/7] Deploying backend..."
+
+    # Build and publish
+    cd $APP_DIR/src/Api/TimeAttendanceSystem.Api
+    echo "  → Restoring dependencies..."
+    dotnet restore
+
+    echo "  → Building..."
+    dotnet build --configuration Release
+
+    echo "  → Publishing..."
+    dotnet publish --configuration Release --output $PUBLISH_DIR
+
+    # Apply migrations
+    echo "  → Applying database migrations..."
+    cd $APP_DIR/src/Infrastructure/TimeAttendanceSystem.Infrastructure
+    ASPNETCORE_ENVIRONMENT=Production dotnet ef database update \
+      --startup-project ../../Api/TimeAttendanceSystem.Api \
+      --context TimeAttendanceDbContext
+
+    # Restart service
+    echo "  → Restarting backend service..."
+    sudo systemctl restart timeattendance.service
+    sleep 3
+
+    # Verify
+    if sudo systemctl is-active --quiet timeattendance.service; then
+        echo "  ✓ Backend deployed successfully"
+    else
+        echo "  ✗ Backend service failed to start!"
+        sudo journalctl -u timeattendance.service -n 20 --no-pager
+        exit 1
+    fi
+}
+
+# Function: Deploy frontend
+deploy_frontend() {
+    echo "[4/7] Deploying frontend..."
+
+    cd $APP_DIR/time-attendance-frontend
+
+    # Check if package.json changed
+    if git diff HEAD~1 HEAD --quiet package.json; then
+        echo "  → No package.json changes"
+    else
+        echo "  → Installing dependencies..."
+        npm ci
+    fi
+
+    # Build
+    echo "  → Building frontend..."
+    rm -rf dist/ .angular/cache
+    npm run build -- --configuration production
+
+    # Deploy
+    echo "  → Deploying files..."
+    sudo rm -rf $FRONTEND_DIR/*
+    sudo cp -r dist/time-attendance-frontend/browser/* $FRONTEND_DIR/
+    sudo chown -R www-data:www-data $FRONTEND_DIR
+    sudo chmod -R 755 $FRONTEND_DIR
+
+    # Reload Nginx
+    echo "  → Reloading Nginx..."
+    sudo nginx -t && sudo systemctl reload nginx
+
+    echo "  ✓ Frontend deployed successfully"
+}
+
+# Function: Verify deployment
+verify_deployment() {
+    echo "[5/7] Verifying deployment..."
+
+    # Check services
+    echo "  → Checking services..."
+    sudo systemctl is-active --quiet timeattendance.service && echo "    ✓ Backend service: Running" || echo "    ✗ Backend service: Stopped"
+    sudo systemctl is-active --quiet nginx && echo "    ✓ Nginx: Running" || echo "    ✗ Nginx: Stopped"
+    sudo docker ps | grep -q timeattendance-postgres && echo "    ✓ PostgreSQL: Running" || echo "    ✗ PostgreSQL: Stopped"
+
+    # Test API
+    echo "  → Testing API..."
+    if curl -sf http://localhost:5099/api/v1/branches > /dev/null 2>&1; then
+        echo "    ✓ Backend API: Responding"
+    else
+        echo "    ✗ Backend API: Not responding"
+    fi
+
+    # Test frontend
+    echo "  → Testing frontend..."
+    if curl -sf http://localhost/ > /dev/null 2>&1; then
+        echo "    ✓ Frontend: Responding"
+    else
+        echo "    ✗ Frontend: Not responding"
+    fi
+}
+
+# Function: Cleanup old backups
+cleanup_backups() {
+    echo "[6/7] Cleaning up old backups (keeping last 5)..."
+    cd /opt/timeattendance
+    ls -t publish.backup.* 2>/dev/null | tail -n +6 | xargs -r sudo rm -rf
+    sudo find /var/www -maxdepth 1 -name "timeattendance.backup.*" -type d | sort -r | tail -n +6 | xargs -r sudo rm -rf
+    echo "  ✓ Cleanup completed"
+}
+
+# Function: Show summary
+show_summary() {
+    echo "[7/7] Deployment Summary"
+    echo "=========================================="
+    echo "Deployment completed at: $(date)"
+    echo "Backup timestamp: $DATE"
+    echo ""
+    echo "Service Status:"
+    sudo systemctl status timeattendance.service --no-pager -l | grep "Active:"
+    sudo systemctl status nginx --no-pager -l | grep "Active:"
+    echo ""
+    echo "Recent Backend Logs:"
+    sudo journalctl -u timeattendance.service -n 5 --no-pager
+    echo ""
+    echo "=========================================="
+    echo "✓ Deployment completed successfully!"
+    echo ""
+    echo "Next Steps:"
+    echo "1. Clear browser cache (Ctrl+Shift+R)"
+    echo "2. Test the application: https://www.clockn.net"
+    echo "3. Monitor logs: sudo journalctl -u timeattendance.service -f"
+    echo ""
+    echo "Rollback command (if needed):"
+    echo "  sudo rm -rf $PUBLISH_DIR && sudo mv $PUBLISH_DIR.backup.$DATE $PUBLISH_DIR"
+    echo "  sudo systemctl restart timeattendance.service"
+    echo "=========================================="
+}
+
+# Main deployment flow
+main() {
+    backup
+    pull_code
+
+    if [ "$DEPLOY_TYPE" = "backend" ] || [ "$DEPLOY_TYPE" = "both" ]; then
+        deploy_backend
+    fi
+
+    if [ "$DEPLOY_TYPE" = "frontend" ] || [ "$DEPLOY_TYPE" = "both" ]; then
+        deploy_frontend
+    fi
+
+    verify_deployment
+    cleanup_backups
+    show_summary
+}
+
+# Run main function
+main
+```
+
+```bash
+# Make script executable
+sudo chmod +x /opt/timeattendance/deploy.sh
+
+# Usage examples:
+# Deploy both backend and frontend
+sudo /opt/timeattendance/deploy.sh both
+
+# Deploy only backend
+sudo /opt/timeattendance/deploy.sh backend
+
+# Deploy only frontend
+sudo /opt/timeattendance/deploy.sh frontend
+```
+
+### Deployment Best Practices
+
+1. **Always test in development first** before deploying to production
+2. **Create backups** before every deployment
+3. **Deploy during low-traffic hours** (late night/early morning)
+4. **Monitor logs** for at least 15-30 minutes after deployment
+5. **Test critical features** immediately after deployment
+6. **Keep rollback plan ready** in case something goes wrong
+7. **Document changes** in each deployment (version numbers, features added)
+8. **Use semantic versioning** for releases (e.g., v1.2.3)
+9. **Create git tags** for production releases
+10. **Notify users** about scheduled deployments if applicable
+
+### Troubleshooting Deployment Issues
+
+**Build fails with missing dependencies:**
+```bash
+# Clean and restore
+cd /opt/timeattendance/app/src/Api/TimeAttendanceSystem.Api
+dotnet clean
+rm -rf bin/ obj/
+dotnet restore
+```
+
+**Frontend build fails:**
+```bash
+# Clear all caches and reinstall
+cd /opt/timeattendance/app/time-attendance-frontend
+rm -rf node_modules package-lock.json dist/ .angular/
+npm install
+npm run build
+```
+
+**Service won't start after deployment:**
+```bash
+# Check logs
+sudo journalctl -u timeattendance.service -n 50 --no-pager
+
+# Check file permissions
+ls -la /opt/timeattendance/publish/
+
+# Try running manually
+cd /opt/timeattendance/publish
+ASPNETCORE_ENVIRONMENT=Production dotnet TimeAttendanceSystem.Api.dll
+```
+
+**Database migration fails:**
+```bash
+# Check connection string
+cat /opt/timeattendance/publish/appsettings.Production.json | grep -A 3 ConnectionStrings
+
+# Verify PostgreSQL is running
+sudo docker ps | grep postgres
+
+# Test database connection
+sudo docker exec -it timeattendance-postgres psql -U postgres -d TimeAttendanceSystem
+```
+
+---
+
 **Last Updated:** January 2025
-**Version:** 1.0
+**Version:** 1.1 - Added GitHub deployment procedures
