@@ -1,12 +1,12 @@
 import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ConfirmationService } from './confirmation.service';
 import { I18nService } from '../i18n/i18n.service';
 
 @Component({
   selector: 'app-confirmation',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   template: `
     @if (confirmationService.isVisible$()) {
       <!-- Modal Backdrop -->

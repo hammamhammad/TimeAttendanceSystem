@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { EmployeesService } from '../employees.service';
@@ -12,7 +12,7 @@ import { SearchableSelectComponent, SearchableSelectOption } from '../../../shar
 @Component({
   selector: 'app-edit-employee',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, SearchableSelectComponent],
+  imports: [RouterModule, ReactiveFormsModule, SearchableSelectComponent],
   template: `
     <div class="container-fluid">
       <!-- Header -->

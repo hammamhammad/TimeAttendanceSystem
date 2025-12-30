@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, computed, inject, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { UsersService } from '../users.service';
 import { UserDto, AssignRoleRequest } from '../../../shared/models/user.model';
@@ -17,7 +17,7 @@ interface Role {
 @Component({
   selector: 'app-role-management',
   standalone: true,
-  imports: [CommonModule, HasPermissionDirective, ModalWrapperComponent],
+  imports: [HasPermissionDirective, ModalWrapperComponent],
   templateUrl: './role-management.component.html',
   styleUrls: ['./role-management.component.css']
 })

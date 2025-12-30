@@ -1,0 +1,158 @@
+Using launch settings from D:\Work\AI Code\TimeAttendanceSystem\src\Api\TimeAttendanceSystem.Api\Properties\launchSettings.json...
+Building...
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10622]
+      Entity 'Employee' has a global query filter defined and is the required end of a relationship with the entity 'AttendanceRecord'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10622]
+      Entity 'Employee' has a global query filter defined and is the required end of a relationship with the entity 'AttendanceTransaction'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10622]
+      Entity 'Employee' has a global query filter defined and is the required end of a relationship with the entity 'EmployeeUserLink'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10622]
+      Entity 'VacationType' has a global query filter defined and is the required end of a relationship with the entity 'LeaveAccrualPolicy'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10622]
+      Entity 'Employee' has a global query filter defined and is the required end of a relationship with the entity 'LeaveBalance'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10622]
+      Entity 'Employee' has a global query filter defined and is the required end of a relationship with the entity 'LeaveEntitlement'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10622]
+      Entity 'User' has a global query filter defined and is the required end of a relationship with the entity 'RemoteWorkRequest'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10622]
+      Entity 'User' has a global query filter defined and is the required end of a relationship with the entity 'BlacklistedToken'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10622]
+      Entity 'User' has a global query filter defined and is the required end of a relationship with the entity 'PasswordHistory'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10622]
+      Entity 'Permission' has a global query filter defined and is the required end of a relationship with the entity 'RolePermission'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10622]
+      Entity 'User' has a global query filter defined and is the required end of a relationship with the entity 'TwoFactorBackupCode'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10622]
+      Entity 'Branch' has a global query filter defined and is the required end of a relationship with the entity 'UserBranchScope'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10622]
+      Entity 'Role' has a global query filter defined and is the required end of a relationship with the entity 'UserRole'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10622]
+      Entity 'User' has a global query filter defined and is the required end of a relationship with the entity 'UserSession'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10400]
+      Sensitive data logging is enabled. Log entries and exception messages may include sensitive application data; this mode should only be enabled during development.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10625]
+      The foreign key property 'Employee.DepartmentId1' was created in shadow state because a conflicting property with the simple name 'DepartmentId' exists in the entity type, but is either not mapped, is already used for another relationship, or is incompatible with the associated primary key type. See https://aka.ms/efcore-relationships for information on mapping relationships in EF Core.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[20601]
+      The 'ApprovalStatus' property 'ApprovalStatus' on entity type 'EmployeeExcuse' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'ApprovalStatus' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[20601]
+      The 'ShiftAssignmentStatus' property 'Status' on entity type 'ShiftAssignment' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'ShiftAssignmentStatus' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (41ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "MigrationId", "ProductVersion"
+      FROM "__EFMigrationsHistory"
+      ORDER BY "MigrationId";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (15ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE TABLE IF NOT EXISTS "__EFMigrationsHistory" (
+          "MigrationId" character varying(150) NOT NULL,
+          "ProductVersion" character varying(32) NOT NULL,
+          CONSTRAINT "PK___EFMigrationsHistory" PRIMARY KEY ("MigrationId")
+      );
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      LOCK TABLE "__EFMigrationsHistory" IN ACCESS EXCLUSIVE MODE
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "MigrationId", "ProductVersion"
+      FROM "__EFMigrationsHistory"
+      ORDER BY "MigrationId";
+info: Microsoft.EntityFrameworkCore.Migrations[20405]
+      No migrations were applied. The database is already up to date.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT p."Key"
+      FROM "Permissions" AS p
+      WHERE NOT (p."IsDeleted")
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM "Roles" AS r
+          WHERE NOT (r."IsDeleted"))
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM "Users" AS u
+          WHERE NOT (u."IsDeleted"))
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT r."Id", r."CreatedAtUtc", r."CreatedBy", r."IsDeletable", r."IsDeleted", r."IsEditable", r."IsSystem", r."ModifiedAtUtc", r."ModifiedBy", r."Name", r."RowVersion"
+      FROM "Roles" AS r
+      WHERE NOT (r."IsDeleted") AND r."Name" = 'SystemAdmin'
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT r."Id", r."CreatedAtUtc", r."CreatedBy", r."IsDeletable", r."IsDeleted", r."IsEditable", r."IsSystem", r."ModifiedAtUtc", r."ModifiedBy", r."Name", r."RowVersion"
+      FROM "Roles" AS r
+      WHERE NOT (r."IsDeleted") AND r."Name" = 'Admin'
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT p."Id", p."CreatedAtUtc", p."CreatedBy", p."Description", p."Group", p."IsDeleted", p."Key", p."ModifiedAtUtc", p."ModifiedBy", p."RowVersion"
+      FROM "Permissions" AS p
+      WHERE NOT (p."IsDeleted")
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (19ms) [Parameters=[@__role_Id_0='1'], CommandType='Text', CommandTimeout='30']
+      SELECT r."PermissionId"
+      FROM "RolePermissions" AS r
+      WHERE r."RoleId" = @__role_Id_0
+SystemAdmin role already has all required permissions
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@__role_Id_0='2'], CommandType='Text', CommandTimeout='30']
+      SELECT r."PermissionId"
+      FROM "RolePermissions" AS r
+      WHERE r."RoleId" = @__role_Id_0
+Admin role already has all required permissions
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM "Shifts" AS s
+          WHERE NOT (s."IsDeleted"))
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (15ms) [Parameters=[@p0='True', @p1=NULL (DbType = Time), @p2=NULL (DbType = Time), @p3='2025-12-20T16:51:10.0304482Z' (DbType = DateTime), @p4='SYSTEM' (Nullable = false), @p5='The default shift to all newly created employees', @p6='60' (Nullable = true), @p7='30' (Nullable = true), @p8=NULL (DbType = Int32), @p9='True', @p10='False', @p11='False', @p12='True', @p13=NULL (DbType = DateTime), @p14=NULL, @p15='Flexible hour 7:30 - 9:00' (Nullable = false), @p16=NULL (DbType = Decimal), @p17=NULL (DbType = Decimal), @p18='1', @p19='1'], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "Shifts" ("AllowFlexibleHours", "CoreEnd", "CoreStart", "CreatedAtUtc", "CreatedBy", "Description", "FlexMinutesAfter", "FlexMinutesBefore", "GracePeriodMinutes", "IsDefault", "IsDeleted", "IsFriday", "IsSunday", "ModifiedAtUtc", "ModifiedBy", "Name", "RequiredHours", "RequiredWeeklyHours", "ShiftType", "Status")
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11, @p12, @p13, @p14, @p15, @p16, @p17, @p18, @p19)
+      RETURNING "Id", "HasCoreHours", "IsAutoCheckOut", "RequiresCheckInOut", "IsMonday", "IsNightShift", "IsSaturday", "IsThursday", "IsTuesday", "IsWednesday", "RowVersion";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (13ms) [Parameters=[@p0='2025-12-20T16:51:10.3891197Z' (DbType = DateTime), @p1='SYSTEM' (Nullable = false), @p2='16:00' (DbType = Time), @p3='8.00', @p4='False', @p5=NULL (DbType = DateTime), @p6=NULL, @p7='1', @p8='1', @p9='08:00' (DbType = Time)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "ShiftPeriods" ("CreatedAtUtc", "CreatedBy", "EndTime", "Hours", "IsDeleted", "ModifiedAtUtc", "ModifiedBy", "PeriodOrder", "ShiftId", "StartTime")
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9)
+      RETURNING "Id", "IsNightPeriod", "RowVersion";
+✅ Default shift created: 'Flexible hour 7:30 - 9:00' (8:00-16:00)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM "RemoteWorkPolicies" AS r)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@p0='True', @p1=NULL, @p2=NULL (DbType = Int64), @p3='True', @p4='2025-12-20T16:51:10.5525456Z' (DbType = DateTime), @p5='SYSTEM' (Nullable = false), @p6='False', @p7='True', @p8='False', @p9='3' (Nullable = true), @p10='10' (Nullable = true), @p11='3' (Nullable = true), @p12='120' (Nullable = true), @p13='1' (Nullable = true), @p14=NULL (DbType = DateTime), @p15=NULL, @p16='False', @p17='0x' (Nullable = false)], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "RemoteWorkPolicies" ("AllowConsecutiveDays", "BlackoutPeriods", "BranchId", "CountForOvertime", "CreatedAtUtc", "CreatedBy", "EnforceShiftTimes", "IsActive", "IsDeleted", "MaxConsecutiveDays", "MaxDaysPerMonth", "MaxDaysPerWeek", "MaxDaysPerYear", "MinAdvanceNoticeDays", "ModifiedAtUtc", "ModifiedBy", "RequiresManagerApproval", "RowVersion")
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11, @p12, @p13, @p14, @p15, @p16, @p17)
+      RETURNING "Id";
+✅ Default remote work policy created: Company-wide (3 days/week, 10 days/month, 120 days/year)
+✅ Essential system data seeding completed (permissions, roles, systemadmin user, default shift, remote work policy)
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: http://localhost:5099
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: D:\Work\AI Code\TimeAttendanceSystem\src\Api\TimeAttendanceSystem.Api
+info: TimeAttendanceSystem.Infrastructure.BackgroundJobs.MonthlyLeaveAccrualJob[0]
+      Starting monthly leave accrual job at 12/20/2025 16:51:11 for 2025-11
+info: TimeAttendanceSystem.Application.LeaveManagement.Commands.ProcessMonthlyAccrual.ProcessMonthlyAccrualCommandHandler[0]
+      Starting monthly accrual processing for Year 2025, Month 11, EmployeeId ALL
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT e."Id"
+      FROM "Employees" AS e
+      WHERE NOT (e."IsDeleted")
+info: TimeAttendanceSystem.Application.Services.LeaveAccrualService[0]
+      Completed monthly accrual processing for year 2025, month 11. Success: 0, Errors: 0
+info: TimeAttendanceSystem.Application.LeaveManagement.Commands.ProcessMonthlyAccrual.ProcessMonthlyAccrualCommandHandler[0]
+      Successfully processed monthly accrual for 0 employees
+info: TimeAttendanceSystem.Infrastructure.BackgroundJobs.MonthlyLeaveAccrualJob[0]
+      Monthly leave accrual completed successfully for 2025-11. Processed 0 employee(s)

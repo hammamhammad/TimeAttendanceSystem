@@ -163,6 +163,92 @@
 
       <!-- Sidebar -->
       <div class="col-lg-4">
+        <!-- Leave Balance Card -->
+        @if (loadingBalance()) {
+          <div class="card mb-3">
+            <div class="card-body text-center py-4">
+              <div class="spinner-border spinner-border-sm text-primary" role="status">
+                <span class="visually-hidden">{{ i18n.t('common.loading') }}</span>
+              </div>
+              <p class="small text-muted mt-2 mb-0">{{ i18n.t('employee_vacations.loading_balance') }}</p>
+            </div>
+          </div>
+        } @else if (hasBalance()) {
+          <div class="card mb-3">
+            <div class="card-header bg-primary-subtle">
+              <h6 class="card-title mb-0 text-primary">
+                <i class="fas fa-balance-scale me-2"></i>
+                {{ i18n.t('employee_vacations.leave_balance') }}
+              </h6>
+            </div>
+            <div class="card-body">
+              <!-- Vacation Type Name -->
+              <div class="mb-3">
+                <small class="text-muted">{{ i18n.t('fields.vacationType') }}</small>
+                <div class="fw-semibold">{{ currentBalance()?.vacationTypeName }}</div>
+              </div>
+
+              <!-- Balance Details -->
+              <div class="row g-2 mb-3">
+                <div class="col-6">
+                  <div class="border rounded p-2 text-center">
+                    <small class="text-muted d-block">{{ i18n.t('employee_vacations.entitled') }}</small>
+                    <span class="fw-bold text-primary">{{ currentBalance()?.entitledDays || 0 }}</span>
+                    <small class="text-muted ms-1">{{ i18n.t('common.days') }}</small>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="border rounded p-2 text-center">
+                    <small class="text-muted d-block">{{ i18n.t('employee_vacations.used') }}</small>
+                    <span class="fw-bold text-warning">{{ currentBalance()?.usedDays || 0 }}</span>
+                    <small class="text-muted ms-1">{{ i18n.t('common.days') }}</small>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="border rounded p-2 text-center">
+                    <small class="text-muted d-block">{{ i18n.t('employee_vacations.pending') }}</small>
+                    <span class="fw-bold text-info">{{ currentBalance()?.pendingDays || 0 }}</span>
+                    <small class="text-muted ms-1">{{ i18n.t('common.days') }}</small>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="border rounded p-2 text-center bg-light">
+                    <small class="text-muted d-block">{{ i18n.t('employee_vacations.available') }}</small>
+                    <span class="fw-bold text-success fs-5">{{ currentBalance()?.currentBalance || 0 }}</span>
+                    <small class="text-muted ms-1">{{ i18n.t('common.days') }}</small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Requested Days -->
+              @if (requestedDays() > 0) {
+                <div class="border-top pt-3">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-muted">{{ i18n.t('employee_vacations.requested_days') }}:</span>
+                    <span class="fw-bold" [class.text-danger]="exceedsBalance()" [class.text-success]="!exceedsBalance()">
+                      {{ requestedDays() }} {{ i18n.t('common.days') }}
+                    </span>
+                  </div>
+
+                  @if (exceedsBalance()) {
+                    <div class="alert alert-warning mt-2 mb-0 py-2 px-3 small">
+                      <i class="fas fa-exclamation-triangle me-2"></i>
+                      {{ i18n.t('employee_vacations.exceeds_balance_warning') }}
+                    </div>
+                  } @else {
+                    <div class="d-flex justify-content-between align-items-center mt-2 text-muted small">
+                      <span>{{ i18n.t('employee_vacations.remaining_after') }}:</span>
+                      <span class="fw-semibold text-success">
+                        {{ (currentBalance()?.currentBalance || 0) - requestedDays() }} {{ i18n.t('common.days') }}
+                      </span>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        }
+
         <!-- Help Card -->
         <div class="card">
           <div class="card-header">

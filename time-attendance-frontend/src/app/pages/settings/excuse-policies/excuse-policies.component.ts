@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { I18nService } from '../../../core/i18n/i18n.service';
@@ -16,12 +16,11 @@ import { PageHeaderComponent } from '../../../shared/components/page-header/page
   selector: 'app-excuse-policies',
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     DataTableComponent,
     UnifiedFilterComponent,
     PageHeaderComponent
-  ],
+],
   templateUrl: './excuse-policies.component.html',
   styleUrls: ['./excuse-policies.component.css']
 })

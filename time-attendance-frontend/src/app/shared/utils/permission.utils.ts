@@ -46,7 +46,10 @@ export const PermissionResources = {
   SYSTEM: 'system',
   VACATION_TYPE: 'vacationType',
   VACATION: 'vacation',
-  EXCUSE: 'excuse'
+  EXCUSE: 'excuse',
+  LEAVE_BALANCE: 'leave_balance',
+  WORKFLOW: 'workflow',
+  APPROVAL: 'approval'
 } as const;
 
 export const ActionDescriptions: Record<string, string> = {
@@ -97,7 +100,10 @@ export const ResourceDescriptions: Record<string, string> = {
   [PermissionResources.SYSTEM]: 'Core system functions',
   [PermissionResources.VACATION_TYPE]: 'Vacation types and leave policies',
   [PermissionResources.VACATION]: 'Employee vacation records and management',
-  [PermissionResources.EXCUSE]: 'Employee excuse management and approval'
+  [PermissionResources.EXCUSE]: 'Employee excuse management and approval',
+  [PermissionResources.LEAVE_BALANCE]: 'Leave balance and entitlement management',
+  [PermissionResources.WORKFLOW]: 'Approval workflow configuration',
+  [PermissionResources.APPROVAL]: 'Approval requests and actions'
 };
 
 export const ActionColors: Record<string, string> = {
@@ -148,7 +154,10 @@ export const ResourceIcons: Record<string, string> = {
   [PermissionResources.SYSTEM]: 'fa-server',
   [PermissionResources.VACATION_TYPE]: 'fa-calendar-times',
   [PermissionResources.VACATION]: 'fa-calendar-week',
-  [PermissionResources.EXCUSE]: 'fa-clipboard-check'
+  [PermissionResources.EXCUSE]: 'fa-clipboard-check',
+  [PermissionResources.LEAVE_BALANCE]: 'fa-balance-scale',
+  [PermissionResources.WORKFLOW]: 'fa-project-diagram',
+  [PermissionResources.APPROVAL]: 'fa-check-double'
 };
 
 export interface PermissionInfo {

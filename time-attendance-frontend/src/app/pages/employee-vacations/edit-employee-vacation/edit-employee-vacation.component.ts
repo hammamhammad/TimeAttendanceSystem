@@ -1,5 +1,5 @@
 import { Component, signal, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { I18nService } from '../../../core/i18n/i18n.service';
@@ -16,7 +16,6 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
   selector: 'app-edit-employee-vacation',
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     ReactiveFormsModule,
     SearchableSelectComponent,
@@ -24,7 +23,7 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
     FormSectionComponent,
     LoadingSpinnerComponent,
     StatusBadgeComponent
-  ],
+],
   templateUrl: './edit-employee-vacation.component.html',
   styleUrls: ['./edit-employee-vacation.component.css']
 })

@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router } from '@angular/router';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { BranchesService } from './branches.service';
@@ -17,12 +17,11 @@ import { PageHeaderComponent } from '../../shared/components/page-header/page-he
   selector: 'app-branches',
   standalone: true,
   imports: [
-    CommonModule,
     UnifiedFilterComponent,
     BranchTableComponent,
     BranchFormModalComponent,
     PageHeaderComponent
-  ],
+],
   templateUrl: './branches.component.html',
   styleUrls: ['./branches.component.css']
 })

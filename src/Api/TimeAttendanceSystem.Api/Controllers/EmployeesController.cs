@@ -245,7 +245,10 @@ public class EmployeesController : ControllerBase
             request.JobTitleAr,
             request.DepartmentId,
             request.ManagerEmployeeId,
-            request.WorkLocationType
+            request.WorkLocationType,
+            request.CreateUserAccount,
+            request.DefaultPassword,
+            request.RoleIds
         );
 
         var result = await _mediator.Send(command);
@@ -452,6 +455,9 @@ public class EmployeesController : ControllerBase
 /// <param name="DepartmentId">Department assignment within branch organizational structure (optional)</param>
 /// <param name="ManagerEmployeeId">Manager employee ID for reporting hierarchy (optional)</param>
 /// <param name="WorkLocationType">Work arrangement type (Office, Remote, Hybrid, Field, etc.)</param>
+/// <param name="CreateUserAccount">Whether to create a user account for this employee (optional, default false)</param>
+/// <param name="DefaultPassword">Default password for the user account (optional, defaults to employeeNumber!)</param>
+/// <param name="RoleIds">Role IDs to assign to the user account (optional, defaults to Employee role)</param>
 public record CreateEmployeeRequest(
     long BranchId,
     string EmployeeNumber,
@@ -470,7 +476,10 @@ public record CreateEmployeeRequest(
     string? JobTitleAr,
     long? DepartmentId,
     long? ManagerEmployeeId,
-    WorkLocationType WorkLocationType
+    WorkLocationType WorkLocationType,
+    bool CreateUserAccount = false,
+    string? DefaultPassword = null,
+    List<long>? RoleIds = null
 );
 
 /// <summary>

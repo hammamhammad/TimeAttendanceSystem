@@ -1,0 +1,46 @@
+/* Approval History Component Styles */
+
+.badge {
+  font-weight: 500;
+}
+
+/* Filter section */
+.card .form-label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+/* Table styling */
+.table th {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+/* Comments column */
+.text-muted[title] {
+  cursor: help;
+}
+
+/* Pagination */
+.pagination {
+  margin-bottom: 0;
+}
+
+.page-link {
+  padding: 0.375rem 0.75rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .row.g-3 > div {
+    margin-bottom: 0.5rem;
+  }
+
+  .table-responsive {
+    font-size: 0.875rem;
+  }
+}

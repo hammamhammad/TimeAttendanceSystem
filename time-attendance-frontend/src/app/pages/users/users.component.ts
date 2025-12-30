@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router } from '@angular/router';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { UsersService } from './users.service';
@@ -21,7 +21,7 @@ interface Role {
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule, RoleManagementComponent, UnifiedFilterComponent, UserTableComponent, PageHeaderComponent],
+  imports: [RoleManagementComponent, UnifiedFilterComponent, UserTableComponent, PageHeaderComponent],
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.css']
 })

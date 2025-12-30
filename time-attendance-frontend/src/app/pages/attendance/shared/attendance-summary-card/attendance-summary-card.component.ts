@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterModule } from '@angular/router';
 import { I18nService } from '../../../../core/i18n/i18n.service';
 
@@ -23,7 +23,7 @@ export interface AttendanceSummaryData {
 @Component({
   selector: 'app-attendance-summary-card',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [RouterModule],
   templateUrl: './attendance-summary-card.component.html',
   styleUrls: ['./attendance-summary-card.component.css']
 })

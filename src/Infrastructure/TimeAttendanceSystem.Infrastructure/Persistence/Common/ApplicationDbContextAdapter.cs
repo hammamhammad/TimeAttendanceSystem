@@ -11,6 +11,8 @@ using TimeAttendanceSystem.Domain.VacationTypes;
 using TimeAttendanceSystem.Domain.Vacations;
 using TimeAttendanceSystem.Domain.Excuses;
 using TimeAttendanceSystem.Domain.RemoteWork;
+using TimeAttendanceSystem.Domain.Workflows;
+using TimeAttendanceSystem.Domain.LeaveManagement;
 using TimeAttendanceSystem.Domain.FingerprintRequests;
 
 namespace TimeAttendanceSystem.Infrastructure.Persistence;
@@ -55,6 +57,21 @@ public class ApplicationDbContextAdapter : IApplicationDbContext
     public DbSet<EmployeeExcuse> EmployeeExcuses => _context.EmployeeExcuses;
     public DbSet<RemoteWorkPolicy> RemoteWorkPolicies => _context.RemoteWorkPolicies;
     public DbSet<RemoteWorkRequest> RemoteWorkRequests => _context.RemoteWorkRequests;
+
+    // Workflow entities
+    public DbSet<WorkflowDefinition> WorkflowDefinitions => _context.WorkflowDefinitions;
+    public DbSet<WorkflowStep> WorkflowSteps => _context.WorkflowSteps;
+    public DbSet<WorkflowInstance> WorkflowInstances => _context.WorkflowInstances;
+    public DbSet<WorkflowStepExecution> WorkflowStepExecutions => _context.WorkflowStepExecutions;
+    public DbSet<ApprovalDelegation> ApprovalDelegations => _context.ApprovalDelegations;
+
+    // Leave Management entities
+    public DbSet<LeaveEntitlement> LeaveEntitlements => _context.LeaveEntitlements;
+    public DbSet<LeaveBalance> LeaveBalances => _context.LeaveBalances;
+    public DbSet<LeaveTransaction> LeaveTransactions => _context.LeaveTransactions;
+    public DbSet<LeaveAccrualPolicy> LeaveAccrualPolicies => _context.LeaveAccrualPolicies;
+
+    // Fingerprint Request entities
     public DbSet<FingerprintRequest> FingerprintRequests => _context.FingerprintRequests;
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

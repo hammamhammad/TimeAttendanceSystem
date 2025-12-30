@@ -19,23 +19,26 @@ public record GetFingerprintRequestByIdQuery : IRequest<Result<FingerprintReques
 /// <summary>
 /// Handler for GetFingerprintRequestByIdQuery
 /// </summary>
-public class GetFingerprintRequestByIdQueryHandler
-    : BaseHandler<GetFingerprintRequestByIdQuery, Result<FingerprintRequestDto>>
+public class GetFingerprintRequestByIdQueryHandler : IRequestHandler<GetFingerprintRequestByIdQuery, Result<FingerprintRequestDto>>
 {
+    private readonly IApplicationDbContext _context;
+    private readonly ICurrentUser _currentUser;
+
     public GetFingerprintRequestByIdQueryHandler(
         IApplicationDbContext context,
         ICurrentUser currentUser)
-        : base(context, currentUser)
     {
+        _context = context;
+        _currentUser = currentUser;
     }
 
-    public override async Task<Result<FingerprintRequestDto>> Handle(
+    public async Task<Result<FingerprintRequestDto>> Handle(
         GetFingerprintRequestByIdQuery request,
         CancellationToken cancellationToken)
     {
-        var fingerprintRequest = await Context.FingerprintRequests
+        var fingerprintRequest = await _context.FingerprintRequests
             .Include(fr => fr.Employee)
-                .ThenInclude(e => e.Department)
+                .ThenInclude(e => e!.Department)
             .Include(fr => fr.Technician)
             .Where(fr => fr.Id == request.Id && !fr.IsDeleted)
             .FirstOrDefaultAsync(cancellationToken);
@@ -44,10 +47,10 @@ public class GetFingerprintRequestByIdQueryHandler
             return Result.Failure<FingerprintRequestDto>("Fingerprint request not found");
 
         // Check if user has permission to view this request
-        if (!CurrentUser.IsSystemAdmin)
+        if (!_currentUser.IsSystemAdmin)
         {
-            var employeeLink = await Context.EmployeeUserLinks
-                .FirstOrDefaultAsync(eul => eul.UserId == CurrentUser.UserId, cancellationToken);
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId, cancellationToken);
 
             if (employeeLink == null || fingerprintRequest.EmployeeId != employeeLink.EmployeeId)
                 return Result.Failure<FingerprintRequestDto>("You do not have permission to view this request");

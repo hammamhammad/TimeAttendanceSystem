@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { RemoteWorkRequestsService } from '../../../core/services/remote-work-requests.service';
@@ -17,13 +17,12 @@ import { AuthService } from '../../../core/auth/auth.service';
   selector: 'app-assign-remote-work',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     FormHeaderComponent,
     FormSectionComponent,
     SearchableSelectComponent,
     LoadingSpinnerComponent
-  ],
+],
   templateUrl: './assign-remote-work.component.html',
   styleUrls: ['./assign-remote-work.component.css']
 })

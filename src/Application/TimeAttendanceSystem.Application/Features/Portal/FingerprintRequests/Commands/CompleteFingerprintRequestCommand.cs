@@ -25,26 +25,29 @@ public record CompleteFingerprintRequestCommand : IRequest<Result>
 /// <summary>
 /// Handler for CompleteFingerprintRequestCommand
 /// </summary>
-public class CompleteFingerprintRequestCommandHandler
-    : BaseHandler<CompleteFingerprintRequestCommand, Result>
+public class CompleteFingerprintRequestCommandHandler : IRequestHandler<CompleteFingerprintRequestCommand, Result>
 {
+    private readonly IApplicationDbContext _context;
+    private readonly ICurrentUser _currentUser;
+
     public CompleteFingerprintRequestCommandHandler(
         IApplicationDbContext context,
         ICurrentUser currentUser)
-        : base(context, currentUser)
     {
+        _context = context;
+        _currentUser = currentUser;
     }
 
-    public override async Task<Result> Handle(
+    public async Task<Result> Handle(
         CompleteFingerprintRequestCommand request,
         CancellationToken cancellationToken)
     {
         // Only admin/system admin can complete requests
-        if (!CurrentUser.IsSystemAdmin)
+        if (!_currentUser.IsSystemAdmin)
             return Result.Failure("Only administrators can complete fingerprint requests");
 
         // Get fingerprint request
-        var fingerprintRequest = await Context.FingerprintRequests
+        var fingerprintRequest = await _context.FingerprintRequests
             .FirstOrDefaultAsync(fr => fr.Id == request.Id && !fr.IsDeleted, cancellationToken);
 
         if (fingerprintRequest == null)
@@ -60,12 +63,12 @@ public class CompleteFingerprintRequestCommandHandler
         // Complete the request
         fingerprintRequest.Status = FingerprintRequestStatus.Completed;
         fingerprintRequest.CompletedDate = DateTime.UtcNow;
-        fingerprintRequest.TechnicianId = CurrentUser.UserId;
+        fingerprintRequest.TechnicianId = _currentUser.UserId;
         fingerprintRequest.TechnicianNotes = request.TechnicianNotes;
         fingerprintRequest.ModifiedAtUtc = DateTime.UtcNow;
-        fingerprintRequest.ModifiedBy = CurrentUser.Username ?? "SYSTEM";
+        fingerprintRequest.ModifiedBy = _currentUser.Username ?? "SYSTEM";
 
-        await Context.SaveChangesAsync(cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }

@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/pages/settings/excuse-policies/edit-excuse-policy/edit-excuse-policy.component.css"],
+  "sourcesContent": ["/* Create Excuse Policy Component Styles */\n\n.container-fluid {\n  padding: 1.5rem;\n}\n\n.card {\n  border: 1px solid #dee2e6;\n  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);\n}\n\n.card-header {\n  border-bottom: 1px solid #dee2e6;\n  padding: 0.75rem 1rem;\n}\n\n.card-header h6 {\n  font-weight: 600;\n  color: #495057;\n}\n\n@media (max-width: 768px) {\n  .container-fluid {\n    padding: 1rem;\n  }\n}\n"],
+  "mappings": ";AAEA,CAAC;AACC,WAAS;AACX;AAEA,CAAC;AACC,UAAQ,IAAI,MAAM;AAClB,cAAY,EAAE,SAAS,QAAQ,KAAK,CAAC,EAAE,CAAC,EAAE,CAAC,EAAE;AAC/C;AAEA,CAAC;AACC,iBAAe,IAAI,MAAM;AACzB,WAAS,QAAQ;AACnB;AAEA,CALC,YAKY;AACX,eAAa;AACb,SAAO;AACT;AAEA,OAAO,CAAC,SAAS,EAAE;AACjB,GApBD;AAqBG,aAAS;AACX;AACF;",
+  "names": []
+}

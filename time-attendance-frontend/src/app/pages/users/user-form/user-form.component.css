@@ -65,9 +65,16 @@
   height: 1.25rem;
 }
 
-.form-switch .form-check-input:checked {
+/* Active status switch - green when checked */
+.form-switch .form-check-input#isActiveSwitch:checked {
   background-color: var(--bs-success);
   border-color: var(--bs-success);
+}
+
+/* Must change password switch - warning/orange when checked */
+.form-switch .form-check-input#mustChangePasswordSwitch:checked {
+  background-color: var(--bs-warning);
+  border-color: var(--bs-warning);
 }
 
 .alert {

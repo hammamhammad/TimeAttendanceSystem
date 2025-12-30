@@ -1,0 +1,49 @@
+<div class="mb-3">
+  <label [for]="fieldId" class="form-label">
+    @if (icon) {
+      <i class="{{ icon }} me-1"></i>
+    }
+    {{ label }}
+  </label>
+  
+  @if (type === 'select') {
+    <select
+      [id]="fieldId"
+      class="form-select"
+      [class.is-invalid]="isInvalid"
+      [formControl]="control"
+      [attr.aria-describedby]="help ? fieldId + '-help' : null">
+      <option value="">{{ placeholder }}</option>
+      @for (option of options; track option.value) {
+        <option [value]="option.value">{{ option.label }}</option>
+      }
+    </select>
+  } @else if (type === 'textarea') {
+    <textarea
+      [id]="fieldId"
+      class="form-control"
+      [class.is-invalid]="isInvalid"
+      [formControl]="control"
+      [placeholder]="placeholder"
+      [attr.aria-describedby]="help ? fieldId + '-help' : null"
+      rows="3">
+    </textarea>
+  } @else {
+    <input
+      [id]="fieldId"
+      [type]="type"
+      class="form-control"
+      [class.is-invalid]="isInvalid"
+      [formControl]="control"
+      [placeholder]="placeholder"
+      [attr.aria-describedby]="help ? fieldId + '-help' : null">
+  }
+  
+  @if (help) {
+    <div [id]="fieldId + '-help'" class="form-text">{{ help }}</div>
+  }
+  
+  @if (isInvalid) {
+    <div class="invalid-feedback">{{ errorMessage }}</div>
+  }
+</div>

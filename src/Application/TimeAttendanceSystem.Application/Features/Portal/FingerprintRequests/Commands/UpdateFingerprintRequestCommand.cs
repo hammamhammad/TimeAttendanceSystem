@@ -45,24 +45,27 @@ public record UpdateFingerprintRequestCommand : IRequest<Result>
 /// <summary>
 /// Handler for UpdateFingerprintRequestCommand
 /// </summary>
-public class UpdateFingerprintRequestCommandHandler
-    : BaseHandler<UpdateFingerprintRequestCommand, Result>
+public class UpdateFingerprintRequestCommandHandler : IRequestHandler<UpdateFingerprintRequestCommand, Result>
 {
+    private readonly IApplicationDbContext _context;
+    private readonly ICurrentUser _currentUser;
+
     public UpdateFingerprintRequestCommandHandler(
         IApplicationDbContext context,
         ICurrentUser currentUser)
-        : base(context, currentUser)
     {
+        _context = context;
+        _currentUser = currentUser;
     }
 
-    public override async Task<Result> Handle(
+    public async Task<Result> Handle(
         UpdateFingerprintRequestCommand request,
         CancellationToken cancellationToken)
     {
         // Get current employee through EmployeeUserLink
-        var employeeLink = await Context.EmployeeUserLinks
+        var employeeLink = await _context.EmployeeUserLinks
             .Include(eul => eul.Employee)
-            .FirstOrDefaultAsync(eul => eul.UserId == CurrentUser.UserId, cancellationToken);
+            .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId, cancellationToken);
 
         if (employeeLink == null)
             return Result.Failure("Employee not found for current user");
@@ -70,14 +73,14 @@ public class UpdateFingerprintRequestCommandHandler
         var employee = employeeLink.Employee;
 
         // Get fingerprint request
-        var fingerprintRequest = await Context.FingerprintRequests
+        var fingerprintRequest = await _context.FingerprintRequests
             .FirstOrDefaultAsync(fr => fr.Id == request.Id && !fr.IsDeleted, cancellationToken);
 
         if (fingerprintRequest == null)
             return Result.Failure("Fingerprint request not found");
 
         // Check if user owns this request
-        if (fingerprintRequest.EmployeeId != employee.Id && !CurrentUser.IsSystemAdmin)
+        if (fingerprintRequest.EmployeeId != employee.Id && !_currentUser.IsSystemAdmin)
             return Result.Failure("You can only update your own fingerprint requests");
 
         // Check if request can be updated (only pending requests)
@@ -99,9 +102,9 @@ public class UpdateFingerprintRequestCommandHandler
         fingerprintRequest.PreferredDate = request.PreferredDate;
         fingerprintRequest.PreferredTime = request.PreferredTime;
         fingerprintRequest.ModifiedAtUtc = DateTime.UtcNow;
-        fingerprintRequest.ModifiedBy = CurrentUser.Username ?? "SYSTEM";
+        fingerprintRequest.ModifiedBy = _currentUser.Username ?? "SYSTEM";
 
-        await Context.SaveChangesAsync(cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }

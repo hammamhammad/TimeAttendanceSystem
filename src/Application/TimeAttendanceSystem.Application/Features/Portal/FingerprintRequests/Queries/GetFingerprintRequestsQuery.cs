@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using TimeAttendanceSystem.Application.Abstractions;
 using TimeAttendanceSystem.Application.Common;
+using TimeAttendanceSystem.Domain.FingerprintRequests;
 
 namespace TimeAttendanceSystem.Application.Features.Portal.FingerprintRequests.Queries;
 
@@ -34,32 +35,35 @@ public record GetFingerprintRequestsQuery : IRequest<Result<PagedResult<Fingerpr
 /// <summary>
 /// Handler for GetFingerprintRequestsQuery
 /// </summary>
-public class GetFingerprintRequestsQueryHandler
-    : BaseHandler<GetFingerprintRequestsQuery, Result<PagedResult<FingerprintRequestDto>>>
+public class GetFingerprintRequestsQueryHandler : IRequestHandler<GetFingerprintRequestsQuery, Result<PagedResult<FingerprintRequestDto>>>
 {
+    private readonly IApplicationDbContext _context;
+    private readonly ICurrentUser _currentUser;
+
     public GetFingerprintRequestsQueryHandler(
         IApplicationDbContext context,
         ICurrentUser currentUser)
-        : base(context, currentUser)
     {
+        _context = context;
+        _currentUser = currentUser;
     }
 
-    public override async Task<Result<PagedResult<FingerprintRequestDto>>> Handle(
+    public async Task<Result<PagedResult<FingerprintRequestDto>>> Handle(
         GetFingerprintRequestsQuery request,
         CancellationToken cancellationToken)
     {
-        var query = Context.FingerprintRequests
+        var query = _context.FingerprintRequests
             .Include(fr => fr.Employee)
-                .ThenInclude(e => e.Department)
+                .ThenInclude(e => e!.Department)
             .Include(fr => fr.Technician)
             .Where(fr => !fr.IsDeleted)
             .AsQueryable();
 
         // If not system admin, filter to only show own requests
-        if (!CurrentUser.IsSystemAdmin)
+        if (!_currentUser.IsSystemAdmin)
         {
-            var employeeLink = await Context.EmployeeUserLinks
-                .FirstOrDefaultAsync(eul => eul.UserId == CurrentUser.UserId, cancellationToken);
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId, cancellationToken);
 
             if (employeeLink == null)
                 return Result.Failure<PagedResult<FingerprintRequestDto>>("Employee not found for current user");
@@ -78,7 +82,7 @@ public class GetFingerprintRequestsQueryHandler
         // Filter by status
         if (!string.IsNullOrWhiteSpace(request.Status))
         {
-            if (Enum.TryParse<Domain.FingerprintRequests.FingerprintRequestStatus>(request.Status, true, out var status))
+            if (Enum.TryParse<FingerprintRequestStatus>(request.Status, true, out var status))
             {
                 query = query.Where(fr => fr.Status == status);
             }

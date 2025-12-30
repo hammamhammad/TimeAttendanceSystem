@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router, ActivatedRoute } from '@angular/router';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { NotificationService } from '../../../core/notifications/notification.service';
@@ -17,12 +17,11 @@ import { DefinitionListComponent, DefinitionItem } from '../../../shared/compone
   selector: 'app-excuse-details',
   standalone: true,
   imports: [
-    CommonModule,
     FormHeaderComponent,
     LoadingSpinnerComponent,
     StatusBadgeComponent,
     DefinitionListComponent
-  ],
+],
   templateUrl: './excuse-details.component.html',
   styleUrls: ['./excuse-details.component.css']
 })

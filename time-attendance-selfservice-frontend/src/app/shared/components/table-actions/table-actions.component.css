@@ -1,0 +1,9 @@
+.btn-group {
+  white-space: nowrap;
+}
+
+.dropdown-item:disabled,
+.dropdown-item.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

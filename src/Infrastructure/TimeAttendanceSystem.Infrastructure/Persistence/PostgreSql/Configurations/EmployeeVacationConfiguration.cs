@@ -64,6 +64,17 @@ public class EmployeeVacationConfiguration : IEntityTypeConfiguration<EmployeeVa
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("FK_EmployeeVacations_VacationTypes");
 
+        // Workflow instance relationship (optional)
+        builder.Property(ev => ev.WorkflowInstanceId)
+            .IsRequired(false)
+            .HasComment("Workflow instance ID for approval tracking");
+
+        builder.HasOne(ev => ev.WorkflowInstance)
+            .WithMany()
+            .HasForeignKey(ev => ev.WorkflowInstanceId)
+            .OnDelete(DeleteBehavior.SetNull)
+            .HasConstraintName("FK_EmployeeVacations_WorkflowInstances");
+
         // Indexes for performance optimization
 
         // Index for employee-specific queries (most common)

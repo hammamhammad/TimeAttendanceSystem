@@ -1,0 +1,105 @@
+<div [class]="colClass">
+  <!-- Label -->
+  @if (label) {
+    <label class="form-label">
+      {{ label }}
+      @if (required) {
+        <span class="text-danger">*</span>
+      }
+    </label>
+  }
+
+  <!-- Input Group (with icon) -->
+  @if (icon && type !== 'textarea' && type !== 'select') {
+    <div class="input-group" [class.input-group-sm]="size === 'sm'" [class.input-group-lg]="size === 'lg'">
+      @if (iconPosition === 'left') {
+        <span class="input-group-text">
+          <i [class]="icon"></i>
+        </span>
+      }
+
+      <input
+        [type]="type"
+        [class]="getInputClasses()"
+        [placeholder]="placeholder"
+        [disabled]="disabled"
+        [readonly]="readonly"
+        [min]="min"
+        [max]="max"
+        [step]="step"
+        [value]="value"
+        (input)="onInputChange($any($event.target).value)"
+        (blur)="onTouched()"
+      />
+
+      @if (iconPosition === 'right') {
+        <span class="input-group-text">
+          <i [class]="icon"></i>
+        </span>
+      }
+    </div>
+  }
+
+  <!-- Regular Input (no icon) -->
+  @if (!icon && type !== 'textarea' && type !== 'select') {
+    <input
+      [type]="type"
+      [class]="getInputClasses()"
+      [placeholder]="placeholder"
+      [disabled]="disabled"
+      [readonly]="readonly"
+      [min]="min"
+      [max]="max"
+      [step]="step"
+      [value]="value"
+      (input)="onInputChange($any($event.target).value)"
+      (blur)="onTouched()"
+    />
+  }
+
+  <!-- Textarea -->
+  @if (type === 'textarea') {
+    <textarea
+      [class]="getInputClasses()"
+      [placeholder]="placeholder"
+      [disabled]="disabled"
+      [readonly]="readonly"
+      [rows]="rows"
+      [value]="value"
+      (input)="onInputChange($any($event.target).value)"
+      (blur)="onTouched()">
+    </textarea>
+  }
+
+  <!-- Select -->
+  @if (type === 'select') {
+    <select
+      [class]="getSelectClasses()"
+      [disabled]="disabled"
+      [value]="value"
+      (change)="onInputChange($any($event.target).value)"
+      (blur)="onTouched()">
+      @if (placeholder) {
+        <option value="">{{ placeholder }}</option>
+      }
+      @for (option of options; track option.value) {
+        <option [value]="option.value">{{ option.label }}</option>
+      }
+    </select>
+  }
+
+  <!-- Error Message -->
+  @if (showError && error) {
+    <div class="invalid-feedback d-block">
+      {{ error }}
+    </div>
+  }
+
+  <!-- Help Text -->
+  @if (helpText && (!showError || !error)) {
+    <div class="form-text">{{ helpText }}</div>
+  }
+
+  <!-- Custom content slot -->
+  <ng-content></ng-content>
+</div>

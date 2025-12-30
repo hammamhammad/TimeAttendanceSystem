@@ -1,0 +1,39 @@
+<nav class="sidenav"
+     [class.collapsed]="collapsed()"
+     [attr.aria-expanded]="!collapsed()">
+
+  <div class="sidenav-header p-3">
+    @if (!collapsed()) {
+      <h5 class="text-truncate mb-0">Self Service Portal</h5>
+    } @else {
+      <i class="bi bi-person-badge fa-lg"></i>
+    }
+  </div>
+
+  <ul class="nav flex-column mt-2">
+    @for (item of menuItems(); track item.path || item.titleKey) {
+      @if (item.isSeparator) {
+        <li class="nav-separator">
+          @if (!collapsed()) {
+            <hr class="my-2">
+            <span class="separator-label px-3">{{ t(item.titleKey) }}</span>
+          } @else {
+            <hr class="my-2">
+          }
+        </li>
+      } @else {
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center"
+             [routerLink]="item.path"
+             routerLinkActive="active"
+             [title]="collapsed() ? t(item.titleKey) : ''">
+            <i class="{{ item.icon }} me-2"></i>
+            @if (!collapsed()) {
+              <span class="text-truncate">{{ t(item.titleKey) }}</span>
+            }
+          </a>
+        </li>
+      }
+    }
+  </ul>
+</nav>

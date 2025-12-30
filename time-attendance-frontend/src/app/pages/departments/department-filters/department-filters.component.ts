@@ -1,5 +1,5 @@
 import { Component, signal, inject, OnInit, Output, EventEmitter, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { BranchesService } from '../../branches/branches.service';
 import { BranchDto } from '../../../shared/models/employee.model';
@@ -14,10 +14,9 @@ type ViewMode = 'table' | 'tree';
   selector: 'app-department-filters',
   standalone: true,
   imports: [
-    CommonModule,
     HasPermissionDirective,
     SearchableSelectComponent
-  ],
+],
   templateUrl: './department-filters.component.html',
   styleUrls: ['./department-filters.component.css']
 })

@@ -22,6 +22,7 @@ export class EmployeesService {
   private baseUrl = `${environment.apiUrl}/api/v1/employees`;
   private branchesUrl = `${environment.apiUrl}/api/v1/branches`;
   private departmentsUrl = `${environment.apiUrl}/api/v1/departments`;
+  private rolesUrl = `${environment.apiUrl}/api/v1/roles`;
 
   getEmployees(filter: EmployeesFilter = {}): Observable<PagedResult<EmployeeDto>> {
     let httpParams = new HttpParams();
@@ -130,6 +131,13 @@ export class EmployeesService {
           name: emp.fullName,
           employeeNumber: emp.employeeNumber
         })))
+      );
+  }
+
+  getRoles(): Observable<{id: number, name: string}[]> {
+    return this.http.get<{items: {id: number, name: string}[]}>(this.rolesUrl)
+      .pipe(
+        map(result => result.items || [])
       );
   }
 }

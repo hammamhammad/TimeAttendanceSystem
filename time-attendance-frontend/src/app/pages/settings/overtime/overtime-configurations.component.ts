@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { I18nService } from '../../../core/i18n/i18n.service';
@@ -15,7 +15,7 @@ import { UnifiedFilterComponent } from '../../../shared/components/unified-filte
 @Component({
   selector: 'app-overtime-configurations',
   standalone: true,
-  imports: [CommonModule, FormsModule, DataTableComponent, PageHeaderComponent, UnifiedFilterComponent],
+  imports: [FormsModule, DataTableComponent, PageHeaderComponent, UnifiedFilterComponent],
   templateUrl: './overtime-configurations.component.html',
   styleUrls: ['./overtime-configurations.component.css']
 })

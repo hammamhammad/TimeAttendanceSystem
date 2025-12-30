@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil, switchMap } from 'rxjs';
@@ -15,7 +15,7 @@ import { LoadingSpinnerComponent } from '../../../../shared/components/loading-s
 @Component({
   selector: 'app-edit-remote-work-policy',
   standalone: true,
-  imports: [CommonModule, FormsModule, FormHeaderComponent, SearchableSelectComponent, LoadingSpinnerComponent],
+  imports: [FormsModule, FormHeaderComponent, SearchableSelectComponent, LoadingSpinnerComponent],
   templateUrl: './edit-remote-work-policy.component.html',
   styleUrls: ['./edit-remote-work-policy.component.css']
 })

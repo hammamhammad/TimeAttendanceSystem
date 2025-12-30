@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { I18nService } from '../../../../core/i18n/i18n.service';
@@ -13,7 +13,7 @@ import { CreateExcusePolicyRequest } from '../../../../shared/models/excuse-poli
 @Component({
   selector: 'app-create-excuse-policy',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, FormHeaderComponent, FormSectionComponent],
+  imports: [FormsModule, RouterModule, FormHeaderComponent, FormSectionComponent],
   templateUrl: './create-excuse-policy.component.html',
   styleUrls: ['./create-excuse-policy.component.css']
 })

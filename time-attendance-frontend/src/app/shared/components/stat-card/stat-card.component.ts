@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 export interface StatChange {
   value: number;
@@ -11,7 +11,7 @@ export interface StatChange {
 @Component({
   selector: 'app-stat-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   template: `
     <div class="app-stat-card card" [class]="getCardClasses()">
       <div class="card-body">

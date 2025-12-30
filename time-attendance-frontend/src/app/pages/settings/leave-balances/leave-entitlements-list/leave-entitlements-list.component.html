@@ -1,0 +1,111 @@
+<div class="container-fluid">
+  <!-- Page Header -->
+  <app-page-header
+    [title]="i18n.t('leaveBalance.leaveEntitlements')"
+    [subtitle]="i18n.t('leaveBalance.leaveEntitlementsDescription')">
+    <ng-container actions>
+      @if (permissionService.has(PERMISSIONS.LEAVE_BALANCE_CREATE)) {
+        <button
+          type="button"
+          class="btn btn-outline-primary"
+          (click)="openBulkUpload()">
+          <i class="fa fa-upload me-2"></i>
+          {{ i18n.t('leaveBalance.bulkUpload') }}
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="createEntitlement()">
+          <i class="fa fa-plus me-2"></i>
+          {{ i18n.t('leaveBalance.createEntitlement') }}
+        </button>
+      }
+    </ng-container>
+  </app-page-header>
+
+  <!-- Filters Card -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3">
+        <!-- Year Filter -->
+        <div class="col-md-3">
+          <label for="yearFilter" class="form-label">
+            {{ i18n.t('leaveBalance.year') }}
+          </label>
+          <select
+            id="yearFilter"
+            class="form-select"
+            [(ngModel)]="selectedYear"
+            (ngModelChange)="onYearChange()">
+            @for (year of availableYears(); track year) {
+              <option [value]="year">{{ year }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Employee Filter -->
+        <div class="col-md-4">
+          <label for="employeeFilter" class="form-label">
+            {{ i18n.t('employees.employee') }}
+          </label>
+          <select
+            id="employeeFilter"
+            class="form-select"
+            [(ngModel)]="selectedEmployeeId"
+            (ngModelChange)="onEmployeeChange()">
+            <option [value]="null">{{ i18n.t('common.all') }}</option>
+            @for (employee of employees(); track employee.id) {
+              <option [value]="employee.id">{{ employee.name }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Vacation Type Filter -->
+        <div class="col-md-4">
+          <label for="vacationTypeFilter" class="form-label">
+            {{ i18n.t('vacationTypes.vacationType') }}
+          </label>
+          <select
+            id="vacationTypeFilter"
+            class="form-select"
+            [(ngModel)]="selectedVacationTypeId"
+            (ngModelChange)="onVacationTypeChange()">
+            <option [value]="null">{{ i18n.t('common.all') }}</option>
+            @for (vacationType of vacationTypes(); track vacationType.id) {
+              <option [value]="vacationType.id">{{ vacationType.name }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Clear Filters Button -->
+        <div class="col-md-1 d-flex align-items-end">
+          <button
+            type="button"
+            class="btn btn-outline-secondary w-100"
+            (click)="clearFilters()"
+            [disabled]="!hasActiveFilters()"
+            title="{{ i18n.t('common.clearFilters') }}">
+            <i class="fa fa-times"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Table -->
+  <app-data-table
+    [columns]="tableColumns()"
+    [data]="tableData()"
+    [actions]="tableActions()"
+    [loading]="loading()"
+    [currentPage]="currentPage()"
+    [pageSize]="pageSize()"
+    [totalItems]="totalCount()"
+    [totalPages]="totalPages()"
+    [emptyTitle]="i18n.t('leaveBalance.noEntitlementsTitle')"
+    [emptyMessage]="i18n.t('leaveBalance.noEntitlementsMessage')"
+    (actionClick)="onActionClick($event)"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+  </app-data-table>
+</div>

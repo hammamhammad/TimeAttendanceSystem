@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router, RouterModule } from '@angular/router';
 import { DepartmentFormComponent } from '../department-form/department-form.component';
 import { Department, DepartmentDto, CreateDepartmentRequest, UpdateDepartmentRequest } from '../../../shared/models/department.model';
@@ -9,7 +9,7 @@ import { DepartmentsService } from '../departments.service';
 @Component({
   selector: 'app-create-department',
   standalone: true,
-  imports: [CommonModule, RouterModule, DepartmentFormComponent],
+  imports: [RouterModule, DepartmentFormComponent],
   template: `
     <div class="container-fluid">
       <!-- Header -->

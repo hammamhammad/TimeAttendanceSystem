@@ -1,0 +1,142 @@
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 250px;
+  right: 0;
+  height: 60px;
+  background-color: var(--bs-white);
+  border-bottom: 1px solid var(--bs-border-color);
+  z-index: 999;
+  transition: left 0.3s ease;
+}
+
+.topbar.sidenav-collapsed {
+  left: 72px;
+}
+
+.topbar-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  padding: 0 1rem;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  min-width: 60px; /* Space for collapse button */
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  min-width: 200px; /* Space for user menu and language */
+}
+
+.topbar-center {
+  flex: 1;
+  text-align: center;
+  margin: 0 1rem; /* Some spacing from sides */
+}
+
+.page-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--bs-dark);
+}
+
+.topbar-btn {
+  color: var(--bs-secondary);
+  padding: 0.5rem;
+  border: none;
+  background: none;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.topbar-btn:hover,
+.topbar-btn:focus {
+  color: var(--bs-primary);
+  text-decoration: none;
+}
+
+.dropdown {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 1000;
+  min-width: 200px;
+  margin-top: 0.5rem;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.375rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.dropdown-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 998;
+}
+
+/* RTL Support */
+:root[dir="rtl"] .topbar {
+  left: 0 !important;
+  right: 250px !important;
+}
+
+:root[dir="rtl"] .topbar.sidenav-collapsed {
+  right: 72px !important;
+}
+
+:root[dir="rtl"] .topbar-center {
+  text-align: center; /* Keep center aligned */
+}
+
+:root[dir="rtl"] .dropdown-menu {
+  left: 0;
+  right: auto;
+}
+
+:root[dir="rtl"] .me-1 {
+  margin-left: 0.25rem !important;
+  margin-right: 0 !important;
+}
+
+:root[dir="rtl"] .me-2 {
+  margin-left: 0.5rem !important;
+  margin-right: 0 !important;
+}
+
+:root[dir="rtl"] .ms-1 {
+  margin-right: 0.25rem !important;
+  margin-left: 0 !important;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 767.98px) {
+  .topbar {
+    left: 0 !important;
+    right: 0 !important;
+  }
+
+  :root[dir="rtl"] .topbar {
+    left: 0 !important;
+    right: 0 !important;
+  }
+  
+  .topbar-left {
+    display: flex;
+  }
+  
+  .page-title {
+    font-size: 1.1rem;
+  }
+}

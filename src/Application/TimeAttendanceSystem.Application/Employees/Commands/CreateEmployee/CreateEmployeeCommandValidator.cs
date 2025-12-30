@@ -207,6 +207,26 @@ public class CreateEmployeeCommandValidator : AbstractValidator<CreateEmployeeCo
             .GreaterThan(0)
             .WithMessage("Manager Employee ID must be a valid positive number")
             .When(x => x.ManagerEmployeeId.HasValue);
+
+        // User account creation validation: Email is required when creating user account
+        RuleFor(x => x.Email)
+            .NotEmpty()
+            .WithMessage("Email is required when creating a user account")
+            .When(x => x.CreateUserAccount);
+
+        // Default password validation: Must meet minimum requirements if provided
+        RuleFor(x => x.DefaultPassword)
+            .MinimumLength(8)
+            .WithMessage("Default password must be at least 8 characters")
+            .MaximumLength(128)
+            .WithMessage("Default password cannot exceed 128 characters")
+            .When(x => x.CreateUserAccount && !string.IsNullOrEmpty(x.DefaultPassword));
+
+        // Role IDs validation: Must be positive numbers if provided
+        RuleForEach(x => x.RoleIds)
+            .GreaterThan(0)
+            .WithMessage("Role ID must be a valid positive number")
+            .When(x => x.RoleIds != null && x.RoleIds.Any());
     }
 
     /// <summary>

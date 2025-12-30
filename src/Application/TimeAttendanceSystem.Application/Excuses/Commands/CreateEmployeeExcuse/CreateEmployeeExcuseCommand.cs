@@ -17,6 +17,7 @@ namespace TimeAttendanceSystem.Application.Excuses.Commands.CreateEmployeeExcuse
 /// <param name="AttachmentPath">Optional path to supporting documentation</param>
 /// <param name="AffectsSalary">Whether this excuse affects salary calculation</param>
 /// <param name="ProcessingNotes">Optional processing notes for approval workflow</param>
+/// <param name="OnBehalfOfEmployeeId">Optional: When a manager submits on behalf of a team member</param>
 /// <remarks>
 /// Command Processing:
 /// - Validates employee exists and is active
@@ -35,6 +36,11 @@ namespace TimeAttendanceSystem.Application.Excuses.Commands.CreateEmployeeExcuse
 /// - No overlapping excuse periods allowed
 /// - Retroactive limits enforced per policy
 ///
+/// On-Behalf-Of Feature:
+/// - If OnBehalfOfEmployeeId is provided, the request is submitted by a manager
+/// - Manager must be in the employee's management chain (recursive)
+/// - If manager is in the approval workflow, their step is auto-approved
+///
 /// Integration Effects:
 /// - Approved excuses update attendance status to Excused/OnDuty
 /// - Policy limits checked against existing excuses in period
@@ -50,5 +56,6 @@ public record CreateEmployeeExcuseCommand(
     string Reason,
     string? AttachmentPath = null,
     bool AffectsSalary = true,
-    string? ProcessingNotes = null
+    string? ProcessingNotes = null,
+    long? OnBehalfOfEmployeeId = null
 ) : IRequest<Result<long>>;

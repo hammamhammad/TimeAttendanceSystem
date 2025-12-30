@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { EmployeesService } from '../employees.service';
@@ -15,11 +15,13 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
 import { DefinitionListComponent, DefinitionItem } from '../../../shared/components/definition-list/definition-list.component';
+import { LeaveBalanceSummaryComponent } from '../../../shared/components/leave-balance-summary/leave-balance-summary.component';
+import { LeaveTransactionHistoryComponent } from '../../../shared/components/leave-transaction-history/leave-transaction-history.component';
 
 @Component({
   selector: 'app-view-employee',
   standalone: true,
-  imports: [CommonModule, FormsModule, HasPermissionDirective, FormHeaderComponent, LoadingSpinnerComponent, StatusBadgeComponent, EmptyStateComponent, DefinitionListComponent],
+  imports: [FormsModule, HasPermissionDirective, FormHeaderComponent, LoadingSpinnerComponent, StatusBadgeComponent, EmptyStateComponent, DefinitionListComponent, LeaveBalanceSummaryComponent, LeaveTransactionHistoryComponent],
   templateUrl: './view-employee.component.html',
   styleUrls: ['./view-employee.component.css']
 })
@@ -41,8 +43,12 @@ export class ViewEmployeeComponent implements OnInit {
   readonly PERMISSIONS = {
     EMPLOYEE_UPDATE: `${PermissionResources.EMPLOYEE}.${PermissionActions.UPDATE}`,
     EMPLOYEE_DELETE: `${PermissionResources.EMPLOYEE}.${PermissionActions.DELETE}`,
-    EMPLOYEE_MANAGE: `${PermissionResources.EMPLOYEE}.${PermissionActions.MANAGE}`
+    EMPLOYEE_MANAGE: `${PermissionResources.EMPLOYEE}.${PermissionActions.MANAGE}`,
+    LEAVE_BALANCE_READ: `${PermissionResources.LEAVE_BALANCE}.${PermissionActions.READ}`
   };
+
+  // Tab state for employee details
+  activeTab = signal<'info' | 'leave-balance'>('info');
 
   ngOnInit() {
     this.employeeId = +this.route.snapshot.params['id'];

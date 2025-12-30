@@ -1,0 +1,38 @@
+<div class="layout-container">
+  <!-- Sidenav -->
+  <app-sidenav 
+    [collapsed]="sidenavCollapsed"
+    [class.show]="showMobileSidenav()"
+    [class.mobile]="isMobile()">
+  </app-sidenav>
+
+  <!-- Main content area -->
+  <div class="main-content" 
+       [class.sidenav-collapsed]="sidenavCollapsed() && !isMobile()"
+       [class.mobile]="isMobile()">
+    
+    <!-- Topbar -->
+    <app-topbar 
+      [sidenavCollapsed]="sidenavCollapsed"
+      (toggleSidenav)="onToggleSidenav()">
+    </app-topbar>
+
+    <!-- Page content -->
+    <main class="page-content">
+      <div class="container-fluid">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
+
+  <!-- Mobile backdrop -->
+  @if (isMobile() && showMobileSidenav()) {
+    <div class="mobile-backdrop" (click)="onCloseMobileSidenav()"></div>
+  }
+
+  <!-- Notifications -->
+  <app-notifications></app-notifications>
+
+  <!-- Confirmation Modal -->
+  <app-confirmation></app-confirmation>
+</div>

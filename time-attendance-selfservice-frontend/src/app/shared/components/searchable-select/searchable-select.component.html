@@ -1,0 +1,122 @@
+<div class="searchable-select position-relative">
+  <div class="input-group">
+    <input
+      type="text"
+      class="form-control"
+      [class.is-invalid]="isInvalid || (required && !selectedValue() && searchTerm().trim() === '')"
+      [value]="displayValue()"
+      [placeholder]="placeholder"
+      [disabled]="disabled"
+      [readonly]="!searchable"
+      (input)="searchable ? onSearchInput($event) : null"
+      (focus)="onInputFocus()"
+      (blur)="onInputBlur()"
+      (click)="!searchable ? onToggleDropdown() : null"
+      autocomplete="off"
+    />
+
+    @if (loading) {
+      <div class="input-group-text">
+        <div class="spinner-border spinner-border-sm" role="status">
+          <span class="visually-hidden">{{ loadingMessage }}...</span>
+        </div>
+      </div>
+    }
+
+    @if (clearable && selectedValue() && !loading && !disabled) {
+      <button
+        type="button"
+        class="btn btn-outline-secondary"
+        (click)="onClear($event)"
+        [title]="i18n.t('common.clear')"
+      >
+        <i class="fas fa-times"></i>
+      </button>
+    }
+
+    @if (!loading) {
+      <button
+        type="button"
+        class="btn btn-outline-secondary dropdown-toggle"
+        [disabled]="disabled"
+        (click)="onToggleDropdown()"
+        [attr.aria-expanded]="showDropdown()"
+      >
+        <span class="visually-hidden">{{ i18n.t('common.select') }}</span>
+      </button>
+    }
+  </div>
+
+  @if (showDropdown() && !loading) {
+    <div
+      class="dropdown-menu show w-100 mt-1 shadow"
+      [style.max-height]="maxDropdownHeight"
+      [style.overflow-y]="'auto'"
+      [style.position]="'absolute'"
+      [style.z-index]="'1050'"
+    >
+      @if (hasResults()) {
+        @for (option of filteredOptions(); track trackByValue($index, option)) {
+          <button
+            type="button"
+            class="dropdown-item"
+            [class.disabled]="option.disabled"
+            (mousedown)="onSelectOption(option, $event)"
+          >
+            <div class="d-flex flex-column">
+              <span class="fw-medium" [class.text-muted]="option.disabled">
+                {{ option.label }}
+              </span>
+              @if (option.subLabel) {
+                <small class="text-muted">
+                  {{ option.subLabel }}
+                </small>
+              }
+            </div>
+          </button>
+        }
+      }
+
+      @if (shouldShowCustomValueOption()) {
+        <button
+          type="button"
+          class="dropdown-item"
+          (mousedown)="onSelectCustomValue($event)"
+        >
+          <div class="d-flex align-items-center">
+            <i class="fas fa-plus me-2 text-primary"></i>
+            <span class="text-primary">
+              {{ customValueMessage }}: "{{ searchTerm() }}"
+            </span>
+          </div>
+        </button>
+      }
+
+      @if (shouldShowNoResults()) {
+        <div class="dropdown-item-text text-center py-3 text-muted">
+          {{ noResultsMessage }}
+        </div>
+      }
+
+      @if (shouldShowEmptyMessage()) {
+        <div class="dropdown-item-text text-center py-3 text-muted">
+          {{ emptyMessage }}
+        </div>
+      }
+    </div>
+  }
+
+  @if (showDropdown() && loading) {
+    <div
+      class="dropdown-menu show w-100 mt-1 shadow text-center py-3"
+      style="position: absolute; z-index: 1050;"
+    >
+      <div class="d-flex align-items-center justify-content-center">
+        <div class="spinner-border spinner-border-sm me-2" role="status">
+          <span class="visually-hidden">{{ loadingMessage }}...</span>
+        </div>
+        <span class="text-muted">{{ loadingMessage }}...</span>
+      </div>
+    </div>
+  }
+</div>

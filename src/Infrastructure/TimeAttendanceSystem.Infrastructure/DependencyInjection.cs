@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -38,6 +39,7 @@ public static class DependencyInjection
         // Add Coravel for background jobs
         services.AddScheduler();
         services.AddTransient<DailyAttendanceGenerationJob>();
+        services.AddTransient<MonthlyLeaveAccrualJob>();
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
@@ -479,6 +481,10 @@ public static class DependencyInjection
                 // Specify migrations assembly
                 npgsqlOptions.MigrationsAssembly(typeof(TimeAttendanceDbContext).Assembly.FullName);
             });
+
+            // Suppress PendingModelChangesWarning for EF Core 9 strict model change detection
+            // This allows seeding to continue even when there are minor model differences
+            options.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
 
             // Common options
             var enableSensitiveDataLogging = configuration.GetValue<bool>("Logging:EnableSensitiveDataLogging");

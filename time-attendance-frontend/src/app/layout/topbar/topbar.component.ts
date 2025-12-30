@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router, NavigationEnd } from '@angular/router';
 import { filter, map } from 'rxjs';
 import { AuthService } from '../../core/auth/auth.service';
@@ -8,7 +8,7 @@ import { I18nService, Locale } from '../../core/i18n/i18n.service';
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './topbar.component.html',
   styleUrl: './topbar.component.css'
 })

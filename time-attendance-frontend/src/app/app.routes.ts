@@ -29,156 +29,6 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/dashboard/dashboard.component').then(m => m.DashboardComponent),
         data: { title: 'dashboard.title' }
       },
-      // Portal Routes (Employee Self-Service)
-      {
-        path: 'portal',
-        redirectTo: 'portal/employee-dashboard',
-        pathMatch: 'full'
-      },
-      {
-        path: 'portal/employee-dashboard',
-        loadComponent: () => import('./pages/portal/employee-dashboard/employee-dashboard.component').then(m => m.EmployeeDashboardComponent),
-        data: {
-          title: 'portal.employee_dashboard',
-          permission: 'portal.access'
-        },
-        canMatch: [authGuard]
-      },
-      {
-        path: 'portal/my-attendance',
-        loadComponent: () => import('./pages/portal/my-attendance/my-attendance.component').then(m => m.MyAttendanceComponent),
-        data: {
-          title: 'portal.my_attendance',
-          permission: 'portal.access'
-        },
-        canMatch: [authGuard]
-      },
-      {
-        path: 'portal/my-profile',
-        loadComponent: () => import('./pages/portal/my-profile/my-profile.component').then(m => m.MyProfileComponent),
-        data: {
-          title: 'portal.my_profile',
-          permission: 'portal.access'
-        },
-        canMatch: [authGuard]
-      },
-      {
-        path: 'portal/fingerprint-requests',
-        loadComponent: () => import('./pages/portal/fingerprint-requests/fingerprint-requests-list.component').then(m => m.FingerprintRequestsListComponent),
-        data: {
-          title: 'portal.fingerprint_requests',
-          permission: 'portal.access'
-        },
-        canMatch: [authGuard]
-      },
-      {
-        path: 'portal/fingerprint-requests/new',
-        loadComponent: () => import('./pages/portal/fingerprint-requests/fingerprint-request-form.component').then(m => m.FingerprintRequestFormComponent),
-        data: {
-          title: 'portal.new_fingerprint_request',
-          permission: 'portal.access'
-        },
-        canMatch: [authGuard]
-      },
-      {
-        path: 'portal/fingerprint-requests/:id',
-        loadComponent: () => import('./pages/portal/fingerprint-requests/fingerprint-request-details.component').then(m => m.FingerprintRequestDetailsComponent),
-        data: {
-          title: 'portal.fingerprint_request_details',
-          permission: 'portal.access'
-        },
-        canMatch: [authGuard]
-      },
-      {
-        path: 'portal/fingerprint-requests/:id/edit',
-        loadComponent: () => import('./pages/portal/fingerprint-requests/fingerprint-request-form.component').then(m => m.FingerprintRequestFormComponent),
-        data: {
-          title: 'portal.edit_fingerprint_request',
-          permission: 'portal.access'
-        },
-        canMatch: [authGuard]
-      },
-      {
-        path: 'portal/vacation-requests',
-        loadComponent: () => import('./pages/portal/vacation-requests/vacation-requests-list.component').then(m => m.VacationRequestsListComponent),
-        data: {
-          title: 'portal.vacation_requests',
-          permission: 'portal.access'
-        },
-        canMatch: [authGuard]
-      },
-      {
-        path: 'portal/excuse-requests',
-        loadComponent: () => import('./pages/portal/excuse-requests/excuse-requests-list.component').then(m => m.ExcuseRequestsListComponent),
-        data: {
-          title: 'portal.excuse_requests',
-          permission: 'portal.access'
-        },
-        canMatch: [authGuard]
-      },
-      {
-        path: 'portal/excuse-requests/new',
-        loadComponent: () => import('./pages/portal/excuse-requests/excuse-request-form.component').then(m => m.PortalExcuseRequestFormComponent),
-        data: {
-          title: 'portal.new_excuse',
-          permission: 'portal.access'
-        },
-        canMatch: [authGuard]
-      },
-      {
-        path: 'portal/excuse-requests/:id/edit',
-        loadComponent: () => import('./pages/portal/excuse-requests/excuse-request-form.component').then(m => m.PortalExcuseRequestFormComponent),
-        data: {
-          title: 'portal.edit_excuse',
-          permission: 'portal.access'
-        },
-        canMatch: [authGuard]
-      },
-      {
-        path: 'portal/excuse-requests/:id',
-        loadComponent: () => import('./pages/portal/excuse-requests/excuse-request-details.component').then(m => m.PortalExcuseRequestDetailsComponent),
-        data: {
-          title: 'portal.excuse_details',
-          permission: 'portal.access'
-        },
-        canMatch: [authGuard]
-      },
-      {
-        path: 'portal/remote-work-requests',
-        loadComponent: () => import('./pages/portal/remote-work-requests/remote-work-requests-list.component').then(m => m.RemoteWorkRequestsListComponent),
-        data: {
-          title: 'portal.remote_work_requests',
-          permission: 'portal.access'
-        },
-        canMatch: [authGuard]
-      },
-      {
-        path: 'portal/remote-work-requests/new',
-        loadComponent: () => import('./pages/portal/remote-work-requests/remote-work-request-form.component').then(m => m.PortalRemoteWorkRequestFormComponent),
-        data: {
-          title: 'portal.new_remote_work',
-          permission: 'portal.access'
-        },
-        canMatch: [authGuard]
-      },
-      {
-        path: 'portal/remote-work-requests/:id/edit',
-        loadComponent: () => import('./pages/portal/remote-work-requests/remote-work-request-form.component').then(m => m.PortalRemoteWorkRequestFormComponent),
-        data: {
-          title: 'portal.edit_remote_work',
-          permission: 'portal.access'
-        },
-        canMatch: [authGuard]
-      },
-      {
-        path: 'portal/remote-work-requests/:id',
-        loadComponent: () => import('./pages/portal/remote-work-requests/remote-work-request-details.component').then(m => m.PortalRemoteWorkRequestDetailsComponent),
-        data: {
-          title: 'portal.remote_work_details',
-          permission: 'portal.access'
-        },
-        canMatch: [authGuard]
-      },
       {
         path: 'users',
         loadComponent: () => import('./pages/users/users.component').then(m => m.UsersComponent),
@@ -299,7 +149,7 @@ export const routes: Routes = [
       {
         path: 'branches',
         loadComponent: () => import('./pages/branches/branches.component').then(m => m.BranchesComponent),
-        data: { 
+        data: {
           title: 'branches.title',
           permission: 'branch.read'
         },
@@ -308,7 +158,7 @@ export const routes: Routes = [
       {
         path: 'branches/:id/view',
         loadComponent: () => import('./pages/branches/view-branch/view-branch.component').then(m => m.ViewBranchComponent),
-        data: { 
+        data: {
           title: 'branches.view_details',
           permission: 'branch.read'
         },
@@ -317,7 +167,7 @@ export const routes: Routes = [
       {
         path: 'branches/:id/edit',
         loadComponent: () => import('./pages/branches/edit-branch/edit-branch.component').then(m => m.EditBranchComponent),
-        data: { 
+        data: {
           title: 'branches.edit_branch',
           permission: 'branch.update'
         },
@@ -326,7 +176,7 @@ export const routes: Routes = [
       {
         path: 'departments',
         loadComponent: () => import('./pages/departments/departments.component').then(m => m.DepartmentsComponent),
-        data: { 
+        data: {
           title: 'departments.title',
           permission: 'department.read'
         },
@@ -335,7 +185,7 @@ export const routes: Routes = [
       {
         path: 'departments/create',
         loadComponent: () => import('./pages/departments/create-department/create-department.component').then(m => m.CreateDepartmentComponent),
-        data: { 
+        data: {
           title: 'departments.create',
           permission: 'department.create'
         },
@@ -344,7 +194,7 @@ export const routes: Routes = [
       {
         path: 'departments/:id/view',
         loadComponent: () => import('./pages/departments/view-department/view-department.component').then(m => m.ViewDepartmentComponent),
-        data: { 
+        data: {
           title: 'departments.view_details',
           permission: 'department.read'
         },
@@ -553,6 +403,24 @@ export const routes: Routes = [
         },
         canMatch: [adminGuard]
       },
+      {
+        path: 'reports/attendance',
+        loadComponent: () => import('./pages/reports/attendance-report').then(m => m.AttendanceReportComponent),
+        data: {
+          title: 'reports.attendance',
+          permission: 'attendance.read'
+        },
+        canMatch: [authGuard]
+      },
+      {
+        path: 'reports/leaves',
+        loadComponent: () => import('./pages/reports/leave-report').then(m => m.LeaveReportComponent),
+        data: {
+          title: 'reports.leaves',
+          permission: 'vacation.read'
+        },
+        canMatch: [authGuard]
+      },
       // Vacation Types Routes
       {
         path: 'vacation-types',
@@ -755,6 +623,90 @@ export const routes: Routes = [
           permission: 'settings.excusePolicy.update'
         },
         canMatch: [adminGuard]
+      },
+      // Workflow Routes
+      {
+        path: 'settings/workflows',
+        loadComponent: () => import('./pages/settings/workflows/workflow-list/workflow-list.component').then(m => m.WorkflowListComponent),
+        data: {
+          title: 'workflows.title',
+          permission: 'workflow.read'
+        },
+        canMatch: [adminGuard]
+      },
+      {
+        path: 'settings/workflows/create',
+        loadComponent: () => import('./pages/settings/workflows/workflow-form/workflow-form.component').then(m => m.WorkflowFormComponent),
+        data: {
+          title: 'workflows.create_workflow',
+          permission: 'workflow.create'
+        },
+        canMatch: [adminGuard]
+      },
+      {
+        path: 'settings/workflows/:id/view',
+        loadComponent: () => import('./pages/settings/workflows/workflow-form/workflow-form.component').then(m => m.WorkflowFormComponent),
+        data: {
+          title: 'workflows.view_workflow',
+          permission: 'workflow.read'
+        },
+        canMatch: [adminGuard]
+      },
+      {
+        path: 'settings/workflows/:id/edit',
+        loadComponent: () => import('./pages/settings/workflows/workflow-form/workflow-form.component').then(m => m.WorkflowFormComponent),
+        data: {
+          title: 'workflows.edit_workflow',
+          permission: 'workflow.update'
+        },
+        canMatch: [adminGuard]
+      },
+      // Leave Entitlements Routes
+      {
+        path: 'settings/leave-entitlements',
+        loadComponent: () => import('./pages/settings/leave-balances/leave-entitlements-list/leave-entitlements-list.component').then(m => m.LeaveEntitlementsListComponent),
+        data: {
+          title: 'leaveBalance.leaveEntitlements',
+          permission: 'leaveBalance.read'
+        },
+        canMatch: [authGuard]
+      },
+      {
+        path: 'settings/leave-entitlements/create',
+        loadComponent: () => import('./pages/settings/leave-balances/leave-entitlement-form/leave-entitlement-form.component').then(m => m.LeaveEntitlementFormComponent),
+        data: {
+          title: 'leaveBalance.createEntitlementTitle',
+          permission: 'leaveBalance.create'
+        },
+        canMatch: [authGuard]
+      },
+      {
+        path: 'settings/leave-entitlements/edit/:id',
+        loadComponent: () => import('./pages/settings/leave-balances/leave-entitlement-form/leave-entitlement-form.component').then(m => m.LeaveEntitlementFormComponent),
+        data: {
+          title: 'leaveBalance.editEntitlementTitle',
+          permission: 'leaveBalance.update'
+        },
+        canMatch: [authGuard]
+      },
+      // Approvals Routes
+      {
+        path: 'approvals',
+        loadComponent: () => import('./pages/approvals/pending-approvals/pending-approvals.component').then(m => m.PendingApprovalsComponent),
+        data: {
+          title: 'approvals.pending_title',
+          permission: 'approval.read'
+        },
+        canMatch: [authGuard]
+      },
+      {
+        path: 'approvals/history',
+        loadComponent: () => import('./pages/approvals/approval-history/approval-history.component').then(m => m.ApprovalHistoryComponent),
+        data: {
+          title: 'approvals.history_title',
+          permission: 'approval.read'
+        },
+        canMatch: [authGuard]
       },
       // Reports Routes
       {

@@ -1,5 +1,5 @@
 import { Component, signal, computed, inject, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { SearchableSelectComponent, SearchableSelectOption } from '../../../shared/components/searchable-select/searchable-select.component';
@@ -14,7 +14,7 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
 @Component({
   selector: 'app-department-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, SearchableSelectComponent, FormSectionComponent, LoadingSpinnerComponent],
+  imports: [ReactiveFormsModule, SearchableSelectComponent, FormSectionComponent, LoadingSpinnerComponent],
   templateUrl: './department-form.component.html',
   styleUrls: ['./department-form.component.css']
 })

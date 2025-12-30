@@ -1,5 +1,5 @@
 import { Component, Output, EventEmitter, signal, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { NotificationService } from '../../../core/notifications/notification.service';
@@ -39,7 +39,7 @@ export enum BulkAssignmentType {
 @Component({
   selector: 'app-bulk-vacation-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, ModalWrapperComponent],
+  imports: [FormsModule, ReactiveFormsModule, ModalWrapperComponent],
   templateUrl: './bulk-vacation-modal.component.html',
   styleUrls: ['./bulk-vacation-modal.component.css']
 })

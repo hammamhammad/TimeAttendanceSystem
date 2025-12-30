@@ -1,5 +1,5 @@
 import { Component, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterModule } from '@angular/router';
 import { I18nService, Locale } from '../../core/i18n/i18n.service';
 import { AuthService } from '../../core/auth/auth.service';
@@ -8,7 +8,7 @@ import { PermissionService } from '../../core/auth/permission.service';
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [RouterModule],
   template: `
     <div class="container-fluid">
       <div class="d-flex justify-content-between align-items-center mb-4">
@@ -163,6 +163,31 @@ import { PermissionService } from '../../core/auth/permission.service';
                     <p class="text-muted flex-grow-1">{{ t('excuse_policies.settings_description') }}</p>
                     <div class="mt-auto">
                       <a routerLink="/settings/excuse-policies" class="btn btn-outline-danger btn-sm w-100">
+                        <i class="fa-solid fa-cog me-1"></i>
+                        {{ t('settings.configure') }}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+
+            @if (hasPermission('workflow.read')) {
+              <div class="col-lg-4 col-md-6 mb-3">
+                <div class="card h-100 border-hover">
+                  <div class="card-body d-flex flex-column">
+                    <div class="d-flex align-items-center mb-3">
+                      <div class="bg-secondary bg-gradient rounded-3 p-2 me-3">
+                        <i class="fa-solid fa-project-diagram text-white" style="font-size: 1.5rem;"></i>
+                      </div>
+                      <div>
+                        <h6 class="mb-0">{{ t('workflows.title') }}</h6>
+                        <small class="text-muted">{{ t('workflows.subtitle') }}</small>
+                      </div>
+                    </div>
+                    <p class="text-muted flex-grow-1">{{ t('workflows.settings_description') }}</p>
+                    <div class="mt-auto">
+                      <a routerLink="/settings/workflows" class="btn btn-outline-secondary btn-sm w-100">
                         <i class="fa-solid fa-cog me-1"></i>
                         {{ t('settings.configure') }}
                       </a>

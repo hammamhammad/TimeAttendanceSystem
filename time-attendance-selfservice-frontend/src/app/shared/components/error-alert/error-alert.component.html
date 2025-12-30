@@ -1,0 +1,68 @@
+<div [class]="getAlertClasses()" role="alert">
+  <div class="d-flex align-items-start">
+    <!-- Icon -->
+    <div class="alert-icon me-3">
+      <i [class]="icon + ' fa-lg'"></i>
+    </div>
+
+    <!-- Content -->
+    <div class="flex-grow-1">
+      <!-- Title -->
+      @if (title) {
+        <h5 class="alert-heading mb-2">{{ title }}</h5>
+      }
+
+      <!-- Message -->
+      <div class="alert-message">
+        {{ message }}
+      </div>
+
+      <!-- Details (collapsible) -->
+      @if (details && showDetails) {
+        <div class="alert-details mt-2">
+          <button
+            type="button"
+            class="btn btn-sm btn-link p-0 text-decoration-none"
+            (click)="toggleDetails()">
+            <i [class]="detailsExpanded ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'"></i>
+            {{ detailsExpanded ? 'Hide details' : 'Show details' }}
+          </button>
+
+          @if (detailsExpanded) {
+            <div class="alert-details-content mt-2 p-2 bg-light rounded">
+              <small class="font-monospace">{{ details }}</small>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Actions -->
+      @if (showRetry) {
+        <div class="alert-actions mt-3">
+          <button
+            type="button"
+            [class]="'btn btn-sm btn-' + variant"
+            (click)="onRetry()">
+            <i class="fa-solid fa-refresh me-1"></i>
+            {{ retryText }}
+          </button>
+        </div>
+      }
+
+      <!-- Custom content slot -->
+      <div class="alert-custom-content mt-2">
+        <ng-content></ng-content>
+      </div>
+    </div>
+
+    <!-- Dismiss Button -->
+    @if (dismissible) {
+      <button
+        type="button"
+        class="btn-close"
+        (click)="onDismiss()"
+        aria-label="Close">
+      </button>
+    }
+  </div>
+</div>

@@ -62,9 +62,6 @@ public class FingerprintRequestsController : ControllerBase
     /// </summary>
     /// <param name="employeeId">Filter by specific employee (admin only)</param>
     /// <param name="status">Filter by request status</param>
-    /// <param name="requestType">Filter by request type</param>
-    /// <param name="startDate">Filter requests created from this date</param>
-    /// <param name="endDate">Filter requests created until this date</param>
     /// <param name="pageNumber">Page number for pagination</param>
     /// <param name="pageSize">Number of items per page</param>
     /// <returns>Paginated list of fingerprint request DTOs</returns>
@@ -75,9 +72,6 @@ public class FingerprintRequestsController : ControllerBase
     public async Task<IActionResult> GetFingerprintRequests(
         [FromQuery] long? employeeId = null,
         [FromQuery] FingerprintRequestStatus? status = null,
-        [FromQuery] FingerprintRequestType? requestType = null,
-        [FromQuery] DateTime? startDate = null,
-        [FromQuery] DateTime? endDate = null,
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 10)
     {
@@ -216,23 +210,5 @@ public class FingerprintRequestsController : ControllerBase
             return BadRequest(result);
 
         return Ok(result);
-    }
-
-    /// <summary>
-    /// Cancels a fingerprint request.
-    /// Only the request owner can cancel, and only if status is Pending or Scheduled.
-    /// </summary>
-    /// <param name="id">Fingerprint request ID</param>
-    /// <returns>Success result</returns>
-    [HttpPost("{id}/cancel")]
-    [ProducesResponseType(typeof(Result), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> CancelFingerprintRequest(long id)
-    {
-        // TODO: Implement CancelFingerprintRequestCommand
-        return Ok(Result.Success());
     }
 }

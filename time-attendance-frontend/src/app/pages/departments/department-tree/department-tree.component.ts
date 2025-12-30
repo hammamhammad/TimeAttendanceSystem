@@ -1,5 +1,5 @@
 import { Component, signal, inject, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { DepartmentsService } from '../departments.service';
@@ -10,7 +10,7 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
 @Component({
   selector: 'app-department-tree',
   standalone: true,
-  imports: [CommonModule, FormsModule, LoadingSpinnerComponent],
+  imports: [FormsModule, LoadingSpinnerComponent],
   templateUrl: './department-tree.component.html',
   styleUrls: ['./department-tree.component.css']
 })

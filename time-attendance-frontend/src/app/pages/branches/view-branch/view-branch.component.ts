@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BranchesService } from '../branches.service';
 import { Branch } from '../../../shared/models/branch.model';
@@ -14,14 +14,13 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
   selector: 'app-view-branch',
   standalone: true,
   imports: [
-    CommonModule,
     RouterModule,
     PageHeaderComponent,
     DetailCardComponent,
     StatusBadgeComponent,
     StatCardComponent,
     LoadingSpinnerComponent
-  ],
+],
   template: `
     <div class="app-view-page">
       <!-- Standardized Page Header -->

@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, signal, computed, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { SearchFilterComponent, FilterField } from '../../../shared/components/search-filter/search-filter.component';
 import { EmployeeVacationsService } from '../employee-vacations.service';
 import { I18nService } from '../../../core/i18n/i18n.service';
@@ -10,7 +10,7 @@ import { PermissionResources, PermissionActions } from '../../../shared/utils/pe
 @Component({
   selector: 'app-employee-vacation-filters',
   standalone: true,
-  imports: [CommonModule, SearchFilterComponent],
+  imports: [SearchFilterComponent],
   template: `
     <app-search-filter
       [filterFields]="filterFields()"

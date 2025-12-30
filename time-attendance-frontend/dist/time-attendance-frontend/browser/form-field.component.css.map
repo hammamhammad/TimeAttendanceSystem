@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/shared/ui/form-field/form-field.component.css"],
+  "sourcesContent": [".form-label {\r\n  font-weight: 500;\r\n}\r\n\r\n.form-text {\r\n  font-size: 0.875rem;\r\n  color: var(--bs-secondary);\r\n}\r\n\r\n.is-invalid {\r\n  border-color: var(--bs-danger);\r\n}\r\n\r\n.invalid-feedback {\r\n  display: block;\r\n  font-size: 0.875rem;\r\n  color: var(--bs-danger);\r\n  margin-top: 0.25rem;\r\n}"],
+  "mappings": ";AAAA,CAAC;AACC,eAAa;AACf;AAEA,CAAC;AACC,aAAW;AACX,SAAO,IAAI;AACb;AAEA,CAAC;AACC,gBAAc,IAAI;AACpB;AAEA,CAAC;AACC,WAAS;AACT,aAAW;AACX,SAAO,IAAI;AACX,cAAY;AACd;",
+  "names": []
+}

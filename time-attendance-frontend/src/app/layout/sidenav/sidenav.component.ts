@@ -1,5 +1,5 @@
 import { Component, Input, signal, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterModule, Router } from '@angular/router';
 import { MenuService, MenuItem } from '../../core/menu/menu.service';
 import { I18nService } from '../../core/i18n/i18n.service';
@@ -8,7 +8,7 @@ import { PermissionService } from '../../core/auth/permission.service';
 @Component({
   selector: 'app-sidenav',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [RouterModule],
   templateUrl: './sidenav.component.html',
   styleUrl: './sidenav.component.css'
 })

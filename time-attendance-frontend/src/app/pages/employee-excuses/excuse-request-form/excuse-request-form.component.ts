@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { I18nService } from '../../../core/i18n/i18n.service';
@@ -20,12 +20,11 @@ import {
   selector: 'app-excuse-request-form',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     SearchableSelectComponent,
     FormHeaderComponent,
     FormSectionComponent
-  ],
+],
   templateUrl: './excuse-request-form.component.html',
   styleUrls: ['./excuse-request-form.component.css']
 })

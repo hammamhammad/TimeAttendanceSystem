@@ -165,6 +165,12 @@ app.Services.UseScheduler(scheduler =>
     // Schedule daily attendance generation to run every day at 2:00 AM
     scheduler.Schedule<DailyAttendanceGenerationJob>()
         .DailyAt(2, 0); // 2:00 AM every day
+
+    // Schedule monthly leave accrual to run on the 1st of each month at 1:00 AM
+    scheduler.Schedule<MonthlyLeaveAccrualJob>()
+        .Monthly()
+        .Zoned(TimeZoneInfo.Utc) // Run at 1:00 AM UTC on the 1st of each month
+        .RunOnceAtStart(); // Also run once when the application starts (for testing/recovery)
 });
 
 // Configure the HTTP request pipeline.

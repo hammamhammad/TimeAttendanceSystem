@@ -1,6 +1,7 @@
 using TimeAttendanceSystem.Domain.Common;
 using TimeAttendanceSystem.Domain.Employees;
 using TimeAttendanceSystem.Domain.Users;
+using TimeAttendanceSystem.Domain.Workflows;
 
 namespace TimeAttendanceSystem.Domain.Excuses;
 
@@ -136,6 +137,20 @@ public class EmployeeExcuse : BaseEntity
     /// <value>Processing notes and comments (nullable)</value>
     public string? ProcessingNotes { get; set; }
 
+    /// <summary>
+    /// Gets or sets the workflow instance ID for approval tracking.
+    /// Null if no workflow is configured for this entity type.
+    /// </summary>
+    /// <value>Workflow instance ID for approval workflow (nullable)</value>
+    public long? WorkflowInstanceId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the user ID who submitted this excuse request.
+    /// This may differ from the employee's user when a manager submits on behalf of a team member.
+    /// </summary>
+    /// <value>User ID of the request submitter</value>
+    public long? SubmittedByUserId { get; set; }
+
     // Navigation Properties
 
     /// <summary>
@@ -151,6 +166,13 @@ public class EmployeeExcuse : BaseEntity
     /// </summary>
     /// <value>Approver user entity (nullable)</value>
     public User? ApprovedBy { get; set; }
+
+    /// <summary>
+    /// Gets or sets the workflow instance for approval tracking.
+    /// Navigation property for accessing workflow status and history.
+    /// </summary>
+    /// <value>Workflow instance entity (nullable)</value>
+    public WorkflowInstance? WorkflowInstance { get; set; }
 
     // Business Logic Methods
 

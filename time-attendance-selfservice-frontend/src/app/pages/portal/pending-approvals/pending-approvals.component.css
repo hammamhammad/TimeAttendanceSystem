@@ -1,0 +1,159 @@
+.pending-approvals-container {
+  padding: 1.5rem;
+}
+
+/* Tabs */
+.nav-tabs-custom {
+  border-bottom: none;
+  padding: 0.5rem 0.5rem 0;
+  gap: 0.25rem;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+
+.nav-tabs-custom .nav-link {
+  border: none;
+  border-radius: 0.5rem 0.5rem 0 0;
+  padding: 0.75rem 1.25rem;
+  color: var(--bs-secondary-color);
+  background: transparent;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nav-tabs-custom .nav-link:hover {
+  background: var(--bs-secondary-bg);
+  color: var(--bs-body-color);
+}
+
+.nav-tabs-custom .nav-link.active {
+  background: var(--bs-primary);
+  color: white;
+}
+
+.nav-tabs-custom .nav-link .badge {
+  font-size: 0.7rem;
+  padding: 0.25rem 0.5rem;
+}
+
+/* Checkbox column */
+.checkbox-col {
+  width: 40px;
+}
+
+/* Avatar */
+.avatar-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--bs-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.avatar-initials {
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+}
+
+/* Request summary */
+.request-summary {
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Workflow progress */
+.workflow-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Table */
+.table th {
+  font-weight: 600;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+.table-active {
+  background-color: var(--bs-primary-bg-subtle) !important;
+}
+
+/* Action buttons */
+.btn-group-sm .btn {
+  padding: 0.25rem 0.5rem;
+}
+
+/* Selected row highlight */
+tr.selected {
+  background-color: rgba(var(--bs-primary-rgb), 0.1);
+}
+
+/* Processing spinner */
+.spinner-border-sm {
+  width: 0.875rem;
+  height: 0.875rem;
+  border-width: 0.15em;
+}
+
+/* Responsive */
+@media (max-width: 991.98px) {
+  .request-summary {
+    max-width: 200px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .pending-approvals-container {
+    padding: 1rem;
+  }
+
+  .nav-tabs-custom {
+    padding: 0.25rem;
+  }
+
+  .nav-tabs-custom .nav-link {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .request-summary {
+    max-width: 150px;
+  }
+
+  .avatar-circle {
+    width: 32px;
+    height: 32px;
+  }
+
+  .avatar-initials {
+    font-size: 0.75rem;
+  }
+}
+
+/* Hide scrollbar for tabs but keep functionality */
+.nav-tabs-custom::-webkit-scrollbar {
+  height: 3px;
+}
+
+.nav-tabs-custom::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.nav-tabs-custom::-webkit-scrollbar-thumb {
+  background: var(--bs-secondary-bg);
+  border-radius: 3px;
+}

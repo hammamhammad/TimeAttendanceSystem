@@ -1,0 +1,71 @@
+<div class="date-range-picker" [class.date-range-inline]="inline">
+  <div [class]="inline ? 'd-flex align-items-center gap-2' : 'row g-3'">
+    <!-- Start Date -->
+    <div [class]="inline ? 'flex-fill' : 'col-md-6'">
+      @if (showLabels) {
+        <label class="form-label">
+          {{ startLabel }}
+          @if (required) {
+            <span class="text-danger">*</span>
+          }
+        </label>
+      }
+      <input
+        type="date"
+        [class]="getInputClasses()"
+        [class.is-invalid]="startError"
+        [placeholder]="startPlaceholder"
+        [disabled]="disabled"
+        [min]="minDate"
+        [max]="getMaxStartDate()"
+        [value]="value.start"
+        (change)="onStartChange($any($event.target).value)"
+        (blur)="onTouched()"
+      />
+      @if (startError) {
+        <div class="invalid-feedback d-block">
+          {{ startError }}
+        </div>
+      }
+    </div>
+
+    <!-- Separator (inline only) -->
+    @if (inline && showLabels) {
+      <span class="date-range-separator align-self-end pb-2">
+        <i class="fa-solid fa-arrow-right"></i>
+      </span>
+    }
+
+    <!-- End Date -->
+    <div [class]="inline ? 'flex-fill' : 'col-md-6'">
+      @if (showLabels) {
+        <label class="form-label">
+          {{ endLabel }}
+          @if (required) {
+            <span class="text-danger">*</span>
+          }
+        </label>
+      }
+      <input
+        type="date"
+        [class]="getInputClasses()"
+        [class.is-invalid]="endError"
+        [placeholder]="endPlaceholder"
+        [disabled]="disabled"
+        [min]="getMinEndDate()"
+        [max]="maxDate"
+        [value]="value.end"
+        (change)="onEndChange($any($event.target).value)"
+        (blur)="onTouched()"
+      />
+      @if (endError) {
+        <div class="invalid-feedback d-block">
+          {{ endError }}
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Custom content slot -->
+  <ng-content></ng-content>
+</div>

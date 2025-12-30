@@ -1,0 +1,146 @@
+export interface EmployeeDto {
+  id: number;
+  branchId: number;
+  branchName: string;
+  employeeNumber: string;
+  firstName: string;
+  lastName: string;
+  firstNameAr?: string;
+  lastNameAr?: string;
+  fullName: string;
+  fullNameAr?: string;
+  nationalId?: string;
+  email?: string;
+  phone?: string;
+  dateOfBirth?: string;
+  gender?: Gender;
+  hireDate: string;
+  employmentStatus: EmploymentStatus;
+  jobTitle: string;
+  jobTitleAr?: string;
+  departmentId?: number;
+  departmentName?: string;
+  managerEmployeeId?: number;
+  managerName?: string;
+  workLocationType: WorkLocationType;
+  photoUrl?: string;
+  currentShiftId?: number;
+  currentShiftName?: string;
+  currentShift?: {
+    id: number;
+    name: string;
+    startTime?: string;
+    endTime?: string;
+  };
+  isActive: boolean;
+  createdAtUtc: string;
+}
+
+export interface CreateEmployeeRequest {
+  branchId: number;
+  employeeNumber: string;
+  firstName: string;
+  lastName: string;
+  firstNameAr?: string;
+  lastNameAr?: string;
+  nationalId?: string;
+  email?: string;
+  phone?: string;
+  dateOfBirth?: string;
+  gender?: Gender;
+  hireDate: string;
+  employmentStatus: EmploymentStatus;
+  jobTitle: string;
+  jobTitleAr?: string;
+  departmentId?: number;
+  managerEmployeeId?: number;
+  workLocationType: WorkLocationType;
+}
+
+export interface UpdateEmployeeRequest {
+  firstName: string;
+  lastName: string;
+  firstNameAr?: string | null;
+  lastNameAr?: string | null;
+  nationalId?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  dateOfBirth?: string | null;
+  gender?: Gender | null;
+  employmentStatus: EmploymentStatus;
+  jobTitle: string;
+  jobTitleAr?: string | null;
+  departmentId?: number | null;
+  managerEmployeeId?: number | null;
+  workLocationType: WorkLocationType;
+  photoUrl?: string | null;
+}
+
+export interface EmployeesFilter {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  branchId?: number;
+  departmentId?: number;
+  managerId?: number;
+  isActive?: boolean;
+  employmentStatus?: string;
+  // Sorting properties
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
+}
+
+export interface PagedResult<T> {
+  items: T[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+export enum Gender {
+  Male = 1,
+  Female = 2
+}
+
+export enum EmploymentStatus {
+  Active = 1,
+  FullTime = 2,
+  PartTime = 3,
+  Contract = 4,
+  Intern = 5,
+  Consultant = 6,
+  Terminated = 7,
+  Inactive = 8
+}
+
+export enum WorkLocationType {
+  OnSite = 1,
+  Remote = 2,
+  Hybrid = 3
+}
+
+export interface BranchDto {
+  id: number;
+  name: string;
+  code: string;
+  location?: string;
+  isActive: boolean;
+}
+
+export interface DepartmentDto {
+  id: number;
+  name: string;
+  nameAr?: string;
+  branchId: number;
+  parentDepartmentId?: number;
+  isActive: boolean;
+}
+
+export interface EmployeeSelectOption {
+  id: number;
+  name: string;
+  employeeNumber: string;
+}
+
+export type Employee = EmployeeDto;

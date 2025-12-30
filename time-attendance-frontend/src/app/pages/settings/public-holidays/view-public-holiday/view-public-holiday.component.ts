@@ -1,5 +1,5 @@
 import { Component, signal, inject, OnInit, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { I18nService } from '../../../../core/i18n/i18n.service';
 import { NotificationService } from '../../../../core/notifications/notification.service';
@@ -19,14 +19,13 @@ import { LoadingSpinnerComponent } from '../../../../shared/components/loading-s
   selector: 'app-view-public-holiday',
   standalone: true,
   imports: [
-    CommonModule,
     RouterModule,
     LoadingSpinnerComponent,
     SectionCardComponent,
     DefinitionListComponent,
     StatusBadgeComponent,
     FormHeaderComponent
-  ],
+],
   templateUrl: './view-public-holiday.component.html',
   styleUrls: ['./view-public-holiday.component.css']
 })

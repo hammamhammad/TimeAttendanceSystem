@@ -1,0 +1,243 @@
+<!-- Page Header -->
+<app-page-header
+  [title]="i18n.t('portal.manager_dashboard')">
+  <div header-actions>
+    <button
+      class="btn btn-outline-primary btn-sm"
+      (click)="refresh()"
+      [disabled]="loading()"
+      type="button">
+      <i class="bi bi-arrow-clockwise" [class.spin]="loading()"></i>
+      {{ i18n.t('common.refresh') }}
+    </button>
+  </div>
+</app-page-header>
+
+<!-- Loading State -->
+@if (loading() && !dashboard()) {
+  <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+}
+
+<!-- Error State -->
+@if (error() && !dashboard()) {
+  <div class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    {{ error() }}
+    <button class="btn btn-sm btn-outline-danger ms-3" (click)="refresh()" type="button">
+      {{ i18n.t('common.retry') }}
+    </button>
+  </div>
+}
+
+<!-- Dashboard Content -->
+@if (dashboard()) {
+  <div class="manager-dashboard">
+    <!-- Welcome Message -->
+    <div class="welcome-section mb-4">
+      <h2 class="welcome-title">
+        {{ i18n.t('portal.welcome') }}, {{ managerName() }}
+      </h2>
+      <p class="welcome-subtitle text-muted">
+        {{ i18n.t('portal.manager_dashboard_subtitle') }}
+      </p>
+    </div>
+
+    <!-- Stats Cards Grid -->
+    <div class="row g-3 mb-4">
+      @for (card of statsCards(); track card.id) {
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="card stats-card h-100" [class.clickable]="card.route" (click)="navigateToStats(card)">
+            <div class="card-body">
+              <div class="d-flex align-items-start justify-content-between mb-2">
+                <div class="stat-icon" [ngClass]="'bg-' + card.iconColor.replace('text-', '') + '-subtle'">
+                  <i [class]="'bi ' + card.icon + ' ' + card.iconColor"></i>
+                </div>
+              </div>
+
+              <h3 class="stat-value mb-1">{{ card.value }}</h3>
+              <p class="stat-title mb-1">{{ card.title }}</p>
+
+              @if (card.subtitle) {
+                <p class="stat-subtitle mb-0 text-muted">
+                  <small>{{ card.subtitle }}</small>
+                </p>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Main Content Row -->
+    <div class="row g-4">
+      <!-- Quick Actions Section -->
+      <div class="col-12 col-lg-4">
+        <div class="card quick-actions-card h-100">
+          <div class="card-header bg-white">
+            <h5 class="card-title mb-0">
+              <i class="bi bi-lightning me-2 text-warning"></i>
+              {{ i18n.t('portal.quick_actions') }}
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="d-grid gap-2">
+              @for (action of quickActions(); track action.id) {
+                <button
+                  type="button"
+                  class="btn btn-outline-{{ action.color }} text-start quick-action-btn"
+                  [disabled]="!action.enabled"
+                  (click)="navigateToAction(action)">
+                  <div class="d-flex align-items-center">
+                    <div class="action-icon me-3">
+                      <i [class]="'bi ' + action.icon"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                      <div class="fw-semibold">{{ action.title }}</div>
+                      <small class="text-muted">{{ action.description }}</small>
+                    </div>
+                    @if (action.badge && action.badge > 0) {
+                      <span class="badge bg-danger rounded-pill">{{ action.badge }}</span>
+                    } @else {
+                      <i class="bi bi-chevron-right ms-2"></i>
+                    }
+                  </div>
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pending Approvals Section -->
+      <div class="col-12 col-lg-8">
+        <div class="card approvals-card h-100">
+          <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">
+              <i class="bi bi-list-task me-2 text-warning"></i>
+              {{ i18n.t('portal.pending_approvals') }}
+            </h5>
+            @if (hasPendingApprovals()) {
+              <button class="btn btn-sm btn-outline-primary" (click)="viewAllApprovals()">
+                {{ i18n.t('common.view_all') }}
+                <i class="bi bi-arrow-right ms-1"></i>
+              </button>
+            }
+          </div>
+          <div class="card-body p-0">
+            @if (pendingApprovalsLoading() && !hasPendingApprovals()) {
+              <div class="p-4 text-center">
+                <span class="spinner-border spinner-border-sm text-primary" role="status"></span>
+                <span class="ms-2">{{ i18n.t('common.loading') }}</span>
+              </div>
+            } @else if (hasPendingApprovals()) {
+              <div class="approval-list">
+                @for (approval of recentPendingApprovals(); track approval.workflowInstanceId) {
+                  <div class="approval-item" (click)="viewApproval(approval)">
+                    <div class="approval-icon">
+                      <i [class]="'bi ' + getEntityTypeIcon(approval.entityType) + ' ' + getEntityTypeColor(approval.entityType)"></i>
+                    </div>
+
+                    <div class="approval-content flex-grow-1">
+                      <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                          <h6 class="mb-1">{{ approval.employeeName }}</h6>
+                          <p class="mb-1 text-muted small">{{ approval.requestSummary }}</p>
+                        </div>
+                        <small class="text-muted">{{ formatDate(approval.requestedAt) }}</small>
+                      </div>
+                      @if (approval.isDelegated) {
+                        <span class="badge bg-info-subtle text-info small">
+                          <i class="bi bi-share me-1"></i>
+                          {{ i18n.t('portal.delegated_from') }} {{ approval.delegatedFrom }}
+                        </span>
+                      }
+                    </div>
+
+                    <div class="approval-actions">
+                      <button
+                        class="btn btn-sm btn-success me-1"
+                        (click)="quickApprove(approval, $event)"
+                        [title]="i18n.t('common.approve')">
+                        <i class="bi bi-check"></i>
+                      </button>
+                      <button
+                        class="btn btn-sm btn-danger"
+                        (click)="quickReject(approval, $event)"
+                        [title]="i18n.t('common.reject')">
+                        <i class="bi bi-x"></i>
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="p-4">
+                <app-empty-state
+                  icon="bi-check-circle"
+                  [title]="i18n.t('portal.no_pending_approvals')"
+                  [message]="i18n.t('portal.no_pending_approvals_message')">
+                </app-empty-state>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Team Attendance Summary -->
+    @if (dashboard().teamSize > 0) {
+      <div class="row g-4 mt-2">
+        <div class="col-12">
+          <div class="card team-summary-card">
+            <div class="card-header bg-white">
+              <h5 class="card-title mb-0">
+                <i class="bi bi-pie-chart me-2 text-primary"></i>
+                {{ i18n.t('portal.team_attendance_summary') }}
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row g-3 text-center">
+                <div class="col-6 col-md-2">
+                  <div class="summary-item">
+                    <div class="summary-value text-success">{{ dashboard().presentToday }}</div>
+                    <div class="summary-label">{{ i18n.t('portal.present') }}</div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-2">
+                  <div class="summary-item">
+                    <div class="summary-value text-danger">{{ dashboard().absentToday }}</div>
+                    <div class="summary-label">{{ i18n.t('portal.absent') }}</div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-2">
+                  <div class="summary-item">
+                    <div class="summary-value text-warning">{{ dashboard().lateToday }}</div>
+                    <div class="summary-label">{{ i18n.t('portal.late') }}</div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-2">
+                  <div class="summary-item">
+                    <div class="summary-value text-info">{{ dashboard().onLeaveToday }}</div>
+                    <div class="summary-label">{{ i18n.t('portal.on_leave') }}</div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-2">
+                  <div class="summary-item">
+                    <div class="summary-value text-primary">{{ dashboard().remoteWorkToday }}</div>
+                    <div class="summary-label">{{ i18n.t('portal.remote') }}</div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-2">
+                  <div class="summary-item">
+                    <div class="summary-value">{{ dashboard().teamAttendanceRate.toFixed(0) }}%</div>
+                    <div class="summary-label">{{ i18n.t('portal.attendance_rate') }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}

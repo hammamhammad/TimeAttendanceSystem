@@ -13,6 +13,7 @@ namespace TimeAttendanceSystem.Application.EmployeeVacations.Commands.CreateEmpl
 /// <param name="EndDate">End date of vacation period</param>
 /// <param name="IsApproved">Whether vacation is approved (affects attendance)</param>
 /// <param name="Notes">Optional notes about the vacation</param>
+/// <param name="OnBehalfOfEmployeeId">Optional: When a manager submits on behalf of a team member</param>
 /// <remarks>
 /// Command Processing:
 /// - Validates employee exists and is active
@@ -29,6 +30,11 @@ namespace TimeAttendanceSystem.Application.EmployeeVacations.Commands.CreateEmpl
 /// - Vacation type must be active
 /// - Total days calculated automatically
 ///
+/// On-Behalf-Of Feature:
+/// - If OnBehalfOfEmployeeId is provided, the request is submitted by a manager
+/// - Manager must be in the employee's management chain (recursive)
+/// - If manager is in the approval workflow, their step is auto-approved
+///
 /// Integration Effects:
 /// - Approved vacations update attendance status to OnLeave
 /// - Historical attendance records updated if vacation is in past
@@ -40,5 +46,6 @@ public record CreateEmployeeVacationCommand(
     DateTime StartDate,
     DateTime EndDate,
     bool IsApproved = true,
-    string? Notes = null
+    string? Notes = null,
+    long? OnBehalfOfEmployeeId = null
 ) : IRequest<Result<long>>;

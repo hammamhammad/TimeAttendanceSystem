@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterModule } from '@angular/router';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { PermissionService } from '../../../core/auth/permission.service';
@@ -25,7 +25,7 @@ export type FormHeaderMode = 'create' | 'edit' | 'view';
 @Component({
   selector: 'app-form-header',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [RouterModule],
   templateUrl: './form-header.component.html',
   styleUrls: ['./form-header.component.css']
 })

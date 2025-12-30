@@ -1,0 +1,14 @@
+<div [class]="getContainerClasses()">
+  <div [class]="getSpinnerClasses()" role="status">
+    <span class="visually-hidden">{{ message }}</span>
+  </div>
+
+  @if (showMessage) {
+    <p class="mt-2 text-muted mb-0">{{ message }}</p>
+  }
+
+  <!-- Custom content slot -->
+  <div class="loading-custom-content mt-2">
+    <ng-content></ng-content>
+  </div>
+</div>

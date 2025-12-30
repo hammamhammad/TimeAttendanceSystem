@@ -1,0 +1,251 @@
+<div class="team-members-container">
+  <!-- Page Header -->
+  <app-page-header [title]="i18n.t('portal.team_members')">
+    <button header-actions class="btn btn-outline-primary btn-sm" (click)="refresh()">
+      <i class="bi bi-arrow-clockwise me-1"></i>
+      {{ i18n.t('common.refresh') }}
+    </button>
+  </app-page-header>
+
+  <!-- Stats Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-4 col-lg-2">
+      <div class="stats-card">
+        <div class="stats-icon bg-primary-subtle text-primary">
+          <i class="bi bi-people"></i>
+        </div>
+        <div class="stats-content">
+          <div class="stats-value">{{ stats().total }}</div>
+          <div class="stats-label">{{ i18n.t('portal.total_team') }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+      <div class="stats-card">
+        <div class="stats-icon bg-info-subtle text-info">
+          <i class="bi bi-person-check"></i>
+        </div>
+        <div class="stats-content">
+          <div class="stats-value">{{ stats().directReports }}</div>
+          <div class="stats-label">{{ i18n.t('portal.direct_reports') }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+      <div class="stats-card">
+        <div class="stats-icon bg-secondary-subtle text-secondary">
+          <i class="bi bi-diagram-3"></i>
+        </div>
+        <div class="stats-content">
+          <div class="stats-value">{{ stats().indirectReports }}</div>
+          <div class="stats-label">{{ i18n.t('portal.indirect_reports') }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+      <div class="stats-card">
+        <div class="stats-icon bg-success-subtle text-success">
+          <i class="bi bi-check-circle"></i>
+        </div>
+        <div class="stats-content">
+          <div class="stats-value">{{ stats().present }}</div>
+          <div class="stats-label">{{ i18n.t('portal.present_today') }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+      <div class="stats-card">
+        <div class="stats-icon bg-warning-subtle text-warning">
+          <i class="bi bi-calendar-check"></i>
+        </div>
+        <div class="stats-content">
+          <div class="stats-value">{{ stats().onLeave }}</div>
+          <div class="stats-label">{{ i18n.t('portal.on_leave') }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+      <div class="stats-card">
+        <div class="stats-icon bg-primary-subtle text-primary">
+          <i class="bi bi-house-door"></i>
+        </div>
+        <div class="stats-content">
+          <div class="stats-value">{{ stats().remote }}</div>
+          <div class="stats-label">{{ i18n.t('portal.remote_work') }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">{{ i18n.t('common.search') }}</label>
+          <div class="input-group">
+            <span class="input-group-text">
+              <i class="bi bi-search"></i>
+            </span>
+            <input
+              type="text"
+              class="form-control"
+              [placeholder]="i18n.t('portal.search_team_members')"
+              [value]="searchTerm()"
+              (input)="onSearch($any($event.target).value)">
+          </div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">{{ i18n.t('portal.status') }}</label>
+          <select
+            class="form-select"
+            [value]="statusFilter()"
+            (change)="onStatusFilterChange($any($event.target).value)">
+            @for (option of statusOptions; track option.value) {
+              <option [value]="option.value">{{ i18n.t(option.label) }}</option>
+            }
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">{{ i18n.t('portal.hierarchy') }}</label>
+          <select
+            class="form-select"
+            [value]="hierarchyFilter()"
+            (change)="onHierarchyFilterChange($any($event.target).value)">
+            @for (option of hierarchyOptions; track option.value) {
+              <option [value]="option.value">{{ i18n.t(option.label) }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <app-loading-spinner [message]="i18n.t('portal.loading_team')"></app-loading-spinner>
+  } @else {
+    <!-- Empty State -->
+    @if (filteredTeamMembers().length === 0) {
+      <app-empty-state
+        [title]="i18n.t('portal.no_team_members')"
+        [message]="searchTerm() || statusFilter() !== 'all' || hierarchyFilter() !== 'all'
+          ? i18n.t('portal.no_team_members_filter')
+          : i18n.t('portal.no_team_members_message')"
+        icon="bi-people">
+      </app-empty-state>
+    } @else {
+      <!-- Team Members Table -->
+      <div class="card">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>{{ i18n.t('portal.employee') }}</th>
+                  <th>{{ i18n.t('portal.department') }}</th>
+                  <th>{{ i18n.t('portal.position') }}</th>
+                  <th>{{ i18n.t('portal.hierarchy') }}</th>
+                  <th>{{ i18n.t('portal.status') }}</th>
+                  <th>{{ i18n.t('portal.pending_requests') }}</th>
+                  <th class="text-end">{{ i18n.t('common.actions') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (member of filteredTeamMembers(); track member.id) {
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="avatar-circle me-2">
+                          @if (member.photo) {
+                            <img [src]="member.photo" [alt]="member.name" class="avatar-img">
+                          } @else {
+                            <span class="avatar-initials">{{ member.name.charAt(0) }}</span>
+                          }
+                        </div>
+                        <div>
+                          <div class="fw-medium">{{ member.name }}</div>
+                          <small class="text-muted">{{ member.employeeCode }}</small>
+                        </div>
+                      </div>
+                    </td>
+                    <td>{{ member.department || '-' }}</td>
+                    <td>{{ member.position || '-' }}</td>
+                    <td>
+                      <span class="badge" [class]="member.hierarchyLevel === 1 ? 'bg-info-subtle text-info' : 'bg-secondary-subtle text-secondary'">
+                        {{ getHierarchyLabel(member.hierarchyLevel) }}
+                      </span>
+                    </td>
+                    <td>
+                      <app-status-badge
+                        [status]="getStatusLabel(member.status)"
+                        [variant]="getStatusVariant(member.status)">
+                      </app-status-badge>
+                    </td>
+                    <td>
+                      @if (getPendingRequestsCount(member) > 0) {
+                        <span class="badge bg-warning-subtle text-warning">
+                          {{ getPendingRequestsCount(member) }} {{ i18n.t('portal.pending') }}
+                        </span>
+                      } @else {
+                        <span class="text-muted">-</span>
+                      }
+                    </td>
+                    <td class="text-end">
+                      <div class="btn-group btn-group-sm">
+                        <button
+                          type="button"
+                          class="btn btn-outline-info"
+                          [title]="i18n.t('portal.view_details')"
+                          (click)="viewMemberDetails(member)">
+                          <i class="bi bi-eye"></i>
+                        </button>
+                        <div class="btn-group btn-group-sm" role="group">
+                          <button
+                            type="button"
+                            class="btn btn-outline-primary dropdown-toggle"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                            [title]="i18n.t('portal.create_request_on_behalf')">
+                            <i class="bi bi-plus-lg"></i>
+                          </button>
+                          <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                              <button class="dropdown-item" (click)="createVacationOnBehalf(member)">
+                                <i class="bi bi-calendar-plus me-2 text-primary"></i>
+                                {{ i18n.t('portal.create_vacation') }}
+                              </button>
+                            </li>
+                            <li>
+                              <button class="dropdown-item" (click)="createExcuseOnBehalf(member)">
+                                <i class="bi bi-clock-history me-2 text-warning"></i>
+                                {{ i18n.t('portal.create_excuse') }}
+                              </button>
+                            </li>
+                            <li>
+                              <button class="dropdown-item" (click)="createRemoteWorkOnBehalf(member)">
+                                <i class="bi bi-house-door me-2 text-success"></i>
+                                {{ i18n.t('portal.create_remote_work') }}
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card-footer bg-transparent">
+          <div class="d-flex justify-content-between align-items-center">
+            <small class="text-muted">
+              {{ i18n.t('portal.showing_members', { count: filteredTeamMembers().length.toString(), total: teamMembers().length.toString() }) }}
+            </small>
+          </div>
+        </div>
+      </div>
+    }
+  }
+</div>

@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { DepartmentDto } from '../../../shared/models/department.model';
 import { PermissionService } from '../../../core/auth/permission.service';
@@ -11,10 +11,9 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
   selector: 'app-department-info-panel',
   standalone: true,
   imports: [
-    CommonModule,
     HasPermissionDirective,
     StatusBadgeComponent
-  ],
+],
   templateUrl: './department-info-panel.component.html',
   styleUrls: ['./department-info-panel.component.css']
 })

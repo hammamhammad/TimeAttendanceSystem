@@ -39,8 +39,11 @@ public class DailyAttendanceGeneratorService : IDailyAttendanceGeneratorService
     {
         _logger.LogInformation("Starting attendance generation for date: {Date}", date.Date);
 
+        // Include all employees except Terminated and Inactive
         var activeEmployees = await _context.Employees
-            .Where(e => e.EmploymentStatus == EmploymentStatus.Active)
+            .Where(e => e.EmploymentStatus != EmploymentStatus.Terminated &&
+                        e.EmploymentStatus != EmploymentStatus.Inactive &&
+                        e.IsActive)
             .ToListAsync(cancellationToken);
 
         var recordsGenerated = 0;
@@ -73,8 +76,12 @@ public class DailyAttendanceGeneratorService : IDailyAttendanceGeneratorService
         _logger.LogInformation("Starting attendance generation for branch {BranchId} on date: {Date}",
             branchId, date.Date);
 
+        // Include all employees except Terminated and Inactive
         var branchEmployees = await _context.Employees
-            .Where(e => e.BranchId == branchId && e.EmploymentStatus == EmploymentStatus.Active)
+            .Where(e => e.BranchId == branchId &&
+                        e.EmploymentStatus != EmploymentStatus.Terminated &&
+                        e.EmploymentStatus != EmploymentStatus.Inactive &&
+                        e.IsActive)
             .ToListAsync(cancellationToken);
 
         var recordsGenerated = 0;
@@ -224,9 +231,11 @@ public class DailyAttendanceGeneratorService : IDailyAttendanceGeneratorService
 
         try
         {
-            // Get all active employees
+            // Get all active employees (excluding Terminated and Inactive)
             var activeEmployees = await _context.Employees
-                .Where(e => e.EmploymentStatus == EmploymentStatus.Active)
+                .Where(e => e.EmploymentStatus != EmploymentStatus.Terminated &&
+                            e.EmploymentStatus != EmploymentStatus.Inactive &&
+                            e.IsActive)
                 .CountAsync(cancellationToken);
 
             result.TotalEmployees = activeEmployees;

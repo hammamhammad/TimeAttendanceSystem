@@ -1,0 +1,19 @@
+﻿  Determining projects to restore...
+  All projects are up-to-date for restore.
+  TimeAttendanceSystem.Domain -> D:\Work\AI Code\TimeAttendanceSystem\src\Domain\TimeAttendanceSystem.Domain\bin\Debug\net9.0\TimeAttendanceSystem.Domain.dll
+  TimeAttendanceSystem.Shared -> D:\Work\AI Code\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\bin\Debug\net9.0\TimeAttendanceSystem.Shared.dll
+D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\Reports\Services\ReportsService.cs(6,35): error CS0234: The type or namespace name 'Entities' does not exist in the namespace 'TimeAttendanceSystem.Domain' (are you missing an assembly reference?) [D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\TimeAttendanceSystem.Application.csproj]
+D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\Reports\Services\ReportsService.cs(7,35): error CS0234: The type or namespace name 'Enums' does not exist in the namespace 'TimeAttendanceSystem.Domain' (are you missing an assembly reference?) [D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\TimeAttendanceSystem.Application.csproj]
+D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\Reports\DTOs\AttendanceReportDto.cs(22,12): error CS0246: The type or namespace name 'ReportFilter' could not be found (are you missing a using directive or an assembly reference?) [D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\TimeAttendanceSystem.Application.csproj]
+D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\Reports\DTOs\LeaveReportDto.cs(18,12): error CS0246: The type or namespace name 'ReportFilter' could not be found (are you missing a using directive or an assembly reference?) [D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\TimeAttendanceSystem.Application.csproj]
+
+Build FAILED.
+
+D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\Reports\Services\ReportsService.cs(6,35): error CS0234: The type or namespace name 'Entities' does not exist in the namespace 'TimeAttendanceSystem.Domain' (are you missing an assembly reference?) [D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\TimeAttendanceSystem.Application.csproj]
+D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\Reports\Services\ReportsService.cs(7,35): error CS0234: The type or namespace name 'Enums' does not exist in the namespace 'TimeAttendanceSystem.Domain' (are you missing an assembly reference?) [D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\TimeAttendanceSystem.Application.csproj]
+D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\Reports\DTOs\AttendanceReportDto.cs(22,12): error CS0246: The type or namespace name 'ReportFilter' could not be found (are you missing a using directive or an assembly reference?) [D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\TimeAttendanceSystem.Application.csproj]
+D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\Reports\DTOs\LeaveReportDto.cs(18,12): error CS0246: The type or namespace name 'ReportFilter' could not be found (are you missing a using directive or an assembly reference?) [D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\TimeAttendanceSystem.Application.csproj]
+    0 Warning(s)
+    4 Error(s)
+
+Time Elapsed 00:00:05.80

@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, signal, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { DataTableComponent, TableColumn, TableAction } from '../../../shared/components/data-table/data-table.component';
 import { UserDto } from '../../../shared/models/user.model';
 import { I18nService } from '../../../core/i18n/i18n.service';
@@ -11,7 +11,7 @@ import { BadgeListComponent } from '../../../shared/components/badge-list/badge-
 @Component({
   selector: 'app-user-table',
   standalone: true,
-  imports: [CommonModule, DataTableComponent, StatusBadgeComponent, BadgeListComponent],
+  imports: [DataTableComponent, StatusBadgeComponent, BadgeListComponent],
   template: `
     <app-data-table
       [data]="users"
@@ -30,81 +30,96 @@ import { BadgeListComponent } from '../../../shared/components/badge-list/badge-
       (pageSizeChange)="onPageSizeChange($event)"
       (selectionChange)="onSelectionChange($event)"
       (sortChange)="onSortChange($event)">
-
+    
       <ng-template #cellTemplate let-user let-column="column">
-        <ng-container [ngSwitch]="column.key">
+        @switch (column.key) {
           <!-- User info with avatar -->
-          <div *ngSwitchCase="'user'" class="d-flex align-items-center">
-            <div class="avatar-sm me-2">
-              <div class="avatar-initial bg-primary text-white rounded-circle">
-                {{ getInitials(user.firstName, user.lastName) }}
+          @case ('user') {
+            <div class="d-flex align-items-center">
+              <div class="avatar-sm me-2">
+                <div class="avatar-initial bg-primary text-white rounded-circle">
+                  {{ getInitials(user.firstName, user.lastName) }}
+                </div>
+              </div>
+              <div>
+                <div class="fw-medium">{{ user.firstName }} {{ user.lastName }}</div>
+                <small class="text-muted">{{ user.email }}</small>
               </div>
             </div>
-            <div>
-              <div class="fw-medium">{{ user.firstName }} {{ user.lastName }}</div>
-              <small class="text-muted">{{ user.email }}</small>
-            </div>
-          </div>
-
+          }
           <!-- Username -->
-          <span *ngSwitchCase="'username'" class="fw-medium">
-            {{ user.username }}
-            <span *ngIf="isSystemAdmin(user)" class="badge bg-warning text-dark ms-1" title="System Administrator">
-              <i class="fas fa-crown"></i>
+          @case ('username') {
+            <span class="fw-medium">
+              {{ user.username }}
+              @if (isSystemAdmin(user)) {
+                <span class="badge bg-warning text-dark ms-1" title="System Administrator">
+                  <i class="fas fa-crown"></i>
+                </span>
+              }
             </span>
-          </span>
-
+          }
           <!-- Roles -->
-          <div *ngSwitchCase="'roles'">
-            <app-badge-list
-              [items]="getRoleBadges(user.roles)"
-              [emptyMessage]="'No roles assigned'">
-            </app-badge-list>
-          </div>
-
+          @case ('roles') {
+            <div>
+              <app-badge-list
+                [items]="getRoleBadges(user.roles)"
+                [emptyMessage]="'No roles assigned'">
+              </app-badge-list>
+            </div>
+          }
           <!-- Status -->
-          <span *ngSwitchCase="'status'">
-            <app-status-badge
-              [status]="user.isActive ? 'active' : 'inactive'"
-              [label]="user.isActive ? 'Active' : 'Inactive'"
-              [showIcon]="true">
-            </app-status-badge>
-          </span>
-
+          @case ('status') {
+            <span>
+              <app-status-badge
+                [status]="user.isActive ? 'active' : 'inactive'"
+                [label]="user.isActive ? 'Active' : 'Inactive'"
+                [showIcon]="true">
+              </app-status-badge>
+            </span>
+          }
           <!-- Lock status -->
-          <span *ngSwitchCase="'lockStatus'">
-            <app-status-badge
-              [status]="isUserLocked(user.lockoutEndUtc) ? 'warning' : 'success'"
-              [label]="isUserLocked(user.lockoutEndUtc) ? 'Locked' : 'Unlocked'"
-              [icon]="isUserLocked(user.lockoutEndUtc) ? 'fa-lock' : 'fa-unlock'"
-              [showIcon]="true">
-            </app-status-badge>
-          </span>
-
+          @case ('lockStatus') {
+            <span>
+              <app-status-badge
+                [status]="isUserLocked(user.lockoutEndUtc) ? 'warning' : 'success'"
+                [label]="isUserLocked(user.lockoutEndUtc) ? 'Locked' : 'Unlocked'"
+                [icon]="isUserLocked(user.lockoutEndUtc) ? 'fa-lock' : 'fa-unlock'"
+                [showIcon]="true">
+              </app-status-badge>
+            </span>
+          }
           <!-- Must Change Password -->
-          <span *ngSwitchCase="'mustChangePassword'">
-            <app-status-badge
-              [status]="user.mustChangePassword ? 'warning' : 'success'"
-              [label]="user.mustChangePassword ? 'Must Change' : 'OK'"
-              [icon]="user.mustChangePassword ? 'fa-key' : 'fa-check'"
-              [showIcon]="true">
-            </app-status-badge>
-          </span>
-
+          @case ('mustChangePassword') {
+            <span>
+              <app-status-badge
+                [status]="user.mustChangePassword ? 'warning' : 'success'"
+                [label]="user.mustChangePassword ? 'Must Change' : 'OK'"
+                [icon]="user.mustChangePassword ? 'fa-key' : 'fa-check'"
+                [showIcon]="true">
+              </app-status-badge>
+            </span>
+          }
           <!-- Created date -->
-          <span *ngSwitchCase="'created'">
-            {{ formatDate(user.createdAtUtc || user.createdAt) }}
-          </span>
-
+          @case ('created') {
+            <span>
+              {{ formatDate(user.createdAtUtc || user.createdAt) }}
+            </span>
+          }
           <!-- Last login -->
-          <span *ngSwitchCase="'lastLogin'">
-            <span *ngIf="user.lastLoginAt">{{ formatDate(user.lastLoginAt) }}</span>
-            <span *ngIf="!user.lastLoginAt" class="text-muted">Never</span>
-          </span>
-        </ng-container>
+          @case ('lastLogin') {
+            <span>
+              @if (user.lastLoginAt) {
+                <span>{{ formatDate(user.lastLoginAt) }}</span>
+              }
+              @if (!user.lastLoginAt) {
+                <span class="text-muted">Never</span>
+              }
+            </span>
+          }
+        }
       </ng-template>
     </app-data-table>
-  `,
+    `,
   styles: [`
     .avatar-sm {
       width: 2rem;

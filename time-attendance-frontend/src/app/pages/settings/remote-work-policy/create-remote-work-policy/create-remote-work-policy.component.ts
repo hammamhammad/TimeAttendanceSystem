@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { I18nService } from '../../../../core/i18n/i18n.service';
@@ -14,7 +14,7 @@ import { CreateRemoteWorkPolicyRequest } from '../../../../core/models/remote-wo
 @Component({
   selector: 'app-create-remote-work-policy',
   standalone: true,
-  imports: [CommonModule, FormsModule, FormHeaderComponent, SearchableSelectComponent, LoadingSpinnerComponent],
+  imports: [FormsModule, FormHeaderComponent, SearchableSelectComponent, LoadingSpinnerComponent],
   templateUrl: './create-remote-work-policy.component.html',
   styleUrls: ['./create-remote-work-policy.component.css']
 })

@@ -1,0 +1,18 @@
+/* Workflow List Component Styles */
+
+.badge {
+  font-weight: 500;
+}
+
+/* Filter section styling */
+.card .form-label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .row.g-3 > div {
+    margin-bottom: 0.5rem;
+  }
+}

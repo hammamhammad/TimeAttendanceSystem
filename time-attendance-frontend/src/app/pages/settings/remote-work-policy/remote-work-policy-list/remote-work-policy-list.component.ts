@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, computed, inject, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router } from '@angular/router';
 import { RemoteWorkPoliciesService } from '../../../../core/services/remote-work-policies.service';
 import { RemoteWorkPolicy } from '../../../../core/models/remote-work-policy.model';
@@ -18,14 +18,13 @@ import { SectionCardComponent } from '../../../../shared/components/section-card
   selector: 'app-remote-work-policy-list',
   standalone: true,
   imports: [
-    CommonModule,
     RemoteWorkPolicyModalComponent,
     DataTableComponent,
     PageHeaderComponent,
     StatusBadgeComponent,
     UnifiedFilterComponent,
     SectionCardComponent
-  ],
+],
   templateUrl: './remote-work-policy-list.component.html',
   styleUrls: ['./remote-work-policy-list.component.css']
 })

@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil, switchMap } from 'rxjs';
@@ -15,7 +15,7 @@ import { UpdateExcusePolicyRequest } from '../../../../shared/models/excuse-poli
 @Component({
   selector: 'app-edit-excuse-policy',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, FormHeaderComponent, FormSectionComponent, LoadingSpinnerComponent],
+  imports: [FormsModule, RouterModule, FormHeaderComponent, FormSectionComponent, LoadingSpinnerComponent],
   templateUrl: './edit-excuse-policy.component.html',
   styleUrls: ['./edit-excuse-policy.component.css']
 })

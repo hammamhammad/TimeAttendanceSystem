@@ -1,0 +1,205 @@
+<!-- Leave Balance Summary Component -->
+<div class="leave-balance-summary" [class.compact]="compact">
+  <!-- Header with Year Selector -->
+  @if (showHeader) {
+    <div class="summary-header">
+      <h4 class="mb-0">{{ i18n.t('leaveBalance.balanceSummary') }}</h4>
+      @if (showYearSelector) {
+        <select
+          class="form-select form-select-sm year-selector"
+          [(ngModel)]="selectedYear"
+          (ngModelChange)="onYearChange()">
+          @for (year of availableYears(); track year) {
+            <option [value]="year">{{ year }}</option>
+          }
+        </select>
+      }
+    </div>
+  }
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="text-center py-4">
+      <app-loading-spinner></app-loading-spinner>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!loading() && !hasBalances()) {
+    <app-empty-state
+      [icon]="'bi-calendar-x'"
+      [title]="i18n.t('leaveBalance.noBalancesTitle')"
+      [message]="i18n.t('leaveBalance.noBalancesMessage')"
+      [size]="'sm'">
+    </app-empty-state>
+  }
+
+  <!-- Balance Summary Content -->
+  @if (!loading() && hasBalances()) {
+    <div class="balance-content">
+      <!-- Total Statistics (Only in non-compact mode) -->
+      @if (!compact && getTotalStats()) {
+        <div class="total-stats mb-4">
+          <div class="row g-3">
+            <div class="col-6 col-md-4 col-lg-2">
+              <div class="stat-card">
+                <div class="stat-label">{{ i18n.t('leaveBalance.totalEntitled') }}</div>
+                <div class="stat-value text-primary">{{ getTotalStats()!.entitled }}</div>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+              <div class="stat-card">
+                <div class="stat-label">{{ i18n.t('leaveBalance.totalAccrued') }}</div>
+                <div class="stat-value text-info">{{ getTotalStats()!.accrued }}</div>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+              <div class="stat-card">
+                <div class="stat-label">{{ i18n.t('leaveBalance.totalUsed') }}</div>
+                <div class="stat-value text-danger">{{ getTotalStats()!.used }}</div>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+              <div class="stat-card">
+                <div class="stat-label">{{ i18n.t('leaveBalance.totalPending') }}</div>
+                <div class="stat-value text-warning">{{ getTotalStats()!.pending }}</div>
+              </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+              <div class="stat-card">
+                <div class="stat-label">{{ i18n.t('leaveBalance.totalAvailable') }}</div>
+                <div class="stat-value text-success">{{ getTotalStats()!.available }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Vacation Type Balances -->
+      <div class="vacation-type-balances">
+        @for (balance of summary()?.vacationTypeBalances; track balance.vacationTypeId) {
+          <div class="balance-card" [class.compact-card]="compact">
+            <!-- Vacation Type Header -->
+            <div class="balance-header">
+              <div class="d-flex align-items-center justify-content-between">
+                <h5 class="vacation-type-name mb-0">{{ balance.vacationTypeName }}</h5>
+                <app-status-badge
+                  [status]="balance.currentBalance.toString() + ' ' + i18n.t('leaveBalance.daysAvailable')"
+                  [variant]="getBalanceBadgeVariant(balance)">
+                </app-status-badge>
+              </div>
+            </div>
+
+            <!-- Balance Details -->
+            <div class="balance-details">
+              <div class="row g-2">
+                <!-- Entitled Days -->
+                <div class="col-6 col-md-3">
+                  <div class="balance-item">
+                    <span class="balance-label">{{ i18n.t('leaveBalance.entitled') }}</span>
+                    <span class="balance-value">{{ balance.entitledDays }}</span>
+                  </div>
+                </div>
+
+                <!-- Accrued Days -->
+                <div class="col-6 col-md-3">
+                  <div class="balance-item">
+                    <span class="balance-label">{{ i18n.t('leaveBalance.accrued') }}</span>
+                    <span class="balance-value text-info">{{ balance.accruedDays }}</span>
+                  </div>
+                </div>
+
+                <!-- Used Days -->
+                <div class="col-6 col-md-3">
+                  <div class="balance-item">
+                    <span class="balance-label">{{ i18n.t('leaveBalance.used') }}</span>
+                    <span class="balance-value text-danger">{{ balance.usedDays }}</span>
+                  </div>
+                </div>
+
+                <!-- Pending Days -->
+                <div class="col-6 col-md-3">
+                  <div class="balance-item">
+                    <span class="balance-label">{{ i18n.t('leaveBalance.pending') }}</span>
+                    <span class="balance-value text-warning">{{ balance.pendingDays }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Progress Bar (Accrual) -->
+              @if (!compact) {
+                <div class="progress-section mt-3">
+                  <div class="d-flex justify-content-between mb-1">
+                    <small class="text-muted">{{ i18n.t('leaveBalance.accrualProgress') }}</small>
+                    <small class="text-muted">{{ getAccrualPercentage(balance) }}%</small>
+                  </div>
+                  <div class="progress" style="height: 8px;">
+                    <div
+                      class="progress-bar bg-info"
+                      role="progressbar"
+                      [style.width.%]="getAccrualPercentage(balance)"
+                      [attr.aria-valuenow]="getAccrualPercentage(balance)"
+                      aria-valuemin="0"
+                      aria-valuemax="100">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Progress Bar (Usage) -->
+                <div class="progress-section mt-2">
+                  <div class="d-flex justify-content-between mb-1">
+                    <small class="text-muted">{{ i18n.t('leaveBalance.usageProgress') }}</small>
+                    <small class="text-muted">{{ getUsagePercentage(balance) }}%</small>
+                  </div>
+                  <div class="progress" style="height: 8px;">
+                    <div
+                      class="progress-bar"
+                      [class]="getProgressBarClass(balance)"
+                      role="progressbar"
+                      [style.width.%]="getUsagePercentage(balance)"
+                      [attr.aria-valuenow]="getUsagePercentage(balance)"
+                      aria-valuemin="0"
+                      aria-valuemax="100">
+                    </div>
+                  </div>
+                </div>
+              }
+
+              <!-- Additional Info -->
+              @if (!compact) {
+                <div class="additional-info mt-3">
+                  <div class="row g-2">
+                    @if (balance.carryOverDays > 0) {
+                      <div class="col-6">
+                        <small class="text-muted">
+                          <i class="bi bi-arrow-right-circle me-1"></i>
+                          {{ i18n.t('leaveBalance.carryOver') }}: {{ balance.carryOverDays }}
+                        </small>
+                      </div>
+                    }
+                    @if (balance.lastAccrualDate) {
+                      <div class="col-6">
+                        <small class="text-muted">
+                          <i class="bi bi-calendar-check me-1"></i>
+                          {{ i18n.t('leaveBalance.lastAccrual') }}: {{ formatLastAccrualDate(balance.lastAccrualDate) }}
+                        </small>
+                      </div>
+                    }
+                    @if (balance.expiresAtYearEnd) {
+                      <div class="col-12">
+                        <small class="text-warning">
+                          <i class="bi bi-exclamation-triangle me-1"></i>
+                          {{ i18n.t('leaveBalance.expiresWarning') }}
+                        </small>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

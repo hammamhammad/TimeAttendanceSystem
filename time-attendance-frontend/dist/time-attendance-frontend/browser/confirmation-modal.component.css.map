@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/shared/components/confirmation-modal/confirmation-modal.component.css"],
+  "sourcesContent": [".confirmation-content {\r\n  padding: 1rem 0;\r\n}\r\n\r\n.confirmation-content p {\r\n  font-size: 1.1rem;\r\n  color: #495057;\r\n}"],
+  "mappings": ";AAAA,CAAC;AACC,WAAS,KAAK;AAChB;AAEA,CAJC,qBAIqB;AACpB,aAAW;AACX,SAAO;AACT;",
+  "names": []
+}

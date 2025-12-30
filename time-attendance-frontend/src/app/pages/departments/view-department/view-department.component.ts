@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { DepartmentsService } from '../departments.service';
 import { Department } from '../../../shared/models/department.model';
@@ -9,7 +9,7 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
 @Component({
   selector: 'app-view-department',
   standalone: true,
-  imports: [CommonModule, RouterModule, LoadingSpinnerComponent],
+  imports: [RouterModule, LoadingSpinnerComponent],
   template: `
     <div class="container-fluid">
       <!-- Header -->

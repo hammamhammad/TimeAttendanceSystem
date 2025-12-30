@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { I18nService } from '../../../core/i18n/i18n.service';
@@ -36,7 +36,7 @@ import { computed } from '@angular/core';
 @Component({
   selector: 'app-assign-shifts',
   standalone: true,
-  imports: [CommonModule, FormsModule, HasPermissionDirective, SearchableSelectComponent, PageHeaderComponent, UnifiedFilterComponent, ModalWrapperComponent, DataTableComponent, StatusBadgeComponent],
+  imports: [FormsModule, HasPermissionDirective, SearchableSelectComponent, PageHeaderComponent, UnifiedFilterComponent, ModalWrapperComponent, DataTableComponent, StatusBadgeComponent],
   templateUrl: './assign-shifts.component.html',
   styleUrls: ['./assign-shifts.component.css']
 })

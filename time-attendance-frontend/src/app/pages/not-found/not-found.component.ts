@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-not-found',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   template: `
     <div class="text-center py-5">
       <i class="fa-solid fa-question-circle fa-5x text-warning mb-4"></i>

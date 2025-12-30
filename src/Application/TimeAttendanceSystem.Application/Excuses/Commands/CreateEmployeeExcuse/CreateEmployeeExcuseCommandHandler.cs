@@ -2,8 +2,10 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using TimeAttendanceSystem.Application.Abstractions;
 using TimeAttendanceSystem.Application.Common;
+using TimeAttendanceSystem.Application.Workflows.Services;
 using TimeAttendanceSystem.Domain.Excuses;
 using TimeAttendanceSystem.Domain.Attendance;
+using TimeAttendanceSystem.Domain.Workflows.Enums;
 
 namespace TimeAttendanceSystem.Application.Excuses.Commands.CreateEmployeeExcuse;
 
@@ -14,10 +16,17 @@ namespace TimeAttendanceSystem.Application.Excuses.Commands.CreateEmployeeExcuse
 public class CreateEmployeeExcuseCommandHandler : IRequestHandler<CreateEmployeeExcuseCommand, Result<long>>
 {
     private readonly IApplicationDbContext _context;
+    private readonly IWorkflowEngine _workflowEngine;
+    private readonly ICurrentUser _currentUser;
 
-    public CreateEmployeeExcuseCommandHandler(IApplicationDbContext context)
+    public CreateEmployeeExcuseCommandHandler(
+        IApplicationDbContext context,
+        IWorkflowEngine workflowEngine,
+        ICurrentUser currentUser)
     {
         _context = context;
+        _workflowEngine = workflowEngine;
+        _currentUser = currentUser;
     }
 
     /// <summary>
@@ -28,10 +37,25 @@ public class CreateEmployeeExcuseCommandHandler : IRequestHandler<CreateEmployee
     /// <returns>Result containing the created excuse ID or validation errors</returns>
     public async Task<Result<long>> Handle(CreateEmployeeExcuseCommand request, CancellationToken cancellationToken)
     {
+        var currentUserId = _currentUser.UserId ?? 0;
+        var isOnBehalfOf = request.OnBehalfOfEmployeeId.HasValue;
+        var targetEmployeeId = request.EmployeeId;
+
+        // If submitting on behalf of another employee, validate manager chain
+        if (isOnBehalfOf)
+        {
+            var isInChain = await IsInManagementChainAsync(currentUserId, request.OnBehalfOfEmployeeId!.Value, cancellationToken);
+            if (!isInChain)
+            {
+                return Result.Failure<long>("You can only submit requests on behalf of employees in your management chain");
+            }
+            targetEmployeeId = request.OnBehalfOfEmployeeId.Value;
+        }
+
         // Validate employee exists and is active
         var employee = await _context.Employees
             .Include(e => e.Branch)
-            .FirstOrDefaultAsync(e => e.Id == request.EmployeeId, cancellationToken);
+            .FirstOrDefaultAsync(e => e.Id == targetEmployeeId, cancellationToken);
 
         if (employee == null)
         {
@@ -51,10 +75,10 @@ public class CreateEmployeeExcuseCommandHandler : IRequestHandler<CreateEmployee
             }
         }
 
-        // Create excuse entity
+        // Create excuse entity - ALWAYS pending workflow approval
         var excuse = new EmployeeExcuse
         {
-            EmployeeId = request.EmployeeId,
+            EmployeeId = targetEmployeeId,
             ExcuseDate = request.ExcuseDate.Date,
             ExcuseType = request.ExcuseType,
             StartTime = request.StartTime,
@@ -62,25 +86,15 @@ public class CreateEmployeeExcuseCommandHandler : IRequestHandler<CreateEmployee
             Reason = request.Reason,
             AttachmentPath = request.AttachmentPath,
             AffectsSalary = request.AffectsSalary,
-            ProcessingNotes = request.ProcessingNotes,
-            ApprovalStatus = GetInitialApprovalStatus(request.ExcuseType, policy)
+            ProcessingNotes = isOnBehalfOf
+                ? $"{request.ProcessingNotes}\n[Submitted on behalf by user ID: {currentUserId}]"
+                : request.ProcessingNotes,
+            ApprovalStatus = ApprovalStatus.Pending, // Pending workflow approval
+            SubmittedByUserId = currentUserId
         };
 
         // Calculate duration using domain method
         excuse.CalculateDuration();
-
-        // If excuse is auto-approved, set approval data to satisfy database constraints
-        if (excuse.ApprovalStatus == ApprovalStatus.Approved)
-        {
-            excuse.ApprovedById = 1; // System auto-approval (assuming system user ID is 1)
-            excuse.ApprovedAt = DateTime.UtcNow;
-
-            // Official duties don't affect salary
-            if (request.ExcuseType == ExcuseType.OfficialDuty)
-            {
-                excuse.AffectsSalary = false;
-            }
-        }
         var duration = (double)excuse.DurationHours;
 
         // Validate excuse business rules
@@ -92,7 +106,7 @@ public class CreateEmployeeExcuseCommandHandler : IRequestHandler<CreateEmployee
 
         // Check for overlapping excuses for the same employee on the same date
         var existingExcuses = await _context.EmployeeExcuses
-            .Where(ee => ee.EmployeeId == request.EmployeeId)
+            .Where(ee => ee.EmployeeId == targetEmployeeId)
             .Where(ee => ee.ExcuseDate == request.ExcuseDate.Date)
             .Where(ee => ee.ApprovalStatus != ApprovalStatus.Rejected)
             .Select(ee => new { ee.StartTime, ee.EndTime })
@@ -132,13 +146,87 @@ public class CreateEmployeeExcuseCommandHandler : IRequestHandler<CreateEmployee
         // Save changes to get the excuse ID
         await _context.SaveChangesAsync(cancellationToken);
 
-        // If excuse is approved, update attendance records
-        if (excuse.ApprovalStatus == ApprovalStatus.Approved)
+        // Start workflow for approval
+        var contextData = new Dictionary<string, object>
         {
-            await UpdateAttendanceRecordsAsync(excuse, cancellationToken);
+            { "durationHours", excuse.DurationHours },
+            { "excuseDate", excuse.ExcuseDate.ToString("yyyy-MM-dd") },
+            { "excuseType", excuse.ExcuseType.ToString() },
+            { "startTime", excuse.StartTime.ToString() },
+            { "endTime", excuse.EndTime.ToString() }
+        };
+
+        var workflowResult = await _workflowEngine.StartWorkflowAsync(
+            WorkflowEntityType.Excuse,
+            excuse.Id,
+            currentUserId,
+            employee.BranchId,
+            contextData);
+
+        if (!workflowResult.IsSuccess)
+        {
+            // Workflow start failed - delete the excuse and return error
+            _context.EmployeeExcuses.Remove(excuse);
+            await _context.SaveChangesAsync(cancellationToken);
+            return Result.Failure<long>($"Failed to start approval workflow: {workflowResult.Error}");
+        }
+
+        // Update excuse with workflow instance ID
+        excuse.WorkflowInstanceId = workflowResult.Value.Id;
+        await _context.SaveChangesAsync(cancellationToken);
+
+        // Auto-approve manager's step if submitted on behalf and manager is assigned to current step
+        if (isOnBehalfOf && workflowResult.Value.Id > 0)
+        {
+            var canApprove = await _workflowEngine.CanUserApproveAsync(workflowResult.Value.Id, currentUserId);
+            if (canApprove)
+            {
+                await _workflowEngine.ApproveAsync(
+                    workflowResult.Value.Id,
+                    currentUserId,
+                    "Auto-approved: Request submitted by manager on behalf of employee");
+            }
         }
 
         return Result.Success(excuse.Id);
+    }
+
+    /// <summary>
+    /// Checks if the current user is in the employee's management chain (recursive).
+    /// </summary>
+    /// <param name="userId">User ID of the potential manager</param>
+    /// <param name="employeeId">Employee ID to check</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>True if user is in the management chain</returns>
+    private async Task<bool> IsInManagementChainAsync(long userId, long employeeId, CancellationToken cancellationToken)
+    {
+        // Get the employee link for the current user
+        var userEmployeeLink = await _context.EmployeeUserLinks
+            .FirstOrDefaultAsync(eul => eul.UserId == userId, cancellationToken);
+
+        if (userEmployeeLink == null)
+            return false;
+
+        var managerEmployeeId = userEmployeeLink.EmployeeId;
+
+        // Get the target employee
+        var currentEmployee = await _context.Employees
+            .FirstOrDefaultAsync(e => e.Id == employeeId, cancellationToken);
+
+        // Traverse up the management chain
+        while (currentEmployee != null)
+        {
+            if (currentEmployee.ManagerEmployeeId == managerEmployeeId)
+                return true;
+
+            if (!currentEmployee.ManagerEmployeeId.HasValue)
+                break;
+
+            currentEmployee = await _context.Employees
+                .FirstOrDefaultAsync(e => e.Id == currentEmployee.ManagerEmployeeId, cancellationToken);
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -161,22 +249,6 @@ public class CreateEmployeeExcuseCommandHandler : IRequestHandler<CreateEmployee
         return await _context.ExcusePolicies
             .Where(ep => ep.BranchId == null && ep.IsActive)
             .FirstOrDefaultAsync(cancellationToken);
-    }
-
-    /// <summary>
-    /// Determines the initial approval status based on excuse type and policy.
-    /// </summary>
-    private static ApprovalStatus GetInitialApprovalStatus(ExcuseType excuseType, ExcusePolicy? policy)
-    {
-        // Official duties are typically auto-approved
-        if (excuseType == ExcuseType.OfficialDuty)
-            return ApprovalStatus.Approved;
-
-        // Personal excuses follow policy requirements
-        if (policy?.RequiresApproval == true)
-            return ApprovalStatus.Pending;
-
-        return ApprovalStatus.Approved;
     }
 
     /// <summary>

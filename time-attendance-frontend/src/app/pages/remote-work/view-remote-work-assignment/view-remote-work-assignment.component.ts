@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { RemoteWorkRequestsService } from '../../../core/services/remote-work-requests.service';
 import { RemoteWorkRequest, RemoteWorkRequestStatus } from '../../../core/models/remote-work-request.model';
@@ -15,13 +15,12 @@ import { ConfirmationService } from '../../../core/confirmation/confirmation.ser
   selector: 'app-view-remote-work-assignment',
   standalone: true,
   imports: [
-    CommonModule,
     RouterModule,
     FormHeaderComponent,
     DefinitionListComponent,
     StatusBadgeComponent,
     LoadingSpinnerComponent
-  ],
+],
   templateUrl: './view-remote-work-assignment.component.html',
   styleUrls: ['./view-remote-work-assignment.component.css']
 })

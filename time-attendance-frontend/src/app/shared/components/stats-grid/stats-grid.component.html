@@ -1,47 +1,39 @@
 <div [class]="getGridClasses()">
   @if (loading) {
-    <!-- Loading Skeletons -->
-    @for (item of getSkeletonItems(); track $index) {
-      <div [class]="getColumnClasses()">
-        <div class="card h-100">
-          <div class="card-body">
-            <div class="skeleton-loader">
-              <div class="skeleton-line skeleton-title"></div>
-              <div class="skeleton-line skeleton-value"></div>
-              <div class="skeleton-line skeleton-subtitle"></div>
-            </div>
-          </div>
+  <!-- Loading Skeletons -->
+  @for (item of getSkeletonItems(); track $index) {
+  <div [class]="getColumnClasses()">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="skeleton-loader">
+          <div class="skeleton-line skeleton-title"></div>
+          <div class="skeleton-line skeleton-value"></div>
+          <div class="skeleton-line skeleton-subtitle"></div>
         </div>
       </div>
-    }
-  } @else if (stats.length > 0) {
-    <!-- Stat Cards -->
-    @for (stat of stats; track $index) {
-      <div [class]="getColumnClasses()">
-        <app-stat-card
-          [label]="stat.label"
-          [value]="stat.value"
-          [icon]="stat.icon"
-          [variant]="stat.variant || 'primary'"
-          [prefix]="stat.prefix"
-          [suffix]="stat.suffix"
-          [subtitle]="stat.subtitle"
-          [change]="stat.change"
-          [size]="cardSize"
-          [borderAccent]="stat.borderAccent ?? true"
-          [clickable]="stat.clickable ?? false"
-          [clickableText]="stat.clickableText">
-        </app-stat-card>
-      </div>
-    }
-  } @else {
-    <!-- Empty State -->
-    <div class="col-12">
-      <div class="text-center py-4 text-muted">
-        <i class="fa-solid fa-chart-simple fa-2x mb-2"></i>
-        <p class="mb-0">No statistics available</p>
-      </div>
     </div>
+  </div>
+  }
+  } @else if (stats.length > 0) {
+  <!-- Stat Cards -->
+  @for (stat of stats; track $index) {
+  <div [class]="getColumnClasses()">
+    <app-stat-card [label]="stat.label" [value]="stat.value" [icon]="stat.icon" [variant]="stat.variant || 'primary'"
+      [prefix]="stat.prefix" [suffix]="stat.suffix" [subtitle]="stat.subtitle" [change]="stat.change" [size]="cardSize"
+      [borderAccent]="stat.borderAccent ?? true" [clickable]="!!stat.route || (stat.clickable ?? false)"
+      [clickableText]="stat.clickableText" (click)="onCardClick(stat)"
+      [style.cursor]="stat.route ? 'pointer' : 'default'">
+    </app-stat-card>
+  </div>
+  }
+  } @else {
+  <!-- Empty State -->
+  <div class="col-12">
+    <div class="text-center py-4 text-muted">
+      <i class="fa-solid fa-chart-simple fa-2x mb-2"></i>
+      <p class="mb-0">No statistics available</p>
+    </div>
+  </div>
   }
 
   <!-- Custom content slot -->

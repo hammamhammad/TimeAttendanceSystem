@@ -939,6 +939,12 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<TimeOnly>("StartTime")
                         .HasColumnType("time");
 
+                    b.Property<long?>("SubmittedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("WorkflowInstanceId")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ApprovalStatus")
@@ -955,6 +961,8 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
 
                     b.HasIndex("ExcuseType")
                         .HasDatabaseName("IX_EmployeeExcuses_ExcuseType");
+
+                    b.HasIndex("WorkflowInstanceId");
 
                     b.HasIndex("EmployeeId", "ExcuseDate")
                         .HasDatabaseName("IX_EmployeeExcuses_EmployeeId_ExcuseDate");
@@ -1120,7 +1128,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("PreferredDate")
-                        .HasColumnType("date");
+                        .HasColumnType("timestamp");
 
                     b.Property<TimeSpan?>("PreferredTime")
                         .HasColumnType("time");
@@ -1135,7 +1143,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasColumnType("bytea");
 
                     b.Property<DateTime?>("ScheduledDate")
-                        .HasColumnType("date");
+                        .HasColumnType("timestamp");
 
                     b.Property<TimeSpan?>("ScheduledTime")
                         .HasColumnType("time");
@@ -1169,6 +1177,323 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasDatabaseName("IX_FingerprintRequests_EmployeeId_Status");
 
                     b.ToTable("FingerprintRequests", (string)null);
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.LeaveManagement.LeaveAccrualPolicy", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("AccrualFrequency")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasDefaultValue("Monthly");
+
+                    b.Property<bool>("AllowsCarryOver")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<int?>("CarryOverExpiryMonths")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime?>("EffectiveEndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("EffectiveStartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("ExpiresAtYearEnd")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsMonthlyAccrual")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<decimal?>("MaxAccrualCap")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)");
+
+                    b.Property<decimal?>("MaxCarryOverDays")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)");
+
+                    b.Property<int>("MinimumServiceMonths")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<bool>("ProrateMidYearHires")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<long>("VacationTypeId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("IX_LeaveAccrualPolicies_IsActive");
+
+                    b.HasIndex("VacationTypeId")
+                        .HasDatabaseName("IX_LeaveAccrualPolicies_VacationTypeId");
+
+                    b.HasIndex("VacationTypeId", "IsActive")
+                        .HasDatabaseName("IX_LeaveAccrualPolicies_VacationType_Active")
+                        .HasFilter("\"IsActive\" = true");
+
+                    b.ToTable("LeaveAccrualPolicies", (string)null);
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.LeaveManagement.LeaveBalance", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("AccruedDays")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<decimal>("AdjustedDays")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal>("EntitledDays")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)");
+
+                    b.Property<DateTime?>("LastAccrualDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("PendingDays")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<decimal>("UsedDays")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<long>("VacationTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_LeaveBalances_EmployeeId");
+
+                    b.HasIndex("VacationTypeId");
+
+                    b.HasIndex("Year")
+                        .HasDatabaseName("IX_LeaveBalances_Year");
+
+                    b.HasIndex("EmployeeId", "VacationTypeId", "Year")
+                        .IsUnique()
+                        .HasDatabaseName("IX_LeaveBalances_Employee_VacationType_Year");
+
+                    b.ToTable("LeaveBalances", (string)null);
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.LeaveManagement.LeaveEntitlement", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("AnnualDays")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)");
+
+                    b.Property<decimal>("CarryOverDays")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime?>("EffectiveEndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("EffectiveStartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("ExpiresAtYearEnd")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<decimal?>("MaxCarryOverDays")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<long>("VacationTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VacationTypeId");
+
+                    b.HasIndex("Year")
+                        .HasDatabaseName("IX_LeaveEntitlements_Year");
+
+                    b.HasIndex("EmployeeId", "VacationTypeId", "Year")
+                        .IsUnique()
+                        .HasDatabaseName("IX_LeaveEntitlements_Employee_VacationType_Year");
+
+                    b.ToTable("LeaveEntitlements", (string)null);
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.LeaveManagement.LeaveTransaction", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal?>("BalanceAfterTransaction")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<decimal>("Days")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)");
+
+                    b.Property<long>("LeaveBalanceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<long?>("ReferenceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ReferenceType")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("TransactionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("TransactionType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LeaveBalanceId")
+                        .HasDatabaseName("IX_LeaveTransactions_LeaveBalanceId");
+
+                    b.HasIndex("TransactionDate")
+                        .HasDatabaseName("IX_LeaveTransactions_TransactionDate");
+
+                    b.HasIndex("TransactionType")
+                        .HasDatabaseName("IX_LeaveTransactions_TransactionType");
+
+                    b.HasIndex("ReferenceType", "ReferenceId")
+                        .HasDatabaseName("IX_LeaveTransactions_Reference");
+
+                    b.ToTable("LeaveTransactions", (string)null);
                 });
 
             modelBuilder.Entity("TimeAttendanceSystem.Domain.RemoteWork.RemoteWorkPolicy", b =>
@@ -1303,6 +1628,12 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
+                    b.Property<long?>("SubmittedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("WorkflowInstanceId")
+                        .HasColumnType("bigint");
+
                     b.Property<int>("WorkingDaysCount")
                         .HasColumnType("integer");
 
@@ -1315,6 +1646,8 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.HasIndex("EmployeeId");
 
                     b.HasIndex("RemoteWorkPolicyId");
+
+                    b.HasIndex("WorkflowInstanceId");
 
                     b.ToTable("RemoteWorkRequests");
                 });
@@ -2801,6 +3134,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasComment("Start date of vacation period");
 
+                    b.Property<long?>("SubmittedByUserId")
+                        .HasColumnType("bigint");
+
                     b.Property<int>("TotalDays")
                         .HasColumnType("integer")
                         .HasComment("Total number of vacation days");
@@ -2808,6 +3144,10 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<long>("VacationTypeId")
                         .HasColumnType("bigint")
                         .HasComment("Vacation type identifier for categorization");
+
+                    b.Property<long?>("WorkflowInstanceId")
+                        .HasColumnType("bigint")
+                        .HasComment("Workflow instance ID for approval tracking");
 
                     b.HasKey("Id");
 
@@ -2823,6 +3163,8 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasDatabaseName("IX_EmployeeVacations_VacationTypeId")
                         .HasFilter("\"IsDeleted\" = false");
 
+                    b.HasIndex("WorkflowInstanceId");
+
                     b.HasIndex("EmployeeId", "EndDate")
                         .HasDatabaseName("IX_EmployeeVacations_Employee_EndDate")
                         .HasFilter("\"IsDeleted\" = false");
@@ -2836,6 +3178,657 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasFilter("\"IsDeleted\" = false AND \"IsApproved\" = true");
 
                     b.ToTable("EmployeeVacations", (string)null);
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Workflows.ApprovalDelegation", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<long>("DelegateUserId")
+                        .HasColumnType("bigint")
+                        .HasComment("User receiving delegated authority");
+
+                    b.Property<long>("DelegatorUserId")
+                        .HasColumnType("bigint")
+                        .HasComment("User delegating their authority");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("End of delegation period");
+
+                    b.Property<string>("EntityTypesJson")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasComment("Comma-separated entity types (null = all)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasComment("Whether delegation is currently active");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .IsUnicode(true)
+                        .HasColumnType("character varying(1000)")
+                        .HasComment("Reason for delegation");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("bytea")
+                        .HasComment("Concurrency control timestamp");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("Start of delegation period");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DelegateUserId")
+                        .HasDatabaseName("IX_ApprovalDelegations_DelegateUserId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("DelegatorUserId")
+                        .HasDatabaseName("IX_ApprovalDelegations_DelegatorUserId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("EndDate")
+                        .HasDatabaseName("IX_ApprovalDelegations_EndDate")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("StartDate")
+                        .HasDatabaseName("IX_ApprovalDelegations_StartDate")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("DelegatorUserId", "IsActive", "StartDate", "EndDate")
+                        .HasDatabaseName("IX_ApprovalDelegations_Active_Dates")
+                        .HasFilter("\"IsDeleted\" = false AND \"IsActive\" = true");
+
+                    b.ToTable("ApprovalDelegations", (string)null);
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Workflows.WorkflowDefinition", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("BranchId")
+                        .HasColumnType("bigint")
+                        .HasComment("Branch scope (null = organization-wide)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .IsUnicode(true)
+                        .HasColumnType("character varying(1000)")
+                        .HasComment("Description of the workflow purpose");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(1000)
+                        .IsUnicode(true)
+                        .HasColumnType("character varying(1000)")
+                        .HasComment("Arabic description of the workflow");
+
+                    b.Property<int>("EntityType")
+                        .HasColumnType("integer")
+                        .HasComment("Type of entity this workflow applies to");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Whether workflow is active for new requests");
+
+                    b.Property<bool>("IsDefault")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Whether this is the default workflow for entity type");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .IsUnicode(true)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Display name of the workflow definition");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .IsUnicode(true)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Arabic display name of the workflow definition");
+
+                    b.Property<int>("Priority")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasComment("Priority for workflow selection");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("bytea")
+                        .HasComment("Concurrency control timestamp");
+
+                    b.Property<int>("Version")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1)
+                        .HasComment("Version number incremented on modifications");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("IX_WorkflowDefinitions_BranchId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("EntityType")
+                        .HasDatabaseName("IX_WorkflowDefinitions_EntityType")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("EntityType", "IsActive")
+                        .HasDatabaseName("IX_WorkflowDefinitions_EntityType_Active")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("EntityType", "BranchId", "IsDefault")
+                        .HasDatabaseName("IX_WorkflowDefinitions_EntityType_Branch_Default")
+                        .HasFilter("\"IsDeleted\" = false AND \"IsActive\" = true");
+
+                    b.ToTable("WorkflowDefinitions", (string)null);
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Workflows.WorkflowInstance", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("When workflow was completed");
+
+                    b.Property<long?>("CompletedByUserId")
+                        .HasColumnType("bigint")
+                        .HasComment("User who completed the workflow");
+
+                    b.Property<string>("ContextJson")
+                        .HasColumnType("jsonb")
+                        .HasComment("Runtime context variables");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<long?>("CurrentStepId")
+                        .HasColumnType("bigint")
+                        .HasComment("Current step in workflow (null if completed)");
+
+                    b.Property<long>("EntityId")
+                        .HasColumnType("bigint")
+                        .HasComment("ID of the entity being processed");
+
+                    b.Property<int>("EntityType")
+                        .HasColumnType("integer")
+                        .HasComment("Type of entity being processed");
+
+                    b.Property<string>("FinalComments")
+                        .HasMaxLength(2000)
+                        .IsUnicode(true)
+                        .HasColumnType("character varying(2000)")
+                        .HasComment("Comments from final action");
+
+                    b.Property<int?>("FinalOutcome")
+                        .HasColumnType("integer")
+                        .HasComment("Final outcome of workflow");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<DateTime>("RequestedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("When workflow was initiated");
+
+                    b.Property<long>("RequestedByUserId")
+                        .HasColumnType("bigint")
+                        .HasComment("User who initiated the workflow");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("bytea")
+                        .HasComment("Concurrency control timestamp");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasComment("Current workflow status");
+
+                    b.Property<long>("WorkflowDefinitionId")
+                        .HasColumnType("bigint")
+                        .HasComment("Workflow definition being executed");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompletedByUserId");
+
+                    b.HasIndex("CurrentStepId");
+
+                    b.HasIndex("RequestedAt")
+                        .IsDescending()
+                        .HasDatabaseName("IX_WorkflowInstances_RequestedAt")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("RequestedByUserId")
+                        .HasDatabaseName("IX_WorkflowInstances_RequestedByUserId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_WorkflowInstances_Status")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("WorkflowDefinitionId")
+                        .HasDatabaseName("IX_WorkflowInstances_WorkflowDefinitionId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("EntityType", "EntityId")
+                        .HasDatabaseName("IX_WorkflowInstances_EntityType_EntityId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("Status", "CurrentStepId")
+                        .HasDatabaseName("IX_WorkflowInstances_Status_CurrentStep")
+                        .HasFilter("\"IsDeleted\" = false AND \"Status\" = 2");
+
+                    b.ToTable("WorkflowInstances", (string)null);
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Workflows.WorkflowStep", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("AllowDelegation")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasComment("Whether step allows delegation");
+
+                    b.Property<string>("ApproverInstructions")
+                        .HasMaxLength(2000)
+                        .IsUnicode(true)
+                        .HasColumnType("character varying(2000)")
+                        .HasComment("Instructions for approver");
+
+                    b.Property<string>("ApproverInstructionsAr")
+                        .HasMaxLength(2000)
+                        .IsUnicode(true)
+                        .HasColumnType("character varying(2000)")
+                        .HasComment("Arabic instructions for approver");
+
+                    b.Property<long?>("ApproverRoleId")
+                        .HasColumnType("bigint")
+                        .HasComment("Role ID for role-based approval");
+
+                    b.Property<int>("ApproverType")
+                        .HasColumnType("integer")
+                        .HasComment("How approver is determined");
+
+                    b.Property<long?>("ApproverUserId")
+                        .HasColumnType("bigint")
+                        .HasComment("User ID for specific user approval");
+
+                    b.Property<string>("ConditionJson")
+                        .HasColumnType("jsonb")
+                        .HasComment("JSON condition for conditional steps");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<long?>("EscalationStepId")
+                        .HasColumnType("bigint")
+                        .HasComment("Step to escalate to on timeout");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .IsUnicode(true)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Display name of the step");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .IsUnicode(true)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Arabic display name");
+
+                    b.Property<bool>("NotifyOnAction")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasComment("Send notifications for actions");
+
+                    b.Property<bool>("NotifyRequesterOnReach")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Notify requester when step is reached");
+
+                    b.Property<long?>("OnApproveNextStepId")
+                        .HasColumnType("bigint")
+                        .HasComment("Next step on approval");
+
+                    b.Property<long?>("OnRejectNextStepId")
+                        .HasColumnType("bigint")
+                        .HasComment("Next step on rejection");
+
+                    b.Property<bool>("RequireCommentsOnApprove")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Require comments when approving");
+
+                    b.Property<bool>("RequireCommentsOnReject")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasComment("Require comments when rejecting");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("bytea")
+                        .HasComment("Concurrency control timestamp");
+
+                    b.Property<int>("StepOrder")
+                        .HasColumnType("integer")
+                        .HasComment("Sequential order within workflow");
+
+                    b.Property<int>("StepType")
+                        .HasColumnType("integer")
+                        .HasComment("Type of workflow step");
+
+                    b.Property<int?>("TimeoutHours")
+                        .HasColumnType("integer")
+                        .HasComment("Hours before escalation");
+
+                    b.Property<long>("WorkflowDefinitionId")
+                        .HasColumnType("bigint")
+                        .HasComment("Parent workflow definition");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApproverRoleId")
+                        .HasDatabaseName("IX_WorkflowSteps_ApproverRoleId")
+                        .HasFilter("\"IsDeleted\" = false AND \"ApproverRoleId\" IS NOT NULL");
+
+                    b.HasIndex("ApproverUserId")
+                        .HasDatabaseName("IX_WorkflowSteps_ApproverUserId")
+                        .HasFilter("\"IsDeleted\" = false AND \"ApproverUserId\" IS NOT NULL");
+
+                    b.HasIndex("EscalationStepId");
+
+                    b.HasIndex("WorkflowDefinitionId")
+                        .HasDatabaseName("IX_WorkflowSteps_WorkflowDefinitionId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("WorkflowDefinitionId", "StepOrder")
+                        .IsUnique()
+                        .HasDatabaseName("IX_WorkflowSteps_Definition_Order")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("WorkflowSteps", (string)null);
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Workflows.WorkflowStepExecution", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<int?>("Action")
+                        .HasColumnType("integer")
+                        .HasComment("Action taken on this step");
+
+                    b.Property<DateTime?>("ActionTakenAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("When action was taken");
+
+                    b.Property<long?>("ActionTakenByUserId")
+                        .HasColumnType("bigint")
+                        .HasComment("User who took the action");
+
+                    b.Property<DateTime>("AssignedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("When step was assigned");
+
+                    b.Property<long>("AssignedToUserId")
+                        .HasColumnType("bigint")
+                        .HasComment("User assigned to approve");
+
+                    b.Property<string>("Comments")
+                        .HasMaxLength(2000)
+                        .IsUnicode(true)
+                        .HasColumnType("character varying(2000)")
+                        .HasComment("Comments provided with action");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<long?>("DelegatedFromExecutionId")
+                        .HasColumnType("bigint")
+                        .HasComment("Original execution delegated from");
+
+                    b.Property<long?>("DelegatedToUserId")
+                        .HasColumnType("bigint")
+                        .HasComment("User delegated to");
+
+                    b.Property<DateTime?>("DueAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("Due date for action");
+
+                    b.Property<bool>("IsDelegated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Whether created by delegation");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<bool>("ReminderSent")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Whether reminder was sent");
+
+                    b.Property<DateTime?>("ReminderSentAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("When reminder was sent");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("bytea")
+                        .HasComment("Concurrency control timestamp");
+
+                    b.Property<long>("StepId")
+                        .HasColumnType("bigint")
+                        .HasComment("Workflow step being executed");
+
+                    b.Property<long>("WorkflowInstanceId")
+                        .HasColumnType("bigint")
+                        .HasComment("Parent workflow instance");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActionTakenAt")
+                        .IsDescending()
+                        .HasDatabaseName("IX_WorkflowStepExecutions_ActionTakenAt")
+                        .HasFilter("\"IsDeleted\" = false AND \"ActionTakenAt\" IS NOT NULL");
+
+                    b.HasIndex("ActionTakenByUserId");
+
+                    b.HasIndex("AssignedToUserId")
+                        .HasDatabaseName("IX_WorkflowStepExecutions_AssignedToUserId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("DelegatedFromExecutionId");
+
+                    b.HasIndex("DelegatedToUserId");
+
+                    b.HasIndex("DueAt")
+                        .HasDatabaseName("IX_WorkflowStepExecutions_DueAt")
+                        .HasFilter("\"IsDeleted\" = false AND \"Action\" IS NULL AND \"DueAt\" IS NOT NULL");
+
+                    b.HasIndex("StepId")
+                        .HasDatabaseName("IX_WorkflowStepExecutions_StepId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("WorkflowInstanceId")
+                        .HasDatabaseName("IX_WorkflowStepExecutions_WorkflowInstanceId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("AssignedToUserId", "Action")
+                        .HasDatabaseName("IX_WorkflowStepExecutions_AssignedTo_Action")
+                        .HasFilter("\"IsDeleted\" = false AND \"Action\" IS NULL");
+
+                    b.ToTable("WorkflowStepExecutions", (string)null);
                 });
 
             modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.AttendanceRecord", b =>
@@ -2994,9 +3987,16 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("TimeAttendanceSystem.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
+                        .WithMany()
+                        .HasForeignKey("WorkflowInstanceId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("ApprovedBy");
 
                     b.Navigation("Employee");
+
+                    b.Navigation("WorkflowInstance");
                 });
 
             modelBuilder.Entity("TimeAttendanceSystem.Domain.Excuses.ExcusePolicy", b =>
@@ -3025,6 +4025,66 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("Employee");
 
                     b.Navigation("Technician");
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.LeaveManagement.LeaveAccrualPolicy", b =>
+                {
+                    b.HasOne("TimeAttendanceSystem.Domain.VacationTypes.VacationType", "VacationType")
+                        .WithMany()
+                        .HasForeignKey("VacationTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("VacationType");
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.LeaveManagement.LeaveBalance", b =>
+                {
+                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TimeAttendanceSystem.Domain.VacationTypes.VacationType", "VacationType")
+                        .WithMany()
+                        .HasForeignKey("VacationTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("VacationType");
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.LeaveManagement.LeaveEntitlement", b =>
+                {
+                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TimeAttendanceSystem.Domain.VacationTypes.VacationType", "VacationType")
+                        .WithMany()
+                        .HasForeignKey("VacationTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("VacationType");
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.LeaveManagement.LeaveTransaction", b =>
+                {
+                    b.HasOne("TimeAttendanceSystem.Domain.LeaveManagement.LeaveBalance", "LeaveBalance")
+                        .WithMany("Transactions")
+                        .HasForeignKey("LeaveBalanceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LeaveBalance");
                 });
 
             modelBuilder.Entity("TimeAttendanceSystem.Domain.RemoteWork.RemoteWorkPolicy", b =>
@@ -3060,6 +4120,10 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("TimeAttendanceSystem.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
+                        .WithMany()
+                        .HasForeignKey("WorkflowInstanceId");
+
                     b.Navigation("ApprovedByUser");
 
                     b.Navigation("CreatedByUser");
@@ -3067,6 +4131,8 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("Employee");
 
                     b.Navigation("RemoteWorkPolicy");
+
+                    b.Navigation("WorkflowInstance");
                 });
 
             modelBuilder.Entity("TimeAttendanceSystem.Domain.Settings.OffDay", b =>
@@ -3282,9 +4348,176 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .IsRequired()
                         .HasConstraintName("FK_EmployeeVacations_VacationTypes");
 
+                    b.HasOne("TimeAttendanceSystem.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
+                        .WithMany()
+                        .HasForeignKey("WorkflowInstanceId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("FK_EmployeeVacations_WorkflowInstances");
+
                     b.Navigation("Employee");
 
                     b.Navigation("VacationType");
+
+                    b.Navigation("WorkflowInstance");
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Workflows.ApprovalDelegation", b =>
+                {
+                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "DelegateUser")
+                        .WithMany()
+                        .HasForeignKey("DelegateUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_ApprovalDelegations_DelegateUser");
+
+                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "DelegatorUser")
+                        .WithMany()
+                        .HasForeignKey("DelegatorUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_ApprovalDelegations_DelegatorUser");
+
+                    b.Navigation("DelegateUser");
+
+                    b.Navigation("DelegatorUser");
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Workflows.WorkflowDefinition", b =>
+                {
+                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_WorkflowDefinitions_Branches");
+
+                    b.Navigation("Branch");
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Workflows.WorkflowInstance", b =>
+                {
+                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "CompletedByUser")
+                        .WithMany()
+                        .HasForeignKey("CompletedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_WorkflowInstances_CompletedByUser");
+
+                    b.HasOne("TimeAttendanceSystem.Domain.Workflows.WorkflowStep", "CurrentStep")
+                        .WithMany()
+                        .HasForeignKey("CurrentStepId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_WorkflowInstances_CurrentStep");
+
+                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "RequestedByUser")
+                        .WithMany()
+                        .HasForeignKey("RequestedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_WorkflowInstances_RequestedByUser");
+
+                    b.HasOne("TimeAttendanceSystem.Domain.Workflows.WorkflowDefinition", "WorkflowDefinition")
+                        .WithMany("Instances")
+                        .HasForeignKey("WorkflowDefinitionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_WorkflowInstances_WorkflowDefinitions");
+
+                    b.Navigation("CompletedByUser");
+
+                    b.Navigation("CurrentStep");
+
+                    b.Navigation("RequestedByUser");
+
+                    b.Navigation("WorkflowDefinition");
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Workflows.WorkflowStep", b =>
+                {
+                    b.HasOne("TimeAttendanceSystem.Domain.Users.Role", "ApproverRole")
+                        .WithMany()
+                        .HasForeignKey("ApproverRoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_WorkflowSteps_Roles");
+
+                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "ApproverUser")
+                        .WithMany()
+                        .HasForeignKey("ApproverUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_WorkflowSteps_Users");
+
+                    b.HasOne("TimeAttendanceSystem.Domain.Workflows.WorkflowStep", "EscalationStep")
+                        .WithMany()
+                        .HasForeignKey("EscalationStepId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_WorkflowSteps_EscalationStep");
+
+                    b.HasOne("TimeAttendanceSystem.Domain.Workflows.WorkflowDefinition", "WorkflowDefinition")
+                        .WithMany("Steps")
+                        .HasForeignKey("WorkflowDefinitionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_WorkflowSteps_WorkflowDefinitions");
+
+                    b.Navigation("ApproverRole");
+
+                    b.Navigation("ApproverUser");
+
+                    b.Navigation("EscalationStep");
+
+                    b.Navigation("WorkflowDefinition");
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Workflows.WorkflowStepExecution", b =>
+                {
+                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "ActionTakenByUser")
+                        .WithMany()
+                        .HasForeignKey("ActionTakenByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_WorkflowStepExecutions_ActionTakenByUser");
+
+                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "AssignedToUser")
+                        .WithMany()
+                        .HasForeignKey("AssignedToUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_WorkflowStepExecutions_AssignedToUser");
+
+                    b.HasOne("TimeAttendanceSystem.Domain.Workflows.WorkflowStepExecution", "DelegatedFromExecution")
+                        .WithMany()
+                        .HasForeignKey("DelegatedFromExecutionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_WorkflowStepExecutions_DelegatedFromExecution");
+
+                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "DelegatedToUser")
+                        .WithMany()
+                        .HasForeignKey("DelegatedToUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_WorkflowStepExecutions_DelegatedToUser");
+
+                    b.HasOne("TimeAttendanceSystem.Domain.Workflows.WorkflowStep", "Step")
+                        .WithMany("Executions")
+                        .HasForeignKey("StepId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_WorkflowStepExecutions_WorkflowSteps");
+
+                    b.HasOne("TimeAttendanceSystem.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
+                        .WithMany("StepExecutions")
+                        .HasForeignKey("WorkflowInstanceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_WorkflowStepExecutions_WorkflowInstances");
+
+                    b.Navigation("ActionTakenByUser");
+
+                    b.Navigation("AssignedToUser");
+
+                    b.Navigation("DelegatedFromExecution");
+
+                    b.Navigation("DelegatedToUser");
+
+                    b.Navigation("Step");
+
+                    b.Navigation("WorkflowInstance");
                 });
 
             modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.AttendanceRecord", b =>
@@ -3314,6 +4547,11 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("DirectReports");
 
                     b.Navigation("EmployeeUserLink");
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.LeaveManagement.LeaveBalance", b =>
+                {
+                    b.Navigation("Transactions");
                 });
 
             modelBuilder.Entity("TimeAttendanceSystem.Domain.RemoteWork.RemoteWorkPolicy", b =>
@@ -3353,6 +4591,23 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("UserRoles");
 
                     b.Navigation("UserSessions");
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Workflows.WorkflowDefinition", b =>
+                {
+                    b.Navigation("Instances");
+
+                    b.Navigation("Steps");
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Workflows.WorkflowInstance", b =>
+                {
+                    b.Navigation("StepExecutions");
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Workflows.WorkflowStep", b =>
+                {
+                    b.Navigation("Executions");
                 });
 #pragma warning restore 612, 618
         }

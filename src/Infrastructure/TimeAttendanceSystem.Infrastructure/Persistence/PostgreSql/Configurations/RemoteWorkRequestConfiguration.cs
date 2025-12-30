@@ -138,6 +138,18 @@ public class RemoteWorkRequestConfiguration : IEntityTypeConfiguration<RemoteWor
             .HasForeignKey(a => a.RemoteWorkPolicyId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        // Workflow instance relationship (optional)
+        builder.Property(a => a.WorkflowInstanceId)
+            .IsRequired(false);
+
+        builder.HasOne(a => a.WorkflowInstance)
+            .WithMany()
+            .HasForeignKey(a => a.WorkflowInstanceId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        builder.HasIndex(a => a.WorkflowInstanceId)
+            .HasDatabaseName("IX_RemoteWorkRequests_WorkflowInstanceId");
+
         // Query filters for soft delete
         builder.HasQueryFilter(a => !a.IsDeleted);
     }

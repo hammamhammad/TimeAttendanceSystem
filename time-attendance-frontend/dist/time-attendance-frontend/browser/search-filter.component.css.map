@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["angular:styles/component:css;08e0ea480c1aa96f03427443f3ea0662bd77cae7604c17d5cf91090d2c98d3cb;D:/Work/AI Code/TimeAttendanceSystem/time-attendance-frontend/src/app/shared/components/search-filter/search-filter.component.ts"],
+  "sourcesContent": ["\n    .search-filter {\n      background-color: #f8f9fa;\n      border: 1px solid #dee2e6;\n      border-radius: 0.375rem;\n      padding: 1rem;\n      margin-bottom: 1rem;\n    }\n\n    .active-filters .badge {\n      font-size: 0.75em;\n    }\n\n    .btn-close {\n      font-size: 0.6em;\n      padding: 0;\n      margin-left: 0.25rem;\n    }\n\n    .input-group-text {\n      background-color: #e9ecef;\n      border-color: #ced4da;\n    }\n  "],
+  "mappings": ";AACI,CAAC;AACC,oBAAkB;AAClB,UAAQ,IAAI,MAAM;AAClB,iBAAe;AACf,WAAS;AACT,iBAAe;AACjB;AAEA,CAAC,eAAe,CAAC;AACf,aAAW;AACb;AAEA,CAAC;AACC,aAAW;AACX,WAAS;AACT,eAAa;AACf;AAEA,CAAC;AACC,oBAAkB;AAClB,gBAAc;AAChB;",
+  "names": []
+}

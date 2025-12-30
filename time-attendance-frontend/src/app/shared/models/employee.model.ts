@@ -55,6 +55,10 @@ export interface CreateEmployeeRequest {
   departmentId?: number;
   managerEmployeeId?: number;
   workLocationType: WorkLocationType;
+  // User account creation options
+  createUserAccount?: boolean;
+  defaultPassword?: string;
+  roleIds?: number[];
 }
 
 export interface UpdateEmployeeRequest {

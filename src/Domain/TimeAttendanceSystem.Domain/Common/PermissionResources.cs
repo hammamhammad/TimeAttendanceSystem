@@ -23,6 +23,9 @@ public static class PermissionResources
     public const string ExcusePolicy = "excusePolicy";
     public const string Excuse = "excuse";
     public const string Session = "session";
+    public const string Workflow = "workflow";
+    public const string Approval = "approval";
+    public const string LeaveBalance = "leaveBalance";
 
     public static readonly Dictionary<string, string> ResourceDescriptions = new()
     {
@@ -47,6 +50,9 @@ public static class PermissionResources
         { ExcusePolicy, "Excuse policies and organizational rules" },
         { Excuse, "Employee excuse requests and management" },
         { Session, "User sessions and security management" },
+        { Workflow, "Approval workflow definitions and configuration" },
+        { Approval, "Approval queue and actions" },
+        { LeaveBalance, "Leave balance and accrual management" },
     };
 
     public static readonly Dictionary<string, string> ResourceIcons = new()
@@ -71,6 +77,9 @@ public static class PermissionResources
         { ExcusePolicy, "fa-gavel" },
         { Excuse, "fa-file-alt" },
         { Session, "fa-wifi" },
+        { Workflow, "fa-project-diagram" },
+        { Approval, "fa-tasks" },
+        { LeaveBalance, "fa-calendar-check" },
     };
     
     public static string GetResourceDescription(string resource)

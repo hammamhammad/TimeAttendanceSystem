@@ -1,0 +1,85 @@
+<div class="container-fluid py-4">
+  <!-- Page Header -->
+  <app-page-header
+    [title]="t('workflows.title')">
+  </app-page-header>
+
+  <!-- Filters -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <!-- Entity Type Filter -->
+        <div class="col-md-3">
+          <label class="form-label">{{ t('workflows.filter_entity_type') }}</label>
+          <select
+            class="form-select"
+            [value]="selectedEntityType() || ''"
+            (change)="onEntityTypeChange($event)">
+            <option value="">{{ t('common.all') }}</option>
+            @for (type of entityTypes; track type.value) {
+              <option [value]="type.value">{{ type.label }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Status Filter -->
+        <div class="col-md-3">
+          <label class="form-label">{{ t('workflows.filter_status') }}</label>
+          <select
+            class="form-select"
+            [value]="selectedActiveStatus() === undefined ? '' : selectedActiveStatus()?.toString()"
+            (change)="onStatusChange($event)">
+            <option value="">{{ t('common.all') }}</option>
+            <option value="true">{{ t('common.active') }}</option>
+            <option value="false">{{ t('common.inactive') }}</option>
+          </select>
+        </div>
+
+        <!-- Clear Filters -->
+        <div class="col-md-3">
+          @if (hasActiveFilters()) {
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              (click)="onClearFilters()">
+              <i class="fa-solid fa-times me-1"></i>
+              {{ t('common.clear_filters') }}
+            </button>
+          }
+        </div>
+
+        <!-- Create Button -->
+        <div class="col-md-3 text-end">
+          @if (permissionService.has(PERMISSIONS.WORKFLOW_CREATE)) {
+            <button
+              type="button"
+              class="btn btn-primary"
+              (click)="onCreateWorkflow()">
+              <i class="fa-solid fa-plus me-1"></i>
+              {{ t('workflows.create_workflow') }}
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Table -->
+  <div class="card">
+    <div class="card-body">
+      <app-data-table
+        [columns]="tableColumns()"
+        [data]="tableData()"
+        [loading]="loading()"
+        [totalItems]="totalCount()"
+        [currentPage]="currentPage()"
+        [pageSize]="pageSize()"
+        [actions]="tableActions()"
+        [emptyMessage]="t('workflows.no_workflows')"
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
+        (actionClick)="onActionClick($event)">
+      </app-data-table>
+    </div>
+  </div>
+</div>

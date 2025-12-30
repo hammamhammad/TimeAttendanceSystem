@@ -17,6 +17,7 @@ interface DashboardCard {
   change?: number;
   trend?: 'up' | 'down' | 'stable';
   module: string;
+  route?: string;
 }
 
 @Component({
@@ -49,7 +50,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
         color: 'primary',
         change: this.calculateChange(data.humanResources?.activeEmployees, data.humanResources?.totalEmployees),
         trend: 'up' as const,
-        module: 'humanResources'
+        module: 'humanResources',
+        route: '/employees'
       },
       {
         title: this.t('dashboard.today_attendance'),
@@ -58,7 +60,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
         color: 'success',
         change: data.attendance?.attendanceRate || 0,
         trend: (data.attendance?.attendanceRate || 0) >= 90 ? 'up' as const : 'down' as const,
-        module: 'attendance'
+        module: 'attendance',
+        route: '/reports/attendance'
       },
       {
         title: this.t('dashboard.pending_vacations'),
@@ -66,7 +69,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
         icon: 'fa-solid fa-calendar-times',
         color: 'warning',
         trend: 'stable' as const,
-        module: 'leaves'
+        module: 'leaves',
+        route: '/approvals' // Redirect to approvals for managers
       },
       {
         title: this.t('dashboard.active_shifts'),
@@ -74,7 +78,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
         icon: 'fa-solid fa-clock',
         color: 'info',
         trend: 'stable' as const,
-        module: 'shifts'
+        module: 'shifts',
+        route: '/shifts'
       },
       {
         title: this.t('dashboard.total_branches'),
@@ -82,7 +87,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
         icon: 'fa-solid fa-code-branch',
         color: 'secondary',
         trend: 'stable' as const,
-        module: 'organization'
+        module: 'organization',
+        route: '/branches'
       },
       {
         title: this.t('dashboard.active_users'),
@@ -90,7 +96,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
         icon: 'fa-solid fa-user-check',
         color: 'primary',
         trend: 'up' as const,
-        module: 'humanResources'
+        module: 'humanResources',
+        route: '/users'
       },
       {
         title: this.t('dashboard.today_late'),
@@ -98,7 +105,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
         icon: 'fa-solid fa-exclamation-triangle',
         color: 'danger',
         trend: (data.attendance?.todayLate || 0) > 5 ? 'up' as const : 'down' as const,
-        module: 'attendance'
+        module: 'attendance',
+        route: '/reports/attendance'
       },
       {
         title: this.t('dashboard.active_sessions'),
@@ -123,7 +131,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
         value: Math.abs(card.change),
         type: card.trend === 'up' ? 'increase' as const : card.trend === 'down' ? 'decrease' as const : 'neutral' as const,
         isPercentage: card.module === 'attendance'
-      } : undefined
+      } : undefined,
+      route: (card as any).route // Pass the route property
     }));
   });
 

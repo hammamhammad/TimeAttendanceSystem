@@ -1,135 +1,145 @@
 using TimeAttendanceSystem.Domain.Common;
+using TimeAttendanceSystem.Domain.Employees;
+using TimeAttendanceSystem.Domain.Users;
 
 namespace TimeAttendanceSystem.Domain.FingerprintRequests;
 
 /// <summary>
-/// Represents a fingerprint enrollment or update request from an employee
+/// Represents a fingerprint enrollment or update request from an employee.
+/// Tracks requests for fingerprint biometric data management in the attendance system.
 /// </summary>
 public class FingerprintRequest : BaseEntity
 {
     /// <summary>
-    /// The employee who made the request
+    /// The employee who made the request.
     /// </summary>
     public long EmployeeId { get; set; }
 
     /// <summary>
-    /// Type of request (NewEnrollment, Update, Issue)
+    /// Type of request (NewEnrollment, Update, Issue).
     /// </summary>
     public FingerprintRequestType RequestType { get; set; }
 
     /// <summary>
-    /// Description of the issue or reason for the request
+    /// Description of the issue or reason for the request.
     /// </summary>
     public string IssueDescription { get; set; } = string.Empty;
 
     /// <summary>
-    /// Which fingers are affected (e.g., "Right Thumb, Left Index")
+    /// Which fingers are affected (e.g., "Right Thumb, Left Index").
     /// </summary>
     public string? AffectedFingers { get; set; }
 
     /// <summary>
-    /// Employee's preferred date for re-enrollment
+    /// Employee's preferred date for re-enrollment.
     /// </summary>
     public DateTime? PreferredDate { get; set; }
 
     /// <summary>
-    /// Employee's preferred time for re-enrollment
+    /// Employee's preferred time for re-enrollment.
     /// </summary>
     public TimeSpan? PreferredTime { get; set; }
 
     /// <summary>
-    /// Scheduled date for fingerprint enrollment
+    /// Scheduled date for fingerprint enrollment.
     /// </summary>
     public DateTime? ScheduledDate { get; set; }
 
     /// <summary>
-    /// Scheduled time for fingerprint enrollment
+    /// Scheduled time for fingerprint enrollment.
     /// </summary>
     public TimeSpan? ScheduledTime { get; set; }
 
     /// <summary>
-    /// Date and time when the request was completed
+    /// Date and time when the request was completed.
     /// </summary>
     public DateTime? CompletedDate { get; set; }
 
     /// <summary>
-    /// Current status of the request
+    /// Current status of the request.
     /// </summary>
     public FingerprintRequestStatus Status { get; set; } = FingerprintRequestStatus.Pending;
 
     /// <summary>
-    /// ID of the technician who will handle the request
+    /// ID of the technician who will handle the request.
     /// </summary>
     public long? TechnicianId { get; set; }
 
     /// <summary>
-    /// Notes from the technician
+    /// Notes from the technician.
     /// </summary>
     public string? TechnicianNotes { get; set; }
 
     // Navigation properties
-    public virtual Employees.Employee? Employee { get; set; }
-    public virtual Users.User? Technician { get; set; }
+    /// <summary>
+    /// The employee entity associated with this request.
+    /// </summary>
+    public virtual Employee? Employee { get; set; }
+
+    /// <summary>
+    /// The technician user entity who handled this request.
+    /// </summary>
+    public virtual User? Technician { get; set; }
 }
 
 /// <summary>
-/// Types of fingerprint requests
+/// Types of fingerprint requests.
 /// </summary>
 public enum FingerprintRequestType
 {
     /// <summary>
-    /// Initial enrollment for new employee
+    /// Initial enrollment for new employee.
     /// </summary>
     NewEnrollment,
 
     /// <summary>
-    /// Update existing fingerprint data
+    /// Update existing fingerprint data.
     /// </summary>
     Update,
 
     /// <summary>
-    /// Report an issue with fingerprint reader or data
+    /// Report an issue with fingerprint reader or data.
     /// </summary>
     Issue,
 
     /// <summary>
-    /// Register additional fingers
+    /// Register additional fingers.
     /// </summary>
     AdditionalFingers,
 
     /// <summary>
-    /// Change fingerprint device location
+    /// Change fingerprint device location.
     /// </summary>
     LocationChange
 }
 
 /// <summary>
-/// Status of fingerprint request
+/// Status of fingerprint request.
 /// </summary>
 public enum FingerprintRequestStatus
 {
     /// <summary>
-    /// Request submitted, awaiting review
+    /// Request submitted, awaiting review.
     /// </summary>
     Pending,
 
     /// <summary>
-    /// Request reviewed and scheduled
+    /// Request reviewed and scheduled.
     /// </summary>
     Scheduled,
 
     /// <summary>
-    /// Fingerprint enrollment completed
+    /// Fingerprint enrollment completed.
     /// </summary>
     Completed,
 
     /// <summary>
-    /// Request cancelled by employee or admin
+    /// Request cancelled by employee or admin.
     /// </summary>
     Cancelled,
 
     /// <summary>
-    /// Request rejected
+    /// Request rejected.
     /// </summary>
     Rejected
 }

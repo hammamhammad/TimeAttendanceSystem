@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject, output, ViewChild, ElementRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { I18nService } from '../../../../core/i18n/i18n.service';
 import { NotificationService } from '../../../../core/notifications/notification.service';
@@ -21,11 +21,10 @@ interface Branch {
   selector: 'app-remote-work-policy-modal',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     StatusBadgeComponent,
     DefinitionListComponent
-  ],
+],
   templateUrl: './remote-work-policy-modal.component.html',
   styleUrls: ['./remote-work-policy-modal.component.css']
 })

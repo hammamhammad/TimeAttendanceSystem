@@ -1,0 +1,59 @@
+<div class="app-page-header">
+  <div class="app-page-header-content">
+    <div>
+      <h2>{{ title }}</h2>
+      @if (subtitle) {
+        <p class="text-muted mb-0">{{ subtitle }}</p>
+      }
+      <nav aria-label="breadcrumb" class="app-breadcrumb-wrapper">
+        <ol class="breadcrumb app-breadcrumb">
+          @for (breadcrumb of allBreadcrumbs; track breadcrumb.label; let isLast = $last) {
+            <li class="breadcrumb-item" [class.active]="isLast">
+              @if (breadcrumb.route && !isLast) {
+                <a [routerLink]="breadcrumb.route">{{ breadcrumb.label }}</a>
+              } @else {
+                {{ breadcrumb.label }}
+              }
+            </li>
+          }
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  <div class="app-page-header-actions">
+    @if (loading) {
+      <div class="d-flex align-items-center">
+        <div class="spinner-border spinner-border-sm me-2" role="status">
+          <span class="visually-hidden">{{ t('common.loading') }}</span>
+        </div>
+        <span class="text-muted">{{ t('common.loading') }}</span>
+      </div>
+    } @else {
+      <div class="app-action-buttons">
+        @for (action of allActions; track action.label) {
+          @if (action.route) {
+            <a
+              [routerLink]="action.route"
+              [queryParams]="action.routeParams"
+              [class]="getButtonClass(action)"
+              [attr.disabled]="action.disabled || loading ? true : null"
+              (click)="onActionClick(action, $event)">
+              <i [class]="action.icon + ' me-2'"></i>
+              {{ action.label }}
+            </a>
+          } @else {
+            <button
+              type="button"
+              [class]="getButtonClass(action)"
+              [disabled]="action.disabled || loading"
+              (click)="onActionClick(action)">
+              <i [class]="action.icon + ' me-2'"></i>
+              {{ action.label }}
+            </button>
+          }
+        }
+      </div>
+    }
+  </div>
+</div>

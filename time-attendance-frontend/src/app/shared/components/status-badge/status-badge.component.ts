@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 export type StatusVariant = 'active' | 'inactive' | 'pending' | 'approved' | 'rejected' | 'cancelled' | 'processing' | 'success' | 'danger' | 'warning' | 'info' | 'primary' | 'secondary' | 'light' | 'dark';
 
@@ -13,7 +13,7 @@ export interface StatusConfig {
 @Component({
   selector: 'app-status-badge',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   template: `
     <span [class]="getBadgeClasses()"
           [attr.title]="title || label">

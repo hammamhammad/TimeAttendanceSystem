@@ -32,6 +32,16 @@ public class EmployeeExcuseConfiguration : IEntityTypeConfiguration<EmployeeExcu
             .OnDelete(DeleteBehavior.SetNull)
             .IsRequired(false);
 
+        // Workflow instance relationship (optional)
+        builder.Property(e => e.WorkflowInstanceId)
+            .IsRequired(false);
+
+        builder.HasOne(e => e.WorkflowInstance)
+            .WithMany()
+            .HasForeignKey(e => e.WorkflowInstanceId)
+            .OnDelete(DeleteBehavior.SetNull)
+            .IsRequired(false);
+
         // Property configurations
         builder.Property(e => e.EmployeeId)
             .IsRequired();

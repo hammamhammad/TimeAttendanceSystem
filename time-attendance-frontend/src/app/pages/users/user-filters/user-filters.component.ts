@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { SearchFilterComponent, FilterField } from '../../../shared/components/search-filter/search-filter.component';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { inject } from '@angular/core';
@@ -13,7 +13,7 @@ interface Role {
 @Component({
   selector: 'app-user-filters',
   standalone: true,
-  imports: [CommonModule, SearchFilterComponent],
+  imports: [SearchFilterComponent],
   template: `
     <app-search-filter
       [filterFields]="filterFields()"

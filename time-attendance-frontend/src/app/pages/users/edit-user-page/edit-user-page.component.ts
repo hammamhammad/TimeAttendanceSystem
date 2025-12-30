@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { UserFormComponent } from '../user-form/user-form.component';
 import { UsersService } from '../users.service';
@@ -9,7 +9,7 @@ import { I18nService } from '../../../core/i18n/i18n.service';
 @Component({
   selector: 'app-edit-user-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, UserFormComponent],
+  imports: [RouterModule, UserFormComponent],
   template: `
     @if (loading()) {
       <div class="d-flex justify-content-center py-5">

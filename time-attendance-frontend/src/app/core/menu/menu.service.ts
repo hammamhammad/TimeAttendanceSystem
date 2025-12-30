@@ -102,6 +102,18 @@ export class MenuService {
       permission: undefined, // Show if user has any report access
       children: [
         {
+          path: '/reports/attendance',
+          titleKey: 'reports.attendance',
+          icon: 'fa-solid fa-list-check',
+          permission: 'attendance.read'
+        },
+        {
+          path: '/reports/leaves',
+          titleKey: 'reports.leaves',
+          icon: 'fa-solid fa-calendar-minus',
+          permission: 'vacation.read'
+        },
+        {
           path: '/reports/sessions',
           titleKey: 'sessions.title',
           icon: 'fa-solid fa-wifi',
@@ -156,6 +168,38 @@ export class MenuService {
           titleKey: 'remoteWork.policy.title',
           icon: 'fa-solid fa-laptop-house',
           permission: 'remoteWork.policy.read'
+        },
+        {
+          path: '/settings/workflows',
+          titleKey: 'workflows.title',
+          icon: 'fa-solid fa-project-diagram',
+          permission: 'workflow.read'
+        },
+        {
+          path: '/settings/leave-entitlements',
+          titleKey: 'leaveBalance.leaveEntitlements',
+          icon: 'fa-solid fa-calendar-check',
+          permission: 'leaveBalance.read'
+        }
+      ]
+    },
+    {
+      path: '/approvals',
+      titleKey: 'approvals.title',
+      icon: 'fa-solid fa-tasks',
+      permission: undefined, // Show if user has any approval access
+      children: [
+        {
+          path: '/approvals',
+          titleKey: 'approvals.pending_title',
+          icon: 'fa-solid fa-clock',
+          permission: 'approval.read'
+        },
+        {
+          path: '/approvals/history',
+          titleKey: 'approvals.history_title',
+          icon: 'fa-solid fa-history',
+          permission: 'approval.read'
         }
       ]
     },
@@ -211,8 +255,8 @@ export class MenuService {
    * Update a menu item
    */
   updateMenuItem(path: string, updatedItem: Partial<MenuItem>) {
-    this.menuItems.update(items => 
-      items.map(item => 
+    this.menuItems.update(items =>
+      items.map(item =>
         item.path === path ? { ...item, ...updatedItem } : item
       )
     );

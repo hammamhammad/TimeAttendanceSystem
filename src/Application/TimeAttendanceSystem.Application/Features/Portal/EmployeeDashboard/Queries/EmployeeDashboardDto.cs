@@ -1,7 +1,7 @@
 namespace TimeAttendanceSystem.Application.Features.Portal.EmployeeDashboard.Queries;
 
 /// <summary>
-/// Employee dashboard data transfer object
+/// Employee dashboard data transfer object for self-service portal
 /// </summary>
 public class EmployeeDashboardDto
 {
@@ -14,6 +14,21 @@ public class EmployeeDashboardDto
     /// Employee full name
     /// </summary>
     public string EmployeeName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Employee code
+    /// </summary>
+    public string EmployeeCode { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Department name
+    /// </summary>
+    public string? DepartmentName { get; set; }
+
+    /// <summary>
+    /// Branch name
+    /// </summary>
+    public string? BranchName { get; set; }
 
     /// <summary>
     /// Current month attendance rate (percentage)
@@ -41,7 +56,7 @@ public class EmployeeDashboardDto
     public int RemainingVacationDays { get; set; }
 
     /// <summary>
-    /// Count of pending requests (vacations + excuses)
+    /// Count of pending requests (vacations + excuses + remote work)
     /// </summary>
     public int PendingRequestsCount { get; set; }
 
@@ -49,6 +64,11 @@ public class EmployeeDashboardDto
     /// Recent activity timeline
     /// </summary>
     public List<ActivityDto> RecentActivity { get; set; } = new();
+
+    /// <summary>
+    /// Today's attendance status
+    /// </summary>
+    public TodayAttendanceDto? TodayAttendance { get; set; }
 }
 
 /// <summary>
@@ -57,7 +77,7 @@ public class EmployeeDashboardDto
 public class ActivityDto
 {
     /// <summary>
-    /// Type of activity (Attendance, Vacation, Excuse, etc.)
+    /// Type of activity (Attendance, Vacation, Excuse, RemoteWork, etc.)
     /// </summary>
     public string Type { get; set; } = string.Empty;
 
@@ -80,4 +100,40 @@ public class ActivityDto
     /// Bootstrap variant (success, info, warning, danger)
     /// </summary>
     public string Variant { get; set; } = "info";
+}
+
+/// <summary>
+/// Today's attendance status for quick overview
+/// </summary>
+public class TodayAttendanceDto
+{
+    /// <summary>
+    /// Check-in time
+    /// </summary>
+    public DateTime? CheckInTime { get; set; }
+
+    /// <summary>
+    /// Check-out time
+    /// </summary>
+    public DateTime? CheckOutTime { get; set; }
+
+    /// <summary>
+    /// Attendance status (Present, Late, Absent, etc.)
+    /// </summary>
+    public string Status { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Working hours so far today
+    /// </summary>
+    public decimal WorkingHours { get; set; }
+
+    /// <summary>
+    /// Is on remote work today
+    /// </summary>
+    public bool IsRemoteWork { get; set; }
+
+    /// <summary>
+    /// Is on vacation today
+    /// </summary>
+    public bool IsOnVacation { get; set; }
 }

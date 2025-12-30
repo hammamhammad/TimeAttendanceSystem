@@ -1,5 +1,5 @@
 import { Component, signal, computed, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { AuditLogsService, AuditLog, AuditLogsFilters } from './audit-logs.service';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { NotificationService } from '../../../core/notifications/notification.service';
@@ -12,12 +12,11 @@ import { AuditLogDetailModalComponent } from './audit-log-detail-modal/audit-log
   selector: 'app-audit-logs',
   standalone: true,
   imports: [
-    CommonModule,
     PageHeaderComponent,
     UnifiedFilterComponent,
     DataTableComponent,
     AuditLogDetailModalComponent
-  ],
+],
   templateUrl: './audit-logs.component.html',
   styleUrls: ['./audit-logs.component.css']
 })

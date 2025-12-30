@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using TimeAttendanceSystem.Infrastructure.Persistence;
 
 namespace TimeAttendanceSystem.Api.Controllers;
@@ -8,10 +9,12 @@ namespace TimeAttendanceSystem.Api.Controllers;
 public class SeedController : ControllerBase
 {
     private readonly TimeAttendanceDbContext _context;
+    private readonly IWebHostEnvironment _environment;
 
-    public SeedController(TimeAttendanceDbContext context)
+    public SeedController(TimeAttendanceDbContext context, IWebHostEnvironment environment)
     {
         _context = context;
+        _environment = environment;
     }
 
     [HttpPost("essential-data")]
@@ -85,6 +88,47 @@ public class SeedController : ControllerBase
         catch (Exception ex)
         {
             return BadRequest(new { error = $"❌ Error clearing all data: {ex.Message}" });
+        }
+    }
+
+    [HttpPost("sample-data-with-users")]
+    public async Task<IActionResult> SeedSampleDataWithUsers()
+    {
+        if (!_environment.IsDevelopment())
+        {
+            return BadRequest(new { error = "This endpoint is only available in Development environment" });
+        }
+
+        try
+        {
+            // Find the scripts folder - go up from ContentRootPath to find the solution root
+            var contentRoot = _environment.ContentRootPath;
+            var solutionRoot = Path.GetFullPath(Path.Combine(contentRoot, "..", "..", ".."));
+            var scriptPath = Path.Combine(solutionRoot, "scripts", "sample-data-with-users.sql");
+
+            if (!System.IO.File.Exists(scriptPath))
+            {
+                return NotFound(new { error = $"SQL script not found at: {scriptPath}" });
+            }
+
+            var sqlScript = await System.IO.File.ReadAllTextAsync(scriptPath);
+
+            // Execute the SQL script
+            await _context.Database.ExecuteSqlRawAsync(sqlScript);
+
+            return Ok(new {
+                message = "✅ Sample data with users seeded successfully!",
+                details = "Created: 5 Branches, 20 Departments, 50 Employees with User Accounts",
+                credentials = "Default password for all employees: Emp@123! (forced to change on first login)"
+            });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new {
+                error = $"❌ Error seeding sample data: {ex.Message}",
+                innerError = ex.InnerException?.Message,
+                fullException = ex.ToString()
+            });
         }
     }
 }

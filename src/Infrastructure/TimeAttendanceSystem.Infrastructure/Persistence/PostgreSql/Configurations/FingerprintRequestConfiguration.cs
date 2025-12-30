@@ -29,13 +29,13 @@ public class FingerprintRequestConfiguration : IEntityTypeConfiguration<Fingerpr
             .HasMaxLength(200);
 
         builder.Property(fr => fr.PreferredDate)
-            .HasColumnType("date");
+            .HasColumnType("timestamp");
 
         builder.Property(fr => fr.PreferredTime)
             .HasColumnType("time");
 
         builder.Property(fr => fr.ScheduledDate)
-            .HasColumnType("date");
+            .HasColumnType("timestamp");
 
         builder.Property(fr => fr.ScheduledTime)
             .HasColumnType("time");

@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 export interface BulkAction {
   id: string;
@@ -14,7 +14,7 @@ export interface BulkAction {
 @Component({
   selector: 'app-bulk-actions-toolbar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './bulk-actions-toolbar.component.html',
   styleUrls: ['./bulk-actions-toolbar.component.css']
 })

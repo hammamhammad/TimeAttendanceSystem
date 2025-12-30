@@ -1,0 +1,234 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="6c36a049-ad38-4076-941e-6ec90bac8d43" name="hhammad@RUH-AGC-18653 2025-12-25 20:42:51" runUser="AIA\hhammad" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2025-12-25T20:42:51.5493166+03:00" queuing="2025-12-25T20:42:51.5493172+03:00" start="2025-12-25T20:42:49.3977738+03:00" finish="2025-12-25T20:42:51.7976873+03:00" />
+  <TestSettings name="default" id="b3340147-c5e6-431a-90fd-3c6b3ac53c3f">
+    <Deployment runDeploymentRoot="hhammad_RUH-AGC-18653_2025-12-25_20_42_51" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="f1f4ea01-41a2-4a7f-b039-029cc4dd68ce" testId="fe472567-7746-f85a-2292-c99b36d6af0a" testName="TimeAttendanceSystem.Application.UnitTests.Workflows.WorkflowEngineTests.StartWorkflowAsync_ShouldFail_WhenNoDefinitionExists" computerName="RUH-AGC-18653" duration="00:00:01.0058482" startTime="2025-12-25T20:42:51.3884137+03:00" endTime="2025-12-25T20:42:51.3884329+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f1f4ea01-41a2-4a7f-b039-029cc4dd68ce">
+      <Output>
+        <ErrorInfo>
+          <Message>System.InvalidOperationException : The LINQ expression 'DbSet&lt;WorkflowInstance&gt;()&#xD;
+    .Where(w =&gt; (int)w.EntityType == (int)__entityType_0 &amp;&amp; w.EntityId == __entityId_1 &amp;&amp; !(w.IsTerminated()))' could not be translated. Either rewrite the query in a form that can be translated, or switch to client evaluation explicitly by inserting a call to 'AsEnumerable', 'AsAsyncEnumerable', 'ToList', or 'ToListAsync'. See https://go.microsoft.com/fwlink/?linkid=2101038 for more information.</Message>
+          <StackTrace>   at Microsoft.EntityFrameworkCore.Query.QueryableMethodTranslatingExpressionVisitor.Translate(Expression expression)&#xD;
+   at Microsoft.EntityFrameworkCore.Query.QueryCompilationContext.CreateQueryExecutorExpression[TResult](Expression query)&#xD;
+   at Microsoft.EntityFrameworkCore.Query.QueryCompilationContext.CreateQueryExecutor[TResult](Expression query)&#xD;
+   at Microsoft.EntityFrameworkCore.Storage.Database.CompileQuery[TResult](Expression query, Boolean async)&#xD;
+   at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.CompileQueryCore[TResult](IDatabase database, Expression query, IModel model, Boolean async)&#xD;
+   at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.&lt;&gt;c__DisplayClass11_0`1.&lt;ExecuteCore&gt;b__0()&#xD;
+   at Microsoft.EntityFrameworkCore.Query.Internal.CompiledQueryCache.GetOrAddQuery[TResult](Object cacheKey, Func`1 compiler)&#xD;
+   at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.ExecuteCore[TResult](Expression query, Boolean async, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.ExecuteAsync[TResult](Expression query, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Query.Internal.EntityQueryProvider.ExecuteAsync[TResult](Expression expression, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ExecuteAsync[TSource,TResult](MethodInfo operatorMethodInfo, IQueryable`1 source, Expression expression, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ExecuteAsync[TSource,TResult](MethodInfo operatorMethodInfo, IQueryable`1 source, LambdaExpression expression, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.FirstOrDefaultAsync[TSource](IQueryable`1 source, Expression`1 predicate, CancellationToken cancellationToken)&#xD;
+   at TimeAttendanceSystem.Application.Workflows.Services.WorkflowEngine.StartWorkflowAsync(WorkflowEntityType entityType, Int64 entityId, Int64 requestedByUserId, Nullable`1 branchId, Dictionary`2 contextData) in D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\Workflows\Services\WorkflowEngine.cs:line 31&#xD;
+   at TimeAttendanceSystem.Application.UnitTests.Workflows.WorkflowEngineTests.StartWorkflowAsync_ShouldFail_WhenNoDefinitionExists() in D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\Workflows\WorkflowEngineTests.cs:line 33&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="62f94ffb-e71e-4828-afbb-e3aafe829422" testId="63fa2a45-ca63-42c5-95c2-af13061654ac" testName="TimeAttendanceSystem.Application.UnitTests.Workflows.WorkflowEngineTests.ApproveAsync_ShouldCompleteWorkflow_WhenLastStep" computerName="RUH-AGC-18653" duration="00:00:00.2891749" startTime="2025-12-25T20:42:51.6731924+03:00" endTime="2025-12-25T20:42:51.6731929+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="62f94ffb-e71e-4828-afbb-e3aafe829422">
+      <Output>
+        <ErrorInfo>
+          <Message>System.InvalidOperationException : The LINQ expression 'DbSet&lt;WorkflowInstance&gt;()&#xD;
+    .Where(w =&gt; (int)w.EntityType == (int)__entityType_0 &amp;&amp; w.EntityId == __entityId_1 &amp;&amp; !(w.IsTerminated()))' could not be translated. Either rewrite the query in a form that can be translated, or switch to client evaluation explicitly by inserting a call to 'AsEnumerable', 'AsAsyncEnumerable', 'ToList', or 'ToListAsync'. See https://go.microsoft.com/fwlink/?linkid=2101038 for more information.</Message>
+          <StackTrace>   at Microsoft.EntityFrameworkCore.Query.QueryableMethodTranslatingExpressionVisitor.Translate(Expression expression)&#xD;
+   at Microsoft.EntityFrameworkCore.Query.QueryCompilationContext.CreateQueryExecutorExpression[TResult](Expression query)&#xD;
+   at Microsoft.EntityFrameworkCore.Query.QueryCompilationContext.CreateQueryExecutor[TResult](Expression query)&#xD;
+   at Microsoft.EntityFrameworkCore.Storage.Database.CompileQuery[TResult](Expression query, Boolean async)&#xD;
+   at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.CompileQueryCore[TResult](IDatabase database, Expression query, IModel model, Boolean async)&#xD;
+   at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.&lt;&gt;c__DisplayClass11_0`1.&lt;ExecuteCore&gt;b__0()&#xD;
+   at Microsoft.EntityFrameworkCore.Query.Internal.CompiledQueryCache.GetOrAddQuery[TResult](Object cacheKey, Func`1 compiler)&#xD;
+   at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.ExecuteCore[TResult](Expression query, Boolean async, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.ExecuteAsync[TResult](Expression query, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Query.Internal.EntityQueryProvider.ExecuteAsync[TResult](Expression expression, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ExecuteAsync[TSource,TResult](MethodInfo operatorMethodInfo, IQueryable`1 source, Expression expression, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ExecuteAsync[TSource,TResult](MethodInfo operatorMethodInfo, IQueryable`1 source, LambdaExpression expression, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.FirstOrDefaultAsync[TSource](IQueryable`1 source, Expression`1 predicate, CancellationToken cancellationToken)&#xD;
+   at TimeAttendanceSystem.Application.Workflows.Services.WorkflowEngine.StartWorkflowAsync(WorkflowEntityType entityType, Int64 entityId, Int64 requestedByUserId, Nullable`1 branchId, Dictionary`2 contextData) in D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\Workflows\Services\WorkflowEngine.cs:line 31&#xD;
+   at TimeAttendanceSystem.Application.UnitTests.Workflows.WorkflowEngineTests.ApproveAsync_ShouldCompleteWorkflow_WhenLastStep() in D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\Workflows\WorkflowEngineTests.cs:line 86&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="5c3ee257-d6a7-4b44-b31d-090fce77f897" testId="3875ef84-6a66-41be-b861-f9458c06f2b9" testName="TimeAttendanceSystem.Application.UnitTests.Workflows.WorkflowEngineTests.StartWorkflowAsync_ShouldSucceed_WhenDefinitionExists" computerName="RUH-AGC-18653" duration="00:00:00.0280721" startTime="2025-12-25T20:42:51.7017218+03:00" endTime="2025-12-25T20:42:51.7017221+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5c3ee257-d6a7-4b44-b31d-090fce77f897">
+      <Output>
+        <ErrorInfo>
+          <Message>System.InvalidOperationException : The LINQ expression 'DbSet&lt;WorkflowInstance&gt;()&#xD;
+    .Where(w =&gt; (int)w.EntityType == (int)__entityType_0 &amp;&amp; w.EntityId == __entityId_1 &amp;&amp; !(w.IsTerminated()))' could not be translated. Either rewrite the query in a form that can be translated, or switch to client evaluation explicitly by inserting a call to 'AsEnumerable', 'AsAsyncEnumerable', 'ToList', or 'ToListAsync'. See https://go.microsoft.com/fwlink/?linkid=2101038 for more information.</Message>
+          <StackTrace>   at Microsoft.EntityFrameworkCore.Query.QueryableMethodTranslatingExpressionVisitor.Translate(Expression expression)&#xD;
+   at Microsoft.EntityFrameworkCore.Query.QueryCompilationContext.CreateQueryExecutorExpression[TResult](Expression query)&#xD;
+   at Microsoft.EntityFrameworkCore.Query.QueryCompilationContext.CreateQueryExecutor[TResult](Expression query)&#xD;
+   at Microsoft.EntityFrameworkCore.Storage.Database.CompileQuery[TResult](Expression query, Boolean async)&#xD;
+   at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.CompileQueryCore[TResult](IDatabase database, Expression query, IModel model, Boolean async)&#xD;
+   at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.&lt;&gt;c__DisplayClass11_0`1.&lt;ExecuteCore&gt;b__0()&#xD;
+   at Microsoft.EntityFrameworkCore.Query.Internal.CompiledQueryCache.GetOrAddQuery[TResult](Object cacheKey, Func`1 compiler)&#xD;
+   at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.ExecuteCore[TResult](Expression query, Boolean async, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.ExecuteAsync[TResult](Expression query, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Query.Internal.EntityQueryProvider.ExecuteAsync[TResult](Expression expression, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ExecuteAsync[TSource,TResult](MethodInfo operatorMethodInfo, IQueryable`1 source, Expression expression, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ExecuteAsync[TSource,TResult](MethodInfo operatorMethodInfo, IQueryable`1 source, LambdaExpression expression, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.FirstOrDefaultAsync[TSource](IQueryable`1 source, Expression`1 predicate, CancellationToken cancellationToken)&#xD;
+   at TimeAttendanceSystem.Application.Workflows.Services.WorkflowEngine.StartWorkflowAsync(WorkflowEntityType entityType, Int64 entityId, Int64 requestedByUserId, Nullable`1 branchId, Dictionary`2 contextData) in D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\Workflows\Services\WorkflowEngine.cs:line 31&#xD;
+   at TimeAttendanceSystem.Application.UnitTests.Workflows.WorkflowEngineTests.StartWorkflowAsync_ShouldSucceed_WhenDefinitionExists() in D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\Workflows\WorkflowEngineTests.cs:line 59&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="995e7a8e-9e0b-4553-b03f-f8c2c3109a35" testId="f544646c-b13c-b6e1-73a7-e59c0a101558" testName="TimeAttendanceSystem.Application.UnitTests.Workflows.WorkflowEngineTests.RejectAsync_ShouldTerminateWorkflow_Immediately" computerName="RUH-AGC-18653" duration="00:00:00.0059266" startTime="2025-12-25T20:42:51.7091948+03:00" endTime="2025-12-25T20:42:51.7091952+03:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="995e7a8e-9e0b-4553-b03f-f8c2c3109a35">
+      <Output>
+        <ErrorInfo>
+          <Message>System.InvalidOperationException : The LINQ expression 'DbSet&lt;WorkflowInstance&gt;()&#xD;
+    .Where(w =&gt; (int)w.EntityType == (int)__entityType_0 &amp;&amp; w.EntityId == __entityId_1 &amp;&amp; !(w.IsTerminated()))' could not be translated. Either rewrite the query in a form that can be translated, or switch to client evaluation explicitly by inserting a call to 'AsEnumerable', 'AsAsyncEnumerable', 'ToList', or 'ToListAsync'. See https://go.microsoft.com/fwlink/?linkid=2101038 for more information.</Message>
+          <StackTrace>   at Microsoft.EntityFrameworkCore.Query.QueryableMethodTranslatingExpressionVisitor.Translate(Expression expression)&#xD;
+   at Microsoft.EntityFrameworkCore.Query.QueryCompilationContext.CreateQueryExecutorExpression[TResult](Expression query)&#xD;
+   at Microsoft.EntityFrameworkCore.Query.QueryCompilationContext.CreateQueryExecutor[TResult](Expression query)&#xD;
+   at Microsoft.EntityFrameworkCore.Storage.Database.CompileQuery[TResult](Expression query, Boolean async)&#xD;
+   at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.CompileQueryCore[TResult](IDatabase database, Expression query, IModel model, Boolean async)&#xD;
+   at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.&lt;&gt;c__DisplayClass11_0`1.&lt;ExecuteCore&gt;b__0()&#xD;
+   at Microsoft.EntityFrameworkCore.Query.Internal.CompiledQueryCache.GetOrAddQuery[TResult](Object cacheKey, Func`1 compiler)&#xD;
+   at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.ExecuteCore[TResult](Expression query, Boolean async, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.ExecuteAsync[TResult](Expression query, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.Query.Internal.EntityQueryProvider.ExecuteAsync[TResult](Expression expression, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ExecuteAsync[TSource,TResult](MethodInfo operatorMethodInfo, IQueryable`1 source, Expression expression, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ExecuteAsync[TSource,TResult](MethodInfo operatorMethodInfo, IQueryable`1 source, LambdaExpression expression, CancellationToken cancellationToken)&#xD;
+   at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.FirstOrDefaultAsync[TSource](IQueryable`1 source, Expression`1 predicate, CancellationToken cancellationToken)&#xD;
+   at TimeAttendanceSystem.Application.Workflows.Services.WorkflowEngine.StartWorkflowAsync(WorkflowEntityType entityType, Int64 entityId, Int64 requestedByUserId, Nullable`1 branchId, Dictionary`2 contextData) in D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\Workflows\Services\WorkflowEngine.cs:line 31&#xD;
+   at TimeAttendanceSystem.Application.UnitTests.Workflows.WorkflowEngineTests.RejectAsync_ShouldTerminateWorkflow_Immediately() in D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\Workflows\WorkflowEngineTests.cs:line 120&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="TimeAttendanceSystem.Application.UnitTests.Workflows.WorkflowEngineTests.ApproveAsync_ShouldCompleteWorkflow_WhenLastStep" storage="d:\work\ai code\timeattendancesystem\src\tests\timeattendancesystem.application.unittests\bin\debug\net9.0\timeattendancesystem.application.unittests.dll" id="63fa2a45-ca63-42c5-95c2-af13061654ac">
+      <Execution id="62f94ffb-e71e-4828-afbb-e3aafe829422" />
+      <TestMethod codeBase="D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\bin\Debug\net9.0\TimeAttendanceSystem.Application.UnitTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="TimeAttendanceSystem.Application.UnitTests.Workflows.WorkflowEngineTests" name="ApproveAsync_ShouldCompleteWorkflow_WhenLastStep" />
+    </UnitTest>
+    <UnitTest name="TimeAttendanceSystem.Application.UnitTests.Workflows.WorkflowEngineTests.StartWorkflowAsync_ShouldSucceed_WhenDefinitionExists" storage="d:\work\ai code\timeattendancesystem\src\tests\timeattendancesystem.application.unittests\bin\debug\net9.0\timeattendancesystem.application.unittests.dll" id="3875ef84-6a66-41be-b861-f9458c06f2b9">
+      <Execution id="5c3ee257-d6a7-4b44-b31d-090fce77f897" />
+      <TestMethod codeBase="D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\bin\Debug\net9.0\TimeAttendanceSystem.Application.UnitTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="TimeAttendanceSystem.Application.UnitTests.Workflows.WorkflowEngineTests" name="StartWorkflowAsync_ShouldSucceed_WhenDefinitionExists" />
+    </UnitTest>
+    <UnitTest name="TimeAttendanceSystem.Application.UnitTests.Workflows.WorkflowEngineTests.RejectAsync_ShouldTerminateWorkflow_Immediately" storage="d:\work\ai code\timeattendancesystem\src\tests\timeattendancesystem.application.unittests\bin\debug\net9.0\timeattendancesystem.application.unittests.dll" id="f544646c-b13c-b6e1-73a7-e59c0a101558">
+      <Execution id="995e7a8e-9e0b-4553-b03f-f8c2c3109a35" />
+      <TestMethod codeBase="D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\bin\Debug\net9.0\TimeAttendanceSystem.Application.UnitTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="TimeAttendanceSystem.Application.UnitTests.Workflows.WorkflowEngineTests" name="RejectAsync_ShouldTerminateWorkflow_Immediately" />
+    </UnitTest>
+    <UnitTest name="TimeAttendanceSystem.Application.UnitTests.Workflows.WorkflowEngineTests.StartWorkflowAsync_ShouldFail_WhenNoDefinitionExists" storage="d:\work\ai code\timeattendancesystem\src\tests\timeattendancesystem.application.unittests\bin\debug\net9.0\timeattendancesystem.application.unittests.dll" id="fe472567-7746-f85a-2292-c99b36d6af0a">
+      <Execution id="f1f4ea01-41a2-4a7f-b039-029cc4dd68ce" />
+      <TestMethod codeBase="D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\bin\Debug\net9.0\TimeAttendanceSystem.Application.UnitTests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="TimeAttendanceSystem.Application.UnitTests.Workflows.WorkflowEngineTests" name="StartWorkflowAsync_ShouldFail_WhenNoDefinitionExists" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="fe472567-7746-f85a-2292-c99b36d6af0a" executionId="f1f4ea01-41a2-4a7f-b039-029cc4dd68ce" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="63fa2a45-ca63-42c5-95c2-af13061654ac" executionId="62f94ffb-e71e-4828-afbb-e3aafe829422" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3875ef84-6a66-41be-b861-f9458c06f2b9" executionId="5c3ee257-d6a7-4b44-b31d-090fce77f897" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f544646c-b13c-b6e1-73a7-e59c0a101558" executionId="995e7a8e-9e0b-4553-b03f-f8c2c3109a35" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="4" executed="4" passed="0" failed="4" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 9.0.11)&#xD;
+[xUnit.net 00:00:00.18]   Discovering: TimeAttendanceSystem.Application.UnitTests&#xD;
+[xUnit.net 00:00:00.24]   Discovered:  TimeAttendanceSystem.Application.UnitTests&#xD;
+[xUnit.net 00:00:00.25]   Starting:    TimeAttendanceSystem.Application.UnitTests&#xD;
+[xUnit.net 00:00:01.32]       System.InvalidOperationException : The LINQ expression 'DbSet&lt;WorkflowInstance&gt;()&#xD;
+[xUnit.net 00:00:01.32]           .Where(w =&gt; (int)w.EntityType == (int)__entityType_0 &amp;&amp; w.EntityId == __entityId_1 &amp;&amp; !(w.IsTerminated()))' could not be translated. Either rewrite the query in a form that can be translated, or switch to client evaluation explicitly by inserting a call to 'AsEnumerable', 'AsAsyncEnumerable', 'ToList', or 'ToListAsync'. See https://go.microsoft.com/fwlink/?linkid=2101038 for more information.&#xD;
+[xUnit.net 00:00:01.32]       Stack Trace:&#xD;
+[xUnit.net 00:00:01.32]            at Microsoft.EntityFrameworkCore.Query.QueryableMethodTranslatingExpressionVisitor.Translate(Expression expression)&#xD;
+[xUnit.net 00:00:01.32]            at Microsoft.EntityFrameworkCore.Query.QueryCompilationContext.CreateQueryExecutorExpression[TResult](Expression query)&#xD;
+[xUnit.net 00:00:01.32]            at Microsoft.EntityFrameworkCore.Query.QueryCompilationContext.CreateQueryExecutor[TResult](Expression query)&#xD;
+[xUnit.net 00:00:01.32]            at Microsoft.EntityFrameworkCore.Storage.Database.CompileQuery[TResult](Expression query, Boolean async)&#xD;
+[xUnit.net 00:00:01.32]            at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.CompileQueryCore[TResult](IDatabase database, Expression query, IModel model, Boolean async)&#xD;
+[xUnit.net 00:00:01.32]            at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.&lt;&gt;c__DisplayClass11_0`1.&lt;ExecuteCore&gt;b__0()&#xD;
+[xUnit.net 00:00:01.32]            at Microsoft.EntityFrameworkCore.Query.Internal.CompiledQueryCache.GetOrAddQuery[TResult](Object cacheKey, Func`1 compiler)&#xD;
+[xUnit.net 00:00:01.32]            at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.ExecuteCore[TResult](Expression query, Boolean async, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:01.32]            at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.ExecuteAsync[TResult](Expression query, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:01.32]            at Microsoft.EntityFrameworkCore.Query.Internal.EntityQueryProvider.ExecuteAsync[TResult](Expression expression, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:01.32]            at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ExecuteAsync[TSource,TResult](MethodInfo operatorMethodInfo, IQueryable`1 source, Expression expression, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:01.32]            at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ExecuteAsync[TSource,TResult](MethodInfo operatorMethodInfo, IQueryable`1 source, LambdaExpression expression, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:01.32]            at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.FirstOrDefaultAsync[TSource](IQueryable`1 source, Expression`1 predicate, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:01.32]         D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\Workflows\Services\WorkflowEngine.cs(31,0): at TimeAttendanceSystem.Application.Workflows.Services.WorkflowEngine.StartWorkflowAsync(WorkflowEntityType entityType, Int64 entityId, Int64 requestedByUserId, Nullable`1 branchId, Dictionary`2 contextData)&#xD;
+[xUnit.net 00:00:01.33]         D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\Workflows\WorkflowEngineTests.cs(33,0): at TimeAttendanceSystem.Application.UnitTests.Workflows.WorkflowEngineTests.StartWorkflowAsync_ShouldFail_WhenNoDefinitionExists()&#xD;
+[xUnit.net 00:00:01.33]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:01.61]       System.InvalidOperationException : The LINQ expression 'DbSet&lt;WorkflowInstance&gt;()&#xD;
+[xUnit.net 00:00:01.61]           .Where(w =&gt; (int)w.EntityType == (int)__entityType_0 &amp;&amp; w.EntityId == __entityId_1 &amp;&amp; !(w.IsTerminated()))' could not be translated. Either rewrite the query in a form that can be translated, or switch to client evaluation explicitly by inserting a call to 'AsEnumerable', 'AsAsyncEnumerable', 'ToList', or 'ToListAsync'. See https://go.microsoft.com/fwlink/?linkid=2101038 for more information.&#xD;
+[xUnit.net 00:00:01.61]       Stack Trace:&#xD;
+[xUnit.net 00:00:01.61]            at Microsoft.EntityFrameworkCore.Query.QueryableMethodTranslatingExpressionVisitor.Translate(Expression expression)&#xD;
+[xUnit.net 00:00:01.61]            at Microsoft.EntityFrameworkCore.Query.QueryCompilationContext.CreateQueryExecutorExpression[TResult](Expression query)&#xD;
+[xUnit.net 00:00:01.61]            at Microsoft.EntityFrameworkCore.Query.QueryCompilationContext.CreateQueryExecutor[TResult](Expression query)&#xD;
+[xUnit.net 00:00:01.61]            at Microsoft.EntityFrameworkCore.Storage.Database.CompileQuery[TResult](Expression query, Boolean async)&#xD;
+[xUnit.net 00:00:01.61]            at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.CompileQueryCore[TResult](IDatabase database, Expression query, IModel model, Boolean async)&#xD;
+[xUnit.net 00:00:01.61]            at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.&lt;&gt;c__DisplayClass11_0`1.&lt;ExecuteCore&gt;b__0()&#xD;
+[xUnit.net 00:00:01.61]            at Microsoft.EntityFrameworkCore.Query.Internal.CompiledQueryCache.GetOrAddQuery[TResult](Object cacheKey, Func`1 compiler)&#xD;
+[xUnit.net 00:00:01.61]            at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.ExecuteCore[TResult](Expression query, Boolean async, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:01.61]            at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.ExecuteAsync[TResult](Expression query, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:01.61]            at Microsoft.EntityFrameworkCore.Query.Internal.EntityQueryProvider.ExecuteAsync[TResult](Expression expression, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:01.61]            at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ExecuteAsync[TSource,TResult](MethodInfo operatorMethodInfo, IQueryable`1 source, Expression expression, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:01.61]            at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ExecuteAsync[TSource,TResult](MethodInfo operatorMethodInfo, IQueryable`1 source, LambdaExpression expression, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:01.61]            at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.FirstOrDefaultAsync[TSource](IQueryable`1 source, Expression`1 predicate, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:01.61]         D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\Workflows\Services\WorkflowEngine.cs(31,0): at TimeAttendanceSystem.Application.Workflows.Services.WorkflowEngine.StartWorkflowAsync(WorkflowEntityType entityType, Int64 entityId, Int64 requestedByUserId, Nullable`1 branchId, Dictionary`2 contextData)&#xD;
+[xUnit.net 00:00:01.61]         D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\Workflows\WorkflowEngineTests.cs(86,0): at TimeAttendanceSystem.Application.UnitTests.Workflows.WorkflowEngineTests.ApproveAsync_ShouldCompleteWorkflow_WhenLastStep()&#xD;
+[xUnit.net 00:00:01.61]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:01.64]       System.InvalidOperationException : The LINQ expression 'DbSet&lt;WorkflowInstance&gt;()&#xD;
+[xUnit.net 00:00:01.64]           .Where(w =&gt; (int)w.EntityType == (int)__entityType_0 &amp;&amp; w.EntityId == __entityId_1 &amp;&amp; !(w.IsTerminated()))' could not be translated. Either rewrite the query in a form that can be translated, or switch to client evaluation explicitly by inserting a call to 'AsEnumerable', 'AsAsyncEnumerable', 'ToList', or 'ToListAsync'. See https://go.microsoft.com/fwlink/?linkid=2101038 for more information.&#xD;
+[xUnit.net 00:00:01.64]       Stack Trace:&#xD;
+[xUnit.net 00:00:01.64]            at Microsoft.EntityFrameworkCore.Query.QueryableMethodTranslatingExpressionVisitor.Translate(Expression expression)&#xD;
+[xUnit.net 00:00:01.64]            at Microsoft.EntityFrameworkCore.Query.QueryCompilationContext.CreateQueryExecutorExpression[TResult](Expression query)&#xD;
+[xUnit.net 00:00:01.64]            at Microsoft.EntityFrameworkCore.Query.QueryCompilationContext.CreateQueryExecutor[TResult](Expression query)&#xD;
+[xUnit.net 00:00:01.64]            at Microsoft.EntityFrameworkCore.Storage.Database.CompileQuery[TResult](Expression query, Boolean async)&#xD;
+[xUnit.net 00:00:01.64]            at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.CompileQueryCore[TResult](IDatabase database, Expression query, IModel model, Boolean async)&#xD;
+[xUnit.net 00:00:01.64]            at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.&lt;&gt;c__DisplayClass11_0`1.&lt;ExecuteCore&gt;b__0()&#xD;
+[xUnit.net 00:00:01.64]            at Microsoft.EntityFrameworkCore.Query.Internal.CompiledQueryCache.GetOrAddQuery[TResult](Object cacheKey, Func`1 compiler)&#xD;
+[xUnit.net 00:00:01.64]            at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.ExecuteCore[TResult](Expression query, Boolean async, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:01.64]            at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.ExecuteAsync[TResult](Expression query, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:01.64]            at Microsoft.EntityFrameworkCore.Query.Internal.EntityQueryProvider.ExecuteAsync[TResult](Expression expression, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:01.64]            at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ExecuteAsync[TSource,TResult](MethodInfo operatorMethodInfo, IQueryable`1 source, Expression expression, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:01.64]            at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ExecuteAsync[TSource,TResult](MethodInfo operatorMethodInfo, IQueryable`1 source, LambdaExpression expression, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:01.64]            at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.FirstOrDefaultAsync[TSource](IQueryable`1 source, Expression`1 predicate, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:01.64]         D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\Workflows\Services\WorkflowEngine.cs(31,0): at TimeAttendanceSystem.Application.Workflows.Services.WorkflowEngine.StartWorkflowAsync(WorkflowEntityType entityType, Int64 entityId, Int64 requestedByUserId, Nullable`1 branchId, Dictionary`2 contextData)&#xD;
+[xUnit.net 00:00:01.64]         D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\Workflows\WorkflowEngineTests.cs(59,0): at TimeAttendanceSystem.Application.UnitTests.Workflows.WorkflowEngineTests.StartWorkflowAsync_ShouldSucceed_WhenDefinitionExists()&#xD;
+[xUnit.net 00:00:01.64]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:01.65]       System.InvalidOperationException : The LINQ expression 'DbSet&lt;WorkflowInstance&gt;()&#xD;
+[xUnit.net 00:00:01.65]           .Where(w =&gt; (int)w.EntityType == (int)__entityType_0 &amp;&amp; w.EntityId == __entityId_1 &amp;&amp; !(w.IsTerminated()))' could not be translated. Either rewrite the query in a form that can be translated, or switch to client evaluation explicitly by inserting a call to 'AsEnumerable', 'AsAsyncEnumerable', 'ToList', or 'ToListAsync'. See https://go.microsoft.com/fwlink/?linkid=2101038 for more information.&#xD;
+[xUnit.net 00:00:01.65]       Stack Trace:&#xD;
+[xUnit.net 00:00:01.65]            at Microsoft.EntityFrameworkCore.Query.QueryableMethodTranslatingExpressionVisitor.Translate(Expression expression)&#xD;
+[xUnit.net 00:00:01.65]            at Microsoft.EntityFrameworkCore.Query.QueryCompilationContext.CreateQueryExecutorExpression[TResult](Expression query)&#xD;
+[xUnit.net 00:00:01.65]            at Microsoft.EntityFrameworkCore.Query.QueryCompilationContext.CreateQueryExecutor[TResult](Expression query)&#xD;
+[xUnit.net 00:00:01.65]            at Microsoft.EntityFrameworkCore.Storage.Database.CompileQuery[TResult](Expression query, Boolean async)&#xD;
+[xUnit.net 00:00:01.65]            at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.CompileQueryCore[TResult](IDatabase database, Expression query, IModel model, Boolean async)&#xD;
+[xUnit.net 00:00:01.65]            at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.&lt;&gt;c__DisplayClass11_0`1.&lt;ExecuteCore&gt;b__0()&#xD;
+[xUnit.net 00:00:01.65]            at Microsoft.EntityFrameworkCore.Query.Internal.CompiledQueryCache.GetOrAddQuery[TResult](Object cacheKey, Func`1 compiler)&#xD;
+[xUnit.net 00:00:01.65]            at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.ExecuteCore[TResult](Expression query, Boolean async, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:01.65]            at Microsoft.EntityFrameworkCore.Query.Internal.QueryCompiler.ExecuteAsync[TResult](Expression query, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:01.65]            at Microsoft.EntityFrameworkCore.Query.Internal.EntityQueryProvider.ExecuteAsync[TResult](Expression expression, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:01.65]            at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ExecuteAsync[TSource,TResult](MethodInfo operatorMethodInfo, IQueryable`1 source, Expression expression, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:01.65]            at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ExecuteAsync[TSource,TResult](MethodInfo operatorMethodInfo, IQueryable`1 source, LambdaExpression expression, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:01.65]            at Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.FirstOrDefaultAsync[TSource](IQueryable`1 source, Expression`1 predicate, CancellationToken cancellationToken)&#xD;
+[xUnit.net 00:00:01.65]         D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\Workflows\Services\WorkflowEngine.cs(31,0): at TimeAttendanceSystem.Application.Workflows.Services.WorkflowEngine.StartWorkflowAsync(WorkflowEntityType entityType, Int64 entityId, Int64 requestedByUserId, Nullable`1 branchId, Dictionary`2 contextData)&#xD;
+[xUnit.net 00:00:01.65]         D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\Workflows\WorkflowEngineTests.cs(120,0): at TimeAttendanceSystem.Application.UnitTests.Workflows.WorkflowEngineTests.RejectAsync_ShouldTerminateWorkflow_Immediately()&#xD;
+[xUnit.net 00:00:01.65]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:01.66]   Finished:    TimeAttendanceSystem.Application.UnitTests&#xD;
+</StdOut>
+    </Output>
+    <RunInfos>
+      <RunInfo computerName="RUH-AGC-18653" outcome="Error" timestamp="2025-12-25T20:42:51.3831061+03:00">
+        <Text>[xUnit.net 00:00:01.32]     TimeAttendanceSystem.Application.UnitTests.Workflows.WorkflowEngineTests.StartWorkflowAsync_ShouldFail_WhenNoDefinitionExists [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="RUH-AGC-18653" outcome="Error" timestamp="2025-12-25T20:42:51.6711473+03:00">
+        <Text>[xUnit.net 00:00:01.61]     TimeAttendanceSystem.Application.UnitTests.Workflows.WorkflowEngineTests.ApproveAsync_ShouldCompleteWorkflow_WhenLastStep [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="RUH-AGC-18653" outcome="Error" timestamp="2025-12-25T20:42:51.6997952+03:00">
+        <Text>[xUnit.net 00:00:01.64]     TimeAttendanceSystem.Application.UnitTests.Workflows.WorkflowEngineTests.StartWorkflowAsync_ShouldSucceed_WhenDefinitionExists [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="RUH-AGC-18653" outcome="Error" timestamp="2025-12-25T20:42:51.7073681+03:00">
+        <Text>[xUnit.net 00:00:01.65]     TimeAttendanceSystem.Application.UnitTests.Workflows.WorkflowEngineTests.RejectAsync_ShouldTerminateWorkflow_Immediately [FAIL]</Text>
+      </RunInfo>
+    </RunInfos>
+  </ResultSummary>
+</TestRun>

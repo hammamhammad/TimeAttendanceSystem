@@ -1,5 +1,5 @@
 import { Component, signal, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { I18nService } from '../../core/i18n/i18n.service';
@@ -22,14 +22,13 @@ type ViewMode = 'table' | 'tree';
   selector: 'app-departments',
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     DepartmentTableComponent,
     DepartmentTreeComponent,
     UnifiedFilterComponent,
     DepartmentInfoPanelComponent,
-    PageHeaderComponent,
-  ],
+    PageHeaderComponent
+],
   templateUrl: './departments.component.html',
   styleUrls: ['./departments.component.css']
 })

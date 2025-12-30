@@ -1,5 +1,5 @@
 import { Component, input, output, computed, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { AuditLog } from '../audit-logs.service';
 import { I18nService } from '../../../../core/i18n/i18n.service';
 import { ModalWrapperComponent } from '../../../../shared/components/modal-wrapper/modal-wrapper.component';
@@ -9,10 +9,9 @@ import { DefinitionListComponent, DefinitionItem } from '../../../../shared/comp
   selector: 'app-audit-log-detail-modal',
   standalone: true,
   imports: [
-    CommonModule,
     ModalWrapperComponent,
     DefinitionListComponent
-  ],
+],
   templateUrl: './audit-log-detail-modal.component.html',
   styleUrls: ['./audit-log-detail-modal.component.css']
 })

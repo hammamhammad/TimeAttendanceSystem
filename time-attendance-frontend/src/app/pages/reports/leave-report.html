@@ -1,0 +1,121 @@
+<div class="container-fluid px-4 py-4">
+    <app-page-header title="Leave Report" subtitle="Analyze employee leave requests and balances"></app-page-header>
+
+    <!-- Filter Section -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label">From Date</label>
+                    <input type="date" class="form-control" [ngModel]="filter().fromDate"
+                        (ngModelChange)="updateFilter('fromDate', $event)">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">To Date</label>
+                    <input type="date" class="form-control" [ngModel]="filter().toDate"
+                        (ngModelChange)="updateFilter('toDate', $event)">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Employee ID</label>
+                    <input type="text" class="form-control" placeholder="Optional" [ngModel]="filter().employeeId"
+                        (ngModelChange)="updateFilter('employeeId', $event)">
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-primary w-100" (click)="loadReport()" [disabled]="loading()">
+                        <i class="fas fa-search me-2"></i> Generate Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading()" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="text-muted mt-2">Loading report data...</p>
+    </div>
+
+    <!-- Report Content -->
+    <div *ngIf="report() && !loading()" class="animate__animated animate__fadeIn">
+
+        <!-- Stats Row -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6 col-lg-3">
+                <app-stat-card label="Total Requests" [value]="report()!.totalRequests" icon="fas fa-file-alt"
+                    variant="primary" [borderAccent]="true">
+                </app-stat-card>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <app-stat-card label="Approved Days" [value]="report()!.totalApprovedDays" icon="fas fa-calendar-check"
+                    variant="success" [borderAccent]="true">
+                </app-stat-card>
+            </div>
+        </div>
+
+        <!-- Results Table -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent py-3">
+                <h5 class="mb-0">Leave Requests</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="border-0">Employee</th>
+                            <th class="border-0">Leave Type</th>
+                            <th class="border-0">Start Date</th>
+                            <th class="border-0">End Date</th>
+                            <th class="border-0 text-center">Days</th>
+                            <th class="border-0">Status</th>
+                            <th class="border-0">Reason</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of report()?.items">
+                            <td>
+                                <div class="d-flex flex-column">
+                                    <span class="fw-medium">{{ item.employeeName }}</span>
+                                    <small class="text-muted">{{ item.departmentName }}</small>
+                                </div>
+                            </td>
+                            <td><span class="badge bg-light text-dark border">{{ item.leaveType }}</span></td>
+                            <td>{{ item.startDate | date:'mediumDate' }}</td>
+                            <td>{{ item.endDate | date:'mediumDate' }}</td>
+                            <td class="text-center">{{ item.totalDays }}</td>
+                            <td>
+                                <span class="badge rounded-pill" [ngClass]="{
+                    'bg-success-subtle text-success': item.status === 'Approved',
+                    'bg-warning-subtle text-warning': item.status === 'Pending',
+                    'bg-danger-subtle text-danger': item.status === 'Rejected'
+                  }">
+                                    {{ item.status }}
+                                </span>
+                            </td>
+                            <td class="text-truncate" style="max-width: 200px;" [title]="item.reason || ''">
+                                {{ item.reason || '-' }}
+                            </td>
+                        </tr>
+                        <tr *ngIf="report()?.items?.length === 0">
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="fas fa-inbox fa-2x mb-3 d-block"></i>
+                                No leave requests found for this period.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!report() && !loading()" class="text-center py-5 text-muted">
+        <div class="mb-3">
+            <i class="fas fa-clipboard-list fa-3x text-light-emphasis"></i>
+        </div>
+        <h5>No Report Generated</h5>
+        <p>Select a date range and click "Generate Report" to view data.</p>
+    </div>
+</div>

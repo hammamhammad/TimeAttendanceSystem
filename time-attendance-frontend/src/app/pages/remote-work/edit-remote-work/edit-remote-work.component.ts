@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { RemoteWorkRequestsService } from '../../../core/services/remote-work-requests.service';
@@ -16,13 +16,12 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
   selector: 'app-edit-remote-work',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     FormHeaderComponent,
     FormSectionComponent,
     SearchableSelectComponent,
     LoadingSpinnerComponent
-  ],
+],
   templateUrl: './edit-remote-work.component.html',
   styleUrls: ['./edit-remote-work.component.css']
 })

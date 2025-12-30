@@ -1,0 +1,87 @@
+<!-- Page Header -->
+<app-page-header
+  [title]="i18n.t('portal.excuse_requests')">
+  <div header-actions>
+    <button
+      class="btn btn-primary btn-sm me-2"
+      (click)="createExcuse()"
+      [disabled]="loading()"
+      type="button">
+      <i class="bi bi-plus me-1"></i>
+      {{ i18n.t('portal.new_excuse') }}
+    </button>
+    <button
+      class="btn btn-outline-primary btn-sm"
+      (click)="refresh()"
+      [disabled]="loading()"
+      type="button">
+      <i class="bi bi-arrow-clockwise" [class.spin]="loading()"></i>
+      {{ i18n.t('common.refresh') }}
+    </button>
+  </div>
+</app-page-header>
+
+<!-- Loading State -->
+@if (loading() && excuses().length === 0) {
+  <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+}
+
+<!-- Error State -->
+@if (error() && excuses().length === 0) {
+  <div class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    {{ error() }}
+    <button class="btn btn-sm btn-outline-danger ms-3" (click)="refresh()" type="button">
+      {{ i18n.t('common.retry') }}
+    </button>
+  </div>
+}
+
+<!-- Empty State -->
+@if (!loading() && excuses().length === 0 && !error()) {
+  <app-empty-state
+    icon="bi bi-clock"
+    [title]="i18n.t('portal.no_excuses')"
+    [message]="i18n.t('portal.no_excuses_message')"
+    [actionText]="i18n.t('portal.request_excuse')"
+    (action)="createExcuse()">
+  </app-empty-state>
+}
+
+<!-- Data Table -->
+@if (excuses().length > 0) {
+  <div class="card">
+    <div class="card-body">
+      <app-data-table
+        [data]="tableData()"
+        [columns]="columns"
+        [loading]="loading()"
+        [pageSize]="10">
+        <ng-template #actionsTemplate let-item>
+          <app-table-actions
+            [actions]="actions"
+            [item]="item"
+            (actionClick)="onActionClick($event)">
+          </app-table-actions>
+        </ng-template>
+      </app-data-table>
+    </div>
+  </div>
+}
+
+<!-- Info Card -->
+@if (excuses().length > 0) {
+  <div class="card mt-3">
+    <div class="card-body">
+      <div class="d-flex align-items-start">
+        <i class="bi bi-info-circle text-info me-3 mt-1" style="font-size: 1.5rem;"></i>
+        <div>
+          <h6 class="mb-2">{{ i18n.t('portal.excuse_info_title') }}</h6>
+          <p class="text-muted mb-0 small">
+            {{ i18n.t('portal.excuse_info_text') }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+}

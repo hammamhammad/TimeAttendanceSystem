@@ -1,0 +1,126 @@
+<div [class]="getListClasses()">
+  @if (layout === 'two-column') {
+    <!-- Two-column layout -->
+    <div class="row">
+      <div class="col-md-6">
+        <dl class="row mb-0">
+          @for (item of getLeftColumnItems(); track $index) {
+            @if (item.visible !== false) {
+              <dt [class]="'col-sm-' + labelWidth + ' definition-label'">
+                @if (item.icon) {
+                  <i [class]="item.icon + ' me-1'"></i>
+                }
+                {{ item.label }}:
+              </dt>
+              <dd [class]="'col-sm-' + valueWidth + ' definition-value'">
+                <ng-container [ngTemplateOutlet]="valueTemplate" [ngTemplateOutletContext]="{ item: item }"></ng-container>
+              </dd>
+            }
+          }
+        </dl>
+      </div>
+
+      <div class="col-md-6">
+        <dl class="row mb-0">
+          @for (item of getRightColumnItems(); track $index) {
+            @if (item.visible !== false) {
+              <dt [class]="'col-sm-' + labelWidth + ' definition-label'">
+                @if (item.icon) {
+                  <i [class]="item.icon + ' me-1'"></i>
+                }
+                {{ item.label }}:
+              </dt>
+              <dd [class]="'col-sm-' + valueWidth + ' definition-value'">
+                <ng-container [ngTemplateOutlet]="valueTemplate" [ngTemplateOutletContext]="{ item: item }"></ng-container>
+              </dd>
+            }
+          }
+        </dl>
+      </div>
+    </div>
+  } @else {
+    <!-- Single column layout -->
+    <dl class="row mb-0">
+      @for (item of getVisibleItems(); track $index) {
+        <dt [class]="'col-sm-' + labelWidth + ' definition-label'">
+          @if (item.icon) {
+            <i [class]="item.icon + ' me-1'"></i>
+          }
+          {{ item.label }}:
+        </dt>
+        <dd [class]="'col-sm-' + valueWidth + ' definition-value'">
+          <ng-container [ngTemplateOutlet]="valueTemplate" [ngTemplateOutletContext]="{ item: item }"></ng-container>
+        </dd>
+      }
+    </dl>
+  }
+</div>
+
+<!-- Value Template -->
+<ng-template #valueTemplate let-item="item">
+  <div [class]="item.valueClass" (click)="onItemClick(item, $event)">
+    <ng-container [ngSwitch]="item.type || 'text'">
+      <!-- Badge type -->
+      <span *ngSwitchCase="'badge'"
+            [class]="'badge bg-' + (item.badgeVariant || 'primary')">
+        {{ item.value }}
+      </span>
+
+      <!-- Date type -->
+      <span *ngSwitchCase="'date'">
+        {{ formatDate(item.value) }}
+      </span>
+
+      <!-- Time type -->
+      <span *ngSwitchCase="'time'">
+        {{ formatTime(item.value) }}
+      </span>
+
+      <!-- DateTime type -->
+      <span *ngSwitchCase="'datetime'">
+        {{ formatDateTime(item.value) }}
+      </span>
+
+      <!-- Currency type -->
+      <span *ngSwitchCase="'currency'">
+        {{ formatCurrency(item.value) }}
+      </span>
+
+      <!-- Percentage type -->
+      <span *ngSwitchCase="'percentage'">
+        {{ item.value }}%
+      </span>
+
+      <!-- Link type -->
+      <a *ngSwitchCase="'link'"
+         [href]="item.href || '#'"
+         [target]="item.href ? '_blank' : '_self'"
+         class="definition-link">
+        {{ item.value }}
+        @if (item.href) {
+          <i class="fa-solid fa-external-link-alt ms-1 small"></i>
+        }
+      </a>
+
+      <!-- Custom template -->
+      <ng-container *ngSwitchCase="'custom'">
+        @if (item.customTemplate) {
+          <ng-container [ngTemplateOutlet]="item.customTemplate"
+                      [ngTemplateOutletContext]="{ $implicit: item.value, item: item }"></ng-container>
+        }
+      </ng-container>
+
+      <!-- Default text -->
+      <span *ngSwitchDefault
+            [class.text-muted]="!item.value || item.value === '-'"
+            [class.definition-clickable]="item.onClick">
+        {{ item.value || '-' }}
+        @if (item.copyable && item.value) {
+          <i class="fa-solid fa-copy ms-2 text-muted definition-copy-icon"
+             (click)="copyToClipboard(item.value, $event)"
+             title="Copy to clipboard"></i>
+        }
+      </span>
+    </ng-container>
+  </div>
+</ng-template>

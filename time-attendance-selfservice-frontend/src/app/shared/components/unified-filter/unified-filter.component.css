@@ -1,0 +1,6 @@
+/* Unified filter component styles */
+:host {
+  display: block;
+}
+
+/* Any additional specific styling for the unified filter can be added here */

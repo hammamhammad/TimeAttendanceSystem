@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/pages/remote-work/view-remote-work-assignment/view-remote-work-assignment.component.css"],
+  "sourcesContent": [".view-remote-work-page {\r\n  padding: 1.5rem;\r\n}\r\n\r\n.card-header h5 {\r\n  font-weight: 600;\r\n}\r\n"],
+  "mappings": ";AAAA,CAAC;AACC,WAAS;AACX;AAEA,CAAC,YAAY;AACX,eAAa;AACf;",
+  "names": []
+}

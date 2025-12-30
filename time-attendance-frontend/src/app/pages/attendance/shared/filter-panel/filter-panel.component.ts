@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { I18nService } from '../../../../core/i18n/i18n.service';
 import { AttendanceStatus, AttendanceReportType } from '../../../../shared/models/attendance.model';
@@ -74,7 +74,7 @@ export interface FilterValues {
 @Component({
   selector: 'app-filter-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [FormsModule, ReactiveFormsModule],
   templateUrl: './filter-panel.component.html',
   styleUrls: ['./filter-panel.component.css']
 })

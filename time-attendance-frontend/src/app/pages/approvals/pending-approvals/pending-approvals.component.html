@@ -1,0 +1,161 @@
+<div class="container-fluid py-4">
+  <!-- Page Header -->
+  <app-page-header [title]="t('approvals.pending_title')">
+  </app-page-header>
+
+  <!-- Filters -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <!-- Entity Type Filter -->
+        <div class="col-md-3">
+          <label class="form-label">{{ t('approvals.request_type') }}</label>
+          <select class="form-select" [value]="selectedEntityType() || ''" (change)="onEntityTypeChange($event)">
+            <option value="">{{ t('common.all') }}</option>
+            @for (type of entityTypes(); track type.value) {
+            <option [value]="type.value">{{ type.label }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Overdue Filter -->
+        <div class="col-md-3">
+          <label class="form-label">{{ t('approvals.status') }}</label>
+          <select class="form-select" [value]="selectedOverdue() === undefined ? '' : selectedOverdue()?.toString()"
+            (change)="onOverdueChange($event)">
+            <option value="">{{ t('common.all') }}</option>
+            <option value="true">{{ t('approvals.overdue_only') }}</option>
+            <option value="false">{{ t('approvals.on_time') }}</option>
+          </select>
+        </div>
+
+        <!-- Clear Filters -->
+        <div class="col-md-3">
+          @if (hasActiveFilters()) {
+          <button type="button" class="btn btn-outline-secondary" (click)="onClearFilters()">
+            <i class="fa-solid fa-times me-1"></i>
+            {{ t('common.clear_filters') }}
+          </button>
+          }
+        </div>
+
+        <!-- Refresh -->
+        <div class="col-md-3 text-end">
+          <button type="button" class="btn btn-outline-primary" (click)="loadApprovals()">
+            <i class="fa-solid fa-refresh me-1"></i>
+            {{ t('common.refresh') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card bg-warning bg-opacity-10 border-warning">
+        <div class="card-body text-center">
+          <h3 class="text-warning mb-1">{{ totalCount() }}</h3>
+          <p class="text-muted mb-0">{{ t('approvals.total_pending') }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card bg-danger bg-opacity-10 border-danger">
+        <div class="card-body text-center">
+          <h3 class="text-danger mb-1">{{ overdueCount() }}</h3>
+          <p class="text-muted mb-0">{{ t('approvals.overdue_count') }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card bg-info bg-opacity-10 border-info">
+        <div class="card-body text-center">
+          <h3 class="text-info mb-1">{{ onTimeCount() }}</h3>
+          <p class="text-muted mb-0">{{ t('approvals.on_time_count') }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Table -->
+  <div class="card">
+    <div class="card-body">
+      <app-data-table [columns]="tableColumns()" [data]="tableData()" [loading]="loading()" [totalItems]="totalCount()"
+        [currentPage]="currentPage()" [pageSize]="pageSize()" [actions]="tableActions()"
+        [emptyMessage]="t('approvals.no_pending_approvals')" (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)" (actionClick)="onActionClick($event)">
+      </app-data-table>
+    </div>
+  </div>
+</div>
+
+<!-- Approval Action Modal -->
+@if (showApprovalModal()) {
+<app-modal-wrapper [title]="getModalTitle()" [show]="showApprovalModal()" (close)="closeApprovalModal()">
+  <div class="modal-body">
+    <!-- Request Summary -->
+    @if (selectedApproval()) {
+    <div class="alert alert-info">
+      <h6 class="alert-heading">{{ t('approvals.request_summary') }}</h6>
+      <p class="mb-1">
+        <strong>{{ t('approvals.request_type') }}:</strong>
+        {{ selectedApproval()!.workflowDefinitionName }}
+      </p>
+      <p class="mb-1">
+        <strong>{{ t('approvals.requested_by') }}:</strong>
+        {{ selectedApproval()!.requestedByName }}
+      </p>
+      @if (selectedApproval()!.entityDescription) {
+      <p class="mb-0">
+        <strong>{{ t('approvals.description') }}:</strong>
+        {{ selectedApproval()!.entityDescription }}
+      </p>
+      }
+    </div>
+    }
+
+    <!-- Comments -->
+    <div class="mb-3">
+      <label class="form-label">
+        {{ t('approvals.comments') }}
+        @if (approvalAction() === 'reject') {
+        <span class="text-danger">*</span>
+        }
+      </label>
+      <textarea class="form-control" rows="3" [placeholder]="t('approvals.comments_placeholder')" [(ngModel)]="comments"
+        [required]="approvalAction() === 'reject'">
+        </textarea>
+      @if (approvalAction() === 'reject') {
+      <small class="text-muted">{{ t('approvals.comments_required_reject') }}</small>
+      }
+    </div>
+
+    <!-- Delegate User Selection (only for delegate action) -->
+    @if (approvalAction() === 'delegate') {
+    <div class="mb-3">
+      <label class="form-label">
+        {{ t('approvals.delegate_to') }}
+        <span class="text-danger">*</span>
+      </label>
+      <input type="number" class="form-control" [placeholder]="t('approvals.enter_user_id')"
+        [(ngModel)]="delegateUserId" required>
+      <small class="text-muted">{{ t('approvals.delegate_user_hint') }}</small>
+    </div>
+    }
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="closeApprovalModal()" [disabled]="processing()">
+      {{ t('common.cancel') }}
+    </button>
+    <button type="button" class="btn" [ngClass]="getSubmitButtonClass()" (click)="submitApproval()"
+      [disabled]="processing()">
+      @if (processing()) {
+      <span class="spinner-border spinner-border-sm me-1"></span>
+      }
+      {{ t('approvals.' + approvalAction()) }}
+    </button>
+  </div>
+</app-modal-wrapper>
+}

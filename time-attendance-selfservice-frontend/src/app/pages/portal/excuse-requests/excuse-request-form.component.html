@@ -1,0 +1,196 @@
+<!-- Loading State -->
+@if (loading()) {
+  <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+}
+
+<!-- Form -->
+@if (!loading()) {
+  <div class="excuse-request-form">
+    <app-page-header
+      [title]="isEditMode() ? i18n.t('portal.edit_excuse') : i18n.t('portal.new_excuse')">
+      <div header-actions>
+        <button
+          type="button"
+          class="btn btn-outline-secondary btn-sm"
+          (click)="onCancel()">
+          <i class="bi bi-arrow-left me-1"></i>
+          {{ i18n.t('common.back') }}
+        </button>
+      </div>
+    </app-page-header>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="mt-4">
+      <!-- Request Details Section -->
+      <app-form-section [title]="i18n.t('portal.excuse_details')">
+        <div class="row">
+          <!-- Excuse Type -->
+          <div class="col-md-6 mb-3">
+            <label for="excuseType" class="form-label">
+              {{ i18n.t('portal.excuse_type') }}
+              <span class="text-danger">*</span>
+            </label>
+            <select
+              id="excuseType"
+              formControlName="excuseType"
+              class="form-select"
+              [class.is-invalid]="hasError('excuseType', 'required')">
+              @for (type of excuseTypes; track type.value) {
+                <option [value]="type.value">{{ type.label }}</option>
+              }
+            </select>
+            @if (hasError('excuseType', 'required')) {
+              <div class="invalid-feedback">
+                {{ getErrorMessage('excuseType') }}
+              </div>
+            }
+          </div>
+
+          <!-- Excuse Date -->
+          <div class="col-md-6 mb-3">
+            <label for="excuseDate" class="form-label">
+              {{ i18n.t('portal.excuse_date') }}
+              <span class="text-danger">*</span>
+            </label>
+            <input
+              type="date"
+              id="excuseDate"
+              formControlName="excuseDate"
+              class="form-control"
+              [class.is-invalid]="hasError('excuseDate', 'required')">
+            @if (hasError('excuseDate', 'required')) {
+              <div class="invalid-feedback">
+                {{ getErrorMessage('excuseDate') }}
+              </div>
+            }
+          </div>
+
+          <!-- Start Time -->
+          <div class="col-md-6 mb-3">
+            <label for="startTime" class="form-label">
+              {{ i18n.t('portal.start_time') }}
+              <span class="text-danger">*</span>
+            </label>
+            <input
+              type="time"
+              id="startTime"
+              formControlName="startTime"
+              class="form-control"
+              [class.is-invalid]="hasError('startTime', 'required')">
+            @if (hasError('startTime', 'required')) {
+              <div class="invalid-feedback">
+                {{ getErrorMessage('startTime') }}
+              </div>
+            }
+          </div>
+
+          <!-- End Time -->
+          <div class="col-md-6 mb-3">
+            <label for="endTime" class="form-label">
+              {{ i18n.t('portal.end_time') }}
+              <span class="text-danger">*</span>
+            </label>
+            <input
+              type="time"
+              id="endTime"
+              formControlName="endTime"
+              class="form-control"
+              [class.is-invalid]="hasError('endTime', 'required')">
+            @if (hasError('endTime', 'required')) {
+              <div class="invalid-feedback">
+                {{ getErrorMessage('endTime') }}
+              </div>
+            }
+          </div>
+
+          <!-- Reason -->
+          <div class="col-12 mb-3">
+            <label for="reason" class="form-label">
+              {{ i18n.t('portal.reason') }}
+              <span class="text-danger">*</span>
+            </label>
+            <textarea
+              id="reason"
+              formControlName="reason"
+              class="form-control"
+              rows="4"
+              maxlength="500"
+              [class.is-invalid]="hasError('reason', 'required') || hasError('reason', 'maxlength')"
+              placeholder="{{ i18n.t('portal.excuse_reason_placeholder') }}">
+            </textarea>
+            <div class="form-text">
+              {{ form.get('reason')?.value?.length || 0 }} / 500 characters
+            </div>
+            @if (hasError('reason', 'required') || hasError('reason', 'maxlength')) {
+              <div class="invalid-feedback">
+                {{ getErrorMessage('reason') }}
+              </div>
+            }
+          </div>
+
+          <!-- Attachment -->
+          <div class="col-12 mb-3">
+            <label for="attachment" class="form-label">
+              {{ i18n.t('portal.attachment') }}
+              <span class="text-muted">({{ i18n.t('common.optional') }})</span>
+            </label>
+
+            @if (!selectedFile()) {
+              <input
+                type="file"
+                id="attachment"
+                class="form-control"
+                (change)="onFileSelected($event)"
+                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+              <div class="form-text">
+                {{ i18n.t('portal.attachment_help') }}
+              </div>
+            } @else {
+              <div class="file-preview">
+                <div class="file-info">
+                  <i class="bi bi-file-earmark me-2"></i>
+                  <span>{{ selectedFile()!.name }}</span>
+                  <span class="text-muted ms-2">
+                    ({{ (selectedFile()!.size / 1024).toFixed(2) }} KB)
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="removeFile()">
+                  <i class="bi bi-x"></i>
+                  {{ i18n.t('common.remove') }}
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      </app-form-section>
+
+      <!-- Info Card -->
+      <div class="alert alert-info mt-3">
+        <i class="bi bi-info-circle me-2"></i>
+        {{ i18n.t('portal.excuse_form_info') }}
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions mt-4">
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="saving() || form.invalid">
+          @if (saving()) {
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          }
+          {{ isEditMode() ? i18n.t('common.update') : i18n.t('common.submit') }}
+        </button>
+        <button
+          type="button"
+          class="btn btn-outline-secondary ms-2"
+          (click)="onCancel()"
+          [disabled]="saving()">
+          {{ i18n.t('common.cancel') }}
+        </button>
+      </div>
+    </form>
+  </div>
+}

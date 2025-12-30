@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, signal, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { SearchFilterComponent, FilterField } from '../../../shared/components/search-filter/search-filter.component';
 import { EmployeesService } from '../employees.service';
 import { BranchDto, DepartmentDto, EmploymentStatus } from '../../../shared/models/employee.model';
@@ -9,7 +9,7 @@ import { SearchableSelectOption } from '../../../shared/components/searchable-se
 @Component({
   selector: 'app-employee-filters',
   standalone: true,
-  imports: [CommonModule, SearchFilterComponent],
+  imports: [SearchFilterComponent],
   template: `
     <app-search-filter
       [filterFields]="filterFields()"

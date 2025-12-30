@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, effect } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, map, of } from 'rxjs';
 import {
@@ -16,6 +16,7 @@ import { EmployeesService } from '../../pages/employees/employees.service';
 import { ShiftsService } from '../../pages/shifts/shifts.service';
 import { VacationTypesService } from '../../pages/vacation-types/vacation-types.service';
 import { RolesService } from '../../pages/roles/roles.service';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -29,12 +30,25 @@ export class FilterRegistryService {
   private shiftsService = inject(ShiftsService);
   private vacationTypesService = inject(VacationTypesService);
   private rolesService = inject(RolesService);
+  private authService = inject(AuthService);
 
   private registry: ModuleFilterRegistry = {};
   private dataCache = new BehaviorSubject<FilterData>({});
+  private dataInitialized = false;
 
   constructor() {
-    this.initializeCommonData();
+    // Use effect to react to authentication changes
+    effect(() => {
+      const isAuthenticated = this.authService.isAuthenticated();
+      if (isAuthenticated && !this.dataInitialized) {
+        this.initializeCommonData();
+        this.dataInitialized = true;
+      } else if (!isAuthenticated) {
+        // Clear cache on logout
+        this.dataCache.next({});
+        this.dataInitialized = false;
+      }
+    });
   }
 
   registerModule(moduleName: string, config: UnifiedFilterConfig): void {
@@ -276,6 +290,9 @@ export class FilterRegistryService {
 
   clearCache(): void {
     this.dataCache.next({});
-    this.initializeCommonData();
+    
+    if (this.authService.isAuthenticated()) {
+      this.initializeCommonData();
+    }
   }
 }

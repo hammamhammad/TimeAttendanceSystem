@@ -1,5 +1,5 @@
 import { Component, signal, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { I18nService } from '../../../core/i18n/i18n.service';
@@ -21,7 +21,7 @@ import {
 @Component({
   selector: 'app-create-employee',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterLink, SearchableSelectComponent, FormHeaderComponent, FormSectionComponent, LoadingSpinnerComponent],
+  imports: [FormsModule, ReactiveFormsModule, RouterLink, SearchableSelectComponent, FormHeaderComponent, FormSectionComponent, LoadingSpinnerComponent],
   templateUrl: './create-employee.component.html',
   styleUrls: ['./create-employee.component.css']
 })
@@ -34,11 +34,13 @@ export class CreateEmployeeComponent implements OnInit {
   // Signals
   loading = signal(false);
   submitting = signal(false);
-  
+  showUserAccountSection = signal(false);
+
   // Dropdown data
   branches = signal<BranchDto[]>([]);
   departments = signal<DepartmentDto[]>([]);
   managers = signal<EmployeeSelectOption[]>([]);
+  roles = signal<{id: number, name: string}[]>([]);
   
   // Form
   createForm: FormGroup;
@@ -87,6 +89,32 @@ export class CreateEmployeeComponent implements OnInit {
 
   ngOnInit() {
     this.loadBranches();
+    this.loadRoles();
+  }
+
+  onCreateUserAccountChange(event: Event) {
+    const checkbox = event.target as HTMLInputElement;
+    this.showUserAccountSection.set(checkbox.checked);
+
+    // If unchecked, clear user account fields
+    if (!checkbox.checked) {
+      this.createForm.patchValue({
+        defaultPassword: '',
+        roleIds: []
+      });
+    }
+  }
+
+  private loadRoles() {
+    // Load roles from roles API
+    this.employeesService.getRoles().subscribe({
+      next: (roles) => {
+        this.roles.set(roles);
+      },
+      error: (error) => {
+        console.error('Failed to load roles:', error);
+      }
+    });
   }
 
   private createFormGroup(): FormGroup {
@@ -128,7 +156,12 @@ export class CreateEmployeeComponent implements OnInit {
       dateOfBirth: ['', [this.dateValidator, this.minAgeValidator(16)]],
       gender: [''],
       departmentId: [''],
-      managerEmployeeId: ['']
+      managerEmployeeId: [''],
+
+      // User account creation fields
+      createUserAccount: [false],
+      defaultPassword: ['', [Validators.minLength(8), Validators.maxLength(128)]],
+      roleIds: [[]]
     });
   }
 
@@ -199,7 +232,7 @@ export class CreateEmployeeComponent implements OnInit {
     if (this.createForm.valid) {
       this.submitting.set(true);
       const formValue = this.createForm.value;
-      
+
       // Clean up the data - convert empty strings to null for optional fields
       const request: CreateEmployeeRequest = {
         ...formValue,
@@ -213,9 +246,13 @@ export class CreateEmployeeComponent implements OnInit {
         jobTitleAr: formValue.jobTitleAr || null,
         nationalId: formValue.nationalId || null,
         email: formValue.email || null,
-        phone: formValue.phone || null
+        phone: formValue.phone || null,
+        // User account creation fields
+        createUserAccount: formValue.createUserAccount || false,
+        defaultPassword: formValue.createUserAccount && formValue.defaultPassword ? formValue.defaultPassword : null,
+        roleIds: formValue.createUserAccount && formValue.roleIds?.length > 0 ? formValue.roleIds : null
       };
-      
+
       this.employeesService.createEmployee(request).subscribe({
         next: () => {
           this.router.navigate(['/employees']);

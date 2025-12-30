@@ -331,6 +331,67 @@
             </div>
           </app-form-section>
 
+          <!-- User Account Section -->
+          <app-form-section [title]="t('employees.user_account.title')">
+            <div class="row g-3">
+              <!-- Create User Account Checkbox -->
+              <div class="col-12">
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="createUserAccount"
+                    formControlName="createUserAccount"
+                    (change)="onCreateUserAccountChange($event)">
+                  <label class="form-check-label" for="createUserAccount">
+                    {{ t('employees.user_account.create_account') }}
+                  </label>
+                </div>
+                <div class="form-text">{{ t('employees.user_account.create_account_hint') }}</div>
+              </div>
+
+              @if (showUserAccountSection()) {
+                <!-- User Account Fields -->
+                <div class="col-12">
+                  <div class="alert alert-warning">
+                    <i class="fa-solid fa-exclamation-triangle me-2"></i>
+                    {{ t('employees.user_account.force_password_change') }}
+                  </div>
+                </div>
+
+                <!-- Default Password -->
+                <div class="col-md-6">
+                  <label class="form-label">{{ t('employees.user_account.default_password') }}</label>
+                  <input
+                    type="password"
+                    class="form-control"
+                    formControlName="defaultPassword"
+                    [class.is-invalid]="hasError('defaultPassword')"
+                    [placeholder]="t('employees.user_account.default_password_placeholder')">
+                  @if (hasError('defaultPassword')) {
+                    <div class="invalid-feedback">{{ getError('defaultPassword') }}</div>
+                  }
+                  <div class="form-text">{{ t('employees.user_account.default_password_hint') }}</div>
+                </div>
+
+                <!-- Roles -->
+                <div class="col-md-6">
+                  <label class="form-label">{{ t('employees.user_account.roles') }}</label>
+                  <select
+                    class="form-select"
+                    formControlName="roleIds"
+                    multiple
+                    size="4">
+                    @for (role of roles(); track role.id) {
+                      <option [value]="role.id">{{ role.name }}</option>
+                    }
+                  </select>
+                  <div class="form-text">{{ t('employees.user_account.roles_hint') }}</div>
+                </div>
+              }
+            </div>
+          </app-form-section>
+
           <!-- Validation Rules Info -->
           <div class="alert alert-info">
             <h6 class="alert-heading">

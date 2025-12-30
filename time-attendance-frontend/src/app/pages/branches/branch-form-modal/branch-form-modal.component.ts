@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, signal, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Branch, CreateBranchRequest, UpdateBranchRequest } from '../../../shared/models/branch.model';
 import { TIMEZONE_OPTIONS } from '../../../shared/constants/timezone.constants';
@@ -10,7 +10,7 @@ import { ModalWrapperComponent } from '../../../shared/components/modal-wrapper/
 @Component({
   selector: 'app-branch-form-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, SearchableSelectComponent, ModalWrapperComponent],
+  imports: [FormsModule, ReactiveFormsModule, SearchableSelectComponent, ModalWrapperComponent],
   template: `
     <app-modal-wrapper
       [show]="show"
@@ -18,40 +18,56 @@ import { ModalWrapperComponent } from '../../../shared/components/modal-wrapper/
       [centered]="true"
       [loading]="submitting()"
       (close)="onClose()">
-
+    
       <form [formGroup]="branchForm" (ngSubmit)="onSubmit()">
         <!-- Branch Code -->
         <div class="mb-3">
           <label for="code" class="form-label">Branch Code *</label>
           <input type="text"
-                 id="code"
-                 class="form-control"
-                 formControlName="code"
-                 [class.is-invalid]="branchForm.get('code')?.invalid && branchForm.get('code')?.touched"
-                 placeholder="Enter branch code">
-          <div class="invalid-feedback" *ngIf="branchForm.get('code')?.invalid && branchForm.get('code')?.touched">
-            <div *ngIf="branchForm.get('code')?.errors?.['required']">Branch code is required.</div>
-            <div *ngIf="branchForm.get('code')?.errors?.['minlength']">Branch code must be at least 2 characters.</div>
-            <div *ngIf="branchForm.get('code')?.errors?.['maxlength']">Branch code cannot exceed 10 characters.</div>
-          </div>
+            id="code"
+            class="form-control"
+            formControlName="code"
+            [class.is-invalid]="branchForm.get('code')?.invalid && branchForm.get('code')?.touched"
+            placeholder="Enter branch code">
+          @if (branchForm.get('code')?.invalid && branchForm.get('code')?.touched) {
+            <div class="invalid-feedback">
+              @if (branchForm.get('code')?.errors?.['required']) {
+                <div>Branch code is required.</div>
+              }
+              @if (branchForm.get('code')?.errors?.['minlength']) {
+                <div>Branch code must be at least 2 characters.</div>
+              }
+              @if (branchForm.get('code')?.errors?.['maxlength']) {
+                <div>Branch code cannot exceed 10 characters.</div>
+              }
+            </div>
+          }
         </div>
-
+    
         <!-- Branch Name -->
         <div class="mb-3">
           <label for="name" class="form-label">Branch Name *</label>
           <input type="text"
-                 id="name"
-                 class="form-control"
-                 formControlName="name"
-                 [class.is-invalid]="branchForm.get('name')?.invalid && branchForm.get('name')?.touched"
-                 placeholder="Enter branch name">
-          <div class="invalid-feedback" *ngIf="branchForm.get('name')?.invalid && branchForm.get('name')?.touched">
-            <div *ngIf="branchForm.get('name')?.errors?.['required']">Branch name is required.</div>
-            <div *ngIf="branchForm.get('name')?.errors?.['minlength']">Branch name must be at least 2 characters.</div>
-            <div *ngIf="branchForm.get('name')?.errors?.['maxlength']">Branch name cannot exceed 100 characters.</div>
-          </div>
+            id="name"
+            class="form-control"
+            formControlName="name"
+            [class.is-invalid]="branchForm.get('name')?.invalid && branchForm.get('name')?.touched"
+            placeholder="Enter branch name">
+          @if (branchForm.get('name')?.invalid && branchForm.get('name')?.touched) {
+            <div class="invalid-feedback">
+              @if (branchForm.get('name')?.errors?.['required']) {
+                <div>Branch name is required.</div>
+              }
+              @if (branchForm.get('name')?.errors?.['minlength']) {
+                <div>Branch name must be at least 2 characters.</div>
+              }
+              @if (branchForm.get('name')?.errors?.['maxlength']) {
+                <div>Branch name cannot exceed 100 characters.</div>
+              }
+            </div>
+          }
         </div>
-
+    
         <!-- Timezone -->
         <div class="mb-3">
           <label for="timeZone" class="form-label">Timezone *</label>
@@ -63,44 +79,50 @@ import { ModalWrapperComponent } from '../../../shared/components/modal-wrapper/
             [searchable]="true"
             [clearable]="false">
           </app-searchable-select>
-          <div class="invalid-feedback d-block" *ngIf="branchForm.get('timeZone')?.invalid && branchForm.get('timeZone')?.touched">
-            Timezone is required.
-          </div>
+          @if (branchForm.get('timeZone')?.invalid && branchForm.get('timeZone')?.touched) {
+            <div class="invalid-feedback d-block">
+              Timezone is required.
+            </div>
+          }
         </div>
-
+    
         <!-- Status -->
         <div class="mb-3">
           <div class="form-check">
             <input class="form-check-input"
-                   type="checkbox"
-                   id="isActive"
-                   formControlName="isActive">
+              type="checkbox"
+              id="isActive"
+              formControlName="isActive">
             <label class="form-check-label" for="isActive">
               Active
             </label>
           </div>
           <div class="form-text">Inactive branches will not be available for new employee assignments.</div>
         </div>
-
+    
         <!-- Footer Buttons -->
         <div modal-footer class="d-flex gap-2 justify-content-end">
           <button type="button"
-                  class="btn btn-secondary"
-                  (click)="onClose()"
-                  [disabled]="submitting()">
+            class="btn btn-secondary"
+            (click)="onClose()"
+            [disabled]="submitting()">
             Cancel
           </button>
           <button type="submit"
-                  class="btn btn-primary"
-                  [disabled]="branchForm.invalid || submitting()">
-            <span *ngIf="submitting()" class="spinner-border spinner-border-sm me-2"></span>
-            <i *ngIf="!submitting()" class="fas fa-save me-2"></i>
+            class="btn btn-primary"
+            [disabled]="branchForm.invalid || submitting()">
+            @if (submitting()) {
+              <span class="spinner-border spinner-border-sm me-2"></span>
+            }
+            @if (!submitting()) {
+              <i class="fas fa-save me-2"></i>
+            }
             {{ submitting() ? 'Saving...' : (editMode ? 'Update Branch' : 'Create Branch') }}
           </button>
         </div>
       </form>
     </app-modal-wrapper>
-  `
+    `
 })
 export class BranchFormModalComponent implements OnInit {
   private fb = inject(FormBuilder);

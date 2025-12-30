@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["angular:styles/component:css;89dc063b9e15e334f5e90a9f29fbebc511c02280b98d55b4477b9079b2849118;D:/Work/AI Code/TimeAttendanceSystem/time-attendance-frontend/src/app/pages/settings/settings.component.ts"],
+  "sourcesContent": ["\n    .border-hover {\n      transition: all 0.2s ease-in-out;\n    }\n\n    .border-hover:hover {\n      border-color: var(--bs-primary) !important;\n      box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);\n      transform: translateY(-1px);\n    }\n\n    .card-body {\n      transition: all 0.2s ease-in-out;\n    }\n\n    .bg-gradient {\n      background: linear-gradient(135deg, var(--bs-primary) 0%, rgba(var(--bs-primary-rgb), 0.8) 100%);\n    }\n\n    .text-primary {\n      color: var(--bs-primary) !important;\n    }\n  "],
+  "mappings": ";AACI,CAAC;AACC,cAAY,IAAI,KAAK;AACvB;AAEA,CAJC,YAIY;AACX,gBAAc,IAAI;AAClB,cAAY,EAAE,SAAS,QAAQ,KAAK,CAAC,EAAE,CAAC,EAAE,CAAC,EAAE;AAC7C,aAAW,WAAW;AACxB;AAEA,CAAC;AACC,cAAY,IAAI,KAAK;AACvB;AAEA,CAAC;AACC;AAAA,IAAY;AAAA,MAAgB,MAAM;AAAA,MAAE,IAAI,cAAc,EAAE;AAAA,MAAE,KAAK,IAAI,iBAAiB,EAAE,KAAK;AAC7F;AAEA,CAAC;AACC,SAAO,IAAI;AACb;",
+  "names": []
+}

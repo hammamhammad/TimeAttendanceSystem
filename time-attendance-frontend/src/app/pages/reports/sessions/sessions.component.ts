@@ -1,5 +1,5 @@
 import { Component, signal, computed, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { SessionsService, UserSession } from './sessions.service';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { NotificationService } from '../../../core/notifications/notification.service';
@@ -12,11 +12,10 @@ import { UnifiedFilterComponent } from '../../../shared/components/unified-filte
   selector: 'app-sessions',
   standalone: true,
   imports: [
-    CommonModule,
     PageHeaderComponent,
     DataTableComponent,
     UnifiedFilterComponent
-  ],
+],
   templateUrl: './sessions.component.html',
   styleUrls: ['./sessions.component.css']
 })

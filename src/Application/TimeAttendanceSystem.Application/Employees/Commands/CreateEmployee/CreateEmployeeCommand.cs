@@ -85,5 +85,9 @@ public record CreateEmployeeCommand(
     string? JobTitleAr,
     long? DepartmentId,
     long? ManagerEmployeeId,
-    WorkLocationType WorkLocationType
+    WorkLocationType WorkLocationType,
+    // User account creation options
+    bool CreateUserAccount = false,
+    string? DefaultPassword = null,
+    List<long>? RoleIds = null
 ) : IRequest<Result<long>>;

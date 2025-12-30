@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, signal, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { DataTableComponent, TableColumn, TableAction } from '../../../shared/components/data-table/data-table.component';
 import { Branch } from '../../../shared/models/branch.model';
 import { I18nService } from '../../../core/i18n/i18n.service';
@@ -10,7 +10,7 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
 @Component({
   selector: 'app-branch-table',
   standalone: true,
-  imports: [CommonModule, DataTableComponent, StatusBadgeComponent],
+  imports: [DataTableComponent, StatusBadgeComponent],
   template: `
     <app-data-table
       [data]="branches"
@@ -27,58 +27,65 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
       (pageSizeChange)="onPageSizeChange($event)"
       (selectionChange)="onSelectionChange($event)"
       (sortChange)="onSortChange($event)">
-
+    
       <ng-template #cellTemplate let-branch let-column="column">
-        <ng-container [ngSwitch]="column.key">
+        @switch (column.key) {
           <!-- Branch info -->
-          <div *ngSwitchCase="'branch'" class="d-flex align-items-center">
-            <div class="avatar-sm me-2">
-              <div class="avatar-initial bg-info text-white rounded-circle">
-                {{ branch.code.charAt(0).toUpperCase() }}
+          @case ('branch') {
+            <div class="d-flex align-items-center">
+              <div class="avatar-sm me-2">
+                <div class="avatar-initial bg-info text-white rounded-circle">
+                  {{ branch.code.charAt(0).toUpperCase() }}
+                </div>
+              </div>
+              <div>
+                <div class="fw-medium">{{ branch.name }}</div>
+                <small class="text-muted">{{ branch.code }}</small>
               </div>
             </div>
-            <div>
-              <div class="fw-medium">{{ branch.name }}</div>
-              <small class="text-muted">{{ branch.code }}</small>
-            </div>
-          </div>
-
+          }
           <!-- Timezone -->
-          <div *ngSwitchCase="'timezone'">
-            <div>{{ branch.timeZone }}</div>
-            <small class="text-muted">{{ getTimezoneDisplay(branch.timeZone) }}</small>
-          </div>
-
+          @case ('timezone') {
+            <div>
+              <div>{{ branch.timeZone }}</div>
+              <small class="text-muted">{{ getTimezoneDisplay(branch.timeZone) }}</small>
+            </div>
+          }
           <!-- Status -->
-          <span *ngSwitchCase="'status'">
-            <app-status-badge
-              [status]="branch.isActive ? 'active' : 'inactive'"
-              [label]="branch.isActive ? 'Active' : 'Inactive'"
-              [showIcon]="true">
-            </app-status-badge>
-          </span>
-
+          @case ('status') {
+            <span>
+              <app-status-badge
+                [status]="branch.isActive ? 'active' : 'inactive'"
+                [label]="branch.isActive ? 'Active' : 'Inactive'"
+                [showIcon]="true">
+              </app-status-badge>
+            </span>
+          }
           <!-- Employee count -->
-          <span *ngSwitchCase="'employeeCount'">
-            <app-status-badge
-              [status]="'primary'"
-              [label]="(branch.employeeCount || 0).toString()">
-            </app-status-badge>
-          </span>
-
+          @case ('employeeCount') {
+            <span>
+              <app-status-badge
+                [status]="'primary'"
+                [label]="(branch.employeeCount || 0).toString()">
+              </app-status-badge>
+            </span>
+          }
           <!-- Created date -->
-          <span *ngSwitchCase="'created'">
-            {{ formatDate(branch.createdAtUtc) }}
-          </span>
-
+          @case ('created') {
+            <span>
+              {{ formatDate(branch.createdAtUtc) }}
+            </span>
+          }
           <!-- Last updated -->
-          <span *ngSwitchCase="'updated'">
-            {{ formatDate(branch.modifiedAtUtc) }}
-          </span>
-        </ng-container>
+          @case ('updated') {
+            <span>
+              {{ formatDate(branch.modifiedAtUtc) }}
+            </span>
+          }
+        }
       </ng-template>
     </app-data-table>
-  `,
+    `,
   styles: [`
     .avatar-sm {
       width: 2rem;

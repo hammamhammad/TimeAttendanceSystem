@@ -4,6 +4,8 @@ using TimeAttendanceSystem.Application.Common;
 using TimeAttendanceSystem.Domain.Employees;
 using TimeAttendanceSystem.Domain.Shifts;
 using TimeAttendanceSystem.Domain.Common;
+using TimeAttendanceSystem.Domain.Users;
+using System.Security.Cryptography;
 
 namespace TimeAttendanceSystem.Application.Employees.Commands.CreateEmployee;
 
@@ -169,6 +171,17 @@ public class CreateEmployeeCommandHandler : BaseHandler<CreateEmployeeCommand, R
         // Automatically assign default shift to new employee
         await AssignDefaultShiftToEmployeeAsync(employee.Id, cancellationToken);
 
+        // Create user account if requested
+        if (request.CreateUserAccount)
+        {
+            var userCreationResult = await CreateUserAccountForEmployeeAsync(employee, request, cancellationToken);
+            if (!userCreationResult.IsSuccess)
+            {
+                // Log warning but don't fail employee creation
+                // The employee was already created successfully
+            }
+        }
+
         // Return success result with created employee ID
         return Result.Success(employee.Id);
     }
@@ -227,5 +240,152 @@ public class CreateEmployeeCommandHandler : BaseHandler<CreateEmployeeCommand, R
             // Fail silently - shift assignment is not critical for employee creation
             // The employee creation should succeed even if shift assignment fails
         }
+    }
+
+    /// <summary>
+    /// Creates a user account for the newly created employee with forced password change on first login.
+    /// </summary>
+    /// <param name="employee">The employee entity to link the user account to</param>
+    /// <param name="request">The create employee command containing user creation options</param>
+    /// <param name="cancellationToken">Cancellation token for async operation control</param>
+    /// <returns>Result indicating success or failure of user account creation</returns>
+    private async Task<Result<long>> CreateUserAccountForEmployeeAsync(
+        Employee employee,
+        CreateEmployeeCommand request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            // Email is required for user account creation
+            if (string.IsNullOrWhiteSpace(employee.Email))
+            {
+                return Result.Failure<long>("Email is required to create a user account.");
+            }
+
+            // Generate username from email (part before @)
+            var username = employee.Email.Split('@')[0].ToLowerInvariant();
+
+            // Ensure username is unique
+            var existingUser = await Context.Users
+                .FirstOrDefaultAsync(u => u.Username == username, cancellationToken);
+
+            if (existingUser != null)
+            {
+                // Append employee number to make it unique
+                username = $"{username}.{employee.EmployeeNumber.ToLowerInvariant()}";
+
+                // Check again
+                existingUser = await Context.Users
+                    .FirstOrDefaultAsync(u => u.Username == username, cancellationToken);
+
+                if (existingUser != null)
+                {
+                    return Result.Failure<long>("Unable to generate unique username for user account.");
+                }
+            }
+
+            // Check if email already exists
+            existingUser = await Context.Users
+                .FirstOrDefaultAsync(u => u.Email == employee.Email, cancellationToken);
+
+            if (existingUser != null)
+            {
+                return Result.Failure<long>("Email already exists for another user account.");
+            }
+
+            // Use provided password or generate default password (employeeNumber + "!")
+            var password = !string.IsNullOrWhiteSpace(request.DefaultPassword)
+                ? request.DefaultPassword
+                : $"{employee.EmployeeNumber}!";
+
+            // Hash the password
+            var (hash, salt) = HashPassword(password);
+
+            // Create user entity with MustChangePassword = true
+            var user = new User
+            {
+                Username = username,
+                Email = employee.Email,
+                Phone = employee.Phone,
+                PasswordHash = hash,
+                PasswordSalt = salt,
+                MustChangePassword = true, // Force password change on first login
+                PreferredLanguage = "en",
+                IsActive = true,
+                CreatedAtUtc = DateTime.UtcNow,
+                CreatedBy = CurrentUser.Username ?? "SYSTEM"
+            };
+
+            Context.Users.Add(user);
+            await Context.SaveChangesAsync(cancellationToken);
+
+            // Assign roles (use provided roles or find default Employee role)
+            var roleIds = request.RoleIds ?? new List<long>();
+            if (!roleIds.Any())
+            {
+                // Find default "Employee" role
+                var employeeRole = await Context.Roles
+                    .FirstOrDefaultAsync(r => r.Name == "Employee", cancellationToken);
+
+                if (employeeRole != null)
+                {
+                    roleIds.Add(employeeRole.Id);
+                }
+            }
+
+            if (roleIds.Any())
+            {
+                var userRoles = roleIds.Select(roleId => new UserRole
+                {
+                    UserId = user.Id,
+                    RoleId = roleId
+                }).ToArray();
+
+                Context.UserRoles.AddRange(userRoles);
+            }
+
+            // Assign user to the same branch as the employee
+            var userBranchScope = new UserBranchScope
+            {
+                UserId = user.Id,
+                BranchId = employee.BranchId
+            };
+            Context.UserBranchScopes.Add(userBranchScope);
+
+            // Create employee-user link
+            var employeeUserLink = new EmployeeUserLink
+            {
+                EmployeeId = employee.Id,
+                UserId = user.Id
+            };
+            Context.EmployeeUserLinks.Add(employeeUserLink);
+
+            await Context.SaveChangesAsync(cancellationToken);
+
+            return Result.Success(user.Id);
+        }
+        catch (Exception)
+        {
+            // Return failure but don't throw - employee was already created
+            return Result.Failure<long>("Failed to create user account for employee.");
+        }
+    }
+
+    /// <summary>
+    /// Generates secure password hash using PBKDF2-SHA256 with cryptographically secure salt.
+    /// </summary>
+    /// <param name="password">Plain text password to hash</param>
+    /// <returns>Tuple containing Base64-encoded hash and salt</returns>
+    private static (string hash, string salt) HashPassword(string password)
+    {
+        var saltBytes = new byte[32];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(saltBytes);
+        var salt = Convert.ToBase64String(saltBytes);
+
+        using var pbkdf2 = new Rfc2898DeriveBytes(password, saltBytes, 10000, HashAlgorithmName.SHA256);
+        var hash = Convert.ToBase64String(pbkdf2.GetBytes(32));
+
+        return (hash, salt);
     }
 }

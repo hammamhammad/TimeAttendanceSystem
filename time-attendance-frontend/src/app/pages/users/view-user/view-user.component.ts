@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { UsersService } from '../users.service';
 import { User } from '../../../shared/models/user.model';
@@ -16,7 +16,7 @@ import { DefinitionListComponent, DefinitionItem } from '../../../shared/compone
 @Component({
   selector: 'app-view-user',
   standalone: true,
-  imports: [CommonModule, HasPermissionDirective, FormHeaderComponent, LoadingSpinnerComponent, StatusBadgeComponent, BadgeListComponent, DefinitionListComponent],
+  imports: [HasPermissionDirective, FormHeaderComponent, LoadingSpinnerComponent, StatusBadgeComponent, BadgeListComponent, DefinitionListComponent],
   templateUrl: './view-user.component.html',
   styleUrls: ['./view-user.component.css']
 })

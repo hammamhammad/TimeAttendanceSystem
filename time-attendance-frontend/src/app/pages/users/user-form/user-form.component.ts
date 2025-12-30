@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, computed, inject, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { I18nService } from '../../../core/i18n/i18n.service';
@@ -22,7 +22,7 @@ interface Branch {
 @Component({
   selector: 'app-user-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, FormSectionComponent, SearchableSelectComponent],
+  imports: [ReactiveFormsModule, RouterModule, FormSectionComponent, SearchableSelectComponent],
   templateUrl: './user-form.component.html',
   styleUrls: ['./user-form.component.css']
 })

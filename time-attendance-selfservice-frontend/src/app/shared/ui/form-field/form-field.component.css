@@ -1,0 +1,19 @@
+.form-label {
+  font-weight: 500;
+}
+
+.form-text {
+  font-size: 0.875rem;
+  color: var(--bs-secondary);
+}
+
+.is-invalid {
+  border-color: var(--bs-danger);
+}
+
+.invalid-feedback {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--bs-danger);
+  margin-top: 0.25rem;
+}

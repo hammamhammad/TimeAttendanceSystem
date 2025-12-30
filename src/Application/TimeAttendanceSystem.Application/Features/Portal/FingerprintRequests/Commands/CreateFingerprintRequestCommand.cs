@@ -40,24 +40,27 @@ public record CreateFingerprintRequestCommand : IRequest<Result<long>>
 /// <summary>
 /// Handler for CreateFingerprintRequestCommand
 /// </summary>
-public class CreateFingerprintRequestCommandHandler
-    : BaseHandler<CreateFingerprintRequestCommand, Result<long>>
+public class CreateFingerprintRequestCommandHandler : IRequestHandler<CreateFingerprintRequestCommand, Result<long>>
 {
+    private readonly IApplicationDbContext _context;
+    private readonly ICurrentUser _currentUser;
+
     public CreateFingerprintRequestCommandHandler(
         IApplicationDbContext context,
         ICurrentUser currentUser)
-        : base(context, currentUser)
     {
+        _context = context;
+        _currentUser = currentUser;
     }
 
-    public override async Task<Result<long>> Handle(
+    public async Task<Result<long>> Handle(
         CreateFingerprintRequestCommand request,
         CancellationToken cancellationToken)
     {
         // Get current employee through EmployeeUserLink
-        var employeeLink = await Context.EmployeeUserLinks
+        var employeeLink = await _context.EmployeeUserLinks
             .Include(eul => eul.Employee)
-            .FirstOrDefaultAsync(eul => eul.UserId == CurrentUser.UserId, cancellationToken);
+            .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId, cancellationToken);
 
         if (employeeLink == null)
             return Result.Failure<long>("Employee not found for current user");
@@ -65,7 +68,7 @@ public class CreateFingerprintRequestCommandHandler
         var employee = employeeLink.Employee;
 
         // Check if employee already has an active fingerprint request
-        var hasActiveRequest = await Context.FingerprintRequests
+        var hasActiveRequest = await _context.FingerprintRequests
             .AnyAsync(fr => fr.EmployeeId == employee.Id &&
                            (fr.Status == FingerprintRequestStatus.Pending ||
                             fr.Status == FingerprintRequestStatus.Scheduled) &&
@@ -94,11 +97,11 @@ public class CreateFingerprintRequestCommandHandler
             PreferredTime = request.PreferredTime,
             Status = FingerprintRequestStatus.Pending,
             CreatedAtUtc = DateTime.UtcNow,
-            CreatedBy = CurrentUser.Username ?? "SYSTEM"
+            CreatedBy = _currentUser.Username ?? "SYSTEM"
         };
 
-        Context.FingerprintRequests.Add(fingerprintRequest);
-        await Context.SaveChangesAsync(cancellationToken);
+        _context.FingerprintRequests.Add(fingerprintRequest);
+        await _context.SaveChangesAsync(cancellationToken);
 
         return Result.Success(fingerprintRequest.Id);
     }

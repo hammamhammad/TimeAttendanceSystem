@@ -1,0 +1,70 @@
+/* Vacation Request Details Component Styles */
+
+.vacation-details {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+/* Status Section */
+.status-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: var(--bs-light);
+  border-radius: 0.5rem;
+}
+
+.status-label {
+  font-weight: 600;
+  margin-bottom: 0;
+  color: var(--bs-secondary);
+}
+
+/* Alert Styling */
+.alert {
+  display: flex;
+  align-items: center;
+  border-radius: 0.5rem;
+}
+
+.alert i {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .vacation-details {
+    padding: 1rem;
+  }
+
+  .status-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.vacation-details {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Button Hover Effects */
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}

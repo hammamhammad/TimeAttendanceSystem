@@ -1,0 +1,24 @@
+﻿  Determining projects to restore...
+  All projects are up-to-date for restore.
+  TimeAttendanceSystem.Shared -> D:\Work\AI Code\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\bin\Debug\net9.0\TimeAttendanceSystem.Shared.dll
+  TimeAttendanceSystem.Domain -> D:\Work\AI Code\TimeAttendanceSystem\src\Domain\TimeAttendanceSystem.Domain\bin\Debug\net9.0\TimeAttendanceSystem.Domain.dll
+  TimeAttendanceSystem.Application -> D:\Work\AI Code\TimeAttendanceSystem\src\Application\TimeAttendanceSystem.Application\bin\Debug\net9.0\TimeAttendanceSystem.Application.dll
+D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\Workflows\WorkflowEngineConditionTests.cs(47,9): warning CS8602: Dereference of a possibly null reference. [D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\TimeAttendanceSystem.Application.UnitTests.csproj]
+D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\Workflows\WorkflowEngineConditionTests.cs(55,98): warning CS8602: Dereference of a possibly null reference. [D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\TimeAttendanceSystem.Application.UnitTests.csproj]
+D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\Reports\ReportsServiceTests.cs(41,30): error CS0246: The type or namespace name 'Department' could not be found (are you missing a using directive or an assembly reference?) [D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\TimeAttendanceSystem.Application.UnitTests.csproj]
+D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\Workflows\WorkflowEngineConditionTests.cs(77,9): warning CS8602: Dereference of a possibly null reference. [D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\TimeAttendanceSystem.Application.UnitTests.csproj]
+D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\Workflows\WorkflowEngineConditionTests.cs(95,9): warning CS8602: Dereference of a possibly null reference. [D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\TimeAttendanceSystem.Application.UnitTests.csproj]
+D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\Workflows\WorkflowEngineConditionTests.cs(114,9): warning CS8602: Dereference of a possibly null reference. [D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\TimeAttendanceSystem.Application.UnitTests.csproj]
+
+Build FAILED.
+
+D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\Workflows\WorkflowEngineConditionTests.cs(47,9): warning CS8602: Dereference of a possibly null reference. [D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\TimeAttendanceSystem.Application.UnitTests.csproj]
+D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\Workflows\WorkflowEngineConditionTests.cs(55,98): warning CS8602: Dereference of a possibly null reference. [D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\TimeAttendanceSystem.Application.UnitTests.csproj]
+D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\Workflows\WorkflowEngineConditionTests.cs(77,9): warning CS8602: Dereference of a possibly null reference. [D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\TimeAttendanceSystem.Application.UnitTests.csproj]
+D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\Workflows\WorkflowEngineConditionTests.cs(95,9): warning CS8602: Dereference of a possibly null reference. [D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\TimeAttendanceSystem.Application.UnitTests.csproj]
+D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\Workflows\WorkflowEngineConditionTests.cs(114,9): warning CS8602: Dereference of a possibly null reference. [D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\TimeAttendanceSystem.Application.UnitTests.csproj]
+D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\Reports\ReportsServiceTests.cs(41,30): error CS0246: The type or namespace name 'Department' could not be found (are you missing a using directive or an assembly reference?) [D:\Work\AI Code\TimeAttendanceSystem\src\Tests\TimeAttendanceSystem.Application.UnitTests\TimeAttendanceSystem.Application.UnitTests.csproj]
+    5 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:05.20

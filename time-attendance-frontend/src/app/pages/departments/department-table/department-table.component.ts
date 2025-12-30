@@ -1,5 +1,5 @@
 import { Component, signal, inject, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { DepartmentsService } from '../departments.service';
@@ -18,7 +18,7 @@ interface SortConfig {
 @Component({
   selector: 'app-department-table',
   standalone: true,
-  imports: [CommonModule, FormsModule, HasPermissionDirective, StatusBadgeComponent, LoadingSpinnerComponent],
+  imports: [FormsModule, HasPermissionDirective, StatusBadgeComponent, LoadingSpinnerComponent],
   templateUrl: './department-table.component.html',
   styleUrls: ['./department-table.component.css']
 })

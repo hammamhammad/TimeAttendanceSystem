@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { DepartmentFormComponent } from '../department-form/department-form.component';
 import { DepartmentsService } from '../departments.service';
@@ -9,7 +9,7 @@ import { I18nService } from '../../../core/i18n/i18n.service';
 @Component({
   selector: 'app-edit-department',
   standalone: true,
-  imports: [CommonModule, RouterModule, DepartmentFormComponent],
+  imports: [RouterModule, DepartmentFormComponent],
   template: `
     <div class="container-fluid">
       <!-- Header -->

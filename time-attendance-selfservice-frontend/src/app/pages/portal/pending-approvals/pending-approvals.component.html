@@ -1,0 +1,220 @@
+<div class="pending-approvals-container">
+  <!-- Page Header -->
+  <app-page-header [title]="i18n.t('portal.pending_approvals')">
+    <button header-actions class="btn btn-outline-primary btn-sm" (click)="refresh()">
+      <i class="bi bi-arrow-clockwise me-1"></i>
+      {{ i18n.t('common.refresh') }}
+    </button>
+  </app-page-header>
+
+  <!-- Tabs -->
+  <div class="card mb-4">
+    <div class="card-body p-0">
+      <ul class="nav nav-tabs nav-tabs-custom">
+        @for (tab of tabs; track tab.id) {
+          <li class="nav-item">
+            <button
+              class="nav-link"
+              [class.active]="activeTab() === tab.id"
+              (click)="onTabChange(tab.id)">
+              <i class="bi {{ tab.icon }} me-1"></i>
+              {{ i18n.t(tab.label) }}
+              @if (getTabCount(tab.id) > 0) {
+                <span class="badge ms-1" [class]="activeTab() === tab.id ? 'bg-white text-primary' : 'bg-secondary'">
+                  {{ getTabCount(tab.id) }}
+                </span>
+              }
+            </button>
+          </li>
+        }
+      </ul>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-center">
+        <div class="col-md-6">
+          <div class="input-group">
+            <span class="input-group-text">
+              <i class="bi bi-search"></i>
+            </span>
+            <input
+              type="text"
+              class="form-control"
+              [placeholder]="i18n.t('portal.search_approvals')"
+              [value]="searchTerm()"
+              (input)="onSearch($any($event.target).value)">
+          </div>
+        </div>
+        <div class="col-md-6">
+          @if (hasSelection()) {
+            <div class="d-flex gap-2 justify-content-md-end">
+              <button
+                class="btn btn-success btn-sm"
+                (click)="bulkApprove()">
+                <i class="bi bi-check-all me-1"></i>
+                {{ i18n.t('portal.approve_selected') }} ({{ selectedItems().size }})
+              </button>
+              <button
+                class="btn btn-danger btn-sm"
+                (click)="bulkReject()">
+                <i class="bi bi-x-lg me-1"></i>
+                {{ i18n.t('portal.reject_selected') }} ({{ selectedItems().size }})
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <app-loading-spinner [message]="i18n.t('portal.loading_approvals')"></app-loading-spinner>
+  } @else {
+    <!-- Empty State -->
+    @if (filteredApprovals().length === 0) {
+      <app-empty-state
+        [title]="i18n.t('portal.no_pending_approvals')"
+        [message]="searchTerm() || activeTab() !== 'all'
+          ? i18n.t('portal.no_pending_approvals_filter')
+          : i18n.t('portal.no_pending_approvals_message')"
+        icon="bi-check-circle">
+      </app-empty-state>
+    } @else {
+      <!-- Approvals List -->
+      <div class="card">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th class="checkbox-col">
+                    <div class="form-check">
+                      <input
+                        type="checkbox"
+                        class="form-check-input"
+                        [checked]="allSelected()"
+                        (change)="toggleSelectAll()">
+                    </div>
+                  </th>
+                  <th>{{ i18n.t('portal.request_type') }}</th>
+                  <th>{{ i18n.t('portal.employee') }}</th>
+                  <th>{{ i18n.t('portal.request_summary') }}</th>
+                  <th>{{ i18n.t('portal.requested_at') }}</th>
+                  <th>{{ i18n.t('portal.workflow_step') }}</th>
+                  <th class="text-end">{{ i18n.t('common.actions') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (approval of filteredApprovals(); track approval.workflowInstanceId) {
+                  <tr [class.table-active]="isSelected(approval)">
+                    <td class="checkbox-col">
+                      <div class="form-check">
+                        <input
+                          type="checkbox"
+                          class="form-check-input"
+                          [checked]="isSelected(approval)"
+                          (change)="toggleSelect(approval)">
+                      </div>
+                    </td>
+                    <td>
+                      <app-status-badge
+                        [status]="getTypeLabel(approval.entityType)"
+                        [variant]="getTypeVariant(approval.entityType)">
+                      </app-status-badge>
+                    </td>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="avatar-circle me-2">
+                          <span class="avatar-initials">{{ approval.employeeName.charAt(0) }}</span>
+                        </div>
+                        <div>
+                          <div class="fw-medium">{{ approval.employeeName }}</div>
+                          <small class="text-muted">{{ approval.employeeCode }}</small>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="request-summary">
+                        {{ approval.requestSummary }}
+                      </div>
+                      @if (approval.isDelegated) {
+                        <small class="text-info">
+                          <i class="bi bi-arrow-right-short"></i>
+                          {{ i18n.t('portal.delegated_from', { name: approval.delegatedFrom || '' }) }}
+                        </small>
+                      }
+                    </td>
+                    <td>
+                      <div class="d-flex flex-column">
+                        <span class="text-nowrap">{{ formatRelativeTime(approval.requestedAt) }}</span>
+                        <small class="text-muted">{{ formatDate(approval.requestedAt) }}</small>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="workflow-progress">
+                        <span class="badge bg-secondary-subtle text-secondary">
+                          {{ i18n.t('portal.step_of', { current: approval.currentStep.toString(), total: approval.totalSteps.toString() }) }}
+                        </span>
+                      </div>
+                    </td>
+                    <td class="text-end">
+                      <div class="btn-group btn-group-sm">
+                        <button
+                          type="button"
+                          class="btn btn-outline-info"
+                          [title]="i18n.t('portal.view_details')"
+                          (click)="viewDetails(approval)">
+                          <i class="bi bi-eye"></i>
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-success"
+                          [title]="i18n.t('portal.approve')"
+                          [disabled]="isProcessing(approval)"
+                          (click)="approve(approval)">
+                          @if (isProcessing(approval)) {
+                            <span class="spinner-border spinner-border-sm"></span>
+                          } @else {
+                            <i class="bi bi-check-lg"></i>
+                          }
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-danger"
+                          [title]="i18n.t('portal.reject')"
+                          [disabled]="isProcessing(approval)"
+                          (click)="reject(approval)">
+                          @if (isProcessing(approval)) {
+                            <span class="spinner-border spinner-border-sm"></span>
+                          } @else {
+                            <i class="bi bi-x-lg"></i>
+                          }
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card-footer bg-transparent">
+          <div class="d-flex justify-content-between align-items-center">
+            <small class="text-muted">
+              {{ i18n.t('portal.showing_approvals', { count: filteredApprovals().length.toString(), total: pendingApprovals().length.toString() }) }}
+            </small>
+            @if (hasSelection()) {
+              <small class="text-primary">
+                {{ i18n.t('portal.selected_count', { count: selectedItems().size.toString() }) }}
+              </small>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  }
+</div>

@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Input, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { StatCardComponent } from '../stat-card/stat-card.component';
 
 export interface StatGridItem {
@@ -19,16 +19,19 @@ export interface StatGridItem {
   borderAccent?: boolean;
   clickable?: boolean;
   clickableText?: string;
+  route?: string | any[];
 }
 
 @Component({
   selector: 'app-stats-grid',
   standalone: true,
-  imports: [CommonModule, StatCardComponent],
+  imports: [StatCardComponent],
   templateUrl: './stats-grid.component.html',
   styleUrls: ['./stats-grid.component.css']
 })
 export class StatsGridComponent {
+  private router = inject(Router);
+
   @Input() stats: StatGridItem[] = [];
   @Input() columns: 2 | 3 | 4 = 4;
   @Input() loading = false;
@@ -72,5 +75,11 @@ export class StatsGridComponent {
 
   getSkeletonItems(): number[] {
     return Array(this.columns).fill(0);
+  }
+
+  onCardClick(item: StatGridItem): void {
+    if (item.route) {
+      this.router.navigate(Array.isArray(item.route) ? item.route : [item.route]);
+    }
   }
 }

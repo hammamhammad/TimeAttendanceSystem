@@ -1,5 +1,5 @@
 import { Component, signal, inject, OnInit, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router } from '@angular/router';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { PermissionService } from '../../core/auth/permission.service';
@@ -15,7 +15,7 @@ import { PageHeaderComponent } from '../../shared/components/page-header/page-he
 @Component({
   selector: 'app-employees',
   standalone: true,
-  imports: [CommonModule, UnifiedFilterComponent, EmployeeTableComponent, PageHeaderComponent],
+  imports: [UnifiedFilterComponent, EmployeeTableComponent, PageHeaderComponent],
   templateUrl: './employees.component.html',
   styleUrls: ['./employees.component.css']
 })

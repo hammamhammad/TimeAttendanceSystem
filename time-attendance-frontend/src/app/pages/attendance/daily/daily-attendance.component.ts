@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, computed, OnDestroy, effect, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { AttendanceService } from '../../../core/services/attendance.service';
@@ -26,7 +26,7 @@ import { Branch } from '../../../shared/models/branch.model';
 @Component({
   selector: 'app-daily-attendance',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, SearchableSelectComponent, DataTableComponent, PageHeaderComponent, LoadingSpinnerComponent],
+  imports: [FormsModule, RouterModule, SearchableSelectComponent, DataTableComponent, PageHeaderComponent, LoadingSpinnerComponent],
   templateUrl: './daily-attendance.component.html',
   styleUrls: ['./daily-attendance.component.css']
 })

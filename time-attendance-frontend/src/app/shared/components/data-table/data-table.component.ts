@@ -36,69 +36,92 @@ export interface SortEvent {
   template: `
     <div class="unified-data-table">
       <!-- Loading State -->
-      <app-loading-spinner *ngIf="isLoading()"></app-loading-spinner>
-
+      @if (isLoading()) {
+        <app-loading-spinner></app-loading-spinner>
+      }
+    
       <!-- Mobile Card View -->
-      <div class="mobile-cards d-block d-md-none" *ngIf="!isLoading() && (responsiveMode === 'cards' || responsiveMode === 'auto')">
-        <div *ngFor="let item of getDisplayedData(); trackBy: trackByFn" class="mobile-card">
-          <!-- Selection -->
-          <div *ngIf="allowSelection" class="mobile-card-selection">
-            <div class="form-check">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                [checked]="isSelected(item)"
-                (change)="toggleSelection(item, $event)"
-              />
-            </div>
-          </div>
-
-          <!-- Card Content -->
-          <div class="mobile-card-content">
-            <!-- Custom template if provided -->
-            <ng-container *ngIf="cardTemplate"
-                         [ngTemplateOutlet]="cardTemplate"
-                         [ngTemplateOutletContext]="{ $implicit: item, actions: getAvailableActions(item) }">
-            </ng-container>
-
-            <!-- Default card layout -->
-            <div *ngIf="!cardTemplate" class="default-card-layout">
-              <div *ngFor="let column of getVisibleColumns()" class="mobile-field">
-                <span class="mobile-label">{{ column.mobileLabel || column.label }}:</span>
-                <span class="mobile-value">
-                  <ng-container *ngTemplateOutlet="cellTemplate; context: { $implicit: item, column: column }">
+      @if (!isLoading() && (responsiveMode === 'cards' || responsiveMode === 'auto')) {
+        <div class="mobile-cards d-block d-md-none">
+          @for (item of getDisplayedData(); track trackByFn($index, item)) {
+            <div class="mobile-card">
+              <!-- Selection -->
+              @if (allowSelection) {
+                <div class="mobile-card-selection">
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      [checked]="isSelected(item)"
+                      (change)="toggleSelection(item, $event)"
+                      />
+                  </div>
+                </div>
+              }
+              <!-- Card Content -->
+              <div class="mobile-card-content">
+                <!-- Custom template if provided -->
+                @if (cardTemplate) {
+                  <ng-container
+                    [ngTemplateOutlet]="cardTemplate"
+                    [ngTemplateOutletContext]="{ $implicit: item, actions: getAvailableActions(item) }">
                   </ng-container>
-                  <span *ngIf="!cellTemplate && !column.renderHtml">{{ getNestedValue(item, column.key) }}</span>
-                  <span *ngIf="!cellTemplate && column.renderHtml" [innerHTML]="getNestedValue(item, column.key)"></span>
-                </span>
+                }
+                <!-- Default card layout -->
+                @if (!cardTemplate) {
+                  <div class="default-card-layout">
+                    @for (column of getVisibleColumns(); track column) {
+                      <div class="mobile-field">
+                        <span class="mobile-label">{{ column.mobileLabel || column.label }}:</span>
+                        <span class="mobile-value">
+                          <ng-container *ngTemplateOutlet="cellTemplate; context: { $implicit: item, column: column }">
+                          </ng-container>
+                          @if (!cellTemplate && !column.renderHtml) {
+                            <span>{{ getNestedValue(item, column.key) }}</span>
+                          }
+                          @if (!cellTemplate && column.renderHtml) {
+                            <span [innerHTML]="getNestedValue(item, column.key)"></span>
+                          }
+                        </span>
+                      </div>
+                    }
+                  </div>
+                }
               </div>
+              <!-- Actions -->
+              @if (actions.length > 0) {
+                <div class="mobile-card-actions">
+                  <div class="btn-group btn-group-sm">
+                    @for (action of getAvailableActions(item); track action) {
+                      <button
+                        class="btn"
+                        [class]="'btn-outline-' + (action.color || 'primary')"
+                        [title]="action.label"
+                        (click)="onAction(action.key, item)">
+                        @if (action.icon) {
+                          <i [class]="'fas ' + action.icon"></i>
+                        }
+                        @if (!action.icon) {
+                          <span>{{ action.label }}</span>
+                        }
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
             </div>
-          </div>
-
-          <!-- Actions -->
-          <div *ngIf="actions.length > 0" class="mobile-card-actions">
-            <div class="btn-group btn-group-sm">
-              <button *ngFor="let action of getAvailableActions(item)"
-                      class="btn"
-                      [class]="'btn-outline-' + (action.color || 'primary')"
-                      [title]="action.label"
-                      (click)="onAction(action.key, item)">
-                <i *ngIf="action.icon" [class]="'fas ' + action.icon"></i>
-                <span *ngIf="!action.icon">{{ action.label }}</span>
-              </button>
-            </div>
-          </div>
+          }
+          <!-- Empty state for mobile -->
+          @if (data.length === 0) {
+            <app-empty-state
+              [icon]="'fa-inbox'"
+              [title]="emptyTitle || 'No Data'"
+              [message]="emptyMessage || 'No data available'">
+            </app-empty-state>
+          }
         </div>
-
-        <!-- Empty state for mobile -->
-        <app-empty-state
-          *ngIf="data.length === 0"
-          [icon]="'fa-inbox'"
-          [title]="emptyTitle || 'No Data'"
-          [message]="emptyMessage || 'No data available'">
-        </app-empty-state>
-      </div>
-
+      }
+    
       <!-- Desktop Table View -->
       <div class="table-container" [class.d-none]="isMobileView() && (responsiveMode === 'cards' || responsiveMode === 'auto')" [class.d-md-block]="responsiveMode === 'cards' || responsiveMode === 'auto'">
         <div class="table-responsive" [class.overflow-auto]="responsiveMode === 'horizontal-scroll'">
@@ -106,20 +129,23 @@ export interface SortEvent {
             <thead class="table-light sticky-top">
               <tr>
                 <!-- Selection column -->
-                <th *ngIf="allowSelection" class="selection-column">
-                  <div class="form-check">
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      [checked]="allSelected()"
-                      [indeterminate]="someSelected()"
-                      (change)="toggleSelectAll($event)"
-                    />
-                  </div>
-                </th>
-
+                @if (allowSelection) {
+                  <th class="selection-column">
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        [checked]="allSelected()"
+                        [indeterminate]="someSelected()"
+                        (change)="toggleSelectAll($event)"
+                        />
+                    </div>
+                  </th>
+                }
+    
                 <!-- Data columns -->
-                <th *ngFor="let column of getVisibleColumns()"
+                @for (column of getVisibleColumns(); track column) {
+                  <th
                     [style.width]="column.width"
                     [class.sortable]="column.sortable"
                     [class.text-center]="column.align === 'center'"
@@ -127,141 +153,172 @@ export interface SortEvent {
                     [class.d-none]="column.hideOnMobile && isMobileView()"
                     [class.d-md-table-cell]="column.hideOnMobile"
                     (click)="onSort(column)">
-                  <div class="d-flex align-items-center"
-                       [class.justify-content-center]="column.align === 'center'"
-                       [class.justify-content-end]="column.align === 'right'">
-                    <span>{{ column.label }}</span>
-                    <i *ngIf="column.sortable && getSortColumn() === column.key"
-                       class="ms-2 fas"
-                       [class.fa-sort-up]="getSortDirection() === 'asc'"
-                       [class.fa-sort-down]="getSortDirection() === 'desc'"></i>
-                    <i *ngIf="column.sortable && getSortColumn() !== column.key"
-                       class="ms-2 fas fa-sort text-muted"></i>
-                  </div>
-                </th>
-
+                    <div class="d-flex align-items-center"
+                      [class.justify-content-center]="column.align === 'center'"
+                      [class.justify-content-end]="column.align === 'right'">
+                      <span>{{ column.label }}</span>
+                      @if (column.sortable && getSortColumn() === column.key) {
+                        <i
+                          class="ms-2 fas"
+                          [class.fa-sort-up]="getSortDirection() === 'asc'"
+                        [class.fa-sort-down]="getSortDirection() === 'desc'"></i>
+                      }
+                      @if (column.sortable && getSortColumn() !== column.key) {
+                        <i
+                        class="ms-2 fas fa-sort text-muted"></i>
+                      }
+                    </div>
+                  </th>
+                }
+    
                 <!-- Actions column -->
-                <th *ngIf="actions.length > 0" class="actions-column">Actions</th>
+                @if (actions.length > 0) {
+                  <th class="actions-column">Actions</th>
+                }
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let item of getDisplayedData(); trackBy: trackByFn"
+              @for (item of getDisplayedData(); track trackByFn($index, item)) {
+                <tr
                   [class.selected-row]="isSelected(item)"
                   [class.inactive-row]="!isActiveItem(item)">
-
-                <!-- Selection cell -->
-                <td *ngIf="allowSelection" class="selection-column">
-                  <div class="form-check">
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      [checked]="isSelected(item)"
-                      (change)="toggleSelection(item, $event); $event.stopPropagation()"
-                    />
-                  </div>
-                </td>
-
-                <!-- Data cells -->
-                <td *ngFor="let column of getVisibleColumns()"
-                    [class.text-center]="column.align === 'center'"
-                    [class.text-end]="column.align === 'right'"
-                    [class.d-none]="column.hideOnMobile && isMobileView()"
-                    [class.d-md-table-cell]="column.hideOnMobile">
-                  <ng-container [ngSwitch]="column.key">
-                    <ng-container *ngSwitchDefault>
-                      <ng-container *ngTemplateOutlet="cellTemplate; context: { $implicit: item, column: column }">
-                      </ng-container>
-                      <span *ngIf="!cellTemplate && !column.renderHtml">{{ getNestedValue(item, column.key) }}</span>
-                      <span *ngIf="!cellTemplate && column.renderHtml" [innerHTML]="getNestedValue(item, column.key)"></span>
-                    </ng-container>
-                  </ng-container>
-                </td>
-
-                <!-- Actions cell -->
-                <td *ngIf="actions.length > 0" class="actions-column">
-                  <div class="btn-group btn-group-sm">
-                    <button *ngFor="let action of getAvailableActions(item)"
+                  <!-- Selection cell -->
+                  @if (allowSelection) {
+                    <td class="selection-column">
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          [checked]="isSelected(item)"
+                          (change)="toggleSelection(item, $event); $event.stopPropagation()"
+                          />
+                      </div>
+                    </td>
+                  }
+                  <!-- Data cells -->
+                  @for (column of getVisibleColumns(); track column) {
+                    <td
+                      [class.text-center]="column.align === 'center'"
+                      [class.text-end]="column.align === 'right'"
+                      [class.d-none]="column.hideOnMobile && isMobileView()"
+                      [class.d-md-table-cell]="column.hideOnMobile">
+                      @switch (column.key) {
+                        @default {
+                          <ng-container *ngTemplateOutlet="cellTemplate; context: { $implicit: item, column: column }">
+                          </ng-container>
+                          @if (!cellTemplate && !column.renderHtml) {
+                            <span>{{ getNestedValue(item, column.key) }}</span>
+                          }
+                          @if (!cellTemplate && column.renderHtml) {
+                            <span [innerHTML]="getNestedValue(item, column.key)"></span>
+                          }
+                        }
+                      }
+                    </td>
+                  }
+                  <!-- Actions cell -->
+                  @if (actions.length > 0) {
+                    <td class="actions-column">
+                      <div class="btn-group btn-group-sm">
+                        @for (action of getAvailableActions(item); track action) {
+                          <button
                             class="btn"
                             [class]="'btn-outline-' + (action.color || 'primary')"
                             [title]="action.label"
                             (click)="onAction(action.key, item); $event.stopPropagation()">
-                      <i *ngIf="action.icon" [class]="'fas ' + action.icon"></i>
-                      <span *ngIf="!action.icon">{{ action.label }}</span>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-
+                            @if (action.icon) {
+                              <i [class]="'fas ' + action.icon"></i>
+                            }
+                            @if (!action.icon) {
+                              <span>{{ action.label }}</span>
+                            }
+                          </button>
+                        }
+                      </div>
+                    </td>
+                  }
+                </tr>
+              }
+    
               <!-- Empty state -->
-              <tr *ngIf="data.length === 0">
-                <td [attr.colspan]="getTotalColumns()" class="p-0">
-                  <app-empty-state
-                    [icon]="'fa-inbox'"
-                    [title]="emptyTitle || 'No Data'"
-                    [message]="emptyMessage || 'No data available'">
-                  </app-empty-state>
-                </td>
-              </tr>
+              @if (data.length === 0) {
+                <tr>
+                  <td [attr.colspan]="getTotalColumns()" class="p-0">
+                    <app-empty-state
+                      [icon]="'fa-inbox'"
+                      [title]="emptyTitle || 'No Data'"
+                      [message]="emptyMessage || 'No data available'">
+                    </app-empty-state>
+                  </td>
+                </tr>
+              }
             </tbody>
           </table>
         </div>
-
+    
         <!-- Enhanced Pagination -->
-        <nav *ngIf="showPagination && getTotalPagesValue() > 1" class="mt-3">
-          <div class="row align-items-center">
-            <div class="col-md-6">
-              <div class="d-flex align-items-center">
-                <label class="form-label me-2 mb-0">Page Size:</label>
-                <select
-                  class="form-select form-select-sm"
-                  style="width: auto;"
-                  [value]="getPageSizeValue()"
-                  (change)="onPageSizeChange(+$any($event.target).value)"
-                >
-                  <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
-                </select>
-                <span class="text-muted ms-3">
-                  Showing
-                  {{ getDisplayStart() }}-{{ getDisplayEnd() }}
-                  of
-                  {{ getTotalItemsValue() }}
-                </span>
+        @if (showPagination && getTotalPagesValue() > 1) {
+          <nav class="mt-3">
+            <div class="row align-items-center">
+              <div class="col-md-6">
+                <div class="d-flex align-items-center">
+                  <label class="form-label me-2 mb-0">Page Size:</label>
+                  <select
+                    class="form-select form-select-sm"
+                    style="width: auto;"
+                    [value]="getPageSizeValue()"
+                    (change)="onPageSizeChange(+$any($event.target).value)"
+                    >
+                    @for (size of pageSizeOptions; track size) {
+                      <option [value]="size">{{ size }}</option>
+                    }
+                  </select>
+                  <span class="text-muted ms-3">
+                    Showing
+                    {{ getDisplayStart() }}-{{ getDisplayEnd() }}
+                    of
+                    {{ getTotalItemsValue() }}
+                  </span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <ul class="pagination pagination-sm justify-content-end mb-0">
+                  <li class="page-item" [class.disabled]="getCurrentPage() === 1">
+                    <button class="page-link" (click)="onPageChange(getCurrentPage() - 1)" [disabled]="getCurrentPage() === 1">
+                      <i class="fas fa-chevron-left"></i>
+                    </button>
+                  </li>
+                  @for (page of getPageNumbers(); track page) {
+                    <li
+                      class="page-item"
+                      [class.active]="page === getCurrentPage()"
+                      [class.disabled]="page === -1">
+                      @if (page !== -1) {
+                        <button
+                          class="page-link"
+                          (click)="onPageChange(page)"
+                          >
+                          {{ page }}
+                        </button>
+                      }
+                      @if (page === -1) {
+                        <span class="page-link">...</span>
+                      }
+                    </li>
+                  }
+                  <li class="page-item" [class.disabled]="getCurrentPage() === getTotalPagesValue()">
+                    <button class="page-link" (click)="onPageChange(getCurrentPage() + 1)" [disabled]="getCurrentPage() === getTotalPagesValue()">
+                      <i class="fas fa-chevron-right"></i>
+                    </button>
+                  </li>
+                </ul>
               </div>
             </div>
-            <div class="col-md-6">
-              <ul class="pagination pagination-sm justify-content-end mb-0">
-                <li class="page-item" [class.disabled]="getCurrentPage() === 1">
-                  <button class="page-link" (click)="onPageChange(getCurrentPage() - 1)" [disabled]="getCurrentPage() === 1">
-                    <i class="fas fa-chevron-left"></i>
-                  </button>
-                </li>
-
-                <li *ngFor="let page of getPageNumbers()"
-                    class="page-item"
-                    [class.active]="page === getCurrentPage()"
-                    [class.disabled]="page === -1">
-                  <button
-                    class="page-link"
-                    *ngIf="page !== -1"
-                    (click)="onPageChange(page)"
-                  >
-                    {{ page }}
-                  </button>
-                  <span class="page-link" *ngIf="page === -1">...</span>
-                </li>
-
-                <li class="page-item" [class.disabled]="getCurrentPage() === getTotalPagesValue()">
-                  <button class="page-link" (click)="onPageChange(getCurrentPage() + 1)" [disabled]="getCurrentPage() === getTotalPagesValue()">
-                    <i class="fas fa-chevron-right"></i>
-                  </button>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </nav>
+          </nav>
+        }
       </div>
     </div>
-  `,
+    `,
   styles: [`
     /* Main Container */
     .unified-data-table {

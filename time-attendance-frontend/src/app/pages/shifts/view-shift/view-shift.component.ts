@@ -1,5 +1,5 @@
 import { Component, signal, inject, OnInit, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router, ActivatedRoute } from '@angular/router';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { NotificationService } from '../../../core/notifications/notification.service';
@@ -18,12 +18,11 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
   selector: 'app-view-shift',
   standalone: true,
   imports: [
-    CommonModule,
     LoadingSpinnerComponent,
     DetailCardComponent,
     FormHeaderComponent,
     StatusBadgeComponent
-  ],
+],
   templateUrl: './view-shift.component.html',
   styleUrls: ['./view-shift.component.css']
 })

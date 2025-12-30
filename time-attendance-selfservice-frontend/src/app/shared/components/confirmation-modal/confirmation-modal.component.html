@@ -1,0 +1,45 @@
+<app-modal-wrapper
+  [show]="show"
+  [title]="title"
+  [size]="'md'"
+  [loading]="false"
+  [closeOnBackdropClick]="!loading"
+  [showCloseButton]="!loading"
+  (close)="onCancel()">
+
+  <!-- Modal Body -->
+  <div class="confirmation-content">
+    <div class="text-center mb-3">
+      <i [class]="getIconClass() + ' fa-3x mb-3'"></i>
+    </div>
+
+    <p class="text-center mb-3">{{ message }}</p>
+
+    @if (details) {
+      <div class="alert alert-light border">
+        <strong>{{ details }}</strong>
+      </div>
+    }
+  </div>
+
+  <!-- Modal Footer -->
+  <div modal-footer class="w-100 d-flex justify-content-end gap-2">
+    <button
+      type="button"
+      class="btn btn-secondary"
+      (click)="onCancel()"
+      [disabled]="loading">
+      {{ cancelText }}
+    </button>
+    <button
+      type="button"
+      [class]="getButtonClass()"
+      (click)="onConfirm()"
+      [disabled]="loading">
+      @if (loading) {
+        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+      }
+      {{ confirmText }}
+    </button>
+  </div>
+</app-modal-wrapper>

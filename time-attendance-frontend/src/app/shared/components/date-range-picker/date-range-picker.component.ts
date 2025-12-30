@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, forwardRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from '@angular/forms';
 
 export interface DateRange {
@@ -10,7 +10,7 @@ export interface DateRange {
 @Component({
   selector: 'app-date-range-picker',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './date-range-picker.component.html',
   styleUrls: ['./date-range-picker.component.css'],
   providers: [

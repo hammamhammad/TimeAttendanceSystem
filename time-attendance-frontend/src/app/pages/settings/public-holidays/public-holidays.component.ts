@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { I18nService } from '../../../core/i18n/i18n.service';
@@ -16,7 +16,7 @@ import { ModalWrapperComponent } from '../../../shared/components/modal-wrapper/
 @Component({
   selector: 'app-public-holidays',
   standalone: true,
-  imports: [CommonModule, FormsModule, DataTableComponent, PageHeaderComponent, UnifiedFilterComponent, ModalWrapperComponent],
+  imports: [FormsModule, DataTableComponent, PageHeaderComponent, UnifiedFilterComponent, ModalWrapperComponent],
   templateUrl: './public-holidays.component.html',
   styleUrls: ['./public-holidays.component.css']
 })

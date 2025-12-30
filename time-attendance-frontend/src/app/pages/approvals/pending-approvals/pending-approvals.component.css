@@ -1,0 +1,43 @@
+/* Pending Approvals Component Styles */
+
+.badge {
+  font-weight: 500;
+}
+
+/* Summary cards */
+.card.bg-warning.bg-opacity-10,
+.card.bg-danger.bg-opacity-10,
+.card.bg-info.bg-opacity-10 {
+  border-width: 2px;
+}
+
+.card h3 {
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+/* Filter section styling */
+.card .form-label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+/* Modal improvements */
+.modal-body .alert {
+  margin-bottom: 1rem;
+}
+
+.modal-body .alert h6 {
+  margin-bottom: 0.75rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .row.g-3 > div {
+    margin-bottom: 0.5rem;
+  }
+
+  .card h3 {
+    font-size: 1.5rem;
+  }
+}

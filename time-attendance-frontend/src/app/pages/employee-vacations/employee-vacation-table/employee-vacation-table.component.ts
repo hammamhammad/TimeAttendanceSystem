@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, signal, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { DataTableComponent, TableColumn, TableAction } from '../../../shared/components/data-table/data-table.component';
 import { EmployeeVacation } from '../../../shared/models/employee-vacation.model';
 import { I18nService } from '../../../core/i18n/i18n.service';
@@ -9,7 +9,7 @@ import { PermissionResources, PermissionActions } from '../../../shared/utils/pe
 @Component({
   selector: 'app-employee-vacation-table',
   standalone: true,
-  imports: [CommonModule, DataTableComponent],
+  imports: [DataTableComponent],
   template: `
     <app-data-table
       [data]="vacations"
@@ -26,69 +26,82 @@ import { PermissionResources, PermissionActions } from '../../../shared/utils/pe
       (pageSizeChange)="onPageSizeChange($event)"
       (selectionChange)="onSelectionChange($event)"
       (sortChange)="onSortChange($event)">
-
+    
       <ng-template #cellTemplate let-vacation let-column="column">
-        <ng-container [ngSwitch]="column.key">
+        @switch (column.key) {
           <!-- Employee name with avatar -->
-          <div *ngSwitchCase="'employee'" class="d-flex align-items-center">
-            <div class="avatar-sm me-2">
-              <div class="avatar-initial bg-primary text-white rounded-circle">
-                {{ getInitials(vacation.employeeName) }}
+          @case ('employee') {
+            <div class="d-flex align-items-center">
+              <div class="avatar-sm me-2">
+                <div class="avatar-initial bg-primary text-white rounded-circle">
+                  {{ getInitials(vacation.employeeName) }}
+                </div>
+              </div>
+              <div>
+                <div class="fw-medium">{{ vacation.employeeName }}</div>
+                <small class="text-muted">{{ vacation.employeeNumber }}</small>
               </div>
             </div>
-            <div>
-              <div class="fw-medium">{{ vacation.employeeName }}</div>
-              <small class="text-muted">{{ vacation.employeeNumber }}</small>
-            </div>
-          </div>
-
+          }
           <!-- Vacation Type -->
-          <span *ngSwitchCase="'vacationType'" class="fw-medium">
-            {{ vacation.vacationTypeName }}
-          </span>
-
+          @case ('vacationType') {
+            <span class="fw-medium">
+              {{ vacation.vacationTypeName }}
+            </span>
+          }
           <!-- Start Date -->
-          <span *ngSwitchCase="'startDate'">
-            {{ formatDate(vacation.startDate) }}
-          </span>
-
+          @case ('startDate') {
+            <span>
+              {{ formatDate(vacation.startDate) }}
+            </span>
+          }
           <!-- End Date -->
-          <span *ngSwitchCase="'endDate'">
-            {{ formatDate(vacation.endDate) }}
-          </span>
-
+          @case ('endDate') {
+            <span>
+              {{ formatDate(vacation.endDate) }}
+            </span>
+          }
           <!-- Total Days -->
-          <span *ngSwitchCase="'totalDays'" class="badge bg-secondary">
-            {{ vacation.totalDays }}
-            {{ vacation.totalDays === 1 ? 'day' : 'days' }}
-          </span>
-
+          @case ('totalDays') {
+            <span class="badge bg-secondary">
+              {{ vacation.totalDays }}
+              {{ vacation.totalDays === 1 ? 'day' : 'days' }}
+            </span>
+          }
           <!-- Approval Status -->
-          <span *ngSwitchCase="'status'"
-                class="badge"
-                [class.bg-success]="vacation.isApproved"
-                [class.bg-warning]="!vacation.isApproved">
-            <i class="fas"
-               [class.fa-check-circle]="vacation.isApproved"
-               [class.fa-clock]="!vacation.isApproved"></i>
-            {{ vacation.isApproved ? 'Approved' : 'Pending' }}
-          </span>
-
+          @case ('status') {
+            <span
+              class="badge"
+              [class.bg-success]="vacation.isApproved"
+              [class.bg-warning]="!vacation.isApproved">
+              <i class="fas"
+                [class.fa-check-circle]="vacation.isApproved"
+              [class.fa-clock]="!vacation.isApproved"></i>
+              {{ vacation.isApproved ? 'Approved' : 'Pending' }}
+            </span>
+          }
           <!-- Current Status -->
-          <span *ngSwitchCase="'currentStatus'" class="badge"
-                [class]="getCurrentStatusClass(vacation)">
-            {{ getCurrentStatusLabel(vacation) }}
-          </span>
-
+          @case ('currentStatus') {
+            <span class="badge"
+              [class]="getCurrentStatusClass(vacation)">
+              {{ getCurrentStatusLabel(vacation) }}
+            </span>
+          }
           <!-- Notes -->
-          <div *ngSwitchCase="'notes'">
-            <span *ngIf="vacation.notes">{{ vacation.notes }}</span>
-            <span *ngIf="!vacation.notes" class="text-muted">-</span>
-          </div>
-        </ng-container>
+          @case ('notes') {
+            <div>
+              @if (vacation.notes) {
+                <span>{{ vacation.notes }}</span>
+              }
+              @if (!vacation.notes) {
+                <span class="text-muted">-</span>
+              }
+            </div>
+          }
+        }
       </ng-template>
     </app-data-table>
-  `,
+    `,
   styles: [`
     .avatar-sm {
       width: 2rem;

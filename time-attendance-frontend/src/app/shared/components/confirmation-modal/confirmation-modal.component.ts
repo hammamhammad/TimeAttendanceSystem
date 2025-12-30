@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ModalWrapperComponent } from '../modal-wrapper/modal-wrapper.component';
 
 export type ConfirmationType = 'danger' | 'warning' | 'info' | 'success';
@@ -7,7 +7,7 @@ export type ConfirmationType = 'danger' | 'warning' | 'info' | 'success';
 @Component({
   selector: 'app-confirmation-modal',
   standalone: true,
-  imports: [CommonModule, ModalWrapperComponent],
+  imports: [ModalWrapperComponent],
   templateUrl: './confirmation-modal.component.html',
   styleUrls: ['./confirmation-modal.component.css']
 })

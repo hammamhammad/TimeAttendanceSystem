@@ -1,0 +1,184 @@
+<!-- Leave Transaction History Component -->
+<div class="leave-transaction-history" [class.compact]="compact">
+  <!-- Header -->
+  @if (showHeader) {
+    <div class="history-header">
+      <h4 class="mb-0">{{ i18n.t('leaveBalance.transactionHistory') }}</h4>
+      <div class="header-actions">
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-primary"
+          (click)="exportToCSV()"
+          title="{{ i18n.t('common.exportToCSV') }}">
+          <i class="bi bi-download me-1"></i>
+          {{ i18n.t('common.export') }}
+        </button>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-secondary"
+          (click)="refresh()"
+          title="{{ i18n.t('common.refresh') }}">
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Filters -->
+  @if (showFilters) {
+    <div class="filters-section">
+      <div class="row g-3">
+        <!-- Year Filter -->
+        <div class="col-md-3">
+          <label for="yearFilter" class="form-label">
+            {{ i18n.t('leaveBalance.year') }}
+          </label>
+          <select
+            id="yearFilter"
+            class="form-select form-select-sm"
+            [(ngModel)]="selectedYear"
+            (ngModelChange)="onYearChange()">
+            <option [value]="null">{{ i18n.t('common.all') }}</option>
+            @for (year of availableYears(); track year) {
+              <option [value]="year">{{ year }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Vacation Type Filter -->
+        <div class="col-md-4">
+          <label for="vacationTypeFilter" class="form-label">
+            {{ i18n.t('vacationTypes.vacationType') }}
+          </label>
+          <select
+            id="vacationTypeFilter"
+            class="form-select form-select-sm"
+            [(ngModel)]="selectedVacationTypeId"
+            (ngModelChange)="onVacationTypeChange()">
+            <option [value]="null">{{ i18n.t('common.all') }}</option>
+            <!-- TODO: Load vacation types dynamically -->
+          </select>
+        </div>
+
+        <!-- Transaction Type Filter -->
+        <div class="col-md-4">
+          <label for="transactionTypeFilter" class="form-label">
+            {{ i18n.t('leaveBalance.transactionType') }}
+          </label>
+          <select
+            id="transactionTypeFilter"
+            class="form-select form-select-sm"
+            [(ngModel)]="selectedTransactionType"
+            (ngModelChange)="onTransactionTypeChange()">
+            @for (option of transactionTypeOptions(); track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Clear Filters Button -->
+        <div class="col-md-1 d-flex align-items-end">
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary w-100"
+            (click)="clearFilters()"
+            title="{{ i18n.t('common.clearFilters') }}">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="text-center py-4">
+      <app-loading-spinner></app-loading-spinner>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!loading() && transactions().length === 0) {
+    <app-empty-state
+      [icon]="'bi-clock-history'"
+      [title]="i18n.t('leaveBalance.noTransactionsTitle')"
+      [message]="i18n.t('leaveBalance.noTransactionsMessage')"
+      [size]="compact ? 'sm' : 'md'">
+    </app-empty-state>
+  }
+
+  <!-- Transaction History Table -->
+  @if (!loading() && transactions().length > 0) {
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>{{ i18n.t('leaveBalance.transactionDate') }}</th>
+            <th>{{ i18n.t('leaveBalance.transactionType') }}</th>
+            <th>{{ i18n.t('vacationTypes.vacationType') }}</th>
+            <th class="text-end">{{ i18n.t('leaveBalance.days') }}</th>
+            <th class="text-end">{{ i18n.t('leaveBalance.balanceBefore') }}</th>
+            <th class="text-end">{{ i18n.t('leaveBalance.balanceAfter') }}</th>
+            <th>{{ i18n.t('common.performedBy') }}</th>
+            <th>{{ i18n.t('common.reason') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (transaction of transactions(); track transaction.id) {
+            <tr>
+              <td>{{ formatDate(transaction.transactionDate) }}</td>
+              <td>
+                <app-status-badge
+                  [status]="transaction.transactionTypeName"
+                  [variant]="getTransactionTypeVariant(transaction.transactionType)">
+                </app-status-badge>
+              </td>
+              <td>{{ transaction.vacationTypeName }}</td>
+              <td class="text-end">
+                <span [class]="getDaysClass(transaction.days)">
+                  {{ formatDays(transaction.days) }}
+                </span>
+              </td>
+              <td class="text-end">{{ transaction.balanceBeforeTransaction }}</td>
+              <td class="text-end">{{ transaction.balanceAfterTransaction }}</td>
+              <td>{{ transaction.performedBy || '-' }}</td>
+              <td>{{ transaction.reason || '-' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination Info -->
+    @if (pagedResult()) {
+      <div class="pagination-info">
+        <small class="text-muted">
+          {{ i18n.t('common.showing') }}
+          {{ (currentPage() - 1) * itemsPerPage + 1 }}-{{ Math.min(currentPage() * itemsPerPage, pagedResult()!.totalCount) }}
+          {{ i18n.t('common.of') }}
+          {{ pagedResult()!.totalCount }}
+          {{ i18n.t('common.items') }}
+        </small>
+      </div>
+
+      <!-- Manual Pagination Controls -->
+      @if (pagedResult()!.totalPages > 1) {
+        <nav aria-label="Page navigation">
+          <ul class="pagination pagination-sm justify-content-center">
+            <li class="page-item" [class.disabled]="currentPage() === 1">
+              <a class="page-link" (click)="onPageChange(currentPage() - 1)">{{ i18n.t('common.previous') }}</a>
+            </li>
+            @for (page of [].constructor(pagedResult()!.totalPages); track $index) {
+              <li class="page-item" [class.active]="currentPage() === $index + 1">
+                <a class="page-link" (click)="onPageChange($index + 1)">{{ $index + 1 }}</a>
+              </li>
+            }
+            <li class="page-item" [class.disabled]="currentPage() === pagedResult()!.totalPages">
+              <a class="page-link" (click)="onPageChange(currentPage() + 1)">{{ i18n.t('common.next') }}</a>
+            </li>
+          </ul>
+        </nav>
+      }
+    }
+  }
+</div>

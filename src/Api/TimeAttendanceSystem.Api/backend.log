@@ -1,0 +1,864 @@
+Using launch settings from D:\Work\AI Code\TimeAttendanceSystem\src\Api\TimeAttendanceSystem.Api\Properties\launchSettings.json...
+Building...
+D:\Work\AI Code\TimeAttendanceSystem\src\Domain\TimeAttendanceSystem.Domain\Common\ValueObject.cs(10,48): warning CS8602: Dereference of a possibly null reference. [D:\Work\AI Code\TimeAttendanceSystem\src\Domain\TimeAttendanceSystem.Domain\TimeAttendanceSystem.Domain.csproj]
+D:\Work\AI Code\TimeAttendanceSystem\src\Domain\TimeAttendanceSystem.Domain\Shifts\Shift.cs(251,52): warning CS8629: Nullable value type may be null. [D:\Work\AI Code\TimeAttendanceSystem\src\Domain\TimeAttendanceSystem.Domain\TimeAttendanceSystem.Domain.csproj]
+D:\Work\AI Code\TimeAttendanceSystem\src\Domain\TimeAttendanceSystem.Domain\Shifts\Shift.cs(251,69): warning CS8629: Nullable value type may be null. [D:\Work\AI Code\TimeAttendanceSystem\src\Domain\TimeAttendanceSystem.Domain\TimeAttendanceSystem.Domain.csproj]
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10622]
+      Entity 'Employee' has a global query filter defined and is the required end of a relationship with the entity 'AttendanceRecord'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10622]
+      Entity 'Employee' has a global query filter defined and is the required end of a relationship with the entity 'AttendanceTransaction'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10622]
+      Entity 'Employee' has a global query filter defined and is the required end of a relationship with the entity 'EmployeeUserLink'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10622]
+      Entity 'VacationType' has a global query filter defined and is the required end of a relationship with the entity 'LeaveAccrualPolicy'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10622]
+      Entity 'Employee' has a global query filter defined and is the required end of a relationship with the entity 'LeaveBalance'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10622]
+      Entity 'Employee' has a global query filter defined and is the required end of a relationship with the entity 'LeaveEntitlement'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10622]
+      Entity 'User' has a global query filter defined and is the required end of a relationship with the entity 'RemoteWorkRequest'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10622]
+      Entity 'User' has a global query filter defined and is the required end of a relationship with the entity 'BlacklistedToken'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10622]
+      Entity 'User' has a global query filter defined and is the required end of a relationship with the entity 'PasswordHistory'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10622]
+      Entity 'Permission' has a global query filter defined and is the required end of a relationship with the entity 'RolePermission'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10622]
+      Entity 'User' has a global query filter defined and is the required end of a relationship with the entity 'TwoFactorBackupCode'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10622]
+      Entity 'Branch' has a global query filter defined and is the required end of a relationship with the entity 'UserBranchScope'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10622]
+      Entity 'Role' has a global query filter defined and is the required end of a relationship with the entity 'UserRole'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10622]
+      Entity 'User' has a global query filter defined and is the required end of a relationship with the entity 'UserSession'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10400]
+      Sensitive data logging is enabled. Log entries and exception messages may include sensitive application data; this mode should only be enabled during development.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10625]
+      The foreign key property 'Employee.DepartmentId1' was created in shadow state because a conflicting property with the simple name 'DepartmentId' exists in the entity type, but is either not mapped, is already used for another relationship, or is incompatible with the associated primary key type. See https://aka.ms/efcore-relationships for information on mapping relationships in EF Core.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[20601]
+      The 'ApprovalStatus' property 'ApprovalStatus' on entity type 'EmployeeExcuse' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'ApprovalStatus' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[20601]
+      The 'ShiftAssignmentStatus' property 'Status' on entity type 'ShiftAssignment' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'ShiftAssignmentStatus' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (21ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "MigrationId", "ProductVersion"
+      FROM "__EFMigrationsHistory"
+      ORDER BY "MigrationId";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (10ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE TABLE IF NOT EXISTS "__EFMigrationsHistory" (
+          "MigrationId" character varying(150) NOT NULL,
+          "ProductVersion" character varying(32) NOT NULL,
+          CONSTRAINT "PK___EFMigrationsHistory" PRIMARY KEY ("MigrationId")
+      );
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      LOCK TABLE "__EFMigrationsHistory" IN ACCESS EXCLUSIVE MODE
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT "MigrationId", "ProductVersion"
+      FROM "__EFMigrationsHistory"
+      ORDER BY "MigrationId";
+info: Microsoft.EntityFrameworkCore.Migrations[20405]
+      No migrations were applied. The database is already up to date.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT p."Key"
+      FROM "Permissions" AS p
+      WHERE NOT (p."IsDeleted")
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM "Roles" AS r
+          WHERE NOT (r."IsDeleted"))
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM "Users" AS u
+          WHERE NOT (u."IsDeleted"))
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT r."Id", r."CreatedAtUtc", r."CreatedBy", r."IsDeletable", r."IsDeleted", r."IsEditable", r."IsSystem", r."ModifiedAtUtc", r."ModifiedBy", r."Name", r."RowVersion"
+      FROM "Roles" AS r
+      WHERE NOT (r."IsDeleted") AND r."Name" = 'SystemAdmin'
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT r."Id", r."CreatedAtUtc", r."CreatedBy", r."IsDeletable", r."IsDeleted", r."IsEditable", r."IsSystem", r."ModifiedAtUtc", r."ModifiedBy", r."Name", r."RowVersion"
+      FROM "Roles" AS r
+      WHERE NOT (r."IsDeleted") AND r."Name" = 'Admin'
+      LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT p."Id", p."CreatedAtUtc", p."CreatedBy", p."Description", p."Group", p."IsDeleted", p."Key", p."ModifiedAtUtc", p."ModifiedBy", p."RowVersion"
+      FROM "Permissions" AS p
+      WHERE NOT (p."IsDeleted")
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (10ms) [Parameters=[@__role_Id_0='1'], CommandType='Text', CommandTimeout='30']
+      SELECT r."PermissionId"
+      FROM "RolePermissions" AS r
+      WHERE r."RoleId" = @__role_Id_0
+SystemAdmin role already has all required permissions
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@__role_Id_0='2'], CommandType='Text', CommandTimeout='30']
+      SELECT r."PermissionId"
+      FROM "RolePermissions" AS r
+      WHERE r."RoleId" = @__role_Id_0
+Admin role already has all required permissions
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM "Shifts" AS s
+          WHERE NOT (s."IsDeleted"))
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM "RemoteWorkPolicies" AS r)
+✅ Essential system data seeding completed (permissions, roles, systemadmin user, default shift, remote work policy)
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: http://localhost:5099
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: D:\Work\AI Code\TimeAttendanceSystem\src\Api\TimeAttendanceSystem.Api
+info: TimeAttendanceSystem.Infrastructure.BackgroundJobs.MonthlyLeaveAccrualJob[0]
+      Starting monthly leave accrual job at 12/20/2025 16:28:49 for 2025-11
+info: TimeAttendanceSystem.Application.LeaveManagement.Commands.ProcessMonthlyAccrual.ProcessMonthlyAccrualCommandHandler[0]
+      Starting monthly accrual processing for Year 2025, Month 11, EmployeeId ALL
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (5ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT e."Id"
+      FROM "Employees" AS e
+      WHERE NOT (e."IsDeleted")
+info: TimeAttendanceSystem.Application.Services.LeaveAccrualService[0]
+      Completed monthly accrual processing for year 2025, month 11. Success: 0, Errors: 0
+info: TimeAttendanceSystem.Application.LeaveManagement.Commands.ProcessMonthlyAccrual.ProcessMonthlyAccrualCommandHandler[0]
+      Successfully processed monthly accrual for 0 employees
+info: TimeAttendanceSystem.Infrastructure.BackgroundJobs.MonthlyLeaveAccrualJob[0]
+      Monthly leave accrual completed successfully for 2025-11. Processed 0 employee(s)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT p."Id", p."Key", p."Group", p."Description", p."CreatedAtUtc"
+      FROM "Permissions" AS p
+      WHERE NOT (p."IsDeleted")
+      ORDER BY p."Group", p."Key"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT count(*)::int
+      FROM "Branches" AS b
+      WHERE NOT (b."IsDeleted")
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT count(*)::int
+      FROM "Shifts" AS s
+      WHERE NOT (s."IsDeleted")
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT r."Id", r."Name", r."IsSystem", r."IsEditable", r."IsDeletable", (
+          SELECT count(*)::int
+          FROM "UserRoles" AS u
+          WHERE u."RoleId" = r."Id") AS "UserCount", r."CreatedAtUtc"
+      FROM "Roles" AS r
+      WHERE NOT (r."IsDeleted")
+      ORDER BY r."Name"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (22ms) [Parameters=[@__p_1='1000', @__p_0='0'], CommandType='Text', CommandTimeout='30']
+      SELECT b."Id", b."Code", b."Name", b."TimeZone", b."IsActive", (
+          SELECT count(*)::int
+          FROM "Employees" AS e
+          WHERE NOT (e."IsDeleted") AND e."BranchId" = b."Id" AND NOT (e."IsDeleted")) AS "EmployeeCount", (
+          SELECT count(*)::int
+          FROM "Departments" AS d
+          WHERE NOT (d."IsDeleted") AND d."BranchId" = b."Id" AND NOT (d."IsDeleted")) AS "DepartmentCount", b."CreatedAtUtc"
+      FROM "Branches" AS b
+      WHERE NOT (b."IsDeleted")
+      ORDER BY b."Name"
+      LIMIT @__p_1 OFFSET @__p_0
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (9ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT p."Id", p."Key", p."Group", p."Description", p."CreatedAtUtc"
+      FROM "Permissions" AS p
+      WHERE NOT (p."IsDeleted")
+      ORDER BY p."Group", p."Key"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (8ms) [Parameters=[@__p_1='1000', @__p_0='0'], CommandType='Text', CommandTimeout='30']
+      SELECT s1."Id", s1."Name", s1."Description", s1."ShiftType", s1."Status", s1."RequiredHours", s1."RequiresCheckInOut", s1."IsAutoCheckOut", s1."AllowFlexibleHours", s1."FlexMinutesBefore", s1."FlexMinutesAfter", s1."GracePeriodMinutes", s1."RequiredWeeklyHours", s1."HasCoreHours", s1."CoreStart", s1."CoreEnd", s1."IsSunday", s1."IsMonday", s1."IsTuesday", s1."IsWednesday", s1."IsThursday", s1."IsFriday", s1."IsSaturday", s1."IsNightShift", s1."IsDefault", s2."Id", s2."PeriodOrder", s2."StartTime", s2."EndTime", s2."Hours", s2."IsNightPeriod", s1."CreatedAtUtc", s1."CreatedBy", s1."ModifiedAtUtc", s1."ModifiedBy"
+      FROM (
+          SELECT s."Id", s."Name", s."Description", s."ShiftType", s."Status", s."RequiredHours", s."RequiresCheckInOut", s."IsAutoCheckOut", s."AllowFlexibleHours", s."FlexMinutesBefore", s."FlexMinutesAfter", s."GracePeriodMinutes", s."RequiredWeeklyHours", s."HasCoreHours", s."CoreStart", s."CoreEnd", s."IsSunday", s."IsMonday", s."IsTuesday", s."IsWednesday", s."IsThursday", s."IsFriday", s."IsSaturday", s."IsNightShift", s."IsDefault", s."CreatedAtUtc", s."CreatedBy", s."ModifiedAtUtc", s."ModifiedBy"
+          FROM "Shifts" AS s
+          WHERE NOT (s."IsDeleted")
+          ORDER BY s."Name"
+          LIMIT @__p_1 OFFSET @__p_0
+      ) AS s1
+      LEFT JOIN (
+          SELECT s0."Id", s0."PeriodOrder", s0."StartTime", s0."EndTime", s0."Hours", s0."IsNightPeriod", s0."ShiftId"
+          FROM "ShiftPeriods" AS s0
+          WHERE NOT (s0."IsDeleted")
+      ) AS s2 ON s1."Id" = s2."ShiftId"
+      ORDER BY s1."Name", s1."Id"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (17ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT r."Id", r."Name", r."IsSystem", r."IsEditable", r."IsDeletable", (
+          SELECT count(*)::int
+          FROM "UserRoles" AS u
+          WHERE u."RoleId" = r."Id"), r."CreatedAtUtc", s."Id", s."Key", s."Group", s."Description", s."RoleId", s."PermissionId"
+      FROM "Roles" AS r
+      LEFT JOIN (
+          SELECT p0."Id", p0."Key", p0."Group", p0."Description", r0."RoleId", r0."PermissionId"
+          FROM "RolePermissions" AS r0
+          INNER JOIN (
+              SELECT p."Id", p."Description", p."Group", p."Key"
+              FROM "Permissions" AS p
+              WHERE NOT (p."IsDeleted")
+          ) AS p0 ON r0."PermissionId" = p0."Id"
+      ) AS s ON r."Id" = s."RoleId"
+      WHERE NOT (r."IsDeleted")
+      ORDER BY r."Name", r."Id", s."RoleId", s."PermissionId"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT count(*)::int
+      FROM "Branches" AS b
+      WHERE NOT (b."IsDeleted")
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (5ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT count(*)::int
+      FROM "Shifts" AS s
+      WHERE NOT (s."IsDeleted")
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (5ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT r."Id", r."Name", r."IsSystem", r."IsEditable", r."IsDeletable", (
+          SELECT count(*)::int
+          FROM "UserRoles" AS u
+          WHERE u."RoleId" = r."Id") AS "UserCount", r."CreatedAtUtc"
+      FROM "Roles" AS r
+      WHERE NOT (r."IsDeleted")
+      ORDER BY r."Name"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@__p_1='1000', @__p_0='0'], CommandType='Text', CommandTimeout='30']
+      SELECT s1."Id", s1."Name", s1."Description", s1."ShiftType", s1."Status", s1."RequiredHours", s1."RequiresCheckInOut", s1."IsAutoCheckOut", s1."AllowFlexibleHours", s1."FlexMinutesBefore", s1."FlexMinutesAfter", s1."GracePeriodMinutes", s1."RequiredWeeklyHours", s1."HasCoreHours", s1."CoreStart", s1."CoreEnd", s1."IsSunday", s1."IsMonday", s1."IsTuesday", s1."IsWednesday", s1."IsThursday", s1."IsFriday", s1."IsSaturday", s1."IsNightShift", s1."IsDefault", s2."Id", s2."PeriodOrder", s2."StartTime", s2."EndTime", s2."Hours", s2."IsNightPeriod", s1."CreatedAtUtc", s1."CreatedBy", s1."ModifiedAtUtc", s1."ModifiedBy"
+      FROM (
+          SELECT s."Id", s."Name", s."Description", s."ShiftType", s."Status", s."RequiredHours", s."RequiresCheckInOut", s."IsAutoCheckOut", s."AllowFlexibleHours", s."FlexMinutesBefore", s."FlexMinutesAfter", s."GracePeriodMinutes", s."RequiredWeeklyHours", s."HasCoreHours", s."CoreStart", s."CoreEnd", s."IsSunday", s."IsMonday", s."IsTuesday", s."IsWednesday", s."IsThursday", s."IsFriday", s."IsSaturday", s."IsNightShift", s."IsDefault", s."CreatedAtUtc", s."CreatedBy", s."ModifiedAtUtc", s."ModifiedBy"
+          FROM "Shifts" AS s
+          WHERE NOT (s."IsDeleted")
+          ORDER BY s."Name"
+          LIMIT @__p_1 OFFSET @__p_0
+      ) AS s1
+      LEFT JOIN (
+          SELECT s0."Id", s0."PeriodOrder", s0."StartTime", s0."EndTime", s0."Hours", s0."IsNightPeriod", s0."ShiftId"
+          FROM "ShiftPeriods" AS s0
+          WHERE NOT (s0."IsDeleted")
+      ) AS s2 ON s1."Id" = s2."ShiftId"
+      ORDER BY s1."Name", s1."Id"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (7ms) [Parameters=[@__p_1='1000', @__p_0='0'], CommandType='Text', CommandTimeout='30']
+      SELECT b."Id", b."Code", b."Name", b."TimeZone", b."IsActive", (
+          SELECT count(*)::int
+          FROM "Employees" AS e
+          WHERE NOT (e."IsDeleted") AND e."BranchId" = b."Id" AND NOT (e."IsDeleted")) AS "EmployeeCount", (
+          SELECT count(*)::int
+          FROM "Departments" AS d
+          WHERE NOT (d."IsDeleted") AND d."BranchId" = b."Id" AND NOT (d."IsDeleted")) AS "DepartmentCount", b."CreatedAtUtc"
+      FROM "Branches" AS b
+      WHERE NOT (b."IsDeleted")
+      ORDER BY b."Name"
+      LIMIT @__p_1 OFFSET @__p_0
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (14ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT r."Id", r."Name", r."IsSystem", r."IsEditable", r."IsDeletable", (
+          SELECT count(*)::int
+          FROM "UserRoles" AS u
+          WHERE u."RoleId" = r."Id"), r."CreatedAtUtc", s."Id", s."Key", s."Group", s."Description", s."RoleId", s."PermissionId"
+      FROM "Roles" AS r
+      LEFT JOIN (
+          SELECT p0."Id", p0."Key", p0."Group", p0."Description", r0."RoleId", r0."PermissionId"
+          FROM "RolePermissions" AS r0
+          INNER JOIN (
+              SELECT p."Id", p."Description", p."Group", p."Key"
+              FROM "Permissions" AS p
+              WHERE NOT (p."IsDeleted")
+          ) AS p0 ON r0."PermissionId" = p0."Id"
+      ) AS s ON r."Id" = s."RoleId"
+      WHERE NOT (r."IsDeleted")
+      ORDER BY r."Name", r."Id", s."RoleId", s."PermissionId"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT p."Id", p."Key", p."Group", p."Description", p."CreatedAtUtc"
+      FROM "Permissions" AS p
+      WHERE NOT (p."IsDeleted")
+      ORDER BY p."Group", p."Key"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT p."Id", p."Key", p."Group", p."Description", p."CreatedAtUtc"
+      FROM "Permissions" AS p
+      WHERE NOT (p."IsDeleted")
+      ORDER BY p."Group", p."Key"
+warn: Microsoft.EntityFrameworkCore.Query[20504]
+      Compiling a query which loads related collections for more than one collection navigation, either via 'Include' or through projection, but no 'QuerySplittingBehavior' has been configured. By default, Entity Framework will use 'QuerySplittingBehavior.SingleQuery', which can potentially result in slow query performance. See https://go.microsoft.com/fwlink/?linkid=2134277 for more information. To identify the query that's triggering this warning call 'ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning))'.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (11ms) [Parameters=[@__request_Username_0='admin'], CommandType='Text', CommandTimeout='30']
+      SELECT u2."Id", u2."CreatedAtUtc", u2."CreatedBy", u2."Email", u2."EmailConfirmationToken", u2."EmailConfirmed", u2."FailedLoginAttempts", u2."IsActive", u2."IsDeleted", u2."LastFailedLoginAtUtc", u2."LockoutEndUtc", u2."ModifiedAtUtc", u2."ModifiedBy", u2."MustChangePassword", u2."PasswordChangedAtUtc", u2."PasswordHash", u2."PasswordResetToken", u2."PasswordResetTokenExpiresAtUtc", u2."PasswordSalt", u2."Phone", u2."PreferredLanguage", u2."RowVersion", u2."TwoFactorEnabled", u2."TwoFactorSecretKey", u2."Username", s0."UserId", s0."RoleId", s0."Id", s0."CreatedAtUtc", s0."CreatedBy", s0."IsDeletable", s0."IsDeleted", s0."IsEditable", s0."IsSystem", s0."ModifiedAtUtc", s0."ModifiedBy", s0."Name", s0."RowVersion", s0."RoleId0", s0."PermissionId", s0."Id0", s0."CreatedAtUtc0", s0."CreatedBy0", s0."Description", s0."Group", s0."IsDeleted0", s0."Key", s0."ModifiedAtUtc0", s0."ModifiedBy0", s0."RowVersion0", s1."UserId", s1."BranchId", s1."Id", s1."Code", s1."CreatedAtUtc", s1."CreatedBy", s1."IsActive", s1."IsDeleted", s1."ModifiedAtUtc", s1."ModifiedBy", s1."Name", s1."RowVersion", s1."TimeZone"
+      FROM (
+          SELECT u."Id", u."CreatedAtUtc", u."CreatedBy", u."Email", u."EmailConfirmationToken", u."EmailConfirmed", u."FailedLoginAttempts", u."IsActive", u."IsDeleted", u."LastFailedLoginAtUtc", u."LockoutEndUtc", u."ModifiedAtUtc", u."ModifiedBy", u."MustChangePassword", u."PasswordChangedAtUtc", u."PasswordHash", u."PasswordResetToken", u."PasswordResetTokenExpiresAtUtc", u."PasswordSalt", u."Phone", u."PreferredLanguage", u."RowVersion", u."TwoFactorEnabled", u."TwoFactorSecretKey", u."Username"
+          FROM "Users" AS u
+          WHERE NOT (u."IsDeleted") AND u."Username" = @__request_Username_0
+          LIMIT 1
+      ) AS u2
+      LEFT JOIN (
+          SELECT u0."UserId", u0."RoleId", r0."Id", r0."CreatedAtUtc", r0."CreatedBy", r0."IsDeletable", r0."IsDeleted", r0."IsEditable", r0."IsSystem", r0."ModifiedAtUtc", r0."ModifiedBy", r0."Name", r0."RowVersion", s."RoleId" AS "RoleId0", s."PermissionId", s."Id" AS "Id0", s."CreatedAtUtc" AS "CreatedAtUtc0", s."CreatedBy" AS "CreatedBy0", s."Description", s."Group", s."IsDeleted" AS "IsDeleted0", s."Key", s."ModifiedAtUtc" AS "ModifiedAtUtc0", s."ModifiedBy" AS "ModifiedBy0", s."RowVersion" AS "RowVersion0"
+          FROM "UserRoles" AS u0
+          INNER JOIN (
+              SELECT r."Id", r."CreatedAtUtc", r."CreatedBy", r."IsDeletable", r."IsDeleted", r."IsEditable", r."IsSystem", r."ModifiedAtUtc", r."ModifiedBy", r."Name", r."RowVersion"
+              FROM "Roles" AS r
+              WHERE NOT (r."IsDeleted")
+          ) AS r0 ON u0."RoleId" = r0."Id"
+          LEFT JOIN (
+              SELECT r1."RoleId", r1."PermissionId", p0."Id", p0."CreatedAtUtc", p0."CreatedBy", p0."Description", p0."Group", p0."IsDeleted", p0."Key", p0."ModifiedAtUtc", p0."ModifiedBy", p0."RowVersion"
+              FROM "RolePermissions" AS r1
+              INNER JOIN (
+                  SELECT p."Id", p."CreatedAtUtc", p."CreatedBy", p."Description", p."Group", p."IsDeleted", p."Key", p."ModifiedAtUtc", p."ModifiedBy", p."RowVersion"
+                  FROM "Permissions" AS p
+                  WHERE NOT (p."IsDeleted")
+              ) AS p0 ON r1."PermissionId" = p0."Id"
+          ) AS s ON r0."Id" = s."RoleId"
+      ) AS s0 ON u2."Id" = s0."UserId"
+      LEFT JOIN (
+          SELECT u1."UserId", u1."BranchId", b0."Id", b0."Code", b0."CreatedAtUtc", b0."CreatedBy", b0."IsActive", b0."IsDeleted", b0."ModifiedAtUtc", b0."ModifiedBy", b0."Name", b0."RowVersion", b0."TimeZone"
+          FROM "UserBranchScopes" AS u1
+          INNER JOIN (
+              SELECT b."Id", b."Code", b."CreatedAtUtc", b."CreatedBy", b."IsActive", b."IsDeleted", b."ModifiedAtUtc", b."ModifiedBy", b."Name", b."RowVersion", b."TimeZone"
+              FROM "Branches" AS b
+              WHERE NOT (b."IsDeleted")
+          ) AS b0 ON u1."BranchId" = b0."Id"
+      ) AS s1 ON u2."Id" = s1."UserId"
+      ORDER BY u2."Id", s0."UserId", s0."RoleId", s0."Id", s0."RoleId0", s0."PermissionId", s0."Id0", s1."UserId", s1."BranchId"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (9ms) [Parameters=[@__request_Username_0='admin'], CommandType='Text', CommandTimeout='30']
+      SELECT u2."Id", u2."CreatedAtUtc", u2."CreatedBy", u2."Email", u2."EmailConfirmationToken", u2."EmailConfirmed", u2."FailedLoginAttempts", u2."IsActive", u2."IsDeleted", u2."LastFailedLoginAtUtc", u2."LockoutEndUtc", u2."ModifiedAtUtc", u2."ModifiedBy", u2."MustChangePassword", u2."PasswordChangedAtUtc", u2."PasswordHash", u2."PasswordResetToken", u2."PasswordResetTokenExpiresAtUtc", u2."PasswordSalt", u2."Phone", u2."PreferredLanguage", u2."RowVersion", u2."TwoFactorEnabled", u2."TwoFactorSecretKey", u2."Username", s0."UserId", s0."RoleId", s0."Id", s0."CreatedAtUtc", s0."CreatedBy", s0."IsDeletable", s0."IsDeleted", s0."IsEditable", s0."IsSystem", s0."ModifiedAtUtc", s0."ModifiedBy", s0."Name", s0."RowVersion", s0."RoleId0", s0."PermissionId", s0."Id0", s0."CreatedAtUtc0", s0."CreatedBy0", s0."Description", s0."Group", s0."IsDeleted0", s0."Key", s0."ModifiedAtUtc0", s0."ModifiedBy0", s0."RowVersion0", s1."UserId", s1."BranchId", s1."Id", s1."Code", s1."CreatedAtUtc", s1."CreatedBy", s1."IsActive", s1."IsDeleted", s1."ModifiedAtUtc", s1."ModifiedBy", s1."Name", s1."RowVersion", s1."TimeZone"
+      FROM (
+          SELECT u."Id", u."CreatedAtUtc", u."CreatedBy", u."Email", u."EmailConfirmationToken", u."EmailConfirmed", u."FailedLoginAttempts", u."IsActive", u."IsDeleted", u."LastFailedLoginAtUtc", u."LockoutEndUtc", u."ModifiedAtUtc", u."ModifiedBy", u."MustChangePassword", u."PasswordChangedAtUtc", u."PasswordHash", u."PasswordResetToken", u."PasswordResetTokenExpiresAtUtc", u."PasswordSalt", u."Phone", u."PreferredLanguage", u."RowVersion", u."TwoFactorEnabled", u."TwoFactorSecretKey", u."Username"
+          FROM "Users" AS u
+          WHERE NOT (u."IsDeleted") AND u."Username" = @__request_Username_0
+          LIMIT 1
+      ) AS u2
+      LEFT JOIN (
+          SELECT u0."UserId", u0."RoleId", r0."Id", r0."CreatedAtUtc", r0."CreatedBy", r0."IsDeletable", r0."IsDeleted", r0."IsEditable", r0."IsSystem", r0."ModifiedAtUtc", r0."ModifiedBy", r0."Name", r0."RowVersion", s."RoleId" AS "RoleId0", s."PermissionId", s."Id" AS "Id0", s."CreatedAtUtc" AS "CreatedAtUtc0", s."CreatedBy" AS "CreatedBy0", s."Description", s."Group", s."IsDeleted" AS "IsDeleted0", s."Key", s."ModifiedAtUtc" AS "ModifiedAtUtc0", s."ModifiedBy" AS "ModifiedBy0", s."RowVersion" AS "RowVersion0"
+          FROM "UserRoles" AS u0
+          INNER JOIN (
+              SELECT r."Id", r."CreatedAtUtc", r."CreatedBy", r."IsDeletable", r."IsDeleted", r."IsEditable", r."IsSystem", r."ModifiedAtUtc", r."ModifiedBy", r."Name", r."RowVersion"
+              FROM "Roles" AS r
+              WHERE NOT (r."IsDeleted")
+          ) AS r0 ON u0."RoleId" = r0."Id"
+          LEFT JOIN (
+              SELECT r1."RoleId", r1."PermissionId", p0."Id", p0."CreatedAtUtc", p0."CreatedBy", p0."Description", p0."Group", p0."IsDeleted", p0."Key", p0."ModifiedAtUtc", p0."ModifiedBy", p0."RowVersion"
+              FROM "RolePermissions" AS r1
+              INNER JOIN (
+                  SELECT p."Id", p."CreatedAtUtc", p."CreatedBy", p."Description", p."Group", p."IsDeleted", p."Key", p."ModifiedAtUtc", p."ModifiedBy", p."RowVersion"
+                  FROM "Permissions" AS p
+                  WHERE NOT (p."IsDeleted")
+              ) AS p0 ON r1."PermissionId" = p0."Id"
+          ) AS s ON r0."Id" = s."RoleId"
+      ) AS s0 ON u2."Id" = s0."UserId"
+      LEFT JOIN (
+          SELECT u1."UserId", u1."BranchId", b0."Id", b0."Code", b0."CreatedAtUtc", b0."CreatedBy", b0."IsActive", b0."IsDeleted", b0."ModifiedAtUtc", b0."ModifiedBy", b0."Name", b0."RowVersion", b0."TimeZone"
+          FROM "UserBranchScopes" AS u1
+          INNER JOIN (
+              SELECT b."Id", b."Code", b."CreatedAtUtc", b."CreatedBy", b."IsActive", b."IsDeleted", b."ModifiedAtUtc", b."ModifiedBy", b."Name", b."RowVersion", b."TimeZone"
+              FROM "Branches" AS b
+              WHERE NOT (b."IsDeleted")
+          ) AS b0 ON u1."BranchId" = b0."Id"
+      ) AS s1 ON u2."Id" = s1."UserId"
+      ORDER BY u2."Id", s0."UserId", s0."RoleId", s0."Id", s0."RoleId0", s0."PermissionId", s0."Id0", s1."UserId", s1."BranchId"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (9ms) [Parameters=[@__request_Username_0='admin'], CommandType='Text', CommandTimeout='30']
+      SELECT u2."Id", u2."CreatedAtUtc", u2."CreatedBy", u2."Email", u2."EmailConfirmationToken", u2."EmailConfirmed", u2."FailedLoginAttempts", u2."IsActive", u2."IsDeleted", u2."LastFailedLoginAtUtc", u2."LockoutEndUtc", u2."ModifiedAtUtc", u2."ModifiedBy", u2."MustChangePassword", u2."PasswordChangedAtUtc", u2."PasswordHash", u2."PasswordResetToken", u2."PasswordResetTokenExpiresAtUtc", u2."PasswordSalt", u2."Phone", u2."PreferredLanguage", u2."RowVersion", u2."TwoFactorEnabled", u2."TwoFactorSecretKey", u2."Username", s0."UserId", s0."RoleId", s0."Id", s0."CreatedAtUtc", s0."CreatedBy", s0."IsDeletable", s0."IsDeleted", s0."IsEditable", s0."IsSystem", s0."ModifiedAtUtc", s0."ModifiedBy", s0."Name", s0."RowVersion", s0."RoleId0", s0."PermissionId", s0."Id0", s0."CreatedAtUtc0", s0."CreatedBy0", s0."Description", s0."Group", s0."IsDeleted0", s0."Key", s0."ModifiedAtUtc0", s0."ModifiedBy0", s0."RowVersion0", s1."UserId", s1."BranchId", s1."Id", s1."Code", s1."CreatedAtUtc", s1."CreatedBy", s1."IsActive", s1."IsDeleted", s1."ModifiedAtUtc", s1."ModifiedBy", s1."Name", s1."RowVersion", s1."TimeZone"
+      FROM (
+          SELECT u."Id", u."CreatedAtUtc", u."CreatedBy", u."Email", u."EmailConfirmationToken", u."EmailConfirmed", u."FailedLoginAttempts", u."IsActive", u."IsDeleted", u."LastFailedLoginAtUtc", u."LockoutEndUtc", u."ModifiedAtUtc", u."ModifiedBy", u."MustChangePassword", u."PasswordChangedAtUtc", u."PasswordHash", u."PasswordResetToken", u."PasswordResetTokenExpiresAtUtc", u."PasswordSalt", u."Phone", u."PreferredLanguage", u."RowVersion", u."TwoFactorEnabled", u."TwoFactorSecretKey", u."Username"
+          FROM "Users" AS u
+          WHERE NOT (u."IsDeleted") AND u."Username" = @__request_Username_0
+          LIMIT 1
+      ) AS u2
+      LEFT JOIN (
+          SELECT u0."UserId", u0."RoleId", r0."Id", r0."CreatedAtUtc", r0."CreatedBy", r0."IsDeletable", r0."IsDeleted", r0."IsEditable", r0."IsSystem", r0."ModifiedAtUtc", r0."ModifiedBy", r0."Name", r0."RowVersion", s."RoleId" AS "RoleId0", s."PermissionId", s."Id" AS "Id0", s."CreatedAtUtc" AS "CreatedAtUtc0", s."CreatedBy" AS "CreatedBy0", s."Description", s."Group", s."IsDeleted" AS "IsDeleted0", s."Key", s."ModifiedAtUtc" AS "ModifiedAtUtc0", s."ModifiedBy" AS "ModifiedBy0", s."RowVersion" AS "RowVersion0"
+          FROM "UserRoles" AS u0
+          INNER JOIN (
+              SELECT r."Id", r."CreatedAtUtc", r."CreatedBy", r."IsDeletable", r."IsDeleted", r."IsEditable", r."IsSystem", r."ModifiedAtUtc", r."ModifiedBy", r."Name", r."RowVersion"
+              FROM "Roles" AS r
+              WHERE NOT (r."IsDeleted")
+          ) AS r0 ON u0."RoleId" = r0."Id"
+          LEFT JOIN (
+              SELECT r1."RoleId", r1."PermissionId", p0."Id", p0."CreatedAtUtc", p0."CreatedBy", p0."Description", p0."Group", p0."IsDeleted", p0."Key", p0."ModifiedAtUtc", p0."ModifiedBy", p0."RowVersion"
+              FROM "RolePermissions" AS r1
+              INNER JOIN (
+                  SELECT p."Id", p."CreatedAtUtc", p."CreatedBy", p."Description", p."Group", p."IsDeleted", p."Key", p."ModifiedAtUtc", p."ModifiedBy", p."RowVersion"
+                  FROM "Permissions" AS p
+                  WHERE NOT (p."IsDeleted")
+              ) AS p0 ON r1."PermissionId" = p0."Id"
+          ) AS s ON r0."Id" = s."RoleId"
+      ) AS s0 ON u2."Id" = s0."UserId"
+      LEFT JOIN (
+          SELECT u1."UserId", u1."BranchId", b0."Id", b0."Code", b0."CreatedAtUtc", b0."CreatedBy", b0."IsActive", b0."IsDeleted", b0."ModifiedAtUtc", b0."ModifiedBy", b0."Name", b0."RowVersion", b0."TimeZone"
+          FROM "UserBranchScopes" AS u1
+          INNER JOIN (
+              SELECT b."Id", b."Code", b."CreatedAtUtc", b."CreatedBy", b."IsActive", b."IsDeleted", b."ModifiedAtUtc", b."ModifiedBy", b."Name", b."RowVersion", b."TimeZone"
+              FROM "Branches" AS b
+              WHERE NOT (b."IsDeleted")
+          ) AS b0 ON u1."BranchId" = b0."Id"
+      ) AS s1 ON u2."Id" = s1."UserId"
+      ORDER BY u2."Id", s0."UserId", s0."RoleId", s0."Id", s0."RoleId0", s0."PermissionId", s0."Id0", s1."UserId", s1."BranchId"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (351ms) [Parameters=[@__request_Username_0='admin'], CommandType='Text', CommandTimeout='30']
+      SELECT u2."Id", u2."CreatedAtUtc", u2."CreatedBy", u2."Email", u2."EmailConfirmationToken", u2."EmailConfirmed", u2."FailedLoginAttempts", u2."IsActive", u2."IsDeleted", u2."LastFailedLoginAtUtc", u2."LockoutEndUtc", u2."ModifiedAtUtc", u2."ModifiedBy", u2."MustChangePassword", u2."PasswordChangedAtUtc", u2."PasswordHash", u2."PasswordResetToken", u2."PasswordResetTokenExpiresAtUtc", u2."PasswordSalt", u2."Phone", u2."PreferredLanguage", u2."RowVersion", u2."TwoFactorEnabled", u2."TwoFactorSecretKey", u2."Username", s0."UserId", s0."RoleId", s0."Id", s0."CreatedAtUtc", s0."CreatedBy", s0."IsDeletable", s0."IsDeleted", s0."IsEditable", s0."IsSystem", s0."ModifiedAtUtc", s0."ModifiedBy", s0."Name", s0."RowVersion", s0."RoleId0", s0."PermissionId", s0."Id0", s0."CreatedAtUtc0", s0."CreatedBy0", s0."Description", s0."Group", s0."IsDeleted0", s0."Key", s0."ModifiedAtUtc0", s0."ModifiedBy0", s0."RowVersion0", s1."UserId", s1."BranchId", s1."Id", s1."Code", s1."CreatedAtUtc", s1."CreatedBy", s1."IsActive", s1."IsDeleted", s1."ModifiedAtUtc", s1."ModifiedBy", s1."Name", s1."RowVersion", s1."TimeZone"
+      FROM (
+          SELECT u."Id", u."CreatedAtUtc", u."CreatedBy", u."Email", u."EmailConfirmationToken", u."EmailConfirmed", u."FailedLoginAttempts", u."IsActive", u."IsDeleted", u."LastFailedLoginAtUtc", u."LockoutEndUtc", u."ModifiedAtUtc", u."ModifiedBy", u."MustChangePassword", u."PasswordChangedAtUtc", u."PasswordHash", u."PasswordResetToken", u."PasswordResetTokenExpiresAtUtc", u."PasswordSalt", u."Phone", u."PreferredLanguage", u."RowVersion", u."TwoFactorEnabled", u."TwoFactorSecretKey", u."Username"
+          FROM "Users" AS u
+          WHERE NOT (u."IsDeleted") AND u."Username" = @__request_Username_0
+          LIMIT 1
+      ) AS u2
+      LEFT JOIN (
+          SELECT u0."UserId", u0."RoleId", r0."Id", r0."CreatedAtUtc", r0."CreatedBy", r0."IsDeletable", r0."IsDeleted", r0."IsEditable", r0."IsSystem", r0."ModifiedAtUtc", r0."ModifiedBy", r0."Name", r0."RowVersion", s."RoleId" AS "RoleId0", s."PermissionId", s."Id" AS "Id0", s."CreatedAtUtc" AS "CreatedAtUtc0", s."CreatedBy" AS "CreatedBy0", s."Description", s."Group", s."IsDeleted" AS "IsDeleted0", s."Key", s."ModifiedAtUtc" AS "ModifiedAtUtc0", s."ModifiedBy" AS "ModifiedBy0", s."RowVersion" AS "RowVersion0"
+          FROM "UserRoles" AS u0
+          INNER JOIN (
+              SELECT r."Id", r."CreatedAtUtc", r."CreatedBy", r."IsDeletable", r."IsDeleted", r."IsEditable", r."IsSystem", r."ModifiedAtUtc", r."ModifiedBy", r."Name", r."RowVersion"
+              FROM "Roles" AS r
+              WHERE NOT (r."IsDeleted")
+          ) AS r0 ON u0."RoleId" = r0."Id"
+          LEFT JOIN (
+              SELECT r1."RoleId", r1."PermissionId", p0."Id", p0."CreatedAtUtc", p0."CreatedBy", p0."Description", p0."Group", p0."IsDeleted", p0."Key", p0."ModifiedAtUtc", p0."ModifiedBy", p0."RowVersion"
+              FROM "RolePermissions" AS r1
+              INNER JOIN (
+                  SELECT p."Id", p."CreatedAtUtc", p."CreatedBy", p."Description", p."Group", p."IsDeleted", p."Key", p."ModifiedAtUtc", p."ModifiedBy", p."RowVersion"
+                  FROM "Permissions" AS p
+                  WHERE NOT (p."IsDeleted")
+              ) AS p0 ON r1."PermissionId" = p0."Id"
+          ) AS s ON r0."Id" = s."RoleId"
+      ) AS s0 ON u2."Id" = s0."UserId"
+      LEFT JOIN (
+          SELECT u1."UserId", u1."BranchId", b0."Id", b0."Code", b0."CreatedAtUtc", b0."CreatedBy", b0."IsActive", b0."IsDeleted", b0."ModifiedAtUtc", b0."ModifiedBy", b0."Name", b0."RowVersion", b0."TimeZone"
+          FROM "UserBranchScopes" AS u1
+          INNER JOIN (
+              SELECT b."Id", b."Code", b."CreatedAtUtc", b."CreatedBy", b."IsActive", b."IsDeleted", b."ModifiedAtUtc", b."ModifiedBy", b."Name", b."RowVersion", b."TimeZone"
+              FROM "Branches" AS b
+              WHERE NOT (b."IsDeleted")
+          ) AS b0 ON u1."BranchId" = b0."Id"
+      ) AS s1 ON u2."Id" = s1."UserId"
+      ORDER BY u2."Id", s0."UserId", s0."RoleId", s0."Id", s0."RoleId0", s0."PermissionId", s0."Id0", s1."UserId", s1."BranchId"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (13ms) [Parameters=[@__request_Username_0='admin'], CommandType='Text', CommandTimeout='30']
+      SELECT u2."Id", u2."CreatedAtUtc", u2."CreatedBy", u2."Email", u2."EmailConfirmationToken", u2."EmailConfirmed", u2."FailedLoginAttempts", u2."IsActive", u2."IsDeleted", u2."LastFailedLoginAtUtc", u2."LockoutEndUtc", u2."ModifiedAtUtc", u2."ModifiedBy", u2."MustChangePassword", u2."PasswordChangedAtUtc", u2."PasswordHash", u2."PasswordResetToken", u2."PasswordResetTokenExpiresAtUtc", u2."PasswordSalt", u2."Phone", u2."PreferredLanguage", u2."RowVersion", u2."TwoFactorEnabled", u2."TwoFactorSecretKey", u2."Username", s0."UserId", s0."RoleId", s0."Id", s0."CreatedAtUtc", s0."CreatedBy", s0."IsDeletable", s0."IsDeleted", s0."IsEditable", s0."IsSystem", s0."ModifiedAtUtc", s0."ModifiedBy", s0."Name", s0."RowVersion", s0."RoleId0", s0."PermissionId", s0."Id0", s0."CreatedAtUtc0", s0."CreatedBy0", s0."Description", s0."Group", s0."IsDeleted0", s0."Key", s0."ModifiedAtUtc0", s0."ModifiedBy0", s0."RowVersion0", s1."UserId", s1."BranchId", s1."Id", s1."Code", s1."CreatedAtUtc", s1."CreatedBy", s1."IsActive", s1."IsDeleted", s1."ModifiedAtUtc", s1."ModifiedBy", s1."Name", s1."RowVersion", s1."TimeZone"
+      FROM (
+          SELECT u."Id", u."CreatedAtUtc", u."CreatedBy", u."Email", u."EmailConfirmationToken", u."EmailConfirmed", u."FailedLoginAttempts", u."IsActive", u."IsDeleted", u."LastFailedLoginAtUtc", u."LockoutEndUtc", u."ModifiedAtUtc", u."ModifiedBy", u."MustChangePassword", u."PasswordChangedAtUtc", u."PasswordHash", u."PasswordResetToken", u."PasswordResetTokenExpiresAtUtc", u."PasswordSalt", u."Phone", u."PreferredLanguage", u."RowVersion", u."TwoFactorEnabled", u."TwoFactorSecretKey", u."Username"
+          FROM "Users" AS u
+          WHERE NOT (u."IsDeleted") AND u."Username" = @__request_Username_0
+          LIMIT 1
+      ) AS u2
+      LEFT JOIN (
+          SELECT u0."UserId", u0."RoleId", r0."Id", r0."CreatedAtUtc", r0."CreatedBy", r0."IsDeletable", r0."IsDeleted", r0."IsEditable", r0."IsSystem", r0."ModifiedAtUtc", r0."ModifiedBy", r0."Name", r0."RowVersion", s."RoleId" AS "RoleId0", s."PermissionId", s."Id" AS "Id0", s."CreatedAtUtc" AS "CreatedAtUtc0", s."CreatedBy" AS "CreatedBy0", s."Description", s."Group", s."IsDeleted" AS "IsDeleted0", s."Key", s."ModifiedAtUtc" AS "ModifiedAtUtc0", s."ModifiedBy" AS "ModifiedBy0", s."RowVersion" AS "RowVersion0"
+          FROM "UserRoles" AS u0
+          INNER JOIN (
+              SELECT r."Id", r."CreatedAtUtc", r."CreatedBy", r."IsDeletable", r."IsDeleted", r."IsEditable", r."IsSystem", r."ModifiedAtUtc", r."ModifiedBy", r."Name", r."RowVersion"
+              FROM "Roles" AS r
+              WHERE NOT (r."IsDeleted")
+          ) AS r0 ON u0."RoleId" = r0."Id"
+          LEFT JOIN (
+              SELECT r1."RoleId", r1."PermissionId", p0."Id", p0."CreatedAtUtc", p0."CreatedBy", p0."Description", p0."Group", p0."IsDeleted", p0."Key", p0."ModifiedAtUtc", p0."ModifiedBy", p0."RowVersion"
+              FROM "RolePermissions" AS r1
+              INNER JOIN (
+                  SELECT p."Id", p."CreatedAtUtc", p."CreatedBy", p."Description", p."Group", p."IsDeleted", p."Key", p."ModifiedAtUtc", p."ModifiedBy", p."RowVersion"
+                  FROM "Permissions" AS p
+                  WHERE NOT (p."IsDeleted")
+              ) AS p0 ON r1."PermissionId" = p0."Id"
+          ) AS s ON r0."Id" = s."RoleId"
+      ) AS s0 ON u2."Id" = s0."UserId"
+      LEFT JOIN (
+          SELECT u1."UserId", u1."BranchId", b0."Id", b0."Code", b0."CreatedAtUtc", b0."CreatedBy", b0."IsActive", b0."IsDeleted", b0."ModifiedAtUtc", b0."ModifiedBy", b0."Name", b0."RowVersion", b0."TimeZone"
+          FROM "UserBranchScopes" AS u1
+          INNER JOIN (
+              SELECT b."Id", b."Code", b."CreatedAtUtc", b."CreatedBy", b."IsActive", b."IsDeleted", b."ModifiedAtUtc", b."ModifiedBy", b."Name", b."RowVersion", b."TimeZone"
+              FROM "Branches" AS b
+              WHERE NOT (b."IsDeleted")
+          ) AS b0 ON u1."BranchId" = b0."Id"
+      ) AS s1 ON u2."Id" = s1."UserId"
+      ORDER BY u2."Id", s0."UserId", s0."RoleId", s0."Id", s0."RoleId0", s0."PermissionId", s0."Id0", s1."UserId", s1."BranchId"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (15ms) [Parameters=[@__request_Username_0='systemadmin'], CommandType='Text', CommandTimeout='30']
+      SELECT u2."Id", u2."CreatedAtUtc", u2."CreatedBy", u2."Email", u2."EmailConfirmationToken", u2."EmailConfirmed", u2."FailedLoginAttempts", u2."IsActive", u2."IsDeleted", u2."LastFailedLoginAtUtc", u2."LockoutEndUtc", u2."ModifiedAtUtc", u2."ModifiedBy", u2."MustChangePassword", u2."PasswordChangedAtUtc", u2."PasswordHash", u2."PasswordResetToken", u2."PasswordResetTokenExpiresAtUtc", u2."PasswordSalt", u2."Phone", u2."PreferredLanguage", u2."RowVersion", u2."TwoFactorEnabled", u2."TwoFactorSecretKey", u2."Username", s0."UserId", s0."RoleId", s0."Id", s0."CreatedAtUtc", s0."CreatedBy", s0."IsDeletable", s0."IsDeleted", s0."IsEditable", s0."IsSystem", s0."ModifiedAtUtc", s0."ModifiedBy", s0."Name", s0."RowVersion", s0."RoleId0", s0."PermissionId", s0."Id0", s0."CreatedAtUtc0", s0."CreatedBy0", s0."Description", s0."Group", s0."IsDeleted0", s0."Key", s0."ModifiedAtUtc0", s0."ModifiedBy0", s0."RowVersion0", s1."UserId", s1."BranchId", s1."Id", s1."Code", s1."CreatedAtUtc", s1."CreatedBy", s1."IsActive", s1."IsDeleted", s1."ModifiedAtUtc", s1."ModifiedBy", s1."Name", s1."RowVersion", s1."TimeZone"
+      FROM (
+          SELECT u."Id", u."CreatedAtUtc", u."CreatedBy", u."Email", u."EmailConfirmationToken", u."EmailConfirmed", u."FailedLoginAttempts", u."IsActive", u."IsDeleted", u."LastFailedLoginAtUtc", u."LockoutEndUtc", u."ModifiedAtUtc", u."ModifiedBy", u."MustChangePassword", u."PasswordChangedAtUtc", u."PasswordHash", u."PasswordResetToken", u."PasswordResetTokenExpiresAtUtc", u."PasswordSalt", u."Phone", u."PreferredLanguage", u."RowVersion", u."TwoFactorEnabled", u."TwoFactorSecretKey", u."Username"
+          FROM "Users" AS u
+          WHERE NOT (u."IsDeleted") AND u."Username" = @__request_Username_0
+          LIMIT 1
+      ) AS u2
+      LEFT JOIN (
+          SELECT u0."UserId", u0."RoleId", r0."Id", r0."CreatedAtUtc", r0."CreatedBy", r0."IsDeletable", r0."IsDeleted", r0."IsEditable", r0."IsSystem", r0."ModifiedAtUtc", r0."ModifiedBy", r0."Name", r0."RowVersion", s."RoleId" AS "RoleId0", s."PermissionId", s."Id" AS "Id0", s."CreatedAtUtc" AS "CreatedAtUtc0", s."CreatedBy" AS "CreatedBy0", s."Description", s."Group", s."IsDeleted" AS "IsDeleted0", s."Key", s."ModifiedAtUtc" AS "ModifiedAtUtc0", s."ModifiedBy" AS "ModifiedBy0", s."RowVersion" AS "RowVersion0"
+          FROM "UserRoles" AS u0
+          INNER JOIN (
+              SELECT r."Id", r."CreatedAtUtc", r."CreatedBy", r."IsDeletable", r."IsDeleted", r."IsEditable", r."IsSystem", r."ModifiedAtUtc", r."ModifiedBy", r."Name", r."RowVersion"
+              FROM "Roles" AS r
+              WHERE NOT (r."IsDeleted")
+          ) AS r0 ON u0."RoleId" = r0."Id"
+          LEFT JOIN (
+              SELECT r1."RoleId", r1."PermissionId", p0."Id", p0."CreatedAtUtc", p0."CreatedBy", p0."Description", p0."Group", p0."IsDeleted", p0."Key", p0."ModifiedAtUtc", p0."ModifiedBy", p0."RowVersion"
+              FROM "RolePermissions" AS r1
+              INNER JOIN (
+                  SELECT p."Id", p."CreatedAtUtc", p."CreatedBy", p."Description", p."Group", p."IsDeleted", p."Key", p."ModifiedAtUtc", p."ModifiedBy", p."RowVersion"
+                  FROM "Permissions" AS p
+                  WHERE NOT (p."IsDeleted")
+              ) AS p0 ON r1."PermissionId" = p0."Id"
+          ) AS s ON r0."Id" = s."RoleId"
+      ) AS s0 ON u2."Id" = s0."UserId"
+      LEFT JOIN (
+          SELECT u1."UserId", u1."BranchId", b0."Id", b0."Code", b0."CreatedAtUtc", b0."CreatedBy", b0."IsActive", b0."IsDeleted", b0."ModifiedAtUtc", b0."ModifiedBy", b0."Name", b0."RowVersion", b0."TimeZone"
+          FROM "UserBranchScopes" AS u1
+          INNER JOIN (
+              SELECT b."Id", b."Code", b."CreatedAtUtc", b."CreatedBy", b."IsActive", b."IsDeleted", b."ModifiedAtUtc", b."ModifiedBy", b."Name", b."RowVersion", b."TimeZone"
+              FROM "Branches" AS b
+              WHERE NOT (b."IsDeleted")
+          ) AS b0 ON u1."BranchId" = b0."Id"
+      ) AS s1 ON u2."Id" = s1."UserId"
+      ORDER BY u2."Id", s0."UserId", s0."RoleId", s0."Id", s0."RoleId0", s0."PermissionId", s0."Id0", s1."UserId", s1."BranchId"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@__userId_0='1'], CommandType='Text', CommandTimeout='30']
+      SELECT u."Id", u."Browser", u."CreatedAtUtc", u."CreatedBy", u."DeviceFingerprint", u."DeviceName", u."ExpiresAtUtc", u."IpAddress", u."IsActive", u."IsCurrentSession", u."IsDeleted", u."LastAccessedAtUtc", u."Location", u."ModifiedAtUtc", u."ModifiedBy", u."Platform", u."RowVersion", u."SessionId", u."UserAgent", u."UserId"
+      FROM "UserSessions" AS u
+      WHERE u."UserId" = @__userId_0 AND u."IsActive"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (24ms) [Parameters=[@p0='1', @p1='1' (Nullable = true), @p2='2025-12-20T16:39:32.1683875Z' (DbType = DateTime), @p3='systemadmin' (Nullable = false), @p4='1' (Nullable = false), @p5='User' (Nullable = false), @p6=NULL, @p7='False', @p8=NULL (DbType = DateTime), @p9=NULL, @p10=NULL, @p11=NULL, @p12='2025-12-20T16:39:31.9986775Z' (DbType = DateTime), @p13='2025-12-20T16:39:32.1683846Z' (DbType = DateTime), @p14='System' (Nullable = false), @p15=NULL, @p16='127.0.0.1' (Nullable = false), @p17='False', @p18='True', @p19=NULL (DbType = DateTime), @p20=NULL, @p21='0x' (Nullable = false), @p22=NULL, @p23='1' (Nullable = true), @p24='systemadmin' (Nullable = false), @p25='2025-12-20T16:39:32.1683800Z' (DbType = DateTime), @p26='systemadmin' (Nullable = false), @p27=NULL, @p28='2026-01-03T16:39:31.8281861Z' (DbType = DateTime), @p29='False', @p30=NULL (DbType = DateTime), @p31=NULL, @p32=NULL (DbType = DateTime), @p33='BgUQOInpCVBRSHnh5XTsAu0YaN6Igl10VsudiWRBS0vrIAfqRXOnfglhtamRswp+nJFoo//W7lgu2hgtfsnh4A==' (Nullable = false), @p34='1', @p37='2', @p35='False', @p36='2025-12-20T16:39:32.1683905Z' (Nullable = true) (DbType = DateTime), @p38='Unknown' (Nullable = false), @p39='2025-12-20T16:39:32.1683833Z' (DbType = DateTime), @p40='System' (Nullable = false), @p41='RRQxx9Wobqae495nvQfYmG1DvjmBy6ni05VIjxK1qDk=' (Nullable = false), @p42='Unknown on Unknown' (Nullable = false), @p43='2026-01-19T16:39:31.9094943Z' (DbType = DateTime), @p44='127.0.0.1' (Nullable = false), @p45='True', @p46='True', @p47='False', @p48='2025-12-20T16:39:31.9094943Z' (DbType = DateTime), @p49='Local' (Nullable = false), @p50=NULL (DbType = DateTime), @p51=NULL, @p52='Unknown' (Nullable = false), @p53='0x' (Nullable = false), @p54='4607271964684373b1a3008b5005e1e3' (Nullable = false), @p55='Unknown' (Nullable = false), @p56='1'], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "AuditLogs" ("Action", "ActorUserId", "CreatedAtUtc", "CreatedBy", "EntityId", "EntityName", "IpAddress", "IsDeleted", "ModifiedAtUtc", "ModifiedBy", "PayloadJson", "UserAgent")
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11)
+      RETURNING "Id", "RowVersion";
+      INSERT INTO "LoginAttempts" ("AttemptedAtUtc", "CreatedAtUtc", "CreatedBy", "FailureReason", "IpAddress", "IsDeleted", "IsSuccessful", "ModifiedAtUtc", "ModifiedBy", "RowVersion", "UserAgent", "UserId", "Username")
+      VALUES (@p12, @p13, @p14, @p15, @p16, @p17, @p18, @p19, @p20, @p21, @p22, @p23, @p24)
+      RETURNING "Id";
+      INSERT INTO "RefreshTokens" ("CreatedAtUtc", "CreatedBy", "DeviceInfo", "ExpiresAtUtc", "IsDeleted", "ModifiedAtUtc", "ModifiedBy", "RevokedAtUtc", "Token", "UserId")
+      VALUES (@p25, @p26, @p27, @p28, @p29, @p30, @p31, @p32, @p33, @p34)
+      RETURNING "Id", "RowVersion";
+      UPDATE "UserSessions" SET "IsCurrentSession" = @p35, "ModifiedAtUtc" = @p36
+      WHERE "Id" = @p37;
+      INSERT INTO "UserSessions" ("Browser", "CreatedAtUtc", "CreatedBy", "DeviceFingerprint", "DeviceName", "ExpiresAtUtc", "IpAddress", "IsActive", "IsCurrentSession", "IsDeleted", "LastAccessedAtUtc", "Location", "ModifiedAtUtc", "ModifiedBy", "Platform", "RowVersion", "SessionId", "UserAgent", "UserId")
+      VALUES (@p38, @p39, @p40, @p41, @p42, @p43, @p44, @p45, @p46, @p47, @p48, @p49, @p50, @p51, @p52, @p53, @p54, @p55, @p56)
+      RETURNING "Id";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (5ms) [Parameters=[@p0='200', @p1=NULL (DbType = Int64), @p2='2025-12-20T16:39:32.4277944Z' (DbType = DateTime), @p3='Anonymous' (Nullable = false), @p4='0' (Nullable = false), @p5='Auth' (Nullable = false), @p6='Unknown', @p7='False', @p8=NULL (DbType = DateTime), @p9=NULL, @p10='{"request":{"Username":"systemadmin","Password":"TempP@ssw0rd123!","DeviceInfo":null,"RememberMe":true}}', @p11='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0'], CommandType='Text', CommandTimeout='30']
+      INSERT INTO "AuditLogs" ("Action", "ActorUserId", "CreatedAtUtc", "CreatedBy", "EntityId", "EntityName", "IpAddress", "IsDeleted", "ModifiedAtUtc", "ModifiedBy", "PayloadJson", "UserAgent")
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10, @p11)
+      RETURNING "Id", "RowVersion";
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (9ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT b."Id", b."Name", (
+          SELECT count(*)::int
+          FROM "Departments" AS d
+          INNER JOIN (
+              SELECT e."DepartmentId1"
+              FROM "Employees" AS e
+              WHERE NOT (e."IsDeleted")
+          ) AS e0 ON d."Id" = e0."DepartmentId1"
+          WHERE NOT (d."IsDeleted") AND b."Id" = d."BranchId") AS "EmployeeCount", (
+          SELECT count(*)::int
+          FROM "Departments" AS d0
+          INNER JOIN (
+              SELECT e1."DepartmentId1", e1."IsDeleted"
+              FROM "Employees" AS e1
+              WHERE NOT (e1."IsDeleted")
+          ) AS e2 ON d0."Id" = e2."DepartmentId1"
+          WHERE NOT (d0."IsDeleted") AND b."Id" = d0."BranchId" AND NOT (e2."IsDeleted")) AS "ActiveEmployees", b."IsActive"
+      FROM "Branches" AS b
+      WHERE NOT (b."IsDeleted")
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (10ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT d."Id", d."Name", b0."Name" AS "BranchName", (
+          SELECT count(*)::int
+          FROM "Employees" AS e
+          WHERE NOT (e."IsDeleted") AND d."Id" = e."DepartmentId1") AS "EmployeeCount", (
+          SELECT count(*)::int
+          FROM "Employees" AS e0
+          WHERE NOT (e0."IsDeleted") AND d."Id" = e0."DepartmentId1" AND NOT (e0."IsDeleted")) AS "ActiveEmployees", d."IsActive"
+      FROM "Departments" AS d
+      INNER JOIN (
+          SELECT b."Id", b."Name"
+          FROM "Branches" AS b
+          WHERE NOT (b."IsDeleted")
+      ) AS b0 ON d."BranchId" = b0."Id"
+      WHERE NOT (d."IsDeleted")
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT count(*)::int
+      FROM "Employees" AS e
+      WHERE NOT (e."IsDeleted")
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT count(*)::int
+      FROM "Employees" AS e
+      WHERE NOT (e."IsDeleted")
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT count(*)::int
+      FROM "Users" AS u
+      WHERE NOT (u."IsDeleted")
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT count(*)::int
+      FROM "Users" AS u
+      WHERE NOT (u."IsDeleted") AND u."IsActive"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (11ms) [Parameters=[@__p_0='1'], CommandType='Text', CommandTimeout='30']
+      SELECT r0."Name" AS "RoleName", count(*)::int AS "UserCount", (count(*)::int::double precision / @__p_0) * 100.0 AS "Percentage"
+      FROM "Users" AS u
+      INNER JOIN "UserRoles" AS u0 ON u."Id" = u0."UserId"
+      INNER JOIN (
+          SELECT r."Id", r."Name"
+          FROM "Roles" AS r
+          WHERE NOT (r."IsDeleted")
+      ) AS r0 ON u0."RoleId" = r0."Id"
+      WHERE NOT (u."IsDeleted") AND u."IsActive"
+      GROUP BY r0."Name"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT e0."Key" AS "Status", count(*)::int AS "Count", 0.0 AS "Percentage"
+      FROM (
+          SELECT CASE e."EmploymentStatus"
+              WHEN 1 THEN 'Active'
+              WHEN 2 THEN 'FullTime'
+              WHEN 3 THEN 'PartTime'
+              WHEN 4 THEN 'Contract'
+              WHEN 5 THEN 'Intern'
+              WHEN 6 THEN 'Consultant'
+              WHEN 7 THEN 'Terminated'
+              WHEN 8 THEN 'Inactive'
+              ELSE e."EmploymentStatus"::text
+          END AS "Key"
+          FROM "Employees" AS e
+          WHERE NOT (e."IsDeleted")
+      ) AS e0
+      GROUP BY e0."Key"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (14ms) [Parameters=[@__startDate_Date_0='2025-12-20T00:00:00.0000000Z' (DbType = Date), @__endDate_Date_1='2025-12-20T00:00:00.0000000Z' (DbType = Date)], CommandType='Text', CommandTimeout='30']
+      SELECT a."Id", a."ActualCheckInTime", a."ActualCheckOutTime", a."ApprovedAtUtc", a."ApprovedByUserId", a."AttendanceDate", a."BreakHours", a."CreatedAtUtc", a."CreatedBy", a."EarlyLeaveMinutes", a."EmployeeId", a."IsApproved", a."IsDeleted", a."IsFinalized", a."IsManualOverride", a."LateMinutes", a."ModifiedAtUtc", a."ModifiedBy", a."Notes", a."OverrideAtUtc", a."OverrideByUserId", a."OverrideNotes", a."OvertimeAmount", a."OvertimeCalculationNotes", a."OvertimeConfigurationId", a."OvertimeDayType", a."OvertimeHours", a."OvertimeRate", a."PostShiftOvertimeHours", a."PreShiftOvertimeHours", a."RemoteWorkRequestId", a."RowVersion", a."ScheduledEndTime", a."ScheduledHours", a."ScheduledStartTime", a."ShiftAssignmentId", a."Status", a."WorkLocation", a."WorkingHours", e0."Id", e0."BranchId", e0."CreatedAtUtc", e0."CreatedBy", e0."DateOfBirth", e0."DepartmentId", e0."DepartmentId1", e0."Email", e0."EmployeeNumber", e0."EmploymentStatus", e0."FirstName", e0."FirstNameAr", e0."Gender", e0."HireDate", e0."IsActive", e0."IsDeleted", e0."JobTitle", e0."JobTitleAr", e0."LastName", e0."LastNameAr", e0."ManagerEmployeeId", e0."ModifiedAtUtc", e0."ModifiedBy", e0."NationalId", e0."Phone", e0."PhotoUrl", e0."RowVersion", e0."WorkLocationType"
+      FROM "AttendanceRecords" AS a
+      INNER JOIN (
+          SELECT e."Id", e."BranchId", e."CreatedAtUtc", e."CreatedBy", e."DateOfBirth", e."DepartmentId", e."DepartmentId1", e."Email", e."EmployeeNumber", e."EmploymentStatus", e."FirstName", e."FirstNameAr", e."Gender", e."HireDate", e."IsActive", e."IsDeleted", e."JobTitle", e."JobTitleAr", e."LastName", e."LastNameAr", e."ManagerEmployeeId", e."ModifiedAtUtc", e."ModifiedBy", e."NationalId", e."Phone", e."PhotoUrl", e."RowVersion", e."WorkLocationType"
+          FROM "Employees" AS e
+          WHERE NOT (e."IsDeleted")
+      ) AS e0 ON a."EmployeeId" = e0."Id"
+      WHERE date_trunc('day', a."AttendanceDate") >= @__startDate_Date_0 AND date_trunc('day', a."AttendanceDate") <= @__endDate_Date_1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (9ms) [Parameters=[@__startDate_Date_0='2025-12-13T00:00:00.0000000Z' (DbType = Date), @__endDate_Date_1='2025-12-13T00:00:00.0000000Z' (DbType = Date)], CommandType='Text', CommandTimeout='30']
+      SELECT a."Id", a."ActualCheckInTime", a."ActualCheckOutTime", a."ApprovedAtUtc", a."ApprovedByUserId", a."AttendanceDate", a."BreakHours", a."CreatedAtUtc", a."CreatedBy", a."EarlyLeaveMinutes", a."EmployeeId", a."IsApproved", a."IsDeleted", a."IsFinalized", a."IsManualOverride", a."LateMinutes", a."ModifiedAtUtc", a."ModifiedBy", a."Notes", a."OverrideAtUtc", a."OverrideByUserId", a."OverrideNotes", a."OvertimeAmount", a."OvertimeCalculationNotes", a."OvertimeConfigurationId", a."OvertimeDayType", a."OvertimeHours", a."OvertimeRate", a."PostShiftOvertimeHours", a."PreShiftOvertimeHours", a."RemoteWorkRequestId", a."RowVersion", a."ScheduledEndTime", a."ScheduledHours", a."ScheduledStartTime", a."ShiftAssignmentId", a."Status", a."WorkLocation", a."WorkingHours", e0."Id", e0."BranchId", e0."CreatedAtUtc", e0."CreatedBy", e0."DateOfBirth", e0."DepartmentId", e0."DepartmentId1", e0."Email", e0."EmployeeNumber", e0."EmploymentStatus", e0."FirstName", e0."FirstNameAr", e0."Gender", e0."HireDate", e0."IsActive", e0."IsDeleted", e0."JobTitle", e0."JobTitleAr", e0."LastName", e0."LastNameAr", e0."ManagerEmployeeId", e0."ModifiedAtUtc", e0."ModifiedBy", e0."NationalId", e0."Phone", e0."PhotoUrl", e0."RowVersion", e0."WorkLocationType"
+      FROM "AttendanceRecords" AS a
+      INNER JOIN (
+          SELECT e."Id", e."BranchId", e."CreatedAtUtc", e."CreatedBy", e."DateOfBirth", e."DepartmentId", e."DepartmentId1", e."Email", e."EmployeeNumber", e."EmploymentStatus", e."FirstName", e."FirstNameAr", e."Gender", e."HireDate", e."IsActive", e."IsDeleted", e."JobTitle", e."JobTitleAr", e."LastName", e."LastNameAr", e."ManagerEmployeeId", e."ModifiedAtUtc", e."ModifiedBy", e."NationalId", e."Phone", e."PhotoUrl", e."RowVersion", e."WorkLocationType"
+          FROM "Employees" AS e
+          WHERE NOT (e."IsDeleted")
+      ) AS e0 ON a."EmployeeId" = e0."Id"
+      WHERE date_trunc('day', a."AttendanceDate") >= @__startDate_Date_0 AND date_trunc('day', a."AttendanceDate") <= @__endDate_Date_1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (6ms) [Parameters=[@__startDate_Date_0='2025-12-14T00:00:00.0000000Z' (DbType = Date), @__endDate_Date_1='2025-12-14T00:00:00.0000000Z' (DbType = Date)], CommandType='Text', CommandTimeout='30']
+      SELECT a."Id", a."ActualCheckInTime", a."ActualCheckOutTime", a."ApprovedAtUtc", a."ApprovedByUserId", a."AttendanceDate", a."BreakHours", a."CreatedAtUtc", a."CreatedBy", a."EarlyLeaveMinutes", a."EmployeeId", a."IsApproved", a."IsDeleted", a."IsFinalized", a."IsManualOverride", a."LateMinutes", a."ModifiedAtUtc", a."ModifiedBy", a."Notes", a."OverrideAtUtc", a."OverrideByUserId", a."OverrideNotes", a."OvertimeAmount", a."OvertimeCalculationNotes", a."OvertimeConfigurationId", a."OvertimeDayType", a."OvertimeHours", a."OvertimeRate", a."PostShiftOvertimeHours", a."PreShiftOvertimeHours", a."RemoteWorkRequestId", a."RowVersion", a."ScheduledEndTime", a."ScheduledHours", a."ScheduledStartTime", a."ShiftAssignmentId", a."Status", a."WorkLocation", a."WorkingHours", e0."Id", e0."BranchId", e0."CreatedAtUtc", e0."CreatedBy", e0."DateOfBirth", e0."DepartmentId", e0."DepartmentId1", e0."Email", e0."EmployeeNumber", e0."EmploymentStatus", e0."FirstName", e0."FirstNameAr", e0."Gender", e0."HireDate", e0."IsActive", e0."IsDeleted", e0."JobTitle", e0."JobTitleAr", e0."LastName", e0."LastNameAr", e0."ManagerEmployeeId", e0."ModifiedAtUtc", e0."ModifiedBy", e0."NationalId", e0."Phone", e0."PhotoUrl", e0."RowVersion", e0."WorkLocationType"
+      FROM "AttendanceRecords" AS a
+      INNER JOIN (
+          SELECT e."Id", e."BranchId", e."CreatedAtUtc", e."CreatedBy", e."DateOfBirth", e."DepartmentId", e."DepartmentId1", e."Email", e."EmployeeNumber", e."EmploymentStatus", e."FirstName", e."FirstNameAr", e."Gender", e."HireDate", e."IsActive", e."IsDeleted", e."JobTitle", e."JobTitleAr", e."LastName", e."LastNameAr", e."ManagerEmployeeId", e."ModifiedAtUtc", e."ModifiedBy", e."NationalId", e."Phone", e."PhotoUrl", e."RowVersion", e."WorkLocationType"
+          FROM "Employees" AS e
+          WHERE NOT (e."IsDeleted")
+      ) AS e0 ON a."EmployeeId" = e0."Id"
+      WHERE date_trunc('day', a."AttendanceDate") >= @__startDate_Date_0 AND date_trunc('day', a."AttendanceDate") <= @__endDate_Date_1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (7ms) [Parameters=[@__startDate_Date_0='2025-12-15T00:00:00.0000000Z' (DbType = Date), @__endDate_Date_1='2025-12-15T00:00:00.0000000Z' (DbType = Date)], CommandType='Text', CommandTimeout='30']
+      SELECT a."Id", a."ActualCheckInTime", a."ActualCheckOutTime", a."ApprovedAtUtc", a."ApprovedByUserId", a."AttendanceDate", a."BreakHours", a."CreatedAtUtc", a."CreatedBy", a."EarlyLeaveMinutes", a."EmployeeId", a."IsApproved", a."IsDeleted", a."IsFinalized", a."IsManualOverride", a."LateMinutes", a."ModifiedAtUtc", a."ModifiedBy", a."Notes", a."OverrideAtUtc", a."OverrideByUserId", a."OverrideNotes", a."OvertimeAmount", a."OvertimeCalculationNotes", a."OvertimeConfigurationId", a."OvertimeDayType", a."OvertimeHours", a."OvertimeRate", a."PostShiftOvertimeHours", a."PreShiftOvertimeHours", a."RemoteWorkRequestId", a."RowVersion", a."ScheduledEndTime", a."ScheduledHours", a."ScheduledStartTime", a."ShiftAssignmentId", a."Status", a."WorkLocation", a."WorkingHours", e0."Id", e0."BranchId", e0."CreatedAtUtc", e0."CreatedBy", e0."DateOfBirth", e0."DepartmentId", e0."DepartmentId1", e0."Email", e0."EmployeeNumber", e0."EmploymentStatus", e0."FirstName", e0."FirstNameAr", e0."Gender", e0."HireDate", e0."IsActive", e0."IsDeleted", e0."JobTitle", e0."JobTitleAr", e0."LastName", e0."LastNameAr", e0."ManagerEmployeeId", e0."ModifiedAtUtc", e0."ModifiedBy", e0."NationalId", e0."Phone", e0."PhotoUrl", e0."RowVersion", e0."WorkLocationType"
+      FROM "AttendanceRecords" AS a
+      INNER JOIN (
+          SELECT e."Id", e."BranchId", e."CreatedAtUtc", e."CreatedBy", e."DateOfBirth", e."DepartmentId", e."DepartmentId1", e."Email", e."EmployeeNumber", e."EmploymentStatus", e."FirstName", e."FirstNameAr", e."Gender", e."HireDate", e."IsActive", e."IsDeleted", e."JobTitle", e."JobTitleAr", e."LastName", e."LastNameAr", e."ManagerEmployeeId", e."ModifiedAtUtc", e."ModifiedBy", e."NationalId", e."Phone", e."PhotoUrl", e."RowVersion", e."WorkLocationType"
+          FROM "Employees" AS e
+          WHERE NOT (e."IsDeleted")
+      ) AS e0 ON a."EmployeeId" = e0."Id"
+      WHERE date_trunc('day', a."AttendanceDate") >= @__startDate_Date_0 AND date_trunc('day', a."AttendanceDate") <= @__endDate_Date_1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (7ms) [Parameters=[@__startDate_Date_0='2025-12-16T00:00:00.0000000Z' (DbType = Date), @__endDate_Date_1='2025-12-16T00:00:00.0000000Z' (DbType = Date)], CommandType='Text', CommandTimeout='30']
+      SELECT a."Id", a."ActualCheckInTime", a."ActualCheckOutTime", a."ApprovedAtUtc", a."ApprovedByUserId", a."AttendanceDate", a."BreakHours", a."CreatedAtUtc", a."CreatedBy", a."EarlyLeaveMinutes", a."EmployeeId", a."IsApproved", a."IsDeleted", a."IsFinalized", a."IsManualOverride", a."LateMinutes", a."ModifiedAtUtc", a."ModifiedBy", a."Notes", a."OverrideAtUtc", a."OverrideByUserId", a."OverrideNotes", a."OvertimeAmount", a."OvertimeCalculationNotes", a."OvertimeConfigurationId", a."OvertimeDayType", a."OvertimeHours", a."OvertimeRate", a."PostShiftOvertimeHours", a."PreShiftOvertimeHours", a."RemoteWorkRequestId", a."RowVersion", a."ScheduledEndTime", a."ScheduledHours", a."ScheduledStartTime", a."ShiftAssignmentId", a."Status", a."WorkLocation", a."WorkingHours", e0."Id", e0."BranchId", e0."CreatedAtUtc", e0."CreatedBy", e0."DateOfBirth", e0."DepartmentId", e0."DepartmentId1", e0."Email", e0."EmployeeNumber", e0."EmploymentStatus", e0."FirstName", e0."FirstNameAr", e0."Gender", e0."HireDate", e0."IsActive", e0."IsDeleted", e0."JobTitle", e0."JobTitleAr", e0."LastName", e0."LastNameAr", e0."ManagerEmployeeId", e0."ModifiedAtUtc", e0."ModifiedBy", e0."NationalId", e0."Phone", e0."PhotoUrl", e0."RowVersion", e0."WorkLocationType"
+      FROM "AttendanceRecords" AS a
+      INNER JOIN (
+          SELECT e."Id", e."BranchId", e."CreatedAtUtc", e."CreatedBy", e."DateOfBirth", e."DepartmentId", e."DepartmentId1", e."Email", e."EmployeeNumber", e."EmploymentStatus", e."FirstName", e."FirstNameAr", e."Gender", e."HireDate", e."IsActive", e."IsDeleted", e."JobTitle", e."JobTitleAr", e."LastName", e."LastNameAr", e."ManagerEmployeeId", e."ModifiedAtUtc", e."ModifiedBy", e."NationalId", e."Phone", e."PhotoUrl", e."RowVersion", e."WorkLocationType"
+          FROM "Employees" AS e
+          WHERE NOT (e."IsDeleted")
+      ) AS e0 ON a."EmployeeId" = e0."Id"
+      WHERE date_trunc('day', a."AttendanceDate") >= @__startDate_Date_0 AND date_trunc('day', a."AttendanceDate") <= @__endDate_Date_1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@__startDate_Date_0='2025-12-17T00:00:00.0000000Z' (DbType = Date), @__endDate_Date_1='2025-12-17T00:00:00.0000000Z' (DbType = Date)], CommandType='Text', CommandTimeout='30']
+      SELECT a."Id", a."ActualCheckInTime", a."ActualCheckOutTime", a."ApprovedAtUtc", a."ApprovedByUserId", a."AttendanceDate", a."BreakHours", a."CreatedAtUtc", a."CreatedBy", a."EarlyLeaveMinutes", a."EmployeeId", a."IsApproved", a."IsDeleted", a."IsFinalized", a."IsManualOverride", a."LateMinutes", a."ModifiedAtUtc", a."ModifiedBy", a."Notes", a."OverrideAtUtc", a."OverrideByUserId", a."OverrideNotes", a."OvertimeAmount", a."OvertimeCalculationNotes", a."OvertimeConfigurationId", a."OvertimeDayType", a."OvertimeHours", a."OvertimeRate", a."PostShiftOvertimeHours", a."PreShiftOvertimeHours", a."RemoteWorkRequestId", a."RowVersion", a."ScheduledEndTime", a."ScheduledHours", a."ScheduledStartTime", a."ShiftAssignmentId", a."Status", a."WorkLocation", a."WorkingHours", e0."Id", e0."BranchId", e0."CreatedAtUtc", e0."CreatedBy", e0."DateOfBirth", e0."DepartmentId", e0."DepartmentId1", e0."Email", e0."EmployeeNumber", e0."EmploymentStatus", e0."FirstName", e0."FirstNameAr", e0."Gender", e0."HireDate", e0."IsActive", e0."IsDeleted", e0."JobTitle", e0."JobTitleAr", e0."LastName", e0."LastNameAr", e0."ManagerEmployeeId", e0."ModifiedAtUtc", e0."ModifiedBy", e0."NationalId", e0."Phone", e0."PhotoUrl", e0."RowVersion", e0."WorkLocationType"
+      FROM "AttendanceRecords" AS a
+      INNER JOIN (
+          SELECT e."Id", e."BranchId", e."CreatedAtUtc", e."CreatedBy", e."DateOfBirth", e."DepartmentId", e."DepartmentId1", e."Email", e."EmployeeNumber", e."EmploymentStatus", e."FirstName", e."FirstNameAr", e."Gender", e."HireDate", e."IsActive", e."IsDeleted", e."JobTitle", e."JobTitleAr", e."LastName", e."LastNameAr", e."ManagerEmployeeId", e."ModifiedAtUtc", e."ModifiedBy", e."NationalId", e."Phone", e."PhotoUrl", e."RowVersion", e."WorkLocationType"
+          FROM "Employees" AS e
+          WHERE NOT (e."IsDeleted")
+      ) AS e0 ON a."EmployeeId" = e0."Id"
+      WHERE date_trunc('day', a."AttendanceDate") >= @__startDate_Date_0 AND date_trunc('day', a."AttendanceDate") <= @__endDate_Date_1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@__startDate_Date_0='2025-12-18T00:00:00.0000000Z' (DbType = Date), @__endDate_Date_1='2025-12-18T00:00:00.0000000Z' (DbType = Date)], CommandType='Text', CommandTimeout='30']
+      SELECT a."Id", a."ActualCheckInTime", a."ActualCheckOutTime", a."ApprovedAtUtc", a."ApprovedByUserId", a."AttendanceDate", a."BreakHours", a."CreatedAtUtc", a."CreatedBy", a."EarlyLeaveMinutes", a."EmployeeId", a."IsApproved", a."IsDeleted", a."IsFinalized", a."IsManualOverride", a."LateMinutes", a."ModifiedAtUtc", a."ModifiedBy", a."Notes", a."OverrideAtUtc", a."OverrideByUserId", a."OverrideNotes", a."OvertimeAmount", a."OvertimeCalculationNotes", a."OvertimeConfigurationId", a."OvertimeDayType", a."OvertimeHours", a."OvertimeRate", a."PostShiftOvertimeHours", a."PreShiftOvertimeHours", a."RemoteWorkRequestId", a."RowVersion", a."ScheduledEndTime", a."ScheduledHours", a."ScheduledStartTime", a."ShiftAssignmentId", a."Status", a."WorkLocation", a."WorkingHours", e0."Id", e0."BranchId", e0."CreatedAtUtc", e0."CreatedBy", e0."DateOfBirth", e0."DepartmentId", e0."DepartmentId1", e0."Email", e0."EmployeeNumber", e0."EmploymentStatus", e0."FirstName", e0."FirstNameAr", e0."Gender", e0."HireDate", e0."IsActive", e0."IsDeleted", e0."JobTitle", e0."JobTitleAr", e0."LastName", e0."LastNameAr", e0."ManagerEmployeeId", e0."ModifiedAtUtc", e0."ModifiedBy", e0."NationalId", e0."Phone", e0."PhotoUrl", e0."RowVersion", e0."WorkLocationType"
+      FROM "AttendanceRecords" AS a
+      INNER JOIN (
+          SELECT e."Id", e."BranchId", e."CreatedAtUtc", e."CreatedBy", e."DateOfBirth", e."DepartmentId", e."DepartmentId1", e."Email", e."EmployeeNumber", e."EmploymentStatus", e."FirstName", e."FirstNameAr", e."Gender", e."HireDate", e."IsActive", e."IsDeleted", e."JobTitle", e."JobTitleAr", e."LastName", e."LastNameAr", e."ManagerEmployeeId", e."ModifiedAtUtc", e."ModifiedBy", e."NationalId", e."Phone", e."PhotoUrl", e."RowVersion", e."WorkLocationType"
+          FROM "Employees" AS e
+          WHERE NOT (e."IsDeleted")
+      ) AS e0 ON a."EmployeeId" = e0."Id"
+      WHERE date_trunc('day', a."AttendanceDate") >= @__startDate_Date_0 AND date_trunc('day', a."AttendanceDate") <= @__endDate_Date_1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@__startDate_Date_0='2025-12-19T00:00:00.0000000Z' (DbType = Date), @__endDate_Date_1='2025-12-19T00:00:00.0000000Z' (DbType = Date)], CommandType='Text', CommandTimeout='30']
+      SELECT a."Id", a."ActualCheckInTime", a."ActualCheckOutTime", a."ApprovedAtUtc", a."ApprovedByUserId", a."AttendanceDate", a."BreakHours", a."CreatedAtUtc", a."CreatedBy", a."EarlyLeaveMinutes", a."EmployeeId", a."IsApproved", a."IsDeleted", a."IsFinalized", a."IsManualOverride", a."LateMinutes", a."ModifiedAtUtc", a."ModifiedBy", a."Notes", a."OverrideAtUtc", a."OverrideByUserId", a."OverrideNotes", a."OvertimeAmount", a."OvertimeCalculationNotes", a."OvertimeConfigurationId", a."OvertimeDayType", a."OvertimeHours", a."OvertimeRate", a."PostShiftOvertimeHours", a."PreShiftOvertimeHours", a."RemoteWorkRequestId", a."RowVersion", a."ScheduledEndTime", a."ScheduledHours", a."ScheduledStartTime", a."ShiftAssignmentId", a."Status", a."WorkLocation", a."WorkingHours", e0."Id", e0."BranchId", e0."CreatedAtUtc", e0."CreatedBy", e0."DateOfBirth", e0."DepartmentId", e0."DepartmentId1", e0."Email", e0."EmployeeNumber", e0."EmploymentStatus", e0."FirstName", e0."FirstNameAr", e0."Gender", e0."HireDate", e0."IsActive", e0."IsDeleted", e0."JobTitle", e0."JobTitleAr", e0."LastName", e0."LastNameAr", e0."ManagerEmployeeId", e0."ModifiedAtUtc", e0."ModifiedBy", e0."NationalId", e0."Phone", e0."PhotoUrl", e0."RowVersion", e0."WorkLocationType"
+      FROM "AttendanceRecords" AS a
+      INNER JOIN (
+          SELECT e."Id", e."BranchId", e."CreatedAtUtc", e."CreatedBy", e."DateOfBirth", e."DepartmentId", e."DepartmentId1", e."Email", e."EmployeeNumber", e."EmploymentStatus", e."FirstName", e."FirstNameAr", e."Gender", e."HireDate", e."IsActive", e."IsDeleted", e."JobTitle", e."JobTitleAr", e."LastName", e."LastNameAr", e."ManagerEmployeeId", e."ModifiedAtUtc", e."ModifiedBy", e."NationalId", e."Phone", e."PhotoUrl", e."RowVersion", e."WorkLocationType"
+          FROM "Employees" AS e
+          WHERE NOT (e."IsDeleted")
+      ) AS e0 ON a."EmployeeId" = e0."Id"
+      WHERE date_trunc('day', a."AttendanceDate") >= @__startDate_Date_0 AND date_trunc('day', a."AttendanceDate") <= @__endDate_Date_1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@__startDate_Date_0='2025-12-20T00:00:00.0000000Z' (DbType = Date), @__endDate_Date_1='2025-12-20T00:00:00.0000000Z' (DbType = Date)], CommandType='Text', CommandTimeout='30']
+      SELECT a."Id", a."ActualCheckInTime", a."ActualCheckOutTime", a."ApprovedAtUtc", a."ApprovedByUserId", a."AttendanceDate", a."BreakHours", a."CreatedAtUtc", a."CreatedBy", a."EarlyLeaveMinutes", a."EmployeeId", a."IsApproved", a."IsDeleted", a."IsFinalized", a."IsManualOverride", a."LateMinutes", a."ModifiedAtUtc", a."ModifiedBy", a."Notes", a."OverrideAtUtc", a."OverrideByUserId", a."OverrideNotes", a."OvertimeAmount", a."OvertimeCalculationNotes", a."OvertimeConfigurationId", a."OvertimeDayType", a."OvertimeHours", a."OvertimeRate", a."PostShiftOvertimeHours", a."PreShiftOvertimeHours", a."RemoteWorkRequestId", a."RowVersion", a."ScheduledEndTime", a."ScheduledHours", a."ScheduledStartTime", a."ShiftAssignmentId", a."Status", a."WorkLocation", a."WorkingHours", e0."Id", e0."BranchId", e0."CreatedAtUtc", e0."CreatedBy", e0."DateOfBirth", e0."DepartmentId", e0."DepartmentId1", e0."Email", e0."EmployeeNumber", e0."EmploymentStatus", e0."FirstName", e0."FirstNameAr", e0."Gender", e0."HireDate", e0."IsActive", e0."IsDeleted", e0."JobTitle", e0."JobTitleAr", e0."LastName", e0."LastNameAr", e0."ManagerEmployeeId", e0."ModifiedAtUtc", e0."ModifiedBy", e0."NationalId", e0."Phone", e0."PhotoUrl", e0."RowVersion", e0."WorkLocationType"
+      FROM "AttendanceRecords" AS a
+      INNER JOIN (
+          SELECT e."Id", e."BranchId", e."CreatedAtUtc", e."CreatedBy", e."DateOfBirth", e."DepartmentId", e."DepartmentId1", e."Email", e."EmployeeNumber", e."EmploymentStatus", e."FirstName", e."FirstNameAr", e."Gender", e."HireDate", e."IsActive", e."IsDeleted", e."JobTitle", e."JobTitleAr", e."LastName", e."LastNameAr", e."ManagerEmployeeId", e."ModifiedAtUtc", e."ModifiedBy", e."NationalId", e."Phone", e."PhotoUrl", e."RowVersion", e."WorkLocationType"
+          FROM "Employees" AS e
+          WHERE NOT (e."IsDeleted")
+      ) AS e0 ON a."EmployeeId" = e0."Id"
+      WHERE date_trunc('day', a."AttendanceDate") >= @__startDate_Date_0 AND date_trunc('day', a."AttendanceDate") <= @__endDate_Date_1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (20ms) [Parameters=[@__maxDate_0='2025-12-20T00:00:00.0000000Z' (DbType = Date)], CommandType='Text', CommandTimeout='30']
+      SELECT a."Id", a."ActualCheckInTime", a."ActualCheckOutTime", a."ApprovedAtUtc", a."ApprovedByUserId", a."AttendanceDate", a."BreakHours", a."CreatedAtUtc", a."CreatedBy", a."EarlyLeaveMinutes", a."EmployeeId", a."IsApproved", a."IsDeleted", a."IsFinalized", a."IsManualOverride", a."LateMinutes", a."ModifiedAtUtc", a."ModifiedBy", a."Notes", a."OverrideAtUtc", a."OverrideByUserId", a."OverrideNotes", a."OvertimeAmount", a."OvertimeCalculationNotes", a."OvertimeConfigurationId", a."OvertimeDayType", a."OvertimeHours", a."OvertimeRate", a."PostShiftOvertimeHours", a."PreShiftOvertimeHours", a."RemoteWorkRequestId", a."RowVersion", a."ScheduledEndTime", a."ScheduledHours", a."ScheduledStartTime", a."ShiftAssignmentId", a."Status", a."WorkLocation", a."WorkingHours", e0."Id", e0."BranchId", e0."CreatedAtUtc", e0."CreatedBy", e0."DateOfBirth", e0."DepartmentId", e0."DepartmentId1", e0."Email", e0."EmployeeNumber", e0."EmploymentStatus", e0."FirstName", e0."FirstNameAr", e0."Gender", e0."HireDate", e0."IsActive", e0."IsDeleted", e0."JobTitle", e0."JobTitleAr", e0."LastName", e0."LastNameAr", e0."ManagerEmployeeId", e0."ModifiedAtUtc", e0."ModifiedBy", e0."NationalId", e0."Phone", e0."PhotoUrl", e0."RowVersion", e0."WorkLocationType", s0."Id", s0."AssignedByUserId", s0."AssignmentType", s0."BranchId", s0."CreatedAtUtc", s0."CreatedBy", s0."DepartmentId", s0."EffectiveFromDate", s0."EffectiveToDate", s0."EmployeeId", s0."IsDeleted", s0."ModifiedAtUtc", s0."ModifiedBy", s0."Notes", s0."Priority", s0."RowVersion", s0."ShiftId", s0."Status", s2."Id", s2."AllowFlexibleHours", s2."CoreEnd", s2."CoreStart", s2."CreatedAtUtc", s2."CreatedBy", s2."Description", s2."FlexMinutesAfter", s2."FlexMinutesBefore", s2."GracePeriodMinutes", s2."HasCoreHours", s2."IsAutoCheckOut", s2."RequiresCheckInOut", s2."IsDefault", s2."IsDeleted", s2."IsFriday", s2."IsMonday", s2."IsNightShift", s2."IsSaturday", s2."IsSunday", s2."IsThursday", s2."IsTuesday", s2."IsWednesday", s2."ModifiedAtUtc", s2."ModifiedBy", s2."Name", s2."RequiredHours", s2."RequiredWeeklyHours", s2."RowVersion", s2."ShiftType", s2."Status", a0."Id", a0."AttendanceDate", a0."AttendanceRecordId", a0."CreatedAtUtc", a0."CreatedBy", a0."DeviceId", a0."EmployeeId", a0."EnteredByUserId", a0."IpAddress", a0."IsDeleted", a0."IsManual", a0."IsVerified", a0."Location", a0."ModifiedAtUtc", a0."ModifiedBy", a0."Notes", a0."RowVersion", a0."TransactionTimeLocal", a0."TransactionTimeUtc", a0."TransactionType", a0."VerifiedAtUtc", a0."VerifiedByUserId"
+      FROM "AttendanceRecords" AS a
+      INNER JOIN (
+          SELECT e."Id", e."BranchId", e."CreatedAtUtc", e."CreatedBy", e."DateOfBirth", e."DepartmentId", e."DepartmentId1", e."Email", e."EmployeeNumber", e."EmploymentStatus", e."FirstName", e."FirstNameAr", e."Gender", e."HireDate", e."IsActive", e."IsDeleted", e."JobTitle", e."JobTitleAr", e."LastName", e."LastNameAr", e."ManagerEmployeeId", e."ModifiedAtUtc", e."ModifiedBy", e."NationalId", e."Phone", e."PhotoUrl", e."RowVersion", e."WorkLocationType"
+          FROM "Employees" AS e
+          WHERE NOT (e."IsDeleted")
+      ) AS e0 ON a."EmployeeId" = e0."Id"
+      LEFT JOIN (
+          SELECT s."Id", s."AssignedByUserId", s."AssignmentType", s."BranchId", s."CreatedAtUtc", s."CreatedBy", s."DepartmentId", s."EffectiveFromDate", s."EffectiveToDate", s."EmployeeId", s."IsDeleted", s."ModifiedAtUtc", s."ModifiedBy", s."Notes", s."Priority", s."RowVersion", s."ShiftId", s."Status"
+          FROM "ShiftAssignments" AS s
+          WHERE NOT (s."IsDeleted")
+      ) AS s0 ON a."ShiftAssignmentId" = s0."Id"
+      LEFT JOIN (
+          SELECT s1."Id", s1."AllowFlexibleHours", s1."CoreEnd", s1."CoreStart", s1."CreatedAtUtc", s1."CreatedBy", s1."Description", s1."FlexMinutesAfter", s1."FlexMinutesBefore", s1."GracePeriodMinutes", s1."HasCoreHours", s1."IsAutoCheckOut", s1."RequiresCheckInOut", s1."IsDefault", s1."IsDeleted", s1."IsFriday", s1."IsMonday", s1."IsNightShift", s1."IsSaturday", s1."IsSunday", s1."IsThursday", s1."IsTuesday", s1."IsWednesday", s1."ModifiedAtUtc", s1."ModifiedBy", s1."Name", s1."RequiredHours", s1."RequiredWeeklyHours", s1."RowVersion", s1."ShiftType", s1."Status"
+          FROM "Shifts" AS s1
+          WHERE NOT (s1."IsDeleted")
+      ) AS s2 ON s0."ShiftId" = s2."Id"
+      LEFT JOIN "AttendanceTransactions" AS a0 ON a."Id" = a0."AttendanceRecordId"
+      WHERE a."Status" = 8 AND date_trunc('day', a."AttendanceDate") <= @__maxDate_0
+      ORDER BY a."AttendanceDate", e0."EmployeeNumber", a."Id", e0."Id", s0."Id", s2."Id", a0."TransactionTimeUtc"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (8ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT count(*)::int
+      FROM "EmployeeVacations" AS e
+      WHERE NOT (e."IsDeleted") AND NOT (e."IsApproved") AND NOT (e."IsDeleted")
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (5ms) [Parameters=[@__today_0='2025-12-20T00:00:00.0000000Z' (DbType = DateTime)], CommandType='Text', CommandTimeout='30']
+      SELECT count(*)::int
+      FROM "EmployeeVacations" AS e
+      WHERE NOT (e."IsDeleted") AND e."IsApproved" AND date_trunc('day', e."CreatedAtUtc") = @__today_0
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (6ms) [Parameters=[@__today_0='2025-12-20T00:00:00.0000000Z' (DbType = DateTimeOffset)], CommandType='Text', CommandTimeout='30']
+      SELECT count(*)::int
+      FROM "EmployeeVacations" AS e
+      WHERE NOT (e."IsDeleted") AND e."IsApproved" AND e."StartDate" <= @__today_0 AND e."EndDate" >= @__today_0
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (10ms) [Parameters=[@__today_0='2025-12-20T00:00:00.0000000Z' (DbType = DateTimeOffset), @__AddDays_1='2026-01-19T00:00:00.0000000Z' (DbType = DateTimeOffset), @__p_2='10'], CommandType='Text', CommandTimeout='30']
+      SELECT e1."Id", e1."EmployeeId", e2."EmployeeNumber", e2."FirstName", e2."LastName", v0."Name", e1."StartDate", e1."EndDate", e1."TotalDays", CASE
+          WHEN e1."IsApproved" THEN 'Approved'
+          ELSE 'Pending'
+      END
+      FROM (
+          SELECT e."Id", e."EmployeeId", e."EndDate", e."IsApproved", e."StartDate", e."TotalDays", e."VacationTypeId"
+          FROM "EmployeeVacations" AS e
+          WHERE NOT (e."IsDeleted") AND e."IsApproved" AND e."StartDate" >= @__today_0 AND e."StartDate" <= @__AddDays_1
+          ORDER BY e."StartDate"
+          LIMIT @__p_2
+      ) AS e1
+      INNER JOIN (
+          SELECT e0."Id", e0."EmployeeNumber", e0."FirstName", e0."LastName"
+          FROM "Employees" AS e0
+          WHERE NOT (e0."IsDeleted")
+      ) AS e2 ON e1."EmployeeId" = e2."Id"
+      INNER JOIN (
+          SELECT v."Id", v."Name"
+          FROM "VacationTypes" AS v
+          WHERE NOT (v."IsDeleted")
+      ) AS v0 ON e1."VacationTypeId" = v0."Id"
+      ORDER BY e1."StartDate"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT v0."Name" AS "VacationType", count(*)::int AS "TotalRequests", count(*) FILTER (WHERE NOT (e."IsApproved"))::int AS "PendingRequests", count(*) FILTER (WHERE e."IsApproved")::int AS "ApprovedRequests", 0 AS "RejectedRequests"
+      FROM "EmployeeVacations" AS e
+      INNER JOIN (
+          SELECT v."Id", v."Name"
+          FROM "VacationTypes" AS v
+          WHERE NOT (v."IsDeleted")
+      ) AS v0 ON e."VacationTypeId" = v0."Id"
+      WHERE NOT (e."IsDeleted")
+      GROUP BY v0."Name"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT count(*)::int
+      FROM "Shifts" AS s
+      WHERE NOT (s."IsDeleted")
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT count(*)::int
+      FROM "ShiftAssignments" AS s
+      WHERE NOT (s."IsDeleted")
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT count(*)::int
+      FROM "ShiftAssignments" AS s
+      WHERE NOT (s."IsDeleted")
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT s."Id", s."Name", EXISTS (
+          SELECT 1
+          FROM "ShiftPeriods" AS s0
+          WHERE NOT (s0."IsDeleted") AND s."Id" = s0."ShiftId"), (
+          SELECT s1."StartTime"
+          FROM "ShiftPeriods" AS s1
+          WHERE NOT (s1."IsDeleted") AND s."Id" = s1."ShiftId"
+          LIMIT 1), (
+          SELECT s2."EndTime"
+          FROM "ShiftPeriods" AS s2
+          WHERE NOT (s2."IsDeleted") AND s."Id" = s2."ShiftId"
+          LIMIT 1), (
+          SELECT count(*)::int
+          FROM "ShiftAssignments" AS s3
+          WHERE NOT (s3."IsDeleted") AND s3."ShiftId" = s."Id" AND NOT (s3."IsDeleted"))
+      FROM "Shifts" AS s
+      WHERE NOT (s."IsDeleted")
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT count(*)::int
+      FROM "UserSessions" AS u
+      WHERE NOT (u."IsDeleted")
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@__today_0='2025-12-20T00:00:00.0000000Z' (DbType = DateTime)], CommandType='Text', CommandTimeout='30']
+      SELECT count(*)::int
+      FROM "UserSessions" AS u
+      WHERE date_trunc('day', u."CreatedAtUtc") = @__today_0
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (8ms) [Parameters=[@__p_0='10'], CommandType='Text', CommandTimeout='30']
+      SELECT a0."Id", a0."AttendanceDate", a0."AttendanceRecordId", a0."CreatedAtUtc", a0."CreatedBy", a0."DeviceId", a0."EmployeeId", a0."EnteredByUserId", a0."IpAddress", a0."IsDeleted", a0."IsManual", a0."IsVerified", a0."Location", a0."ModifiedAtUtc", a0."ModifiedBy", a0."Notes", a0."RowVersion", a0."TransactionTimeLocal", a0."TransactionTimeUtc", a0."TransactionType", a0."VerifiedAtUtc", a0."VerifiedByUserId", e0."Id", e0."BranchId", e0."CreatedAtUtc", e0."CreatedBy", e0."DateOfBirth", e0."DepartmentId", e0."DepartmentId1", e0."Email", e0."EmployeeNumber", e0."EmploymentStatus", e0."FirstName", e0."FirstNameAr", e0."Gender", e0."HireDate", e0."IsActive", e0."IsDeleted", e0."JobTitle", e0."JobTitleAr", e0."LastName", e0."LastNameAr", e0."ManagerEmployeeId", e0."ModifiedAtUtc", e0."ModifiedBy", e0."NationalId", e0."Phone", e0."PhotoUrl", e0."RowVersion", e0."WorkLocationType", u0."Id", u0."CreatedAtUtc", u0."CreatedBy", u0."Email", u0."EmailConfirmationToken", u0."EmailConfirmed", u0."FailedLoginAttempts", u0."IsActive", u0."IsDeleted", u0."LastFailedLoginAtUtc", u0."LockoutEndUtc", u0."ModifiedAtUtc", u0."ModifiedBy", u0."MustChangePassword", u0."PasswordChangedAtUtc", u0."PasswordHash", u0."PasswordResetToken", u0."PasswordResetTokenExpiresAtUtc", u0."PasswordSalt", u0."Phone", u0."PreferredLanguage", u0."RowVersion", u0."TwoFactorEnabled", u0."TwoFactorSecretKey", u0."Username"
+      FROM (
+          SELECT a."Id", a."AttendanceDate", a."AttendanceRecordId", a."CreatedAtUtc", a."CreatedBy", a."DeviceId", a."EmployeeId", a."EnteredByUserId", a."IpAddress", a."IsDeleted", a."IsManual", a."IsVerified", a."Location", a."ModifiedAtUtc", a."ModifiedBy", a."Notes", a."RowVersion", a."TransactionTimeLocal", a."TransactionTimeUtc", a."TransactionType", a."VerifiedAtUtc", a."VerifiedByUserId"
+          FROM "AttendanceTransactions" AS a
+          ORDER BY a."TransactionTimeUtc" DESC
+          LIMIT @__p_0
+      ) AS a0
+      INNER JOIN (
+          SELECT e."Id", e."BranchId", e."CreatedAtUtc", e."CreatedBy", e."DateOfBirth", e."DepartmentId", e."DepartmentId1", e."Email", e."EmployeeNumber", e."EmploymentStatus", e."FirstName", e."FirstNameAr", e."Gender", e."HireDate", e."IsActive", e."IsDeleted", e."JobTitle", e."JobTitleAr", e."LastName", e."LastNameAr", e."ManagerEmployeeId", e."ModifiedAtUtc", e."ModifiedBy", e."NationalId", e."Phone", e."PhotoUrl", e."RowVersion", e."WorkLocationType"
+          FROM "Employees" AS e
+          WHERE NOT (e."IsDeleted")
+      ) AS e0 ON a0."EmployeeId" = e0."Id"
+      LEFT JOIN (
+          SELECT u."Id", u."CreatedAtUtc", u."CreatedBy", u."Email", u."EmailConfirmationToken", u."EmailConfirmed", u."FailedLoginAttempts", u."IsActive", u."IsDeleted", u."LastFailedLoginAtUtc", u."LockoutEndUtc", u."ModifiedAtUtc", u."ModifiedBy", u."MustChangePassword", u."PasswordChangedAtUtc", u."PasswordHash", u."PasswordResetToken", u."PasswordResetTokenExpiresAtUtc", u."PasswordSalt", u."Phone", u."PreferredLanguage", u."RowVersion", u."TwoFactorEnabled", u."TwoFactorSecretKey", u."Username"
+          FROM "Users" AS u
+          WHERE NOT (u."IsDeleted")
+      ) AS u0 ON a0."EnteredByUserId" = u0."Id"
+      ORDER BY a0."TransactionTimeUtc" DESC

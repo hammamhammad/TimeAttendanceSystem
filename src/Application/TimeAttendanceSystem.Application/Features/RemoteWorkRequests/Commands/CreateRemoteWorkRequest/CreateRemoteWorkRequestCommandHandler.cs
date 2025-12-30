@@ -2,7 +2,9 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using TimeAttendanceSystem.Application.Abstractions;
 using TimeAttendanceSystem.Application.Common;
+using TimeAttendanceSystem.Application.Workflows.Services;
 using TimeAttendanceSystem.Domain.RemoteWork;
+using TimeAttendanceSystem.Domain.Workflows.Enums;
 using TimeAttendanceSystem.Shared.Common.Exceptions;
 
 namespace TimeAttendanceSystem.Application.Features.RemoteWorkRequests.Commands.CreateRemoteWorkRequest;
@@ -13,17 +15,39 @@ namespace TimeAttendanceSystem.Application.Features.RemoteWorkRequests.Commands.
 public class CreateRemoteWorkRequestCommandHandler : IRequestHandler<CreateRemoteWorkRequestCommand, Result<long>>
 {
     private readonly IApplicationDbContext _context;
+    private readonly IWorkflowEngine _workflowEngine;
+    private readonly ICurrentUser _currentUser;
 
-    public CreateRemoteWorkRequestCommandHandler(IApplicationDbContext context)
+    public CreateRemoteWorkRequestCommandHandler(
+        IApplicationDbContext context,
+        IWorkflowEngine workflowEngine,
+        ICurrentUser currentUser)
     {
         _context = context;
+        _workflowEngine = workflowEngine;
+        _currentUser = currentUser;
     }
 
     public async Task<Result<long>> Handle(CreateRemoteWorkRequestCommand request, CancellationToken cancellationToken)
     {
+        var currentUserId = _currentUser.UserId ?? 0;
+        var isOnBehalfOf = request.OnBehalfOfEmployeeId.HasValue;
+        var targetEmployeeId = request.EmployeeId;
+
+        // If submitting on behalf of another employee, validate manager chain
+        if (isOnBehalfOf)
+        {
+            var isInChain = await IsInManagementChainAsync(currentUserId, request.OnBehalfOfEmployeeId!.Value, cancellationToken);
+            if (!isInChain)
+            {
+                return Result.Failure<long>("You can only submit requests on behalf of employees in your management chain");
+            }
+            targetEmployeeId = request.OnBehalfOfEmployeeId.Value;
+        }
+
         // Validate employee exists and get employee data
         var employee = await _context.Employees
-            .FirstOrDefaultAsync(e => e.Id == request.EmployeeId, cancellationToken);
+            .FirstOrDefaultAsync(e => e.Id == targetEmployeeId, cancellationToken);
 
         if (employee == null)
             throw new NotFoundException("Employee not found");
@@ -69,7 +93,7 @@ public class CreateRemoteWorkRequestCommandHandler : IRequestHandler<CreateRemot
 
         // Check for overlapping requests
         var hasOverlap = await _context.RemoteWorkRequests
-            .AnyAsync(a => a.EmployeeId == request.EmployeeId &&
+            .AnyAsync(a => a.EmployeeId == targetEmployeeId &&
                           (a.Status == RemoteWorkRequestStatus.Approved ||
                            a.Status == RemoteWorkRequestStatus.Pending) &&
                           ((request.StartDate >= a.StartDate && request.StartDate <= a.EndDate) ||
@@ -81,31 +105,27 @@ public class CreateRemoteWorkRequestCommandHandler : IRequestHandler<CreateRemot
             return Result.Failure<long>("Remote work request overlaps with existing request");
 
         // Check quota limits
-        var quotaValidation = await ValidateQuotaLimits(request.EmployeeId, request.StartDate, request.EndDate, workingDays, policy, cancellationToken);
+        var quotaValidation = await ValidateQuotaLimits(targetEmployeeId, request.StartDate, request.EndDate, workingDays, policy, cancellationToken);
         if (!quotaValidation.IsSuccess)
             return Result.Failure<long>(quotaValidation.Error ?? "Quota validation failed");
 
-        // Create the request with the specified status (defaults to Approved for HR entry)
+        // Create the request - ALWAYS pending workflow approval
         var remoteWorkRequest = new RemoteWorkRequest
         {
-            EmployeeId = request.EmployeeId,
+            EmployeeId = targetEmployeeId,
             StartDate = request.StartDate,
             EndDate = request.EndDate,
-            Reason = request.Reason,
-            CreatedByUserId = request.CreatedByUserId,
+            Reason = isOnBehalfOf
+                ? $"{request.Reason}\n[Submitted on behalf by user ID: {currentUserId}]"
+                : request.Reason,
+            CreatedByUserId = currentUserId,
             RemoteWorkPolicyId = policyId,
             WorkingDaysCount = workingDays,
-            Status = request.Status,
+            Status = RemoteWorkRequestStatus.Pending, // Pending workflow approval
             ApprovalComments = request.ApprovalComments,
-            CreatedAtUtc = DateTime.UtcNow
+            CreatedAtUtc = DateTime.UtcNow,
+            SubmittedByUserId = currentUserId
         };
-
-        // Set approval fields if creating with Approved or Rejected status
-        if (request.Status == RemoteWorkRequestStatus.Approved || request.Status == RemoteWorkRequestStatus.Rejected)
-        {
-            remoteWorkRequest.ApprovedByUserId = request.CreatedByUserId;
-            remoteWorkRequest.ApprovedAt = DateTime.UtcNow;
-        }
 
         // Validate the request
         var (isValid, errors) = remoteWorkRequest.ValidateRequest();
@@ -115,7 +135,86 @@ public class CreateRemoteWorkRequestCommandHandler : IRequestHandler<CreateRemot
         _context.RemoteWorkRequests.Add(remoteWorkRequest);
         await _context.SaveChangesAsync(cancellationToken);
 
+        // Start workflow for approval
+        var contextData = new Dictionary<string, object>
+        {
+            { "workingDays", remoteWorkRequest.WorkingDaysCount },
+            { "startDate", remoteWorkRequest.StartDate.ToString("yyyy-MM-dd") },
+            { "endDate", remoteWorkRequest.EndDate.ToString("yyyy-MM-dd") },
+            { "reason", remoteWorkRequest.Reason ?? string.Empty }
+        };
+
+        var workflowResult = await _workflowEngine.StartWorkflowAsync(
+            WorkflowEntityType.RemoteWork,
+            remoteWorkRequest.Id,
+            currentUserId,
+            employee.BranchId,
+            contextData);
+
+        if (!workflowResult.IsSuccess)
+        {
+            // Workflow start failed - delete the request and return error
+            _context.RemoteWorkRequests.Remove(remoteWorkRequest);
+            await _context.SaveChangesAsync(cancellationToken);
+            return Result.Failure<long>($"Failed to start approval workflow: {workflowResult.Error}");
+        }
+
+        // Update request with workflow instance ID
+        remoteWorkRequest.WorkflowInstanceId = workflowResult.Value.Id;
+        await _context.SaveChangesAsync(cancellationToken);
+
+        // Auto-approve manager's step if submitted on behalf and manager is assigned to current step
+        if (isOnBehalfOf && workflowResult.Value.Id > 0)
+        {
+            var canApprove = await _workflowEngine.CanUserApproveAsync(workflowResult.Value.Id, currentUserId);
+            if (canApprove)
+            {
+                await _workflowEngine.ApproveAsync(
+                    workflowResult.Value.Id,
+                    currentUserId,
+                    "Auto-approved: Request submitted by manager on behalf of employee");
+            }
+        }
+
         return Result<long>.Success(remoteWorkRequest.Id);
+    }
+
+    /// <summary>
+    /// Checks if the current user is in the employee's management chain (recursive).
+    /// </summary>
+    /// <param name="userId">User ID of the potential manager</param>
+    /// <param name="employeeId">Employee ID to check</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>True if user is in the management chain</returns>
+    private async Task<bool> IsInManagementChainAsync(long userId, long employeeId, CancellationToken cancellationToken)
+    {
+        // Get the employee link for the current user
+        var userEmployeeLink = await _context.EmployeeUserLinks
+            .FirstOrDefaultAsync(eul => eul.UserId == userId, cancellationToken);
+
+        if (userEmployeeLink == null)
+            return false;
+
+        var managerEmployeeId = userEmployeeLink.EmployeeId;
+
+        // Get the target employee
+        var currentEmployee = await _context.Employees
+            .FirstOrDefaultAsync(e => e.Id == employeeId, cancellationToken);
+
+        // Traverse up the management chain
+        while (currentEmployee != null)
+        {
+            if (currentEmployee.ManagerEmployeeId == managerEmployeeId)
+                return true;
+
+            if (!currentEmployee.ManagerEmployeeId.HasValue)
+                break;
+
+            currentEmployee = await _context.Employees
+                .FirstOrDefaultAsync(e => e.Id == currentEmployee.ManagerEmployeeId, cancellationToken);
+        }
+
+        return false;
     }
 
     private int CalculateWorkingDays(DateOnly startDate, DateOnly endDate)

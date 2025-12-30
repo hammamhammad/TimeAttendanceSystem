@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 export interface TableActionItem {
   id: string;
@@ -15,7 +15,7 @@ export interface TableActionItem {
 @Component({
   selector: 'app-table-actions',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './table-actions.component.html',
   styleUrls: ['./table-actions.component.css']
 })

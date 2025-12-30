@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, forwardRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from '@angular/forms';
 
 export interface TimeRange {
@@ -10,7 +10,7 @@ export interface TimeRange {
 @Component({
   selector: 'app-time-range-input',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './time-range-input.component.html',
   styleUrls: ['./time-range-input.component.css'],
   providers: [

@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, signal, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { DataTableComponent, TableColumn, TableAction } from '../../../shared/components/data-table/data-table.component';
 import { EmployeeDto, EmploymentStatus, Gender, WorkLocationType } from '../../../shared/models/employee.model';
 import { I18nService } from '../../../core/i18n/i18n.service';
@@ -10,7 +10,7 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
 @Component({
   selector: 'app-employee-table',
   standalone: true,
-  imports: [CommonModule, DataTableComponent, StatusBadgeComponent],
+  imports: [DataTableComponent, StatusBadgeComponent],
   template: `
     <app-data-table
       [data]="employees"
@@ -27,77 +27,91 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
       (pageSizeChange)="onPageSizeChange($event)"
       (selectionChange)="onSelectionChange($event)"
       (sortChange)="onSortChange($event)">
-
+    
       <ng-template #cellTemplate let-employee let-column="column">
-        <ng-container [ngSwitch]="column.key">
+        @switch (column.key) {
           <!-- Employee name with avatar -->
-          <div *ngSwitchCase="'name'" class="d-flex align-items-center">
-            <div class="avatar-sm me-2">
-              <div class="avatar-initial bg-primary text-white rounded-circle">
-                {{ getInitials(employee.firstName, employee.lastName) }}
+          @case ('name') {
+            <div class="d-flex align-items-center">
+              <div class="avatar-sm me-2">
+                <div class="avatar-initial bg-primary text-white rounded-circle">
+                  {{ getInitials(employee.firstName, employee.lastName) }}
+                </div>
+              </div>
+              <div>
+                <div class="fw-medium">{{ employee.firstName }} {{ employee.lastName }}</div>
+                <small class="text-muted">{{ employee.email }}</small>
               </div>
             </div>
-            <div>
-              <div class="fw-medium">{{ employee.firstName }} {{ employee.lastName }}</div>
-              <small class="text-muted">{{ employee.email }}</small>
-            </div>
-          </div>
-
+          }
           <!-- Employee Code -->
-          <span *ngSwitchCase="'employeeCode'" class="fw-medium">
-            {{ employee.employeeNumber }}
-          </span>
-
+          @case ('employeeCode') {
+            <span class="fw-medium">
+              {{ employee.employeeNumber }}
+            </span>
+          }
           <!-- Department with branch -->
-          <div *ngSwitchCase="'department'">
-            <div>{{ employee.departmentName }}</div>
-            <small class="text-muted">{{ employee.branchName }}</small>
-          </div>
-
+          @case ('department') {
+            <div>
+              <div>{{ employee.departmentName }}</div>
+              <small class="text-muted">{{ employee.branchName }}</small>
+            </div>
+          }
           <!-- Employment status with badge -->
-          <span *ngSwitchCase="'employmentStatus'">
-            <app-status-badge
-              [status]="getEmploymentStatusBadgeStatus(employee.employmentStatus)"
-              [label]="getEmploymentStatusLabel(employee.employmentStatus)">
-            </app-status-badge>
-          </span>
-
+          @case ('employmentStatus') {
+            <span>
+              <app-status-badge
+                [status]="getEmploymentStatusBadgeStatus(employee.employmentStatus)"
+                [label]="getEmploymentStatusLabel(employee.employmentStatus)">
+              </app-status-badge>
+            </span>
+          }
           <!-- Gender -->
-          <span *ngSwitchCase="'gender'">
-            {{ getGenderLabel(employee.gender) }}
-          </span>
-
+          @case ('gender') {
+            <span>
+              {{ getGenderLabel(employee.gender) }}
+            </span>
+          }
           <!-- Work location -->
-          <span *ngSwitchCase="'workLocation'">
-            <app-status-badge
-              [status]="'info'"
-              [label]="getWorkLocationLabel(employee.workLocationType)">
-            </app-status-badge>
-          </span>
-
+          @case ('workLocation') {
+            <span>
+              <app-status-badge
+                [status]="'info'"
+                [label]="getWorkLocationLabel(employee.workLocationType)">
+              </app-status-badge>
+            </span>
+          }
           <!-- Status -->
-          <span *ngSwitchCase="'status'">
-            <app-status-badge
-              [status]="employee.isActive ? 'active' : 'inactive'"
-              [label]="employee.isActive ? 'Active' : 'Inactive'"
-              [showIcon]="true">
-            </app-status-badge>
-          </span>
-
+          @case ('status') {
+            <span>
+              <app-status-badge
+                [status]="employee.isActive ? 'active' : 'inactive'"
+                [label]="employee.isActive ? 'Active' : 'Inactive'"
+                [showIcon]="true">
+              </app-status-badge>
+            </span>
+          }
           <!-- Hire date -->
-          <span *ngSwitchCase="'hireDate'">
-            {{ formatDate(employee.hireDate) }}
-          </span>
-
+          @case ('hireDate') {
+            <span>
+              {{ formatDate(employee.hireDate) }}
+            </span>
+          }
           <!-- Current shift -->
-          <div *ngSwitchCase="'shift'">
-            <div *ngIf="employee.currentShiftName">{{ employee.currentShiftName }}</div>
-            <span *ngIf="!employee.currentShiftName" class="text-muted">No shift assigned</span>
-          </div>
-        </ng-container>
+          @case ('shift') {
+            <div>
+              @if (employee.currentShiftName) {
+                <div>{{ employee.currentShiftName }}</div>
+              }
+              @if (!employee.currentShiftName) {
+                <span class="text-muted">No shift assigned</span>
+              }
+            </div>
+          }
+        }
       </ng-template>
     </app-data-table>
-  `,
+    `,
   styles: [`
     .avatar-sm {
       width: 2rem;

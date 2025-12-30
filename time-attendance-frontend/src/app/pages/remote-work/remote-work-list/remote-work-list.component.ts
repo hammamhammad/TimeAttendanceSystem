@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router } from '@angular/router';
 import { RemoteWorkRequestsService } from '../../../core/services/remote-work-requests.service';
 import { RemoteWorkRequest, RemoteWorkRequestStatus } from '../../../core/models/remote-work-request.model';
@@ -16,12 +16,11 @@ import { PermissionService } from '../../../core/auth/permission.service';
   selector: 'app-remote-work-list',
   standalone: true,
   imports: [
-    CommonModule,
     DataTableComponent,
     PageHeaderComponent,
     StatusBadgeComponent,
     UnifiedFilterComponent
-  ],
+],
   templateUrl: './remote-work-list.component.html',
   styleUrls: ['./remote-work-list.component.css']
 })

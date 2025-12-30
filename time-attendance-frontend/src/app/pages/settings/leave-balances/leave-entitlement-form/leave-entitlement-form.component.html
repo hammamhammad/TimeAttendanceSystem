@@ -1,0 +1,272 @@
+<div class="container-fluid">
+  <!-- Form Header -->
+  <app-form-header
+    [title]="getPageTitle()"
+    [subtitle]="i18n.t('leaveBalance.entitlementFormDescription')"
+    [mode]="isEditMode() ? 'edit' : 'create'"
+    [moduleName]="'leaveBalance'"
+    [moduleRoute]="'settings/leave-entitlements'"
+    [entityId]="entitlementId() ?? undefined"
+    [loading]="submitting()">
+  </app-form-header>
+
+  @if (loading()) {
+    <app-loading-spinner
+      [message]="i18n.t('common.loading')"
+      [centered]="true">
+    </app-loading-spinner>
+  } @else {
+    <!-- Form Card -->
+    <div class="card">
+      <div class="card-body">
+        <form [formGroup]="entitlementForm" (ngSubmit)="onSubmit()">
+          <div class="row">
+            <!-- Basic Information Section -->
+            <div class="col-md-6">
+              <app-form-section
+                [title]="i18n.t('leaveBalance.basicInformation')"
+                [description]="i18n.t('leaveBalance.basicInformationDescription')">
+                <!-- Employee Selection -->
+                <div class="mb-3">
+                  <label for="employeeId" class="form-label">
+                    {{ i18n.t('employees.employee') }}
+                    <span class="text-danger">*</span>
+                  </label>
+                  <app-searchable-select
+                    formControlName="employeeId"
+                    [options]="employees()"
+                    [placeholder]="i18n.t('leaveBalance.selectEmployee')"
+                    [disabled]="isEditMode()">
+                  </app-searchable-select>
+                  @if (entitlementForm.get('employeeId')?.invalid && entitlementForm.get('employeeId')?.touched) {
+                    <div class="text-danger small mt-1">
+                      {{ i18n.t('errors.fieldRequired') }}
+                    </div>
+                  }
+                </div>
+
+                <!-- Vacation Type Selection -->
+                <div class="mb-3">
+                  <label for="vacationTypeId" class="form-label">
+                    {{ i18n.t('vacationTypes.vacationType') }}
+                    <span class="text-danger">*</span>
+                  </label>
+                  <app-searchable-select
+                    formControlName="vacationTypeId"
+                    [options]="vacationTypes()"
+                    [placeholder]="i18n.t('leaveBalance.selectVacationType')"
+                    [disabled]="isEditMode()">
+                  </app-searchable-select>
+                  @if (entitlementForm.get('vacationTypeId')?.invalid && entitlementForm.get('vacationTypeId')?.touched) {
+                    <div class="text-danger small mt-1">
+                      {{ i18n.t('errors.fieldRequired') }}
+                    </div>
+                  }
+                </div>
+
+                <!-- Year -->
+                <div class="mb-3">
+                  <label for="year" class="form-label">
+                    {{ i18n.t('leaveBalance.year') }}
+                    <span class="text-danger">*</span>
+                  </label>
+                  <select
+                    id="year"
+                    class="form-select"
+                    formControlName="year"
+                    [class.is-invalid]="entitlementForm.get('year')?.invalid && entitlementForm.get('year')?.touched"
+                    [attr.disabled]="isEditMode() ? true : null">
+                    @for (year of availableYears(); track year) {
+                      <option [value]="year">{{ year }}</option>
+                    }
+                  </select>
+                  @if (entitlementForm.get('year')?.invalid && entitlementForm.get('year')?.touched) {
+                    <div class="invalid-feedback">
+                      {{ i18n.t('errors.invalidYear') }}
+                    </div>
+                  }
+                </div>
+
+                <!-- Annual Days -->
+                <div class="mb-3">
+                  <label for="annualDays" class="form-label">
+                    {{ i18n.t('leaveBalance.annualDays') }}
+                    <span class="text-danger">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    id="annualDays"
+                    class="form-control"
+                    formControlName="annualDays"
+                    [class.is-invalid]="entitlementForm.get('annualDays')?.invalid && entitlementForm.get('annualDays')?.touched"
+                    min="0"
+                    max="365"
+                    step="0.5"
+                    placeholder="30">
+                  @if (entitlementForm.get('annualDays')?.invalid && entitlementForm.get('annualDays')?.touched) {
+                    <div class="invalid-feedback">
+                      {{ i18n.t('errors.invalidDays') }}
+                    </div>
+                  }
+                  <div class="form-text">{{ i18n.t('leaveBalance.annualDaysHelp') }}</div>
+                </div>
+              </app-form-section>
+            </div>
+
+            <!-- Carry-Over Configuration Section -->
+            <div class="col-md-6">
+              <app-form-section
+                [title]="i18n.t('leaveBalance.carryOverConfiguration')"
+                [description]="i18n.t('leaveBalance.carryOverConfigurationDescription')">
+                <!-- Carry Over Days -->
+                <div class="mb-3">
+                  <label for="carryOverDays" class="form-label">
+                    {{ i18n.t('leaveBalance.carryOverDays') }}
+                  </label>
+                  <input
+                    type="number"
+                    id="carryOverDays"
+                    class="form-control"
+                    formControlName="carryOverDays"
+                    [class.is-invalid]="entitlementForm.get('carryOverDays')?.invalid && entitlementForm.get('carryOverDays')?.touched"
+                    min="0"
+                    max="365"
+                    step="0.5"
+                    placeholder="0"
+                    (blur)="validateMaxCarryOver()">
+                  @if (entitlementForm.get('carryOverDays')?.invalid && entitlementForm.get('carryOverDays')?.touched) {
+                    <div class="invalid-feedback">
+                      {{ i18n.t('errors.invalidDays') }}
+                    </div>
+                  }
+                  <div class="form-text">{{ i18n.t('leaveBalance.carryOverDaysHelp') }}</div>
+                </div>
+
+                <!-- Max Carry Over Days -->
+                <div class="mb-3">
+                  <label for="maxCarryOverDays" class="form-label">
+                    {{ i18n.t('leaveBalance.maxCarryOverDays') }}
+                  </label>
+                  <input
+                    type="number"
+                    id="maxCarryOverDays"
+                    class="form-control"
+                    formControlName="maxCarryOverDays"
+                    [class.is-invalid]="entitlementForm.get('maxCarryOverDays')?.invalid && entitlementForm.get('maxCarryOverDays')?.touched"
+                    min="0"
+                    max="365"
+                    step="0.5"
+                    [placeholder]="i18n.t('common.unlimited')">
+                  @if (entitlementForm.get('maxCarryOverDays')?.invalid && entitlementForm.get('maxCarryOverDays')?.touched) {
+                    <div class="invalid-feedback">
+                      {{ i18n.t('errors.invalidDays') }}
+                    </div>
+                  }
+                  <div class="form-text">{{ i18n.t('leaveBalance.maxCarryOverDaysHelp') }}</div>
+                </div>
+
+                <!-- Expires At Year End -->
+                <div class="mb-3">
+                  <div class="form-check form-switch">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="expiresAtYearEnd"
+                      formControlName="expiresAtYearEnd">
+                    <label class="form-check-label" for="expiresAtYearEnd">
+                      {{ i18n.t('leaveBalance.expiresAtYearEnd') }}
+                    </label>
+                  </div>
+                  <div class="form-text">{{ i18n.t('leaveBalance.expiresAtYearEndHelp') }}</div>
+                </div>
+              </app-form-section>
+            </div>
+          </div>
+
+          <!-- Effective Dates Section -->
+          <app-form-section
+            [title]="i18n.t('leaveBalance.effectiveDates')"
+            [description]="i18n.t('leaveBalance.effectiveDatesDescription')">
+            <div class="row">
+              <div class="col-md-6">
+                <!-- Effective Start Date -->
+                <div class="mb-3">
+                  <label for="effectiveStartDate" class="form-label">
+                    {{ i18n.t('leaveBalance.effectiveStartDate') }}
+                  </label>
+                  <input
+                    type="date"
+                    id="effectiveStartDate"
+                    class="form-control"
+                    formControlName="effectiveStartDate">
+                  <div class="form-text">{{ i18n.t('leaveBalance.effectiveStartDateHelp') }}</div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <!-- Effective End Date -->
+                <div class="mb-3">
+                  <label for="effectiveEndDate" class="form-label">
+                    {{ i18n.t('leaveBalance.effectiveEndDate') }}
+                  </label>
+                  <input
+                    type="date"
+                    id="effectiveEndDate"
+                    class="form-control"
+                    formControlName="effectiveEndDate">
+                  <div class="form-text">{{ i18n.t('leaveBalance.effectiveEndDateHelp') }}</div>
+                </div>
+              </div>
+            </div>
+          </app-form-section>
+
+          <!-- Notes Section -->
+          <app-form-section
+            [title]="i18n.t('common.notes')"
+            [description]="i18n.t('leaveBalance.notesDescription')">
+            <div class="mb-3">
+              <label for="notes" class="form-label">
+                {{ i18n.t('common.notes') }}
+              </label>
+              <textarea
+                id="notes"
+                class="form-control"
+                formControlName="notes"
+                rows="4"
+                maxlength="500"
+                [class.is-invalid]="entitlementForm.get('notes')?.invalid && entitlementForm.get('notes')?.touched"
+                [placeholder]="i18n.t('leaveBalance.notesPlaceholder')"></textarea>
+              @if (entitlementForm.get('notes')?.invalid && entitlementForm.get('notes')?.touched) {
+                <div class="invalid-feedback">
+                  {{ i18n.t('errors.notesTooLong') }}
+                </div>
+              }
+              <small class="text-muted">
+                {{ entitlementForm.get('notes')?.value?.length || 0 }} / 500
+              </small>
+            </div>
+          </app-form-section>
+
+          <!-- Form Actions -->
+          <div class="d-flex justify-content-end gap-2 mt-4">
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              (click)="onCancel()"
+              [disabled]="submitting()">
+              {{ i18n.t('common.cancel') }}
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="submitting() || entitlementForm.invalid">
+              @if (submitting()) {
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              }
+              {{ getSubmitButtonLabel() }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

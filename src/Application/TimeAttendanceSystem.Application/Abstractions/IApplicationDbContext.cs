@@ -10,6 +10,8 @@ using TimeAttendanceSystem.Domain.VacationTypes;
 using TimeAttendanceSystem.Domain.Vacations;
 using TimeAttendanceSystem.Domain.Excuses;
 using TimeAttendanceSystem.Domain.RemoteWork;
+using TimeAttendanceSystem.Domain.Workflows;
+using TimeAttendanceSystem.Domain.LeaveManagement;
 using TimeAttendanceSystem.Domain.FingerprintRequests;
 
 namespace TimeAttendanceSystem.Application.Abstractions;
@@ -528,18 +530,112 @@ public interface IApplicationDbContext
     DbSet<RemoteWorkRequest> RemoteWorkRequests { get; }
 
     /// <summary>
-    /// Gets the database set for FingerprintRequest entities representing fingerprint enrollment or update requests.
-    /// Enables employees to request fingerprint re-enrollment or report fingerprint reader issues.
+    /// Gets the database set for WorkflowDefinition entities representing configurable approval workflow templates.
+    /// Enables dynamic workflow configuration for various request types (Vacation, Excuse, RemoteWork, etc.).
+    /// </summary>
+    /// <value>DbSet for querying and managing WorkflowDefinition entities</value>
+    DbSet<WorkflowDefinition> WorkflowDefinitions { get; }
+
+    /// <summary>
+    /// Gets the database set for WorkflowStep entities representing individual steps within workflow definitions.
+    /// Defines approval chain configuration with approver types, conditions, and escalation rules.
+    /// </summary>
+    /// <value>DbSet for querying and managing WorkflowStep entities</value>
+    DbSet<WorkflowStep> WorkflowSteps { get; }
+
+    /// <summary>
+    /// Gets the database set for WorkflowInstance entities representing active workflow executions.
+    /// Tracks the runtime state of workflows processing entity approval requests.
+    /// </summary>
+    /// <value>DbSet for querying and managing WorkflowInstance entities</value>
+    DbSet<WorkflowInstance> WorkflowInstances { get; }
+
+    /// <summary>
+    /// Gets the database set for WorkflowStepExecution entities representing individual step execution records.
+    /// Records approval decisions, delegations, and action history for each workflow step.
+    /// </summary>
+    /// <value>DbSet for querying and managing WorkflowStepExecution entities</value>
+    DbSet<WorkflowStepExecution> WorkflowStepExecutions { get; }
+
+    /// <summary>
+    /// Gets the database set for ApprovalDelegation entities representing approval delegation configurations.
+    /// Enables users to delegate approval authority during absences or vacations.
+    /// </summary>
+    /// <value>DbSet for querying and managing ApprovalDelegation entities</value>
+    DbSet<ApprovalDelegation> ApprovalDelegations { get; }
+
+    /// <summary>
+    /// Gets the database set for LeaveEntitlement entities representing annual leave entitlement configuration.
+    /// Defines base leave entitlements for employees with carry-over and proration support.
+    /// </summary>
+    /// <value>DbSet for querying and managing LeaveEntitlement entities</value>
+    /// <remarks>
+    /// LeaveEntitlement Entity Features:
+    /// - Annual leave entitlement configuration per employee
+    /// - Carry-over management with maximum limits
+    /// - Mid-year hire proration support
+    /// - Year-specific entitlement tracking
+    /// - Integration with vacation types and accrual policies
+    /// </remarks>
+    DbSet<LeaveEntitlement> LeaveEntitlements { get; }
+
+    /// <summary>
+    /// Gets the database set for LeaveBalance entities representing current leave balance tracking.
+    /// Tracks accrued, used, pending, and adjusted leave balances for employees.
+    /// </summary>
+    /// <value>DbSet for querying and managing LeaveBalance entities</value>
+    /// <remarks>
+    /// LeaveBalance Entity Features:
+    /// - Real-time leave balance tracking (accrued, used, pending, adjusted)
+    /// - Monthly accrual processing integration
+    /// - Balance reservation for pending vacation requests
+    /// - Automatic balance calculations and validations
+    /// - Transaction history tracking for complete audit trail
+    /// </remarks>
+    DbSet<LeaveBalance> LeaveBalances { get; }
+
+    /// <summary>
+    /// Gets the database set for LeaveTransaction entities representing leave balance transaction history.
+    /// Provides complete audit trail for all leave balance changes including accruals, usage, and adjustments.
+    /// </summary>
+    /// <value>DbSet for querying and managing LeaveTransaction entities</value>
+    /// <remarks>
+    /// LeaveTransaction Entity Features:
+    /// - Complete audit trail for all balance changes
+    /// - Support for multiple transaction types (Accrual, Usage, Adjustment, CarryOver, etc.)
+    /// - Reference tracking to source entities (vacation requests, adjustments)
+    /// - Balance snapshot after each transaction
+    /// - Detailed transaction notes and attribution
+    /// </remarks>
+    DbSet<LeaveTransaction> LeaveTransactions { get; }
+
+    /// <summary>
+    /// Gets the database set for LeaveAccrualPolicy entities representing leave accrual policy configurations.
+    /// Defines accrual rules, carry-over policies, and eligibility criteria for vacation types.
+    /// </summary>
+    /// <value>DbSet for querying and managing LeaveAccrualPolicy entities</value>
+    /// <remarks>
+    /// LeaveAccrualPolicy Entity Features:
+    /// - Monthly vs. upfront accrual configuration
+    /// - Proration rules for mid-year hires
+    /// - Minimum service period requirements
+    /// - Carry-over and expiration rules
+    /// - Active policy enforcement (one active policy per vacation type)
+    /// </remarks>
+    DbSet<LeaveAccrualPolicy> LeaveAccrualPolicies { get; }
+
+    /// <summary>
+    /// Gets the database set for FingerprintRequest entities representing fingerprint enrollment requests.
+    /// Enables tracking of biometric enrollment requests from employees.
     /// </summary>
     /// <value>DbSet for querying and managing FingerprintRequest entities</value>
     /// <remarks>
     /// FingerprintRequest Entity Features:
-    /// - Employee self-service fingerprint management
-    /// - Multiple request types (NewEnrollment, Update, Issue, AdditionalFingers, LocationChange)
+    /// - Employee-initiated fingerprint enrollment requests
+    /// - Request types: NewEnrollment, Update, Issue, AdditionalFingers, LocationChange
     /// - Status workflow (Pending, Scheduled, Completed, Cancelled, Rejected)
-    /// - Scheduling system with preferred and scheduled date/time
-    /// - Technician assignment and notes for completion tracking
-    /// - One active request limit per employee for process control
+    /// - Technician assignment and completion tracking
+    /// - Preferred and scheduled date/time management
     /// </remarks>
     DbSet<FingerprintRequest> FingerprintRequests { get; }
 
@@ -556,7 +652,7 @@ public interface IApplicationDbContext
     /// - Optimistic concurrency control and conflict resolution
     /// - Entity validation and business rule enforcement
     /// - Performance optimization through batched operations
-    /// 
+    ///
     /// Implementation Notes:
     /// - Called by command handlers after business logic execution
     /// - Triggers entity validation and domain event publishing

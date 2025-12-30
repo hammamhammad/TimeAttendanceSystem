@@ -1,10 +1,10 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'app-error-alert',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './error-alert.component.html',
   styleUrls: ['./error-alert.component.css']
 })

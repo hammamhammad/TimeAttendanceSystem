@@ -1,5 +1,5 @@
 import { Component, signal, inject, OnInit, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router, ActivatedRoute } from '@angular/router';
 import { I18nService } from '../../../../core/i18n/i18n.service';
 import { NotificationService } from '../../../../core/notifications/notification.service';
@@ -19,14 +19,13 @@ import { SectionCardComponent } from '../../../../shared/components/section-card
   selector: 'app-view-overtime-configuration',
   standalone: true,
   imports: [
-    CommonModule,
     RouterModule,
     LoadingSpinnerComponent,
     DefinitionListComponent,
     SectionCardComponent,
     FormHeaderComponent,
     StatusBadgeComponent
-  ],
+],
   templateUrl: './view-overtime-configuration.component.html',
   styleUrls: ['./view-overtime-configuration.component.css']
 })

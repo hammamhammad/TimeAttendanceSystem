@@ -144,6 +144,11 @@ public static class SeedData
         permissions.AddRange(PermissionBuilder.CreateResourcePermissions(PermissionResources.Vacation, "Employee Vacation Management",
             PermissionActions.Approve, PermissionActions.Reject, PermissionActions.View, PermissionActions.BulkCreate));
 
+        // Leave Balance Management - Managing leave balances, entitlements and accruals
+        permissions.AddRange(PermissionBuilder.CreateExtendedCrudPermissions(PermissionResources.LeaveBalance, "Leave Balance Management"));
+        permissions.AddRange(PermissionBuilder.CreateResourcePermissions(PermissionResources.LeaveBalance, "Leave Balance Management",
+            PermissionActions.View, PermissionActions.Manage, PermissionActions.Configure, "adjust", "accrue"));
+
         // Excuse Policy Management - Settings for excuse policies
         permissions.AddRange(PermissionBuilder.CreateResourcePermissions("settings.excusePolicy", "Excuse Policy Management",
             PermissionActions.Read, PermissionActions.Create, PermissionActions.Update, PermissionActions.Delete,
@@ -167,6 +172,15 @@ public static class SeedData
         // Session Management - Managing user sessions and security
         permissions.AddRange(PermissionBuilder.CreateResourcePermissions(PermissionResources.Session, "Session Management",
             PermissionActions.Read, PermissionActions.Delete, PermissionActions.Manage));
+
+        // Workflow Management - Managing approval workflow definitions
+        permissions.AddRange(PermissionBuilder.CreateExtendedCrudPermissions(PermissionResources.Workflow, "Workflow Management"));
+        permissions.AddRange(PermissionBuilder.CreateResourcePermissions(PermissionResources.Workflow, "Workflow Management",
+            PermissionActions.Activate, PermissionActions.Deactivate, PermissionActions.Manage));
+
+        // Approval Management - Managing approval queue and actions
+        permissions.AddRange(PermissionBuilder.CreateResourcePermissions(PermissionResources.Approval, "Approval Management",
+            PermissionActions.Read, PermissionActions.Approve, PermissionActions.Reject, "delegate"));
 
         // Get existing permission keys
         var existingKeys = await context.Permissions

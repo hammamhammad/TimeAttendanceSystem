@@ -123,5 +123,7 @@ public record UserInfo(
     string PreferredLanguage,
     List<string> Roles,
     List<string> Permissions,
-    List<long> BranchIds
+    List<long> BranchIds,
+    string? FullName = null,
+    string? FullNameAr = null
 );

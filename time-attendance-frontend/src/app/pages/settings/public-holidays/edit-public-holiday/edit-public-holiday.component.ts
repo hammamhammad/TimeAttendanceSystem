@@ -1,5 +1,5 @@
 import { Component, signal, inject, OnInit, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { I18nService } from '../../../../core/i18n/i18n.service';
@@ -14,13 +14,12 @@ import { FormSectionComponent } from '../../../../shared/components/form-section
   selector: 'app-edit-public-holiday',
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     ReactiveFormsModule,
     SearchableSelectComponent,
     FormHeaderComponent,
     FormSectionComponent
-  ],
+],
   templateUrl: './edit-public-holiday.component.html',
   styleUrls: ['./edit-public-holiday.component.css']
 })
