@@ -1,0 +1,9 @@
+d:\Work\TimeAttendanceSystem\obj\Debug\net9.0\RunSampleData.csproj.AssemblyReference.cache
+d:\Work\TimeAttendanceSystem\obj\Debug\net9.0\RunSampleData.src.Shared.TimeAttendanceSystem.Shared.Localization.Resources.ValidationMessages.resources
+d:\Work\TimeAttendanceSystem\obj\Debug\net9.0\RunSampleData.src.Shared.TimeAttendanceSystem.Shared.Localization.Resources.ValidationMessages.ar.resources
+d:\Work\TimeAttendanceSystem\obj\Debug\net9.0\RunSampleData.csproj.GenerateResource.cache
+d:\Work\TimeAttendanceSystem\obj\Debug\net9.0\RunSampleData.GeneratedMSBuildEditorConfig.editorconfig
+d:\Work\TimeAttendanceSystem\obj\Debug\net9.0\RunSampleData.AssemblyInfoInputs.cache
+d:\Work\TimeAttendanceSystem\obj\Debug\net9.0\RunSampleData.AssemblyInfo.cs
+d:\Work\TimeAttendanceSystem\obj\Debug\net9.0\RunSampleData.csproj.CoreCompileInputs.cache
+d:\Work\TimeAttendanceSystem\obj\Debug\net9.0\RunSampleData.sourcelink.json

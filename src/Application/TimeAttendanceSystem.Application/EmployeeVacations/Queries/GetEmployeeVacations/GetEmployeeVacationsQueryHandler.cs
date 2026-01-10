@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using TimeAttendanceSystem.Application.Abstractions;
 using TimeAttendanceSystem.Application.Common;
 using TimeAttendanceSystem.Application.EmployeeVacations.Queries.Common;
+using TimeAttendanceSystem.Domain.Workflows.Enums;
 
 namespace TimeAttendanceSystem.Application.EmployeeVacations.Queries.GetEmployeeVacations;
 
@@ -55,17 +56,121 @@ public class GetEmployeeVacationsQueryHandler : IRequestHandler<GetEmployeeVacat
         // Apply sorting
         query = ApplySorting(query, request.SortBy, request.SortDescending);
 
-        // Apply pagination
-        var items = await query
+        // Apply pagination and get vacation IDs first
+        var vacationIds = await query
             .Skip((request.Page - 1) * request.PageSize)
             .Take(request.PageSize)
-            .Select(ev => new EmployeeVacationDto(
+            .Select(ev => ev.Id)
+            .ToListAsync(cancellationToken);
+
+        // Get workflow instances for these vacations
+        var workflowInstances = await _context.WorkflowInstances
+            .Include(wi => wi.CurrentStep)
+                .ThenInclude(cs => cs!.ApproverRole)
+            .Include(wi => wi.CurrentStep)
+                .ThenInclude(cs => cs!.ApproverUser)
+            .Include(wi => wi.WorkflowDefinition)
+                .ThenInclude(wd => wd.Steps)
+            .Where(wi => wi.EntityType == WorkflowEntityType.Vacation && vacationIds.Contains(wi.EntityId))
+            .ToListAsync(cancellationToken);
+
+        // Create a lookup dictionary for workflow info
+        var workflowLookup = workflowInstances.ToDictionary(wi => wi.EntityId);
+
+        // Get workflow instance IDs for step executions
+        var workflowInstanceIds = workflowInstances.Select(wi => wi.Id).ToList();
+
+        // Get all step executions for these workflow instances
+        var stepExecutions = await _context.WorkflowStepExecutions
+            .Include(wse => wse.Step)
+            .Include(wse => wse.AssignedToUser)
+            .Include(wse => wse.ActionTakenByUser)
+            .Where(wse => workflowInstanceIds.Contains(wse.WorkflowInstanceId))
+            .OrderBy(wse => wse.Step.StepOrder)
+            .ThenBy(wse => wse.AssignedAt)
+            .ToListAsync(cancellationToken);
+
+        // Create a lookup dictionary for step executions by workflow instance ID
+        var stepExecutionLookup = stepExecutions
+            .GroupBy(se => se.WorkflowInstanceId)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        // Get the vacation items with workflow info
+        var items = await query
+            .Where(ev => vacationIds.Contains(ev.Id))
+            .Select(ev => new
+            {
                 ev.Id,
                 ev.EmployeeId,
                 ev.Employee.EmployeeNumber,
-                $"{ev.Employee.FirstName} {ev.Employee.LastName}",
+                EmployeeName = $"{ev.Employee.FirstName} {ev.Employee.LastName}",
                 ev.VacationTypeId,
-                ev.VacationType.Name,
+                VacationTypeName = ev.VacationType.Name,
+                ev.StartDate,
+                ev.EndDate,
+                ev.TotalDays,
+                ev.IsApproved,
+                ev.Notes,
+                ev.CreatedAtUtc,
+                ev.CreatedBy,
+                ev.ModifiedAtUtc,
+                ev.ModifiedBy
+            })
+            .ToListAsync(cancellationToken);
+
+        // Map to DTOs with workflow info
+        var dtos = items.Select(ev =>
+        {
+            workflowLookup.TryGetValue(ev.Id, out var workflow);
+            var currentStep = workflow?.CurrentStep;
+            var totalSteps = workflow?.WorkflowDefinition?.Steps?.Count ?? 0;
+
+            string? approverName = null;
+            string? approverRole = null;
+
+            if (currentStep != null)
+            {
+                if (currentStep.ApproverType == ApproverType.DirectManager)
+                {
+                    approverRole = "Direct Manager";
+                }
+                else if (currentStep.ApproverType == ApproverType.DepartmentHead)
+                {
+                    approverRole = "Department Head";
+                }
+                else if (currentStep.ApproverType == ApproverType.Role && currentStep.ApproverRole != null)
+                {
+                    approverRole = currentStep.ApproverRole.Name;
+                }
+                else if (currentStep.ApproverType == ApproverType.SpecificUser && currentStep.ApproverUser != null)
+                {
+                    approverName = currentStep.ApproverUser.Username;
+                }
+            }
+
+            // Build approval history
+            List<ApprovalStepDto>? approvalHistory = null;
+            if (workflow != null && stepExecutionLookup.TryGetValue(workflow.Id, out var executions))
+            {
+                approvalHistory = executions.Select(exec => new ApprovalStepDto(
+                    exec.Step.StepOrder,
+                    exec.Step.Name ?? $"Step {exec.Step.StepOrder}",
+                    exec.Action?.ToString() ?? "Pending",
+                    exec.AssignedToUser?.Username ?? "Unknown",
+                    exec.ActionTakenByUser?.Username,
+                    exec.AssignedAt,
+                    exec.ActionTakenAt,
+                    exec.Comments
+                )).ToList();
+            }
+
+            return new EmployeeVacationDto(
+                ev.Id,
+                ev.EmployeeId,
+                ev.EmployeeNumber,
+                ev.EmployeeName,
+                ev.VacationTypeId,
+                ev.VacationTypeName,
                 ev.StartDate,
                 ev.EndDate,
                 ev.TotalDays,
@@ -78,12 +183,18 @@ public class GetEmployeeVacationsQueryHandler : IRequestHandler<GetEmployeeVacat
                 ev.CreatedAtUtc,
                 ev.CreatedBy,
                 ev.ModifiedAtUtc,
-                ev.ModifiedBy
-            ))
-            .ToListAsync(cancellationToken);
+                ev.ModifiedBy,
+                workflow?.Status.ToString(),
+                approverName,
+                approverRole,
+                currentStep?.StepOrder,
+                totalSteps > 0 ? totalSteps : null,
+                approvalHistory
+            );
+        }).ToList();
 
         var result = new PagedResult<EmployeeVacationDto>(
-            items,
+            dtos,
             totalCount,
             request.Page,
             request.PageSize

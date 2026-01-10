@@ -56,15 +56,15 @@ export class PendingApprovalsComponent implements OnInit, OnDestroy {
 
     // Filter by type tab
     if (tab !== 'all') {
-      approvals = approvals.filter(a => a.entityType === tab);
+      approvals = approvals.filter(a => this.matchesEntityType(a.entityType, tab));
     }
 
     // Filter by search term
     if (search) {
       approvals = approvals.filter(a =>
-        a.employeeName.toLowerCase().includes(search) ||
-        a.employeeCode.toLowerCase().includes(search) ||
-        a.requestSummary.toLowerCase().includes(search)
+        (a.employeeName || '').toLowerCase().includes(search) ||
+        (a.employeeCode || '').toLowerCase().includes(search) ||
+        (a.requestSummary || '').toLowerCase().includes(search)
       );
     }
 
@@ -76,10 +76,10 @@ export class PendingApprovalsComponent implements OnInit, OnDestroy {
     const approvals = this.pendingApprovals();
     return {
       all: approvals.length,
-      vacation: approvals.filter(a => a.entityType === ApprovalEntityType.Vacation).length,
-      excuse: approvals.filter(a => a.entityType === ApprovalEntityType.Excuse).length,
-      remoteWork: approvals.filter(a => a.entityType === ApprovalEntityType.RemoteWork).length,
-      fingerprint: approvals.filter(a => a.entityType === ApprovalEntityType.Fingerprint).length
+      vacation: approvals.filter(a => this.matchesEntityType(a.entityType, ApprovalEntityType.Vacation)).length,
+      excuse: approvals.filter(a => this.matchesEntityType(a.entityType, ApprovalEntityType.Excuse)).length,
+      remoteWork: approvals.filter(a => this.matchesEntityType(a.entityType, ApprovalEntityType.RemoteWork)).length,
+      fingerprint: approvals.filter(a => this.matchesEntityType(a.entityType, ApprovalEntityType.Fingerprint)).length
     };
   });
 
@@ -167,7 +167,7 @@ export class PendingApprovalsComponent implements OnInit, OnDestroy {
   async approve(item: PendingApprovalItem): Promise<void> {
     const result = await this.confirmation.confirm({
       title: this.i18n.t('portal.confirm_approve'),
-      message: this.i18n.t('portal.confirm_approve_message', { name: item.employeeName }),
+      message: this.i18n.t('portal.confirm_approve_message', { name: item.employeeName || 'Unknown' }),
       confirmText: this.i18n.t('portal.approve'),
       cancelText: this.i18n.t('common.cancel'),
       confirmButtonClass: 'btn-success'
@@ -202,7 +202,7 @@ export class PendingApprovalsComponent implements OnInit, OnDestroy {
   async reject(item: PendingApprovalItem): Promise<void> {
     const result = await this.confirmation.confirm({
       title: this.i18n.t('portal.confirm_reject'),
-      message: this.i18n.t('portal.confirm_reject_message', { name: item.employeeName }),
+      message: this.i18n.t('portal.confirm_reject_message', { name: item.employeeName || 'Unknown' }),
       confirmText: this.i18n.t('portal.reject'),
       cancelText: this.i18n.t('common.cancel'),
       confirmButtonClass: 'btn-danger'
@@ -295,6 +295,11 @@ export class PendingApprovalsComponent implements OnInit, OnDestroy {
   }
 
   viewDetails(item: PendingApprovalItem): void {
+    // Normalize entity type for routing
+    const entityType = typeof item.entityType === 'number'
+      ? this.getEntityTypeFromNumber(item.entityType)
+      : item.entityType;
+
     const routeMap: Record<string, string> = {
       [ApprovalEntityType.Vacation]: '/vacation-requests',
       [ApprovalEntityType.Excuse]: '/excuse-requests',
@@ -302,9 +307,10 @@ export class PendingApprovalsComponent implements OnInit, OnDestroy {
       [ApprovalEntityType.Fingerprint]: '/fingerprint-requests'
     };
 
-    const route = routeMap[item.entityType];
+    const route = routeMap[entityType];
     if (route) {
-      this.router.navigate([route, item.entityId]);
+      // Add approval=true query param to indicate this is for approval purposes
+      this.router.navigate([route, item.entityId], { queryParams: { approval: 'true' } });
     }
   }
 
@@ -318,24 +324,60 @@ export class PendingApprovalsComponent implements OnInit, OnDestroy {
     return iconMap[type] || 'bi-file-text';
   }
 
-  getTypeLabel(type: ApprovalEntityType): string {
+  getTypeLabel(type: ApprovalEntityType | number | string): string {
+    // Handle numeric enum values from backend (1 = Vacation, 2 = Excuse, etc.)
+    const typeKey = typeof type === 'number' ? this.getEntityTypeFromNumber(type) : type;
+
     const labelMap: Record<string, string> = {
       [ApprovalEntityType.Vacation]: this.i18n.t('portal.vacation'),
       [ApprovalEntityType.Excuse]: this.i18n.t('portal.excuse'),
       [ApprovalEntityType.RemoteWork]: this.i18n.t('portal.remote_work'),
-      [ApprovalEntityType.Fingerprint]: this.i18n.t('portal.fingerprint')
+      [ApprovalEntityType.Fingerprint]: this.i18n.t('portal.fingerprint'),
+      'FingerprintRequest': this.i18n.t('portal.fingerprint') // Backend uses FingerprintRequest
     };
-    return labelMap[type] || type;
+    return labelMap[typeKey] || typeKey?.toString() || this.i18n.t('common.unknown');
   }
 
-  getTypeVariant(type: ApprovalEntityType): 'primary' | 'warning' | 'success' | 'info' {
+  getTypeVariant(type: ApprovalEntityType | number | string): 'primary' | 'warning' | 'success' | 'info' {
+    // Handle numeric enum values from backend (1 = Vacation, 2 = Excuse, etc.)
+    const typeKey = typeof type === 'number' ? this.getEntityTypeFromNumber(type) : type;
+
     const variantMap: Record<string, 'primary' | 'warning' | 'success' | 'info'> = {
       [ApprovalEntityType.Vacation]: 'primary',
       [ApprovalEntityType.Excuse]: 'warning',
       [ApprovalEntityType.RemoteWork]: 'success',
-      [ApprovalEntityType.Fingerprint]: 'info'
+      [ApprovalEntityType.Fingerprint]: 'info',
+      'FingerprintRequest': 'info' // Backend uses FingerprintRequest
     };
-    return variantMap[type] || 'primary';
+    return variantMap[typeKey] || 'primary';
+  }
+
+  private getEntityTypeFromNumber(type: number): string {
+    const typeMap: Record<number, string> = {
+      1: ApprovalEntityType.Vacation,
+      2: ApprovalEntityType.Excuse,
+      3: ApprovalEntityType.RemoteWork,
+      4: ApprovalEntityType.Fingerprint
+    };
+    return typeMap[type] || '';
+  }
+
+  /**
+   * Checks if an entity type matches the expected type.
+   * Handles numeric values from backend (1 = Vacation, etc.) and string values.
+   */
+  private matchesEntityType(actualType: ApprovalEntityType | number | string, expectedType: string): boolean {
+    // Convert numeric type to string if needed
+    const normalizedActual = typeof actualType === 'number'
+      ? this.getEntityTypeFromNumber(actualType)
+      : actualType;
+
+    // Handle FingerprintRequest from backend
+    if (expectedType === ApprovalEntityType.Fingerprint) {
+      return normalizedActual === expectedType || normalizedActual === 'FingerprintRequest';
+    }
+
+    return normalizedActual === expectedType;
   }
 
   getTabCount(tabId: string): number {
@@ -368,12 +410,12 @@ export class PendingApprovalsComponent implements OnInit, OnDestroy {
       const hours = Math.floor(diff / (1000 * 60 * 60));
       if (hours === 0) {
         const minutes = Math.floor(diff / (1000 * 60));
-        return this.i18n.t('portal.minutes_ago', { minutes: minutes.toString() });
+        return this.i18n.t('portal.minutes_ago', { count: minutes.toString() });
       }
-      return this.i18n.t('portal.hours_ago', { hours: hours.toString() });
+      return this.i18n.t('portal.hours_ago', { count: hours.toString() });
     }
     if (days === 1) return this.i18n.t('portal.yesterday');
-    if (days < 7) return this.i18n.t('portal.days_ago', { days: days.toString() });
+    if (days < 7) return this.i18n.t('portal.days_ago', { count: days.toString() });
     return this.formatDate(date);
   }
 

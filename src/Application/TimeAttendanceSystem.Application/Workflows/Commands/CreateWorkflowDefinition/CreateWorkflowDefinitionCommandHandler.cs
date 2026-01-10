@@ -94,6 +94,7 @@ public class CreateWorkflowDefinitionCommandHandler : IRequestHandler<CreateWork
                 ApproverUserId = stepDto.ApproverUserId,
                 ConditionJson = stepDto.ConditionJson,
                 TimeoutHours = stepDto.TimeoutHours,
+                TimeoutAction = stepDto.TimeoutAction,
                 AllowDelegation = stepDto.AllowDelegation,
                 NotifyOnAction = stepDto.NotifyOnAction,
                 NotifyRequesterOnReach = stepDto.NotifyRequesterOnReach,

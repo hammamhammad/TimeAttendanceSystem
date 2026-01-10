@@ -105,6 +105,7 @@ public class UpdateWorkflowDefinitionCommandHandler : IRequestHandler<UpdateWork
                 ApproverUserId = stepDto.ApproverUserId,
                 ConditionJson = stepDto.ConditionJson,
                 TimeoutHours = stepDto.TimeoutHours,
+                TimeoutAction = stepDto.TimeoutAction,
                 AllowDelegation = stepDto.AllowDelegation,
                 NotifyOnAction = stepDto.NotifyOnAction,
                 NotifyRequesterOnReach = stepDto.NotifyRequesterOnReach,

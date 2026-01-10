@@ -70,7 +70,7 @@ export interface SortEvent {
                 <!-- Default card layout -->
                 @if (!cardTemplate) {
                   <div class="default-card-layout">
-                    @for (column of getVisibleColumns(); track column) {
+                    @for (column of getVisibleColumns(); track column.key) {
                       <div class="mobile-field">
                         <span class="mobile-label">{{ column.mobileLabel || column.label }}:</span>
                         <span class="mobile-value">
@@ -92,7 +92,7 @@ export interface SortEvent {
               @if (actions.length > 0) {
                 <div class="mobile-card-actions">
                   <div class="btn-group btn-group-sm">
-                    @for (action of getAvailableActions(item); track action) {
+                    @for (action of getAvailableActions(item); track action.key) {
                       <button
                         class="btn"
                         [class]="'btn-outline-' + (action.color || 'primary')"
@@ -144,7 +144,7 @@ export interface SortEvent {
                 }
     
                 <!-- Data columns -->
-                @for (column of getVisibleColumns(); track column) {
+                @for (column of getVisibleColumns(); track column.key) {
                   <th
                     [style.width]="column.width"
                     [class.sortable]="column.sortable"
@@ -196,7 +196,7 @@ export interface SortEvent {
                     </td>
                   }
                   <!-- Data cells -->
-                  @for (column of getVisibleColumns(); track column) {
+                  @for (column of getVisibleColumns(); track column.key) {
                     <td
                       [class.text-center]="column.align === 'center'"
                       [class.text-end]="column.align === 'right'"
@@ -220,7 +220,7 @@ export interface SortEvent {
                   @if (actions.length > 0) {
                     <td class="actions-column">
                       <div class="btn-group btn-group-sm">
-                        @for (action of getAvailableActions(item); track action) {
+                        @for (action of getAvailableActions(item); track action.key) {
                           <button
                             class="btn"
                             [class]="'btn-outline-' + (action.color || 'primary')"

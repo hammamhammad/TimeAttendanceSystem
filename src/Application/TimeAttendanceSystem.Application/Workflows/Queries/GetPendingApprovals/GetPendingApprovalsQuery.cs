@@ -58,4 +58,14 @@ public class PendingApprovalDto
     public string? ApproverInstructions { get; set; }
     public bool RequireCommentsOnApprove { get; set; }
     public bool RequireCommentsOnReject { get; set; }
+
+    // Additional fields for frontend compatibility
+    public long? EmployeeId { get; set; }
+    public string EmployeeName { get; set; } = string.Empty;
+    public string EmployeeCode { get; set; } = string.Empty;
+    public string RequestSummary { get; set; } = string.Empty;
+    public bool IsDelegated { get; set; }
+    public string? DelegatedFrom { get; set; }
+    public int CurrentStep { get; set; }
+    public int TotalSteps { get; set; }
 }

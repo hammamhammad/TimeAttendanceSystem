@@ -3,8 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using Coravel;
 using TimeAttendanceSystem.Api.Configuration;
 using TimeAttendanceSystem.Api.Filters;
+using TimeAttendanceSystem.Api.Hubs;
 using TimeAttendanceSystem.Api.Middleware;
 using TimeAttendanceSystem.Application;
+using TimeAttendanceSystem.Application.Abstractions;
 using TimeAttendanceSystem.Infrastructure;
 using TimeAttendanceSystem.Infrastructure.BackgroundJobs;
 using TimeAttendanceSystem.Infrastructure.Persistence;
@@ -65,6 +67,10 @@ builder.Services.AddMemoryCache();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
+// Add SignalR for real-time notifications
+builder.Services.AddSignalR();
+builder.Services.AddScoped<INotificationHubContext, NotificationHubContext>();
+
 // Add localization services
 builder.Services.AddLocalization(options => options.ResourcesPath = "Localization/Resources");
 builder.Services.Configure<RequestLocalizationOptions>(options =>
@@ -97,6 +103,8 @@ builder.Services.AddControllers(options =>
     options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
     options.JsonSerializerOptions.DictionaryKeyPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
     options.JsonSerializerOptions.WriteIndented = true;
+    // Serialize enums as strings instead of integers
+    options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
 });
 builder.Services.AddOpenApi();
 
@@ -171,6 +179,10 @@ app.Services.UseScheduler(scheduler =>
         .Monthly()
         .Zoned(TimeZoneInfo.Utc) // Run at 1:00 AM UTC on the 1st of each month
         .RunOnceAtStart(); // Also run once when the application starts (for testing/recovery)
+
+    // Schedule workflow timeout processing to run every hour
+    scheduler.Schedule<WorkflowTimeoutProcessingJob>()
+        .Hourly(); // Check for timed out workflow steps every hour
 });
 
 // Configure the HTTP request pipeline.
@@ -195,6 +207,9 @@ app.UseMiddleware<LocalizationMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+// Map SignalR hubs
+app.MapHub<NotificationHub>("/hubs/notifications");
 
 app.Run();
 

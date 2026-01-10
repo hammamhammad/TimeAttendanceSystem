@@ -73,6 +73,9 @@ public class CreateEmployeeVacationCommandHandler : IRequestHandler<CreateEmploy
             return Result.Failure<long>("Vacation type not found or inactive");
         }
 
+        // Get current user name for audit trail
+        var currentUserName = _currentUser.Username ?? "Unknown";
+
         // Create vacation entity - ALWAYS pending workflow approval
         var vacation = new EmployeeVacation
         {
@@ -84,7 +87,8 @@ public class CreateEmployeeVacationCommandHandler : IRequestHandler<CreateEmploy
             Notes = isOnBehalfOf
                 ? $"{request.Notes}\n[Submitted on behalf by user ID: {currentUserId}]"
                 : request.Notes,
-            SubmittedByUserId = currentUserId
+            SubmittedByUserId = currentUserId,
+            CreatedBy = currentUserName
         };
 
         // Calculate total days
@@ -120,13 +124,8 @@ public class CreateEmployeeVacationCommandHandler : IRequestHandler<CreateEmploy
 
         if (!hasSufficientBalance.IsSuccess)
         {
-            return Result.Failure<long>($"Balance check failed: {hasSufficientBalance.Error}");
-        }
-
-        if (!hasSufficientBalance.Value)
-        {
-            return Result.Failure<long>(
-                $"Insufficient leave balance. You have requested {vacation.TotalDays} days but do not have enough available balance for this vacation type.");
+            // Return the user-friendly error message from the service
+            return Result.Failure<long>(hasSufficientBalance.Error ?? "Failed to check leave balance.");
         }
 
         // Add vacation to context

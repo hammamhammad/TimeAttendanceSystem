@@ -42,8 +42,8 @@ public class AuditLogConfiguration : IEntityTypeConfiguration<AuditLog>
 
         builder.Property(x => x.RowVersion)
             .IsConcurrencyToken()
-            .IsRowVersion()
-            .HasDefaultValueSql("E'\\\\x01'::bytea");
+            .IsRequired()
+            .HasDefaultValue(new byte[] { 1 });
 
         builder.HasIndex(x => x.ActorUserId);
         builder.HasIndex(x => x.EntityName);

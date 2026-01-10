@@ -14,6 +14,7 @@ using TimeAttendanceSystem.Domain.RemoteWork;
 using TimeAttendanceSystem.Domain.Workflows;
 using TimeAttendanceSystem.Domain.LeaveManagement;
 using TimeAttendanceSystem.Domain.FingerprintRequests;
+using TimeAttendanceSystem.Domain.Notifications;
 
 namespace TimeAttendanceSystem.Infrastructure.Persistence;
 
@@ -73,6 +74,9 @@ public class ApplicationDbContextAdapter : IApplicationDbContext
 
     // Fingerprint Request entities
     public DbSet<FingerprintRequest> FingerprintRequests => _context.FingerprintRequests;
+
+    // Notification entities
+    public DbSet<Notification> Notifications => _context.Notifications;
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

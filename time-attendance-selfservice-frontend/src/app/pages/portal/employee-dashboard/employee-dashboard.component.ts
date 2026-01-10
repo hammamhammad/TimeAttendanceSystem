@@ -148,6 +148,40 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Navigates to activity details based on activity type
+   */
+  navigateToActivity(activity: Activity): void {
+    if (!activity.entityId) {
+      return;
+    }
+
+    const routeMap: Record<string, string> = {
+      'Vacation': '/vacation-requests',
+      'Excuse': '/excuse-requests',
+      'RemoteWork': '/remote-work-requests',
+      'Attendance': '/my-attendance'
+    };
+
+    const baseRoute = routeMap[activity.type];
+    if (baseRoute) {
+      // For requests, navigate to detail page with ID
+      if (activity.type !== 'Attendance') {
+        this.router.navigate([baseRoute, activity.entityId]);
+      } else {
+        // For attendance, navigate to attendance list (no detail view)
+        this.router.navigate([baseRoute]);
+      }
+    }
+  }
+
+  /**
+   * Checks if an activity is clickable (has a valid route)
+   */
+  isActivityClickable(activity: Activity): boolean {
+    return !!activity.entityId && activity.type !== 'Attendance';
+  }
+
+  /**
    * Gets activity icon class
    */
   getActivityIconClass(activity: Activity): string {
@@ -207,9 +241,23 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Gets localized variant label (status)
+   * Gets localized variant label (status) based on activity type and variant
    */
-  getActivityVariantLabel(variant: string): string {
+  getActivityVariantLabel(variant: string, activityType?: string): string {
+    // For attendance, use attendance-specific status labels
+    if (activityType === 'Attendance') {
+      const attendanceStatusMap: Record<string, string> = {
+        'success': this.i18n.t('attendance.status.present'),
+        'warning': this.i18n.t('attendance.status.late'),
+        'danger': this.i18n.t('attendance.status.absent'),
+        'info': this.i18n.t('attendance.status.on_leave'),
+        'secondary': this.i18n.t('common.completed'),
+        'primary': this.i18n.t('common.active')
+      };
+      return attendanceStatusMap[variant] || variant;
+    }
+
+    // For other activity types (Vacation, Excuse, RemoteWork), use approval status labels
     const variantLabelMap: Record<string, string> = {
       'success': this.i18n.t('common.approved'),
       'warning': this.i18n.t('common.pending'),

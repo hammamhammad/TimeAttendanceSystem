@@ -7,6 +7,8 @@ using TimeAttendanceSystem.Application.Common;
 using TimeAttendanceSystem.Application.Features.Portal.EmployeeDashboard.Queries;
 using TimeAttendanceSystem.Application.Features.Portal.ManagerDashboard.Queries;
 using TimeAttendanceSystem.Application.Features.Portal.Team.Queries;
+using TimeAttendanceSystem.Application.Workflows.Queries.GetPendingApprovals;
+using TimeAttendanceSystem.Domain.Workflows.Enums;
 
 namespace TimeAttendanceSystem.Api.Controllers;
 
@@ -234,6 +236,60 @@ public class PortalController : ControllerBase
     }
 
     /// <summary>
+    /// Retrieves pending approvals for the current user (manager).
+    /// Returns workflow items awaiting the user's approval action.
+    /// </summary>
+    /// <param name="entityType">Filter by entity type (Vacation, Excuse, RemoteWork, etc.)</param>
+    /// <param name="isOverdue">Filter by overdue status</param>
+    /// <param name="page">Page number (1-based). Default: 1</param>
+    /// <param name="pageSize">Page size. Default: 10</param>
+    /// <returns>Paginated list of pending approvals</returns>
+    /// <response code="200">Pending approvals retrieved successfully</response>
+    /// <response code="401">Unauthorized - user not authenticated</response>
+    [HttpGet("pending-approvals")]
+    [ProducesResponseType(typeof(Result<PagedResult<PendingApprovalDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetPendingApprovals(
+        [FromQuery] WorkflowEntityType? entityType = null,
+        [FromQuery] bool? isOverdue = null,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
+    {
+        try
+        {
+            var userId = _currentUser.UserId;
+            if (userId == null)
+            {
+                return Unauthorized(new { error = "User not authenticated" });
+            }
+
+            var query = new GetPendingApprovalsQuery
+            {
+                UserId = userId.Value,
+                EntityType = entityType,
+                IsOverdue = isOverdue,
+                Page = page,
+                PageSize = Math.Min(pageSize, 100) // Cap at 100
+            };
+
+            var result = await _mediator.Send(query);
+
+            if (!result.IsSuccess)
+            {
+                return BadRequest(new { error = result.Error });
+            }
+
+            // Return the value directly as an array for frontend compatibility
+            return Ok(new { isSuccess = true, value = result.Value.Items, error = (string?)null });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving pending approvals");
+            return StatusCode(500, new { error = "An error occurred while retrieving pending approvals" });
+        }
+    }
+
+    /// <summary>
     /// Retrieves the current employee's attendance records for a date range.
     /// Employees can only view their own attendance records.
     /// </summary>
@@ -457,6 +513,454 @@ public class PortalController : ControllerBase
             _logger.LogError(ex, "Error updating my profile");
             return StatusCode(500, new { error = "An error occurred while updating profile" });
         }
+    }
+
+    /// <summary>
+    /// Retrieves the current employee's vacation requests.
+    /// </summary>
+    /// <param name="page">Page number (1-based). Default: 1</param>
+    /// <param name="pageSize">Page size. Default: 20</param>
+    /// <returns>List of vacation requests for the current employee</returns>
+    /// <response code="200">Vacation requests retrieved successfully</response>
+    /// <response code="401">Unauthorized - user not authenticated</response>
+    /// <response code="404">Employee profile not found for current user</response>
+    [HttpGet("my-vacations")]
+    [ProducesResponseType(typeof(Result<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetMyVacations(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+            {
+                return Unauthorized(new { error = "User not authenticated" });
+            }
+
+            // Get current employee from user context
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+            {
+                return NotFound(new { error = "Employee profile not found for current user" });
+            }
+
+            var employeeId = employeeLink.EmployeeId;
+
+            // Query vacations for the current employee
+            var query = new Application.EmployeeVacations.Queries.GetEmployeeVacations.GetEmployeeVacationsQuery(
+                EmployeeId: employeeId,
+                Page: page,
+                PageSize: pageSize,
+                SortBy: "StartDate",
+                SortDescending: true
+            );
+
+            var result = await _mediator.Send(query);
+
+            if (!result.IsSuccess)
+            {
+                return BadRequest(new { error = result.Error });
+            }
+
+            return Ok(result.Value);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving my vacation requests");
+            return StatusCode(500, new { error = "An error occurred while retrieving vacation requests" });
+        }
+    }
+
+    /// <summary>
+    /// Retrieves a specific vacation request for the current employee.
+    /// Only returns vacation if it belongs to the current employee.
+    /// </summary>
+    /// <param name="id">Vacation ID</param>
+    /// <returns>Vacation request details</returns>
+    /// <response code="200">Vacation request retrieved successfully</response>
+    /// <response code="401">Unauthorized - user not authenticated</response>
+    /// <response code="404">Vacation not found or doesn't belong to current employee</response>
+    [HttpGet("my-vacations/{id}")]
+    [ProducesResponseType(typeof(Application.EmployeeVacations.Queries.Common.EmployeeVacationDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetMyVacationById(long id)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+            {
+                return Unauthorized(new { error = "User not authenticated" });
+            }
+
+            // Get current employee from user context
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+            {
+                return NotFound(new { error = "Employee profile not found for current user" });
+            }
+
+            var employeeId = employeeLink.EmployeeId;
+
+            // Query the vacation directly with employee filter for security
+            var vacation = await _context.EmployeeVacations
+                .Include(ev => ev.Employee)
+                .Include(ev => ev.VacationType)
+                .Where(ev => ev.Id == id && ev.EmployeeId == employeeId && !ev.IsDeleted)
+                .Select(ev => new
+                {
+                    ev.Id,
+                    ev.EmployeeId,
+                    ev.Employee.EmployeeNumber,
+                    EmployeeName = $"{ev.Employee.FirstName} {ev.Employee.LastName}",
+                    ev.VacationTypeId,
+                    VacationTypeName = ev.VacationType.Name,
+                    ev.StartDate,
+                    ev.EndDate,
+                    ev.TotalDays,
+                    ev.IsApproved,
+                    ev.Notes,
+                    ev.CreatedAtUtc,
+                    ev.CreatedBy,
+                    ev.ModifiedAtUtc,
+                    ev.ModifiedBy
+                })
+                .FirstOrDefaultAsync();
+
+            if (vacation == null)
+            {
+                return NotFound(new { error = $"Vacation with ID {id} not found" });
+            }
+
+            // Get workflow instance for this vacation
+            var workflow = await _context.WorkflowInstances
+                .Include(wi => wi.CurrentStep)
+                    .ThenInclude(cs => cs!.ApproverRole)
+                .Include(wi => wi.CurrentStep)
+                    .ThenInclude(cs => cs!.ApproverUser)
+                .Include(wi => wi.WorkflowDefinition)
+                    .ThenInclude(wd => wd.Steps)
+                .Where(wi => wi.EntityType == Domain.Workflows.Enums.WorkflowEntityType.Vacation && wi.EntityId == id)
+                .FirstOrDefaultAsync();
+
+            var currentStep = workflow?.CurrentStep;
+            var totalSteps = workflow?.WorkflowDefinition?.Steps?.Count ?? 0;
+
+            string? approverName = null;
+            string? approverRole = null;
+
+            if (currentStep != null)
+            {
+                if (currentStep.ApproverType == Domain.Workflows.Enums.ApproverType.DirectManager)
+                {
+                    approverRole = "Direct Manager";
+                }
+                else if (currentStep.ApproverType == Domain.Workflows.Enums.ApproverType.DepartmentHead)
+                {
+                    approverRole = "Department Head";
+                }
+                else if (currentStep.ApproverType == Domain.Workflows.Enums.ApproverType.Role && currentStep.ApproverRole != null)
+                {
+                    approverRole = currentStep.ApproverRole.Name;
+                }
+                else if (currentStep.ApproverType == Domain.Workflows.Enums.ApproverType.SpecificUser && currentStep.ApproverUser != null)
+                {
+                    approverName = currentStep.ApproverUser.Username;
+                }
+            }
+
+            // Build approval history
+            List<Application.EmployeeVacations.Queries.Common.ApprovalStepDto>? approvalHistory = null;
+            if (workflow != null)
+            {
+                var stepExecutions = await _context.WorkflowStepExecutions
+                    .Include(wse => wse.Step)
+                    .Include(wse => wse.AssignedToUser)
+                    .Include(wse => wse.ActionTakenByUser)
+                    .Where(wse => wse.WorkflowInstanceId == workflow.Id)
+                    .OrderBy(wse => wse.Step.StepOrder)
+                    .ThenBy(wse => wse.AssignedAt)
+                    .ToListAsync();
+
+                if (stepExecutions.Any())
+                {
+                    approvalHistory = stepExecutions.Select(exec => new Application.EmployeeVacations.Queries.Common.ApprovalStepDto(
+                        exec.Step.StepOrder,
+                        exec.Step.Name ?? $"Step {exec.Step.StepOrder}",
+                        exec.Action?.ToString() ?? "Pending",
+                        exec.AssignedToUser?.Username ?? "Unknown",
+                        exec.ActionTakenByUser?.Username,
+                        exec.AssignedAt,
+                        exec.ActionTakenAt,
+                        exec.Comments
+                    )).ToList();
+                }
+            }
+
+            // Calculate derived fields
+            var today = DateTime.Today;
+            var isCurrentlyActive = vacation.IsApproved && vacation.StartDate.Date <= today && vacation.EndDate.Date >= today;
+            var isUpcoming = vacation.StartDate.Date > today;
+            var isCompleted = vacation.EndDate.Date < today;
+            var businessDays = CalculateBusinessDays(vacation.StartDate, vacation.EndDate);
+
+            var dto = new Application.EmployeeVacations.Queries.Common.EmployeeVacationDto(
+                vacation.Id,
+                vacation.EmployeeId,
+                vacation.EmployeeNumber,
+                vacation.EmployeeName,
+                vacation.VacationTypeId,
+                vacation.VacationTypeName,
+                vacation.StartDate,
+                vacation.EndDate,
+                vacation.TotalDays,
+                businessDays,
+                vacation.IsApproved,
+                vacation.Notes,
+                isCurrentlyActive,
+                isUpcoming,
+                isCompleted,
+                vacation.CreatedAtUtc,
+                vacation.CreatedBy,
+                vacation.ModifiedAtUtc,
+                vacation.ModifiedBy,
+                workflow?.Status.ToString(),
+                approverName,
+                approverRole,
+                currentStep?.StepOrder,
+                totalSteps > 0 ? totalSteps : null,
+                approvalHistory,
+                workflow?.Id
+            );
+
+            return Ok(dto);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving vacation request {VacationId}", id);
+            return StatusCode(500, new { error = "An error occurred while retrieving vacation request" });
+        }
+    }
+
+    /// <summary>
+    /// Retrieves a vacation request for approval purposes (manager view).
+    /// Returns vacation details if the current user is an approver for this request.
+    /// </summary>
+    /// <param name="id">Vacation ID</param>
+    /// <returns>Vacation request details for approval</returns>
+    /// <response code="200">Vacation request retrieved successfully</response>
+    /// <response code="401">Unauthorized - user not authenticated</response>
+    /// <response code="403">Forbidden - user is not an approver for this request</response>
+    /// <response code="404">Vacation not found</response>
+    [HttpGet("approval-vacation/{id}")]
+    [ProducesResponseType(typeof(Application.EmployeeVacations.Queries.Common.EmployeeVacationDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetVacationForApproval(long id)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+            {
+                return Unauthorized(new { error = "User not authenticated" });
+            }
+
+            var userId = _currentUser.UserId.Value;
+
+            // Check if user has a pending approval for this vacation
+            var hasPendingApproval = await _context.WorkflowStepExecutions
+                .Include(wse => wse.WorkflowInstance)
+                .Where(wse => wse.AssignedToUserId == userId &&
+                             wse.Action == null &&
+                             !wse.IsDeleted &&
+                             wse.WorkflowInstance.EntityType == Domain.Workflows.Enums.WorkflowEntityType.Vacation &&
+                             wse.WorkflowInstance.EntityId == id &&
+                             !wse.WorkflowInstance.IsDeleted)
+                .AnyAsync();
+
+            if (!hasPendingApproval)
+            {
+                // Also check if user is a manager of the requesting employee
+                var employeeLink = await _context.EmployeeUserLinks
+                    .FirstOrDefaultAsync(eul => eul.UserId == userId);
+
+                if (employeeLink != null)
+                {
+                    var managerEmployeeId = employeeLink.EmployeeId;
+
+                    // Get the vacation to check if it belongs to a direct report
+                    var vacationCheck = await _context.EmployeeVacations
+                        .Include(ev => ev.Employee)
+                        .Where(ev => ev.Id == id && !ev.IsDeleted)
+                        .FirstOrDefaultAsync();
+
+                    if (vacationCheck != null)
+                    {
+                        var isDirectReport = vacationCheck.Employee.ManagerEmployeeId == managerEmployeeId;
+                        if (!isDirectReport && !hasPendingApproval)
+                        {
+                            return StatusCode(403, new { error = "You are not authorized to view this vacation request" });
+                        }
+                    }
+                }
+                else if (!hasPendingApproval)
+                {
+                    return StatusCode(403, new { error = "You are not authorized to view this vacation request" });
+                }
+            }
+
+            // Query the vacation without employee filter (manager can view)
+            var vacation = await _context.EmployeeVacations
+                .Include(ev => ev.Employee)
+                .Include(ev => ev.VacationType)
+                .Where(ev => ev.Id == id && !ev.IsDeleted)
+                .Select(ev => new
+                {
+                    ev.Id,
+                    ev.EmployeeId,
+                    ev.Employee.EmployeeNumber,
+                    EmployeeName = $"{ev.Employee.FirstName} {ev.Employee.LastName}",
+                    ev.VacationTypeId,
+                    VacationTypeName = ev.VacationType.Name,
+                    ev.StartDate,
+                    ev.EndDate,
+                    ev.TotalDays,
+                    ev.IsApproved,
+                    ev.Notes,
+                    ev.CreatedAtUtc,
+                    ev.CreatedBy,
+                    ev.ModifiedAtUtc,
+                    ev.ModifiedBy
+                })
+                .FirstOrDefaultAsync();
+
+            if (vacation == null)
+            {
+                return NotFound(new { error = $"Vacation with ID {id} not found" });
+            }
+
+            // Get workflow instance for this vacation
+            var workflow = await _context.WorkflowInstances
+                .Include(wi => wi.CurrentStep)
+                    .ThenInclude(cs => cs!.ApproverRole)
+                .Include(wi => wi.CurrentStep)
+                    .ThenInclude(cs => cs!.ApproverUser)
+                .Include(wi => wi.WorkflowDefinition)
+                    .ThenInclude(wd => wd.Steps)
+                .Where(wi => wi.EntityType == Domain.Workflows.Enums.WorkflowEntityType.Vacation && wi.EntityId == id)
+                .FirstOrDefaultAsync();
+
+            var currentStep = workflow?.CurrentStep;
+            var totalSteps = workflow?.WorkflowDefinition?.Steps?.Count ?? 0;
+
+            string? approverName = null;
+            string? approverRole = null;
+
+            if (currentStep != null)
+            {
+                approverName = currentStep.ApproverUser != null
+                    ? currentStep.ApproverUser.Username
+                    : null;
+                approverRole = currentStep.ApproverRole != null
+                    ? currentStep.ApproverRole.Name
+                    : currentStep.ApproverType.ToString();
+            }
+
+            var now = DateTime.UtcNow.Date;
+            var startDate = vacation.StartDate.Date;
+            var endDate = vacation.EndDate.Date;
+            var isCurrentlyActive = vacation.IsApproved && startDate <= now && endDate >= now;
+            var isUpcoming = vacation.IsApproved && startDate > now;
+            var isCompleted = endDate < now;
+            var businessDays = CalculateBusinessDays(startDate, endDate);
+
+            // Get approval history
+            List<Application.EmployeeVacations.Queries.Common.ApprovalStepDto>? approvalHistory = null;
+            if (workflow != null)
+            {
+                var stepExecutions = await _context.WorkflowStepExecutions
+                    .Include(wse => wse.Step)
+                    .Include(wse => wse.AssignedToUser)
+                    .Include(wse => wse.ActionTakenByUser)
+                    .Where(wse => wse.WorkflowInstanceId == workflow.Id && !wse.IsDeleted)
+                    .OrderBy(wse => wse.Step.StepOrder)
+                    .ToListAsync();
+
+                approvalHistory = stepExecutions.Select(exec => new Application.EmployeeVacations.Queries.Common.ApprovalStepDto(
+                    exec.Step.StepOrder,
+                    exec.Step.Name ?? $"Step {exec.Step.StepOrder}",
+                    exec.Action?.ToString() ?? "Pending",
+                    exec.AssignedToUser?.Username ?? "Unknown",
+                    exec.ActionTakenByUser?.Username,
+                    exec.AssignedAt,
+                    exec.ActionTakenAt,
+                    exec.Comments
+                )).ToList();
+            }
+
+            var dto = new Application.EmployeeVacations.Queries.Common.EmployeeVacationDto(
+                vacation.Id,
+                vacation.EmployeeId,
+                vacation.EmployeeNumber,
+                vacation.EmployeeName,
+                vacation.VacationTypeId,
+                vacation.VacationTypeName,
+                vacation.StartDate,
+                vacation.EndDate,
+                vacation.TotalDays,
+                businessDays,
+                vacation.IsApproved,
+                vacation.Notes,
+                isCurrentlyActive,
+                isUpcoming,
+                isCompleted,
+                vacation.CreatedAtUtc,
+                vacation.CreatedBy,
+                vacation.ModifiedAtUtc,
+                vacation.ModifiedBy,
+                workflow?.Status.ToString(),
+                approverName,
+                approverRole,
+                currentStep?.StepOrder,
+                totalSteps > 0 ? totalSteps : null,
+                approvalHistory,
+                workflow?.Id
+            );
+
+            return Ok(dto);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving vacation request for approval {VacationId}", id);
+            return StatusCode(500, new { error = "An error occurred while retrieving vacation request" });
+        }
+    }
+
+    /// <summary>
+    /// Calculates business days between two dates (excluding weekends).
+    /// </summary>
+    private static int CalculateBusinessDays(DateTime startDate, DateTime endDate)
+    {
+        var businessDays = 0;
+        var currentDate = startDate.Date;
+
+        while (currentDate <= endDate.Date)
+        {
+            if (currentDate.DayOfWeek != DayOfWeek.Saturday && currentDate.DayOfWeek != DayOfWeek.Sunday)
+            {
+                businessDays++;
+            }
+            currentDate = currentDate.AddDays(1);
+        }
+
+        return businessDays;
     }
 }
 

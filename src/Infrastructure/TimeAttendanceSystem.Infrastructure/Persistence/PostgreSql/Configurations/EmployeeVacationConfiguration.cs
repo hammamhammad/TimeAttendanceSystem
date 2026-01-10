@@ -135,7 +135,9 @@ public class EmployeeVacationConfiguration : IEntityTypeConfiguration<EmployeeVa
             .HasComment("Soft delete flag");
 
         builder.Property(ev => ev.RowVersion)
-            .IsConcurrencyToken().ValueGeneratedOnAddOrUpdate()
+            .IsConcurrencyToken()
+            .IsRequired()
+            .HasDefaultValue(new byte[] { 1 })
             .HasComment("Concurrency control timestamp");
     }
 }

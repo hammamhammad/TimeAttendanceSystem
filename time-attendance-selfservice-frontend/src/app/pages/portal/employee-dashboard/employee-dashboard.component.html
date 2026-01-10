@@ -131,7 +131,11 @@
             @if (hasActivity()) {
               <div class="activity-timeline">
                 @for (activity of recentActivity(); track $index) {
-                  <div class="activity-item">
+                  <div class="activity-item"
+                       [class.clickable]="isActivityClickable(activity)"
+                       (click)="navigateToActivity(activity)"
+                       [attr.role]="isActivityClickable(activity) ? 'button' : null"
+                       [attr.tabindex]="isActivityClickable(activity) ? 0 : null">
                     <div class="activity-marker">
                       <div class="activity-icon-wrapper" [ngClass]="getActivityBgClass(activity)">
                         <i [class]="getActivityIconClass(activity)"></i>
@@ -144,11 +148,16 @@
                     <div class="activity-content">
                       <div class="d-flex justify-content-between align-items-start mb-1">
                         <div class="flex-grow-1">
-                          <h6 class="activity-title mb-1">{{ getActivityType(activity.type) }}</h6>
+                          <h6 class="activity-title mb-1">
+                            {{ getActivityType(activity.type) }}
+                            @if (isActivityClickable(activity)) {
+                              <i class="bi bi-box-arrow-up-right ms-1 small text-muted"></i>
+                            }
+                          </h6>
                           <p class="activity-description mb-1 text-muted">{{ activity.description }}</p>
                         </div>
                         <span [class]="getActivityBadgeClass(activity)" class="ms-2">
-                          {{ getActivityVariantLabel(activity.variant) }}
+                          {{ getActivityVariantLabel(activity.variant, activity.type) }}
                         </span>
                       </div>
                       <small class="text-muted">

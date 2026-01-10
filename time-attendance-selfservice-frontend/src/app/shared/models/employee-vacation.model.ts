@@ -22,6 +22,30 @@ export interface EmployeeVacation {
   createdBy: string;
   modifiedAtUtc?: Date;
   modifiedBy?: string;
+  // Workflow information
+  workflowStatus?: string;
+  currentApproverName?: string;
+  currentApproverRole?: string;
+  currentStepOrder?: number;
+  totalSteps?: number;
+  // Approval history
+  approvalHistory?: ApprovalStep[];
+  // Workflow instance ID for approval actions
+  workflowInstanceId?: number;
+}
+
+/**
+ * Represents a single approval step in the workflow history.
+ */
+export interface ApprovalStep {
+  stepOrder: number;
+  stepName: string;
+  status: string;
+  assignedToName: string;
+  actionByName?: string;
+  assignedAt: Date;
+  actionAt?: Date;
+  comments?: string;
 }
 
 /**

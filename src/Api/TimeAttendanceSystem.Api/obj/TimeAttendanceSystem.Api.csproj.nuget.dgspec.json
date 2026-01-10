@@ -1,45 +1,39 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Api\\TimeAttendanceSystem.Api\\TimeAttendanceSystem.Api.csproj": {}
+    "D:\\Work\\TimeAttendanceSystem\\src\\Api\\TimeAttendanceSystem.Api\\TimeAttendanceSystem.Api.csproj": {}
   },
   "projects": {
-    "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Api\\TimeAttendanceSystem.Api\\TimeAttendanceSystem.Api.csproj": {
+    "D:\\Work\\TimeAttendanceSystem\\src\\Api\\TimeAttendanceSystem.Api\\TimeAttendanceSystem.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Api\\TimeAttendanceSystem.Api\\TimeAttendanceSystem.Api.csproj",
+        "projectUniqueName": "D:\\Work\\TimeAttendanceSystem\\src\\Api\\TimeAttendanceSystem.Api\\TimeAttendanceSystem.Api.csproj",
         "projectName": "TimeAttendanceSystem.Api",
-        "projectPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Api\\TimeAttendanceSystem.Api\\TimeAttendanceSystem.Api.csproj",
-        "packagesPath": "C:\\Users\\hhammad\\.nuget\\packages\\",
-        "outputPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Api\\TimeAttendanceSystem.Api\\obj\\",
+        "projectPath": "D:\\Work\\TimeAttendanceSystem\\src\\Api\\TimeAttendanceSystem.Api\\TimeAttendanceSystem.Api.csproj",
+        "packagesPath": "C:\\Users\\Hammam\\.nuget\\packages\\",
+        "outputPath": "D:\\Work\\TimeAttendanceSystem\\src\\Api\\TimeAttendanceSystem.Api\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\hhammad\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\Hammam\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Application\\TimeAttendanceSystem.Application\\TimeAttendanceSystem.Application.csproj": {
-                "projectPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Application\\TimeAttendanceSystem.Application\\TimeAttendanceSystem.Application.csproj"
+              "D:\\Work\\TimeAttendanceSystem\\src\\Application\\TimeAttendanceSystem.Application\\TimeAttendanceSystem.Application.csproj": {
+                "projectPath": "D:\\Work\\TimeAttendanceSystem\\src\\Application\\TimeAttendanceSystem.Application\\TimeAttendanceSystem.Application.csproj"
               },
-              "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure\\TimeAttendanceSystem.Infrastructure.csproj": {
-                "projectPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure\\TimeAttendanceSystem.Infrastructure.csproj"
+              "D:\\Work\\TimeAttendanceSystem\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure\\TimeAttendanceSystem.Infrastructure.csproj": {
+                "projectPath": "D:\\Work\\TimeAttendanceSystem\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure\\TimeAttendanceSystem.Infrastructure.csproj"
               },
-              "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Shared\\TimeAttendanceSystem.Shared\\TimeAttendanceSystem.Shared.csproj": {
-                "projectPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Shared\\TimeAttendanceSystem.Shared\\TimeAttendanceSystem.Shared.csproj"
+              "D:\\Work\\TimeAttendanceSystem\\src\\Shared\\TimeAttendanceSystem.Shared\\TimeAttendanceSystem.Shared.csproj": {
+                "projectPath": "D:\\Work\\TimeAttendanceSystem\\src\\Shared\\TimeAttendanceSystem.Shared\\TimeAttendanceSystem.Shared.csproj"
               }
             }
           }
@@ -54,7 +48,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.300"
+        "SdkAnalysisLevel": "10.0.100"
       },
       "frameworks": {
         "net9.0": {
@@ -98,43 +92,37 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.308/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Application\\TimeAttendanceSystem.Application\\TimeAttendanceSystem.Application.csproj": {
+    "D:\\Work\\TimeAttendanceSystem\\src\\Application\\TimeAttendanceSystem.Application\\TimeAttendanceSystem.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Application\\TimeAttendanceSystem.Application\\TimeAttendanceSystem.Application.csproj",
+        "projectUniqueName": "D:\\Work\\TimeAttendanceSystem\\src\\Application\\TimeAttendanceSystem.Application\\TimeAttendanceSystem.Application.csproj",
         "projectName": "TimeAttendanceSystem.Application",
-        "projectPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Application\\TimeAttendanceSystem.Application\\TimeAttendanceSystem.Application.csproj",
-        "packagesPath": "C:\\Users\\hhammad\\.nuget\\packages\\",
-        "outputPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Application\\TimeAttendanceSystem.Application\\obj\\",
+        "projectPath": "D:\\Work\\TimeAttendanceSystem\\src\\Application\\TimeAttendanceSystem.Application\\TimeAttendanceSystem.Application.csproj",
+        "packagesPath": "C:\\Users\\Hammam\\.nuget\\packages\\",
+        "outputPath": "D:\\Work\\TimeAttendanceSystem\\src\\Application\\TimeAttendanceSystem.Application\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\hhammad\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\Hammam\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj": {
-                "projectPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj"
+              "D:\\Work\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj": {
+                "projectPath": "D:\\Work\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj"
               },
-              "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Shared\\TimeAttendanceSystem.Shared\\TimeAttendanceSystem.Shared.csproj": {
-                "projectPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Shared\\TimeAttendanceSystem.Shared\\TimeAttendanceSystem.Shared.csproj"
+              "D:\\Work\\TimeAttendanceSystem\\src\\Shared\\TimeAttendanceSystem.Shared\\TimeAttendanceSystem.Shared.csproj": {
+                "projectPath": "D:\\Work\\TimeAttendanceSystem\\src\\Shared\\TimeAttendanceSystem.Shared\\TimeAttendanceSystem.Shared.csproj"
               }
             }
           }
@@ -149,7 +137,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.300"
+        "SdkAnalysisLevel": "10.0.100"
       },
       "frameworks": {
         "net9.0": {
@@ -200,32 +188,26 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.308/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj": {
+    "D:\\Work\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj",
+        "projectUniqueName": "D:\\Work\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj",
         "projectName": "TimeAttendanceSystem.Domain",
-        "projectPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj",
-        "packagesPath": "C:\\Users\\hhammad\\.nuget\\packages\\",
-        "outputPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\obj\\",
+        "projectPath": "D:\\Work\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj",
+        "packagesPath": "C:\\Users\\Hammam\\.nuget\\packages\\",
+        "outputPath": "D:\\Work\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\hhammad\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\Hammam\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -244,7 +226,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.300"
+        "SdkAnalysisLevel": "10.0.100"
       },
       "frameworks": {
         "net9.0": {
@@ -265,43 +247,37 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.308/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure\\TimeAttendanceSystem.Infrastructure.csproj": {
+    "D:\\Work\\TimeAttendanceSystem\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure\\TimeAttendanceSystem.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure\\TimeAttendanceSystem.Infrastructure.csproj",
+        "projectUniqueName": "D:\\Work\\TimeAttendanceSystem\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure\\TimeAttendanceSystem.Infrastructure.csproj",
         "projectName": "TimeAttendanceSystem.Infrastructure",
-        "projectPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure\\TimeAttendanceSystem.Infrastructure.csproj",
-        "packagesPath": "C:\\Users\\hhammad\\.nuget\\packages\\",
-        "outputPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure\\obj\\",
+        "projectPath": "D:\\Work\\TimeAttendanceSystem\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure\\TimeAttendanceSystem.Infrastructure.csproj",
+        "packagesPath": "C:\\Users\\Hammam\\.nuget\\packages\\",
+        "outputPath": "D:\\Work\\TimeAttendanceSystem\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\hhammad\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\Hammam\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Application\\TimeAttendanceSystem.Application\\TimeAttendanceSystem.Application.csproj": {
-                "projectPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Application\\TimeAttendanceSystem.Application\\TimeAttendanceSystem.Application.csproj"
+              "D:\\Work\\TimeAttendanceSystem\\src\\Application\\TimeAttendanceSystem.Application\\TimeAttendanceSystem.Application.csproj": {
+                "projectPath": "D:\\Work\\TimeAttendanceSystem\\src\\Application\\TimeAttendanceSystem.Application\\TimeAttendanceSystem.Application.csproj"
               },
-              "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj": {
-                "projectPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj"
+              "D:\\Work\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj": {
+                "projectPath": "D:\\Work\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj"
               }
             }
           }
@@ -316,7 +292,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.300"
+        "SdkAnalysisLevel": "10.0.100"
       },
       "frameworks": {
         "net9.0": {
@@ -387,32 +363,26 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.308/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Shared\\TimeAttendanceSystem.Shared\\TimeAttendanceSystem.Shared.csproj": {
+    "D:\\Work\\TimeAttendanceSystem\\src\\Shared\\TimeAttendanceSystem.Shared\\TimeAttendanceSystem.Shared.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Shared\\TimeAttendanceSystem.Shared\\TimeAttendanceSystem.Shared.csproj",
+        "projectUniqueName": "D:\\Work\\TimeAttendanceSystem\\src\\Shared\\TimeAttendanceSystem.Shared\\TimeAttendanceSystem.Shared.csproj",
         "projectName": "TimeAttendanceSystem.Shared",
-        "projectPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Shared\\TimeAttendanceSystem.Shared\\TimeAttendanceSystem.Shared.csproj",
-        "packagesPath": "C:\\Users\\hhammad\\.nuget\\packages\\",
-        "outputPath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Shared\\TimeAttendanceSystem.Shared\\obj\\",
+        "projectPath": "D:\\Work\\TimeAttendanceSystem\\src\\Shared\\TimeAttendanceSystem.Shared\\TimeAttendanceSystem.Shared.csproj",
+        "packagesPath": "C:\\Users\\Hammam\\.nuget\\packages\\",
+        "outputPath": "D:\\Work\\TimeAttendanceSystem\\src\\Shared\\TimeAttendanceSystem.Shared\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\hhammad\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\Hammam\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -431,7 +401,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.300"
+        "SdkAnalysisLevel": "10.0.100"
       },
       "frameworks": {
         "net9.0": {
@@ -458,7 +428,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.308/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.101/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

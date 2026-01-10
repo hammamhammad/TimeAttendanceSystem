@@ -62,32 +62,32 @@ export class ApprovalsService {
   /**
    * Get approval history for current user
    */
-  getApprovalHistory(
-    page: number = 1,
-    pageSize: number = 10,
-    entityType?: WorkflowEntityType | null,
-    action?: ApprovalAction | null,
-    fromDate?: string | null,
-    toDate?: string | null
-  ): Observable<PagedWorkflowResponse<ApprovalHistoryItem>> {
+  getApprovalHistory(filters: {
+    page: number;
+    pageSize: number;
+    entityType?: string | null;
+    action?: string | null;
+    dateFrom?: string | null;
+    dateTo?: string | null;
+  }): Observable<PagedWorkflowResponse<ApprovalHistoryItem>> {
     let params = new HttpParams()
-      .set('page', page.toString())
-      .set('pageSize', pageSize.toString());
+      .set('page', filters.page.toString())
+      .set('pageSize', filters.pageSize.toString());
 
-    if (entityType !== null && entityType !== undefined) {
-      params = params.set('entityType', entityType);
+    if (filters.entityType) {
+      params = params.set('entityType', filters.entityType);
     }
 
-    if (action !== null && action !== undefined) {
-      params = params.set('action', action);
+    if (filters.action) {
+      params = params.set('action', filters.action);
     }
 
-    if (fromDate !== null && fromDate !== undefined) {
-      params = params.set('fromDate', fromDate);
+    if (filters.dateFrom) {
+      params = params.set('dateFrom', filters.dateFrom);
     }
 
-    if (toDate !== null && toDate !== undefined) {
-      params = params.set('toDate', toDate);
+    if (filters.dateTo) {
+      params = params.set('dateTo', filters.dateTo);
     }
 
     return this.http.get<ApiResponse<PagedWorkflowResponse<ApprovalHistoryItem>>>(`${this.baseUrl}/history`, { params })
@@ -166,7 +166,8 @@ export class ApprovalsService {
       'RemoteWork': 'Remote Work Request',
       'Overtime': 'Overtime Request',
       'Timesheet': 'Timesheet',
-      'AttendanceCorrection': 'Attendance Correction'
+      'AttendanceCorrection': 'Attendance Correction',
+      'FingerprintRequest': 'Fingerprint Request'
     };
     return displayNames[entityType] || entityType;
   }

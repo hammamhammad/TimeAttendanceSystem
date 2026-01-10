@@ -37,8 +37,8 @@ public class ShiftPeriodConfiguration : IEntityTypeConfiguration<ShiftPeriod>
 
         builder.Property(x => x.RowVersion)
             .IsConcurrencyToken()
-            .IsRowVersion()
-            .HasDefaultValueSql("E'\\\\x01'::bytea");
+            .IsRequired()
+            .HasDefaultValue(new byte[] { 1 });
 
         builder.HasIndex(x => new { x.ShiftId, x.PeriodOrder })
             .IsUnique()

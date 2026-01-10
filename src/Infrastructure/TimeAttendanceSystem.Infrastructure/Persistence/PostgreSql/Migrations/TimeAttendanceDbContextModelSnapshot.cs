@@ -451,9 +451,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bytea")
-                        .HasDefaultValueSql("E'\\\\x01'::bytea");
+                        .HasDefaultValue(new byte[] { 1 });
 
                     b.Property<string>("TimeZone")
                         .IsRequired()
@@ -548,9 +548,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bytea")
-                        .HasDefaultValueSql("E'\\\\x01'::bytea");
+                        .HasDefaultValue(new byte[] { 1 });
 
                     b.Property<int>("SortOrder")
                         .HasColumnType("integer");
@@ -618,9 +618,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bytea")
-                        .HasDefaultValueSql("E'\\\\x01'::bytea");
+                        .HasDefaultValue(new byte[] { 1 });
 
                     b.HasKey("Id");
 
@@ -683,9 +683,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bytea")
-                        .HasDefaultValueSql("E'\\\\x01'::bytea");
+                        .HasDefaultValue(new byte[] { 1 });
 
                     b.Property<string>("UserAgent")
                         .HasMaxLength(500)
@@ -806,9 +806,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bytea")
-                        .HasDefaultValueSql("E'\\\\x01'::bytea");
+                        .HasDefaultValue(new byte[] { 1 });
 
                     b.Property<int>("WorkLocationType")
                         .HasColumnType("integer");
@@ -932,9 +932,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bytea")
-                        .HasDefaultValueSql("E'\\\\x01'::bytea");
+                        .HasDefaultValue(new byte[] { 1 });
 
                     b.Property<TimeOnly>("StartTime")
                         .HasColumnType("time");
@@ -1070,9 +1070,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bytea")
-                        .HasDefaultValueSql("E'\\\\x01'::bytea");
+                        .HasDefaultValue(new byte[] { 1 });
 
                     b.HasKey("Id");
 
@@ -1494,6 +1494,135 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasDatabaseName("IX_LeaveTransactions_Reference");
 
                     b.ToTable("LeaveTransactions", (string)null);
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Notifications.Notification", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("ActionUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasComment("URL to navigate when notification is clicked");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<long?>("EntityId")
+                        .HasColumnType("bigint")
+                        .HasComment("ID of the related entity");
+
+                    b.Property<string>("EntityType")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasComment("Type of related entity (e.g., Vacation, Excuse)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<bool>("IsRead")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Whether notification has been read");
+
+                    b.Property<string>("MessageAr")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .IsUnicode(true)
+                        .HasColumnType("character varying(1000)")
+                        .HasComment("Notification message in Arabic");
+
+                    b.Property<string>("MessageEn")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .IsUnicode(true)
+                        .HasColumnType("character varying(1000)")
+                        .HasComment("Notification message in English");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<DateTime?>("ReadAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("When notification was read");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
+                        .HasComment("Concurrency control timestamp");
+
+                    b.Property<string>("TitleAr")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .IsUnicode(true)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Notification title in Arabic");
+
+                    b.Property<string>("TitleEn")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .IsUnicode(true)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Notification title in English");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer")
+                        .HasComment("Type of notification");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint")
+                        .HasComment("User who receives this notification");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAtUtc")
+                        .IsDescending()
+                        .HasDatabaseName("IX_Notifications_CreatedAtUtc")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("Type")
+                        .HasDatabaseName("IX_Notifications_Type")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("IX_Notifications_UserId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("EntityType", "EntityId")
+                        .HasDatabaseName("IX_Notifications_EntityType_EntityId")
+                        .HasFilter("\"IsDeleted\" = false AND \"EntityType\" IS NOT NULL");
+
+                    b.HasIndex("UserId", "IsRead")
+                        .HasDatabaseName("IX_Notifications_UserId_IsRead")
+                        .HasFilter("\"IsDeleted\" = false AND \"IsRead\" = false");
+
+                    b.ToTable("Notifications", (string)null);
                 });
 
             modelBuilder.Entity("TimeAttendanceSystem.Domain.RemoteWork.RemoteWorkPolicy", b =>
@@ -2146,9 +2275,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bytea")
-                        .HasDefaultValueSql("E'\\\\x01'::bytea");
+                        .HasDefaultValue(new byte[] { 1 });
 
                     b.Property<int>("ShiftType")
                         .HasColumnType("integer");
@@ -2237,9 +2366,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bytea")
-                        .HasDefaultValueSql("E'\\\\x01'::bytea");
+                        .HasDefaultValue(new byte[] { 1 });
 
                     b.Property<long>("ShiftId")
                         .HasColumnType("bigint")
@@ -2330,9 +2459,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bytea")
-                        .HasDefaultValueSql("E'\\\\x01'::bytea");
+                        .HasDefaultValue(new byte[] { 1 });
 
                     b.Property<long>("ShiftId")
                         .HasColumnType("bigint");
@@ -2577,9 +2706,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bytea")
-                        .HasDefaultValueSql("E'\\\\x01'::bytea");
+                        .HasDefaultValue(new byte[] { 1 });
 
                     b.HasKey("Id");
 
@@ -2629,9 +2758,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bytea")
-                        .HasDefaultValueSql("E'\\\\x01'::bytea");
+                        .HasDefaultValue(new byte[] { 1 });
 
                     b.Property<string>("Token")
                         .IsRequired()
@@ -2694,9 +2823,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bytea")
-                        .HasDefaultValueSql("E'\\\\x01'::bytea");
+                        .HasDefaultValue(new byte[] { 1 });
 
                     b.HasKey("Id");
 
@@ -2855,9 +2984,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bytea")
-                        .HasDefaultValueSql("E'\\\\x01'::bytea");
+                        .HasDefaultValue(new byte[] { 1 });
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean");
@@ -3126,8 +3255,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
                         .HasComment("Concurrency control timestamp");
 
                     b.Property<DateTime>("StartDate")
@@ -3247,8 +3377,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
                         .HasComment("Concurrency control timestamp");
 
                     b.Property<DateTime>("StartDate")
@@ -3369,8 +3500,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
                         .HasComment("Concurrency control timestamp");
 
                     b.Property<int>("Version")
@@ -3480,8 +3612,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
                         .HasComment("Concurrency control timestamp");
 
                     b.Property<int>("Status")
@@ -3647,8 +3780,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
                         .HasComment("Concurrency control timestamp");
 
                     b.Property<int>("StepOrder")
@@ -3658,6 +3792,12 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<int>("StepType")
                         .HasColumnType("integer")
                         .HasComment("Type of workflow step");
+
+                    b.Property<int>("TimeoutAction")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasComment("Action to take when step times out (0=Expire, 1=Escalate, 2=AutoApprove, 3=AutoReject)");
 
                     b.Property<int?>("TimeoutHours")
                         .HasColumnType("integer")
@@ -3783,8 +3923,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
                         .HasComment("Concurrency control timestamp");
 
                     b.Property<long>("StepId")
@@ -4085,6 +4226,18 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .IsRequired();
 
                     b.Navigation("LeaveBalance");
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Notifications.Notification", b =>
+                {
+                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_Notifications_Users");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TimeAttendanceSystem.Domain.RemoteWork.RemoteWorkPolicy", b =>

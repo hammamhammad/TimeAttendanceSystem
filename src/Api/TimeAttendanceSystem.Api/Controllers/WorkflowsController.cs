@@ -93,6 +93,7 @@ public class WorkflowsController : ControllerBase
             s.ApproverUserId,
             s.ConditionJson,
             s.TimeoutHours,
+            s.TimeoutAction,
             null, // EscalationStepId
             null, // OnApproveNextStepId
             null, // OnRejectNextStepId
@@ -143,6 +144,7 @@ public class WorkflowsController : ControllerBase
             s.ApproverUserId,
             s.ConditionJson,
             s.TimeoutHours,
+            s.TimeoutAction,
             null, // EscalationStepId
             null, // OnApproveNextStepId
             null, // OnRejectNextStepId
@@ -304,6 +306,7 @@ public record WorkflowStepRequest(
     long? ApproverUserId,
     string? ConditionJson,
     int? TimeoutHours,
+    TimeoutAction TimeoutAction,
     bool AllowDelegation,
     bool NotifyOnAction,
     bool NotifyRequesterOnReach,

@@ -52,6 +52,8 @@ public class WorkflowStepDto
     public string? ApproverUserName { get; set; }
     public string? ConditionJson { get; set; }
     public int? TimeoutHours { get; set; }
+    public TimeoutAction TimeoutAction { get; set; }
+    public string TimeoutActionName { get; set; } = string.Empty;
     public long? EscalationStepId { get; set; }
     public long? OnApproveNextStepId { get; set; }
     public long? OnRejectNextStepId { get; set; }

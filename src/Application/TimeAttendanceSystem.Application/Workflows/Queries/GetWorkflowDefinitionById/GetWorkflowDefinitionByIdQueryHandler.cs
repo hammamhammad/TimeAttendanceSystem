@@ -68,6 +68,8 @@ public class GetWorkflowDefinitionByIdQueryHandler : IRequestHandler<GetWorkflow
                     ApproverUserName = s.ApproverUser?.Username,
                     ConditionJson = s.ConditionJson,
                     TimeoutHours = s.TimeoutHours,
+                    TimeoutAction = s.TimeoutAction,
+                    TimeoutActionName = s.TimeoutAction.ToString(),
                     EscalationStepId = s.EscalationStepId,
                     OnApproveNextStepId = s.OnApproveNextStepId,
                     OnRejectNextStepId = s.OnRejectNextStepId,

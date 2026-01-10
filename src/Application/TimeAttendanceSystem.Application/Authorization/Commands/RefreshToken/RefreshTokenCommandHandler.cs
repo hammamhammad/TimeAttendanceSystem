@@ -110,6 +110,27 @@ public class RefreshTokenCommandHandler : BaseHandler<RefreshTokenCommand, Resul
 
         var branchIds = user.UserBranchScopes.Select(ubs => ubs.BranchId).ToList();
 
+        // Fetch linked employee for full name and employee context
+        string? employeeFullName = null;
+        string? employeeFullNameAr = null;
+        long? employeeId = null;
+        bool isManager = false;
+
+        var employeeLink = await Context.EmployeeUserLinks
+            .Include(eul => eul.Employee)
+            .FirstOrDefaultAsync(eul => eul.UserId == user.Id, cancellationToken);
+
+        if (employeeLink?.Employee != null)
+        {
+            employeeFullName = employeeLink.Employee.FullName;
+            employeeFullNameAr = employeeLink.Employee.FullNameAr;
+            employeeId = employeeLink.EmployeeId;
+
+            // Check if the employee is a manager (has direct reports)
+            isManager = await Context.Employees
+                .AnyAsync(e => e.ManagerEmployeeId == employeeLink.EmployeeId && !e.IsDeleted, cancellationToken);
+        }
+
         // Generate new tokens
         var accessToken = _tokenGenerator.GenerateAccessToken(user, roles, permissions, branchIds);
         var newRefreshToken = _tokenGenerator.GenerateRefreshToken();
@@ -149,7 +170,11 @@ public class RefreshTokenCommandHandler : BaseHandler<RefreshTokenCommand, Resul
             user.PreferredLanguage,
             roles,
             permissions,
-            branchIds
+            branchIds,
+            employeeFullName,
+            employeeFullNameAr,
+            employeeId,
+            isManager
         );
 
         var response = new LoginResponse(

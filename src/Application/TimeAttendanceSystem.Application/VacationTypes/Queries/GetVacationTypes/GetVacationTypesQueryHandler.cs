@@ -113,9 +113,14 @@ public class GetVacationTypesQueryHandler : BaseHandler<GetVacationTypesQuery, R
                 .AsNoTracking();
 
             // Apply multi-tenant security filtering
+            // Users can see vacation types that either:
+            // 1. Have no branch (BranchId = null) - these apply to all branches
+            // 2. Are assigned to one of the user's branches
             if (!CurrentUser.IsSystemAdmin && CurrentUser.BranchIds.Any())
             {
-                query = query.Where(vt => vt.BranchId.HasValue && CurrentUser.BranchIds.Contains(vt.BranchId.Value));
+                query = query.Where(vt =>
+                    !vt.BranchId.HasValue || // Global vacation types (applies to all branches)
+                    CurrentUser.BranchIds.Contains(vt.BranchId.Value)); // Branch-specific vacation types
             }
 
             // Apply search filter across name fields

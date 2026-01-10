@@ -13,6 +13,7 @@ using TimeAttendanceSystem.Domain.RemoteWork;
 using TimeAttendanceSystem.Domain.Workflows;
 using TimeAttendanceSystem.Domain.LeaveManagement;
 using TimeAttendanceSystem.Domain.FingerprintRequests;
+using TimeAttendanceSystem.Domain.Notifications;
 
 namespace TimeAttendanceSystem.Application.Abstractions;
 
@@ -638,6 +639,21 @@ public interface IApplicationDbContext
     /// - Preferred and scheduled date/time management
     /// </remarks>
     DbSet<FingerprintRequest> FingerprintRequests { get; }
+
+    /// <summary>
+    /// Gets the database set for Notification entities representing in-app notifications.
+    /// Enables sending and tracking notifications for workflow events and user alerts.
+    /// </summary>
+    /// <value>DbSet for querying and managing Notification entities</value>
+    /// <remarks>
+    /// Notification Entity Features:
+    /// - In-app notification support for workflow events
+    /// - Bilingual notification content (English and Arabic)
+    /// - Read/unread status tracking
+    /// - Entity reference linking for navigation
+    /// - Real-time delivery via SignalR integration
+    /// </remarks>
+    DbSet<Notification> Notifications { get; }
 
     /// <summary>
     /// Asynchronously saves all pending changes to the database.

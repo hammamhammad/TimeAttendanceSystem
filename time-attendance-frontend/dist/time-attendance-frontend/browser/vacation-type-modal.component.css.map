@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "sources": ["angular:styles/component:css;e8171b9692b96c7b745382622623e329ba5a7786594dd1848a83906d2e2959f7;D:/Work/AI Code/TimeAttendanceSystem/time-attendance-frontend/src/app/pages/vacation-types/vacation-type-modal/vacation-type-modal.component.ts"],
+  "sources": ["angular:styles/component:css;e8171b9692b96c7b745382622623e329ba5a7786594dd1848a83906d2e2959f7;D:/Work/TimeAttendanceSystem/time-attendance-frontend/src/app/pages/vacation-types/vacation-type-modal/vacation-type-modal.component.ts"],
   "sourcesContent": ["\n    .required::after {\n      content: ' *';\n      color: red;\n    }\n  "],
   "mappings": ";AACI,CAAC,QAAQ;AACP,WAAS;AACT,SAAO;AACT;",
   "names": []

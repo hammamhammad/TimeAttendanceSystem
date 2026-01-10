@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using TimeAttendanceSystem.Application.Abstractions;
 using TimeAttendanceSystem.Application.Common;
 using TimeAttendanceSystem.Application.Workflows.Services;
+using TimeAttendanceSystem.Domain.Attendance;
 using TimeAttendanceSystem.Domain.Workflows.Enums;
 
 namespace TimeAttendanceSystem.Application.Workflows.Commands.ApproveStep;
@@ -105,8 +106,12 @@ public class ApproveStepCommandHandler : IRequestHandler<ApproveStepCommand, Res
                 vacationYear,
                 cancellationToken);
 
-            // TODO: Trigger attendance recalculation for vacation period
-            // This will be implemented when attendance recalculation service is ready
+            // Update attendance records to OnLeave status for the vacation period
+            await UpdateAttendanceForVacationPeriodAsync(
+                vacation.EmployeeId,
+                vacation.StartDate,
+                vacation.EndDate,
+                cancellationToken);
         }
         else if (workflowInstance.FinalOutcome == ApprovalAction.Rejected)
         {
@@ -157,6 +162,72 @@ public class ApproveStepCommandHandler : IRequestHandler<ApproveStepCommand, Res
         else if (workflowInstance.FinalOutcome == ApprovalAction.Rejected)
         {
             remoteWork.Status = Domain.RemoteWork.RemoteWorkRequestStatus.Rejected;
+        }
+
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Updates attendance records to OnLeave status for the vacation period.
+    /// Creates attendance records if they don't exist for dates within the vacation period.
+    /// </summary>
+    private async Task UpdateAttendanceForVacationPeriodAsync(
+        long employeeId,
+        DateTime startDate,
+        DateTime endDate,
+        CancellationToken cancellationToken)
+    {
+        // Get all attendance records for the vacation period
+        var attendanceRecords = await _context.AttendanceRecords
+            .Where(ar => ar.EmployeeId == employeeId &&
+                        ar.AttendanceDate.Date >= startDate.Date &&
+                        ar.AttendanceDate.Date <= endDate.Date &&
+                        !ar.IsFinalized) // Only update non-finalized records
+            .ToListAsync(cancellationToken);
+
+        // Update existing records to OnLeave status
+        foreach (var record in attendanceRecords)
+        {
+            // Only update if not already OnLeave (to preserve any manual overrides)
+            if (record.Status != AttendanceStatus.OnLeave)
+            {
+                record.Status = AttendanceStatus.OnLeave;
+                // Clear working hours since employee is on leave
+                record.WorkingHours = 0;
+                record.OvertimeHours = 0;
+                record.LateMinutes = 0;
+                record.EarlyLeaveMinutes = 0;
+                record.Notes = record.Notes != null
+                    ? $"{record.Notes} | Updated to OnLeave due to approved vacation"
+                    : "Updated to OnLeave due to approved vacation";
+            }
+        }
+
+        // Create attendance records for dates that don't have records yet
+        var existingDates = attendanceRecords.Select(ar => ar.AttendanceDate.Date).ToHashSet();
+        var currentDate = startDate.Date;
+
+        while (currentDate <= endDate.Date)
+        {
+            if (!existingDates.Contains(currentDate))
+            {
+                // Create a new attendance record with OnLeave status
+                var newRecord = new AttendanceRecord
+                {
+                    EmployeeId = employeeId,
+                    AttendanceDate = currentDate,
+                    Status = AttendanceStatus.OnLeave,
+                    WorkingHours = 0,
+                    OvertimeHours = 0,
+                    LateMinutes = 0,
+                    EarlyLeaveMinutes = 0,
+                    ScheduledHours = 0,
+                    BreakHours = 0,
+                    Notes = "Created as OnLeave due to approved vacation"
+                };
+                _context.AttendanceRecords.Add(newRecord);
+            }
+            currentDate = currentDate.AddDays(1);
         }
 
         await _context.SaveChangesAsync(cancellationToken);

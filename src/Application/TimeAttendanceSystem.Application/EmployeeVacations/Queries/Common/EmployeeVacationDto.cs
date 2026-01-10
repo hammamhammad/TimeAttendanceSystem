@@ -51,7 +51,39 @@ public record EmployeeVacationDto(
     DateTime CreatedAtUtc,
     string CreatedBy,
     DateTime? ModifiedAtUtc,
-    string? ModifiedBy
+    string? ModifiedBy,
+    // Workflow information
+    string? WorkflowStatus,
+    string? CurrentApproverName,
+    string? CurrentApproverRole,
+    int? CurrentStepOrder,
+    int? TotalSteps,
+    // Approval history
+    List<ApprovalStepDto>? ApprovalHistory,
+    // Workflow instance ID for approval actions
+    long? WorkflowInstanceId = null
+);
+
+/// <summary>
+/// Data Transfer Object representing a single approval step in workflow history.
+/// </summary>
+/// <param name="StepOrder">Order of the step in the workflow</param>
+/// <param name="StepName">Name of the workflow step</param>
+/// <param name="Status">Status of the step (Pending, Approved, Rejected, etc.)</param>
+/// <param name="AssignedToName">Name of the user/role assigned to this step</param>
+/// <param name="ActionByName">Name of the user who took action</param>
+/// <param name="AssignedAt">When the step was assigned</param>
+/// <param name="ActionAt">When the action was taken</param>
+/// <param name="Comments">Comments provided with the action</param>
+public record ApprovalStepDto(
+    int StepOrder,
+    string StepName,
+    string Status,
+    string AssignedToName,
+    string? ActionByName,
+    DateTime AssignedAt,
+    DateTime? ActionAt,
+    string? Comments
 );
 
 /// <summary>

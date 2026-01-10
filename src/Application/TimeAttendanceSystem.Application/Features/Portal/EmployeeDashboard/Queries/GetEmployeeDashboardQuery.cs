@@ -133,6 +133,7 @@ public class GetEmployeeDashboardQueryHandler : IRequestHandler<GetEmployeeDashb
             .Take(5)
             .Select(a => new ActivityDto
             {
+                EntityId = a.Id,
                 Type = "Attendance",
                 Description = $"Attended on {a.AttendanceDate:MMM dd, yyyy} - {a.WorkingHours:F1}h worked",
                 Timestamp = a.CreatedAtUtc,
@@ -149,6 +150,7 @@ public class GetEmployeeDashboardQueryHandler : IRequestHandler<GetEmployeeDashb
             .Take(3)
             .Select(v => new ActivityDto
             {
+                EntityId = v.Id,
                 Type = "Vacation",
                 Description = $"Vacation request from {v.StartDate:MMM dd} to {v.EndDate:MMM dd} - {(v.IsApproved ? "Approved" : "Pending")}",
                 Timestamp = v.CreatedAtUtc,
@@ -166,6 +168,7 @@ public class GetEmployeeDashboardQueryHandler : IRequestHandler<GetEmployeeDashb
             .Take(3)
             .Select(e => new ActivityDto
             {
+                EntityId = e.Id,
                 Type = "Excuse",
                 Description = $"Excuse request for {e.ExcuseDate:MMM dd} - {e.ApprovalStatus}",
                 Timestamp = e.CreatedAtUtc,
@@ -183,6 +186,7 @@ public class GetEmployeeDashboardQueryHandler : IRequestHandler<GetEmployeeDashb
             .Take(3)
             .Select(r => new ActivityDto
             {
+                EntityId = r.Id,
                 Type = "RemoteWork",
                 Description = $"Remote work from {r.StartDate:MMM dd} to {r.EndDate:MMM dd} - {r.Status}",
                 Timestamp = r.CreatedAtUtc,

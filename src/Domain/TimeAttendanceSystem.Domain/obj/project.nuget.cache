@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "o+enV9L143A=",
+  "dgSpecHash": "yJKLILW+A0Q=",
   "success": true,
-  "projectFilePath": "D:\\Work\\AI Code\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj",
+  "projectFilePath": "D:\\Work\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

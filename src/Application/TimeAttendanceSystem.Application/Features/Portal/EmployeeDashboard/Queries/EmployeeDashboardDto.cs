@@ -77,6 +77,11 @@ public class EmployeeDashboardDto
 public class ActivityDto
 {
     /// <summary>
+    /// Entity ID for navigation to detail page
+    /// </summary>
+    public long? EntityId { get; set; }
+
+    /// <summary>
     /// Type of activity (Attendance, Vacation, Excuse, RemoteWork, etc.)
     /// </summary>
     public string Type { get; set; } = string.Empty;

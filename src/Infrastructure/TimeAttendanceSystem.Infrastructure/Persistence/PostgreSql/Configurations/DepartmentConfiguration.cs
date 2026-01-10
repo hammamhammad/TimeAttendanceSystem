@@ -50,8 +50,8 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
 
         builder.Property(x => x.RowVersion)
             .IsConcurrencyToken()
-            .IsRowVersion()
-            .HasDefaultValueSql("E'\\\\x01'::bytea");
+            .IsRequired()
+            .HasDefaultValue(new byte[] { 1 });
 
         // Indexes for performance
         builder.HasIndex(x => new { x.BranchId, x.Code })

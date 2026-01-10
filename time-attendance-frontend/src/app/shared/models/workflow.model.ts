@@ -7,7 +7,8 @@ export type WorkflowEntityType =
   | 'RemoteWork'
   | 'Overtime'
   | 'Timesheet'
-  | 'AttendanceCorrection';
+  | 'AttendanceCorrection'
+  | 'FingerprintRequest';
 
 /**
  * Workflow step types
@@ -26,6 +27,15 @@ export type ApproverType =
   | 'DepartmentHead'
   | 'Role'
   | 'SpecificUser';
+
+/**
+ * Timeout action types - determines what happens when a step times out
+ */
+export type TimeoutAction =
+  | 'Expire'
+  | 'Escalate'
+  | 'AutoApprove'
+  | 'AutoReject';
 
 /**
  * Workflow instance status
@@ -62,6 +72,8 @@ export interface WorkflowStep {
   approverUserId?: number;
   conditionJson?: string;
   timeoutHours?: number;
+  timeoutAction?: TimeoutAction;
+  timeoutActionName?: string;
   escalationStepId?: number;
   onApproveNextStepId?: number;
   onRejectNextStepId?: number;
@@ -94,9 +106,10 @@ export interface WorkflowDefinition {
   isDefault: boolean;
   version: number;
   steps: WorkflowStep[];
-  createdAtUtc: string;
+  stepCount?: number;
+  createdAt: string;
   createdBy?: string;
-  modifiedAtUtc?: string;
+  modifiedAt?: string;
   modifiedBy?: string;
 }
 
@@ -204,7 +217,7 @@ export interface ApprovalDelegation {
   startDate: string;
   endDate: string;
   isActive: boolean;
-  createdAtUtc: string;
+  createdAt: string;
 }
 
 // Request DTOs
@@ -236,6 +249,7 @@ export interface CreateWorkflowStepRequest {
   approverUserId?: number;
   conditionJson?: string;
   timeoutHours?: number;
+  timeoutAction: TimeoutAction;
   allowDelegation: boolean;
   notifyOnAction: boolean;
   notifyRequesterOnReach: boolean;

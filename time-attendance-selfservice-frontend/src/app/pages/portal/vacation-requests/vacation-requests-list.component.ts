@@ -6,8 +6,7 @@ import { NotificationService } from '../../../core/notifications/notification.se
 import { ConfirmationService } from '../../../core/confirmation/confirmation.service';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
-import { DataTableComponent, TableColumn } from '../../../shared/components/data-table/data-table.component';
-import { TableActionsComponent, TableActionItem } from '../../../shared/components/table-actions/table-actions.component';
+import { DataTableComponent, TableColumn, TableAction } from '../../../shared/components/data-table/data-table.component';
 import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
 import { EmployeeVacationsService } from '../../employee-vacations/employee-vacations.service';
 import { EmployeeVacation } from '../../../shared/models/employee-vacation.model';
@@ -24,7 +23,6 @@ import { EmployeeVacation } from '../../../shared/models/employee-vacation.model
     PageHeaderComponent,
     LoadingSpinnerComponent,
     DataTableComponent,
-    TableActionsComponent,
     EmptyStateComponent
   ],
   templateUrl: './vacation-requests-list.component.html',
@@ -42,53 +40,154 @@ export class VacationRequestsListComponent implements OnInit, OnDestroy {
   loading = signal<boolean>(false);
   error = signal<string | null>(null);
 
+  // Sorting state
+  sortColumn = signal<string>('createdAtUtc');
+  sortDirection = signal<'asc' | 'desc'>('desc');
+
   // Table columns
-  readonly columns: TableColumn[] = [
-    { key: 'id', label: 'ID', sortable: true, width: '80px' },
-    { key: 'vacationTypeName', label: 'Type', sortable: true },
-    { key: 'startDate', label: 'Start Date', sortable: true },
-    { key: 'endDate', label: 'End Date', sortable: true },
-    { key: 'totalDays', label: 'Days', sortable: true, width: '100px' },
-    { key: 'status', label: 'Status', sortable: true, renderHtml: true },
-    { key: 'actions', label: 'Actions', sortable: false, width: '120px' }
-  ];
+  columns: TableColumn[] = [];
 
-  // Table actions
-  readonly actions: TableActionItem[] = [
-    {
-      id: 'view',
-      label: 'View',
-      icon: 'bi bi-eye',
-      variant: 'primary'
-    },
-    {
-      id: 'edit',
-      label: 'Edit',
-      icon: 'bi bi-pencil',
-      variant: 'warning',
-      visible: (item: any) => !item.isApproved && !item.isCompleted
-    },
-    {
-      id: 'delete',
-      label: 'Delete',
-      icon: 'bi bi-trash',
-      variant: 'danger',
-      visible: (item: any) => !item.isApproved && !item.isCompleted
-    }
-  ];
+  initColumns(): void {
+    this.columns = [
+      { key: 'id', label: 'ID', sortable: true, width: '80px' },
+      { key: 'vacationTypeName', label: this.i18n.t('portal.vacation_type'), sortable: true },
+      { key: 'startDate', label: this.i18n.t('portal.start_date'), sortable: true },
+      { key: 'endDate', label: this.i18n.t('portal.end_date'), sortable: true },
+      { key: 'totalDays', label: this.i18n.t('portal.total_days'), sortable: true, width: '80px' },
+      { key: 'createdAtUtc', label: this.i18n.t('portal.submitted_date'), sortable: true },
+      { key: 'status', label: this.i18n.t('portal.status'), sortable: true, renderHtml: true }
+    ];
+  }
 
-  // Computed properties for table data
+  // Table actions - using DataTableComponent's TableAction interface with Bootstrap Icons
+  tableActions: TableAction[] = [];
+
+  initTableActions(): void {
+    this.tableActions = [
+      {
+        key: 'view',
+        label: 'View',
+        icon: 'bi-eye',
+        color: 'primary'
+      },
+      {
+        key: 'edit',
+        label: 'Edit',
+        icon: 'bi-pencil',
+        color: 'warning',
+        // Only allow edit for pending workflow requests that haven't been finalized
+        condition: (item: any) => this.canEditOrDelete(item)
+      },
+      {
+        key: 'delete',
+        label: 'Delete',
+        icon: 'bi-trash',
+        color: 'danger',
+        // Only allow delete for pending workflow requests that haven't been finalized
+        condition: (item: any) => this.canEditOrDelete(item)
+      }
+    ];
+  }
+
+  /**
+   * Check if a vacation request can be edited or deleted.
+   * Only pending requests that haven't been finalized (approved/rejected/expired) can be modified.
+   */
+  canEditOrDelete(item: any): boolean {
+    // Get the original vacation to check workflow status
+    const vacation = this.vacations().find(v => v.id === item.id);
+    if (!vacation) return false;
+
+    const workflowStatus = vacation.workflowStatus?.toLowerCase();
+
+    // Cannot edit/delete if:
+    // - Already approved (isApproved = true)
+    // - Workflow status is expired (timed out)
+    // - Workflow status is rejected
+    // - Workflow status is approved
+    if (vacation.isApproved) return false;
+    if (workflowStatus === 'expired') return false;
+    if (workflowStatus === 'rejected') return false;
+    if (workflowStatus === 'approved') return false;
+
+    // Can edit/delete if workflow is pending or in progress
+    return workflowStatus === 'pending' || workflowStatus === 'inprogress';
+  }
+
+  // Computed properties for table data with sorting
   tableData = computed(() => {
     const vacs = this.vacations();
-    return vacs.map(vac => ({
+    const column = this.sortColumn();
+    const direction = this.sortDirection();
+
+    // Sort the data
+    const sorted = [...vacs].sort((a, b) => {
+      let aVal: any;
+      let bVal: any;
+
+      switch (column) {
+        case 'id':
+          aVal = a.id;
+          bVal = b.id;
+          break;
+        case 'vacationTypeName':
+          aVal = a.vacationTypeName?.toLowerCase() || '';
+          bVal = b.vacationTypeName?.toLowerCase() || '';
+          break;
+        case 'startDate':
+          aVal = new Date(a.startDate).getTime();
+          bVal = new Date(b.startDate).getTime();
+          break;
+        case 'endDate':
+          aVal = new Date(a.endDate).getTime();
+          bVal = new Date(b.endDate).getTime();
+          break;
+        case 'totalDays':
+          aVal = a.totalDays;
+          bVal = b.totalDays;
+          break;
+        case 'createdAtUtc':
+          aVal = new Date(a.createdAtUtc).getTime();
+          bVal = new Date(b.createdAtUtc).getTime();
+          break;
+        case 'status':
+          aVal = this.getStatusSortOrder(a);
+          bVal = this.getStatusSortOrder(b);
+          break;
+        default:
+          aVal = a.id;
+          bVal = b.id;
+      }
+
+      if (aVal < bVal) return direction === 'asc' ? -1 : 1;
+      if (aVal > bVal) return direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    // Map to display format
+    return sorted.map(vac => ({
       ...vac,
       startDate: this.formatDate(vac.startDate),
       endDate: this.formatDate(vac.endDate),
+      createdAtUtc: this.formatDate(vac.createdAtUtc),
       status: this.getStatusBadgeHtml(vac)
     }));
   });
 
+  // Helper to get status sort order
+  getStatusSortOrder(vac: EmployeeVacation): number {
+    // Check workflow status for expired (timed out)
+    if (vac.workflowStatus?.toLowerCase() === 'expired') return 2; // Workflow timed out
+    if (vac.workflowStatus?.toLowerCase() === 'rejected') return 2; // Rejected
+    if (vac.isApproved && vac.isCurrentlyActive) return 1; // Active
+    if (!vac.isApproved) return 3; // Pending
+    if (vac.isApproved && !vac.isCompleted) return 4; // Approved
+    return 5; // Completed
+  }
+
   ngOnInit(): void {
+    this.initColumns();
+    this.initTableActions();
     this.loadVacations();
   }
 
@@ -122,11 +221,16 @@ export class VacationRequestsListComponent implements OnInit, OnDestroy {
     this.router.navigate(['/vacation-requests/new']);
   }
 
-  onActionClick(event: { action: TableActionItem; item: any }): void {
+  onSort(event: { column: string; direction: 'asc' | 'desc' }): void {
+    this.sortColumn.set(event.column);
+    this.sortDirection.set(event.direction);
+  }
+
+  onActionClick(event: { action: string; item: any }): void {
     const vacation = this.vacations().find(v => v.id === event.item.id);
     if (!vacation) return;
 
-    switch (event.action.id) {
+    switch (event.action) {
       case 'view':
         this.viewVacation(vacation);
         break;
@@ -173,22 +277,37 @@ export class VacationRequestsListComponent implements OnInit, OnDestroy {
   }
 
   getStatusBadgeHtml(vacation: EmployeeVacation): string {
-    if (vacation.isCurrentlyActive) {
-      return '<span class="badge bg-info">Active</span>';
+    // Check workflow status first - this reflects the actual approval state
+    const workflowStatus = vacation.workflowStatus?.toLowerCase();
+
+    // If workflow explicitly expired (timed out), show as expired
+    if (workflowStatus === 'expired') {
+      return `<span class="badge bg-danger">${this.i18n.t('portal.status_expired')}</span>`;
     }
-    if (vacation.isCompleted) {
-      return '<span class="badge bg-secondary">Completed</span>';
+
+    // If workflow was rejected
+    if (workflowStatus === 'rejected') {
+      return `<span class="badge bg-danger">${this.i18n.t('portal.status_rejected')}</span>`;
     }
-    if (vacation.isUpcoming) {
-      if (vacation.isApproved) {
-        return '<span class="badge bg-success">Approved</span>';
-      }
-      return '<span class="badge bg-warning">Pending</span>';
-    }
+
+    // Check if vacation dates have passed
+    const isPastEndDate = vacation.isCompleted;
+
     if (vacation.isApproved) {
-      return '<span class="badge bg-success">Approved</span>';
+      // Approved vacation
+      if (vacation.isCurrentlyActive) {
+        return `<span class="badge bg-info">${this.i18n.t('portal.status_active')}</span>`;
+      }
+      if (isPastEndDate) {
+        return `<span class="badge bg-secondary">${this.i18n.t('portal.status_completed')}</span>`;
+      }
+      // Approved and upcoming
+      return `<span class="badge bg-success">${this.i18n.t('portal.status_approved')}</span>`;
+    } else {
+      // Not approved - workflow is still in progress
+      // Show as pending regardless of vacation dates
+      return `<span class="badge bg-warning">${this.i18n.t('portal.status_pending')}</span>`;
     }
-    return '<span class="badge bg-warning">Pending</span>';
   }
 
   formatDate(date: Date | string): string {

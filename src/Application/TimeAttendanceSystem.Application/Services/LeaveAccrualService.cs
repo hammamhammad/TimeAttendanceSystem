@@ -279,7 +279,7 @@ public class LeaveAccrualService : ILeaveAccrualService
             var balance = await GetLeaveBalanceAsync(employeeId, vacationTypeId, year, cancellationToken);
 
             if (balance == null)
-                return Result.Failure($"No leave balance found for employee {employeeId}, vacation type {vacationTypeId}, year {year}");
+                return Result.Failure("No leave balance has been assigned for this vacation type. Please contact HR to set up your leave entitlement.");
 
             if (!balance.HasSufficientBalance(days))
             {
@@ -414,9 +414,19 @@ public class LeaveAccrualService : ILeaveAccrualService
         var balance = await GetLeaveBalanceAsync(employeeId, vacationTypeId, year, cancellationToken);
 
         if (balance == null)
-            return Result<bool>.Success(false);
+        {
+            // Return a failure with a user-friendly message
+            return Result.Failure<bool>(
+                "No leave balance has been assigned to you for this vacation type. Please contact HR to set up your leave entitlement.");
+        }
 
-        return Result<bool>.Success(balance.HasSufficientBalance(days));
+        if (!balance.HasSufficientBalance(days))
+        {
+            return Result.Failure<bool>(
+                $"Insufficient leave balance. You have {balance.CurrentBalance:F1} days available but requested {days:F1} days.");
+        }
+
+        return Result<bool>.Success(true);
     }
 
     public async Task<LeaveBalance?> GetLeaveBalanceAsync(

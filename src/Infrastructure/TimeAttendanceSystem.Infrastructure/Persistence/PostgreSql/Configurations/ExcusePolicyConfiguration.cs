@@ -115,9 +115,8 @@ public class ExcusePolicyConfiguration : IEntityTypeConfiguration<ExcusePolicy>
             .HasDefaultValue(false);
 
         builder.Property("RowVersion")
-            .IsRequired()
             .IsConcurrencyToken()
-            .IsRowVersion()
-            .HasDefaultValueSql("E'\\\\x01'::bytea");
+            .IsRequired()
+            .HasDefaultValue(new byte[] { 1 });
     }
 }

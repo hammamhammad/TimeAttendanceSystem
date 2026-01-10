@@ -100,9 +100,11 @@ public class LoginCommandHandler : BaseHandler<LoginCommand, Result<LoginRespons
                 .ThenInclude(ubs => ubs.Branch)
             .FirstOrDefaultAsync(u => u.Username == request.Username, cancellationToken);
 
-        // Fetch linked employee for full name display (separate query to avoid complex joins)
+        // Fetch linked employee for full name display and employee context (separate query to avoid complex joins)
         string? employeeFullName = null;
         string? employeeFullNameAr = null;
+        long? employeeId = null;
+        bool isManager = false;
         if (user != null)
         {
             var employeeLink = await Context.EmployeeUserLinks
@@ -113,6 +115,11 @@ public class LoginCommandHandler : BaseHandler<LoginCommand, Result<LoginRespons
             {
                 employeeFullName = employeeLink.Employee.FullName;
                 employeeFullNameAr = employeeLink.Employee.FullNameAr;
+                employeeId = employeeLink.EmployeeId;
+
+                // Check if the employee is a manager (has direct reports)
+                isManager = await Context.Employees
+                    .AnyAsync(e => e.ManagerEmployeeId == employeeLink.EmployeeId && !e.IsDeleted, cancellationToken);
             }
         }
 
@@ -232,7 +239,9 @@ public class LoginCommandHandler : BaseHandler<LoginCommand, Result<LoginRespons
             permissions,
             branchIds,
             employeeFullName,
-            employeeFullNameAr
+            employeeFullNameAr,
+            employeeId,
+            isManager
         );
 
         // Build complete login response with tokens and user data

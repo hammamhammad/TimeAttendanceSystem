@@ -117,7 +117,8 @@ public class ApprovalDelegationConfiguration : IEntityTypeConfiguration<Approval
 
         builder.Property(e => e.RowVersion)
             .IsConcurrencyToken()
-            .ValueGeneratedOnAddOrUpdate()
+            .IsRequired()
+            .HasDefaultValue(new byte[] { 1 })
             .HasComment("Concurrency control timestamp");
     }
 }

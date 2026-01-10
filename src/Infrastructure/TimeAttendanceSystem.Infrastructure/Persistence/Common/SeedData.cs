@@ -5,6 +5,9 @@ using TimeAttendanceSystem.Domain.Settings;
 using TimeAttendanceSystem.Domain.Branches;
 using TimeAttendanceSystem.Domain.Employees;
 using TimeAttendanceSystem.Domain.RemoteWork;
+using TimeAttendanceSystem.Domain.Workflows;
+using TimeAttendanceSystem.Domain.Workflows.Enums;
+using TimeAttendanceSystem.Domain.VacationTypes;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
@@ -41,9 +44,19 @@ public static class SeedData
             await SeedDefaultRemoteWorkPolicyAsync(context);
         }
 
+        if (!await context.WorkflowDefinitions.AnyAsync())
+        {
+            await SeedDefaultWorkflowsAsync(context);
+        }
+
+        if (!await context.VacationTypes.AnyAsync())
+        {
+            await SeedDefaultVacationTypesAsync(context);
+        }
+
         await context.SaveChangesAsync();
 
-        Console.WriteLine("✅ Essential system data seeding completed (permissions, roles, systemadmin user, default shift, remote work policy)");
+        Console.WriteLine("✅ Essential system data seeding completed (permissions, roles, systemadmin user, default shift, remote work policy, default workflows, vacation types)");
     }
 
     private static async Task SeedPermissionsAsync(TimeAttendanceDbContext context)
@@ -436,6 +449,238 @@ public static class SeedData
         await context.SaveChangesAsync();
 
         Console.WriteLine("✅ Default remote work policy created: Company-wide (3 days/week, 10 days/month, 120 days/year)");
+    }
+
+    private static async Task SeedDefaultWorkflowsAsync(TimeAttendanceDbContext context)
+    {
+        Console.WriteLine("Creating default workflows for Vacation, Excuse, Remote Work, and Fingerprint requests...");
+
+        var workflows = new List<WorkflowDefinition>();
+
+        // 1. Vacation Request Workflow
+        var vacationWorkflow = new WorkflowDefinition
+        {
+            Name = "Default Vacation Approval",
+            NameAr = "موافقة الإجازة الافتراضية",
+            Description = "Default workflow for vacation requests - requires direct manager approval",
+            DescriptionAr = "مسار العمل الافتراضي لطلبات الإجازة - يتطلب موافقة المدير المباشر",
+            EntityType = WorkflowEntityType.Vacation,
+            IsActive = true,
+            IsDefault = true,
+            BranchId = null, // Organization-wide
+            Version = 1,
+            Priority = 10,
+            CreatedBy = "SYSTEM",
+            CreatedAtUtc = DateTime.UtcNow,
+            RowVersion = new byte[] { 1 }
+        };
+
+        vacationWorkflow.Steps.Add(new WorkflowStep
+        {
+            StepOrder = 1,
+            Name = "Direct Manager Approval",
+            NameAr = "موافقة المدير المباشر",
+            StepType = WorkflowStepType.Approval,
+            ApproverType = ApproverType.DirectManager,
+            TimeoutHours = 48, // 2 days
+            NotifyOnAction = true,
+            CreatedBy = "SYSTEM",
+            CreatedAtUtc = DateTime.UtcNow,
+            RowVersion = new byte[] { 1 }
+        });
+
+        workflows.Add(vacationWorkflow);
+
+        // 2. Excuse Request Workflow
+        var excuseWorkflow = new WorkflowDefinition
+        {
+            Name = "Default Excuse Approval",
+            NameAr = "موافقة العذر الافتراضية",
+            Description = "Default workflow for excuse requests - requires direct manager approval",
+            DescriptionAr = "مسار العمل الافتراضي لطلبات الأعذار - يتطلب موافقة المدير المباشر",
+            EntityType = WorkflowEntityType.Excuse,
+            IsActive = true,
+            IsDefault = true,
+            BranchId = null,
+            Version = 1,
+            Priority = 10,
+            CreatedBy = "SYSTEM",
+            CreatedAtUtc = DateTime.UtcNow,
+            RowVersion = new byte[] { 1 }
+        };
+
+        excuseWorkflow.Steps.Add(new WorkflowStep
+        {
+            StepOrder = 1,
+            Name = "Direct Manager Approval",
+            NameAr = "موافقة المدير المباشر",
+            StepType = WorkflowStepType.Approval,
+            ApproverType = ApproverType.DirectManager,
+            TimeoutHours = 24, // 1 day
+            NotifyOnAction = true,
+            CreatedBy = "SYSTEM",
+            CreatedAtUtc = DateTime.UtcNow,
+            RowVersion = new byte[] { 1 }
+        });
+
+        workflows.Add(excuseWorkflow);
+
+        // 3. Remote Work Request Workflow
+        var remoteWorkWorkflow = new WorkflowDefinition
+        {
+            Name = "Default Remote Work Approval",
+            NameAr = "موافقة العمل عن بعد الافتراضية",
+            Description = "Default workflow for remote work requests - requires direct manager approval",
+            DescriptionAr = "مسار العمل الافتراضي لطلبات العمل عن بعد - يتطلب موافقة المدير المباشر",
+            EntityType = WorkflowEntityType.RemoteWork,
+            IsActive = true,
+            IsDefault = true,
+            BranchId = null,
+            Version = 1,
+            Priority = 10,
+            CreatedBy = "SYSTEM",
+            CreatedAtUtc = DateTime.UtcNow,
+            RowVersion = new byte[] { 1 }
+        };
+
+        remoteWorkWorkflow.Steps.Add(new WorkflowStep
+        {
+            StepOrder = 1,
+            Name = "Direct Manager Approval",
+            NameAr = "موافقة المدير المباشر",
+            StepType = WorkflowStepType.Approval,
+            ApproverType = ApproverType.DirectManager,
+            TimeoutHours = 48, // 2 days
+            NotifyOnAction = true,
+            CreatedBy = "SYSTEM",
+            CreatedAtUtc = DateTime.UtcNow,
+            RowVersion = new byte[] { 1 }
+        });
+
+        workflows.Add(remoteWorkWorkflow);
+
+        // 4. Fingerprint Request Workflow
+        var fingerprintWorkflow = new WorkflowDefinition
+        {
+            Name = "Default Fingerprint Request Approval",
+            NameAr = "موافقة طلب البصمة الافتراضية",
+            Description = "Default workflow for fingerprint requests - requires direct manager approval",
+            DescriptionAr = "مسار العمل الافتراضي لطلبات البصمة - يتطلب موافقة المدير المباشر",
+            EntityType = WorkflowEntityType.FingerprintRequest,
+            IsActive = true,
+            IsDefault = true,
+            BranchId = null,
+            Version = 1,
+            Priority = 10,
+            CreatedBy = "SYSTEM",
+            CreatedAtUtc = DateTime.UtcNow,
+            RowVersion = new byte[] { 1 }
+        };
+
+        fingerprintWorkflow.Steps.Add(new WorkflowStep
+        {
+            StepOrder = 1,
+            Name = "Direct Manager Approval",
+            NameAr = "موافقة المدير المباشر",
+            StepType = WorkflowStepType.Approval,
+            ApproverType = ApproverType.DirectManager,
+            TimeoutHours = 24, // 1 day
+            NotifyOnAction = true,
+            CreatedBy = "SYSTEM",
+            CreatedAtUtc = DateTime.UtcNow,
+            RowVersion = new byte[] { 1 }
+        });
+
+        workflows.Add(fingerprintWorkflow);
+
+        await context.WorkflowDefinitions.AddRangeAsync(workflows);
+        await context.SaveChangesAsync();
+
+        Console.WriteLine("✅ Created 4 default workflows: Vacation, Excuse, Remote Work, and Fingerprint Request - all with direct manager approval");
+    }
+
+    private static async Task SeedDefaultVacationTypesAsync(TimeAttendanceDbContext context)
+    {
+        var vacationTypes = new List<VacationType>
+        {
+            new VacationType
+            {
+                Name = "Annual Leave",
+                NameAr = "إجازة سنوية",
+                IsActive = true,
+                BranchId = null, // Applies to all branches
+                CreatedBy = "SYSTEM",
+                CreatedAtUtc = DateTime.UtcNow
+            },
+            new VacationType
+            {
+                Name = "Sick Leave",
+                NameAr = "إجازة مرضية",
+                IsActive = true,
+                BranchId = null,
+                CreatedBy = "SYSTEM",
+                CreatedAtUtc = DateTime.UtcNow
+            },
+            new VacationType
+            {
+                Name = "Unpaid Leave",
+                NameAr = "إجازة بدون راتب",
+                IsActive = true,
+                BranchId = null,
+                CreatedBy = "SYSTEM",
+                CreatedAtUtc = DateTime.UtcNow
+            },
+            new VacationType
+            {
+                Name = "Emergency Leave",
+                NameAr = "إجازة طارئة",
+                IsActive = true,
+                BranchId = null,
+                CreatedBy = "SYSTEM",
+                CreatedAtUtc = DateTime.UtcNow
+            },
+            new VacationType
+            {
+                Name = "Maternity Leave",
+                NameAr = "إجازة أمومة",
+                IsActive = true,
+                BranchId = null,
+                CreatedBy = "SYSTEM",
+                CreatedAtUtc = DateTime.UtcNow
+            },
+            new VacationType
+            {
+                Name = "Paternity Leave",
+                NameAr = "إجازة أبوة",
+                IsActive = true,
+                BranchId = null,
+                CreatedBy = "SYSTEM",
+                CreatedAtUtc = DateTime.UtcNow
+            },
+            new VacationType
+            {
+                Name = "Bereavement Leave",
+                NameAr = "إجازة عزاء",
+                IsActive = true,
+                BranchId = null,
+                CreatedBy = "SYSTEM",
+                CreatedAtUtc = DateTime.UtcNow
+            },
+            new VacationType
+            {
+                Name = "Marriage Leave",
+                NameAr = "إجازة زواج",
+                IsActive = true,
+                BranchId = null,
+                CreatedBy = "SYSTEM",
+                CreatedAtUtc = DateTime.UtcNow
+            }
+        };
+
+        await context.VacationTypes.AddRangeAsync(vacationTypes);
+        await context.SaveChangesAsync();
+
+        Console.WriteLine("✅ Created 8 default vacation types: Annual, Sick, Unpaid, Emergency, Maternity, Paternity, Bereavement, Marriage Leave");
     }
 
     private static (string hash, string salt) HashPassword(string password)

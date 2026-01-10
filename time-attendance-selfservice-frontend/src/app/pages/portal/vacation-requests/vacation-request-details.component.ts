@@ -5,6 +5,7 @@ import { I18nService } from '../../../core/i18n/i18n.service';
 import { NotificationService } from '../../../core/notifications/notification.service';
 import { ConfirmationService } from '../../../core/confirmation/confirmation.service';
 import { EmployeeVacationsService } from '../../employee-vacations/employee-vacations.service';
+import { PortalService } from '../services/portal.service';
 import { EmployeeVacation, VacationStatus } from '../../../shared/models/employee-vacation.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
@@ -35,6 +36,7 @@ export class PortalVacationRequestDetailsComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly vacationService = inject(EmployeeVacationsService);
+  private readonly portalService = inject(PortalService);
   private readonly notificationService = inject(NotificationService);
   private readonly confirmationService = inject(ConfirmationService);
 
@@ -42,28 +44,48 @@ export class PortalVacationRequestDetailsComponent implements OnInit {
   vacation = signal<EmployeeVacation | null>(null);
   loading = signal(true);
   error = signal<string | null>(null);
+  processingApproval = signal(false);
 
   // Computed properties
   statusBadge = computed(() => {
     const vac = this.vacation();
     if (!vac) return { label: '', variant: 'secondary' as const };
 
-    if (vac.isCurrentlyActive) {
-      return { label: this.i18n.t('portal.status_active'), variant: 'info' as const };
+    // Check workflow status first - this reflects the actual approval state
+    const workflowStatus = vac.workflowStatus?.toLowerCase();
+
+    // If workflow explicitly expired (timed out), show as expired
+    if (workflowStatus === 'expired') {
+      return { label: this.i18n.t('portal.status_expired'), variant: 'danger' as const };
     }
-    if (vac.isCompleted) {
-      return { label: this.i18n.t('portal.status_completed'), variant: 'secondary' as const };
+
+    // If workflow was rejected
+    if (workflowStatus === 'rejected') {
+      return { label: this.i18n.t('portal.status_rejected'), variant: 'danger' as const };
     }
-    if (vac.isUpcoming) {
-      if (vac.isApproved) {
-        return { label: this.i18n.t('portal.status_approved'), variant: 'success' as const };
+
+    // Check if vacation dates have passed
+    const isPastEndDate = vac.isCompleted;
+
+    if (vac.isApproved) {
+      // Approved vacation
+      if (vac.isCurrentlyActive) {
+        return { label: this.i18n.t('portal.status_active'), variant: 'info' as const };
       }
+      if (isPastEndDate) {
+        return { label: this.i18n.t('portal.status_completed'), variant: 'secondary' as const };
+      }
+      // Approved and upcoming
+      return { label: this.i18n.t('portal.status_approved'), variant: 'success' as const };
+    } else {
+      // Not approved - check if workflow is still in progress
+      if (workflowStatus === 'inprogress' || workflowStatus === 'pending') {
+        // Workflow is still active, show as pending regardless of vacation dates
+        return { label: this.i18n.t('portal.status_pending'), variant: 'warning' as const };
+      }
+      // Fallback for unknown status
       return { label: this.i18n.t('portal.status_pending'), variant: 'warning' as const };
     }
-    if (vac.isApproved) {
-      return { label: this.i18n.t('portal.status_approved'), variant: 'success' as const };
-    }
-    return { label: this.i18n.t('portal.status_pending'), variant: 'warning' as const };
   });
 
   basicInfoItems = computed<DefinitionItem[]>(() => {
@@ -85,11 +107,11 @@ export class PortalVacationRequestDetailsComponent implements OnInit {
       },
       {
         label: this.i18n.t('portal.total_days'),
-        value: `${vac.totalDays} ${this.i18n.t('common.days')}`
+        value: `${vac.totalDays} ${this.i18n.t('common.days_unit')}`
       },
       {
         label: this.i18n.t('portal.business_days'),
-        value: `${vac.businessDays} ${this.i18n.t('common.days')}`
+        value: `${vac.businessDays} ${this.i18n.t('common.days_unit')}`
       },
       {
         label: this.i18n.t('portal.notes'),
@@ -140,18 +162,66 @@ export class PortalVacationRequestDetailsComponent implements OnInit {
     return vac && !vac.isApproved && !vac.isCompleted;
   });
 
+  // Computed property for pending approval information
+  pendingApprovalInfo = computed(() => {
+    const vac = this.vacation();
+    if (!vac || vac.isApproved || vac.isCompleted) return null;
+
+    // Determine who the request is pending with
+    let pendingWith: string | null = null;
+    if (vac.currentApproverName) {
+      pendingWith = vac.currentApproverName;
+    } else if (vac.currentApproverRole) {
+      pendingWith = vac.currentApproverRole;
+    }
+
+    // Build step progress info
+    let stepProgress: string | null = null;
+    if (vac.currentStepOrder && vac.totalSteps) {
+      stepProgress = `${vac.currentStepOrder}/${vac.totalSteps}`;
+    }
+
+    return {
+      pendingWith,
+      stepProgress,
+      workflowStatus: vac.workflowStatus
+    };
+  });
+
+  // Track if viewing for approval purposes
+  isApprovalView = signal(false);
+
+  // Computed property to check if approval actions are available
+  canApprove = computed(() => {
+    const vac = this.vacation();
+    // Can approve if: viewing for approval, not already approved, has workflow instance ID, and workflow is in progress
+    return this.isApprovalView() &&
+           vac &&
+           !vac.isApproved &&
+           vac.workflowInstanceId &&
+           (vac.workflowStatus?.toLowerCase() === 'inprogress' || vac.workflowStatus?.toLowerCase() === 'pending');
+  });
+
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
+    const isApproval = this.route.snapshot.queryParamMap.get('approval') === 'true';
+    this.isApprovalView.set(isApproval);
+
     if (id) {
-      this.loadVacation(+id);
+      this.loadVacation(+id, isApproval);
     }
   }
 
-  private loadVacation(id: number): void {
+  private loadVacation(id: number, forApproval: boolean = false): void {
     this.loading.set(true);
     this.error.set(null);
 
-    this.vacationService.getVacationById(id).subscribe({
+    // Use the appropriate endpoint based on whether this is an approval view
+    const request$ = forApproval
+      ? this.vacationService.getVacationForApproval(id)
+      : this.vacationService.getVacationById(id);
+
+    request$.subscribe({
       next: (vacation) => {
         if (vacation) {
           this.vacation.set(vacation);
@@ -216,14 +286,202 @@ export class PortalVacationRequestDetailsComponent implements OnInit {
     });
   }
 
-  private formatDateTime(date: Date | string): string {
+  formatDateTime(date: Date | string): string {
     const d = typeof date === 'string' ? new Date(date) : date;
-    return d.toLocaleDateString('en-US', {
+    // Use toLocaleString with locale from i18n service for consistent display
+    return d.toLocaleString(this.i18n.getCurrentLocale() === 'ar' ? 'ar-SA' : 'en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
+      hour12: true
+    });
+  }
+
+  /**
+   * Checks if the vacation workflow is expired (timed out).
+   * Uses the actual workflow status, not vacation dates.
+   */
+  isVacationExpired(): boolean {
+    const vac = this.vacation();
+    // Only return true if the workflow itself has expired (timed out)
+    return vac?.workflowStatus?.toLowerCase() === 'expired';
+  }
+
+  /**
+   * Gets the translated label for a workflow step status
+   * If the workflow has timed out, show as Expired
+   */
+  getStepStatusLabel(status: string): string {
+    const statusLower = status?.toLowerCase() || 'pending';
+
+    // If workflow has timed out, show as Expired
+    if (statusLower === 'pending' && this.isVacationExpired()) {
+      return this.i18n.t('portal.status_expired');
+    }
+
+    switch (statusLower) {
+      case 'approved':
+        return this.i18n.t('portal.workflow_approved');
+      case 'rejected':
+        return this.i18n.t('portal.workflow_rejected');
+      case 'delegated':
+        return this.i18n.t('portal.workflow_delegated');
+      case 'timedout':
+      case 'timed_out':
+        return this.i18n.t('portal.workflow_timed_out');
+      case 'skipped':
+        return this.i18n.t('portal.workflow_skipped');
+      case 'pending':
+      default:
+        return this.i18n.t('portal.workflow_pending');
+    }
+  }
+
+  /**
+   * Gets the badge variant for a workflow step status
+   * If the workflow has timed out, show as danger (red)
+   */
+  getStepStatusVariant(status: string): 'success' | 'danger' | 'warning' | 'info' | 'secondary' | 'primary' {
+    const statusLower = status?.toLowerCase() || 'pending';
+
+    // If workflow has timed out, show as danger (red)
+    if (statusLower === 'pending' && this.isVacationExpired()) {
+      return 'danger';
+    }
+
+    switch (statusLower) {
+      case 'approved':
+        return 'success';
+      case 'rejected':
+        return 'danger';
+      case 'delegated':
+        return 'info';
+      case 'timedout':
+      case 'timed_out':
+        return 'danger';
+      case 'skipped':
+        return 'secondary';
+      case 'pending':
+      default:
+        return 'warning';
+    }
+  }
+
+  /**
+   * Approves the vacation request
+   */
+  async onApprove(): Promise<void> {
+    const vac = this.vacation();
+    if (!vac?.workflowInstanceId) return;
+
+    const result = await this.confirmationService.confirm({
+      title: this.i18n.t('portal.confirm_approve'),
+      message: this.i18n.t('portal.confirm_approve_message', { name: vac.employeeName || 'Unknown' }),
+      confirmText: this.i18n.t('portal.approve'),
+      cancelText: this.i18n.t('common.cancel'),
+      confirmButtonClass: 'btn-success',
+      icon: 'bi-check-circle',
+      iconClass: 'text-success'
+    });
+
+    if (!result.confirmed) return;
+
+    this.processingApproval.set(true);
+
+    this.portalService.approveWorkflowStep(vac.workflowInstanceId, 'Approved via vacation details').subscribe({
+      next: () => {
+        this.notificationService.success(this.i18n.t('portal.approval_success'));
+        // Navigate back to pending approvals or refresh the page
+        this.router.navigate(['/pending-approvals']);
+      },
+      error: (error) => {
+        console.error('Error approving vacation:', error);
+        this.notificationService.error(this.i18n.t('portal.approval_error'));
+        this.processingApproval.set(false);
+      }
+    });
+  }
+
+  /**
+   * Rejects the vacation request
+   */
+  async onReject(): Promise<void> {
+    const vac = this.vacation();
+    if (!vac?.workflowInstanceId) return;
+
+    const result = await this.confirmationService.confirm({
+      title: this.i18n.t('portal.confirm_reject'),
+      message: this.i18n.t('portal.confirm_reject_message', { name: vac.employeeName || 'Unknown' }),
+      confirmText: this.i18n.t('portal.reject'),
+      cancelText: this.i18n.t('common.cancel'),
+      confirmButtonClass: 'btn-danger',
+      icon: 'bi-x-circle',
+      iconClass: 'text-danger'
+    });
+
+    if (!result.confirmed) return;
+
+    this.processingApproval.set(true);
+
+    this.portalService.rejectWorkflowStep(vac.workflowInstanceId, 'Rejected via vacation details').subscribe({
+      next: () => {
+        this.notificationService.success(this.i18n.t('portal.rejection_success'));
+        // Navigate back to pending approvals
+        this.router.navigate(['/pending-approvals']);
+      },
+      error: (error) => {
+        console.error('Error rejecting vacation:', error);
+        this.notificationService.error(this.i18n.t('portal.rejection_error'));
+        this.processingApproval.set(false);
+      }
+    });
+  }
+
+  /**
+   * Delegates the vacation request to another user
+   */
+  async onDelegate(): Promise<void> {
+    const vac = this.vacation();
+    if (!vac?.workflowInstanceId) return;
+
+    // For now, prompt user for delegate user ID
+    // In a full implementation, this would open a user selection modal
+    const delegateUserIdStr = prompt(this.i18n.t('portal.enter_delegate_user_id'));
+    if (!delegateUserIdStr) return;
+
+    const delegateToUserId = parseInt(delegateUserIdStr, 10);
+    if (isNaN(delegateToUserId) || delegateToUserId <= 0) {
+      this.notificationService.error(this.i18n.t('portal.invalid_user_id'));
+      return;
+    }
+
+    const result = await this.confirmationService.confirm({
+      title: this.i18n.t('portal.confirm_delegate'),
+      message: this.i18n.t('portal.confirm_delegate_message'),
+      confirmText: this.i18n.t('portal.delegate'),
+      cancelText: this.i18n.t('common.cancel'),
+      confirmButtonClass: 'btn-info',
+      icon: 'bi-person-plus',
+      iconClass: 'text-info'
+    });
+
+    if (!result.confirmed) return;
+
+    this.processingApproval.set(true);
+
+    this.portalService.delegateWorkflowStep(vac.workflowInstanceId, delegateToUserId, 'Delegated via vacation details').subscribe({
+      next: () => {
+        this.notificationService.success(this.i18n.t('portal.delegation_success'));
+        // Navigate back to pending approvals
+        this.router.navigate(['/pending-approvals']);
+      },
+      error: (error) => {
+        console.error('Error delegating vacation:', error);
+        this.notificationService.error(this.i18n.t('portal.delegation_error'));
+        this.processingApproval.set(false);
+      }
     });
   }
 }

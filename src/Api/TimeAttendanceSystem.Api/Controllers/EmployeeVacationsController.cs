@@ -95,9 +95,8 @@ public class EmployeeVacationsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetEmployeeVacation(long id)
     {
-        var query = new GetEmployeeVacationsQuery(Page: 1, PageSize: 1);
-        // Note: For a single item, you would typically create a GetEmployeeVacationByIdQuery
-        // This is simplified for the demo
+        // Query with a large page size to find the specific vacation by ID
+        var query = new GetEmployeeVacationsQuery(Page: 1, PageSize: 1000);
         var result = await _mediator.Send(query);
 
         if (!result.IsSuccess)

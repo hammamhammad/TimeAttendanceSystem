@@ -4,11 +4,12 @@ import { Router, NavigationEnd } from '@angular/router';
 import { filter, map } from 'rxjs';
 import { AuthService } from '../../core/auth/auth.service';
 import { I18nService, Locale } from '../../core/i18n/i18n.service';
+import { NotificationBellComponent } from '../../shared/components/notification-bell/notification-bell.component';
 
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [],
+  imports: [NotificationBellComponent],
   templateUrl: './topbar.component.html',
   styleUrl: './topbar.component.css'
 })

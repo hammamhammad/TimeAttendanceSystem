@@ -13,6 +13,7 @@ using TimeAttendanceSystem.Domain.RemoteWork;
 using TimeAttendanceSystem.Domain.Workflows;
 using TimeAttendanceSystem.Domain.LeaveManagement;
 using TimeAttendanceSystem.Domain.FingerprintRequests;
+using TimeAttendanceSystem.Domain.Notifications;
 using TimeAttendanceSystem.Application.Abstractions;
 using TimeAttendanceSystem.Application.Services;
 
@@ -134,6 +135,9 @@ public class TimeAttendanceDbContext : DbContext, IApplicationDbContext
     public DbSet<WorkflowInstance> WorkflowInstances => Set<WorkflowInstance>();
     public DbSet<WorkflowStepExecution> WorkflowStepExecutions => Set<WorkflowStepExecution>();
     public DbSet<ApprovalDelegation> ApprovalDelegations => Set<ApprovalDelegation>();
+
+    // Notification entities
+    public DbSet<Notification> Notifications => Set<Notification>();
 
     /// <summary>
     /// Configures the database model using Fluent API configurations from the current assembly.

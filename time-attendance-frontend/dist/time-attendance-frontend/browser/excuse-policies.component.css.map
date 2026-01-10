@@ -1,7 +1,7 @@
 {
   "version": 3,
   "sources": ["src/app/pages/settings/excuse-policies/excuse-policies.component.css"],
-  "sourcesContent": ["/* Excuse Policies List Component Styles */\n\n.container-fluid {\n  padding: 1.5rem;\n}\n\n@media (max-width: 768px) {\n  .container-fluid {\n    padding: 1rem;\n  }\n}\n"],
+  "sourcesContent": ["/* Excuse Policies List Component Styles */\r\n\r\n.container-fluid {\r\n  padding: 1.5rem;\r\n}\r\n\r\n@media (max-width: 768px) {\r\n  .container-fluid {\r\n    padding: 1rem;\r\n  }\r\n}\r\n"],
   "mappings": ";AAEA,CAAC;AACC,WAAS;AACX;AAEA,OAAO,CAAC,SAAS,EAAE;AACjB,GALD;AAMG,aAAS;AACX;AACF;",
   "names": []
 }

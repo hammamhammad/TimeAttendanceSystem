@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using TimeAttendanceSystem.Application.Abstractions;
+using TimeAttendanceSystem.Domain.Notifications;
 using TimeAttendanceSystem.Domain.Workflows;
 using TimeAttendanceSystem.Domain.Workflows.Enums;
 
@@ -13,10 +14,12 @@ namespace TimeAttendanceSystem.Application.Workflows.Services;
 public class WorkflowEngine : IWorkflowEngine
 {
     private readonly IApplicationDbContext _context;
+    private readonly IInAppNotificationService _notificationService;
 
-    public WorkflowEngine(IApplicationDbContext context)
+    public WorkflowEngine(IApplicationDbContext context, IInAppNotificationService notificationService)
     {
         _context = context;
+        _notificationService = notificationService;
     }
 
     /// <inheritdoc />
@@ -77,6 +80,9 @@ public class WorkflowEngine : IWorkflowEngine
             return WorkflowResult<WorkflowInstance>.Failure(processResult.Error ?? "Failed to process first step");
         }
 
+        // Send notification to requester about request submission
+        await SendRequestSubmittedNotificationAsync(workflowInstance, entityType);
+
         return WorkflowResult<WorkflowInstance>.Success(workflowInstance);
     }
 
@@ -118,8 +124,15 @@ public class WorkflowEngine : IWorkflowEngine
             // No more steps - workflow is approved
             instance.Complete(ApprovalAction.Approved, comments, userId);
             await _context.SaveChangesAsync();
+
+            // Send final approval notification to requester
+            await SendRequestApprovedNotificationAsync(instance, userId);
+
             return WorkflowResult<bool>.Success(true);
         }
+
+        // Send intermediate approval notification to requester
+        await SendIntermediateApprovalNotificationAsync(instance, execution.Step, userId);
 
         // Process the next step
         var processResult = await ProcessStepAsync(instance, nextStep, userId);
@@ -160,6 +173,10 @@ public class WorkflowEngine : IWorkflowEngine
         instance.Complete(ApprovalAction.Rejected, comments, userId);
 
         await _context.SaveChangesAsync();
+
+        // Send rejection notification to requester
+        await SendRequestRejectedNotificationAsync(instance, userId, comments);
+
         return WorkflowResult<bool>.Success(true);
     }
 
@@ -211,6 +228,9 @@ public class WorkflowEngine : IWorkflowEngine
 
         _context.WorkflowStepExecutions.Add(newExecution);
         await _context.SaveChangesAsync();
+
+        // Send notifications for delegation
+        await SendDelegationNotificationsAsync(instance, delegateToUserId, userId, comments);
 
         return WorkflowResult<bool>.Success(true);
     }
@@ -423,6 +443,8 @@ public class WorkflowEngine : IWorkflowEngine
         var now = DateTime.UtcNow;
         var overdueExecutions = await _context.WorkflowStepExecutions
             .Include(se => se.WorkflowInstance)
+                .ThenInclude(wi => wi.WorkflowDefinition)
+                    .ThenInclude(wd => wd.Steps)
             .Include(se => se.Step)
             .Where(se => !se.Action.HasValue &&
                         se.DueAt.HasValue &&
@@ -437,20 +459,64 @@ public class WorkflowEngine : IWorkflowEngine
             // Mark as timed out
             execution.MarkTimedOut();
 
-            // Check if escalation is configured
-            if (execution.Step.EscalationStepId.HasValue)
+            // Process based on configured timeout action
+            switch (execution.Step.TimeoutAction)
             {
-                // Escalate to the configured step
-                var escalationStep = await _context.WorkflowSteps.FindAsync(execution.Step.EscalationStepId);
-                if (escalationStep != null)
-                {
-                    await ProcessStepAsync(execution.WorkflowInstance, escalationStep, 0);
-                }
-            }
-            else
-            {
-                // Default behavior: mark workflow as expired
-                execution.WorkflowInstance.Status = WorkflowStatus.Expired;
+                case TimeoutAction.AutoApprove:
+                    // Auto-approve the step
+                    execution.Action = ApprovalAction.AutoApproved;
+                    execution.ActionTakenAt = DateTime.UtcNow;
+                    execution.Comments = "Automatically approved due to timeout";
+
+                    // Move to next step or complete workflow
+                    var nextStepAfterApprove = execution.WorkflowInstance.WorkflowDefinition.GetNextStep(execution.Step.StepOrder);
+                    if (nextStepAfterApprove == null)
+                    {
+                        // No more steps - workflow is approved
+                        execution.WorkflowInstance.Complete(ApprovalAction.AutoApproved, "Automatically approved due to timeout");
+                    }
+                    else
+                    {
+                        // Process next step
+                        await ProcessStepAsync(execution.WorkflowInstance, nextStepAfterApprove, 0);
+                    }
+                    break;
+
+                case TimeoutAction.AutoReject:
+                    // Auto-reject the step and complete workflow as rejected
+                    execution.Action = ApprovalAction.AutoRejected;
+                    execution.ActionTakenAt = DateTime.UtcNow;
+                    execution.Comments = "Automatically rejected due to timeout";
+                    execution.WorkflowInstance.Complete(ApprovalAction.AutoRejected, "Automatically rejected due to timeout");
+                    break;
+
+                case TimeoutAction.Escalate:
+                    // Escalate to configured step
+                    if (execution.Step.EscalationStepId.HasValue)
+                    {
+                        var escalationStep = await _context.WorkflowSteps.FindAsync(execution.Step.EscalationStepId);
+                        if (escalationStep != null)
+                        {
+                            await ProcessStepAsync(execution.WorkflowInstance, escalationStep, 0);
+                        }
+                        else
+                        {
+                            // Escalation step not found - expire workflow
+                            execution.WorkflowInstance.Status = WorkflowStatus.Expired;
+                        }
+                    }
+                    else
+                    {
+                        // No escalation step configured - expire workflow
+                        execution.WorkflowInstance.Status = WorkflowStatus.Expired;
+                    }
+                    break;
+
+                case TimeoutAction.Expire:
+                default:
+                    // Default behavior: mark workflow as expired
+                    execution.WorkflowInstance.Status = WorkflowStatus.Expired;
+                    break;
             }
 
             processedCount++;
@@ -562,6 +628,9 @@ public class WorkflowEngine : IWorkflowEngine
 
         _context.WorkflowStepExecutions.Add(execution);
         await _context.SaveChangesAsync();
+
+        // Send notification to the approver about pending approval
+        await SendApprovalPendingNotificationAsync(instance, approverId.Value, step.Name);
 
         return WorkflowResult<bool>.Success(true);
     }
@@ -828,6 +897,215 @@ public class WorkflowEngine : IWorkflowEngine
         // In a full implementation, this would check business rules
         // For now, always pass validation
         return Task.FromResult(true);
+    }
+
+    #endregion
+
+    #region Notification Helper Methods
+
+    private string GetEntityTypeDisplayName(WorkflowEntityType entityType, bool isArabic = false)
+    {
+        return entityType switch
+        {
+            WorkflowEntityType.Vacation => isArabic ? "طلب إجازة" : "Vacation Request",
+            WorkflowEntityType.Excuse => isArabic ? "طلب استئذان" : "Excuse Request",
+            WorkflowEntityType.RemoteWork => isArabic ? "طلب عمل عن بُعد" : "Remote Work Request",
+            _ => isArabic ? "طلب" : "Request"
+        };
+    }
+
+    private string GetActionUrl(WorkflowEntityType entityType, long entityId)
+    {
+        return entityType switch
+        {
+            WorkflowEntityType.Vacation => $"/vacations/{entityId}",
+            WorkflowEntityType.Excuse => $"/excuses/{entityId}",
+            WorkflowEntityType.RemoteWork => $"/remote-work/{entityId}",
+            _ => $"/workflows"
+        };
+    }
+
+    private async Task SendRequestSubmittedNotificationAsync(WorkflowInstance instance, WorkflowEntityType entityType)
+    {
+        try
+        {
+            var entityNameEn = GetEntityTypeDisplayName(entityType, false);
+            var entityNameAr = GetEntityTypeDisplayName(entityType, true);
+
+            await _notificationService.SendNotificationAsync(new CreateNotificationRequest
+            {
+                UserId = instance.RequestedByUserId,
+                Type = NotificationType.RequestSubmitted,
+                TitleEn = $"{entityNameEn} Submitted",
+                TitleAr = $"تم تقديم {entityNameAr}",
+                MessageEn = $"Your {entityNameEn.ToLower()} has been submitted and is pending approval.",
+                MessageAr = $"تم تقديم {entityNameAr} وهو في انتظار الموافقة.",
+                EntityType = entityType.ToString(),
+                EntityId = instance.EntityId,
+                ActionUrl = GetActionUrl(entityType, instance.EntityId)
+            });
+        }
+        catch
+        {
+            // Don't fail the workflow if notification fails
+        }
+    }
+
+    private async Task SendApprovalPendingNotificationAsync(WorkflowInstance instance, long approverId, string stepName)
+    {
+        try
+        {
+            var entityNameEn = GetEntityTypeDisplayName(instance.EntityType, false);
+            var entityNameAr = GetEntityTypeDisplayName(instance.EntityType, true);
+
+            await _notificationService.SendNotificationAsync(new CreateNotificationRequest
+            {
+                UserId = approverId,
+                Type = NotificationType.ApprovalPending,
+                TitleEn = $"New {entityNameEn} Pending Your Approval",
+                TitleAr = $"{entityNameAr} جديد بانتظار موافقتك",
+                MessageEn = $"A new {entityNameEn.ToLower()} requires your approval at step: {stepName}.",
+                MessageAr = $"يوجد {entityNameAr} جديد يتطلب موافقتك في خطوة: {stepName}.",
+                EntityType = instance.EntityType.ToString(),
+                EntityId = instance.EntityId,
+                ActionUrl = $"/approvals?workflowId={instance.Id}"
+            });
+        }
+        catch
+        {
+            // Don't fail the workflow if notification fails
+        }
+    }
+
+    private async Task SendRequestApprovedNotificationAsync(WorkflowInstance instance, long approvedByUserId)
+    {
+        try
+        {
+            var entityNameEn = GetEntityTypeDisplayName(instance.EntityType, false);
+            var entityNameAr = GetEntityTypeDisplayName(instance.EntityType, true);
+
+            // Get approver name for the message
+            var approver = await _context.Users.FindAsync(approvedByUserId);
+            var approverName = approver?.Username ?? "Approver";
+
+            await _notificationService.SendNotificationAsync(new CreateNotificationRequest
+            {
+                UserId = instance.RequestedByUserId,
+                Type = NotificationType.RequestApproved,
+                TitleEn = $"{entityNameEn} Approved",
+                TitleAr = $"تمت الموافقة على {entityNameAr}",
+                MessageEn = $"Your {entityNameEn.ToLower()} has been approved.",
+                MessageAr = $"تمت الموافقة على {entityNameAr} الخاص بك.",
+                EntityType = instance.EntityType.ToString(),
+                EntityId = instance.EntityId,
+                ActionUrl = GetActionUrl(instance.EntityType, instance.EntityId)
+            });
+        }
+        catch
+        {
+            // Don't fail the workflow if notification fails
+        }
+    }
+
+    private async Task SendIntermediateApprovalNotificationAsync(WorkflowInstance instance, WorkflowStep step, long approvedByUserId)
+    {
+        try
+        {
+            var entityNameEn = GetEntityTypeDisplayName(instance.EntityType, false);
+            var entityNameAr = GetEntityTypeDisplayName(instance.EntityType, true);
+
+            await _notificationService.SendNotificationAsync(new CreateNotificationRequest
+            {
+                UserId = instance.RequestedByUserId,
+                Type = NotificationType.RequestApproved,
+                TitleEn = $"{entityNameEn} Progress Update",
+                TitleAr = $"تحديث حالة {entityNameAr}",
+                MessageEn = $"Your {entityNameEn.ToLower()} has been approved at step: {step.Name}. Pending next approval.",
+                MessageAr = $"تمت الموافقة على {entityNameAr} في خطوة: {step.Name}. في انتظار الموافقة التالية.",
+                EntityType = instance.EntityType.ToString(),
+                EntityId = instance.EntityId,
+                ActionUrl = GetActionUrl(instance.EntityType, instance.EntityId)
+            });
+        }
+        catch
+        {
+            // Don't fail the workflow if notification fails
+        }
+    }
+
+    private async Task SendRequestRejectedNotificationAsync(WorkflowInstance instance, long rejectedByUserId, string rejectionReason)
+    {
+        try
+        {
+            var entityNameEn = GetEntityTypeDisplayName(instance.EntityType, false);
+            var entityNameAr = GetEntityTypeDisplayName(instance.EntityType, true);
+
+            // Get rejector name for the message
+            var rejector = await _context.Users.FindAsync(rejectedByUserId);
+            var rejectorName = rejector?.Username ?? "Approver";
+
+            await _notificationService.SendNotificationAsync(new CreateNotificationRequest
+            {
+                UserId = instance.RequestedByUserId,
+                Type = NotificationType.RequestRejected,
+                TitleEn = $"{entityNameEn} Rejected",
+                TitleAr = $"تم رفض {entityNameAr}",
+                MessageEn = $"Your {entityNameEn.ToLower()} has been rejected. Reason: {rejectionReason}",
+                MessageAr = $"تم رفض {entityNameAr} الخاص بك. السبب: {rejectionReason}",
+                EntityType = instance.EntityType.ToString(),
+                EntityId = instance.EntityId,
+                ActionUrl = GetActionUrl(instance.EntityType, instance.EntityId)
+            });
+        }
+        catch
+        {
+            // Don't fail the workflow if notification fails
+        }
+    }
+
+    private async Task SendDelegationNotificationsAsync(WorkflowInstance instance, long delegateToUserId, long delegatedByUserId, string? comments)
+    {
+        try
+        {
+            var entityNameEn = GetEntityTypeDisplayName(instance.EntityType, false);
+            var entityNameAr = GetEntityTypeDisplayName(instance.EntityType, true);
+
+            // Get delegator name
+            var delegator = await _context.Users.FindAsync(delegatedByUserId);
+            var delegatorName = delegator?.Username ?? "User";
+
+            // Notify the new delegate about the delegation
+            await _notificationService.SendNotificationAsync(new CreateNotificationRequest
+            {
+                UserId = delegateToUserId,
+                Type = NotificationType.DelegationReceived,
+                TitleEn = $"Approval Delegated to You",
+                TitleAr = $"تم تفويض موافقة إليك",
+                MessageEn = $"{delegatorName} has delegated a {entityNameEn.ToLower()} approval to you.",
+                MessageAr = $"قام {delegatorName} بتفويض موافقة {entityNameAr} إليك.",
+                EntityType = instance.EntityType.ToString(),
+                EntityId = instance.EntityId,
+                ActionUrl = $"/approvals?workflowId={instance.Id}"
+            });
+
+            // Notify the requester about the delegation
+            await _notificationService.SendNotificationAsync(new CreateNotificationRequest
+            {
+                UserId = instance.RequestedByUserId,
+                Type = NotificationType.RequestDelegated,
+                TitleEn = $"{entityNameEn} Delegated",
+                TitleAr = $"تم تفويض {entityNameAr}",
+                MessageEn = $"Your {entityNameEn.ToLower()} approval has been delegated to another approver.",
+                MessageAr = $"تم تفويض موافقة {entityNameAr} الخاص بك إلى مُعتمد آخر.",
+                EntityType = instance.EntityType.ToString(),
+                EntityId = instance.EntityId,
+                ActionUrl = GetActionUrl(instance.EntityType, instance.EntityId)
+            });
+        }
+        catch
+        {
+            // Don't fail the workflow if notification fails
+        }
     }
 
     #endregion

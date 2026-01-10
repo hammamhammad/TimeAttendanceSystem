@@ -33,8 +33,8 @@ public class BranchConfiguration : IEntityTypeConfiguration<Branch>
 
         builder.Property(x => x.RowVersion)
             .IsConcurrencyToken()
-            .IsRowVersion()
-            .HasDefaultValueSql("E'\\\\x01'::bytea");
+            .IsRequired()
+            .HasDefaultValue(new byte[] { 1 });
 
         builder.HasIndex(x => x.Code)
             .IsUnique()

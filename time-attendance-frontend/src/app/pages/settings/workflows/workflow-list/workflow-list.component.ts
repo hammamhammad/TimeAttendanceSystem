@@ -159,10 +159,10 @@ export class WorkflowListComponent implements OnInit {
       ...workflow,
       entityTypeDisplay: this.formatEntityType(workflow.entityType),
       scope: this.formatScope(workflow),
-      stepsCount: workflow.steps?.length || 0,
+      stepsCount: workflow.stepCount || workflow.steps?.length || 0,
       isDefault: this.formatBoolean(workflow.isDefault),
       status: this.formatStatus(workflow),
-      createdAt: this.formatDate(workflow.createdAtUtc)
+      createdAt: this.formatDate(workflow.createdAt)
     }));
   });
 
@@ -207,8 +207,14 @@ export class WorkflowListComponent implements OnInit {
     });
   }
 
-  formatDate(dateString: string): string {
+  formatDate(dateString: string | undefined): string {
+    if (!dateString) {
+      return '-';
+    }
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      return '-';
+    }
     return date.toLocaleDateString(this.i18n.getCurrentLocale(), {
       year: 'numeric',
       month: 'short',

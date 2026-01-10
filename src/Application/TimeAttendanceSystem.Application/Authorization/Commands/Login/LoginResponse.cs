@@ -125,5 +125,7 @@ public record UserInfo(
     List<string> Permissions,
     List<long> BranchIds,
     string? FullName = null,
-    string? FullNameAr = null
+    string? FullNameAr = null,
+    long? EmployeeId = null,
+    bool IsManager = false
 );

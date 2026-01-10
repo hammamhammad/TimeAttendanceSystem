@@ -90,6 +90,12 @@ public class WorkflowStep : BaseEntity
     public long? EscalationStepId { get; set; }
 
     /// <summary>
+    /// Gets or sets the action to take when the step times out.
+    /// Determines behavior when TimeoutHours is exceeded.
+    /// </summary>
+    public TimeoutAction TimeoutAction { get; set; } = TimeoutAction.Expire;
+
+    /// <summary>
     /// Gets or sets the next step to proceed to on approval.
     /// If null, proceeds to next sequential step or completes workflow.
     /// </summary>

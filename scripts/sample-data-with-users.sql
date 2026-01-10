@@ -262,8 +262,104 @@ BEGIN
     UPDATE "Departments" SET "ManagerEmployeeId" = 1024 WHERE "Id" = 119;
     UPDATE "Departments" SET "ManagerEmployeeId" = 1025 WHERE "Id" = 120;
 
+    -- ============================================
+    -- Step 10: Insert Leave Balances for all Employees (2025 & 2026)
+    -- ============================================
+    -- Vacation Type IDs (from seed data):
+    -- 1 = Annual Leave (21 days)
+    -- 2 = Sick Leave (10 days)
+    -- 3 = Unpaid Leave (0 days - no balance)
+    -- 4 = Emergency Leave (5 days)
+    -- 5 = Maternity Leave (90 days)
+    -- 6 = Paternity Leave (5 days)
+    -- 7 = Bereavement Leave (3 days)
+    -- 8 = Marriage Leave (5 days)
+
+    -- Insert leave balances for 2025
+    INSERT INTO "LeaveBalances" ("EmployeeId", "VacationTypeId", "Year", "EntitledDays", "AccruedDays", "UsedDays", "PendingDays", "AdjustedDays", "CreatedAtUtc", "ModifiedAtUtc")
+    SELECT
+        e."Id",
+        vt."Id",
+        2025,
+        CASE vt."Id"
+            WHEN 1 THEN 21  -- Annual Leave
+            WHEN 2 THEN 10  -- Sick Leave
+            WHEN 3 THEN 0   -- Unpaid Leave (no balance)
+            WHEN 4 THEN 5   -- Emergency Leave
+            WHEN 5 THEN 90  -- Maternity Leave
+            WHEN 6 THEN 5   -- Paternity Leave
+            WHEN 7 THEN 3   -- Bereavement Leave
+            WHEN 8 THEN 5   -- Marriage Leave
+            ELSE 0
+        END,
+        CASE vt."Id"
+            WHEN 1 THEN 21  -- Annual Leave - fully accrued
+            WHEN 2 THEN 10  -- Sick Leave - fully accrued
+            WHEN 3 THEN 0   -- Unpaid Leave
+            WHEN 4 THEN 5   -- Emergency Leave - fully accrued
+            WHEN 5 THEN 90  -- Maternity Leave - fully accrued
+            WHEN 6 THEN 5   -- Paternity Leave - fully accrued
+            WHEN 7 THEN 3   -- Bereavement Leave - fully accrued
+            WHEN 8 THEN 5   -- Marriage Leave - fully accrued
+            ELSE 0
+        END,
+        0, -- UsedDays
+        0, -- PendingDays
+        0, -- AdjustedDays
+        v_now,
+        v_now
+    FROM "Employees" e
+    CROSS JOIN "VacationTypes" vt
+    WHERE e."Id" BETWEEN 1001 AND 1050
+      AND vt."Id" BETWEEN 1 AND 8
+      AND NOT vt."IsDeleted"
+      AND vt."Id" != 3  -- Skip Unpaid Leave (no balance needed)
+    ON CONFLICT DO NOTHING;
+
+    -- Insert leave balances for 2026
+    INSERT INTO "LeaveBalances" ("EmployeeId", "VacationTypeId", "Year", "EntitledDays", "AccruedDays", "UsedDays", "PendingDays", "AdjustedDays", "CreatedAtUtc", "ModifiedAtUtc")
+    SELECT
+        e."Id",
+        vt."Id",
+        2026,
+        CASE vt."Id"
+            WHEN 1 THEN 21  -- Annual Leave
+            WHEN 2 THEN 10  -- Sick Leave
+            WHEN 3 THEN 0   -- Unpaid Leave (no balance)
+            WHEN 4 THEN 5   -- Emergency Leave
+            WHEN 5 THEN 90  -- Maternity Leave
+            WHEN 6 THEN 5   -- Paternity Leave
+            WHEN 7 THEN 3   -- Bereavement Leave
+            WHEN 8 THEN 5   -- Marriage Leave
+            ELSE 0
+        END,
+        CASE vt."Id"
+            WHEN 1 THEN 21  -- Annual Leave - fully accrued
+            WHEN 2 THEN 10  -- Sick Leave - fully accrued
+            WHEN 3 THEN 0   -- Unpaid Leave
+            WHEN 4 THEN 5   -- Emergency Leave - fully accrued
+            WHEN 5 THEN 90  -- Maternity Leave - fully accrued
+            WHEN 6 THEN 5   -- Paternity Leave - fully accrued
+            WHEN 7 THEN 3   -- Bereavement Leave - fully accrued
+            WHEN 8 THEN 5   -- Marriage Leave - fully accrued
+            ELSE 0
+        END,
+        0, -- UsedDays
+        0, -- PendingDays
+        0, -- AdjustedDays
+        v_now,
+        v_now
+    FROM "Employees" e
+    CROSS JOIN "VacationTypes" vt
+    WHERE e."Id" BETWEEN 1001 AND 1050
+      AND vt."Id" BETWEEN 1 AND 8
+      AND NOT vt."IsDeleted"
+      AND vt."Id" != 3  -- Skip Unpaid Leave (no balance needed)
+    ON CONFLICT DO NOTHING;
+
     RAISE NOTICE 'Sample data inserted successfully!';
     RAISE NOTICE 'Created: 5 Branches, 20 Departments, 50 Employees with User Accounts';
+    RAISE NOTICE 'Created: 700 Leave Balances (50 employees x 7 vacation types x 2 years)';
     RAISE NOTICE 'Default password for all employees: Emp@123!';
     RAISE NOTICE 'All users have MustChangePassword=true (will be forced to change on first login)';
 
@@ -272,14 +368,22 @@ END $$;
 -- ============================================
 -- Summary
 -- ============================================
--- Branches: 101-105
--- Departments: 101-120
--- Employees & Users: 1001-1050
+-- Branches: 101-105 (5 total)
+--   - Headquarters Riyadh, Jeddah, Dammam, Madinah, Makkah
 --
--- Hierarchy:
--- - Branch Managers (1001-1005): Manager role, no manager
--- - Department Managers (1006-1025): Manager + Employee roles, report to Branch Managers
--- - Regular Employees (1026-1050): Employee role, report to Department Managers
+-- Departments: 101-120 (20 total, 4 per branch)
+--   - HR, IT, Finance, Operations per branch
+--
+-- Employees & Users: 1001-1050 (50 total)
+--   - Branch Managers (1001-1005): Manager role, no manager
+--   - Department Managers (1006-1025): Manager + Employee roles, report to Branch Managers
+--   - Regular Employees (1026-1050): Employee role, report to Department Managers
+--
+-- Leave Balances: 700 total (50 employees x 7 vacation types x 2 years)
+--   - Years: 2025, 2026
+--   - Vacation Types: Annual (21d), Sick (10d), Emergency (5d), Maternity (90d),
+--                     Paternity (5d), Bereavement (3d), Marriage (5d)
+--   - Note: Unpaid Leave excluded (no balance needed)
 --
 -- Login Credentials:
 -- - Username: email prefix (e.g., ahmed.rashid for ahmed.rashid@company.com)

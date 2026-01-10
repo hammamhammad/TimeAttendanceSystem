@@ -23,6 +23,7 @@ import { environment } from '../../../environments/environment';
 })
 export class EmployeeVacationsService {
   private readonly apiUrl = `${environment.apiUrl}/api/v1/employee-vacations`;
+  private readonly portalApiUrl = `${environment.apiUrl}/api/v1/portal`;
 
   // Signal-based state management
   private readonly _vacations = signal<EmployeeVacation[]>([]);
@@ -57,7 +58,8 @@ export class EmployeeVacationsService {
   ) {}
 
   /**
-   * Retrieves employee vacation records with filtering and pagination.
+   * Retrieves vacation records for the current employee (self-service).
+   * Uses the portal endpoint which automatically filters by the logged-in user.
    */
   getVacations(params?: VacationQueryParams): Observable<PagedResult<EmployeeVacation>> {
     this._loading.set(true);
@@ -66,21 +68,13 @@ export class EmployeeVacationsService {
     let httpParams = new HttpParams();
 
     if (params) {
-      if (params.employeeId) httpParams = httpParams.set('employeeId', params.employeeId.toString());
-      if (params.vacationTypeId) httpParams = httpParams.set('vacationTypeId', params.vacationTypeId.toString());
-      if (params.startDate) httpParams = httpParams.set('startDate', params.startDate.toISOString());
-      if (params.endDate) httpParams = httpParams.set('endDate', params.endDate.toISOString());
-      if (params.isApproved !== undefined) httpParams = httpParams.set('isApproved', params.isApproved.toString());
-      if (params.isCurrentlyActive !== undefined) httpParams = httpParams.set('isCurrentlyActive', params.isCurrentlyActive.toString());
-      if (params.isUpcoming !== undefined) httpParams = httpParams.set('isUpcoming', params.isUpcoming.toString());
-      if (params.searchTerm) httpParams = httpParams.set('searchTerm', params.searchTerm);
+      // Portal endpoint only supports pagination params
       if (params.page) httpParams = httpParams.set('page', params.page.toString());
       if (params.pageSize) httpParams = httpParams.set('pageSize', params.pageSize.toString());
-      if (params.sortBy) httpParams = httpParams.set('sortBy', params.sortBy);
-      if (params.sortDescending) httpParams = httpParams.set('sortDescending', params.sortDescending.toString());
     }
 
-    return this.http.get<PagedResult<EmployeeVacation>>(this.apiUrl, { params: httpParams }).pipe(
+    // Use portal endpoint which filters by current employee automatically
+    return this.http.get<PagedResult<EmployeeVacation>>(`${this.portalApiUrl}/my-vacations`, { params: httpParams }).pipe(
       map(result => ({
         ...result,
         items: result.items.map((item: EmployeeVacation) => this.transformDates(item))
@@ -101,9 +95,25 @@ export class EmployeeVacationsService {
 
   /**
    * Retrieves a specific employee vacation by ID.
+   * Uses the portal endpoint for self-service access.
    */
   getVacationById(id: number): Observable<EmployeeVacation> {
-    return this.http.get<EmployeeVacation>(`${this.apiUrl}/${id}`).pipe(
+    // Use portal endpoint for self-service (doesn't require VacationRead policy)
+    return this.http.get<EmployeeVacation>(`${environment.apiUrl}/api/v1/portal/my-vacations/${id}`).pipe(
+      map(vacation => this.transformDates(vacation)),
+      catchError(error => {
+        this.notificationService.error('Failed to load vacation details');
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Retrieves a vacation for approval purposes (manager view).
+   * Used when managers view team member vacation requests.
+   */
+  getVacationForApproval(id: number): Observable<EmployeeVacation> {
+    return this.http.get<EmployeeVacation>(`${environment.apiUrl}/api/v1/portal/approval-vacation/${id}`).pipe(
       map(vacation => this.transformDates(vacation)),
       catchError(error => {
         this.notificationService.error('Failed to load vacation details');
@@ -302,7 +312,13 @@ export class EmployeeVacationsService {
       startDate: new Date(vacation.startDate),
       endDate: new Date(vacation.endDate),
       createdAtUtc: new Date(vacation.createdAtUtc),
-      modifiedAtUtc: vacation.modifiedAtUtc ? new Date(vacation.modifiedAtUtc) : undefined
+      modifiedAtUtc: vacation.modifiedAtUtc ? new Date(vacation.modifiedAtUtc) : undefined,
+      // Transform approval history dates
+      approvalHistory: vacation.approvalHistory?.map(step => ({
+        ...step,
+        assignedAt: new Date(step.assignedAt),
+        actionAt: step.actionAt ? new Date(step.actionAt) : undefined
+      }))
     };
   }
 

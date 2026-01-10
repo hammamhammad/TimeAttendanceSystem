@@ -1,34 +1,34 @@
 import {
   VacationTypesService
-} from "./chunk-5ZTOQBVY.js";
+} from "./chunk-ZC4UCEJS.js";
 import {
   ShiftsService
-} from "./chunk-3L6JDBEN.js";
+} from "./chunk-QRFVLUN5.js";
 import {
   RolesService
-} from "./chunk-EHLSZ7TE.js";
+} from "./chunk-GBUXYQ2X.js";
 import {
   BranchesService
-} from "./chunk-VA62FO4C.js";
+} from "./chunk-Z44KTAEC.js";
 import {
   DepartmentsService
-} from "./chunk-MPELPKFG.js";
+} from "./chunk-OU7DT47F.js";
 import {
   EmployeesService
-} from "./chunk-IR2IKZBB.js";
+} from "./chunk-5B6AVE4S.js";
 import {
   CommonFilterTypes,
   FILTER_CONFIGURATIONS
-} from "./chunk-DS3UNCKJ.js";
+} from "./chunk-NHQ5PIWI.js";
 import "./chunk-MMUPQRFG.js";
 import "./chunk-7XYWDBYG.js";
 import {
   PermissionService
-} from "./chunk-HT4DZZW3.js";
-import "./chunk-6LEZROWG.js";
+} from "./chunk-DWXA666M.js";
+import "./chunk-EVMJ7ILG.js";
 import {
   AuthService
-} from "./chunk-HZ2IZU2F.js";
+} from "./chunk-O2IS3HK2.js";
 import {
   Router,
   RouterOutlet,
@@ -38,11 +38,11 @@ import {
   provideRouter,
   withComponentInputBinding,
   withHashLocation
-} from "./chunk-APWG5MB4.js";
+} from "./chunk-UBDTZQTK.js";
 import {
   I18nService
-} from "./chunk-GNCBCLZN.js";
-import "./chunk-ZTCQ26FY.js";
+} from "./chunk-6BO32D3M.js";
+import "./chunk-TNEZPYQG.js";
 import {
   APP_INITIALIZER,
   BehaviorSubject,
@@ -66,13 +66,13 @@ import {
   ɵɵdirectiveInject,
   ɵɵelement,
   ɵɵgetInheritedFactory
-} from "./chunk-2WKN5CRJ.js";
+} from "./chunk-DUNHAUAW.js";
 import {
   __name,
   __publicField,
   __spreadProps,
   __spreadValues
-} from "./chunk-EUAPD56R.js";
+} from "./chunk-26Y7QVDB.js";
 
 // src/app/core/auth/auth.guard.ts
 var authGuard = /* @__PURE__ */ __name((route, segments) => {
@@ -165,28 +165,28 @@ var routes = [
   },
   {
     path: "login",
-    loadComponent: /* @__PURE__ */ __name(() => import("./chunk-OFVR2QB4.js").then((m) => m.LoginComponent), "loadComponent"),
+    loadComponent: /* @__PURE__ */ __name(() => import("./chunk-VZOYNSXS.js").then((m) => m.LoginComponent), "loadComponent"),
     data: { title: "auth.login" }
   },
   {
     path: "auth/change-password",
-    loadComponent: /* @__PURE__ */ __name(() => import("./chunk-PMXF4KUR.js").then((m) => m.ChangePasswordComponent), "loadComponent"),
+    loadComponent: /* @__PURE__ */ __name(() => import("./chunk-T3VNQIN7.js").then((m) => m.ChangePasswordComponent), "loadComponent"),
     canMatch: [authGuard],
     data: { title: "auth.change_password" }
   },
   {
     path: "",
-    loadComponent: /* @__PURE__ */ __name(() => import("./chunk-HATR5UVM.js").then((m) => m.LayoutComponent), "loadComponent"),
+    loadComponent: /* @__PURE__ */ __name(() => import("./chunk-HZHKNKT7.js").then((m) => m.LayoutComponent), "loadComponent"),
     canMatch: [authGuard],
     children: [
       {
         path: "dashboard",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-GGFETQI7.js").then((m) => m.DashboardComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-PV6V3YOD.js").then((m) => m.DashboardComponent), "loadComponent"),
         data: { title: "dashboard.title" }
       },
       {
         path: "users",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-SWIY2QHO.js").then((m) => m.UsersComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-WSC2DJWL.js").then((m) => m.UsersComponent), "loadComponent"),
         data: {
           title: "users.title",
           permission: "user.read"
@@ -195,7 +195,7 @@ var routes = [
       },
       {
         path: "users/create",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-MEZL2VHB.js").then((m) => m.CreateUserPageComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-4YZXC5ZA.js").then((m) => m.CreateUserPageComponent), "loadComponent"),
         data: {
           title: "users.create_user",
           permission: "user.create"
@@ -204,7 +204,7 @@ var routes = [
       },
       {
         path: "users/:id/view",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-7FMTGMGK.js").then((m) => m.ViewUserComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-BYQBHG2E.js").then((m) => m.ViewUserComponent), "loadComponent"),
         data: {
           title: "users.view_details",
           permission: "user.read"
@@ -213,7 +213,7 @@ var routes = [
       },
       {
         path: "users/:id/edit",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-GFCKCUVW.js").then((m) => m.EditUserPageComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-OI52NVKO.js").then((m) => m.EditUserPageComponent), "loadComponent"),
         data: {
           title: "users.edit_user",
           permission: "user.update"
@@ -222,7 +222,7 @@ var routes = [
       },
       {
         path: "employees",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-QW24TSO3.js").then((m) => m.EmployeesComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-UMTCRTSC.js").then((m) => m.EmployeesComponent), "loadComponent"),
         data: {
           title: "employees.title",
           permission: "employee.read"
@@ -231,7 +231,7 @@ var routes = [
       },
       {
         path: "employees/create",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-M7TBHSDW.js").then((m) => m.CreateEmployeeComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-NDWFZ7QN.js").then((m) => m.CreateEmployeeComponent), "loadComponent"),
         data: {
           title: "employees.create_employee",
           permission: "employee.create"
@@ -240,7 +240,7 @@ var routes = [
       },
       {
         path: "employees/:id/view",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-YYRNYWRT.js").then((m) => m.ViewEmployeeComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-3VFTFNR4.js").then((m) => m.ViewEmployeeComponent), "loadComponent"),
         data: {
           title: "employees.view_details",
           permission: "employee.read"
@@ -249,7 +249,7 @@ var routes = [
       },
       {
         path: "employees/:id/edit",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-QCTW6NEY.js").then((m) => m.EditEmployeeComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-H23OGETZ.js").then((m) => m.EditEmployeeComponent), "loadComponent"),
         data: {
           title: "employees.edit_employee",
           permission: "employee.update"
@@ -258,7 +258,7 @@ var routes = [
       },
       {
         path: "employees/:employeeId/change-shift",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-2PJVZCEX.js").then((m) => m.ChangeEmployeeShiftComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-DF5XGJKH.js").then((m) => m.ChangeEmployeeShiftComponent), "loadComponent"),
         data: {
           title: "employees.change_shift",
           permission: "employee.update"
@@ -267,7 +267,7 @@ var routes = [
       },
       {
         path: "roles",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-LMVCI5ZU.js").then((m) => m.RolesComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-BGKMDTDV.js").then((m) => m.RolesComponent), "loadComponent"),
         data: {
           title: "roles.title",
           permission: "role.read"
@@ -276,7 +276,7 @@ var routes = [
       },
       {
         path: "roles/create",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-NHFRWF5L.js").then((m) => m.CreateRoleComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-W5TC5F3R.js").then((m) => m.CreateRoleComponent), "loadComponent"),
         data: {
           title: "roles.create_role",
           permission: "role.create"
@@ -285,7 +285,7 @@ var routes = [
       },
       {
         path: "roles/:id/view",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-46GXOOPB.js").then((m) => m.ViewRoleComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-S5UT7H46.js").then((m) => m.ViewRoleComponent), "loadComponent"),
         data: {
           title: "roles.view_details",
           permission: "role.read"
@@ -294,7 +294,7 @@ var routes = [
       },
       {
         path: "roles/:id/edit",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-2RUFZR4D.js").then((m) => m.EditRoleComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-MCYT2AGT.js").then((m) => m.EditRoleComponent), "loadComponent"),
         data: {
           title: "roles.edit_role",
           permission: "role.update"
@@ -303,7 +303,7 @@ var routes = [
       },
       {
         path: "branches",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-FHY3RU4T.js").then((m) => m.BranchesComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-NU2RWJA4.js").then((m) => m.BranchesComponent), "loadComponent"),
         data: {
           title: "branches.title",
           permission: "branch.read"
@@ -312,7 +312,7 @@ var routes = [
       },
       {
         path: "branches/:id/view",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-T52XA5VS.js").then((m) => m.ViewBranchComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-7ZB2BEFQ.js").then((m) => m.ViewBranchComponent), "loadComponent"),
         data: {
           title: "branches.view_details",
           permission: "branch.read"
@@ -321,7 +321,7 @@ var routes = [
       },
       {
         path: "branches/:id/edit",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-NOUWVPSN.js").then((m) => m.EditBranchComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-3HY6XDMW.js").then((m) => m.EditBranchComponent), "loadComponent"),
         data: {
           title: "branches.edit_branch",
           permission: "branch.update"
@@ -330,7 +330,7 @@ var routes = [
       },
       {
         path: "departments",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-XIJ23SSJ.js").then((m) => m.DepartmentsComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-YEXHFF5K.js").then((m) => m.DepartmentsComponent), "loadComponent"),
         data: {
           title: "departments.title",
           permission: "department.read"
@@ -339,7 +339,7 @@ var routes = [
       },
       {
         path: "departments/create",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-DCS6Q65A.js").then((m) => m.CreateDepartmentComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-FIO2UHHJ.js").then((m) => m.CreateDepartmentComponent), "loadComponent"),
         data: {
           title: "departments.create",
           permission: "department.create"
@@ -348,7 +348,7 @@ var routes = [
       },
       {
         path: "departments/:id/view",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-GRHDOS4V.js").then((m) => m.ViewDepartmentComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-3PLP63EM.js").then((m) => m.ViewDepartmentComponent), "loadComponent"),
         data: {
           title: "departments.view_details",
           permission: "department.read"
@@ -357,7 +357,7 @@ var routes = [
       },
       {
         path: "departments/:id/edit",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-I4XHLFU6.js").then((m) => m.EditDepartmentComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-GC6XIXB5.js").then((m) => m.EditDepartmentComponent), "loadComponent"),
         data: {
           title: "departments.edit",
           permission: "department.update"
@@ -366,7 +366,7 @@ var routes = [
       },
       {
         path: "shifts",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-TQP6X2AZ.js").then((m) => m.ShiftsComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-MT2BCHD3.js").then((m) => m.ShiftsComponent), "loadComponent"),
         data: {
           title: "shifts.title",
           permission: "shift.read"
@@ -375,7 +375,7 @@ var routes = [
       },
       {
         path: "shifts/create",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-W4534RHA.js").then((m) => m.CreateShiftComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-WKG5Z75I.js").then((m) => m.CreateShiftComponent), "loadComponent"),
         data: {
           title: "shifts.create_shift",
           permission: "shift.create"
@@ -384,7 +384,7 @@ var routes = [
       },
       {
         path: "shifts/:id/view",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-VF5DMHCS.js").then((m) => m.ViewShiftComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-352ZUXPU.js").then((m) => m.ViewShiftComponent), "loadComponent"),
         data: {
           title: "shifts.view_details",
           permission: "shift.read"
@@ -393,7 +393,7 @@ var routes = [
       },
       {
         path: "shifts/:id/edit",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-QN5KCED5.js").then((m) => m.EditShiftComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-PI6URAOL.js").then((m) => m.EditShiftComponent), "loadComponent"),
         data: {
           title: "shifts.edit_shift",
           permission: "shift.update"
@@ -402,7 +402,7 @@ var routes = [
       },
       {
         path: "shifts/assign",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-TKMYYB5V.js").then((m) => m.AssignShiftsComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-FW2TSQX4.js").then((m) => m.AssignShiftsComponent), "loadComponent"),
         data: {
           title: "shifts.assignments.title",
           permission: "shift.assign"
@@ -411,7 +411,7 @@ var routes = [
       },
       {
         path: "attendance",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-T7G5O77V.js").then((m) => m.AttendanceComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-LEMXFFZ3.js").then((m) => m.AttendanceComponent), "loadComponent"),
         data: {
           title: "attendance.dashboard_title",
           permission: "attendance.read"
@@ -420,7 +420,7 @@ var routes = [
       },
       {
         path: "attendance/daily",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-G3IOVJ6T.js").then((m) => m.DailyAttendanceComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-GJ5YVRYH.js").then((m) => m.DailyAttendanceComponent), "loadComponent"),
         data: {
           title: "attendance.daily_view",
           permission: "attendance.read"
@@ -429,7 +429,7 @@ var routes = [
       },
       {
         path: "attendance/monthly-report",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-WPRNW7YV.js").then((m) => m.MonthlyReportComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-R4W37YS5.js").then((m) => m.MonthlyReportComponent), "loadComponent"),
         data: {
           title: "attendance.monthly_report",
           permission: "attendance.read"
@@ -438,7 +438,7 @@ var routes = [
       },
       {
         path: "attendance/daily-detail/:employeeId/:date",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-OOBNEYED.js").then((m) => m.DailyAttendanceDetailComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-P4M3XB4I.js").then((m) => m.DailyAttendanceDetailComponent), "loadComponent"),
         data: {
           title: "attendance.daily_detail.title",
           permission: "attendance.read"
@@ -447,7 +447,7 @@ var routes = [
       },
       {
         path: "attendance/employee-history",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-QMOQTXDD.js").then((m) => m.EmployeeAttendanceDetailComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-HXPFRMZN.js").then((m) => m.EmployeeAttendanceDetailComponent), "loadComponent"),
         data: {
           title: "attendance.employee_history.title",
           permission: "attendance.read"
@@ -456,7 +456,7 @@ var routes = [
       },
       {
         path: "attendance/employee/:id",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-QMOQTXDD.js").then((m) => m.EmployeeAttendanceDetailComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-HXPFRMZN.js").then((m) => m.EmployeeAttendanceDetailComponent), "loadComponent"),
         data: {
           title: "attendance.employee_detail",
           permission: "attendance.read"
@@ -465,7 +465,7 @@ var routes = [
       },
       {
         path: "attendance/edit/:id",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-3JGIKRQ6.js").then((m) => m.EditAttendanceComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-OZ6ED2S3.js").then((m) => m.EditAttendanceComponent), "loadComponent"),
         data: {
           title: "attendance.edit.title",
           permission: "attendance.update"
@@ -474,7 +474,7 @@ var routes = [
       },
       {
         path: "attendance/:attendanceId/change-shift",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-2XI5Z6NF.js").then((m) => m.ChangeAttendanceShiftComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-XUGGFCLQ.js").then((m) => m.ChangeAttendanceShiftComponent), "loadComponent"),
         data: {
           title: "attendance.change_shift_title",
           permission: "attendance.update"
@@ -483,12 +483,12 @@ var routes = [
       },
       {
         path: "settings",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-VVJ3KZD2.js").then((m) => m.SettingsComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-7OU44MFZ.js").then((m) => m.SettingsComponent), "loadComponent"),
         data: { title: "settings.title" }
       },
       {
         path: "settings/overtime",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-4MG6UF27.js").then((m) => m.OvertimeConfigurationsComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-PTCHCH3K.js").then((m) => m.OvertimeConfigurationsComponent), "loadComponent"),
         data: {
           title: "settings.overtime.title",
           permission: "settings.overtime.read"
@@ -497,7 +497,7 @@ var routes = [
       },
       {
         path: "settings/overtime/create",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-YERUAY5D.js").then((m) => m.CreateOvertimeConfigurationComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-WVI3UBXF.js").then((m) => m.CreateOvertimeConfigurationComponent), "loadComponent"),
         data: {
           title: "settings.overtime.create",
           permission: "settings.overtime.create"
@@ -506,7 +506,7 @@ var routes = [
       },
       {
         path: "settings/overtime/edit/:id",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-EZH3LII3.js").then((m) => m.EditOvertimeConfigurationComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-PI6I3RNN.js").then((m) => m.EditOvertimeConfigurationComponent), "loadComponent"),
         data: {
           title: "settings.overtime.edit",
           permission: "settings.overtime.update"
@@ -515,7 +515,7 @@ var routes = [
       },
       {
         path: "settings/overtime/:id/view",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-RMN3ELZU.js").then((m) => m.ViewOvertimeConfigurationComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-PL2GDNDI.js").then((m) => m.ViewOvertimeConfigurationComponent), "loadComponent"),
         data: {
           title: "settings.overtime.view_details",
           permission: "settings.overtime.read"
@@ -524,7 +524,7 @@ var routes = [
       },
       {
         path: "settings/public-holidays",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-USOZFBN7.js").then((m) => m.PublicHolidaysComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-YN5N2SDP.js").then((m) => m.PublicHolidaysComponent), "loadComponent"),
         data: {
           title: "settings.holidays.title",
           permission: "publicHoliday.read"
@@ -533,7 +533,7 @@ var routes = [
       },
       {
         path: "settings/public-holidays/create",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-G7HFJNQG.js").then((m) => m.CreatePublicHolidayComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-TCLYCB2X.js").then((m) => m.CreatePublicHolidayComponent), "loadComponent"),
         data: {
           title: "settings.holidays.create",
           permission: "publicHoliday.create"
@@ -542,7 +542,7 @@ var routes = [
       },
       {
         path: "settings/public-holidays/:id/view",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-E4DLYXSQ.js").then((m) => m.ViewPublicHolidayComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-IMS7JQ3W.js").then((m) => m.ViewPublicHolidayComponent), "loadComponent"),
         data: {
           title: "settings.holidays.view_details",
           permission: "publicHoliday.read"
@@ -551,7 +551,7 @@ var routes = [
       },
       {
         path: "settings/public-holidays/:id/edit",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-VMJBQGYE.js").then((m) => m.EditPublicHolidayComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-CIN5NO6S.js").then((m) => m.EditPublicHolidayComponent), "loadComponent"),
         data: {
           title: "settings.holidays.edit",
           permission: "publicHoliday.update"
@@ -560,7 +560,7 @@ var routes = [
       },
       {
         path: "reports/attendance",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-5MRFHDG4.js").then((m) => m.AttendanceReportComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-LS43SEYU.js").then((m) => m.AttendanceReportComponent), "loadComponent"),
         data: {
           title: "reports.attendance",
           permission: "attendance.read"
@@ -569,7 +569,7 @@ var routes = [
       },
       {
         path: "reports/leaves",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-JMIKHR3A.js").then((m) => m.LeaveReportComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-BVKUZC7E.js").then((m) => m.LeaveReportComponent), "loadComponent"),
         data: {
           title: "reports.leaves",
           permission: "vacation.read"
@@ -579,7 +579,7 @@ var routes = [
       // Vacation Types Routes
       {
         path: "vacation-types",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-2ZQDSY5X.js").then((m) => m.VacationTypesComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-2MFPAHWS.js").then((m) => m.VacationTypesComponent), "loadComponent"),
         data: {
           title: "vacation_types.title",
           permission: "vacationType.read"
@@ -588,7 +588,7 @@ var routes = [
       },
       {
         path: "vacation-types/:id",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-3FVDAI3J.js").then((m) => m.ViewVacationTypeComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-M7ED7XSP.js").then((m) => m.ViewVacationTypeComponent), "loadComponent"),
         data: {
           title: "vacation_types.view_details",
           permission: "vacationType.read"
@@ -598,7 +598,7 @@ var routes = [
       // Employee Vacations Routes
       {
         path: "employee-vacations",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-OE2MWUNJ.js").then((m) => m.EmployeeVacationsComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-IAGYIECD.js").then((m) => m.EmployeeVacationsComponent), "loadComponent"),
         data: {
           title: "employee_vacations.title",
           permission: "vacation.read"
@@ -607,7 +607,7 @@ var routes = [
       },
       {
         path: "employee-vacations/create",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-SOFFDG4L.js").then((m) => m.CreateEmployeeVacationComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-IDNBVRJU.js").then((m) => m.CreateEmployeeVacationComponent), "loadComponent"),
         data: {
           title: "employee_vacations.create_vacation",
           permission: "vacation.create"
@@ -616,7 +616,7 @@ var routes = [
       },
       {
         path: "employee-vacations/:id/view",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-HDF4XA4K.js").then((m) => m.ViewEmployeeVacationComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-ACCFGDNI.js").then((m) => m.ViewEmployeeVacationComponent), "loadComponent"),
         data: {
           title: "employee_vacations.view_details",
           permission: "vacation.read"
@@ -625,7 +625,7 @@ var routes = [
       },
       {
         path: "employee-vacations/:id/edit",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-JG6XYTDS.js").then((m) => m.EditEmployeeVacationComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-EN3UE6HZ.js").then((m) => m.EditEmployeeVacationComponent), "loadComponent"),
         data: {
           title: "employee_vacations.edit_vacation",
           permission: "vacation.update"
@@ -635,7 +635,7 @@ var routes = [
       // Employee Excuses Routes
       {
         path: "employee-excuses",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-W7KOTGE2.js").then((m) => m.EmployeeExcusesComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-5IESC6AN.js").then((m) => m.EmployeeExcusesComponent), "loadComponent"),
         data: {
           title: "employee_excuses.title",
           permission: "excuse.read"
@@ -644,7 +644,7 @@ var routes = [
       },
       {
         path: "employee-excuses/create",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-FEE25L5D.js").then((m) => m.ExcuseRequestFormComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-GLOPMJ3N.js").then((m) => m.ExcuseRequestFormComponent), "loadComponent"),
         data: {
           title: "employee_excuses.create_request",
           permission: "excuse.create"
@@ -653,7 +653,7 @@ var routes = [
       },
       {
         path: "employee-excuses/:id/view",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-O3YO44UE.js").then((m) => m.ExcuseDetailsComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-DX4PNOGX.js").then((m) => m.ExcuseDetailsComponent), "loadComponent"),
         data: {
           title: "employee_excuses.excuse_details",
           permission: "excuse.read"
@@ -662,7 +662,7 @@ var routes = [
       },
       {
         path: "employee-excuses/:id/edit",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-FEE25L5D.js").then((m) => m.ExcuseRequestFormComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-GLOPMJ3N.js").then((m) => m.ExcuseRequestFormComponent), "loadComponent"),
         data: {
           title: "employee_excuses.edit_request",
           permission: "excuse.update"
@@ -672,7 +672,7 @@ var routes = [
       // Remote Work Routes
       {
         path: "remote-work",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-AZASXLGP.js").then((m) => m.RemoteWorkListComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-6DN6S74Z.js").then((m) => m.RemoteWorkListComponent), "loadComponent"),
         data: {
           title: "remoteWork.request.title",
           permission: "remoteWork.request.read"
@@ -681,7 +681,7 @@ var routes = [
       },
       {
         path: "remote-work/create",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-MSJ2RKTU.js").then((m) => m.AssignRemoteWorkComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-MPJPXTZJ.js").then((m) => m.AssignRemoteWorkComponent), "loadComponent"),
         data: {
           title: "remoteWork.request.create",
           permission: "remoteWork.request.create"
@@ -690,7 +690,7 @@ var routes = [
       },
       {
         path: "remote-work/:id/view",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-N2IOO6OZ.js").then((m) => m.ViewRemoteWorkAssignmentComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-G5NOSYVH.js").then((m) => m.ViewRemoteWorkAssignmentComponent), "loadComponent"),
         data: {
           title: "remoteWork.request.view_details",
           permission: "remoteWork.request.read"
@@ -699,7 +699,7 @@ var routes = [
       },
       {
         path: "remote-work/edit/:id",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-HNYH7HKL.js").then((m) => m.EditRemoteWorkComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-VB2ONBA2.js").then((m) => m.EditRemoteWorkComponent), "loadComponent"),
         data: {
           title: "remoteWork.request.edit",
           permission: "remoteWork.request.update"
@@ -708,7 +708,7 @@ var routes = [
       },
       {
         path: "settings/remote-work-policy",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-IRLI62UQ.js").then((m) => m.RemoteWorkPolicyListComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-EKDRYZVO.js").then((m) => m.RemoteWorkPolicyListComponent), "loadComponent"),
         data: {
           title: "remoteWork.policy.title",
           permission: "remoteWork.policy.read"
@@ -717,7 +717,7 @@ var routes = [
       },
       {
         path: "settings/remote-work-policy/create",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-I7GLDVIJ.js").then((m) => m.CreateRemoteWorkPolicyComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-V63GYIEU.js").then((m) => m.CreateRemoteWorkPolicyComponent), "loadComponent"),
         data: {
           title: "remoteWork.policy.create_policy",
           permission: "remoteWork.policy.create"
@@ -726,7 +726,7 @@ var routes = [
       },
       {
         path: "settings/remote-work-policy/:id/view",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-NY2ADYQC.js").then((m) => m.ViewRemoteWorkPolicyComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-ZKZD7K4C.js").then((m) => m.ViewRemoteWorkPolicyComponent), "loadComponent"),
         data: {
           title: "remoteWork.policy.policy_details",
           permission: "remoteWork.policy.read"
@@ -735,7 +735,7 @@ var routes = [
       },
       {
         path: "settings/remote-work-policy/:id/edit",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-3H3AJFCX.js").then((m) => m.EditRemoteWorkPolicyComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-ICH342FX.js").then((m) => m.EditRemoteWorkPolicyComponent), "loadComponent"),
         data: {
           title: "remoteWork.policy.edit_policy",
           permission: "remoteWork.policy.update"
@@ -745,7 +745,7 @@ var routes = [
       // Excuse Policies Routes
       {
         path: "settings/excuse-policies",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-SC6HF6HN.js").then((m) => m.ExcusePoliciesComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-N77F62MF.js").then((m) => m.ExcusePoliciesComponent), "loadComponent"),
         data: {
           title: "excuse_policies.title",
           permission: "settings.excusePolicy.read"
@@ -754,7 +754,7 @@ var routes = [
       },
       {
         path: "settings/excuse-policies/create",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-A3ENWKTZ.js").then((m) => m.CreateExcusePolicyComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-EERGQUYV.js").then((m) => m.CreateExcusePolicyComponent), "loadComponent"),
         data: {
           title: "excuse_policies.create_policy",
           permission: "settings.excusePolicy.create"
@@ -763,7 +763,7 @@ var routes = [
       },
       {
         path: "settings/excuse-policies/:id/view",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-KAHBSC37.js").then((m) => m.ViewExcusePolicyComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-SCR6ICAR.js").then((m) => m.ViewExcusePolicyComponent), "loadComponent"),
         data: {
           title: "excuse_policies.view_policy",
           permission: "settings.excusePolicy.read"
@@ -772,7 +772,7 @@ var routes = [
       },
       {
         path: "settings/excuse-policies/:id/edit",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-W676VSOP.js").then((m) => m.EditExcusePolicyComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-RN5HSYLN.js").then((m) => m.EditExcusePolicyComponent), "loadComponent"),
         data: {
           title: "excuse_policies.edit_policy",
           permission: "settings.excusePolicy.update"
@@ -782,7 +782,7 @@ var routes = [
       // Workflow Routes
       {
         path: "settings/workflows",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-KIIZFBXF.js").then((m) => m.WorkflowListComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-5IOFZVBB.js").then((m) => m.WorkflowListComponent), "loadComponent"),
         data: {
           title: "workflows.title",
           permission: "workflow.read"
@@ -791,7 +791,7 @@ var routes = [
       },
       {
         path: "settings/workflows/create",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-5XPWBAAN.js").then((m) => m.WorkflowFormComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-IMSMVE3Z.js").then((m) => m.WorkflowFormComponent), "loadComponent"),
         data: {
           title: "workflows.create_workflow",
           permission: "workflow.create"
@@ -800,7 +800,7 @@ var routes = [
       },
       {
         path: "settings/workflows/:id/view",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-5XPWBAAN.js").then((m) => m.WorkflowFormComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-IMSMVE3Z.js").then((m) => m.WorkflowFormComponent), "loadComponent"),
         data: {
           title: "workflows.view_workflow",
           permission: "workflow.read"
@@ -809,7 +809,7 @@ var routes = [
       },
       {
         path: "settings/workflows/:id/edit",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-5XPWBAAN.js").then((m) => m.WorkflowFormComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-IMSMVE3Z.js").then((m) => m.WorkflowFormComponent), "loadComponent"),
         data: {
           title: "workflows.edit_workflow",
           permission: "workflow.update"
@@ -819,7 +819,7 @@ var routes = [
       // Leave Entitlements Routes
       {
         path: "settings/leave-entitlements",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-AGE4HJFE.js").then((m) => m.LeaveEntitlementsListComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-WRTFWGD7.js").then((m) => m.LeaveEntitlementsListComponent), "loadComponent"),
         data: {
           title: "leaveBalance.leaveEntitlements",
           permission: "leaveBalance.read"
@@ -828,7 +828,7 @@ var routes = [
       },
       {
         path: "settings/leave-entitlements/create",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-PNRNGXOJ.js").then((m) => m.LeaveEntitlementFormComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-RNF4GB7V.js").then((m) => m.LeaveEntitlementFormComponent), "loadComponent"),
         data: {
           title: "leaveBalance.createEntitlementTitle",
           permission: "leaveBalance.create"
@@ -837,7 +837,7 @@ var routes = [
       },
       {
         path: "settings/leave-entitlements/edit/:id",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-PNRNGXOJ.js").then((m) => m.LeaveEntitlementFormComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-RNF4GB7V.js").then((m) => m.LeaveEntitlementFormComponent), "loadComponent"),
         data: {
           title: "leaveBalance.editEntitlementTitle",
           permission: "leaveBalance.update"
@@ -847,7 +847,7 @@ var routes = [
       // Approvals Routes
       {
         path: "approvals",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-C3CY67GX.js").then((m) => m.PendingApprovalsComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-ASDNZEA6.js").then((m) => m.PendingApprovalsComponent), "loadComponent"),
         data: {
           title: "approvals.pending_title",
           permission: "approval.read"
@@ -856,7 +856,7 @@ var routes = [
       },
       {
         path: "approvals/history",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-FAMQUZFP.js").then((m) => m.ApprovalHistoryComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-7WFN6VWX.js").then((m) => m.ApprovalHistoryComponent), "loadComponent"),
         data: {
           title: "approvals.history_title",
           permission: "approval.read"
@@ -866,7 +866,7 @@ var routes = [
       // Reports Routes
       {
         path: "reports/sessions",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-BLLNYIWJ.js").then((m) => m.SessionsComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-P2BRHKDB.js").then((m) => m.SessionsComponent), "loadComponent"),
         data: {
           title: "sessions.title",
           permission: "session.read"
@@ -875,7 +875,7 @@ var routes = [
       },
       {
         path: "reports/audit-logs",
-        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-63DE5DGO.js").then((m) => m.AuditLogsComponent), "loadComponent"),
+        loadComponent: /* @__PURE__ */ __name(() => import("./chunk-JC4CUINO.js").then((m) => m.AuditLogsComponent), "loadComponent"),
         data: {
           title: "audit_logs.title",
           permission: "audit.read"
@@ -886,12 +886,12 @@ var routes = [
   },
   {
     path: "unauthorized",
-    loadComponent: /* @__PURE__ */ __name(() => import("./chunk-QCMKR5TD.js").then((m) => m.UnauthorizedComponent), "loadComponent"),
+    loadComponent: /* @__PURE__ */ __name(() => import("./chunk-42EHOIMV.js").then((m) => m.UnauthorizedComponent), "loadComponent"),
     data: { title: "Unauthorized Access" }
   },
   {
     path: "**",
-    loadComponent: /* @__PURE__ */ __name(() => import("./chunk-NHQOYO56.js").then((m) => m.NotFoundComponent), "loadComponent"),
+    loadComponent: /* @__PURE__ */ __name(() => import("./chunk-5SRBDQUJ.js").then((m) => m.NotFoundComponent), "loadComponent"),
     data: { title: "Page Not Found" }
   }
 ];
@@ -1283,7 +1283,7 @@ var App = _App;
 (() => {
   (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(App, [{
     type: Component,
-    args: [{ selector: "app-root", imports: [RouterOutlet], template: "<router-outlet />\n" }]
+    args: [{ selector: "app-root", imports: [RouterOutlet], template: "<router-outlet />\r\n" }]
   }], () => [{ type: I18nService }], null);
 })();
 (() => {

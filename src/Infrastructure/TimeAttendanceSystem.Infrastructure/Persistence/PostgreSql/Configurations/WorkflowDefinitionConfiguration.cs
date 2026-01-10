@@ -136,7 +136,8 @@ public class WorkflowDefinitionConfiguration : IEntityTypeConfiguration<Workflow
 
         builder.Property(e => e.RowVersion)
             .IsConcurrencyToken()
-            .ValueGeneratedOnAddOrUpdate()
+            .IsRequired()
+            .HasDefaultValue(new byte[] { 1 })
             .HasComment("Concurrency control timestamp");
     }
 }

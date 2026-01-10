@@ -64,6 +64,12 @@ public class WorkflowStepConfiguration : IEntityTypeConfiguration<WorkflowStep>
         builder.Property(ws => ws.EscalationStepId)
             .HasComment("Step to escalate to on timeout");
 
+        builder.Property(ws => ws.TimeoutAction)
+            .IsRequired()
+            .HasDefaultValue(Domain.Workflows.Enums.TimeoutAction.Expire)
+            .HasConversion<int>()
+            .HasComment("Action to take when step times out (0=Expire, 1=Escalate, 2=AutoApprove, 3=AutoReject)");
+
         builder.Property(ws => ws.OnApproveNextStepId)
             .HasComment("Next step on approval");
 
@@ -180,7 +186,8 @@ public class WorkflowStepConfiguration : IEntityTypeConfiguration<WorkflowStep>
 
         builder.Property(e => e.RowVersion)
             .IsConcurrencyToken()
-            .ValueGeneratedOnAddOrUpdate()
+            .IsRequired()
+            .HasDefaultValue(new byte[] { 1 })
             .HasComment("Concurrency control timestamp");
     }
 }

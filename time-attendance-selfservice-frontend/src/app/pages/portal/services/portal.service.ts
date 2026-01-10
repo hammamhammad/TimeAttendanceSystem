@@ -734,6 +734,8 @@ export class PortalService {
         }
         return response.value.map((item: any) => ({
           ...item,
+          // Use entityTypeName (string) from backend instead of entityType (number)
+          entityType: item.entityTypeName || item.entityType,
           requestedAt: new Date(item.requestedAt),
           dueAt: item.dueAt ? new Date(item.dueAt) : undefined
         }));
@@ -756,15 +758,10 @@ export class PortalService {
    * Approves a workflow step
    */
   approveWorkflowStep(workflowInstanceId: number, comments?: string): Observable<void> {
-    return this.http.post<{ isSuccess: boolean; error: string }>(
-      `${this.portalApiUrl}/approvals/${workflowInstanceId}/approve`,
+    return this.http.post<void>(
+      `${environment.apiUrl}/api/v1/approvals/${workflowInstanceId}/approve`,
       { comments }
     ).pipe(
-      map(response => {
-        if (!response.isSuccess) {
-          throw new Error(response.error || 'Failed to approve');
-        }
-      }),
       tap(() => {
         this.notificationService.success('Request approved successfully');
         // Refresh pending approvals
@@ -782,15 +779,10 @@ export class PortalService {
    * Rejects a workflow step
    */
   rejectWorkflowStep(workflowInstanceId: number, comments?: string): Observable<void> {
-    return this.http.post<{ isSuccess: boolean; error: string }>(
-      `${this.portalApiUrl}/approvals/${workflowInstanceId}/reject`,
+    return this.http.post<void>(
+      `${environment.apiUrl}/api/v1/approvals/${workflowInstanceId}/reject`,
       { comments }
     ).pipe(
-      map(response => {
-        if (!response.isSuccess) {
-          throw new Error(response.error || 'Failed to reject');
-        }
-      }),
       tap(() => {
         this.notificationService.success('Request rejected successfully');
         // Refresh pending approvals
@@ -798,6 +790,27 @@ export class PortalService {
       }),
       catchError(error => {
         const errorMessage = error.error?.error || error.message || 'Failed to reject request';
+        this.notificationService.error(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Delegates a workflow step to another user
+   */
+  delegateWorkflowStep(workflowInstanceId: number, delegateToUserId: number, comments?: string): Observable<void> {
+    return this.http.post<void>(
+      `${environment.apiUrl}/api/v1/approvals/${workflowInstanceId}/delegate`,
+      { delegateToUserId, comments }
+    ).pipe(
+      tap(() => {
+        this.notificationService.success('Request delegated successfully');
+        // Refresh pending approvals
+        this.loadPendingApprovals().subscribe();
+      }),
+      catchError(error => {
+        const errorMessage = error.error?.error || error.message || 'Failed to delegate request';
         this.notificationService.error(errorMessage);
         return throwError(() => error);
       })

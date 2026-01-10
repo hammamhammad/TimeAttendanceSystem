@@ -55,8 +55,8 @@ public class AuditChangeConfiguration : IEntityTypeConfiguration<AuditChange>
 
         builder.Property(x => x.RowVersion)
             .IsConcurrencyToken()
-            .IsRowVersion()
-            .HasDefaultValueSql("E'\\\\x01'::bytea");
+            .IsRequired()
+            .HasDefaultValue(new byte[] { 1 });
 
         // Foreign key relationship is configured in AuditLogConfiguration
         // Index for efficient queries

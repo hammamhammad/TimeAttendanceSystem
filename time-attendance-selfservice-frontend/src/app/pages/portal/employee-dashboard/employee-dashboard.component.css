@@ -143,6 +143,30 @@
   background-color: var(--bs-light);
 }
 
+.activity-item.clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.activity-item.clickable:hover {
+  background-color: rgba(13, 110, 253, 0.05);
+  border-left: 3px solid var(--bs-primary);
+  padding-left: calc(1.25rem - 3px);
+}
+
+.activity-item.clickable:focus {
+  outline: 2px solid var(--bs-primary);
+  outline-offset: -2px;
+}
+
+.activity-item.clickable .activity-title {
+  color: var(--bs-primary);
+}
+
+.activity-item.clickable:hover .activity-title {
+  text-decoration: underline;
+}
+
 .activity-marker {
   position: relative;
   flex-shrink: 0;

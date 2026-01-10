@@ -21,3 +21,15 @@ D:\Work\AI Code\TimeAttendanceSystem\src\Domain\TimeAttendanceSystem.Domain\obj\
 D:\Work\AI Code\TimeAttendanceSystem\src\Domain\TimeAttendanceSystem.Domain\obj\Debug\net9.0\refint\TimeAttendanceSystem.Domain.dll
 D:\Work\AI Code\TimeAttendanceSystem\src\Domain\TimeAttendanceSystem.Domain\obj\Debug\net9.0\TimeAttendanceSystem.Domain.pdb
 D:\Work\AI Code\TimeAttendanceSystem\src\Domain\TimeAttendanceSystem.Domain\obj\Debug\net9.0\ref\TimeAttendanceSystem.Domain.dll
+D:\Work\TimeAttendanceSystem\src\Domain\TimeAttendanceSystem.Domain\bin\Debug\net9.0\TimeAttendanceSystem.Domain.deps.json
+D:\Work\TimeAttendanceSystem\src\Domain\TimeAttendanceSystem.Domain\bin\Debug\net9.0\TimeAttendanceSystem.Domain.dll
+D:\Work\TimeAttendanceSystem\src\Domain\TimeAttendanceSystem.Domain\bin\Debug\net9.0\TimeAttendanceSystem.Domain.pdb
+D:\Work\TimeAttendanceSystem\src\Domain\TimeAttendanceSystem.Domain\obj\Debug\net9.0\TimeAttendanceSystem.Domain.GeneratedMSBuildEditorConfig.editorconfig
+D:\Work\TimeAttendanceSystem\src\Domain\TimeAttendanceSystem.Domain\obj\Debug\net9.0\TimeAttendanceSystem.Domain.AssemblyInfoInputs.cache
+D:\Work\TimeAttendanceSystem\src\Domain\TimeAttendanceSystem.Domain\obj\Debug\net9.0\TimeAttendanceSystem.Domain.AssemblyInfo.cs
+D:\Work\TimeAttendanceSystem\src\Domain\TimeAttendanceSystem.Domain\obj\Debug\net9.0\TimeAttendanceSystem.Domain.csproj.CoreCompileInputs.cache
+D:\Work\TimeAttendanceSystem\src\Domain\TimeAttendanceSystem.Domain\obj\Debug\net9.0\TimeAttendanceSystem.Domain.sourcelink.json
+D:\Work\TimeAttendanceSystem\src\Domain\TimeAttendanceSystem.Domain\obj\Debug\net9.0\TimeAttendanceSystem.Domain.dll
+D:\Work\TimeAttendanceSystem\src\Domain\TimeAttendanceSystem.Domain\obj\Debug\net9.0\refint\TimeAttendanceSystem.Domain.dll
+D:\Work\TimeAttendanceSystem\src\Domain\TimeAttendanceSystem.Domain\obj\Debug\net9.0\TimeAttendanceSystem.Domain.pdb
+D:\Work\TimeAttendanceSystem\src\Domain\TimeAttendanceSystem.Domain\obj\Debug\net9.0\ref\TimeAttendanceSystem.Domain.dll

@@ -122,8 +122,8 @@ public class ShiftAssignmentConfiguration : IEntityTypeConfiguration<ShiftAssign
 
         builder.Property(sa => sa.RowVersion)
             .IsConcurrencyToken()
-            .IsRowVersion()
-            .HasDefaultValueSql("E'\\\\x01'::bytea");
+            .IsRequired()
+            .HasDefaultValue(new byte[] { 1 });
 
         // Relationships
         builder.HasOne(sa => sa.Shift)

@@ -78,16 +78,22 @@ export class ViewEmployeeComponent implements OnInit {
     return new Date(dateString).toLocaleDateString();
   }
 
-  getEmploymentStatusLabel(status: EmploymentStatus): string {
-    return this.t(`employees.employment_status.${EmploymentStatus[status].toLowerCase()}`);
+  getEmploymentStatusLabel(status: EmploymentStatus | string): string {
+    // Backend returns enum as string (e.g., "Active") due to JsonStringEnumConverter
+    const statusStr = typeof status === 'string' ? status : EmploymentStatus[status];
+    return this.t(`employees.employment_status.${statusStr?.toLowerCase() || 'unknown'}`);
   }
 
-  getGenderLabel(gender: Gender): string {
-    return this.t(`employees.gender.${Gender[gender].toLowerCase()}`);
+  getGenderLabel(gender: Gender | string): string {
+    // Backend returns enum as string (e.g., "Male") due to JsonStringEnumConverter
+    const genderStr = typeof gender === 'string' ? gender : Gender[gender];
+    return this.t(`employees.gender.${genderStr?.toLowerCase() || 'unknown'}`);
   }
 
-  getWorkLocationTypeLabel(type: WorkLocationType): string {
-    return this.t(`employees.work_location.${WorkLocationType[type].toLowerCase()}`);
+  getWorkLocationTypeLabel(type: WorkLocationType | string): string {
+    // Backend returns enum as string (e.g., "Office") due to JsonStringEnumConverter
+    const typeStr = typeof type === 'string' ? type : WorkLocationType[type];
+    return this.t(`employees.work_location.${typeStr?.toLowerCase() || 'unknown'}`);
   }
 
   t(key: string): string {

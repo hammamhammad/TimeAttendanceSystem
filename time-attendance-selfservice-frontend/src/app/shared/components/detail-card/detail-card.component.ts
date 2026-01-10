@@ -243,6 +243,9 @@ export interface DetailField {
             <ng-container [ngTemplateOutlet]="customContent"></ng-container>
           </div>
         }
+
+        <!-- Content projection for nested components -->
+        <ng-content></ng-content>
       </div>
     </div>
   `

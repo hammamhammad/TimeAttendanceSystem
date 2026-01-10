@@ -15,6 +15,7 @@ import {
   WorkflowEntityType,
   WorkflowStepType,
   ApproverType,
+  TimeoutAction,
   CreateWorkflowDefinitionRequest,
   UpdateWorkflowDefinitionRequest,
   CreateWorkflowStepRequest
@@ -75,6 +76,12 @@ export class WorkflowFormComponent implements OnInit {
     { value: 'DepartmentHead', label: 'Department Head' },
     { value: 'Role', label: 'Specific Role' },
     { value: 'SpecificUser', label: 'Specific User' }
+  ];
+  timeoutActions: { value: TimeoutAction; label: string }[] = [
+    { value: 'Expire', label: 'Expire' },
+    { value: 'Escalate', label: 'Escalate' },
+    { value: 'AutoApprove', label: 'Auto Approve' },
+    { value: 'AutoReject', label: 'Auto Reject' }
   ];
 
   // Page title
@@ -208,6 +215,7 @@ export class WorkflowFormComponent implements OnInit {
       approverUserId: [step?.approverUserId],
       conditionJson: [step?.conditionJson],
       timeoutHours: [step?.timeoutHours],
+      timeoutAction: [step?.timeoutAction ?? 'Expire'],
       allowDelegation: [step?.allowDelegation ?? true],
       notifyOnAction: [step?.notifyOnAction ?? true],
       notifyRequesterOnReach: [step?.notifyRequesterOnReach ?? true],
@@ -275,6 +283,7 @@ export class WorkflowFormComponent implements OnInit {
       approverUserId: step.approverUserId || undefined,
       conditionJson: step.conditionJson || undefined,
       timeoutHours: step.timeoutHours || undefined,
+      timeoutAction: step.timeoutAction,
       allowDelegation: step.allowDelegation,
       notifyOnAction: step.notifyOnAction,
       notifyRequesterOnReach: step.notifyRequesterOnReach,

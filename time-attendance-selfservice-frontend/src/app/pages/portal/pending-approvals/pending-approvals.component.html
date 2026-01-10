@@ -129,17 +129,17 @@
                     <td>
                       <div class="d-flex align-items-center">
                         <div class="avatar-circle me-2">
-                          <span class="avatar-initials">{{ approval.employeeName.charAt(0) }}</span>
+                          <span class="avatar-initials">{{ (approval.employeeName || 'U').charAt(0) }}</span>
                         </div>
                         <div>
-                          <div class="fw-medium">{{ approval.employeeName }}</div>
-                          <small class="text-muted">{{ approval.employeeCode }}</small>
+                          <div class="fw-medium">{{ approval.employeeName || 'Unknown' }}</div>
+                          <small class="text-muted">{{ approval.employeeCode || '-' }}</small>
                         </div>
                       </div>
                     </td>
                     <td>
                       <div class="request-summary">
-                        {{ approval.requestSummary }}
+                        {{ approval.requestSummary || '-' }}
                       </div>
                       @if (approval.isDelegated) {
                         <small class="text-info">
@@ -157,7 +157,7 @@
                     <td>
                       <div class="workflow-progress">
                         <span class="badge bg-secondary-subtle text-secondary">
-                          {{ i18n.t('portal.step_of', { current: approval.currentStep.toString(), total: approval.totalSteps.toString() }) }}
+                          {{ i18n.t('portal.step_of', { current: (approval.currentStep || 1).toString(), total: (approval.totalSteps || 1).toString() }) }}
                         </span>
                       </div>
                     </td>

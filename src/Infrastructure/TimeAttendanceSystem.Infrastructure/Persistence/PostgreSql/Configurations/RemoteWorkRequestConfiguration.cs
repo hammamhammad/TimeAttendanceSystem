@@ -82,8 +82,8 @@ public class RemoteWorkRequestConfiguration : IEntityTypeConfiguration<RemoteWor
 
         builder.Property(a => a.RowVersion)
             .IsConcurrencyToken()
-            .IsRowVersion()
-            .HasDefaultValueSql("E'\\\\x01'::bytea");
+            .IsRequired()
+            .HasDefaultValue(new byte[] { 1 });
 
         // Indexes
         builder.HasIndex(a => a.EmployeeId)

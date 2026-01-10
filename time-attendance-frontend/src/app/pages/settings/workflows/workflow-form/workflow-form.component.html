@@ -237,6 +237,17 @@
                           formControlName="timeoutHours"
                           min="0"
                           [placeholder]="t('workflows.timeout_hours_placeholder')">
+                        <small class="text-muted">{{ t('workflows.timeout_hours_hint') }}</small>
+                      </div>
+
+                      <div class="col-md-6 mb-3">
+                        <label class="form-label">{{ t('workflows.timeout_action') }}</label>
+                        <select class="form-select" formControlName="timeoutAction">
+                          @for (action of timeoutActions; track action.value) {
+                            <option [value]="action.value">{{ action.label }}</option>
+                          }
+                        </select>
+                        <small class="text-muted">{{ t('workflows.timeout_action_hint') }}</small>
                       </div>
 
                       <div class="col-md-6 mb-3">

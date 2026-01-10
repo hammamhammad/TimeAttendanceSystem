@@ -83,7 +83,7 @@ export interface SortEvent {
                       [class]="'btn-outline-' + (action.color || 'primary')"
                       [title]="action.label"
                       (click)="onAction(action.key, item)">
-                <i *ngIf="action.icon" [class]="'fas ' + action.icon"></i>
+                <i *ngIf="action.icon" [class]="getIconClass(action.icon)"></i>
                 <span *ngIf="!action.icon">{{ action.label }}</span>
               </button>
             </div>
@@ -93,7 +93,7 @@ export interface SortEvent {
         <!-- Empty state for mobile -->
         <app-empty-state
           *ngIf="data.length === 0"
-          [icon]="'fa-inbox'"
+          [icon]="'bi-inbox'"
           [title]="emptyTitle || 'No Data'"
           [message]="emptyMessage || 'No data available'">
         </app-empty-state>
@@ -132,11 +132,11 @@ export interface SortEvent {
                        [class.justify-content-end]="column.align === 'right'">
                     <span>{{ column.label }}</span>
                     <i *ngIf="column.sortable && getSortColumn() === column.key"
-                       class="ms-2 fas"
-                       [class.fa-sort-up]="getSortDirection() === 'asc'"
-                       [class.fa-sort-down]="getSortDirection() === 'desc'"></i>
+                       class="ms-2 bi"
+                       [class.bi-caret-up-fill]="getSortDirection() === 'asc'"
+                       [class.bi-caret-down-fill]="getSortDirection() === 'desc'"></i>
                     <i *ngIf="column.sortable && getSortColumn() !== column.key"
-                       class="ms-2 fas fa-sort text-muted"></i>
+                       class="ms-2 bi bi-arrow-down-up text-muted"></i>
                   </div>
                 </th>
 
@@ -185,7 +185,7 @@ export interface SortEvent {
                             [class]="'btn-outline-' + (action.color || 'primary')"
                             [title]="action.label"
                             (click)="onAction(action.key, item); $event.stopPropagation()">
-                      <i *ngIf="action.icon" [class]="'fas ' + action.icon"></i>
+                      <i *ngIf="action.icon" [class]="getIconClass(action.icon)"></i>
                       <span *ngIf="!action.icon">{{ action.label }}</span>
                     </button>
                   </div>
@@ -196,7 +196,7 @@ export interface SortEvent {
               <tr *ngIf="data.length === 0">
                 <td [attr.colspan]="getTotalColumns()" class="p-0">
                   <app-empty-state
-                    [icon]="'fa-inbox'"
+                    [icon]="'bi-inbox'"
                     [title]="emptyTitle || 'No Data'"
                     [message]="emptyMessage || 'No data available'">
                   </app-empty-state>
@@ -232,7 +232,7 @@ export interface SortEvent {
               <ul class="pagination pagination-sm justify-content-end mb-0">
                 <li class="page-item" [class.disabled]="getCurrentPage() === 1">
                   <button class="page-link" (click)="onPageChange(getCurrentPage() - 1)" [disabled]="getCurrentPage() === 1">
-                    <i class="fas fa-chevron-left"></i>
+                    <i class="bi bi-chevron-left"></i>
                   </button>
                 </li>
 
@@ -252,7 +252,7 @@ export interface SortEvent {
 
                 <li class="page-item" [class.disabled]="getCurrentPage() === getTotalPagesValue()">
                   <button class="page-link" (click)="onPageChange(getCurrentPage() + 1)" [disabled]="getCurrentPage() === getTotalPagesValue()">
-                    <i class="fas fa-chevron-right"></i>
+                    <i class="bi bi-chevron-right"></i>
                   </button>
                 </li>
               </ul>
@@ -337,13 +337,13 @@ export interface SortEvent {
       background-color: #f0f7ff;
     }
 
-    .sortable .fas {
+    .sortable .bi {
       font-size: 0.75rem;
       opacity: 0.6;
       transition: opacity 0.2s ease, transform 0.2s ease;
     }
 
-    .sortable:hover .fas {
+    .sortable:hover .bi {
       opacity: 1;
       transform: scale(1.1);
     }
@@ -957,5 +957,14 @@ export class DataTableComponent {
   isMobileView(): boolean {
     if (typeof window === 'undefined') return false;
     return window.innerWidth < 768;
+  }
+
+  getIconClass(icon: string): string {
+    // Support both Bootstrap Icons (bi-*) and FontAwesome (fa-*)
+    if (icon.startsWith('bi-')) {
+      return 'bi ' + icon;
+    }
+    // Default to FontAwesome
+    return 'fas ' + icon;
   }
 }

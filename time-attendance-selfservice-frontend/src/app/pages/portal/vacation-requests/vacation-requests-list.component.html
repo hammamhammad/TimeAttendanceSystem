@@ -55,15 +55,15 @@
       <app-data-table
         [data]="tableData()"
         [columns]="columns"
+        [actions]="tableActions"
         [loading]="loading()"
-        [pageSize]="10">
-        <ng-template #actionsTemplate let-item>
-          <app-table-actions
-            [actions]="actions"
-            [item]="item"
-            (actionClick)="onActionClick($event)">
-          </app-table-actions>
-        </ng-template>
+        [pageSize]="10"
+        [paginated]="true"
+        [sortable]="true"
+        [sortColumn]="sortColumn"
+        [sortDirection]="sortDirection"
+        (sortChange)="onSort($event)"
+        (actionClick)="onActionClick($event)">
       </app-data-table>
     </div>
   </div>

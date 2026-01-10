@@ -1,7 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import {
   WorkflowDefinition,
@@ -10,16 +9,6 @@ import {
   UpdateWorkflowDefinitionRequest,
   PagedWorkflowResponse
 } from '../../../shared/models/workflow.model';
-
-/**
- * API response wrapper (matches backend Result<T> structure)
- */
-interface ApiResponse<T> {
-  value: T;
-  isSuccess: boolean;
-  isFailure: boolean;
-  error?: string;
-}
 
 @Injectable({
   providedIn: 'root'
@@ -54,70 +43,56 @@ export class WorkflowsService {
       params = params.set('isActive', isActive.toString());
     }
 
-    return this.http.get<ApiResponse<PagedWorkflowResponse<WorkflowDefinition>>>(this.baseUrl, { params })
-      .pipe(
-        map(response => response.value)
-      );
+    // Backend returns PagedResult directly (not wrapped in ApiResponse)
+    return this.http.get<PagedWorkflowResponse<WorkflowDefinition>>(this.baseUrl, { params });
   }
 
   /**
    * Get a single workflow definition by ID
    */
   getWorkflowDefinitionById(id: number): Observable<WorkflowDefinition> {
-    return this.http.get<ApiResponse<WorkflowDefinition>>(`${this.baseUrl}/${id}`)
-      .pipe(
-        map(response => response.value)
-      );
+    // Backend returns WorkflowDefinitionDto directly
+    return this.http.get<WorkflowDefinition>(`${this.baseUrl}/${id}`);
   }
 
   /**
    * Create a new workflow definition
    */
-  createWorkflowDefinition(request: CreateWorkflowDefinitionRequest): Observable<number> {
-    return this.http.post<ApiResponse<number>>(this.baseUrl, request)
-      .pipe(
-        map(response => response.value)
-      );
+  createWorkflowDefinition(request: CreateWorkflowDefinitionRequest): Observable<{ id: number }> {
+    // Backend returns { id: number } directly
+    return this.http.post<{ id: number }>(this.baseUrl, request);
   }
 
   /**
    * Update an existing workflow definition
    */
-  updateWorkflowDefinition(id: number, request: UpdateWorkflowDefinitionRequest): Observable<boolean> {
-    return this.http.put<ApiResponse<boolean>>(`${this.baseUrl}/${id}`, request)
-      .pipe(
-        map(response => response.value)
-      );
+  updateWorkflowDefinition(id: number, request: UpdateWorkflowDefinitionRequest): Observable<void> {
+    // Backend returns NoContent (204)
+    return this.http.put<void>(`${this.baseUrl}/${id}`, request);
   }
 
   /**
    * Delete a workflow definition (soft delete)
    */
-  deleteWorkflowDefinition(id: number): Observable<boolean> {
-    return this.http.delete<ApiResponse<boolean>>(`${this.baseUrl}/${id}`)
-      .pipe(
-        map(response => response.value)
-      );
+  deleteWorkflowDefinition(id: number): Observable<void> {
+    // Backend returns NoContent (204)
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 
   /**
    * Activate a workflow definition
    */
-  activateWorkflowDefinition(id: number): Observable<boolean> {
-    return this.http.post<ApiResponse<boolean>>(`${this.baseUrl}/${id}/activate`, {})
-      .pipe(
-        map(response => response.value)
-      );
+  activateWorkflowDefinition(id: number): Observable<void> {
+    // Backend returns NoContent (204)
+    return this.http.post<void>(`${this.baseUrl}/${id}/activate`, {});
   }
 
   /**
    * Deactivate a workflow definition
    */
-  deactivateWorkflowDefinition(id: number): Observable<boolean> {
-    return this.http.post<ApiResponse<boolean>>(`${this.baseUrl}/${id}/deactivate`, {})
-      .pipe(
-        map(response => response.value)
-      );
+  deactivateWorkflowDefinition(id: number): Observable<void> {
+    // Backend returns NoContent (204)
+    return this.http.post<void>(`${this.baseUrl}/${id}/deactivate`, {});
   }
 
   /**
@@ -130,22 +105,22 @@ export class WorkflowsService {
       'RemoteWork': 'Remote Work Request',
       'Overtime': 'Overtime Request',
       'Timesheet': 'Timesheet',
-      'AttendanceCorrection': 'Attendance Correction'
+      'AttendanceCorrection': 'Attendance Correction',
+      'FingerprintRequest': 'Fingerprint Request'
     };
     return displayNames[entityType] || entityType;
   }
 
   /**
    * Get all entity types for dropdown
+   * Limited to 4 entity types that have default workflows with direct manager approval
    */
   getEntityTypes(): { value: WorkflowEntityType; label: string }[] {
     return [
       { value: 'Vacation', label: 'Vacation Request' },
       { value: 'Excuse', label: 'Excuse Request' },
       { value: 'RemoteWork', label: 'Remote Work Request' },
-      { value: 'Overtime', label: 'Overtime Request' },
-      { value: 'Timesheet', label: 'Timesheet' },
-      { value: 'AttendanceCorrection', label: 'Attendance Correction' }
+      { value: 'FingerprintRequest', label: 'Fingerprint Request' }
     ];
   }
 }

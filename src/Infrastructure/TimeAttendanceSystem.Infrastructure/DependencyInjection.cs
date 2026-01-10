@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Coravel;
 using TimeAttendanceSystem.Application.Abstractions;
+using TimeAttendanceSystem.Application.Services;
 using TimeAttendanceSystem.Infrastructure.BackgroundJobs;
 using TimeAttendanceSystem.Infrastructure.Persistence;
 using TimeAttendanceSystem.Infrastructure.Persistence.Repositories;
@@ -35,11 +36,13 @@ public static class DependencyInjection
         services.AddScoped<IAttendanceRepository, AttendanceRepository>();
         services.AddScoped<IAttendanceTransactionRepository, AttendanceTransactionRepository>();
         services.AddScoped<ISettingsRepository, SettingsRepository>();
+        services.AddScoped<IInAppNotificationService, InAppNotificationService>();
 
         // Add Coravel for background jobs
         services.AddScheduler();
         services.AddTransient<DailyAttendanceGenerationJob>();
         services.AddTransient<MonthlyLeaveAccrualJob>();
+        services.AddTransient<WorkflowTimeoutProcessingJob>();
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
@@ -297,11 +300,13 @@ public static class DependencyInjection
                     context.User.HasClaim("permission", "vacation.create")));
 
             // Define VacationTypeRead policy - users who can view vacation types
+            // Employees need this permission to see vacation types when creating vacation requests
             options.AddPolicy("VacationTypeRead", policy =>
                 policy.RequireAssertion(context =>
                     context.User.IsInRole("SystemAdmin") ||
                     context.User.IsInRole("Admin") ||
                     context.User.IsInRole("Manager") ||
+                    context.User.IsInRole("Employee") ||
                     context.User.HasClaim("permission", "vacationType.read")));
 
             // Define VacationTypeManagement policy - users who can manage vacation types (admin level)
@@ -463,9 +468,6 @@ public static class DependencyInjection
                     "PostgreSQL connection string not found. " +
                     "Please ensure 'PostgreSqlConnection' or 'DefaultConnection' is configured in appsettings.json");
             }
-
-            // Configure Npgsql to handle DateTime without timezone automatically
-            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
             options.UseNpgsql(connectionString, npgsqlOptions =>
             {

@@ -39,6 +39,7 @@ export interface TodayAttendance {
  * Matches backend ActivityDto
  */
 export interface Activity {
+  entityId?: number;
   type: string;
   description: string;
   timestamp: Date;

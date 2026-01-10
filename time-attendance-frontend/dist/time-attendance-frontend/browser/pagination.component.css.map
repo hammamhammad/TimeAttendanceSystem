@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "sources": ["angular:styles/component:css;8755cb8556cf0ca60b0d778ffd5e86bc5cf9f3ccf2da8f63c0fa487d7760ca90;D:/Work/AI Code/TimeAttendanceSystem/time-attendance-frontend/src/app/shared/components/pagination/pagination.component.ts"],
+  "sources": ["angular:styles/component:css;8755cb8556cf0ca60b0d778ffd5e86bc5cf9f3ccf2da8f63c0fa487d7760ca90;D:/Work/TimeAttendanceSystem/time-attendance-frontend/src/app/shared/components/pagination/pagination.component.ts"],
   "sourcesContent": ["\n    .page-link {\n      border: 1px solid #dee2e6;\n      color: #6c757d;\n    }\n\n    .page-link:hover {\n      background-color: #e9ecef;\n      border-color: #dee2e6;\n    }\n\n    .page-item.active .page-link {\n      background-color: #007bff;\n      border-color: #007bff;\n    }\n\n    .page-item.disabled .page-link {\n      color: #6c757d;\n      background-color: #fff;\n      border-color: #dee2e6;\n    }\n  "],
   "mappings": ";AACI,CAAC;AACC,UAAQ,IAAI,MAAM;AAClB,SAAO;AACT;AAEA,CALC,SAKS;AACR,oBAAkB;AAClB,gBAAc;AAChB;AAEA,CAAC,SAAS,CAAC,OAAO,CAVjB;AAWC,oBAAkB;AAClB,gBAAc;AAChB;AAEA,CALC,SAKS,CAAC,SAAS,CAfnB;AAgBC,SAAO;AACP,oBAAkB;AAClB,gBAAc;AAChB;",
   "names": []
