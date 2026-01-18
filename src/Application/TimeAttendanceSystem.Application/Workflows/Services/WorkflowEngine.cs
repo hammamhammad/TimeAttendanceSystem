@@ -918,10 +918,10 @@ public class WorkflowEngine : IWorkflowEngine
     {
         return entityType switch
         {
-            WorkflowEntityType.Vacation => $"/vacations/{entityId}",
-            WorkflowEntityType.Excuse => $"/excuses/{entityId}",
-            WorkflowEntityType.RemoteWork => $"/remote-work/{entityId}",
-            _ => $"/workflows"
+            WorkflowEntityType.Vacation => $"/vacation-requests/{entityId}",
+            WorkflowEntityType.Excuse => $"/excuse-requests/{entityId}",
+            WorkflowEntityType.RemoteWork => $"/remote-work-requests/{entityId}",
+            _ => $"/employee-dashboard"
         };
     }
 
@@ -968,13 +968,25 @@ public class WorkflowEngine : IWorkflowEngine
                 MessageAr = $"يوجد {entityNameAr} جديد يتطلب موافقتك في خطوة: {stepName}.",
                 EntityType = instance.EntityType.ToString(),
                 EntityId = instance.EntityId,
-                ActionUrl = $"/approvals?workflowId={instance.Id}"
+                ActionUrl = GetApprovalActionUrl(instance.EntityType, instance.EntityId)
             });
         }
         catch
         {
             // Don't fail the workflow if notification fails
         }
+    }
+
+    private string GetApprovalActionUrl(WorkflowEntityType entityType, long entityId)
+    {
+        // For manager approval actions, navigate directly to the entity detail page
+        return entityType switch
+        {
+            WorkflowEntityType.Vacation => $"/vacation-requests/{entityId}",
+            WorkflowEntityType.Excuse => $"/excuse-requests/{entityId}",
+            WorkflowEntityType.RemoteWork => $"/remote-work-requests/{entityId}",
+            _ => $"/pending-approvals"
+        };
     }
 
     private async Task SendRequestApprovedNotificationAsync(WorkflowInstance instance, long approvedByUserId)
@@ -1085,7 +1097,7 @@ public class WorkflowEngine : IWorkflowEngine
                 MessageAr = $"قام {delegatorName} بتفويض موافقة {entityNameAr} إليك.",
                 EntityType = instance.EntityType.ToString(),
                 EntityId = instance.EntityId,
-                ActionUrl = $"/approvals?workflowId={instance.Id}"
+                ActionUrl = GetApprovalActionUrl(instance.EntityType, instance.EntityId)
             });
 
             // Notify the requester about the delegation

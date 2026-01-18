@@ -41,14 +41,8 @@ builder.Services.AddCors(options =>
             policy.AllowAnyMethod();
         }
 
-        if (corsSettings.AllowedHeaders.Length > 0)
-        {
-            policy.WithHeaders(corsSettings.AllowedHeaders);
-        }
-        else
-        {
-            policy.AllowAnyHeader();
-        }
+        // Always allow any header to support SignalR's x-signalr-user-agent header
+        policy.AllowAnyHeader();
 
         if (corsSettings.AllowCredentials)
         {
@@ -174,6 +168,12 @@ app.Services.UseScheduler(scheduler =>
     scheduler.Schedule<DailyAttendanceGenerationJob>()
         .DailyAt(2, 0); // 2:00 AM every day
 
+    // Schedule end-of-day attendance finalization to run every day at 11:59 PM
+    // This recalculates and finalizes yesterday's attendance records
+    // Any "Pending" status records from yesterday will be converted to "Absent"
+    scheduler.Schedule<EndOfDayAttendanceFinalizationJob>()
+        .DailyAt(23, 59); // 11:59 PM every day
+
     // Schedule monthly leave accrual to run on the 1st of each month at 1:00 AM
     scheduler.Schedule<MonthlyLeaveAccrualJob>()
         .Monthly()
@@ -208,7 +208,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-// Map SignalR hubs
+// Map SignalR notification hub
 app.MapHub<NotificationHub>("/hubs/notifications");
 
 app.Run();

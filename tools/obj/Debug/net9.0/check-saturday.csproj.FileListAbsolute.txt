@@ -1,0 +1,6 @@
+D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\check-saturday.csproj.AssemblyReference.cache
+D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\check-saturday.GeneratedMSBuildEditorConfig.editorconfig
+D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\check-saturday.AssemblyInfoInputs.cache
+D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\check-saturday.AssemblyInfo.cs
+D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\check-saturday.csproj.CoreCompileInputs.cache
+D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\check-saturday.sourcelink.json

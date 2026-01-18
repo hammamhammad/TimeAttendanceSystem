@@ -4,10 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TimeAttendanceSystem.Application.Abstractions;
 using TimeAttendanceSystem.Application.Common;
+using TimeAttendanceSystem.Application.Excuses.Queries.GetEmployeeExcuses;
 using TimeAttendanceSystem.Application.Features.Portal.EmployeeDashboard.Queries;
 using TimeAttendanceSystem.Application.Features.Portal.ManagerDashboard.Queries;
 using TimeAttendanceSystem.Application.Features.Portal.Team.Queries;
 using TimeAttendanceSystem.Application.Workflows.Queries.GetPendingApprovals;
+using TimeAttendanceSystem.Domain.Attendance;
+using TimeAttendanceSystem.Domain.Excuses;
 using TimeAttendanceSystem.Domain.Workflows.Enums;
 
 namespace TimeAttendanceSystem.Api.Controllers;
@@ -31,17 +34,20 @@ public class PortalController : ControllerBase
     private readonly ILogger<PortalController> _logger;
     private readonly IApplicationDbContext _context;
     private readonly ICurrentUser _currentUser;
+    private readonly IInAppNotificationService _notificationService;
 
     public PortalController(
         IMediator mediator,
         ILogger<PortalController> logger,
         IApplicationDbContext context,
-        ICurrentUser currentUser)
+        ICurrentUser currentUser,
+        IInAppNotificationService notificationService)
     {
         _mediator = mediator;
         _logger = logger;
         _context = context;
         _currentUser = currentUser;
+        _notificationService = notificationService;
     }
 
     /// <summary>
@@ -348,24 +354,38 @@ public class PortalController : ControllerBase
                 .ToListAsync();
 
             // Map to DTOs with proper time conversions
-            var attendanceRecords = records.Select(a => new MyAttendanceRecordDto
-            {
-                Id = a.Id,
-                Date = a.AttendanceDate,
-                Status = a.Status.ToString(),
-                ScheduledStartTime = a.ScheduledStartTime.HasValue
-                    ? a.AttendanceDate.Date.Add(a.ScheduledStartTime.Value.ToTimeSpan())
-                    : null,
-                ScheduledEndTime = a.ScheduledEndTime.HasValue
-                    ? a.AttendanceDate.Date.Add(a.ScheduledEndTime.Value.ToTimeSpan())
-                    : null,
-                ActualCheckInTime = a.ActualCheckInTime,
-                ActualCheckOutTime = a.ActualCheckOutTime,
-                WorkingHours = a.WorkingHours,
-                OvertimeHours = a.OvertimeHours,
-                LateMinutes = a.LateMinutes,
-                EarlyLeaveMinutes = a.EarlyLeaveMinutes,
-                Notes = a.Notes
+            // Fix: For past dates, convert invalid/undefined status values to Absent
+            // This handles both AttendanceStatus.Pending (11) and undefined status (0)
+            // Business rule: Default status should be "Absent" for working days with no check-in
+            var today = DateTime.UtcNow.Date;
+            var attendanceRecords = records.Select(a => {
+                var statusValue = (int)a.Status;
+                var isInvalidOrPending = statusValue == 0 ||
+                                         statusValue == (int)AttendanceStatus.Pending ||
+                                         !Enum.IsDefined(typeof(AttendanceStatus), a.Status);
+                var effectiveStatus = (isInvalidOrPending && a.AttendanceDate.Date < today)
+                    ? AttendanceStatus.Absent
+                    : a.Status;
+
+                return new MyAttendanceRecordDto
+                {
+                    Id = a.Id,
+                    Date = a.AttendanceDate,
+                    Status = effectiveStatus.ToString(),
+                    ScheduledStartTime = a.ScheduledStartTime.HasValue
+                        ? a.AttendanceDate.Date.Add(a.ScheduledStartTime.Value.ToTimeSpan())
+                        : null,
+                    ScheduledEndTime = a.ScheduledEndTime.HasValue
+                        ? a.AttendanceDate.Date.Add(a.ScheduledEndTime.Value.ToTimeSpan())
+                        : null,
+                    ActualCheckInTime = a.ActualCheckInTime,
+                    ActualCheckOutTime = a.ActualCheckOutTime,
+                    WorkingHours = a.WorkingHours,
+                    OvertimeHours = a.OvertimeHours,
+                    LateMinutes = a.LateMinutes,
+                    EarlyLeaveMinutes = a.EarlyLeaveMinutes,
+                    Notes = a.Notes
+                };
             }).ToList();
 
             var result = Result.Success(attendanceRecords);
@@ -943,6 +963,610 @@ public class PortalController : ControllerBase
         }
     }
 
+    #region Excuse Self-Service Endpoints
+
+    /// <summary>
+    /// Retrieves the current employee's excuse requests.
+    /// </summary>
+    /// <param name="page">Page number (1-based). Default: 1</param>
+    /// <param name="pageSize">Page size. Default: 20</param>
+    /// <returns>List of excuse requests for the current employee</returns>
+    /// <response code="200">Excuse requests retrieved successfully</response>
+    /// <response code="401">Unauthorized - user not authenticated</response>
+    /// <response code="404">Employee profile not found for current user</response>
+    [HttpGet("my-excuses")]
+    [ProducesResponseType(typeof(Result<PagedResult<EmployeeExcuseDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetMyExcuses(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+            {
+                return Unauthorized(new { error = "User not authenticated" });
+            }
+
+            // Get current employee from user context
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+            {
+                return NotFound(new { error = "Employee profile not found for current user" });
+            }
+
+            var employeeId = employeeLink.EmployeeId;
+
+            // Query excuses for the current employee
+            var query = new GetEmployeeExcusesQuery
+            {
+                EmployeeId = employeeId,
+                PageNumber = page,
+                PageSize = pageSize
+            };
+
+            var result = await _mediator.Send(query);
+
+            if (!result.IsSuccess)
+            {
+                return BadRequest(new { error = result.Error });
+            }
+
+            return Ok(result.Value);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving my excuse requests");
+            return StatusCode(500, new { error = "An error occurred while retrieving excuse requests" });
+        }
+    }
+
+    /// <summary>
+    /// Retrieves a specific excuse request for the current employee.
+    /// Only returns excuse if it belongs to the current employee.
+    /// </summary>
+    /// <param name="id">Excuse ID</param>
+    /// <returns>Excuse request details</returns>
+    /// <response code="200">Excuse request retrieved successfully</response>
+    /// <response code="401">Unauthorized - user not authenticated</response>
+    /// <response code="404">Excuse not found or doesn't belong to current employee</response>
+    [HttpGet("my-excuses/{id}")]
+    [ProducesResponseType(typeof(EmployeeExcuseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetMyExcuseById(long id)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+            {
+                return Unauthorized(new { error = "User not authenticated" });
+            }
+
+            // Get current employee from user context
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+            {
+                return NotFound(new { error = "Employee profile not found for current user" });
+            }
+
+            var employeeId = employeeLink.EmployeeId;
+
+            // Query the excuse directly with employee filter for security
+            var excuse = await _context.EmployeeExcuses
+                .Include(ee => ee.Employee)
+                    .ThenInclude(e => e.Department)
+                .Include(ee => ee.Employee)
+                    .ThenInclude(e => e.Branch)
+                .Include(ee => ee.ApprovedBy)
+                .Where(ee => ee.Id == id && ee.EmployeeId == employeeId && !ee.IsDeleted)
+                .FirstOrDefaultAsync();
+
+            if (excuse == null)
+            {
+                return NotFound(new { error = $"Excuse with ID {id} not found" });
+            }
+
+            // Get workflow instance for this excuse
+            var workflow = await _context.WorkflowInstances
+                .Include(wi => wi.CurrentStep)
+                    .ThenInclude(cs => cs!.ApproverRole)
+                .Include(wi => wi.CurrentStep)
+                    .ThenInclude(cs => cs!.ApproverUser)
+                .Include(wi => wi.WorkflowDefinition)
+                    .ThenInclude(wd => wd.Steps)
+                .Where(wi => wi.EntityType == WorkflowEntityType.Excuse && wi.EntityId == id)
+                .FirstOrDefaultAsync();
+
+            var currentStep = workflow?.CurrentStep;
+            var totalSteps = workflow?.WorkflowDefinition?.Steps?.Count ?? 0;
+
+            string? approverName = null;
+            string? approverRole = null;
+
+            if (currentStep != null)
+            {
+                if (currentStep.ApproverType == ApproverType.DirectManager)
+                {
+                    approverRole = "Direct Manager";
+                }
+                else if (currentStep.ApproverType == ApproverType.DepartmentHead)
+                {
+                    approverRole = "Department Head";
+                }
+                else if (currentStep.ApproverType == ApproverType.Role && currentStep.ApproverRole != null)
+                {
+                    approverRole = currentStep.ApproverRole.Name;
+                }
+                else if (currentStep.ApproverType == ApproverType.SpecificUser && currentStep.ApproverUser != null)
+                {
+                    approverName = currentStep.ApproverUser.Username;
+                }
+            }
+
+            // Build approval history
+            List<ExcuseApprovalStepDto>? approvalHistory = null;
+            if (workflow != null)
+            {
+                var stepExecutions = await _context.WorkflowStepExecutions
+                    .Include(wse => wse.Step)
+                    .Include(wse => wse.AssignedToUser)
+                    .Include(wse => wse.ActionTakenByUser)
+                    .Where(wse => wse.WorkflowInstanceId == workflow.Id)
+                    .OrderBy(wse => wse.Step.StepOrder)
+                    .ThenBy(wse => wse.AssignedAt)
+                    .ToListAsync();
+
+                if (stepExecutions.Any())
+                {
+                    approvalHistory = stepExecutions.Select(exec => new ExcuseApprovalStepDto
+                    {
+                        StepOrder = exec.Step.StepOrder,
+                        StepName = exec.Step.Name ?? $"Step {exec.Step.StepOrder}",
+                        Status = exec.Action?.ToString() ?? "Pending",
+                        AssignedToName = exec.AssignedToUser?.Username ?? "Unknown",
+                        ActionByName = exec.ActionTakenByUser?.Username,
+                        AssignedAt = exec.AssignedAt,
+                        ActionAt = exec.ActionTakenAt,
+                        Comments = exec.Comments
+                    }).ToList();
+                }
+            }
+
+            // Build the DTO
+            var dto = new EmployeeExcuseDto
+            {
+                Id = excuse.Id,
+                EmployeeId = excuse.EmployeeId,
+                EmployeeName = $"{excuse.Employee.FirstName} {excuse.Employee.LastName}",
+                EmployeeNumber = excuse.Employee.EmployeeNumber,
+                DepartmentName = excuse.Employee.Department?.Name ?? "",
+                BranchName = excuse.Employee.Branch?.Name ?? "",
+                ExcuseDate = excuse.ExcuseDate,
+                ExcuseType = excuse.ExcuseType,
+                ExcuseTypeDisplay = excuse.ExcuseType == ExcuseType.PersonalExcuse ? "Personal Excuse" : "Official Duty",
+                StartTime = excuse.StartTime,
+                EndTime = excuse.EndTime,
+                TimeRange = $"{excuse.StartTime:HH:mm} - {excuse.EndTime:HH:mm}",
+                DurationHours = excuse.DurationHours,
+                Reason = excuse.Reason,
+                ApprovalStatus = excuse.ApprovalStatus,
+                ApprovalStatusDisplay = excuse.ApprovalStatus.ToString(),
+                ApprovedById = excuse.ApprovedById,
+                ApprovedByName = excuse.ApprovedBy?.Username,
+                ApprovedAt = excuse.ApprovedAt,
+                RejectionReason = excuse.RejectionReason,
+                AttachmentPath = excuse.AttachmentPath,
+                AffectsSalary = excuse.AffectsSalary,
+                ProcessingNotes = excuse.ProcessingNotes,
+                CreatedAtUtc = excuse.CreatedAtUtc,
+                CreatedBy = excuse.CreatedBy,
+                ModifiedAtUtc = excuse.ModifiedAtUtc,
+                ModifiedBy = excuse.ModifiedBy,
+                CanBeModified = excuse.ApprovalStatus != ApprovalStatus.Approved && excuse.ExcuseDate.Date >= DateTime.Today,
+                ExcuseSummary = $"{excuse.ExcuseDate:MMM dd, yyyy} {excuse.StartTime:HH:mm} - {excuse.EndTime:HH:mm} ({excuse.DurationHours:F1}h) - {(excuse.ExcuseType == ExcuseType.PersonalExcuse ? "Personal" : "Official Duty")} - {excuse.ApprovalStatus}",
+                // Workflow information
+                WorkflowInstanceId = workflow?.Id,
+                WorkflowStatus = workflow?.Status.ToString(),
+                CurrentApproverName = approverName,
+                CurrentApproverRole = approverRole,
+                CurrentStepOrder = currentStep?.StepOrder,
+                TotalSteps = totalSteps > 0 ? totalSteps : null,
+                ApprovalHistory = approvalHistory
+            };
+
+            return Ok(dto);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving excuse request {ExcuseId}", id);
+            return StatusCode(500, new { error = "An error occurred while retrieving excuse request" });
+        }
+    }
+
+    /// <summary>
+    /// Retrieves an excuse request for approval purposes (manager view).
+    /// Returns excuse details if the current user is an approver for this request.
+    /// </summary>
+    /// <param name="id">Excuse ID</param>
+    /// <returns>Excuse request details for approval</returns>
+    /// <response code="200">Excuse request retrieved successfully</response>
+    /// <response code="401">Unauthorized - user not authenticated</response>
+    /// <response code="403">Forbidden - user is not an approver for this request</response>
+    /// <response code="404">Excuse not found</response>
+    [HttpGet("approval-excuse/{id}")]
+    [ProducesResponseType(typeof(EmployeeExcuseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetExcuseForApproval(long id)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+            {
+                return Unauthorized(new { error = "User not authenticated" });
+            }
+
+            var userId = _currentUser.UserId.Value;
+
+            // Check if user was ever assigned to approve this excuse (pending or completed/skipped)
+            var wasAssignedToApprove = await _context.WorkflowStepExecutions
+                .Include(wse => wse.WorkflowInstance)
+                .Where(wse => wse.AssignedToUserId == userId &&
+                             !wse.IsDeleted &&
+                             wse.WorkflowInstance.EntityType == WorkflowEntityType.Excuse &&
+                             wse.WorkflowInstance.EntityId == id &&
+                             !wse.WorkflowInstance.IsDeleted)
+                .AnyAsync();
+
+            if (!wasAssignedToApprove)
+            {
+                // Also check if user is a manager of the requesting employee
+                var employeeLink = await _context.EmployeeUserLinks
+                    .FirstOrDefaultAsync(eul => eul.UserId == userId);
+
+                if (employeeLink != null)
+                {
+                    var managerEmployeeId = employeeLink.EmployeeId;
+
+                    // Get the excuse to check if it belongs to a direct report
+                    var excuseCheck = await _context.EmployeeExcuses
+                        .Include(ee => ee.Employee)
+                        .Where(ee => ee.Id == id && !ee.IsDeleted)
+                        .FirstOrDefaultAsync();
+
+                    if (excuseCheck != null)
+                    {
+                        var isDirectReport = excuseCheck.Employee.ManagerEmployeeId == managerEmployeeId;
+                        if (!isDirectReport)
+                        {
+                            return StatusCode(403, new { error = "You are not authorized to view this excuse request" });
+                        }
+                    }
+                }
+                else
+                {
+                    return StatusCode(403, new { error = "You are not authorized to view this excuse request" });
+                }
+            }
+
+            // Query the excuse without employee filter (manager can view)
+            var excuse = await _context.EmployeeExcuses
+                .Include(ee => ee.Employee)
+                    .ThenInclude(e => e.Department)
+                .Include(ee => ee.Employee)
+                    .ThenInclude(e => e.Branch)
+                .Include(ee => ee.ApprovedBy)
+                .Where(ee => ee.Id == id && !ee.IsDeleted)
+                .FirstOrDefaultAsync();
+
+            if (excuse == null)
+            {
+                return NotFound(new { error = $"Excuse with ID {id} not found" });
+            }
+
+            // Get workflow instance for this excuse
+            var workflow = await _context.WorkflowInstances
+                .Include(wi => wi.CurrentStep)
+                    .ThenInclude(cs => cs!.ApproverRole)
+                .Include(wi => wi.CurrentStep)
+                    .ThenInclude(cs => cs!.ApproverUser)
+                .Include(wi => wi.WorkflowDefinition)
+                    .ThenInclude(wd => wd.Steps)
+                .Where(wi => wi.EntityType == WorkflowEntityType.Excuse && wi.EntityId == id)
+                .FirstOrDefaultAsync();
+
+            var currentStep = workflow?.CurrentStep;
+            var totalSteps = workflow?.WorkflowDefinition?.Steps?.Count ?? 0;
+
+            string? approverName = null;
+            string? approverRole = null;
+
+            if (currentStep != null)
+            {
+                approverName = currentStep.ApproverUser != null
+                    ? currentStep.ApproverUser.Username
+                    : null;
+                approverRole = currentStep.ApproverRole != null
+                    ? currentStep.ApproverRole.Name
+                    : currentStep.ApproverType.ToString();
+            }
+
+            // Get approval history
+            List<ExcuseApprovalStepDto>? approvalHistory = null;
+            if (workflow != null)
+            {
+                var stepExecutions = await _context.WorkflowStepExecutions
+                    .Include(wse => wse.Step)
+                    .Include(wse => wse.AssignedToUser)
+                    .Include(wse => wse.ActionTakenByUser)
+                    .Where(wse => wse.WorkflowInstanceId == workflow.Id && !wse.IsDeleted)
+                    .OrderBy(wse => wse.Step.StepOrder)
+                    .ToListAsync();
+
+                approvalHistory = stepExecutions.Select(exec => new ExcuseApprovalStepDto
+                {
+                    StepOrder = exec.Step.StepOrder,
+                    StepName = exec.Step.Name ?? $"Step {exec.Step.StepOrder}",
+                    Status = exec.Action?.ToString() ?? "Pending",
+                    AssignedToName = exec.AssignedToUser?.Username ?? "Unknown",
+                    ActionByName = exec.ActionTakenByUser?.Username,
+                    AssignedAt = exec.AssignedAt,
+                    ActionAt = exec.ActionTakenAt,
+                    Comments = exec.Comments
+                }).ToList();
+            }
+
+            // Build the DTO
+            var dto = new EmployeeExcuseDto
+            {
+                Id = excuse.Id,
+                EmployeeId = excuse.EmployeeId,
+                EmployeeName = $"{excuse.Employee.FirstName} {excuse.Employee.LastName}",
+                EmployeeNumber = excuse.Employee.EmployeeNumber,
+                DepartmentName = excuse.Employee.Department?.Name ?? "",
+                BranchName = excuse.Employee.Branch?.Name ?? "",
+                ExcuseDate = excuse.ExcuseDate,
+                ExcuseType = excuse.ExcuseType,
+                ExcuseTypeDisplay = excuse.ExcuseType == ExcuseType.PersonalExcuse ? "Personal Excuse" : "Official Duty",
+                StartTime = excuse.StartTime,
+                EndTime = excuse.EndTime,
+                TimeRange = $"{excuse.StartTime:HH:mm} - {excuse.EndTime:HH:mm}",
+                DurationHours = excuse.DurationHours,
+                Reason = excuse.Reason,
+                ApprovalStatus = excuse.ApprovalStatus,
+                ApprovalStatusDisplay = excuse.ApprovalStatus.ToString(),
+                ApprovedById = excuse.ApprovedById,
+                ApprovedByName = excuse.ApprovedBy?.Username,
+                ApprovedAt = excuse.ApprovedAt,
+                RejectionReason = excuse.RejectionReason,
+                AttachmentPath = excuse.AttachmentPath,
+                AffectsSalary = excuse.AffectsSalary,
+                ProcessingNotes = excuse.ProcessingNotes,
+                CreatedAtUtc = excuse.CreatedAtUtc,
+                CreatedBy = excuse.CreatedBy,
+                ModifiedAtUtc = excuse.ModifiedAtUtc,
+                ModifiedBy = excuse.ModifiedBy,
+                CanBeModified = excuse.ApprovalStatus != ApprovalStatus.Approved && excuse.ExcuseDate.Date >= DateTime.Today,
+                ExcuseSummary = $"{excuse.ExcuseDate:MMM dd, yyyy} {excuse.StartTime:HH:mm} - {excuse.EndTime:HH:mm} ({excuse.DurationHours:F1}h) - {(excuse.ExcuseType == ExcuseType.PersonalExcuse ? "Personal" : "Official Duty")} - {excuse.ApprovalStatus}",
+                // Workflow information
+                WorkflowInstanceId = workflow?.Id,
+                WorkflowStatus = workflow?.Status.ToString(),
+                CurrentApproverName = approverName,
+                CurrentApproverRole = approverRole,
+                CurrentStepOrder = currentStep?.StepOrder,
+                TotalSteps = totalSteps > 0 ? totalSteps : null,
+                ApprovalHistory = approvalHistory
+            };
+
+            return Ok(dto);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving excuse request for approval {ExcuseId}", id);
+            return StatusCode(500, new { error = "An error occurred while retrieving excuse request" });
+        }
+    }
+
+    /// <summary>
+    /// Cancels the current employee's own excuse request.
+    /// Only pending excuses can be cancelled.
+    /// </summary>
+    /// <param name="id">Excuse ID</param>
+    /// <returns>Success result</returns>
+    /// <response code="200">Excuse cancelled successfully</response>
+    /// <response code="400">Excuse cannot be cancelled (already approved/rejected)</response>
+    /// <response code="401">Unauthorized - user not authenticated</response>
+    /// <response code="404">Excuse not found or doesn't belong to current employee</response>
+    [HttpDelete("my-excuses/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> CancelMyExcuse(long id)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+            {
+                return Unauthorized(new { error = "User not authenticated" });
+            }
+
+            // Get current employee from user context
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+            {
+                return NotFound(new { error = "Employee profile not found" });
+            }
+
+            var employeeId = employeeLink.EmployeeId;
+
+            // Find the excuse and verify it belongs to the current employee
+            var excuse = await _context.EmployeeExcuses
+                .Where(ee => ee.Id == id && ee.EmployeeId == employeeId && !ee.IsDeleted)
+                .FirstOrDefaultAsync();
+
+            if (excuse == null)
+            {
+                return NotFound(new { error = $"Excuse with ID {id} not found or doesn't belong to you" });
+            }
+
+            // Only allow cancellation of pending excuses
+            if (excuse.ApprovalStatus != ApprovalStatus.Pending)
+            {
+                return BadRequest(new { error = $"Cannot cancel excuse with status '{excuse.ApprovalStatus}'. Only pending excuses can be cancelled." });
+            }
+
+            // Cancel the excuse by setting status to Cancelled
+            excuse.ApprovalStatus = ApprovalStatus.Cancelled;
+            excuse.ModifiedAtUtc = DateTime.UtcNow;
+            excuse.ModifiedBy = _currentUser.Username;
+
+            // Cancel any associated workflow and its pending steps
+            if (excuse.WorkflowInstanceId.HasValue)
+            {
+                var workflow = await _context.WorkflowInstances
+                    .Include(wi => wi.StepExecutions)
+                    .FirstOrDefaultAsync(wi => wi.Id == excuse.WorkflowInstanceId);
+
+                if (workflow != null && workflow.Status != WorkflowStatus.Approved && workflow.Status != WorkflowStatus.Rejected)
+                {
+                    workflow.Status = WorkflowStatus.Cancelled;
+                    workflow.CompletedAt = DateTime.UtcNow;
+                    workflow.ModifiedAtUtc = DateTime.UtcNow;
+
+                    // Mark all pending step executions as skipped (cancelled)
+                    foreach (var step in workflow.StepExecutions.Where(s => !s.Action.HasValue))
+                    {
+                        step.Skip("Request cancelled by employee");
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            // Mark all notifications related to this excuse as read for all users
+            await _notificationService.MarkEntityNotificationsAsReadAsync("Excuse", id);
+
+            _logger.LogInformation("User {UserId} cancelled excuse {ExcuseId}", _currentUser.UserId, id);
+
+            return Ok(new { message = "Excuse cancelled successfully" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error cancelling excuse request {ExcuseId}", id);
+            return StatusCode(500, new { error = "An error occurred while cancelling excuse request" });
+        }
+    }
+
+    #endregion
+
+    #region Delegation Search
+
+    /// <summary>
+    /// Searches for employees that can be delegated to.
+    /// Returns all active employees with linked user accounts (excluding current user).
+    /// </summary>
+    /// <param name="searchTerm">Search term for name, employee code, or email</param>
+    /// <param name="pageSize">Maximum number of results to return. Default: 20</param>
+    /// <returns>List of employees available for delegation</returns>
+    /// <response code="200">Employees retrieved successfully</response>
+    /// <response code="401">Unauthorized - user not authenticated</response>
+    [HttpGet("delegation-employees")]
+    [ProducesResponseType(typeof(List<DelegationEmployeeDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> SearchDelegationEmployees(
+        [FromQuery] string? searchTerm = null,
+        [FromQuery] int pageSize = 20)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+            {
+                return Unauthorized(new { error = "User not authenticated" });
+            }
+
+            var currentUserId = _currentUser.UserId.Value;
+
+            // Get current user's employee ID to exclude from results
+            var currentEmployeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == currentUserId);
+            var currentEmployeeId = currentEmployeeLink?.EmployeeId;
+
+            // Query employees with linked user accounts
+            var query = _context.Employees
+                .Include(e => e.Department)
+                .Include(e => e.Branch)
+                .Where(e => e.IsActive && !e.IsDeleted);
+
+            // Exclude current employee
+            if (currentEmployeeId.HasValue)
+            {
+                query = query.Where(e => e.Id != currentEmployeeId.Value);
+            }
+
+            // Apply search filter
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                var searchLower = searchTerm.ToLower();
+                query = query.Where(e =>
+                    e.FirstName.ToLower().Contains(searchLower) ||
+                    e.LastName.ToLower().Contains(searchLower) ||
+                    e.EmployeeNumber.ToLower().Contains(searchLower) ||
+                    (e.Email != null && e.Email.ToLower().Contains(searchLower)) ||
+                    (e.FirstName + " " + e.LastName).ToLower().Contains(searchLower));
+            }
+
+            // Get employee IDs first
+            var employees = await query
+                .OrderBy(e => e.FirstName)
+                .ThenBy(e => e.LastName)
+                .Take(Math.Min(pageSize, 50))
+                .ToListAsync();
+
+            var employeeIds = employees.Select(e => e.Id).ToList();
+
+            // Get user IDs for these employees
+            var employeeUserLinks = await _context.EmployeeUserLinks
+                .Where(eul => employeeIds.Contains(eul.EmployeeId))
+                .ToDictionaryAsync(eul => eul.EmployeeId, eul => eul.UserId);
+
+            // Build result - only include employees with linked user accounts
+            var result = employees
+                .Where(e => employeeUserLinks.ContainsKey(e.Id))
+                .Select(e => new DelegationEmployeeDto
+                {
+                    EmployeeId = e.Id,
+                    UserId = employeeUserLinks[e.Id],
+                    FullName = $"{e.FirstName} {e.LastName}",
+                    FullNameAr = e.FullNameAr,
+                    EmployeeCode = e.EmployeeNumber,
+                    Email = e.Email,
+                    JobTitle = e.JobTitle,
+                    DepartmentName = e.Department?.Name,
+                    BranchName = e.Branch?.Name
+                })
+                .ToList();
+
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error searching delegation employees");
+            return StatusCode(500, new { error = "An error occurred while searching employees" });
+        }
+    }
+
+    #endregion
+
     /// <summary>
     /// Calculates business days between two dates (excluding weekends).
     /// </summary>
@@ -1030,4 +1654,20 @@ public class MyAttendanceRecordDto
     public int LateMinutes { get; set; }
     public int EarlyLeaveMinutes { get; set; }
     public string? Notes { get; set; }
+}
+
+/// <summary>
+/// DTO for employees available for delegation
+/// </summary>
+public class DelegationEmployeeDto
+{
+    public long EmployeeId { get; set; }
+    public long UserId { get; set; }
+    public string FullName { get; set; } = string.Empty;
+    public string? FullNameAr { get; set; }
+    public string EmployeeCode { get; set; } = string.Empty;
+    public string? Email { get; set; }
+    public string? JobTitle { get; set; }
+    public string? DepartmentName { get; set; }
+    public string? BranchName { get; set; }
 }

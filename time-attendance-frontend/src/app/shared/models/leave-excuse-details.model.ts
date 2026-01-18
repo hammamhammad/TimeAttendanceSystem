@@ -17,6 +17,8 @@ export interface EmployeeVacationDetail {
   isApproved: boolean;
   notes?: string;
   createdAtUtc: Date;
+  status: string;
+  statusDisplay: string;
 }
 
 export interface EmployeeExcuseDetail {

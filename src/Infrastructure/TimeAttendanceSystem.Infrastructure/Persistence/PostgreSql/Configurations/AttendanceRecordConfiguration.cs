@@ -31,7 +31,8 @@ public class AttendanceRecordConfiguration : IEntityTypeConfiguration<Attendance
 
         builder.Property(ar => ar.Status)
             .IsRequired()
-            .HasConversion<int>();
+            .HasConversion<int>()
+            .HasDefaultValue(AttendanceStatus.Absent);
 
         builder.Property(ar => ar.ScheduledStartTime)
             .HasColumnType("time")

@@ -41,6 +41,7 @@ public static class DependencyInjection
         // Add Coravel for background jobs
         services.AddScheduler();
         services.AddTransient<DailyAttendanceGenerationJob>();
+        services.AddTransient<EndOfDayAttendanceFinalizationJob>();
         services.AddTransient<MonthlyLeaveAccrualJob>();
         services.AddTransient<WorkflowTimeoutProcessingJob>();
 
@@ -58,6 +59,25 @@ public static class DependencyInjection
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(configuration["Jwt:Secret"]!)),
                     ClockSkew = TimeSpan.Zero
+                };
+
+                // Configure SignalR to read JWT token from query string for WebSocket connections
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+
+                        // If the request is for a SignalR hub, read the token from the query string
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) &&
+                            path.StartsWithSegments("/hubs"))
+                        {
+                            context.Token = accessToken;
+                        }
+
+                        return Task.CompletedTask;
+                    }
                 };
             });
 

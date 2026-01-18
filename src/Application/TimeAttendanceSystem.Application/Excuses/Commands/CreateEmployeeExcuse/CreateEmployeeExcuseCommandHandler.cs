@@ -109,6 +109,7 @@ public class CreateEmployeeExcuseCommandHandler : IRequestHandler<CreateEmployee
             .Where(ee => ee.EmployeeId == targetEmployeeId)
             .Where(ee => ee.ExcuseDate == request.ExcuseDate.Date)
             .Where(ee => ee.ApprovalStatus != ApprovalStatus.Rejected)
+            .Where(ee => ee.ApprovalStatus != ApprovalStatus.Cancelled)
             .Select(ee => new { ee.StartTime, ee.EndTime })
             .ToListAsync(cancellationToken);
 
@@ -278,6 +279,7 @@ public class CreateEmployeeExcuseCommandHandler : IRequestHandler<CreateEmployee
             .Where(ee => ee.ExcuseDate == request.ExcuseDate.Date)
             .Where(ee => ee.ExcuseType == ExcuseType.PersonalExcuse)
             .Where(ee => ee.ApprovalStatus != ApprovalStatus.Rejected)
+            .Where(ee => ee.ApprovalStatus != ApprovalStatus.Cancelled)
             .SumAsync(ee => ee.DurationHours, cancellationToken);
 
         if (dailyHours + (decimal)duration > policy.MaxPersonalExcuseHoursPerDay)
@@ -294,6 +296,7 @@ public class CreateEmployeeExcuseCommandHandler : IRequestHandler<CreateEmployee
             .Where(ee => ee.ExcuseDate >= monthStart && ee.ExcuseDate <= monthEnd)
             .Where(ee => ee.ExcuseType == ExcuseType.PersonalExcuse)
             .Where(ee => ee.ApprovalStatus != ApprovalStatus.Rejected)
+            .Where(ee => ee.ApprovalStatus != ApprovalStatus.Cancelled)
             .ToListAsync(cancellationToken);
 
         var monthlyCount = monthlyExcuses.Count;

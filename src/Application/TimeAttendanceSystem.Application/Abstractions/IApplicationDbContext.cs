@@ -677,4 +677,10 @@ public interface IApplicationDbContext
     /// - Supports distributed transactions for complex operations
     /// </remarks>
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Clears the change tracker to remove all tracked entities.
+    /// Useful after bulk operations to ensure fresh data is loaded from the database.
+    /// </summary>
+    void ClearChangeTracker();
 }

@@ -7,7 +7,7 @@ import { NotificationService } from '../../../core/notifications/notification.se
 import { AttendanceService } from '../../../core/services/attendance.service';
 import { EmployeesService } from '../../employees/employees.service';
 import { ShiftsService } from '../../shifts/shifts.service';
-import { AttendanceRecord } from '../../../shared/models/attendance.model';
+import { AttendanceRecord, ShiftInfo } from '../../../shared/models/attendance.model';
 import { Employee } from '../../../shared/models/employee.model';
 import { Shift, ShiftType } from '../../../shared/models/shift.model';
 import { AttendanceStatus } from '../../../shared/models/attendance.model';
@@ -38,7 +38,7 @@ export class DailyAttendanceDetailComponent implements OnInit {
   error = signal<string | null>(null);
   attendanceRecord = signal<AttendanceRecord | null>(null);
   employee = signal<Employee | null>(null);
-  shift = signal<Shift | null>(null);
+  shift = signal<ShiftInfo | null>(null);
   leaveExcuseDetails = signal<LeaveExcuseDetailsResponse | null>(null);
 
   // Route parameters
@@ -104,9 +104,10 @@ export class DailyAttendanceDetailComponent implements OnInit {
       if (attendanceResponse) {
         this.attendanceRecord.set(attendanceResponse);
 
-        // Note: Shift information would need to be loaded differently
-        // since AttendanceRecord doesn't include shiftId directly
-        // This would require an additional API call or backend enhancement
+        // Set shift from the attendance response (included by backend)
+        if (attendanceResponse.shift) {
+          this.shift.set(attendanceResponse.shift);
+        }
       }
 
       if (leaveExcuseResponse) {
@@ -123,6 +124,14 @@ export class DailyAttendanceDetailComponent implements OnInit {
 
   formatTime(time: string | null): string {
     if (!time) return '--:--';
+    // The backend sends ActualCheckInTime/ActualCheckOutTime which is already in local time
+    // (from TransactionTimeLocal). Parse the time string directly without timezone conversion.
+    // Format: "2026-01-18T09:53:00" or similar ISO format
+    const match = time.match(/T(\d{2}):(\d{2})/);
+    if (match) {
+      return `${match[1]}:${match[2]}`;
+    }
+    // Fallback to Date parsing if pattern doesn't match
     const date = new Date(time);
     return date.toLocaleTimeString('en-US', {
       hour: '2-digit',
@@ -193,19 +202,23 @@ export class DailyAttendanceDetailComponent implements OnInit {
     return (record.lateMinutes || 0) + (record.earlyLeaveMinutes || 0);
   }
 
-  getShiftStartTime(shift: Shift): string {
-    if (!shift.shiftPeriods || shift.shiftPeriods.length === 0) return '--:--';
-    return shift.shiftPeriods[0].startTime;
+  getShiftStartTime(shift: ShiftInfo): string {
+    // Use startTime from ShiftInfo (already formatted) or from periods
+    if (shift.startTime) return shift.startTime;
+    if (!shift.periods || shift.periods.length === 0) return '--:--';
+    return shift.periods[0].startTime;
   }
 
-  getShiftEndTime(shift: Shift): string {
-    if (!shift.shiftPeriods || shift.shiftPeriods.length === 0) return '--:--';
-    const lastPeriod = shift.shiftPeriods[shift.shiftPeriods.length - 1];
+  getShiftEndTime(shift: ShiftInfo): string {
+    // Use endTime from ShiftInfo (already formatted) or from periods
+    if (shift.endTime) return shift.endTime;
+    if (!shift.periods || shift.periods.length === 0) return '--:--';
+    const lastPeriod = shift.periods[shift.periods.length - 1];
     return lastPeriod.endTime;
   }
 
-  getShiftTypeDisplay(shift: Shift): string {
-    return shift.shiftType === ShiftType.TimeBased ? 'Time Based' : 'Hours Only';
+  getShiftTypeDisplay(shift: ShiftInfo): string {
+    return shift.shiftType || 'Time Based';
   }
 
   // Helper methods for leave/excuse details
@@ -234,6 +247,37 @@ export class DailyAttendanceDetailComponent implements OnInit {
         return 'badge bg-danger';
       default:
         return 'badge bg-secondary';
+    }
+  }
+
+  // Vacation status helper methods
+  getVacationStatusVariant(status: string): 'success' | 'warning' | 'danger' | 'secondary' | 'info' {
+    switch (status?.toLowerCase()) {
+      case 'approved':
+        return 'success';
+      case 'completed':
+        return 'secondary';
+      case 'pending':
+        return 'warning';
+      case 'expired':
+        return 'danger';
+      default:
+        return 'warning';
+    }
+  }
+
+  getVacationStatusIcon(status: string): string {
+    switch (status?.toLowerCase()) {
+      case 'approved':
+        return 'fas fa-check-circle';
+      case 'completed':
+        return 'fas fa-check-double';
+      case 'pending':
+        return 'fas fa-hourglass-half';
+      case 'expired':
+        return 'fas fa-times-circle';
+      default:
+        return 'fas fa-hourglass-half';
     }
   }
 }

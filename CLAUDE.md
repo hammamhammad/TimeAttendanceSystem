@@ -10,6 +10,7 @@ The Time Attendance System is a comprehensive enterprise-grade workforce managem
 - **Organization Management**: Multi-branch support with departments and hierarchies
 - **Shift Management**: Complex shift configurations with multiple periods and assignments
 - **Remote Work Management**: Policies and requests for remote/hybrid work
+- **Real-Time Notifications**: SignalR-based in-app notification system
 - **Comprehensive Reporting**: Analytics, dashboards, and audit logging
 
 ---
@@ -164,6 +165,22 @@ The Time Attendance System is a comprehensive enterprise-grade workforce managem
 - **RTL Support**: Right-to-left layout for Arabic
 - **Translation Service**: Centralized i18n service
 
+#### 17. Real-Time Notifications (NEW)
+- **SignalR Hub**: Real-time notification delivery via WebSocket
+- **Notification Types**:
+  - RequestSubmitted: Sent when a request is created
+  - RequestApproved: Sent when a request is approved
+  - RequestRejected: Sent when a request is rejected
+  - RequestDelegated: Sent when approval is delegated
+  - RequestEscalated: Sent when a request times out
+  - ApprovalPending: Sent when a new request awaits approval
+  - DelegationReceived: Sent when delegation is assigned to user
+  - ApprovalReminder: Reminder for pending approvals
+- **User-Targeted**: Notifications sent to specific user groups
+- **Bilingual Content**: Title and message in English and Arabic
+- **Read Tracking**: Mark notifications as read
+- **Action URLs**: Navigate directly to related entities
+
 ---
 
 ## General Development Rules
@@ -272,7 +289,7 @@ When creating form pages, **always use**:
 - **NEVER** use manual dt/dd lists - always use `DefinitionListComponent`
 - For DataTable columns, use HTML injection pattern (documented exception)
 
-**❌ Bad - Don't do this**:
+**Bad - Don't do this**:
 ```html
 <span [class]="getStatusBadgeClass(entity.isActive)">
   {{ getStatusText(entity.isActive) }}
@@ -284,7 +301,7 @@ When creating form pages, **always use**:
 </dl>
 ```
 
-**✅ Good - Do this**:
+**Good - Do this**:
 ```html
 <app-status-badge
   [status]="statusBadge().label"
@@ -462,34 +479,36 @@ The Time Attendance System includes a **separate Angular application** specifica
 ### Self-Service Portal Features
 
 #### For All Employees
-1. **Dashboard**
+1. **Dashboard** (`employee-dashboard/`)
    - Personal attendance statistics
    - Leave balance summary
    - Recent activity timeline
    - Upcoming vacations
    - Pending requests status
 
-2. **My Attendance**
+2. **My Attendance** (`my-attendance/`)
    - View personal attendance records
    - Attendance history with filters
    - Monthly attendance calendar
    - Attendance details (check-in/out times, working hours, overtime)
 
-3. **My Profile**
+3. **My Profile** (`my-profile/`)
    - View personal information
    - View job details
    - View contact information
    - View department and branch assignment
+   - Change password modal
 
-4. **Leave Requests** (Vacation Management)
+4. **Leave Requests** (`vacation-requests/`)
    - Create new vacation requests
    - View current leave balance
    - View vacation request history
    - Edit pending vacation requests
    - Cancel approved vacation requests (with validation)
-   - Track approval status
+   - Track approval status with workflow details
+   - View approval history
 
-5. **Excuse Requests**
+5. **Excuse Requests** (`excuse-requests/`)
    - Create excuse requests
    - Upload supporting documents
    - View excuse request history
@@ -497,7 +516,7 @@ The Time Attendance System includes a **separate Angular application** specifica
    - Track approval status
    - View remaining excuse balance
 
-6. **Remote Work Requests**
+6. **Remote Work Requests** (`remote-work-requests/`)
    - Request remote work days
    - Select work location (Remote, Field Work, Client Site)
    - View remote work request history
@@ -505,7 +524,7 @@ The Time Attendance System includes a **separate Angular application** specifica
    - Cancel requests
    - Track approval status
 
-7. **Fingerprint Requests**
+7. **Fingerprint Requests** (`fingerprint-requests/`)
    - Request fingerprint enrollment
    - Request fingerprint updates/repairs
    - Track request status
@@ -513,19 +532,21 @@ The Time Attendance System includes a **separate Angular application** specifica
    - View technician notes
 
 #### For Managers (Additional Features)
-8. **Manager Dashboard**
+8. **Manager Dashboard** (`manager-dashboard/`)
    - Team size and statistics
    - Direct reports count
    - Indirect reports count
    - Team members list
    - Pending approvals count
 
-9. **Team Management**
+9. **Team Management** (`team-members/`)
    - View team members
    - View team hierarchy
    - View team attendance overview
+   - Filter by department, status
+   - Search team members
 
-10. **Approvals**
+10. **Approvals** (`pending-approvals/`)
     - Approve/reject vacation requests
     - Approve/reject excuse requests
     - Approve/reject remote work requests
@@ -540,7 +561,7 @@ The Time Attendance System includes a **separate Angular application** specifica
 time-attendance-selfservice-frontend/
 ├── src/
 │   ├── app/
-│   │   ├── features/
+│   │   ├── pages/
 │   │   │   ├── portal/
 │   │   │   │   ├── employee-dashboard/
 │   │   │   │   ├── manager-dashboard/
@@ -551,7 +572,16 @@ time-attendance-selfservice-frontend/
 │   │   │   │   ├── remote-work-requests/
 │   │   │   │   ├── fingerprint-requests/
 │   │   │   │   ├── team-members/
-│   │   │   │   └── approvals/
+│   │   │   │   ├── pending-approvals/
+│   │   │   │   ├── portal-navigation/
+│   │   │   │   ├── services/
+│   │   │   │   │   └── portal.service.ts
+│   │   │   │   └── models/
+│   │   │   │       ├── employee-dashboard.model.ts
+│   │   │   │       ├── manager-dashboard.model.ts
+│   │   │   │       ├── my-attendance.model.ts
+│   │   │   │       ├── my-profile.model.ts
+│   │   │   │       └── fingerprint-request.model.ts
 │   │   ├── shared/
 │   │   │   ├── components/
 │   │   │   ├── models/
@@ -566,9 +596,10 @@ time-attendance-selfservice-frontend/
 ```
 
 #### Key Components
-- **Portal Components**: Located in `src/app/features/portal/`
+- **Portal Components**: Located in `src/app/pages/portal/`
+- **Portal Service**: `src/app/pages/portal/services/portal.service.ts` - API communication
+- **Portal Models**: `src/app/pages/portal/models/` - Type definitions
 - **Shared Components**: Reusable UI components
-- **Services**: API communication services
 - **Guards**: Route guards for authentication and role-based access
 - **Interceptors**: HTTP interceptors for token management
 
@@ -664,34 +695,40 @@ async approveRequest(requestId: number, requestType: string) {
 
 The self-service portal communicates with the backend through dedicated endpoints:
 
-#### Employee Endpoints
-- `GET /api/portal/employee-dashboard` - Get employee dashboard data
-- `GET /api/portal/my-attendance` - Get personal attendance records
-- `GET /api/portal/my-profile` - Get employee profile
-- `PUT /api/portal/my-profile` - Update employee profile
-- `GET /api/portal/leave-balance` - Get leave balance
+#### Portal Endpoints (Base: `/api/v1/portal`)
+- `GET /employee-dashboard` - Get employee dashboard data
+- `GET /manager-dashboard` - Get manager dashboard data
+- `GET /team-members` - Get team members (paginated, with filters)
+- `GET /team-members/{employeeId}` - Get specific team member details
+- `GET /pending-approvals` - Get pending approvals for manager
+- `GET /my-attendance` - Get personal attendance records
+- `GET /my-profile` - Get employee profile
+- `PUT /my-profile` - Update employee profile
+- `GET /my-vacations` - Get employee's vacation requests
+- `GET /my-vacations/{id}` - Get vacation request details
+- `GET /approval-vacation/{id}` - Get vacation for approval (manager view)
 
-#### Manager Endpoints
-- `GET /api/portal/manager-dashboard` - Get manager dashboard data
-- `GET /api/portal/my-team` - Get team members
-- `GET /api/portal/pending-approvals` - Get pending approvals
-- `POST /api/portal/approve-request` - Approve a request
-- `POST /api/portal/reject-request` - Reject a request
+#### Notification Endpoints (Base: `/api/v1/notifications`)
+- `GET /` - Get notifications (with unreadOnly and limit params)
+- `GET /unread-count` - Get unread notification count
+- `POST /{id}/mark-read` - Mark notification as read
+- `POST /mark-all-read` - Mark all notifications as read
+- `DELETE /{id}` - Delete a notification
 
 #### Request Management Endpoints
-- `GET /api/employee-vacations/my-requests` - Get my vacation requests
-- `POST /api/employee-vacations` - Create vacation request
-- `PUT /api/employee-vacations/{id}` - Update vacation request
-- `DELETE /api/employee-vacations/{id}` - Cancel vacation request
+- `GET /api/v1/employee-vacations/my-requests` - Get my vacation requests
+- `POST /api/v1/employee-vacations` - Create vacation request
+- `PUT /api/v1/employee-vacations/{id}` - Update vacation request
+- `DELETE /api/v1/employee-vacations/{id}` - Cancel vacation request
 
-- `GET /api/employee-excuses/my-requests` - Get my excuse requests
-- `POST /api/employee-excuses` - Create excuse request
+- `GET /api/v1/employee-excuses/my-requests` - Get my excuse requests
+- `POST /api/v1/employee-excuses` - Create excuse request
 
-- `GET /api/remote-work-requests/my-requests` - Get my remote work requests
-- `POST /api/remote-work-requests` - Create remote work request
+- `GET /api/v1/remote-work-requests/my-requests` - Get my remote work requests
+- `POST /api/v1/remote-work-requests` - Create remote work request
 
-- `GET /api/fingerprint-requests/my-requests` - Get my fingerprint requests
-- `POST /api/fingerprint-requests` - Create fingerprint request
+- `GET /api/v1/fingerprint-requests/my-requests` - Get my fingerprint requests
+- `POST /api/v1/fingerprint-requests` - Create fingerprint request
 
 ### Running the Self-Service Portal
 
@@ -761,13 +798,303 @@ npm run build
    - Refresh dashboard data automatically
    - Show real-time approval status
    - Update balances after requests
-   - Notify users of approval/rejection
+   - Notify users of approval/rejection via SignalR
 
 5. **Offline Considerations**
    - Handle network failures gracefully
    - Show appropriate error messages
    - Allow retry for failed operations
    - Cache non-sensitive data when appropriate
+
+---
+
+## Admin Frontend Application
+
+### Overview
+The admin frontend (`time-attendance-frontend`) is the full-featured management application for HR administrators, managers, and system administrators.
+
+**Application Location**: `time-attendance-frontend/`
+**Port**: http://localhost:4200
+
+### Admin Portal Features
+
+#### Authentication (`pages/auth/`)
+- Login page
+- Change password
+
+#### Dashboard (`pages/dashboard/`)
+- Organization statistics
+- HR statistics
+- Attendance overview
+- Leave statistics
+- System health
+
+#### Organization Management
+
+**Branches** (`pages/branches/`)
+- Branch list with filters
+- Create/edit branch
+- View branch details
+- Branch table component
+
+**Departments** (`pages/departments/`)
+- Department list with hierarchical tree view
+- Create/edit department
+- View department details
+- Department filters
+- Department info panel
+
+**Employees** (`pages/employees/`)
+- Employee list with filters
+- Create/edit employee
+- View employee details
+- Change employee shift
+- Employee table component
+
+#### Time & Attendance (`pages/attendance/`)
+- **Daily Attendance**: Daily view of all employees
+- **Daily Attendance Detail**: Individual day details
+- **Employee Attendance Detail**: Individual employee history
+- **Edit Attendance**: Modify attendance records
+- **Change Attendance Shift**: Change shift for specific records
+- **Monthly Report**: Monthly attendance summary
+- **Shared Components**: Charts, summary cards, filter panel
+
+#### Leave Management
+
+**Employee Vacations** (`pages/employee-vacations/`)
+- Vacation list with filters
+- Create/edit vacation
+- View vacation details
+- Bulk vacation creation modal
+- Vacation table component
+
+**Employee Excuses** (`pages/employee-excuses/`)
+- Excuse list with filters
+- Create excuse request
+- View excuse details
+
+#### Remote Work (`pages/remote-work/`)
+- Remote work assignment list
+- Assign remote work
+- Edit remote work assignment
+- View remote work assignment details
+
+#### Approvals (`pages/approvals/`)
+- Pending approvals list
+- Approval history
+
+#### Shift Management (`pages/shifts/`)
+- Shift list with filters
+- Create/edit shift
+- View shift details
+- Assign shifts to employees/departments
+
+#### User Management (`pages/users/`)
+- User list with filters
+- Create/edit user
+- View user details
+- Role management
+- User form component
+- User table component
+
+#### Roles & Permissions (`pages/roles/`)
+- Role list with filters
+- Create/edit role
+- View role details
+
+#### Settings (`pages/settings/`)
+
+**Vacation Types** (`vacation-types/`)
+- Vacation type list
+- Create/edit/view vacation type
+
+**Excuse Policies** (`excuse-policies/`)
+- Excuse policy list
+- Create/edit/view excuse policy
+
+**Overtime Configuration** (`overtime/`)
+- Overtime configuration list
+- Create/edit/view overtime config
+
+**Leave Balances** (`leave-balances/`)
+- Leave balance list
+- Leave entitlement form
+
+**Remote Work Policies** (`remote-work-policy/`)
+- Remote work policy list
+- Create/edit/view policy
+
+**Public Holidays** (`public-holidays/`)
+- Public holiday list
+- Create/edit/view holiday
+
+**Workflows** (`workflows/`)
+- Workflow definition list
+- Workflow form
+
+#### Reports (`pages/reports/`)
+- Audit logs with detail modal
+- Sessions (active sessions, login history)
+
+#### Error Pages
+- Not Found (404)
+- Unauthorized (403)
+
+### Admin Frontend Architecture
+
+#### Project Structure
+```
+time-attendance-frontend/
+├── src/
+│   ├── app/
+│   │   ├── pages/
+│   │   │   ├── approvals/
+│   │   │   ├── attendance/
+│   │   │   ├── auth/
+│   │   │   ├── branches/
+│   │   │   ├── dashboard/
+│   │   │   ├── departments/
+│   │   │   ├── employee-excuses/
+│   │   │   ├── employee-vacations/
+│   │   │   ├── employees/
+│   │   │   ├── not-found/
+│   │   │   ├── remote-work/
+│   │   │   ├── reports/
+│   │   │   ├── roles/
+│   │   │   ├── settings/
+│   │   │   ├── shifts/
+│   │   │   ├── unauthorized/
+│   │   │   ├── users/
+│   │   │   └── vacation-types/
+│   │   ├── shared/
+│   │   │   ├── components/
+│   │   │   ├── models/
+│   │   │   └── services/
+│   │   ├── core/
+│   │   │   ├── auth/
+│   │   │   ├── guards/
+│   │   │   ├── interceptors/
+│   │   │   └── services/
+│   │   └── app.config.ts
+│   └── assets/
+└── package.json
+```
+
+---
+
+## Backend API Architecture
+
+### Controllers (29 total)
+
+#### Core Management
+- **AuthController** - Authentication (login, logout, 2FA, password management)
+- **UsersController** - User CRUD operations
+- **RolesController** - Role management
+- **PermissionsController** - Permission management
+- **EmployeesController** - Employee CRUD operations
+- **BranchesController** - Branch management
+- **DepartmentsController** - Department management
+
+#### Time & Attendance
+- **AttendanceController** - Attendance records management
+- **ShiftsController** - Shift configuration
+- **ShiftAssignmentsController** - Shift assignments
+
+#### Leave & Absence
+- **EmployeeVacationsController** - Vacation request management
+- **VacationTypesController** - Vacation type configuration
+- **LeaveBalancesController** - Leave balance management
+- **EmployeeExcusesController** - Excuse management
+- **ExcusePoliciesController** - Excuse policy configuration
+
+#### Remote Work
+- **RemoteWorkRequestsController** - Remote work requests
+- **RemoteWorkPoliciesController** - Remote work policy configuration
+
+#### Self-Service Portal
+- **PortalController** - Employee self-service dashboard and features
+- **NotificationsController** - In-app notification management
+
+#### Workflows & Approvals
+- **ApprovalsController** - Approval actions
+- **WorkflowsController** - Workflow definition and instance management
+
+#### System Administration
+- **OvertimeConfigurationController** - Overtime rules
+- **PublicHolidaysController** - Public holiday management
+- **SessionsController** - Session management
+- **SeedController** - Database seeding
+- **FingerprintRequestsController** - Fingerprint request management
+
+#### Reporting & Analytics
+- **DashboardController** - Dashboard data
+- **ReportsController** - Report generation
+- **AuditLogsController** - Audit trail
+
+### SignalR Hub
+- **NotificationHub** (`/hubs/notifications`) - Real-time notification delivery
+  - User connection management
+  - Group-based notification targeting
+  - WebSocket connection handling
+
+### Domain Entities
+
+#### Organization
+- Branch, Department, Employee, EmployeeUserLink
+
+#### Authentication & Security
+- User, Role, Permission, RolePermission, UserRole
+- UserBranchScope, UserSession, BlacklistedToken, RefreshToken
+- PasswordHistory, LoginAttempt, TwoFactorBackupCode
+
+#### Time & Attendance
+- AttendanceRecord, AttendanceTransaction, WorkingDay
+
+#### Leave Management
+- VacationType, EmployeeVacation, LeaveBalance
+- LeaveTransaction, LeaveEntitlement, LeaveAccrualPolicy
+
+#### Shift Management
+- Shift, ShiftPeriod, ShiftAssignment, OffDay
+
+#### Excuse Management
+- EmployeeExcuse, ExcusePolicy
+
+#### Remote Work
+- RemoteWorkPolicy, RemoteWorkRequest
+
+#### Biometric
+- FingerprintRequest
+
+#### Configuration
+- PublicHoliday, OvertimeConfiguration
+
+#### Workflows
+- WorkflowDefinition, WorkflowInstance, WorkflowStep
+- WorkflowStepExecution, ApprovalDelegation
+
+#### Notifications
+- Notification
+
+#### Audit
+- AuditLog, AuditChange
+
+### Application Services
+
+#### Core Services
+- AttendanceCalculationService
+- DailyAttendanceGeneratorService
+- OvertimeConfigurationService
+- LeaveAccrualService
+- InAppNotificationService
+- ChangeTrackingService
+
+### Background Jobs (Coravel)
+- Daily attendance generation
+- Leave accrual calculations
+- Session cleanup
+- Report generation
 
 ---
 
@@ -827,6 +1154,15 @@ When adding self-service features:
 - Show balance information before requests
 - Allow request cancellation with proper validation
 
+### Notification Features
+When implementing notifications:
+- Use SignalR for real-time delivery
+- Support bilingual content (English/Arabic)
+- Include action URLs for navigation
+- Track read/unread status
+- Send notifications for all workflow events
+- Target specific users or user groups
+
 ### Reporting Features
 When creating reports:
 - Support flexible date range filtering
@@ -856,6 +1192,7 @@ When creating reports:
    - Service interfaces and implementations
    - Business logic and validations
    - Mapping configurations (AutoMapper profiles)
+   - CQRS commands and queries (MediatR)
    - Depends only on Domain layer
 
 3. **Infrastructure Layer** (`TimeAttendanceSystem.Infrastructure`)
@@ -867,6 +1204,7 @@ When creating reports:
 
 4. **API Layer** (`TimeAttendanceSystem.Api`)
    - Controllers for HTTP endpoints
+   - SignalR hubs for real-time communication
    - Authentication/authorization middleware
    - Swagger/API documentation
    - Depends on all other layers
@@ -1014,6 +1352,7 @@ public class EmployeeDto
 - [ ] Test loading states
 - [ ] Test permission restrictions
 - [ ] Test data filtering and pagination
+- [ ] Test real-time notifications
 
 ---
 
@@ -1023,7 +1362,7 @@ public class EmployeeDto
 - Backend: http://localhost:5099
 - Admin Frontend: http://localhost:4200
 - Self-Service Frontend: http://localhost:4201
-- Database: SQL Server (local or container)
+- Database: PostgreSQL (local or container)
 - Use Coravel for background jobs
 - **See "Running the Complete System" section for detailed startup instructions**
 
@@ -1038,6 +1377,7 @@ public class EmployeeDto
 - Set up database migrations pipeline
 - Configure branch-specific settings
 - Review and set CORS policies
+- Configure SignalR for load-balanced environments
 
 ---
 
@@ -1067,27 +1407,30 @@ When adding a new feature:
 ### Common Issues
 
 #### Backend Issues
-- **Database connection errors**: Check connection string, ensure SQL Server is running
+- **Database connection errors**: Check connection string, ensure PostgreSQL is running
 - **Migration errors**: Drop database and recreate (dev only), or fix migration conflicts
 - **Authentication errors**: Check JWT secret, token expiration, user permissions
 - **Background job failures**: Check Coravel configuration, review job logs
+- **SignalR connection issues**: Check CORS, verify hub route, check authentication
 
 #### Frontend Issues
 - **Compilation errors**: Clear node_modules and reinstall, check TypeScript version
 - **API call failures**: Check backend is running, verify CORS settings, check network tab
 - **Routing issues**: Verify route configuration, check authentication guards
 - **Translation errors**: Ensure translation keys exist in both languages
+- **SignalR not connecting**: Check WebSocket support, verify authentication token
 
 #### Common Mistakes to Avoid
-- ❌ Forgetting to validate leave balances before approval
-- ❌ Not recalculating attendance after shift changes
-- ❌ Missing branch scope in data queries
-- ❌ Not handling Arabic RTL layout
-- ❌ Using inline styles instead of shared components
-- ❌ Forgetting to update audit logs
-- ❌ Not implementing proper error handling
-- ❌ Missing pagination on large datasets
-- ❌ Not testing with different user roles
+- Forgetting to validate leave balances before approval
+- Not recalculating attendance after shift changes
+- Missing branch scope in data queries
+- Not handling Arabic RTL layout
+- Using inline styles instead of shared components
+- Forgetting to update audit logs
+- Not implementing proper error handling
+- Missing pagination on large datasets
+- Not testing with different user roles
+- Not sending notifications for workflow events
 
 ---
 
@@ -1119,7 +1462,7 @@ dotnet run --project RunSampleData.csproj
 Reading SQL file...
 Connecting to database...
 Executing SQL script...
-✅ Sample data inserted successfully!
+Sample data inserted successfully!
 Created: 5 Branches, 20 Departments, 50 Employees with User Accounts
 Default password for all employees: Emp@123!
 ```
@@ -1145,18 +1488,18 @@ dotnet run
 
 **Output**:
 ```
-✅ Branches: 5/5
-✅ Departments: 20/20
-✅ Employees: 50/50
-✅ Users: 50/50
+Branches: 5/5
+Departments: 20/20
+Employees: 50/50
+Users: 50/50
 
-📋 Sample Branch Manager:
+Sample Branch Manager:
    Name: Ahmed Al-Rashid
    Email: ahmed.rashid@company.com
    Username: ahmed.rashid
    Password: Emp@123! (must change on first login)
 
-✅ All sample data verified successfully!
+All sample data verified successfully!
 ```
 
 ### Configuration
@@ -1253,9 +1596,6 @@ dotnet run --project RunSampleData.csproj
 # Option 2: Using PostgreSQL command line
 psql -U your_username -d TimeAttendanceDb -f scripts/sample-data-with-users.sql
 
-# Option 3: Using SQL Server command line
-sqlcmd -S localhost -d TimeAttendanceDb -i scripts/sample-data-with-users.sql
-
 # Verify sample data was loaded correctly
 cd tools/verify
 dotnet run
@@ -1298,7 +1638,7 @@ npm run build
 To run and test the entire Time Attendance System, you need to start all three applications:
 
 #### Prerequisites
-- Ensure SQL Server is running
+- Ensure PostgreSQL is running
 - Ensure Node.js and .NET SDK are installed
 - First-time setup: Install npm dependencies for both frontends
 
@@ -1323,9 +1663,6 @@ dotnet run --project RunSampleData.csproj
 
 # Option 2: Using PostgreSQL command line
 # psql -U your_username -d TimeAttendanceDb -f scripts/sample-data-with-users.sql
-
-# Option 3: Using SQL Server command line
-# sqlcmd -S localhost -d TimeAttendanceDb -i scripts/sample-data-with-users.sql
 
 # Verify the data was loaded successfully
 cd tools/verify
@@ -1364,7 +1701,7 @@ npm start
 
 | Application | URL | Port | Purpose |
 |-------------|-----|------|---------|
-| **Backend API** | http://localhost:5099 | 5099 | RESTful API, Authentication, Business Logic |
+| **Backend API** | http://localhost:5099 | 5099 | RESTful API, SignalR Hub, Authentication, Business Logic |
 | **Admin Portal** | http://localhost:4200 | 4200 | Full system management for HR/Admins |
 | **Self-Service Portal** | http://localhost:4201 | 4201 | Employee self-service and manager approvals |
 
@@ -1393,36 +1730,40 @@ Once all three applications are running:
 - [ ] Test employee features: Create a vacation request in self-service portal
 - [ ] Test manager features: Log in as department manager (e.g., `sara.fahad`) and approve requests
 - [ ] Test hierarchy: Verify managers can see their team members and pending approvals
+- [ ] Test notifications: Verify real-time notifications appear after request submission/approval
 
 #### Troubleshooting Startup Issues
-- **Backend won't start**: Check SQL Server connection, review appsettings.json
+- **Backend won't start**: Check PostgreSQL connection, review appsettings.json
 - **Frontend compilation errors**: Delete node_modules and run `npm install` again
 - **Port conflicts**: Check if ports 4200, 4201, or 5099 are already in use
 - **API connection errors**: Verify backend is running and CORS is configured correctly
 - **Self-Service shows different port**: Port is configured in `angular.json` under `serve.options.port`
 - **No employees to test with**: Make sure you ran the sample data script `scripts/sample-data-with-users.sql` after first run
 - **Can't login with employee account**: Verify you're using the correct username format (email prefix) and default password `Emp@123!`
+- **SignalR not connecting**: Check browser console for WebSocket errors, verify JWT token is being sent
 
 ### Key File Locations
 
 #### Backend
 - Controllers: `src/Api/TimeAttendanceSystem.Api/Controllers/`
+- SignalR Hubs: `src/Api/TimeAttendanceSystem.Api/Hubs/`
 - Services: `src/Application/TimeAttendanceSystem.Application/Services/`
-- Entities: `src/Domain/TimeAttendanceSystem.Domain/Entities/`
+- Entities: `src/Domain/TimeAttendanceSystem.Domain/`
 - Repositories: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/Repositories/`
-- DTOs: `src/Application/TimeAttendanceSystem.Application/DTOs/`
+- DTOs: `src/Application/TimeAttendanceSystem.Application/` (within feature folders)
 - Background Jobs: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/BackgroundJobs/`
 
 #### Frontend (Admin)
-- Components: `time-attendance-frontend/src/app/features/`
+- Pages: `time-attendance-frontend/src/app/pages/`
 - Shared Components: `time-attendance-frontend/src/app/shared/components/`
-- Services: `time-attendance-frontend/src/app/core/services/`
+- Core Services: `time-attendance-frontend/src/app/core/services/`
 - Models: `time-attendance-frontend/src/app/shared/models/`
 - Guards: `time-attendance-frontend/src/app/core/guards/`
 
 #### Frontend (Self-Service)
-- Components: `time-attendance-selfservice-frontend/src/app/features/`
-- Portal Components: `time-attendance-selfservice-frontend/src/app/features/portal/`
+- Portal Pages: `time-attendance-selfservice-frontend/src/app/pages/portal/`
+- Portal Service: `time-attendance-selfservice-frontend/src/app/pages/portal/services/portal.service.ts`
+- Portal Models: `time-attendance-selfservice-frontend/src/app/pages/portal/models/`
 - Shared: `time-attendance-selfservice-frontend/src/app/shared/`
 
 ---
@@ -1445,6 +1786,7 @@ Once all three applications are running:
 ### Business Rules
 - [Overtime Business Rules](OVERTIME_BUSINESS_RULES.md) - Overtime calculation rules
 - [Workflow Integration Plan](WORKFLOW_INTEGRATION_PLAN.md) - Approval workflow guide
+- [Self-Service Implementation Plan](SELFSERVICE_IMPLEMENTATION_PLAN.md) - Self-service portal guide
 
 ### Deployment
 - [Ubuntu Deployment Guide](UBUNTU_DEPLOYMENT_GUIDE.md) - Linux deployment instructions
@@ -1455,5 +1797,5 @@ Once all three applications are running:
 
 ---
 
-**Last Updated**: December 30, 2025
-**Version**: 3.0 - Comprehensive system features and development guidelines
+**Last Updated**: January 10, 2026
+**Version**: 4.0 - Added Real-Time Notifications, Updated Self-Service Portal, Complete API Documentation

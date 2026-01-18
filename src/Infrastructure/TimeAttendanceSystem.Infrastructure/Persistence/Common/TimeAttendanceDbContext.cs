@@ -292,4 +292,13 @@ public class TimeAttendanceDbContext : DbContext, IApplicationDbContext
 
         return result;
     }
+
+    /// <summary>
+    /// Clears the change tracker to remove all tracked entities.
+    /// Useful after bulk operations to ensure fresh data is loaded from the database.
+    /// </summary>
+    public void ClearChangeTracker()
+    {
+        ChangeTracker.Clear();
+    }
 }

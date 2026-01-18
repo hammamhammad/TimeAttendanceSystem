@@ -1,0 +1,129 @@
+<app-modal-wrapper
+  [show]="show"
+  [title]="title || i18n.t('portal.delegate_approval')"
+  [size]="'md'"
+  [centered]="true"
+  [closeOnBackdropClick]="false"
+  (close)="onCancel()">
+
+  <div class="delegation-modal-content">
+    <!-- Selected Employee Display -->
+    @if (selectedEmployee()) {
+      <div class="selected-employee-card mb-3">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center">
+            <div class="employee-avatar me-3">
+              <i class="bi bi-person-circle"></i>
+            </div>
+            <div>
+              <div class="employee-name fw-semibold">{{ displayName() }}</div>
+              @if (selectedEmployee()?.jobTitle) {
+                <small class="text-muted">{{ selectedEmployee()?.jobTitle }}</small>
+              }
+              @if (selectedEmployee()?.departmentName) {
+                <small class="text-muted d-block">{{ selectedEmployee()?.departmentName }}</small>
+              }
+            </div>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-secondary" (click)="clearSelection()">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      </div>
+    } @else {
+      <!-- Search Input -->
+      <div class="mb-3">
+        <label class="form-label">{{ i18n.t('portal.search_employee') }}</label>
+        <div class="position-relative">
+          <input
+            type="text"
+            class="form-control"
+            [placeholder]="i18n.t('portal.search_employee_placeholder')"
+            [value]="searchTerm()"
+            (input)="onSearchChange($event)"
+            autocomplete="off">
+          @if (searchLoading()) {
+            <div class="search-loading">
+              <div class="spinner-border spinner-border-sm text-primary" role="status">
+                <span class="visually-hidden">{{ i18n.t('common.loading') }}</span>
+              </div>
+            </div>
+          }
+        </div>
+        <small class="form-text text-muted">{{ i18n.t('portal.search_min_chars') }}</small>
+      </div>
+
+      <!-- Search Results -->
+      @if (searchPerformed() && !searchLoading()) {
+        @if (filteredEmployees().length > 0) {
+          <div class="search-results-list mb-3">
+            <label class="form-label text-muted small">{{ i18n.t('portal.search_results') }}</label>
+            <div class="list-group">
+              @for (employee of filteredEmployees(); track trackByUserId($index, employee)) {
+                <button
+                  type="button"
+                  class="list-group-item list-group-item-action"
+                  (click)="selectEmployee(employee)">
+                  <div class="d-flex align-items-center">
+                    <div class="employee-avatar-small me-2">
+                      <i class="bi bi-person"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                      <div class="fw-medium">{{ getEmployeeDisplayName(employee) }}</div>
+                      <small class="text-muted">
+                        @if (employee.jobTitle) {
+                          {{ employee.jobTitle }}
+                        }
+                        @if (employee.jobTitle && employee.departmentName) {
+                          -
+                        }
+                        @if (employee.departmentName) {
+                          {{ employee.departmentName }}
+                        }
+                      </small>
+                    </div>
+                  </div>
+                </button>
+              }
+            </div>
+          </div>
+        } @else {
+          <div class="no-results text-center text-muted py-3">
+            <i class="bi bi-search fs-4 d-block mb-2"></i>
+            {{ i18n.t('portal.no_employees_found') }}
+          </div>
+        }
+      }
+    }
+
+    <!-- Delegation Reason (Optional) -->
+    @if (selectedEmployee()) {
+      <div class="mb-3">
+        <label class="form-label">{{ i18n.t('portal.delegation_reason') }}</label>
+        <textarea
+          class="form-control"
+          rows="2"
+          [placeholder]="i18n.t('portal.delegation_reason_placeholder')"
+          [ngModel]="delegationReason()"
+          (ngModelChange)="delegationReason.set($event)">
+        </textarea>
+        <small class="form-text text-muted">{{ i18n.t('common.optional') }}</small>
+      </div>
+    }
+  </div>
+
+  <!-- Footer -->
+  <ng-container modal-footer>
+    <button type="button" class="btn btn-secondary" (click)="onCancel()">
+      {{ i18n.t('common.cancel') }}
+    </button>
+    <button
+      type="button"
+      class="btn btn-info"
+      [disabled]="!canDelegate()"
+      (click)="onConfirmDelegate()">
+      <i class="bi bi-person-plus me-1"></i>
+      {{ i18n.t('portal.delegate') }}
+    </button>
+  </ng-container>
+</app-modal-wrapper>

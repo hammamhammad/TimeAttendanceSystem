@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TimeAttendanceSystem.Application.Abstractions;
+using TimeAttendanceSystem.Application.Extensions;
 using TimeAttendanceSystem.Domain.Attendance;
 
 namespace TimeAttendanceSystem.Infrastructure.Persistence.Repositories;
@@ -28,25 +29,28 @@ public class AttendanceTransactionRepository : IAttendanceTransactionRepository
 
     public async Task<List<AttendanceTransaction>> GetByEmployeeAndDateAsync(long employeeId, DateTime attendanceDate, CancellationToken cancellationToken = default)
     {
+        var normalizedDate = attendanceDate.ToUtcDate();
         return await _context.AttendanceTransactions
             .Include(t => t.Employee)
             .Include(t => t.EnteredByUser)
             .Include(t => t.VerifiedByUser)
             .Where(t => t.EmployeeId == employeeId &&
-                       t.AttendanceDate.Date == attendanceDate.Date)
+                       t.AttendanceDate.Date == normalizedDate)
             .OrderBy(t => t.TransactionTimeUtc)
             .ToListAsync(cancellationToken);
     }
 
     public async Task<List<AttendanceTransaction>> GetByEmployeeAndDateRangeAsync(long employeeId, DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
     {
+        var normalizedStartDate = startDate.ToUtcDate();
+        var normalizedEndDate = endDate.ToUtcDate();
         return await _context.AttendanceTransactions
             .Include(t => t.Employee)
             .Include(t => t.EnteredByUser)
             .Include(t => t.VerifiedByUser)
             .Where(t => t.EmployeeId == employeeId &&
-                       t.AttendanceDate.Date >= startDate.Date &&
-                       t.AttendanceDate.Date <= endDate.Date)
+                       t.AttendanceDate.Date >= normalizedStartDate &&
+                       t.AttendanceDate.Date <= normalizedEndDate)
             .OrderBy(t => t.AttendanceDate)
             .ThenBy(t => t.TransactionTimeUtc)
             .ToListAsync(cancellationToken);
@@ -84,13 +88,15 @@ public class AttendanceTransactionRepository : IAttendanceTransactionRepository
 
     public async Task<List<AttendanceTransaction>> GetManualTransactionsAsync(long? branchId, DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
     {
+        var normalizedStartDate = startDate.ToUtcDate();
+        var normalizedEndDate = endDate.ToUtcDate();
         var query = _context.AttendanceTransactions
             .Include(t => t.Employee)
             .Include(t => t.EnteredByUser)
             .Include(t => t.VerifiedByUser)
             .Where(t => t.IsManual &&
-                       t.AttendanceDate.Date >= startDate.Date &&
-                       t.AttendanceDate.Date <= endDate.Date);
+                       t.AttendanceDate.Date >= normalizedStartDate &&
+                       t.AttendanceDate.Date <= normalizedEndDate);
 
         if (branchId.HasValue)
         {
@@ -105,13 +111,15 @@ public class AttendanceTransactionRepository : IAttendanceTransactionRepository
 
     public async Task<List<AttendanceTransaction>> GetByTypeAndDateRangeAsync(TransactionType transactionType, long? branchId, DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
     {
+        var normalizedStartDate = startDate.ToUtcDate();
+        var normalizedEndDate = endDate.ToUtcDate();
         var query = _context.AttendanceTransactions
             .Include(t => t.Employee)
             .Include(t => t.EnteredByUser)
             .Include(t => t.VerifiedByUser)
             .Where(t => t.TransactionType == transactionType &&
-                       t.AttendanceDate.Date >= startDate.Date &&
-                       t.AttendanceDate.Date <= endDate.Date);
+                       t.AttendanceDate.Date >= normalizedStartDate &&
+                       t.AttendanceDate.Date <= normalizedEndDate);
 
         if (branchId.HasValue)
         {
@@ -159,18 +167,20 @@ public class AttendanceTransactionRepository : IAttendanceTransactionRepository
 
     public async Task<bool> ExistsTransactionTypeAsync(long employeeId, DateTime attendanceDate, TransactionType transactionType, CancellationToken cancellationToken = default)
     {
+        var normalizedDate = attendanceDate.ToUtcDate();
         return await _context.AttendanceTransactions
             .AnyAsync(t => t.EmployeeId == employeeId &&
-                          t.AttendanceDate.Date == attendanceDate.Date &&
+                          t.AttendanceDate.Date == normalizedDate &&
                           t.TransactionType == transactionType,
                      cancellationToken);
     }
 
     public async Task<(AttendanceTransaction? CheckIn, AttendanceTransaction? CheckOut)> GetCheckInOutPairAsync(long employeeId, DateTime attendanceDate, CancellationToken cancellationToken = default)
     {
+        var normalizedDate = attendanceDate.ToUtcDate();
         var transactions = await _context.AttendanceTransactions
             .Where(t => t.EmployeeId == employeeId &&
-                       t.AttendanceDate.Date == attendanceDate.Date &&
+                       t.AttendanceDate.Date == normalizedDate &&
                        (t.TransactionType == TransactionType.CheckIn ||
                         t.TransactionType == TransactionType.CheckOut ||
                         t.TransactionType == TransactionType.AutoCheckOut))
@@ -186,9 +196,10 @@ public class AttendanceTransactionRepository : IAttendanceTransactionRepository
 
     public async Task<List<(AttendanceTransaction BreakStart, AttendanceTransaction? BreakEnd)>> GetBreakPeriodsAsync(long employeeId, DateTime attendanceDate, CancellationToken cancellationToken = default)
     {
+        var normalizedDate = attendanceDate.ToUtcDate();
         var breakTransactions = await _context.AttendanceTransactions
             .Where(t => t.EmployeeId == employeeId &&
-                       t.AttendanceDate.Date == attendanceDate.Date &&
+                       t.AttendanceDate.Date == normalizedDate &&
                        (t.TransactionType == TransactionType.BreakStart ||
                         t.TransactionType == TransactionType.BreakEnd))
             .OrderBy(t => t.TransactionTimeUtc)

@@ -155,7 +155,29 @@ export const routes: Routes = [
         path: 'pending-approvals',
         loadComponent: () => import('./pages/portal/pending-approvals/pending-approvals.component').then(m => m.PendingApprovalsComponent),
         data: { title: 'portal.pending_approvals' },
-        canMatch: [managerGuard]
+        canMatch: [authGuard]  // Changed from managerGuard - anyone can receive delegated approvals
+      },
+      // Redirect legacy /approvals route to pending-approvals
+      {
+        path: 'approvals',
+        redirectTo: 'pending-approvals',
+        pathMatch: 'prefix'
+      },
+      // Redirect legacy notification URLs to correct routes
+      {
+        path: 'excuses/:id',
+        redirectTo: 'excuse-requests/:id',
+        pathMatch: 'full'
+      },
+      {
+        path: 'vacations/:id',
+        redirectTo: 'vacation-requests/:id',
+        pathMatch: 'full'
+      },
+      {
+        path: 'remote-work/:id',
+        redirectTo: 'remote-work-requests/:id',
+        pathMatch: 'full'
       }
     ]
   },

@@ -116,7 +116,18 @@
       "Bash(for:*)",
       "Bash(do sed -i 's/.IsConcurrencyToken\\(\\)\\\\s*\\\\n\\\\s*.IsRowVersion\\(\\)\\\\s*\\\\n\\\\s*.HasDefaultValueSql\\(\"\"E'\"''\"'\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\x01'\"''\"'::bytea\"\"\\)/.IsConcurrencyToken\\(\\)\\\\n            .IsRequired\\(\\)\\\\n            .HasDefaultValue\\(new byte[] { 1 }\\)/g' \"$file\")",
       "Bash(do curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5099/swagger/index.html)",
-      "Bash(break)"
+      "Bash(break)",
+      "Bash(timeout /t 2 /nobreak)",
+      "Bash(dir /s /b \"d:\\\\Work\\\\TimeAttendanceSystem\\\\time-attendance-selfservice-frontend\\\\src\\\\app\\\\shared\\\\components\")",
+      "Bash(cmd /c \"taskkill /PID 196800 /F\")",
+      "Bash(grep:*)",
+      "Bash(cmd /c \"taskkill /F /PID 128620\")",
+      "Bash(ping:*)",
+      "Bash(wmic process where \"name=''TimeAttendanceSystem.Api.exe''\" get processid)",
+      "Bash(Start-Process -FilePath \"dotnet\" -ArgumentList \"run\" -NoNewWindow -PassThru)",
+      "Bash(wmic process where \"ProcessId=19964\" delete)",
+      "Bash(PGPASSWORD='P@ssw0rd@3213' psql -h localhost -U postgres -d TimeAttendanceSystem -c \"\\\\d \"\"ShiftAssignments\"\"\")",
+      "Bash(start /B dotnet run)"
     ],
     "deny": [],
     "ask": []

@@ -34,7 +34,8 @@ public class GetLeaveExcuseDetailsQueryHandler : IRequestHandler<GetLeaveExcuseD
             return Result.Failure<LeaveExcuseDetailsResponse>("Employee ID must be greater than 0");
 
         // Query date should be normalized to date only (remove time component)
-        var queryDate = request.Date.Date;
+        // IMPORTANT: Must specify UTC kind for PostgreSQL timestamp with time zone compatibility
+        var queryDate = DateTime.SpecifyKind(request.Date.Date, DateTimeKind.Utc);
 
         // Fetch employee vacations that are active on the specified date
         var vacations = await GetEmployeeVacationsAsync(request.EmployeeId, queryDate, cancellationToken);
@@ -64,25 +65,58 @@ public class GetLeaveExcuseDetailsQueryHandler : IRequestHandler<GetLeaveExcuseD
         DateTime date,
         CancellationToken cancellationToken)
     {
-        return await _context.EmployeeVacations
+        // Fetch full entities to avoid EF Core translation issues
+        var vacations = await _context.EmployeeVacations
+            .Include(ev => ev.Employee)
+            .Include(ev => ev.VacationType)
             .Where(ev => !ev.IsDeleted &&
                         ev.EmployeeId == employeeId &&
                         ev.StartDate <= date &&
-                        ev.EndDate >= date) // Vacation is active on the specified date
-            .Select(ev => new EmployeeVacationDetailDto
+                        ev.EndDate >= date)
+            .OrderByDescending(ev => ev.CreatedAtUtc)
+            .ToListAsync(cancellationToken);
+
+        // Map to DTOs on the client side
+        var today = DateTime.UtcNow.Date;
+        return vacations.Select(ev =>
+        {
+            var (status, statusDisplay) = GetVacationStatus(ev.IsApproved, ev.EndDate, today);
+            return new EmployeeVacationDetailDto
             {
                 Id = ev.Id,
-                EmployeeName = ev.Employee.FullName,
-                VacationTypeName = ev.VacationType.Name,
+                EmployeeName = ev.Employee?.FullName ?? string.Empty,
+                VacationTypeName = ev.VacationType?.Name ?? string.Empty,
                 StartDate = ev.StartDate,
                 EndDate = ev.EndDate,
                 DurationDays = ev.TotalDays,
                 IsApproved = ev.IsApproved,
                 Notes = ev.Notes,
-                CreatedAtUtc = ev.CreatedAtUtc
-            })
-            .OrderByDescending(ev => ev.CreatedAtUtc)
-            .ToListAsync(cancellationToken);
+                CreatedAtUtc = ev.CreatedAtUtc,
+                Status = status,
+                StatusDisplay = statusDisplay
+            };
+        }).ToList();
+    }
+
+    /// <summary>
+    /// Computes the vacation status based on approval and dates.
+    /// </summary>
+    private static (string Status, string StatusDisplay) GetVacationStatus(bool isApproved, DateTime endDate, DateTime today)
+    {
+        if (isApproved)
+        {
+            // Approved vacation - check if completed (past) or still active
+            if (endDate.Date < today)
+                return ("Completed", "Completed");
+            return ("Approved", "Approved");
+        }
+        else
+        {
+            // Not approved - check if expired (end date has passed)
+            if (endDate.Date < today)
+                return ("Expired", "Expired");
+            return ("Pending", "Pending");
+        }
     }
 
     /// <summary>
@@ -93,33 +127,44 @@ public class GetLeaveExcuseDetailsQueryHandler : IRequestHandler<GetLeaveExcuseD
         DateTime date,
         CancellationToken cancellationToken)
     {
-        return await _context.EmployeeExcuses
+        // Normalize date to start and end of day for comparison
+        // IMPORTANT: Must specify UTC kind for PostgreSQL timestamp with time zone compatibility
+        var startOfDay = DateTime.SpecifyKind(date.Date, DateTimeKind.Utc);
+        var endOfDay = DateTime.SpecifyKind(date.Date.AddDays(1), DateTimeKind.Utc);
+
+        // Fetch full entities to avoid EF Core translation issues with TimeOnly
+        var excuses = await _context.EmployeeExcuses
+            .Include(ee => ee.Employee)
+            .Include(ee => ee.ApprovedBy)
             .Where(ee => !ee.IsDeleted &&
                         ee.EmployeeId == employeeId &&
-                        ee.ExcuseDate.Date == date) // Excuse is for the specified date
-            .Select(ee => new AttendanceExcuseDetailDto
-            {
-                Id = ee.Id,
-                EmployeeName = ee.Employee.FullName,
-                ExcuseDate = ee.ExcuseDate,
-                ExcuseType = ee.ExcuseType,
-                ExcuseTypeDisplay = ee.ExcuseType == ExcuseType.PersonalExcuse ? "Personal Excuse" : "Official Duty",
-                StartTime = ee.StartTime,
-                EndTime = ee.EndTime,
-                DurationHours = ee.DurationHours,
-                Reason = ee.Reason,
-                ApprovalStatus = ee.ApprovalStatus,
-                ApprovalStatusDisplay = GetApprovalStatusDisplay(ee.ApprovalStatus),
-                ApprovedByName = ee.ApprovedBy != null ? ee.ApprovedBy.Username : null,
-                ApprovedAt = ee.ApprovedAt,
-                RejectionReason = ee.RejectionReason,
-                HasAttachment = !string.IsNullOrEmpty(ee.AttachmentPath),
-                AttachmentPath = ee.AttachmentPath,
-                ProcessingNotes = ee.ProcessingNotes,
-                CreatedAtUtc = ee.CreatedAtUtc
-            })
+                        ee.ExcuseDate >= startOfDay &&
+                        ee.ExcuseDate < endOfDay)
             .OrderByDescending(ee => ee.CreatedAtUtc)
             .ToListAsync(cancellationToken);
+
+        // Map to DTOs on the client side
+        return excuses.Select(ee => new AttendanceExcuseDetailDto
+        {
+            Id = ee.Id,
+            EmployeeName = ee.Employee?.FullName ?? string.Empty,
+            ExcuseDate = ee.ExcuseDate,
+            ExcuseType = ee.ExcuseType,
+            ExcuseTypeDisplay = ee.ExcuseType == ExcuseType.PersonalExcuse ? "Personal Excuse" : "Official Duty",
+            StartTime = ee.StartTime,
+            EndTime = ee.EndTime,
+            DurationHours = ee.DurationHours,
+            Reason = ee.Reason,
+            ApprovalStatus = ee.ApprovalStatus,
+            ApprovalStatusDisplay = GetApprovalStatusDisplay(ee.ApprovalStatus),
+            ApprovedByName = ee.ApprovedBy?.Username,
+            ApprovedAt = ee.ApprovedAt,
+            RejectionReason = ee.RejectionReason,
+            HasAttachment = !string.IsNullOrEmpty(ee.AttachmentPath),
+            AttachmentPath = ee.AttachmentPath,
+            ProcessingNotes = ee.ProcessingNotes,
+            CreatedAtUtc = ee.CreatedAtUtc
+        }).ToList();
     }
 
     /// <summary>
@@ -132,6 +177,7 @@ public class GetLeaveExcuseDetailsQueryHandler : IRequestHandler<GetLeaveExcuseD
             ApprovalStatus.Pending => "Pending",
             ApprovalStatus.Approved => "Approved",
             ApprovalStatus.Rejected => "Rejected",
+            ApprovalStatus.Cancelled => "Cancelled",
             _ => "Unknown"
         };
     }

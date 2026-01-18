@@ -1,5 +1,19 @@
 import { PagedResult } from './employee.model';
 
+/**
+ * DTO representing a single approval step in workflow history.
+ */
+export interface ExcuseApprovalStepDto {
+  stepOrder: number;
+  stepName: string;
+  status: string;
+  assignedToName: string;
+  actionByName?: string;
+  assignedAt: string;
+  actionAt?: string;
+  comments?: string;
+}
+
 export interface EmployeeExcuseDto {
   id: number;
   employeeId: number;
@@ -9,19 +23,47 @@ export interface EmployeeExcuseDto {
   branchName: string;
   excuseDate: string;
   excuseType: ExcuseType;
+  excuseTypeDisplay: string;
   startTime: string;
   endTime: string;
+  timeRange: string;
   durationHours: number;
   reason: string;
-  status: ExcuseStatus;
-  submissionDate: string;
+  approvalStatus: ApprovalStatus;
+  approvalStatusDisplay: string;
+  approvedById?: number;
+  approvedByName?: string;
+  approvedAt?: string;
+  rejectionReason?: string;
+  attachmentPath?: string;
+  affectsSalary: boolean;
+  processingNotes?: string;
+  createdAtUtc: string;
+  createdBy: string;
+  modifiedAtUtc?: string;
+  modifiedBy?: string;
+  canBeModified: boolean;
+  excuseSummary: string;
+
+  // Legacy fields for backwards compatibility
+  status?: ExcuseStatus;
+  submissionDate?: string;
   reviewDate?: string;
   reviewerId?: number;
   reviewerName?: string;
   reviewerComments?: string;
   attachmentUrl?: string;
-  isWithinPolicy: boolean;
+  isWithinPolicy?: boolean;
   policyViolationReason?: string;
+
+  // Workflow information
+  workflowInstanceId?: number;
+  workflowStatus?: string;
+  currentApproverName?: string;
+  currentApproverRole?: string;
+  currentStepOrder?: number;
+  totalSteps?: number;
+  approvalHistory?: ExcuseApprovalStepDto[];
 }
 
 export enum ExcuseStatus {
@@ -34,6 +76,16 @@ export enum ExcuseStatus {
 export enum ExcuseType {
   PersonalExcuse = 'PersonalExcuse',
   OfficialDuty = 'OfficialDuty'
+}
+
+/**
+ * Approval status enum matching backend ApprovalStatus
+ */
+export enum ApprovalStatus {
+  Pending = 'Pending',
+  Approved = 'Approved',
+  Rejected = 'Rejected',
+  Cancelled = 'Cancelled'
 }
 
 export interface CreateEmployeeExcuseRequest {

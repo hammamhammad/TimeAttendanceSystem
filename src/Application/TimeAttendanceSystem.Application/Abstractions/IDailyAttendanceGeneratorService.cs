@@ -42,6 +42,16 @@ public interface IDailyAttendanceGeneratorService
     Task<AttendanceGenerationResult> RunDailyGenerationAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Runs attendance generation for a specific date.
+    /// Deletes existing records and regenerates them fresh.
+    /// </summary>
+    /// <param name="date">The date to generate attendance for</param>
+    /// <param name="branchId">Optional branch filter</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Generation result with statistics</returns>
+    Task<AttendanceGenerationResult> RunGenerationForDateAsync(DateTime date, long? branchId = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Recalculates attendance records that have new transactions.
     /// Updates existing records when transactions are added or modified.
     /// </summary>

@@ -6,19 +6,15 @@ namespace TimeAttendanceSystem.Application.Services;
 
 /// <summary>
 /// Service for managing in-app notifications.
-/// Handles notification creation, retrieval, and real-time delivery via SignalR.
+/// Handles notification creation and retrieval (database-only, no real-time delivery).
 /// </summary>
 public class InAppNotificationService : IInAppNotificationService
 {
     private readonly IApplicationDbContext _context;
-    private readonly INotificationHubContext _hubContext;
 
-    public InAppNotificationService(
-        IApplicationDbContext context,
-        INotificationHubContext hubContext)
+    public InAppNotificationService(IApplicationDbContext context)
     {
         _context = context;
-        _hubContext = hubContext;
     }
 
     /// <inheritdoc />
@@ -40,14 +36,6 @@ public class InAppNotificationService : IInAppNotificationService
 
         _context.Notifications.Add(entity);
         await _context.SaveChangesAsync(cancellationToken);
-
-        // Send real-time notification via SignalR
-        var dto = MapToDto(entity);
-        await _hubContext.SendNotificationToUserAsync(notification.UserId, dto);
-
-        // Send updated unread count
-        var unreadCount = await GetUnreadCountAsync(notification.UserId, cancellationToken);
-        await _hubContext.SendUnreadCountUpdateAsync(notification.UserId, unreadCount);
 
         return entity.Id;
     }
@@ -71,21 +59,6 @@ public class InAppNotificationService : IInAppNotificationService
 
         _context.Notifications.AddRange(entities);
         await _context.SaveChangesAsync(cancellationToken);
-
-        // Send real-time notifications via SignalR
-        var userNotifications = entities.GroupBy(e => e.UserId);
-        foreach (var group in userNotifications)
-        {
-            foreach (var entity in group)
-            {
-                var dto = MapToDto(entity);
-                await _hubContext.SendNotificationToUserAsync(group.Key, dto);
-            }
-
-            // Send updated unread count for each user
-            var unreadCount = await GetUnreadCountAsync(group.Key, cancellationToken);
-            await _hubContext.SendUnreadCountUpdateAsync(group.Key, unreadCount);
-        }
     }
 
     /// <inheritdoc />
@@ -125,10 +98,6 @@ public class InAppNotificationService : IInAppNotificationService
             notification.IsRead = true;
             notification.ReadAt = DateTime.UtcNow;
             await _context.SaveChangesAsync(cancellationToken);
-
-            // Send updated unread count
-            var unreadCount = await GetUnreadCountAsync(userId, cancellationToken);
-            await _hubContext.SendUnreadCountUpdateAsync(userId, unreadCount);
         }
     }
 
@@ -148,9 +117,6 @@ public class InAppNotificationService : IInAppNotificationService
                 notification.ReadAt = now;
             }
             await _context.SaveChangesAsync(cancellationToken);
-
-            // Send updated unread count (0)
-            await _hubContext.SendUnreadCountUpdateAsync(userId, 0);
         }
     }
 
@@ -164,13 +130,26 @@ public class InAppNotificationService : IInAppNotificationService
         {
             notification.IsDeleted = true;
             await _context.SaveChangesAsync(cancellationToken);
+        }
+    }
 
-            // Send updated unread count if the notification was unread
-            if (!notification.IsRead)
+    /// <inheritdoc />
+    public async Task MarkEntityNotificationsAsReadAsync(string entityType, long entityId, CancellationToken cancellationToken = default)
+    {
+        var notifications = await _context.Notifications
+            .Where(n => n.EntityType == entityType && n.EntityId == entityId && !n.IsRead)
+            .ToListAsync(cancellationToken);
+
+        if (notifications.Any())
+        {
+            var now = DateTime.UtcNow;
+            foreach (var notification in notifications)
             {
-                var unreadCount = await GetUnreadCountAsync(userId, cancellationToken);
-                await _hubContext.SendUnreadCountUpdateAsync(userId, unreadCount);
+                notification.IsRead = true;
+                notification.ReadAt = now;
             }
+
+            await _context.SaveChangesAsync(cancellationToken);
         }
     }
 

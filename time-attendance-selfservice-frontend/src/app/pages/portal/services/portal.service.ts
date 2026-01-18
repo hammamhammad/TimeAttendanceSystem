@@ -1,6 +1,6 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, tap, catchError, throwError, map } from 'rxjs';
+import { Observable, tap, catchError, throwError, map, of } from 'rxjs';
 import { NotificationService } from '../../../core/notifications/notification.service';
 import { environment } from '../../../../environments/environment';
 import {
@@ -824,4 +824,86 @@ export class PortalService {
     this._pendingApprovals.set([]);
     this._pendingApprovalsError.set(null);
   }
+
+  /**
+   * Gets workflow instance details by ID.
+   * Used to redirect from old notification URLs with workflowId to proper entity pages.
+   */
+  getWorkflowInstance(workflowInstanceId: number): Observable<WorkflowInstanceDto> {
+    return this.http.get<WorkflowInstanceDto>(
+      `${environment.apiUrl}/api/v1/workflows/instances/${workflowInstanceId}`
+    );
+  }
+
+  // ===== DELEGATION EMPLOYEE SEARCH =====
+
+  /**
+   * Search employees for delegation purposes.
+   * Uses the dedicated delegation-employees endpoint to search ALL employees with user accounts.
+   */
+  searchEmployeesForDelegation(searchTerm: string): Observable<DelegationEmployee[]> {
+    let params = new HttpParams();
+    params = params.set('searchTerm', searchTerm);
+    params = params.set('pageSize', '20');
+
+    return this.http.get<any[]>(
+      `${this.portalApiUrl}/delegation-employees`,
+      { params }
+    ).pipe(
+      map(response => {
+        // Backend returns array of DelegationEmployeeDto directly
+        if (!response || !Array.isArray(response)) {
+          return [];
+        }
+
+        return response.map((emp: any) => ({
+          id: emp.employeeId,
+          userId: emp.userId,
+          fullName: emp.fullName,
+          fullNameAr: emp.fullNameAr,
+          jobTitle: emp.jobTitle,
+          departmentName: emp.departmentName,
+          email: emp.email
+        }));
+      }),
+      catchError(error => {
+        console.error('Error searching employees for delegation:', error);
+        return of([]);
+      })
+    );
+  }
+}
+
+/**
+ * DTO for delegation employee search results
+ */
+export interface DelegationEmployee {
+  id: number;
+  userId: number;
+  fullName: string;
+  fullNameAr?: string;
+  jobTitle?: string;
+  departmentName?: string;
+  email?: string;
+}
+
+/**
+ * DTO for workflow instance details
+ */
+export interface WorkflowInstanceDto {
+  id: number;
+  workflowDefinitionId: number;
+  workflowName: string;
+  entityType: string;
+  entityTypeName: string;
+  entityId: number;
+  status: number;
+  statusName: string;
+  requestedByUserId: number;
+  requestedByUserName: string;
+  requestedAt: string;
+  completedAt?: string;
+  currentStepOrder: number;
+  currentStepName: string;
+  totalSteps: number;
 }

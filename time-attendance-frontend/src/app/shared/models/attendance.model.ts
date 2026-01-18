@@ -31,6 +31,23 @@ export enum AttendanceReportType {
   Custom = 3
 }
 
+export interface ShiftPeriodInfo {
+  startTime: string;
+  endTime: string;
+  isBreak: boolean;
+}
+
+export interface ShiftInfo {
+  id: number;
+  name: string;
+  nameAr?: string;
+  shiftType: string;
+  startTime?: string;
+  endTime?: string;
+  totalHours: number;
+  periods: ShiftPeriodInfo[];
+}
+
 export interface AttendanceRecord {
   id: number;
   employeeId: number;
@@ -59,6 +76,7 @@ export interface AttendanceRecord {
   notes?: string;
   transactions: AttendanceTransaction[];
   workingDayAnalysis?: WorkingDayAnalysis;
+  shift?: ShiftInfo;
 }
 
 export interface AttendanceTransaction {

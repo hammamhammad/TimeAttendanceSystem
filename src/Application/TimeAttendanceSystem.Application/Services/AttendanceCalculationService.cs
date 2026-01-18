@@ -1,11 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using TimeAttendanceSystem.Application.Abstractions;
+using TimeAttendanceSystem.Application.Extensions;
 using TimeAttendanceSystem.Domain.Attendance;
 using TimeAttendanceSystem.Domain.Shifts;
 using TimeAttendanceSystem.Domain.Common;
 using TimeAttendanceSystem.Domain.Vacations;
 using TimeAttendanceSystem.Domain.RemoteWork;
+using TimeAttendanceSystem.Domain.Excuses;
 
 namespace TimeAttendanceSystem.Application.Services;
 
@@ -57,12 +59,15 @@ public class AttendanceCalculationService : IAttendanceCalculationService
         // Determine attendance status first to check if it's a holiday
         var status = await DetermineAttendanceStatusAsync(employeeId, shift, transactionsList, attendanceDate, cancellationToken);
 
-        // Calculate late and early leave minutes ONLY if it's NOT a holiday
-        // On holidays, employees should not be penalized for lateness or early leave
+        // Calculate late and early leave minutes ONLY if it's NOT a holiday, excused, or on duty
+        // On holidays and excused days, employees should not be penalized for lateness or early leave
         var lateMinutes = 0;
         var earlyLeaveMinutes = 0;
 
-        if (status != AttendanceStatus.Holiday)
+        if (status != AttendanceStatus.Holiday &&
+            status != AttendanceStatus.Excused &&
+            status != AttendanceStatus.OnDuty &&
+            status != AttendanceStatus.OnLeave)
         {
             lateMinutes = await CalculateLateMinutesAsync(
                 scheduledStartTime,
@@ -76,6 +81,33 @@ public class AttendanceCalculationService : IAttendanceCalculationService
                 checkInTransaction?.TransactionTimeLocal,
                 shift,
                 cancellationToken);
+
+            // Apply excuse offsets to late and early leave minutes for partial excuses
+            var approvedExcuses = await GetApprovedExcusesForDateAsync(employeeId, attendanceDate, cancellationToken);
+            if (approvedExcuses.Any())
+            {
+                var excuseOffset = CalculateExcuseOffset(
+                    approvedExcuses,
+                    scheduledStartTime,
+                    scheduledEndTime,
+                    checkInTransaction?.TransactionTimeLocal,
+                    checkOutTransaction?.TransactionTimeLocal,
+                    shift);
+
+                // Offset late minutes (cannot go negative)
+                var originalLateMinutes = lateMinutes;
+                lateMinutes = Math.Max(0, lateMinutes - excuseOffset.LateMinutesOffset);
+
+                // Offset early leave minutes (cannot go negative)
+                var originalEarlyLeaveMinutes = earlyLeaveMinutes;
+                earlyLeaveMinutes = Math.Max(0, earlyLeaveMinutes - excuseOffset.EarlyLeaveMinutesOffset);
+
+                if (originalLateMinutes != lateMinutes || originalEarlyLeaveMinutes != earlyLeaveMinutes)
+                {
+                    _logger?.LogDebug("Applied excuse offset for employee {EmployeeId} on {Date}. Late: {OriginalLate} -> {AdjustedLate}, Early: {OriginalEarly} -> {AdjustedEarly}",
+                        employeeId, attendanceDate.Date, originalLateMinutes, lateMinutes, originalEarlyLeaveMinutes, earlyLeaveMinutes);
+                }
+            }
         }
 
         // Calculate comprehensive overtime details
@@ -253,13 +285,14 @@ public class AttendanceCalculationService : IAttendanceCalculationService
             }
 
             // Rule 1.5: Check for approved leave SECOND (higher priority than day off)
+            var normalizedAttendanceDate = attendanceDate.ToUtcDate();
             var isOnLeave = await _context.EmployeeVacations
                 .AsNoTracking()
                 .AnyAsync(ev => ev.EmployeeId == employeeId &&
                               ev.IsApproved &&
                               !ev.IsDeleted &&
-                              attendanceDate.Date >= ev.StartDate.Date &&
-                              attendanceDate.Date <= ev.EndDate.Date,
+                              normalizedAttendanceDate >= ev.StartDate.Date &&
+                              normalizedAttendanceDate <= ev.EndDate.Date,
                          cancellationToken);
 
             if (isOnLeave)
@@ -285,6 +318,33 @@ public class AttendanceCalculationService : IAttendanceCalculationService
                 _logger?.LogInformation("Approved remote work detected for date {Date} and employee {EmployeeId}. Setting status to RemoteWork.",
                     attendanceDate.Date, employeeId);
                 return AttendanceStatus.RemoteWork; // Approved remote work - mark as RemoteWork
+            }
+
+            // Rule 1.7: Check for approved FULL-DAY excuses FOURTH (higher priority than day off for full-day excuses)
+            var approvedExcuses = await GetApprovedExcusesForDateAsync(employeeId, attendanceDate, cancellationToken);
+            if (approvedExcuses.Any())
+            {
+                var totalExcuseHours = approvedExcuses.Sum(e => e.DurationHours);
+
+                // For full-day excuses (8+ hours or covers entire scheduled shift), set status directly
+                if (totalExcuseHours >= 8m)
+                {
+                    var dominantExcuseType = approvedExcuses.OrderByDescending(e => e.DurationHours).First().ExcuseType;
+                    if (dominantExcuseType == ExcuseType.OfficialDuty)
+                    {
+                        _logger?.LogInformation("Full-day official duty detected for date {Date} and employee {EmployeeId}. Setting status to OnDuty.",
+                            attendanceDate.Date, employeeId);
+                        return AttendanceStatus.OnDuty;
+                    }
+                    else
+                    {
+                        _logger?.LogInformation("Full-day excuse detected for date {Date} and employee {EmployeeId}. Setting status to Excused.",
+                            attendanceDate.Date, employeeId);
+                        return AttendanceStatus.Excused;
+                    }
+                }
+                // For partial excuses, continue with normal status determination
+                // The late/early minutes will be adjusted in CalculateAttendanceAsync
             }
 
             // Log if employee not found for debugging
@@ -982,13 +1042,16 @@ public class AttendanceCalculationService : IAttendanceCalculationService
         if (employee == null)
             return null;
 
+        // Normalize date to UTC for PostgreSQL timestamp with time zone comparisons
+        var normalizedDate = date.ToUtcDate();
+
         // Get all potential shift assignments for the date
         var assignments = await _context.ShiftAssignments
             .Include(sa => sa.Shift)
                 .ThenInclude(s => s.ShiftPeriods)
             .Where(sa => sa.Status == ShiftAssignmentStatus.Active &&
-                        sa.EffectiveFromDate.Date <= date.Date &&
-                        (!sa.EffectiveToDate.HasValue || sa.EffectiveToDate.Value.Date >= date.Date))
+                        sa.EffectiveFromDate.Date <= normalizedDate &&
+                        (!sa.EffectiveToDate.HasValue || sa.EffectiveToDate.Value.Date >= normalizedDate))
             .Where(sa =>
                 (sa.AssignmentType == ShiftAssignmentType.Employee && sa.EmployeeId == employeeId) ||
                 (sa.AssignmentType == ShiftAssignmentType.Department && sa.DepartmentId == employee.DepartmentId) ||
@@ -1068,4 +1131,176 @@ public class AttendanceCalculationService : IAttendanceCalculationService
         public DateTime End { get; set; }
         public decimal Duration { get; set; }
     }
+
+    /// <summary>
+    /// Gets all approved excuses for an employee on a specific date.
+    /// </summary>
+    private async Task<List<EmployeeExcuse>> GetApprovedExcusesForDateAsync(
+        long employeeId,
+        DateTime date,
+        CancellationToken cancellationToken)
+    {
+        var normalizedDate = date.ToUtcDate();
+        return await _context.EmployeeExcuses
+            .AsNoTracking()
+            .Where(ee => ee.EmployeeId == employeeId &&
+                        ee.ExcuseDate.Date == normalizedDate &&
+                        ee.ApprovalStatus == ApprovalStatus.Approved &&
+                        !ee.IsDeleted)
+            .OrderBy(ee => ee.StartTime)
+            .ToListAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Calculates how many minutes of late/early leave are covered by approved excuses.
+    /// For flexible shifts, uses the effective late period start (end of flexible window)
+    /// and the required end time (based on check-in + 8 hours) for accurate offset calculation.
+    /// </summary>
+    /// <param name="excuses">List of approved excuses for the date</param>
+    /// <param name="scheduledStartTime">Shift scheduled start time</param>
+    /// <param name="scheduledEndTime">Shift scheduled end time</param>
+    /// <param name="actualCheckInTime">Actual check-in time</param>
+    /// <param name="actualCheckOutTime">Actual check-out time</param>
+    /// <param name="shift">Shift information for flexible hours calculation</param>
+    /// <returns>Offset values for late and early leave minutes</returns>
+    private ExcuseOffset CalculateExcuseOffset(
+        List<EmployeeExcuse> excuses,
+        TimeOnly? scheduledStartTime,
+        TimeOnly? scheduledEndTime,
+        DateTime? actualCheckInTime,
+        DateTime? actualCheckOutTime,
+        Shift? shift = null)
+    {
+        if (!excuses.Any())
+            return new ExcuseOffset(0, 0, false, null);
+
+        int lateMinutesOffset = 0;
+        int earlyLeaveOffset = 0;
+
+        // Calculate late minutes offset
+        // For flexible shifts: late period starts from the end of the flexible arrival window
+        // For regular shifts: late period starts from the scheduled start time
+        if (scheduledStartTime.HasValue && actualCheckInTime.HasValue)
+        {
+            var checkInTimeOnly = TimeOnly.FromDateTime(actualCheckInTime.Value);
+
+            // Determine the effective late period start based on shift type
+            TimeOnly effectiveLatePeriodStart;
+            if (shift != null && shift.AllowFlexibleHours)
+            {
+                // For flexible shifts, late period starts at the END of the flexible arrival window
+                var flexMinutesAfter = shift.FlexMinutesAfter ?? 0;
+                effectiveLatePeriodStart = scheduledStartTime.Value.AddMinutes(flexMinutesAfter);
+            }
+            else
+            {
+                // For regular shifts, use the scheduled start time
+                effectiveLatePeriodStart = scheduledStartTime.Value;
+            }
+
+            // Only calculate offset if employee was actually late (check-in after effective late period start)
+            if (checkInTimeOnly > effectiveLatePeriodStart)
+            {
+                foreach (var excuse in excuses)
+                {
+                    // Calculate the overlap between excuse period and late period
+                    // Late period: [effectiveLatePeriodStart, checkInTimeOnly]
+                    // Excuse period: [excuse.StartTime, excuse.EndTime]
+
+                    var latePeriodStart = effectiveLatePeriodStart;
+                    var latePeriodEnd = checkInTimeOnly;
+
+                    // Find the intersection of excuse period and late period
+                    var overlapStart = excuse.StartTime > latePeriodStart ? excuse.StartTime : latePeriodStart;
+                    var overlapEnd = excuse.EndTime < latePeriodEnd ? excuse.EndTime : latePeriodEnd;
+
+                    // If there's a valid overlap (start < end), calculate covered minutes
+                    if (overlapStart < overlapEnd)
+                    {
+                        var coveredMinutes = (int)(overlapEnd - overlapStart).TotalMinutes;
+                        lateMinutesOffset += coveredMinutes;
+                    }
+                }
+            }
+        }
+
+        // Calculate early leave offset
+        // For flexible shifts: use the required end time (check-in + 8 hours, constrained to flexible bounds)
+        // For regular shifts: use the scheduled end time
+        if (scheduledEndTime.HasValue && actualCheckOutTime.HasValue)
+        {
+            var checkOutTimeOnly = TimeOnly.FromDateTime(actualCheckOutTime.Value);
+
+            // Determine the effective required end time based on shift type
+            TimeOnly effectiveRequiredEndTime;
+            if (shift != null && shift.AllowFlexibleHours && actualCheckInTime.HasValue)
+            {
+                // For flexible shifts, employee must work the full required hours from check-in time
+                var requiredWorkingHours = 8.0m; // Standard 8-hour shift
+                var requiredEndTime = TimeOnly.FromDateTime(actualCheckInTime.Value).AddMinutes((int)(requiredWorkingHours * 60));
+
+                // Apply flexible hours constraints
+                var baseShiftEnd = scheduledEndTime.Value;
+                var flexMinutesBefore = shift.FlexMinutesBefore ?? 30;
+                var flexMinutesAfter = shift.FlexMinutesAfter ?? 60;
+
+                var earliestAllowedEnd = baseShiftEnd.AddMinutes(-flexMinutesBefore);
+                var latestAllowedEnd = baseShiftEnd.AddMinutes(flexMinutesAfter);
+
+                // Constrain the required end time within flexible bounds
+                if (requiredEndTime < earliestAllowedEnd)
+                    requiredEndTime = earliestAllowedEnd;
+                else if (requiredEndTime > latestAllowedEnd)
+                    requiredEndTime = latestAllowedEnd;
+
+                effectiveRequiredEndTime = requiredEndTime;
+            }
+            else
+            {
+                // For regular shifts, use the scheduled end time
+                effectiveRequiredEndTime = scheduledEndTime.Value;
+            }
+
+            // Only calculate offset if employee left early (check-out before required end time)
+            if (checkOutTimeOnly < effectiveRequiredEndTime)
+            {
+                foreach (var excuse in excuses)
+                {
+                    // Calculate the overlap between excuse period and early leave period
+                    // Early leave period: [checkOutTimeOnly, effectiveRequiredEndTime]
+                    // Excuse period: [excuse.StartTime, excuse.EndTime]
+
+                    var earlyLeavePeriodStart = checkOutTimeOnly;
+                    var earlyLeavePeriodEnd = effectiveRequiredEndTime;
+
+                    // Find the intersection of excuse period and early leave period
+                    var overlapStart = excuse.StartTime > earlyLeavePeriodStart ? excuse.StartTime : earlyLeavePeriodStart;
+                    var overlapEnd = excuse.EndTime < earlyLeavePeriodEnd ? excuse.EndTime : earlyLeavePeriodEnd;
+
+                    // If there's a valid overlap (start < end), calculate covered minutes
+                    if (overlapStart < overlapEnd)
+                    {
+                        var coveredMinutes = (int)(overlapEnd - overlapStart).TotalMinutes;
+                        earlyLeaveOffset += coveredMinutes;
+                    }
+                }
+            }
+        }
+
+        // Determine if it's a full-day excuse and the dominant excuse type
+        var totalExcuseHours = excuses.Sum(e => e.DurationHours);
+        var isFullDayExcuse = totalExcuseHours >= 8m;
+        var dominantExcuseType = excuses.OrderByDescending(e => e.DurationHours).FirstOrDefault()?.ExcuseType;
+
+        return new ExcuseOffset(lateMinutesOffset, earlyLeaveOffset, isFullDayExcuse, dominantExcuseType);
+    }
+
+    /// <summary>
+    /// Record for excuse offset calculation results.
+    /// </summary>
+    private record ExcuseOffset(
+        int LateMinutesOffset,
+        int EarlyLeaveMinutesOffset,
+        bool IsFullDayExcuse,
+        ExcuseType? DominantExcuseType);
 }

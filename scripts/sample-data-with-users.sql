@@ -357,8 +357,39 @@ BEGIN
       AND vt."Id" != 3  -- Skip Unpaid Leave (no balance needed)
     ON CONFLICT DO NOTHING;
 
+    -- ============================================
+    -- Step 11: Assign Default Shift to All Branches
+    -- ============================================
+    -- This ensures all employees have shift coverage through branch-level assignment
+    -- The default shift (ID 1) is created by the system seeder
+
+    -- First, get the default shift ID
+    DECLARE
+        v_default_shift_id BIGINT;
+    BEGIN
+        SELECT "Id" INTO v_default_shift_id FROM "Shifts" WHERE "IsDefault" = true AND NOT "IsDeleted" LIMIT 1;
+
+        IF v_default_shift_id IS NOT NULL THEN
+            -- Create branch-level shift assignments for all sample branches
+            -- AssignmentType: 1=Employee, 2=Department, 3=Branch
+            INSERT INTO "ShiftAssignments" ("ShiftId", "AssignmentType", "BranchId", "EffectiveFromDate", "Status", "Priority", "Notes", "AssignedByUserId", "CreatedAtUtc", "CreatedBy", "IsDeleted", "RowVersion")
+            VALUES
+                (v_default_shift_id, 3, 101, '2020-01-01', 2, 10, 'Default shift assignment for Headquarters', 1, v_now, 'SYSTEM', false, E'\\x00'),
+                (v_default_shift_id, 3, 102, '2020-01-01', 2, 10, 'Default shift assignment for Jeddah Branch', 1, v_now, 'SYSTEM', false, E'\\x00'),
+                (v_default_shift_id, 3, 103, '2020-01-01', 2, 10, 'Default shift assignment for Dammam Branch', 1, v_now, 'SYSTEM', false, E'\\x00'),
+                (v_default_shift_id, 3, 104, '2020-01-01', 2, 10, 'Default shift assignment for Madinah Branch', 1, v_now, 'SYSTEM', false, E'\\x00'),
+                (v_default_shift_id, 3, 105, '2020-01-01', 2, 10, 'Default shift assignment for Makkah Branch', 1, v_now, 'SYSTEM', false, E'\\x00')
+            ON CONFLICT DO NOTHING;
+
+            RAISE NOTICE 'Assigned default shift (ID: %) to all 5 branches', v_default_shift_id;
+        ELSE
+            RAISE WARNING 'Default shift not found! Please run the system seeder first to create the default shift.';
+        END IF;
+    END;
+
     RAISE NOTICE 'Sample data inserted successfully!';
     RAISE NOTICE 'Created: 5 Branches, 20 Departments, 50 Employees with User Accounts';
+    RAISE NOTICE 'Created: 5 Branch-level Shift Assignments (default shift for all branches)';
     RAISE NOTICE 'Created: 700 Leave Balances (50 employees x 7 vacation types x 2 years)';
     RAISE NOTICE 'Default password for all employees: Emp@123!';
     RAISE NOTICE 'All users have MustChangePassword=true (will be forced to change on first login)';
@@ -378,6 +409,11 @@ END $$;
 --   - Branch Managers (1001-1005): Manager role, no manager
 --   - Department Managers (1006-1025): Manager + Employee roles, report to Branch Managers
 --   - Regular Employees (1026-1050): Employee role, report to Department Managers
+--
+-- Shift Assignments: 5 branch-level assignments
+--   - Default shift assigned to all 5 branches
+--   - All employees inherit shift through branch assignment
+--   - Effective from 2020-01-01 (covers all employees)
 --
 -- Leave Balances: 700 total (50 employees x 7 vacation types x 2 years)
 --   - Years: 2025, 2026

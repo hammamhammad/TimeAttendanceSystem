@@ -22,8 +22,8 @@ public class CreateEmployeeExcuseRequest
 {
     public long EmployeeId { get; set; }
     public DateTime ExcuseDate { get; set; }
-    public TimeOnly StartTime { get; set; }
-    public TimeOnly EndTime { get; set; }
+    public string StartTime { get; set; } = string.Empty;
+    public string EndTime { get; set; } = string.Empty;
     public string Reason { get; set; } = string.Empty;
     public Domain.Excuses.ExcuseType ExcuseType { get; set; } = Domain.Excuses.ExcuseType.PersonalExcuse;
 }
@@ -35,8 +35,8 @@ public class UpdateEmployeeExcuseRequest
 {
     public DateTime ExcuseDate { get; set; }
     public ExcuseType ExcuseType { get; set; }
-    public TimeOnly StartTime { get; set; }
-    public TimeOnly EndTime { get; set; }
+    public string StartTime { get; set; } = string.Empty;
+    public string EndTime { get; set; } = string.Empty;
     public string Reason { get; set; } = string.Empty;
     public ApprovalStatus ApprovalStatus { get; set; }
     public string? ReviewerComments { get; set; }
@@ -127,6 +127,16 @@ public class EmployeeExcusesController : ControllerBase
     public async Task<IActionResult> CreateEmployeeExcuse(
         [FromBody] CreateEmployeeExcuseRequest request)
     {
+        // Parse time strings to TimeOnly
+        if (!TimeOnly.TryParse(request.StartTime, out var startTime))
+        {
+            return BadRequest(Result<long>.Failure("Invalid start time format. Use HH:mm format."));
+        }
+        if (!TimeOnly.TryParse(request.EndTime, out var endTime))
+        {
+            return BadRequest(Result<long>.Failure("Invalid end time format. Use HH:mm format."));
+        }
+
         // TODO: File upload functionality will be implemented later
         string? attachmentPath = null;
 
@@ -134,8 +144,8 @@ public class EmployeeExcusesController : ControllerBase
             request.EmployeeId,
             request.ExcuseDate,
             request.ExcuseType,
-            request.StartTime,
-            request.EndTime,
+            startTime,
+            endTime,
             request.Reason,
             attachmentPath
         );
@@ -145,9 +155,9 @@ public class EmployeeExcusesController : ControllerBase
         if (result.IsSuccess)
         {
             return CreatedAtAction(
-                nameof(GetEmployeeExcuses),
-                new { },
-                result);
+                nameof(GetEmployeeExcuseById),
+                new { id = result.Value },
+                result.Value);
         }
 
         return BadRequest(result);
@@ -354,6 +364,16 @@ public class EmployeeExcusesController : ControllerBase
         long id,
         [FromBody] UpdateEmployeeExcuseRequest request)
     {
+        // Parse time strings to TimeOnly
+        if (!TimeOnly.TryParse(request.StartTime, out var startTime))
+        {
+            return BadRequest(Result<bool>.Failure("Invalid start time format. Use HH:mm format."));
+        }
+        if (!TimeOnly.TryParse(request.EndTime, out var endTime))
+        {
+            return BadRequest(Result<bool>.Failure("Invalid end time format. Use HH:mm format."));
+        }
+
         // TODO: File upload functionality will be implemented later
         string? attachmentPath = null;
 
@@ -361,8 +381,8 @@ public class EmployeeExcusesController : ControllerBase
             id,
             request.ExcuseDate,
             request.ExcuseType,
-            request.StartTime,
-            request.EndTime,
+            startTime,
+            endTime,
             request.Reason,
             request.ApprovalStatus,
             request.ReviewerComments,

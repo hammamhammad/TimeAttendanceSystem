@@ -11,6 +11,11 @@ public class TeamMemberDto
     public long EmployeeId { get; set; }
 
     /// <summary>
+    /// Linked User ID (if the employee has a user account)
+    /// </summary>
+    public long? UserId { get; set; }
+
+    /// <summary>
     /// Employee code
     /// </summary>
     public string EmployeeCode { get; set; } = string.Empty;

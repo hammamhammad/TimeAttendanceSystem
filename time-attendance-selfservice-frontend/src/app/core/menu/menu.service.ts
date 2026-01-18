@@ -60,6 +60,16 @@ export class MenuService {
     }
   ];
 
+  // Approval menu items (visible to all users - anyone can receive delegated approvals)
+  private readonly approvalMenuItems: MenuItem[] = [
+    {
+      path: '/pending-approvals',
+      titleKey: 'portal.pending_approvals',
+      icon: 'bi bi-clipboard-check',
+      isManagerOnly: false
+    }
+  ];
+
   // Manager menu items (visible only to managers)
   private readonly managerMenuItems: MenuItem[] = [
     {
@@ -80,12 +90,6 @@ export class MenuService {
       titleKey: 'portal.team_members',
       icon: 'bi bi-people',
       isManagerOnly: true
-    },
-    {
-      path: '/pending-approvals',
-      titleKey: 'portal.pending_approvals',
-      icon: 'bi bi-clipboard-check',
-      isManagerOnly: true
     }
   ];
 
@@ -94,6 +98,10 @@ export class MenuService {
     const isManager = this.authService.isManager();
     const items = [...this.employeeMenuItems];
 
+    // Pending Approvals is visible to all users (anyone can receive delegated approvals)
+    items.push(...this.approvalMenuItems);
+
+    // Manager-specific items only visible to managers
     if (isManager) {
       items.push(...this.managerMenuItems);
     }

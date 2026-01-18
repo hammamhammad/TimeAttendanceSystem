@@ -81,7 +81,9 @@ export class DailyAttendanceComponent implements OnInit, OnDestroy {
         record.employeeName.toLowerCase().includes(search) ||
         record.employeeNumber.toLowerCase().includes(search);
 
-      const matchesStatus = status === null || record.status === status;
+      // Normalize status for comparison (API returns strings, frontend uses numbers)
+      const normalizedRecordStatus = this.normalizeStatusValue(record.status);
+      const matchesStatus = status === null || normalizedRecordStatus === status;
 
       return matchesSearch && matchesStatus;
     });
@@ -131,10 +133,10 @@ export class DailyAttendanceComponent implements OnInit, OnDestroy {
   // Statistics computed from filtered records
   totalEmployees = computed(() => this.filteredRecords().length);
   presentEmployees = computed(() =>
-    this.filteredRecords().filter(r => r.status === AttendanceStatus.Present).length
+    this.filteredRecords().filter(r => this.normalizeStatusValue(r.status) === AttendanceStatus.Present).length
   );
   absentEmployees = computed(() =>
-    this.filteredRecords().filter(r => r.status === AttendanceStatus.Absent).length
+    this.filteredRecords().filter(r => this.normalizeStatusValue(r.status) === AttendanceStatus.Absent).length
   );
   lateEmployees = computed(() =>
     this.filteredRecords().filter(r => this.calculateTotalLateMinutes(r) > 0).length
@@ -374,11 +376,12 @@ export class DailyAttendanceComponent implements OnInit, OnDestroy {
       return 0;
     }
 
-    const presentRecords = records.filter(r =>
-      r.status === AttendanceStatus.Present ||
-      r.status === AttendanceStatus.Late ||
-      r.status === AttendanceStatus.Overtime
-    ).length;
+    const presentRecords = records.filter(r => {
+      const normalizedStatus = this.normalizeStatusValue(r.status);
+      return normalizedStatus === AttendanceStatus.Present ||
+             normalizedStatus === AttendanceStatus.Late ||
+             normalizedStatus === AttendanceStatus.Overtime;
+    }).length;
 
     return Math.round((presentRecords / totalRecords) * 100);
   }
@@ -625,11 +628,48 @@ export class DailyAttendanceComponent implements OnInit, OnDestroy {
     });
   }
 
+  // Status map for normalizing string enum values from API
+  private readonly statusMap: Record<string, AttendanceStatus> = {
+    'Present': AttendanceStatus.Present,
+    'Absent': AttendanceStatus.Absent,
+    'Late': AttendanceStatus.Late,
+    'EarlyLeave': AttendanceStatus.EarlyLeave,
+    'OnLeave': AttendanceStatus.OnLeave,
+    'DayOff': AttendanceStatus.DayOff,
+    'Overtime': AttendanceStatus.Overtime,
+    'Incomplete': AttendanceStatus.Incomplete,
+    'Holiday': AttendanceStatus.Holiday,
+    'SickLeave': AttendanceStatus.SickLeave,
+    'Pending': AttendanceStatus.Pending,
+    'OnDuty': AttendanceStatus.OnDuty,
+    'Excused': AttendanceStatus.Excused,
+    'RemoteWork': AttendanceStatus.RemoteWork
+  };
+
+  /**
+   * Normalize status value to handle both string and numeric enum values
+   * API returns strings due to JsonStringEnumConverter
+   */
+  normalizeStatusValue = (status: AttendanceStatus | string): AttendanceStatus => {
+    if (typeof status === 'number') {
+      return status;
+    }
+    return this.statusMap[status as string] ?? AttendanceStatus.Pending;
+  };
+
+  /**
+   * Wrapper method for normalizeStatusValue
+   */
+  private normalizeStatus(status: AttendanceStatus | string): AttendanceStatus {
+    return this.normalizeStatusValue(status);
+  }
+
   /**
    * Get status badge class for attendance status
    */
   getStatusBadgeClass(status: AttendanceStatus): string {
-    switch (status) {
+    const normalizedStatus = this.normalizeStatus(status);
+    switch (normalizedStatus) {
       case AttendanceStatus.Present:
         return 'badge bg-success';
       case AttendanceStatus.Absent:
@@ -665,7 +705,8 @@ export class DailyAttendanceComponent implements OnInit, OnDestroy {
    * Get status text translation key
    */
   getStatusText(status: AttendanceStatus): string {
-    switch (status) {
+    const normalizedStatus = this.normalizeStatus(status);
+    switch (normalizedStatus) {
       case AttendanceStatus.Present:
         return 'attendance.status.present';
       case AttendanceStatus.Absent:
@@ -1265,10 +1306,11 @@ export class DailyAttendanceComponent implements OnInit, OnDestroy {
    * Check if any employee has incomplete status that might benefit from recalculation
    */
   hasIncompleteRecords(): boolean {
-    return this.filteredRecords().some(record =>
-      record.status === AttendanceStatus.Incomplete ||
-      record.status === AttendanceStatus.Pending
-    );
+    return this.filteredRecords().some(record => {
+      const normalizedStatus = this.normalizeStatusValue(record.status);
+      return normalizedStatus === AttendanceStatus.Incomplete ||
+             normalizedStatus === AttendanceStatus.Pending;
+    });
   }
 
   /**

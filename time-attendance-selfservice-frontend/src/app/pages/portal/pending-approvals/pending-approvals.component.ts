@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 
@@ -33,6 +33,7 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
 export class PendingApprovalsComponent implements OnInit, OnDestroy {
   private readonly portalService = inject(PortalService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   readonly i18n = inject(I18nService);
   private readonly notification = inject(NotificationService);
   private readonly confirmation = inject(ConfirmationService);
@@ -104,6 +105,51 @@ export class PendingApprovalsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadPendingApprovals();
+    this.checkForWorkflowRedirect();
+  }
+
+  /**
+   * Check if there's a workflowId query parameter and redirect to the appropriate entity page.
+   * This handles old notification URLs that use workflowId instead of direct entity links.
+   */
+  private checkForWorkflowRedirect(): void {
+    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
+      const workflowId = params['workflowId'];
+      if (workflowId) {
+        const workflowIdNum = parseInt(workflowId, 10);
+        if (!isNaN(workflowIdNum)) {
+          this.redirectToEntityFromWorkflow(workflowIdNum);
+        }
+      }
+    });
+  }
+
+  /**
+   * Fetches workflow instance details and redirects to the appropriate entity page.
+   */
+  private redirectToEntityFromWorkflow(workflowInstanceId: number): void {
+    this.portalService.getWorkflowInstance(workflowInstanceId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (workflow) => {
+          const routeMap: Record<string, string> = {
+            'Vacation': '/vacation-requests',
+            'Excuse': '/excuse-requests',
+            'RemoteWork': '/remote-work-requests',
+            'Fingerprint': '/fingerprint-requests',
+            'FingerprintRequest': '/fingerprint-requests'
+          };
+
+          const route = routeMap[workflow.entityType] || routeMap[workflow.entityTypeName];
+          if (route) {
+            this.router.navigate([route, workflow.entityId], { queryParams: { approval: 'true' } });
+          }
+        },
+        error: (error) => {
+          console.error('Error fetching workflow instance:', error);
+          // Stay on pending approvals page if workflow not found
+        }
+      });
   }
 
   ngOnDestroy(): void {

@@ -8,7 +8,6 @@ import { ConfirmationService } from '../../../core/confirmation/confirmation.ser
 import { EmployeeExcusesService } from '../../employee-excuses/employee-excuses.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import { FormSectionComponent } from '../../../shared/components/form-section/form-section.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import {
   CreateEmployeeExcuseRequest,
@@ -28,7 +27,6 @@ import {
     CommonModule,
     ReactiveFormsModule,
     PageHeaderComponent,
-    FormSectionComponent,
     LoadingSpinnerComponent
   ],
   templateUrl: './excuse-request-form.component.html',
@@ -54,11 +52,13 @@ export class PortalExcuseRequestFormComponent implements OnInit {
   // Form
   form: FormGroup;
 
-  // Excuse types for dropdown
-  readonly excuseTypes = [
-    { value: ExcuseType.PersonalExcuse, label: 'Personal Excuse' },
-    { value: ExcuseType.OfficialDuty, label: 'Official Duty' }
-  ];
+  // Excuse types for dropdown - use getter for i18n
+  get excuseTypes() {
+    return [
+      { value: ExcuseType.PersonalExcuse, label: this.i18n.t('portal.personal_excuse') },
+      { value: ExcuseType.OfficialDuty, label: this.i18n.t('portal.official_duty') }
+    ];
+  }
 
   constructor() {
     this.form = this.createForm();
@@ -160,9 +160,12 @@ export class PortalExcuseRequestFormComponent implements OnInit {
   }
 
   private createExcuse(): void {
+    console.log('[ExcuseForm] createExcuse() called');
     this.saving.set(true);
+    console.log('[ExcuseForm] saving set to true');
 
     const currentUser = this.authService.currentUser();
+    console.log('[ExcuseForm] currentUser:', currentUser);
     if (!currentUser || !currentUser.employeeId) {
       this.notificationService.error(this.i18n.t('portal.employee_not_found'));
       this.saving.set(false);
@@ -179,18 +182,31 @@ export class PortalExcuseRequestFormComponent implements OnInit {
       reason: formValue.reason,
       attachmentFile: this.selectedFile() || undefined
     };
+    console.log('[ExcuseForm] Request object:', JSON.stringify(request));
 
+    console.log('[ExcuseForm] Calling excuseService.createEmployeeExcuse()...');
     this.excuseService.createEmployeeExcuse(request).subscribe({
-      next: () => {
+      next: (response) => {
+        console.log('[ExcuseForm] SUCCESS callback - response:', response);
+        this.saving.set(false);
+        console.log('[ExcuseForm] saving set to false');
         this.notificationService.success(this.i18n.t('portal.excuse_created'));
+        console.log('[ExcuseForm] Navigating to /excuse-requests');
         this.router.navigate(['/excuse-requests']);
       },
       error: (error) => {
-        console.error('Failed to create excuse:', error);
-        this.notificationService.error(this.i18n.t('portal.failed_to_create_excuse'));
+        console.error('[ExcuseForm] ERROR callback - error:', error);
         this.saving.set(false);
+        console.log('[ExcuseForm] saving set to false after error');
+        // Extract and display the actual error message from the backend
+        const errorMessage = this.extractErrorMessage(error) || this.i18n.t('portal.failed_to_create_excuse');
+        this.notificationService.error(errorMessage);
+      },
+      complete: () => {
+        console.log('[ExcuseForm] COMPLETE callback - subscription completed');
       }
     });
+    console.log('[ExcuseForm] subscribe() called, waiting for response...');
   }
 
   private updateExcuse(): void {
@@ -212,13 +228,16 @@ export class PortalExcuseRequestFormComponent implements OnInit {
 
     this.excuseService.updateEmployeeExcuse(currentExcuse.id, request).subscribe({
       next: () => {
+        this.saving.set(false);
         this.notificationService.success(this.i18n.t('portal.excuse_updated'));
         this.router.navigate(['/excuse-requests']);
       },
       error: (error) => {
-        console.error('Failed to update excuse:', error);
-        this.notificationService.error(this.i18n.t('portal.failed_to_update_excuse'));
         this.saving.set(false);
+        console.error('Failed to update excuse:', error);
+        // Extract and display the actual error message from the backend
+        const errorMessage = this.extractErrorMessage(error) || this.i18n.t('portal.failed_to_update_excuse');
+        this.notificationService.error(errorMessage);
       }
     });
   }
@@ -246,5 +265,77 @@ export class PortalExcuseRequestFormComponent implements OnInit {
       return this.i18n.t('common.field_max_length', { max: maxLength });
     }
     return '';
+  }
+
+  /**
+   * Extracts the error message from the backend response
+   * Handles different error response formats
+   */
+  private extractErrorMessage(error: any): string | null {
+    // Check for error in HttpErrorResponse body
+    if (error?.error) {
+      // Backend returns Result<T> with error property
+      if (typeof error.error.error === 'string') {
+        return error.error.error;
+      }
+      // Backend returns direct error message
+      if (typeof error.error === 'string') {
+        return error.error;
+      }
+      // Backend returns message property
+      if (typeof error.error.message === 'string') {
+        return error.error.message;
+      }
+    }
+    // Check for message property on error itself
+    if (typeof error?.message === 'string' && !error.message.includes('Http failure')) {
+      return error.message;
+    }
+    return null;
+  }
+
+  /**
+   * Calculates the duration in hours between start and end times
+   * Returns formatted string like "1 h 30 m" or "0 m" if times not set
+   */
+  calculateDuration(): string {
+    const startTime = this.form.get('startTime')?.value;
+    const endTime = this.form.get('endTime')?.value;
+
+    if (!startTime || !endTime) {
+      return '0 m';
+    }
+
+    try {
+      // Parse time strings (HH:mm format)
+      const [startHour, startMin] = startTime.split(':').map(Number);
+      const [endHour, endMin] = endTime.split(':').map(Number);
+
+      // Calculate total minutes
+      const startTotalMinutes = startHour * 60 + startMin;
+      const endTotalMinutes = endHour * 60 + endMin;
+
+      // Calculate difference
+      let diffMinutes = endTotalMinutes - startTotalMinutes;
+
+      // Handle case where end time is before start time (invalid)
+      if (diffMinutes <= 0) {
+        return '0 m';
+      }
+
+      // Format as hours and minutes
+      const hours = Math.floor(diffMinutes / 60);
+      const minutes = diffMinutes % 60;
+
+      if (hours === 0) {
+        return `${minutes} m`;
+      } else if (minutes === 0) {
+        return `${hours} h`;
+      } else {
+        return `${hours} h ${minutes} m`;
+      }
+    } catch {
+      return '0 m';
+    }
   }
 }

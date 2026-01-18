@@ -209,6 +209,11 @@ public class GetTeamMembersQueryHandler : IRequestHandler<GetTeamMembersQuery, R
             .Select(g => new { ManagerId = g.Key, Count = g.Count() })
             .ToDictionaryAsync(x => x.ManagerId ?? 0, x => x.Count, cancellationToken);
 
+        // Get user IDs for employees (from EmployeeUserLinks)
+        var employeeUserIds = await _context.EmployeeUserLinks
+            .Where(eul => employeeIds.Contains(eul.EmployeeId))
+            .ToDictionaryAsync(eul => eul.EmployeeId, eul => eul.UserId, cancellationToken);
+
         // Build DTOs
         var items = pagedMembers.Select(m =>
         {
@@ -235,6 +240,7 @@ public class GetTeamMembersQueryHandler : IRequestHandler<GetTeamMembersQuery, R
             return new TeamMemberDto
             {
                 EmployeeId = emp.Id,
+                UserId = employeeUserIds.GetValueOrDefault(emp.Id),
                 EmployeeCode = emp.EmployeeNumber,
                 FullName = $"{emp.FirstName} {emp.LastName}",
                 FirstName = emp.FirstName,

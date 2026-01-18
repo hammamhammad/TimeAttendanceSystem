@@ -1,0 +1,6 @@
+D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\AddExcusePolicy.csproj.AssemblyReference.cache
+D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\AddExcusePolicy.GeneratedMSBuildEditorConfig.editorconfig
+D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\AddExcusePolicy.AssemblyInfoInputs.cache
+D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\AddExcusePolicy.AssemblyInfo.cs
+D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\AddExcusePolicy.csproj.CoreCompileInputs.cache
+D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\AddExcusePolicy.sourcelink.json

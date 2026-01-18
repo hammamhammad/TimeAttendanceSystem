@@ -1,0 +1,15 @@
+D:\Work\TimeAttendanceSystem\tools\check-saturday\obj\Debug\net9.0\generate-saturday.GeneratedMSBuildEditorConfig.editorconfig
+D:\Work\TimeAttendanceSystem\tools\check-saturday\obj\Debug\net9.0\generate-saturday.AssemblyInfoInputs.cache
+D:\Work\TimeAttendanceSystem\tools\check-saturday\obj\Debug\net9.0\generate-saturday.AssemblyInfo.cs
+D:\Work\TimeAttendanceSystem\tools\check-saturday\obj\Debug\net9.0\generate-saturday.csproj.CoreCompileInputs.cache
+D:\Work\TimeAttendanceSystem\tools\check-saturday\obj\Debug\net9.0\generate-saturday.sourcelink.json
+D:\Work\TimeAttendanceSystem\tools\check-saturday\bin\Debug\net9.0\generate-saturday.exe
+D:\Work\TimeAttendanceSystem\tools\check-saturday\bin\Debug\net9.0\generate-saturday.deps.json
+D:\Work\TimeAttendanceSystem\tools\check-saturday\bin\Debug\net9.0\generate-saturday.runtimeconfig.json
+D:\Work\TimeAttendanceSystem\tools\check-saturday\bin\Debug\net9.0\generate-saturday.dll
+D:\Work\TimeAttendanceSystem\tools\check-saturday\bin\Debug\net9.0\generate-saturday.pdb
+D:\Work\TimeAttendanceSystem\tools\check-saturday\obj\Debug\net9.0\generate-saturday.dll
+D:\Work\TimeAttendanceSystem\tools\check-saturday\obj\Debug\net9.0\refint\generate-saturday.dll
+D:\Work\TimeAttendanceSystem\tools\check-saturday\obj\Debug\net9.0\generate-saturday.pdb
+D:\Work\TimeAttendanceSystem\tools\check-saturday\obj\Debug\net9.0\generate-saturday.genruntimeconfig.cache
+D:\Work\TimeAttendanceSystem\tools\check-saturday\obj\Debug\net9.0\ref\generate-saturday.dll

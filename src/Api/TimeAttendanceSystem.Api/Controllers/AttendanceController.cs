@@ -629,6 +629,19 @@ public class AttendanceController : ControllerBase
 
     private static AttendanceRecordResponse MapToAttendanceRecordResponse(AttendanceRecord record)
     {
+        // Fix: For past dates, convert invalid/undefined status values to Absent
+        // This handles both AttendanceStatus.Pending (11) and undefined status (0)
+        // Business rule: Default status should be "Absent" for working days with no check-in
+        var today = DateTime.UtcNow.Date;
+        var statusValue = (int)record.Status;
+        var isInvalidOrPending = statusValue == 0 ||
+                                 statusValue == (int)AttendanceStatus.Pending ||
+                                 !Enum.IsDefined(typeof(AttendanceStatus), record.Status);
+
+        var effectiveStatus = (isInvalidOrPending && record.AttendanceDate.Date < today)
+            ? AttendanceStatus.Absent
+            : record.Status;
+
         return new AttendanceRecordResponse
         {
             Id = record.Id,
@@ -636,8 +649,8 @@ public class AttendanceController : ControllerBase
             EmployeeNumber = record.Employee?.EmployeeNumber ?? "",
             EmployeeName = record.Employee?.FullName ?? "",
             AttendanceDate = record.AttendanceDate,
-            Status = record.Status,
-            StatusText = record.Status.ToString(),
+            Status = effectiveStatus,
+            StatusText = effectiveStatus.ToString(),
             ScheduledStartTime = record.ScheduledStartTime,
             ScheduledEndTime = record.ScheduledEndTime,
             ActualCheckInTime = record.ActualCheckInTime,
@@ -651,7 +664,34 @@ public class AttendanceController : ControllerBase
             IsManualOverride = record.IsManualOverride,
             IsApproved = record.IsApproved,
             IsFinalized = record.IsFinalized,
-            Notes = record.Notes
+            Notes = record.Notes,
+            Shift = MapToShiftInfoResponse(record.ShiftAssignment?.Shift)
+        };
+    }
+
+    private static ShiftInfoResponse? MapToShiftInfoResponse(Domain.Shifts.Shift? shift)
+    {
+        if (shift == null)
+            return null;
+
+        return new ShiftInfoResponse
+        {
+            Id = shift.Id,
+            Name = shift.Name,
+            NameAr = null, // Shift entity doesn't have NameAr
+            ShiftType = shift.ShiftType.ToString(),
+            StartTime = shift.ShiftPeriods.OrderBy(p => p.PeriodOrder).FirstOrDefault()?.StartTime,
+            EndTime = shift.ShiftPeriods.OrderBy(p => p.PeriodOrder).LastOrDefault()?.EndTime,
+            TotalHours = shift.CalculateTotalHours(),
+            Periods = shift.ShiftPeriods
+                .OrderBy(p => p.PeriodOrder)
+                .Select(p => new ShiftPeriodResponse
+                {
+                    StartTime = p.StartTime,
+                    EndTime = p.EndTime,
+                    IsBreak = false // ShiftPeriod is for work time, not break
+                })
+                .ToList()
         };
     }
 
@@ -764,16 +804,17 @@ public class AttendanceController : ControllerBase
             var hasTimeChanges = false;
 
             // Time fields are editable and trigger recalculation
+            // Note: DateTime values must be converted to UTC for PostgreSQL timestamp with time zone
             if (request.ActualCheckInTime.HasValue)
             {
-                existingRecord.ActualCheckInTime = request.ActualCheckInTime;
+                existingRecord.ActualCheckInTime = EnsureUtcDateTime(request.ActualCheckInTime.Value);
                 hasManualOverrides = true;
                 hasTimeChanges = true;
             }
 
             if (request.ActualCheckOutTime.HasValue)
             {
-                existingRecord.ActualCheckOutTime = request.ActualCheckOutTime;
+                existingRecord.ActualCheckOutTime = EnsureUtcDateTime(request.ActualCheckOutTime.Value);
                 hasManualOverrides = true;
                 hasTimeChanges = true;
             }
@@ -1028,11 +1069,15 @@ public class AttendanceController : ControllerBase
         // Find existing transaction of the same type
         var existingTransaction = existingTransactions.FirstOrDefault(t => t.TransactionType == transactionType);
 
+        // Ensure both UTC and local times have UTC kind for PostgreSQL compatibility
+        var utcTime = EnsureUtcDateTime(transactionTime);
+        var localTime = EnsureUtcDateTime(transactionTime); // Store local time with UTC kind for PostgreSQL
+
         if (existingTransaction != null)
         {
             // Update existing transaction
-            existingTransaction.TransactionTimeUtc = transactionTime.ToUniversalTime();
-            existingTransaction.TransactionTimeLocal = transactionTime;
+            existingTransaction.TransactionTimeUtc = utcTime;
+            existingTransaction.TransactionTimeLocal = localTime;
             existingTransaction.IsManual = true;
             existingTransaction.EnteredByUserId = _currentUser.UserId;
             existingTransaction.Notes = $"Updated via attendance record edit at {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC";
@@ -1046,9 +1091,9 @@ public class AttendanceController : ControllerBase
             {
                 EmployeeId = employeeId,
                 TransactionType = transactionType,
-                TransactionTimeUtc = transactionTime.ToUniversalTime(),
-                TransactionTimeLocal = transactionTime,
-                AttendanceDate = attendanceDate,
+                TransactionTimeUtc = utcTime,
+                TransactionTimeLocal = localTime,
+                AttendanceDate = DateTime.SpecifyKind(attendanceDate.Date, DateTimeKind.Utc),
                 IsManual = true,
                 EnteredByUserId = _currentUser.UserId,
                 Notes = $"Created via attendance record edit at {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC",
@@ -1058,6 +1103,20 @@ public class AttendanceController : ControllerBase
 
             await _transactionRepository.CreateAsync(newTransaction);
         }
+    }
+
+    /// <summary>
+    /// Ensures a DateTime has UTC kind for PostgreSQL timestamp with time zone compatibility.
+    /// If the DateTime has Unspecified kind, it assumes the value is already in UTC.
+    /// </summary>
+    private static DateTime EnsureUtcDateTime(DateTime dateTime)
+    {
+        return dateTime.Kind switch
+        {
+            DateTimeKind.Utc => dateTime,
+            DateTimeKind.Local => dateTime.ToUniversalTime(),
+            _ => DateTime.SpecifyKind(dateTime, DateTimeKind.Utc) // Unspecified - assume UTC
+        };
     }
 
     /// <summary>
@@ -1143,42 +1202,30 @@ public class AttendanceController : ControllerBase
     {
         try
         {
-            _logger.LogInformation("Manual attendance calculation requested for date {Date} (force recalculate: {ForceRecalculate}, branch: {BranchId}) by user {UserId}",
-                date.Date, forceRecalculate, branchId, _currentUser.UserId);
+            _logger.LogInformation("=== ATTENDANCE CALCULATION REQUEST ===");
+            _logger.LogInformation("Raw date param: {RawDate}, Date.Date: {DateOnly}, Kind: {Kind}, UTC: {UtcDate}",
+                date, date.Date, date.Kind, date.ToUniversalTime());
+            _logger.LogInformation("ForceRecalculate: {ForceRecalculate}, BranchId: {BranchId}, UserId: {UserId}",
+                forceRecalculate, branchId, _currentUser.UserId);
+
+            // Use the RunGenerationForDateAsync method which properly deletes and recreates records
+            var serviceResult = await _generatorService.RunGenerationForDateAsync(date, branchId);
 
             var result = new Models.AttendanceGenerationResult
             {
-                Date = date,
-                Errors = new List<string>()
+                Date = serviceResult.Date,
+                TotalEmployees = serviceResult.TotalEmployees,
+                RecordsGenerated = serviceResult.RecordsGenerated,
+                RecordsUpdated = serviceResult.RecordsUpdated,
+                RecordsSkipped = serviceResult.RecordsSkipped,
+                ErrorCount = serviceResult.ErrorCount,
+                Errors = serviceResult.Errors,
+                Duration = (long)serviceResult.Duration.TotalMilliseconds
+                // IsSuccessful is computed from ErrorCount
             };
 
-            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-
-            if (forceRecalculate)
-            {
-                // Recalculate all existing records for the date
-                var recalculatedCount = await _generatorService.RecalculateAttendanceRecordsAsync(date);
-                result.RecordsUpdated = recalculatedCount;
-            }
-
-            // Generate attendance for any employees missing records
-            // Use branch-specific generation if branchId is provided
-            int generatedCount;
-            if (branchId.HasValue)
-            {
-                generatedCount = await _generatorService.GenerateAttendanceRecordsForBranchAsync(branchId.Value, date);
-            }
-            else
-            {
-                generatedCount = await _generatorService.GenerateAttendanceRecordsAsync(date);
-            }
-            result.RecordsGenerated = generatedCount;
-
-            stopwatch.Stop();
-            result.Duration = stopwatch.ElapsedMilliseconds;
-
-            _logger.LogInformation("Manual attendance calculation completed for {Date} (branch: {BranchId}). Generated: {Generated}, Updated: {Updated}",
-                date.Date, branchId, result.RecordsGenerated, result.RecordsUpdated);
+            _logger.LogInformation("Manual attendance calculation completed for {Date} (branch: {BranchId}). Generated: {Generated}, Updated: {Updated}, Total Employees: {TotalEmployees}",
+                date.Date, branchId, result.RecordsGenerated, result.RecordsUpdated, result.TotalEmployees);
 
             return Ok(result);
         }
@@ -1513,7 +1560,13 @@ public class AttendanceController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving leave/excuse details for employee {EmployeeId} on {Date}", employeeId, date);
-            return StatusCode(500, "An error occurred while retrieving leave and excuse details");
+            // Return detailed error in development for debugging
+            return StatusCode(500, new {
+                error = "An error occurred while retrieving leave and excuse details",
+                details = ex.Message,
+                innerException = ex.InnerException?.Message,
+                stackTrace = ex.StackTrace
+            });
         }
     }
 }

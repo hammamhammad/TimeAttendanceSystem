@@ -210,9 +210,9 @@
                     <span class="text-primary fw-bold">{{ shiftData.name }}</span>
                   </div>
                   <div class="col-6">
-                    <strong>{{ i18n.t('shifts.fields.description') }}:</strong>
+                    <strong>{{ i18n.t('shifts.fields.shift_type') }}:</strong>
                     <br>
-                    <span class="text-muted">{{ shiftData.description || '--' }}</span>
+                    <span class="text-warning">{{ getShiftTypeDisplay(shiftData) }}</span>
                   </div>
                 </div>
                 <div class="row mb-3">
@@ -228,28 +228,21 @@
                   </div>
                 </div>
                 <div class="row mb-3">
-                  <div class="col-6">
+                  <div class="col-12">
                     <strong>{{ i18n.t('shifts.fields.working_hours') }}:</strong>
                     <br>
-                    <span class="text-primary fw-bold">{{ formatHoursAsTime(shiftData.requiredHours || 0) }}</span>
-                  </div>
-                  <div class="col-6">
-                    <strong>{{ i18n.t('shifts.fields.shift_type') }}:</strong>
-                    <br>
-                    <span class="text-warning">{{ getShiftTypeDisplay(shiftData) }}</span>
+                    <span class="text-primary fw-bold">{{ formatHoursAsTime(shiftData.totalHours || 0) }}</span>
                   </div>
                 </div>
-                @if (shiftData.allowFlexibleHours) {
+                @if (shiftData.periods && shiftData.periods.length > 1) {
                   <div class="row">
                     <div class="col-12">
-                      <div class="alert alert-info">
-                        <strong>{{ i18n.t('shifts.fields.flexible_hours') }}:</strong>
-                        <ul class="mb-0 mt-2">
-                          <li>{{ i18n.t('shifts.fields.flex_minutes_before') }}: {{ shiftData.flexMinutesBefore || 0 }} {{ i18n.t('common.minutes') }}</li>
-                          <li>{{ i18n.t('shifts.fields.flex_minutes_after') }}: {{ shiftData.flexMinutesAfter || 0 }} {{ i18n.t('common.minutes') }}</li>
-                          <li>{{ i18n.t('shifts.fields.grace_period') }}: {{ shiftData.gracePeriodMinutes || 0 }} {{ i18n.t('common.minutes') }}</li>
-                        </ul>
-                      </div>
+                      <strong>{{ i18n.t('shifts.fields.periods') }}:</strong>
+                      <ul class="mb-0 mt-2">
+                        @for (period of shiftData.periods; track $index) {
+                          <li>{{ period.startTime }} - {{ period.endTime }}</li>
+                        }
+                      </ul>
                     </div>
                   </div>
                 }
@@ -309,9 +302,9 @@
                             <strong>{{ i18n.t('employee_vacations.fields.status') }}:</strong>
                             <br>
                             <app-status-badge
-                              [label]="vacation.isApproved ? i18n.t('employee_vacations.approved') : i18n.t('employee_vacations.pending')"
-                              [variant]="vacation.isApproved ? 'success' : 'warning'"
-                              [icon]="vacation.isApproved ? 'fas fa-check-circle' : 'fas fa-hourglass-half'">
+                              [label]="vacation.statusDisplay"
+                              [variant]="getVacationStatusVariant(vacation.status)"
+                              [icon]="getVacationStatusIcon(vacation.status)">
                             </app-status-badge>
                           </div>
                           <div class="col-md-2">
@@ -475,8 +468,8 @@
       </div>
     }
 
-    <!-- Additional Information -->
-    @if (attendanceRecord()!.notes || attendanceRecord()!.isApproved !== undefined) {
+    <!-- Additional Information (Notes and Manual Override only) -->
+    @if (attendanceRecord()!.notes || attendanceRecord()!.isManualOverride) {
       <div class="row">
         <div class="col-12">
           <div class="card">
@@ -507,19 +500,6 @@
                   </div>
                 }
               </div>
-              @if (attendanceRecord()!.isApproved !== undefined) {
-                <div class="row">
-                  <div class="col-12">
-                    <strong>{{ i18n.t('attendance.fields.approval_status') }}:</strong>
-                    <br>
-                    <app-status-badge
-                      [label]="attendanceRecord()!.isApproved ? i18n.t('attendance.approved') : i18n.t('attendance.pending_approval')"
-                      [variant]="attendanceRecord()!.isApproved ? 'success' : 'warning'"
-                      [icon]="attendanceRecord()!.isApproved ? 'fas fa-check-circle' : 'fas fa-hourglass-half'">
-                    </app-status-badge>
-                  </div>
-                </div>
-              }
             </div>
           </div>
         </div>

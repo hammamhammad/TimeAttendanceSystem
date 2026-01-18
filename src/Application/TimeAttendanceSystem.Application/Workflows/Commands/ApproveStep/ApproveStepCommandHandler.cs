@@ -2,8 +2,10 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using TimeAttendanceSystem.Application.Abstractions;
 using TimeAttendanceSystem.Application.Common;
+using TimeAttendanceSystem.Application.Extensions;
 using TimeAttendanceSystem.Application.Workflows.Services;
 using TimeAttendanceSystem.Domain.Attendance;
+using TimeAttendanceSystem.Domain.Excuses;
 using TimeAttendanceSystem.Domain.Workflows.Enums;
 
 namespace TimeAttendanceSystem.Application.Workflows.Commands.ApproveStep;
@@ -12,21 +14,28 @@ namespace TimeAttendanceSystem.Application.Workflows.Commands.ApproveStep;
 /// Handler for ApproveStepCommand.
 /// Approves a workflow step and updates the related entity status if workflow completes.
 /// Integrates with leave balance management for vacation approvals.
+/// Integrates with attendance recalculation for excuse approvals.
 /// </summary>
 public class ApproveStepCommandHandler : IRequestHandler<ApproveStepCommand, Result<bool>>
 {
     private readonly IWorkflowEngine _workflowEngine;
     private readonly IApplicationDbContext _context;
     private readonly ILeaveAccrualService _leaveAccrualService;
+    private readonly IAttendanceCalculationService _calculationService;
+    private readonly IAttendanceTransactionRepository _transactionRepository;
 
     public ApproveStepCommandHandler(
         IWorkflowEngine workflowEngine,
         IApplicationDbContext context,
-        ILeaveAccrualService leaveAccrualService)
+        ILeaveAccrualService leaveAccrualService,
+        IAttendanceCalculationService calculationService,
+        IAttendanceTransactionRepository transactionRepository)
     {
         _workflowEngine = workflowEngine;
         _context = context;
         _leaveAccrualService = leaveAccrualService;
+        _calculationService = calculationService;
+        _transactionRepository = transactionRepository;
     }
 
     public async Task<Result<bool>> Handle(ApproveStepCommand request, CancellationToken cancellationToken)
@@ -139,13 +148,61 @@ public class ApproveStepCommandHandler : IRequestHandler<ApproveStepCommand, Res
         if (workflowInstance.FinalOutcome == ApprovalAction.Approved)
         {
             excuse.ApprovalStatus = Domain.Excuses.ApprovalStatus.Approved;
+            await _context.SaveChangesAsync(cancellationToken);
+
+            // Recalculate attendance to apply excuse offset to late/early minutes
+            await UpdateAttendanceForExcuseAsync(excuse, cancellationToken);
         }
         else if (workflowInstance.FinalOutcome == ApprovalAction.Rejected)
         {
             excuse.ApprovalStatus = Domain.Excuses.ApprovalStatus.Rejected;
+            await _context.SaveChangesAsync(cancellationToken);
         }
+    }
 
-        await _context.SaveChangesAsync(cancellationToken);
+    /// <summary>
+    /// Updates attendance record when an excuse is approved via workflow.
+    /// Triggers full recalculation to apply excuse offsets to late/early minutes.
+    /// </summary>
+    private async Task UpdateAttendanceForExcuseAsync(EmployeeExcuse excuse, CancellationToken cancellationToken)
+    {
+        // Normalize the excuse date to UTC for PostgreSQL compatibility
+        var normalizedExcuseDate = excuse.ExcuseDate.ToUtcDate();
+
+        // Find existing attendance record for the excuse date with shift assignment
+        var attendanceRecord = await _context.AttendanceRecords
+            .Include(ar => ar.ShiftAssignment)
+                .ThenInclude(sa => sa!.Shift)
+                    .ThenInclude(s => s.ShiftPeriods)
+            .FirstOrDefaultAsync(ar => ar.EmployeeId == excuse.EmployeeId &&
+                                     ar.AttendanceDate.Date == normalizedExcuseDate &&
+                                     !ar.IsFinalized,
+                                cancellationToken);
+
+        if (attendanceRecord != null)
+        {
+            // Get transactions for recalculation
+            var transactions = await _transactionRepository.GetByEmployeeAndDateAsync(
+                excuse.EmployeeId, excuse.ExcuseDate, cancellationToken);
+
+            // Recalculate attendance - this will now consider the approved excuse
+            var recalculatedRecord = await _calculationService.RecalculateAttendanceAsync(
+                attendanceRecord, transactions, cancellationToken);
+
+            // Copy recalculated values to existing record
+            attendanceRecord.Status = recalculatedRecord.Status;
+            attendanceRecord.LateMinutes = recalculatedRecord.LateMinutes;
+            attendanceRecord.EarlyLeaveMinutes = recalculatedRecord.EarlyLeaveMinutes;
+            attendanceRecord.WorkingHours = recalculatedRecord.WorkingHours;
+            attendanceRecord.OvertimeHours = recalculatedRecord.OvertimeHours;
+            attendanceRecord.BreakHours = recalculatedRecord.BreakHours;
+            attendanceRecord.Notes = string.IsNullOrEmpty(attendanceRecord.Notes)
+                ? $"Recalculated after excuse approval via workflow (ID: {excuse.Id})"
+                : $"{attendanceRecord.Notes} | Recalculated after excuse approval via workflow (ID: {excuse.Id})";
+            attendanceRecord.ModifiedAtUtc = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync(cancellationToken);
+        }
     }
 
     private async Task UpdateRemoteWorkStatusAsync(Domain.Workflows.WorkflowInstance workflowInstance, CancellationToken cancellationToken)
@@ -177,11 +234,15 @@ public class ApproveStepCommandHandler : IRequestHandler<ApproveStepCommand, Res
         DateTime endDate,
         CancellationToken cancellationToken)
     {
+        // Normalize dates to UTC for PostgreSQL compatibility
+        var normalizedStartDate = startDate.ToUtcDate();
+        var normalizedEndDate = endDate.ToUtcDate();
+
         // Get all attendance records for the vacation period
         var attendanceRecords = await _context.AttendanceRecords
             .Where(ar => ar.EmployeeId == employeeId &&
-                        ar.AttendanceDate.Date >= startDate.Date &&
-                        ar.AttendanceDate.Date <= endDate.Date &&
+                        ar.AttendanceDate.Date >= normalizedStartDate &&
+                        ar.AttendanceDate.Date <= normalizedEndDate &&
                         !ar.IsFinalized) // Only update non-finalized records
             .ToListAsync(cancellationToken);
 

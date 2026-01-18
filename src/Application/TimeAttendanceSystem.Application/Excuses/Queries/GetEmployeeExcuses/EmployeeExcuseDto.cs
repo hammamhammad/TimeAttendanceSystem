@@ -3,6 +3,52 @@ using TimeAttendanceSystem.Domain.Excuses;
 namespace TimeAttendanceSystem.Application.Excuses.Queries.GetEmployeeExcuses;
 
 /// <summary>
+/// Data Transfer Object representing a single approval step in workflow history.
+/// </summary>
+public class ExcuseApprovalStepDto
+{
+    /// <summary>
+    /// Order of the step in the workflow.
+    /// </summary>
+    public int StepOrder { get; set; }
+
+    /// <summary>
+    /// Name of the workflow step.
+    /// </summary>
+    public string StepName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Status of the step (Pending, Approved, Rejected, etc.).
+    /// </summary>
+    public string Status { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Name of the user/role assigned to this step.
+    /// </summary>
+    public string AssignedToName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Name of the user who took action.
+    /// </summary>
+    public string? ActionByName { get; set; }
+
+    /// <summary>
+    /// When the step was assigned.
+    /// </summary>
+    public DateTime AssignedAt { get; set; }
+
+    /// <summary>
+    /// When the action was taken.
+    /// </summary>
+    public DateTime? ActionAt { get; set; }
+
+    /// <summary>
+    /// Comments provided with the action.
+    /// </summary>
+    public string? Comments { get; set; }
+}
+
+/// <summary>
 /// Data Transfer Object for employee excuse information.
 /// Contains all excuse details for frontend consumption.
 /// </summary>
@@ -152,4 +198,41 @@ public class EmployeeExcuseDto
     /// Gets or sets a summary of the excuse for display.
     /// </summary>
     public string ExcuseSummary { get; set; } = string.Empty;
+
+    // Workflow information
+
+    /// <summary>
+    /// Gets or sets the workflow instance ID for approval actions.
+    /// </summary>
+    public long? WorkflowInstanceId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the current workflow status (e.g., Pending, Approved, Rejected).
+    /// </summary>
+    public string? WorkflowStatus { get; set; }
+
+    /// <summary>
+    /// Gets or sets the name of the current approver.
+    /// </summary>
+    public string? CurrentApproverName { get; set; }
+
+    /// <summary>
+    /// Gets or sets the role of the current approver.
+    /// </summary>
+    public string? CurrentApproverRole { get; set; }
+
+    /// <summary>
+    /// Gets or sets the current step order in the workflow.
+    /// </summary>
+    public int? CurrentStepOrder { get; set; }
+
+    /// <summary>
+    /// Gets or sets the total number of steps in the workflow.
+    /// </summary>
+    public int? TotalSteps { get; set; }
+
+    /// <summary>
+    /// Gets or sets the approval history for this excuse.
+    /// </summary>
+    public List<ExcuseApprovalStepDto>? ApprovalHistory { get; set; }
 }

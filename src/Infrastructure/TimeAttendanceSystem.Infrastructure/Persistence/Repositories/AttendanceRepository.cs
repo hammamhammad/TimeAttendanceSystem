@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TimeAttendanceSystem.Application.Abstractions;
+using TimeAttendanceSystem.Application.Extensions;
 using TimeAttendanceSystem.Domain.Attendance;
 
 namespace TimeAttendanceSystem.Infrastructure.Persistence.Repositories;
@@ -23,32 +24,38 @@ public class AttendanceRepository : IAttendanceRepository
             .Include(ar => ar.Employee)
             .Include(ar => ar.ShiftAssignment)
                 .ThenInclude(sa => sa!.Shift)
+                    .ThenInclude(s => s!.ShiftPeriods.OrderBy(p => p.PeriodOrder))
             .Include(ar => ar.Transactions.OrderBy(t => t.TransactionTimeUtc))
             .FirstOrDefaultAsync(ar => ar.Id == id, cancellationToken);
     }
 
     public async Task<AttendanceRecord?> GetByEmployeeAndDateAsync(long employeeId, DateTime attendanceDate, CancellationToken cancellationToken = default)
     {
+        var normalizedDate = attendanceDate.ToUtcDate();
         return await _context.AttendanceRecords
             .Include(ar => ar.Employee)
             .Include(ar => ar.ShiftAssignment)
                 .ThenInclude(sa => sa!.Shift)
+                    .ThenInclude(s => s!.ShiftPeriods.OrderBy(p => p.PeriodOrder))
             .Include(ar => ar.Transactions.OrderBy(t => t.TransactionTimeUtc))
             .FirstOrDefaultAsync(ar => ar.EmployeeId == employeeId &&
-                                      ar.AttendanceDate.Date == attendanceDate.Date,
+                                      ar.AttendanceDate.Date == normalizedDate,
                                 cancellationToken);
     }
 
     public async Task<List<AttendanceRecord>> GetByEmployeeAndDateRangeAsync(long employeeId, DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
     {
+        var normalizedStartDate = startDate.ToUtcDate();
+        var normalizedEndDate = endDate.ToUtcDate();
         return await _context.AttendanceRecords
             .Include(ar => ar.Employee)
             .Include(ar => ar.ShiftAssignment)
                 .ThenInclude(sa => sa!.Shift)
+                    .ThenInclude(s => s!.ShiftPeriods.OrderBy(p => p.PeriodOrder))
             .Include(ar => ar.Transactions.OrderBy(t => t.TransactionTimeUtc))
             .Where(ar => ar.EmployeeId == employeeId &&
-                        ar.AttendanceDate.Date >= startDate.Date &&
-                        ar.AttendanceDate.Date <= endDate.Date)
+                        ar.AttendanceDate.Date >= normalizedStartDate &&
+                        ar.AttendanceDate.Date <= normalizedEndDate)
             .OrderBy(ar => ar.AttendanceDate)
             .ToListAsync(cancellationToken);
     }
@@ -56,27 +63,32 @@ public class AttendanceRepository : IAttendanceRepository
     public async Task<List<AttendanceRecord>> GetByEmployeesAndDateAsync(IEnumerable<long> employeeIds, DateTime attendanceDate, CancellationToken cancellationToken = default)
     {
         var employeeIdList = employeeIds.ToList();
+        var normalizedDate = attendanceDate.ToUtcDate();
         return await _context.AttendanceRecords
             .Include(ar => ar.Employee)
             .Include(ar => ar.ShiftAssignment)
                 .ThenInclude(sa => sa!.Shift)
+                    .ThenInclude(s => s!.ShiftPeriods.OrderBy(p => p.PeriodOrder))
             .Include(ar => ar.Transactions.OrderBy(t => t.TransactionTimeUtc))
             .Where(ar => employeeIdList.Contains(ar.EmployeeId) &&
-                        ar.AttendanceDate.Date == attendanceDate.Date)
+                        ar.AttendanceDate.Date == normalizedDate)
             .OrderBy(ar => ar.Employee.EmployeeNumber)
             .ToListAsync(cancellationToken);
     }
 
     public async Task<List<AttendanceRecord>> GetByBranchAndDateRangeAsync(long branchId, DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
     {
+        var normalizedStartDate = startDate.ToUtcDate();
+        var normalizedEndDate = endDate.ToUtcDate();
         return await _context.AttendanceRecords
             .Include(ar => ar.Employee)
             .Include(ar => ar.ShiftAssignment)
                 .ThenInclude(sa => sa!.Shift)
+                    .ThenInclude(s => s!.ShiftPeriods.OrderBy(p => p.PeriodOrder))
             .Include(ar => ar.Transactions.OrderBy(t => t.TransactionTimeUtc))
             .Where(ar => ar.Employee.BranchId == branchId &&
-                        ar.AttendanceDate.Date >= startDate.Date &&
-                        ar.AttendanceDate.Date <= endDate.Date)
+                        ar.AttendanceDate.Date >= normalizedStartDate &&
+                        ar.AttendanceDate.Date <= normalizedEndDate)
             .OrderBy(ar => ar.AttendanceDate)
             .ThenBy(ar => ar.Employee.EmployeeNumber)
             .ToListAsync(cancellationToken);
@@ -84,14 +96,17 @@ public class AttendanceRepository : IAttendanceRepository
 
     public async Task<List<AttendanceRecord>> GetByDepartmentAndDateRangeAsync(long departmentId, DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
     {
+        var normalizedStartDate = startDate.ToUtcDate();
+        var normalizedEndDate = endDate.ToUtcDate();
         return await _context.AttendanceRecords
             .Include(ar => ar.Employee)
             .Include(ar => ar.ShiftAssignment)
                 .ThenInclude(sa => sa!.Shift)
+                    .ThenInclude(s => s!.ShiftPeriods.OrderBy(p => p.PeriodOrder))
             .Include(ar => ar.Transactions.OrderBy(t => t.TransactionTimeUtc))
             .Where(ar => ar.Employee.DepartmentId == departmentId &&
-                        ar.AttendanceDate.Date >= startDate.Date &&
-                        ar.AttendanceDate.Date <= endDate.Date)
+                        ar.AttendanceDate.Date >= normalizedStartDate &&
+                        ar.AttendanceDate.Date <= normalizedEndDate)
             .OrderBy(ar => ar.AttendanceDate)
             .ThenBy(ar => ar.Employee.EmployeeNumber)
             .ToListAsync(cancellationToken);
@@ -99,13 +114,16 @@ public class AttendanceRepository : IAttendanceRepository
 
     public async Task<List<AttendanceRecord>> GetAllByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
     {
+        var normalizedStartDate = startDate.ToUtcDate();
+        var normalizedEndDate = endDate.ToUtcDate();
         return await _context.AttendanceRecords
             .Include(ar => ar.Employee)
             .Include(ar => ar.ShiftAssignment)
                 .ThenInclude(sa => sa!.Shift)
+                    .ThenInclude(s => s!.ShiftPeriods.OrderBy(p => p.PeriodOrder))
             .Include(ar => ar.Transactions.OrderBy(t => t.TransactionTimeUtc))
-            .Where(ar => ar.AttendanceDate.Date >= startDate.Date &&
-                        ar.AttendanceDate.Date <= endDate.Date)
+            .Where(ar => ar.AttendanceDate.Date >= normalizedStartDate &&
+                        ar.AttendanceDate.Date <= normalizedEndDate)
             .OrderBy(ar => ar.AttendanceDate)
             .ThenBy(ar => ar.Employee.EmployeeNumber)
             .ToListAsync(cancellationToken);
@@ -117,6 +135,7 @@ public class AttendanceRepository : IAttendanceRepository
             .Include(ar => ar.Employee)
             .Include(ar => ar.ShiftAssignment)
                 .ThenInclude(sa => sa!.Shift)
+                    .ThenInclude(s => s!.ShiftPeriods.OrderBy(p => p.PeriodOrder))
             .Include(ar => ar.Transactions.OrderBy(t => t.TransactionTimeUtc))
             .Where(ar => !ar.IsApproved &&
                         !ar.IsFinalized &&
@@ -135,12 +154,13 @@ public class AttendanceRepository : IAttendanceRepository
 
     public async Task<List<AttendanceRecord>> GetIncompleteRecordsAsync(long? branchId = null, DateTime? upToDate = null, CancellationToken cancellationToken = default)
     {
-        var maxDate = upToDate ?? DateTime.UtcNow.Date.AddDays(-1);
+        var maxDate = (upToDate ?? DateTime.UtcNow.Date.AddDays(-1)).ToUtcDate();
 
         var query = _context.AttendanceRecords
             .Include(ar => ar.Employee)
             .Include(ar => ar.ShiftAssignment)
                 .ThenInclude(sa => sa!.Shift)
+                    .ThenInclude(s => s!.ShiftPeriods.OrderBy(p => p.PeriodOrder))
             .Include(ar => ar.Transactions.OrderBy(t => t.TransactionTimeUtc))
             .Where(ar => ar.Status == AttendanceStatus.Incomplete &&
                         ar.AttendanceDate.Date <= maxDate);
@@ -191,8 +211,25 @@ public class AttendanceRepository : IAttendanceRepository
 
     public async Task<int> DeleteByDateAsync(DateTime attendanceDate, CancellationToken cancellationToken = default)
     {
+        var normalizedDate = attendanceDate.ToUtcDate();
         var recordsToDelete = await _context.AttendanceRecords
-            .Where(ar => ar.AttendanceDate.Date == attendanceDate.Date)
+            .Where(ar => ar.AttendanceDate.Date == normalizedDate)
+            .ToListAsync(cancellationToken);
+
+        if (recordsToDelete.Count == 0)
+            return 0;
+
+        _context.AttendanceRecords.RemoveRange(recordsToDelete);
+        await _context.SaveChangesAsync(cancellationToken);
+        return recordsToDelete.Count;
+    }
+
+    public async Task<int> DeleteByDateAndBranchAsync(DateTime attendanceDate, long branchId, CancellationToken cancellationToken = default)
+    {
+        var normalizedDate = attendanceDate.ToUtcDate();
+        var recordsToDelete = await _context.AttendanceRecords
+            .Include(ar => ar.Employee)
+            .Where(ar => ar.AttendanceDate.Date == normalizedDate && ar.Employee.BranchId == branchId)
             .ToListAsync(cancellationToken);
 
         if (recordsToDelete.Count == 0)
@@ -205,18 +242,21 @@ public class AttendanceRepository : IAttendanceRepository
 
     public async Task<bool> ExistsAsync(long employeeId, DateTime attendanceDate, CancellationToken cancellationToken = default)
     {
+        var normalizedDate = attendanceDate.ToUtcDate();
         return await _context.AttendanceRecords
             .AnyAsync(ar => ar.EmployeeId == employeeId &&
-                           ar.AttendanceDate.Date == attendanceDate.Date,
+                           ar.AttendanceDate.Date == normalizedDate,
                      cancellationToken);
     }
 
     public async Task<AttendanceStatistics> GetStatisticsAsync(long? branchId, long? departmentId, DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
     {
+        var normalizedStartDate = startDate.ToUtcDate();
+        var normalizedEndDate = endDate.ToUtcDate();
         var query = _context.AttendanceRecords
             .Include(ar => ar.Employee)
-            .Where(ar => ar.AttendanceDate.Date >= startDate.Date &&
-                        ar.AttendanceDate.Date <= endDate.Date);
+            .Where(ar => ar.AttendanceDate.Date >= normalizedStartDate &&
+                        ar.AttendanceDate.Date <= normalizedEndDate);
 
         if (branchId.HasValue)
         {

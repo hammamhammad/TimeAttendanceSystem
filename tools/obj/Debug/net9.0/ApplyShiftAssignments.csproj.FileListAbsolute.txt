@@ -1,0 +1,6 @@
+D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\ApplyShiftAssignments.csproj.AssemblyReference.cache
+D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\ApplyShiftAssignments.GeneratedMSBuildEditorConfig.editorconfig
+D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\ApplyShiftAssignments.AssemblyInfoInputs.cache
+D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\ApplyShiftAssignments.AssemblyInfo.cs
+D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\ApplyShiftAssignments.csproj.CoreCompileInputs.cache
+D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\ApplyShiftAssignments.sourcelink.json

@@ -131,6 +131,15 @@ public interface IAttendanceRepository
     Task<int> DeleteByDateAsync(DateTime attendanceDate, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Deletes all attendance records for a specific date and branch.
+    /// </summary>
+    /// <param name="attendanceDate">The attendance date</param>
+    /// <param name="branchId">The branch identifier</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Number of records deleted</returns>
+    Task<int> DeleteByDateAndBranchAsync(DateTime attendanceDate, long branchId, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Checks if an attendance record exists for employee and date.
     /// </summary>
     /// <param name="employeeId">The employee identifier</param>

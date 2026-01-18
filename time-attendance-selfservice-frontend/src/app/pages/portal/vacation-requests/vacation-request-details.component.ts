@@ -12,6 +12,7 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 import { DefinitionListComponent, DefinitionItem } from '../../../shared/components/definition-list/definition-list.component';
 import { DetailCardComponent } from '../../../shared/components/detail-card/detail-card.component';
+import { DelegationModalComponent, DelegationResult } from '../../../shared/components/delegation-modal/delegation-modal.component';
 
 /**
  * Portal Vacation Request Details Component
@@ -26,7 +27,8 @@ import { DetailCardComponent } from '../../../shared/components/detail-card/deta
     LoadingSpinnerComponent,
     StatusBadgeComponent,
     DefinitionListComponent,
-    DetailCardComponent
+    DetailCardComponent,
+    DelegationModalComponent
   ],
   templateUrl: './vacation-request-details.component.html',
   styleUrl: './vacation-request-details.component.css'
@@ -45,6 +47,7 @@ export class PortalVacationRequestDetailsComponent implements OnInit {
   loading = signal(true);
   error = signal<string | null>(null);
   processingApproval = signal(false);
+  showDelegationModal = signal(false);
 
   // Computed properties
   statusBadge = computed(() => {
@@ -440,38 +443,36 @@ export class PortalVacationRequestDetailsComponent implements OnInit {
   }
 
   /**
-   * Delegates the vacation request to another user
+   * Opens the delegation modal
    */
-  async onDelegate(): Promise<void> {
+  onDelegate(): void {
+    const vac = this.vacation();
+    if (!vac?.workflowInstanceId) return;
+    this.showDelegationModal.set(true);
+  }
+
+  /**
+   * Closes the delegation modal
+   */
+  onCloseDelegationModal(): void {
+    this.showDelegationModal.set(false);
+  }
+
+  /**
+   * Handles the delegation result from the modal
+   */
+  onDelegateConfirmed(result: DelegationResult): void {
     const vac = this.vacation();
     if (!vac?.workflowInstanceId) return;
 
-    // For now, prompt user for delegate user ID
-    // In a full implementation, this would open a user selection modal
-    const delegateUserIdStr = prompt(this.i18n.t('portal.enter_delegate_user_id'));
-    if (!delegateUserIdStr) return;
-
-    const delegateToUserId = parseInt(delegateUserIdStr, 10);
-    if (isNaN(delegateToUserId) || delegateToUserId <= 0) {
-      this.notificationService.error(this.i18n.t('portal.invalid_user_id'));
-      return;
-    }
-
-    const result = await this.confirmationService.confirm({
-      title: this.i18n.t('portal.confirm_delegate'),
-      message: this.i18n.t('portal.confirm_delegate_message'),
-      confirmText: this.i18n.t('portal.delegate'),
-      cancelText: this.i18n.t('common.cancel'),
-      confirmButtonClass: 'btn-info',
-      icon: 'bi-person-plus',
-      iconClass: 'text-info'
-    });
-
-    if (!result.confirmed) return;
-
+    this.showDelegationModal.set(false);
     this.processingApproval.set(true);
 
-    this.portalService.delegateWorkflowStep(vac.workflowInstanceId, delegateToUserId, 'Delegated via vacation details').subscribe({
+    const comments = result.reason
+      ? `Delegated to ${result.employeeName}: ${result.reason}`
+      : `Delegated to ${result.employeeName} via vacation details`;
+
+    this.portalService.delegateWorkflowStep(vac.workflowInstanceId, result.userId, comments).subscribe({
       next: () => {
         this.notificationService.success(this.i18n.t('portal.delegation_success'));
         // Navigate back to pending approvals

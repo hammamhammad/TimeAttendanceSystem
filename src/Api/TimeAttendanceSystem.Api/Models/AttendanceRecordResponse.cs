@@ -30,6 +30,34 @@ public class AttendanceRecordResponse
     public string? Notes { get; set; }
     public List<AttendanceTransactionResponse> Transactions { get; set; } = new();
     public WorkingDayAnalysisResponse? WorkingDayAnalysis { get; set; }
+
+    // Shift information
+    public ShiftInfoResponse? Shift { get; set; }
+}
+
+/// <summary>
+/// Response model for shift information in attendance context.
+/// </summary>
+public class ShiftInfoResponse
+{
+    public long Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string? NameAr { get; set; }
+    public string ShiftType { get; set; } = string.Empty;
+    public TimeOnly? StartTime { get; set; }
+    public TimeOnly? EndTime { get; set; }
+    public decimal TotalHours { get; set; }
+    public List<ShiftPeriodResponse> Periods { get; set; } = new();
+}
+
+/// <summary>
+/// Response model for shift period information.
+/// </summary>
+public class ShiftPeriodResponse
+{
+    public TimeOnly StartTime { get; set; }
+    public TimeOnly EndTime { get; set; }
+    public bool IsBreak { get; set; }
 }
 
 /// <summary>

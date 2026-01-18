@@ -43,6 +43,16 @@ public class EmployeeVacationDetailDto
     public bool IsApproved { get; set; }
     public string? Notes { get; set; }
     public DateTime CreatedAtUtc { get; set; }
+
+    /// <summary>
+    /// Computed status: Approved, Pending, Expired, or Completed
+    /// </summary>
+    public string Status { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Display text for the status
+    /// </summary>
+    public string StatusDisplay { get; set; } = string.Empty;
 }
 
 /// <summary>

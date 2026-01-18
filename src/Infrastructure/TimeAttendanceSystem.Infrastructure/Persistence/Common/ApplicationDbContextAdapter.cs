@@ -82,4 +82,13 @@ public class ApplicationDbContextAdapter : IApplicationDbContext
     {
         return _context.SaveChangesAsync(cancellationToken);
     }
+
+    /// <summary>
+    /// Clears the change tracker to remove all tracked entities.
+    /// Useful after bulk operations to ensure fresh data is loaded.
+    /// </summary>
+    public void ClearChangeTracker()
+    {
+        _context.ChangeTracker.Clear();
+    }
 }

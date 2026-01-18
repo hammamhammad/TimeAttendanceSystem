@@ -113,7 +113,8 @@ public class ValidateExcuseCommandHandler : IRequestHandler<ValidateExcuseComman
                             ee.ExcuseType == ExcuseType.PersonalExcuse &&
                             ee.ExcuseDate >= monthStart &&
                             ee.ExcuseDate <= monthEnd &&
-                            ee.ApprovalStatus != ApprovalStatus.Rejected)
+                            ee.ApprovalStatus != ApprovalStatus.Rejected &&
+                            ee.ApprovalStatus != ApprovalStatus.Cancelled)
                 .ToListAsync(cancellationToken);
 
             var currentMonthlyCount = monthlyExcuses.Count;
@@ -134,7 +135,8 @@ public class ValidateExcuseCommandHandler : IRequestHandler<ValidateExcuseComman
                 .Where(ee => ee.EmployeeId == request.EmployeeId &&
                             ee.ExcuseType == ExcuseType.PersonalExcuse &&
                             ee.ExcuseDate.Date == request.ExcuseDate.Date &&
-                            ee.ApprovalStatus != ApprovalStatus.Rejected)
+                            ee.ApprovalStatus != ApprovalStatus.Rejected &&
+                            ee.ApprovalStatus != ApprovalStatus.Cancelled)
                 .ToListAsync(cancellationToken);
 
             var currentDailyHours = dailyExcuses.Sum(e => e.DurationHours);

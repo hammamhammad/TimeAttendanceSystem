@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using TimeAttendanceSystem.Application.Abstractions;
 using TimeAttendanceSystem.Application.Common;
+using TimeAttendanceSystem.Application.Extensions;
 using TimeAttendanceSystem.Domain.Excuses;
 using TimeAttendanceSystem.Domain.Attendance;
 
@@ -14,10 +15,17 @@ namespace TimeAttendanceSystem.Application.Excuses.Commands.ApproveEmployeeExcus
 public class ApproveEmployeeExcuseCommandHandler : IRequestHandler<ApproveEmployeeExcuseCommand, Result<bool>>
 {
     private readonly IApplicationDbContext _context;
+    private readonly IAttendanceCalculationService _calculationService;
+    private readonly IAttendanceTransactionRepository _transactionRepository;
 
-    public ApproveEmployeeExcuseCommandHandler(IApplicationDbContext context)
+    public ApproveEmployeeExcuseCommandHandler(
+        IApplicationDbContext context,
+        IAttendanceCalculationService calculationService,
+        IAttendanceTransactionRepository transactionRepository)
     {
         _context = context;
+        _calculationService = calculationService;
+        _transactionRepository = transactionRepository;
     }
 
     /// <summary>
@@ -98,23 +106,43 @@ public class ApproveEmployeeExcuseCommandHandler : IRequestHandler<ApproveEmploy
 
     /// <summary>
     /// Updates attendance records for the excuse period when excuse is approved.
+    /// Triggers full recalculation to properly apply excuse offsets to late/early minutes.
     /// </summary>
     private async Task UpdateAttendanceRecordsAsync(Domain.Excuses.EmployeeExcuse excuse, CancellationToken cancellationToken)
     {
-        // Find existing attendance record for the date
+        // Normalize the excuse date to UTC for PostgreSQL compatibility
+        var normalizedExcuseDate = excuse.ExcuseDate.ToUtcDate();
+
+        // Find existing attendance record for the date with shift assignment
         var attendanceRecord = await _context.AttendanceRecords
+            .Include(ar => ar.ShiftAssignment)
+                .ThenInclude(sa => sa!.Shift)
+                    .ThenInclude(s => s.ShiftPeriods)
             .FirstOrDefaultAsync(ar => ar.EmployeeId == excuse.EmployeeId &&
-                                     ar.AttendanceDate.Date == excuse.ExcuseDate.Date,
+                                     ar.AttendanceDate.Date == normalizedExcuseDate &&
+                                     !ar.IsFinalized,
                                 cancellationToken);
 
         if (attendanceRecord != null)
         {
-            // Update attendance status based on excuse type
-            var newStatus = excuse.ExcuseType == ExcuseType.OfficialDuty
-                ? AttendanceStatus.OnDuty
-                : AttendanceStatus.Excused;
+            // Get transactions for recalculation
+            var transactions = await _transactionRepository.GetByEmployeeAndDateAsync(
+                excuse.EmployeeId, excuse.ExcuseDate, cancellationToken);
 
-            attendanceRecord.Status = newStatus;
+            // Recalculate attendance - this will now consider the approved excuse
+            var recalculatedRecord = await _calculationService.RecalculateAttendanceAsync(
+                attendanceRecord, transactions, cancellationToken);
+
+            // Copy recalculated values to existing record
+            attendanceRecord.Status = recalculatedRecord.Status;
+            attendanceRecord.LateMinutes = recalculatedRecord.LateMinutes;
+            attendanceRecord.EarlyLeaveMinutes = recalculatedRecord.EarlyLeaveMinutes;
+            attendanceRecord.WorkingHours = recalculatedRecord.WorkingHours;
+            attendanceRecord.OvertimeHours = recalculatedRecord.OvertimeHours;
+            attendanceRecord.BreakHours = recalculatedRecord.BreakHours;
+            attendanceRecord.Notes = string.IsNullOrEmpty(attendanceRecord.Notes)
+                ? $"Recalculated after excuse approval (ID: {excuse.Id})"
+                : $"{attendanceRecord.Notes} | Recalculated after excuse approval (ID: {excuse.Id})";
             attendanceRecord.ModifiedAtUtc = DateTime.UtcNow;
 
             await _context.SaveChangesAsync(cancellationToken);

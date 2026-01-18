@@ -4,6 +4,7 @@ using TimeAttendanceSystem.Domain.Shifts;
 using TimeAttendanceSystem.Domain.Settings;
 using TimeAttendanceSystem.Domain.Branches;
 using TimeAttendanceSystem.Domain.Employees;
+using TimeAttendanceSystem.Domain.Excuses;
 using TimeAttendanceSystem.Domain.RemoteWork;
 using TimeAttendanceSystem.Domain.Workflows;
 using TimeAttendanceSystem.Domain.Workflows.Enums;
@@ -54,9 +55,14 @@ public static class SeedData
             await SeedDefaultVacationTypesAsync(context);
         }
 
+        if (!await context.ExcusePolicies.AnyAsync())
+        {
+            await SeedDefaultExcusePolicyAsync(context);
+        }
+
         await context.SaveChangesAsync();
 
-        Console.WriteLine("✅ Essential system data seeding completed (permissions, roles, systemadmin user, default shift, remote work policy, default workflows, vacation types)");
+        Console.WriteLine("✅ Essential system data seeding completed (permissions, roles, systemadmin user, default shift, remote work policy, default workflows, vacation types, excuse policy)");
     }
 
     private static async Task SeedPermissionsAsync(TimeAttendanceDbContext context)
@@ -681,6 +687,32 @@ public static class SeedData
         await context.SaveChangesAsync();
 
         Console.WriteLine("✅ Created 8 default vacation types: Annual, Sick, Unpaid, Emergency, Maternity, Paternity, Bereavement, Marriage Leave");
+    }
+
+    private static async Task SeedDefaultExcusePolicyAsync(TimeAttendanceDbContext context)
+    {
+        // Create a company-wide default excuse policy
+        var defaultPolicy = new ExcusePolicy
+        {
+            BranchId = null, // Organization-wide policy
+            MaxPersonalExcusesPerMonth = 5,
+            MaxPersonalExcuseHoursPerMonth = 8.0m,
+            MaxPersonalExcuseHoursPerDay = 4.0m,
+            MaxHoursPerExcuse = 2.0m,
+            RequiresApproval = true,
+            AllowPartialHourExcuses = true,
+            MinimumExcuseDuration = 0.5m,
+            IsActive = true,
+            MaxRetroactiveDays = 7,
+            AllowSelfServiceRequests = true,
+            CreatedBy = "SYSTEM",
+            CreatedAtUtc = DateTime.UtcNow
+        };
+
+        await context.ExcusePolicies.AddAsync(defaultPolicy);
+        await context.SaveChangesAsync();
+
+        Console.WriteLine("✅ Default excuse policy created: Organization-wide (5 excuses/month, 8h/month, 2h max per excuse)");
     }
 
     private static (string hash, string salt) HashPassword(string password)

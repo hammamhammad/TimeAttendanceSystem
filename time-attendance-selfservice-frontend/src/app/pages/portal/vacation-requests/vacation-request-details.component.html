@@ -184,3 +184,11 @@
     }
   </div>
 }
+
+<!-- Delegation Modal -->
+<app-delegation-modal
+  [show]="showDelegationModal()"
+  [title]="i18n.t('portal.delegate_approval')"
+  (close)="onCloseDelegationModal()"
+  (delegate)="onDelegateConfirmed($event)">
+</app-delegation-modal>

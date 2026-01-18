@@ -57,8 +57,10 @@ public class AttendanceRecord : BaseEntity
     /// <summary>
     /// Gets or sets the calculated attendance status for this date.
     /// Determined by comparing actual transactions against shift requirements.
+    /// Default is Absent - this follows the business rule that employees with no check-in
+    /// on a working day should be marked as Absent.
     /// </summary>
-    public AttendanceStatus Status { get; set; }
+    public AttendanceStatus Status { get; set; } = AttendanceStatus.Absent;
 
     /// <summary>
     /// Gets or sets the scheduled start time for this date based on shift assignment.

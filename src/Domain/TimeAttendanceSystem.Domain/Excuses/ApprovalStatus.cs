@@ -19,5 +19,10 @@ public enum ApprovalStatus
     /// <summary>
     /// Excuse request has been rejected and will not affect attendance.
     /// </summary>
-    Rejected = 3
+    Rejected = 3,
+
+    /// <summary>
+    /// Excuse request has been cancelled by the employee.
+    /// </summary>
+    Cancelled = 4
 }

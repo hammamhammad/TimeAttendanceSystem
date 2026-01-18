@@ -64,6 +64,15 @@ public interface IInAppNotificationService
     /// <param name="userId">The user ID (for validation).</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     Task DeleteNotificationAsync(long notificationId, long userId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Marks all notifications related to a specific entity as read for all users.
+    /// Used when an entity (like an excuse or vacation) is cancelled.
+    /// </summary>
+    /// <param name="entityType">The type of entity (e.g., "Excuse", "Vacation").</param>
+    /// <param name="entityId">The ID of the entity.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    Task MarkEntityNotificationsAsReadAsync(string entityType, long entityId, CancellationToken cancellationToken = default);
 }
 
 /// <summary>

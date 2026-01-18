@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using TimeAttendanceSystem.Application.Abstractions;
+using TimeAttendanceSystem.Application.Extensions;
 using TimeAttendanceSystem.Domain.Attendance;
 using TimeAttendanceSystem.Domain.Employees;
 using TimeAttendanceSystem.Domain.Common;
@@ -37,7 +38,8 @@ public class DailyAttendanceGeneratorService : IDailyAttendanceGeneratorService
 
     public async Task<int> GenerateAttendanceRecordsAsync(DateTime date, CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("Starting attendance generation for date: {Date}", date.Date);
+        var normalizedDate = date.Date;
+        _logger.LogInformation("=== GenerateAttendanceRecordsAsync START for date: {Date} ===", normalizedDate);
 
         // Include all employees except Terminated and Inactive
         var activeEmployees = await _context.Employees
@@ -46,27 +48,51 @@ public class DailyAttendanceGeneratorService : IDailyAttendanceGeneratorService
                         e.IsActive)
             .ToListAsync(cancellationToken);
 
+        _logger.LogInformation("Query returned {Count} active employees", activeEmployees.Count);
+
+        if (activeEmployees.Count == 0)
+        {
+            _logger.LogWarning("No active employees found! Check database connection and employee data.");
+            return 0;
+        }
+
+        // Log first few employees for debugging
+        var sampleEmployees = activeEmployees.Take(3).Select(e => $"ID={e.Id}, Name={e.FirstName} {e.LastName}, HireDate={e.HireDate:yyyy-MM-dd}");
+        _logger.LogInformation("Sample employees: {Employees}", string.Join("; ", sampleEmployees));
+
         var recordsGenerated = 0;
+        var failedCount = 0;
 
         foreach (var employee in activeEmployees)
         {
             try
             {
-                var wasGenerated = await GenerateAttendanceRecordForEmployeeAsync(employee.Id, date, cancellationToken);
+                var wasGenerated = await GenerateAttendanceRecordForEmployeeAsync(employee.Id, normalizedDate, cancellationToken);
                 if (wasGenerated)
                 {
                     recordsGenerated++;
                 }
+                else
+                {
+                    failedCount++;
+                    if (failedCount <= 5)
+                    {
+                        _logger.LogWarning("GenerateAttendanceRecordForEmployeeAsync returned false for employee {EmployeeId} ({EmployeeName}) on {Date}",
+                            employee.Id, $"{employee.FirstName} {employee.LastName}", normalizedDate);
+                    }
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error generating attendance record for employee {EmployeeId} on {Date}",
-                    employee.Id, date.Date);
+                failedCount++;
+                _logger.LogError(ex, "Exception generating attendance record for employee {EmployeeId} on {Date}",
+                    employee.Id, normalizedDate);
             }
         }
 
-        _logger.LogInformation("Generated {Count} attendance records for date: {Date}",
-            recordsGenerated, date.Date);
+        _logger.LogInformation("=== GenerateAttendanceRecordsAsync COMPLETE ===");
+        _logger.LogInformation("Date: {Date}, Generated: {Generated}, Failed/Skipped: {Failed}, Total: {Total}",
+            normalizedDate, recordsGenerated, failedCount, activeEmployees.Count);
 
         return recordsGenerated;
     }
@@ -111,17 +137,18 @@ public class DailyAttendanceGeneratorService : IDailyAttendanceGeneratorService
 
     public async Task<bool> GenerateAttendanceRecordForEmployeeAsync(long employeeId, DateTime date, CancellationToken cancellationToken = default)
     {
-        _logger.LogDebug("=== Starting attendance generation for employee {EmployeeId} on {Date} ===", employeeId, date.Date);
+        var normalizedDate = date.Date;
+        _logger.LogDebug("=== Starting attendance generation for employee {EmployeeId} on {Date} (normalized) ===", employeeId, normalizedDate);
 
         // Check if attendance record already exists
-        var existingRecord = await _attendanceRepository.GetByEmployeeAndDateAsync(employeeId, date, cancellationToken);
+        var existingRecord = await _attendanceRepository.GetByEmployeeAndDateAsync(employeeId, normalizedDate, cancellationToken);
         if (existingRecord != null)
         {
-            _logger.LogWarning("Attendance record already exists for employee {EmployeeId} on {Date} - skipping generation",
-                employeeId, date.Date);
+            _logger.LogWarning("SKIP: Attendance record already exists for employee {EmployeeId} on {Date} (RecordId={RecordId}, Status={Status})",
+                employeeId, normalizedDate, existingRecord.Id, existingRecord.Status);
             return false;
         }
-        _logger.LogDebug("No existing attendance record found for employee {EmployeeId} on {Date} - proceeding with generation", employeeId, date.Date);
+        _logger.LogDebug("No existing attendance record found for employee {EmployeeId} on {Date} - proceeding with generation", employeeId, normalizedDate);
 
         try
         {
@@ -132,17 +159,20 @@ public class DailyAttendanceGeneratorService : IDailyAttendanceGeneratorService
 
             if (employee == null)
             {
-                _logger.LogWarning("Employee {EmployeeId} not found - skipping attendance generation", employeeId);
+                _logger.LogWarning("SKIP: Employee {EmployeeId} not found - skipping attendance generation", employeeId);
                 return false;
             }
+            _logger.LogDebug("Found employee: {EmployeeId}, Name={Name}, HireDate={HireDate}",
+                employeeId, $"{employee.FirstName} {employee.LastName}", employee.HireDate);
 
             // Rule 1: Check if the date is before the employee's hire date
-            if (date.Date < employee.HireDate.Date)
+            if (normalizedDate < employee.HireDate.Date)
             {
-                _logger.LogDebug("Date {Date} is before employee {EmployeeId} hire date {HireDate} - skipping attendance generation",
-                    date.Date, employeeId, employee.HireDate.Date);
+                _logger.LogWarning("SKIP: Date {Date} is before employee {EmployeeId} hire date {HireDate} - skipping attendance generation",
+                    normalizedDate, employeeId, employee.HireDate.Date);
                 return false;
             }
+            _logger.LogDebug("Date check passed: {Date} >= HireDate {HireDate}", normalizedDate, employee.HireDate.Date);
 
             // Get the effective shift assignment for the employee on this date
             _logger.LogDebug("Getting effective shift assignment for employee {EmployeeId} on {Date}", employeeId, date.Date);
@@ -245,10 +275,7 @@ public class DailyAttendanceGeneratorService : IDailyAttendanceGeneratorService
             _logger.LogInformation("Deleted {DeletedCount} existing attendance records for {Date}", recordsDeleted, date);
 
             // Clear the Entity Framework context to ensure fresh data
-            if (_context is DbContext dbContext)
-            {
-                dbContext.ChangeTracker.Clear();
-            }
+            _context.ClearChangeTracker();
 
             // Generate fresh attendance records for all active employees
             var recordsGenerated = await GenerateAttendanceRecordsAsync(date, cancellationToken);
@@ -272,16 +299,98 @@ public class DailyAttendanceGeneratorService : IDailyAttendanceGeneratorService
         return result;
     }
 
+    public async Task<AttendanceGenerationResult> RunGenerationForDateAsync(DateTime date, long? branchId = null, CancellationToken cancellationToken = default)
+    {
+        var stopwatch = Stopwatch.StartNew();
+        var normalizedDate = date.Date;
+
+        _logger.LogInformation("=== RunGenerationForDateAsync START ===");
+        _logger.LogInformation("Input date: {InputDate}, Normalized date: {NormalizedDate}, Branch: {BranchId}",
+            date, normalizedDate, branchId);
+
+        var result = new AttendanceGenerationResult
+        {
+            Date = normalizedDate
+        };
+
+        try
+        {
+            // Get active employee count for the result
+            var employeesQuery = _context.Employees
+                .Where(e => e.EmploymentStatus != EmploymentStatus.Terminated &&
+                            e.EmploymentStatus != EmploymentStatus.Inactive &&
+                            e.IsActive);
+
+            if (branchId.HasValue)
+            {
+                employeesQuery = employeesQuery.Where(e => e.BranchId == branchId.Value);
+            }
+
+            result.TotalEmployees = await employeesQuery.CountAsync(cancellationToken);
+            _logger.LogInformation("Found {TotalEmployees} active employees to process", result.TotalEmployees);
+
+            // Delete existing records for the date (and branch if specified)
+            int recordsDeleted;
+            if (branchId.HasValue)
+            {
+                recordsDeleted = await _attendanceRepository.DeleteByDateAndBranchAsync(normalizedDate, branchId.Value, cancellationToken);
+            }
+            else
+            {
+                recordsDeleted = await _attendanceRepository.DeleteByDateAsync(normalizedDate, cancellationToken);
+            }
+            _logger.LogInformation("Deleted {DeletedCount} existing attendance records for {Date}", recordsDeleted, normalizedDate);
+
+            // Clear the Entity Framework context to ensure fresh data
+            _context.ClearChangeTracker();
+            _logger.LogInformation("Cleared EF change tracker");
+
+            // Generate fresh attendance records
+            _logger.LogInformation("Starting record generation for date {Date}...", normalizedDate);
+            int recordsGenerated;
+            if (branchId.HasValue)
+            {
+                recordsGenerated = await GenerateAttendanceRecordsForBranchAsync(branchId.Value, normalizedDate, cancellationToken);
+            }
+            else
+            {
+                recordsGenerated = await GenerateAttendanceRecordsAsync(normalizedDate, cancellationToken);
+            }
+
+            result.RecordsGenerated = recordsGenerated;
+            result.RecordsUpdated = recordsDeleted;
+            result.RecordsSkipped = 0;
+
+            _logger.LogInformation("=== RunGenerationForDateAsync COMPLETE ===");
+            _logger.LogInformation("Date: {Date}, Generated: {Generated}, Deleted: {Deleted}, TotalEmployees: {TotalEmployees}",
+                normalizedDate, result.RecordsGenerated, result.RecordsUpdated, result.TotalEmployees);
+        }
+        catch (Exception ex)
+        {
+            result.ErrorCount++;
+            result.Errors.Add($"Failed to generate attendance for {normalizedDate:yyyy-MM-dd}: {ex.Message}");
+            _logger.LogError(ex, "Error during attendance generation for {Date}: {Message}", normalizedDate, ex.Message);
+        }
+
+        stopwatch.Stop();
+        result.Duration = stopwatch.Elapsed;
+
+        return result;
+    }
+
     public async Task<int> RecalculateAttendanceRecordsAsync(DateTime date, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Starting attendance recalculation for date: {Date}", date.Date);
+
+        // Normalize date to UTC for PostgreSQL timestamp with time zone comparisons
+        var normalizedDate = date.ToUtcDate();
 
         // Get all attendance records for the date that are not finalized
         var attendanceRecords = await _context.AttendanceRecords
             .Include(ar => ar.ShiftAssignment)
                 .ThenInclude(sa => sa!.Shift)
                     .ThenInclude(s => s.ShiftPeriods)
-            .Where(ar => ar.AttendanceDate.Date == date.Date && !ar.IsFinalized)
+            .Where(ar => ar.AttendanceDate.Date == normalizedDate && !ar.IsFinalized)
             .ToListAsync(cancellationToken);
 
         var recordsUpdated = 0;
@@ -358,9 +467,12 @@ public class DailyAttendanceGeneratorService : IDailyAttendanceGeneratorService
         _logger.LogInformation("Finalizing attendance records for date: {Date}, branch: {BranchId}",
             date.Date, branchId);
 
+        // Normalize date to UTC for PostgreSQL timestamp with time zone comparisons
+        var normalizedDate = date.ToUtcDate();
+
         var query = _context.AttendanceRecords
             .Include(ar => ar.Employee)
-            .Where(ar => ar.AttendanceDate.Date == date.Date && !ar.IsFinalized);
+            .Where(ar => ar.AttendanceDate.Date == normalizedDate && !ar.IsFinalized);
 
         if (branchId.HasValue)
         {
