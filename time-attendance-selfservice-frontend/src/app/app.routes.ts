@@ -43,30 +43,6 @@ export const routes: Routes = [
         canMatch: [authGuard]
       },
       {
-        path: 'fingerprint-requests',
-        loadComponent: () => import('./pages/portal/fingerprint-requests/fingerprint-requests-list.component').then(m => m.FingerprintRequestsListComponent),
-        data: { title: 'portal.fingerprint_requests' },
-        canMatch: [authGuard]
-      },
-      {
-        path: 'fingerprint-requests/new',
-        loadComponent: () => import('./pages/portal/fingerprint-requests/fingerprint-request-form.component').then(m => m.FingerprintRequestFormComponent),
-        data: { title: 'portal.new_fingerprint_request' },
-        canMatch: [authGuard]
-      },
-      {
-        path: 'fingerprint-requests/:id',
-        loadComponent: () => import('./pages/portal/fingerprint-requests/fingerprint-request-details.component').then(m => m.FingerprintRequestDetailsComponent),
-        data: { title: 'portal.fingerprint_request_details' },
-        canMatch: [authGuard]
-      },
-      {
-        path: 'fingerprint-requests/:id/edit',
-        loadComponent: () => import('./pages/portal/fingerprint-requests/fingerprint-request-form.component').then(m => m.FingerprintRequestFormComponent),
-        data: { title: 'portal.edit_fingerprint_request' },
-        canMatch: [authGuard]
-      },
-      {
         path: 'vacation-requests',
         loadComponent: () => import('./pages/portal/vacation-requests/vacation-requests-list.component').then(m => m.VacationRequestsListComponent),
         data: { title: 'portal.vacation_requests' },
@@ -136,6 +112,37 @@ export const routes: Routes = [
         path: 'remote-work-requests/:id',
         loadComponent: () => import('./pages/portal/remote-work-requests/remote-work-request-details.component').then(m => m.PortalRemoteWorkRequestDetailsComponent),
         data: { title: 'portal.remote_work_details' },
+        canMatch: [authGuard]
+      },
+      {
+        path: 'remote-work-requests/approval/:id',
+        loadComponent: () => import('./pages/portal/remote-work-requests/remote-work-request-details.component').then(m => m.PortalRemoteWorkRequestDetailsComponent),
+        data: { title: 'portal.remote_work_approval' },
+        canMatch: [authGuard]
+      },
+      // Attendance Correction routes
+      {
+        path: 'attendance-corrections',
+        loadComponent: () => import('./pages/attendance-corrections/attendance-corrections-list.component').then(m => m.AttendanceCorrectionsListComponent),
+        data: { title: 'portal.attendance_corrections' },
+        canMatch: [authGuard]
+      },
+      {
+        path: 'attendance-corrections/new',
+        loadComponent: () => import('./pages/attendance-corrections/attendance-correction-form.component').then(m => m.AttendanceCorrectionFormComponent),
+        data: { title: 'portal.new_correction' },
+        canMatch: [authGuard]
+      },
+      {
+        path: 'attendance-corrections/:id/edit',
+        loadComponent: () => import('./pages/attendance-corrections/attendance-correction-form.component').then(m => m.AttendanceCorrectionFormComponent),
+        data: { title: 'portal.edit_correction' },
+        canMatch: [authGuard]
+      },
+      {
+        path: 'attendance-corrections/:id',
+        loadComponent: () => import('./pages/attendance-corrections/attendance-correction-details.component').then(m => m.AttendanceCorrectionDetailsComponent),
+        data: { title: 'portal.correction_details' },
         canMatch: [authGuard]
       },
       // Manager routes (require manager role)

@@ -40,11 +40,5 @@ public enum WorkflowEntityType
     /// Timesheet submission workflow.
     /// Supports weekly/monthly timesheet approval.
     /// </summary>
-    Timesheet = 6,
-
-    /// <summary>
-    /// Fingerprint registration request workflow.
-    /// Supports biometric enrollment requests.
-    /// </summary>
-    FingerprintRequest = 7
+    Timesheet = 6
 }

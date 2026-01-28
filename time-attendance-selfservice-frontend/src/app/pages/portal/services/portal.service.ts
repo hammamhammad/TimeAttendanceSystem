@@ -9,20 +9,10 @@ import {
   QuickAction,
   StatsCard
 } from '../models/employee-dashboard.model';
-import {
-  FingerprintRequest,
-  FingerprintRequestType,
-  FingerprintRequestStatus,
-  CreateFingerprintRequestRequest,
-  UpdateFingerprintRequestRequest,
-  CompleteFingerprintRequestRequest,
-  FingerprintRequestQueryParams,
-  PagedResult
-} from '../models/fingerprint-request.model';
 
 /**
  * Portal Service - Manages employee self-service portal data
- * Provides dashboard, fingerprint requests, and other portal features
+ * Provides dashboard and other portal features
  * Uses Angular signals for reactive state management
  */
 @Injectable({
@@ -30,7 +20,6 @@ import {
 })
 export class PortalService {
   private readonly portalApiUrl = `${environment.apiUrl}/api/v1/portal`;
-  private readonly fingerprintApiUrl = `${environment.apiUrl}/api/v1/fingerprint-requests`;
 
   // ===== EMPLOYEE DASHBOARD STATE =====
 
@@ -120,15 +109,6 @@ export class PortalService {
         enabled: true
       },
       {
-        id: 'fingerprint-request',
-        title: 'Fingerprint Request',
-        description: 'Request fingerprint enrollment or update',
-        icon: 'bi-fingerprint',
-        route: '/fingerprint-requests/new',
-        color: 'warning',
-        enabled: true
-      },
-      {
         id: 'view-attendance',
         title: 'My Attendance',
         description: 'View attendance history',
@@ -136,21 +116,18 @@ export class PortalService {
         route: '/my-attendance',
         color: 'success',
         enabled: true
+      },
+      {
+        id: 'attendance-correction',
+        title: 'Attendance Correction',
+        description: 'Request correction for missed clock-in/out',
+        icon: 'bi-clock-history',
+        route: '/attendance-corrections/new',
+        color: 'warning',
+        enabled: true
       }
     ];
   });
-
-  // ===== FINGERPRINT REQUESTS STATE =====
-
-  private readonly _fingerprintRequests = signal<FingerprintRequest[]>([]);
-  private readonly _fingerprintRequestsLoading = signal<boolean>(false);
-  private readonly _fingerprintRequestsError = signal<string | null>(null);
-  private readonly _fingerprintRequestsPagedResult = signal<PagedResult<FingerprintRequest> | null>(null);
-
-  readonly fingerprintRequests = this._fingerprintRequests.asReadonly();
-  readonly fingerprintRequestsLoading = this._fingerprintRequestsLoading.asReadonly();
-  readonly fingerprintRequestsError = this._fingerprintRequestsError.asReadonly();
-  readonly fingerprintRequestsPagedResult = this._fingerprintRequestsPagedResult.asReadonly();
 
   constructor(
     private http: HttpClient,
@@ -217,248 +194,7 @@ export class PortalService {
     };
   }
 
-  // ===== FINGERPRINT REQUESTS METHODS =====
-
-  /**
-   * Loads fingerprint requests with optional filtering
-   */
-  loadFingerprintRequests(params?: FingerprintRequestQueryParams): Observable<PagedResult<FingerprintRequest>> {
-    this._fingerprintRequestsLoading.set(true);
-    this._fingerprintRequestsError.set(null);
-
-    let httpParams = new HttpParams();
-
-    if (params) {
-      if (params.employeeId) httpParams = httpParams.set('employeeId', params.employeeId.toString());
-      if (params.status) httpParams = httpParams.set('status', params.status);
-      if (params.requestType) httpParams = httpParams.set('requestType', params.requestType);
-      if (params.startDate) httpParams = httpParams.set('startDate', params.startDate.toISOString());
-      if (params.endDate) httpParams = httpParams.set('endDate', params.endDate.toISOString());
-      if (params.pageNumber) httpParams = httpParams.set('pageNumber', params.pageNumber.toString());
-      if (params.pageSize) httpParams = httpParams.set('pageSize', params.pageSize.toString());
-    }
-
-    return this.http.get<{ isSuccess: boolean; value: PagedResult<FingerprintRequest>; error: string }>(
-      this.fingerprintApiUrl,
-      { params: httpParams }
-    ).pipe(
-      map(response => {
-        if (!response.isSuccess) {
-          throw new Error(response.error || 'Failed to load fingerprint requests');
-        }
-        return {
-          ...response.value,
-          items: response.value.items.map(item => this.transformFingerprintRequestDates(item))
-        };
-      }),
-      tap(result => {
-        this._fingerprintRequests.set(result.items);
-        this._fingerprintRequestsPagedResult.set(result);
-        this._fingerprintRequestsLoading.set(false);
-      }),
-      catchError(error => {
-        const errorMessage = error.error?.error || error.message || 'Failed to load fingerprint requests';
-        this._fingerprintRequestsError.set(errorMessage);
-        this._fingerprintRequestsLoading.set(false);
-        this.notificationService.error(errorMessage);
-        return throwError(() => error);
-      })
-    );
-  }
-
-  /**
-   * Gets a specific fingerprint request by ID
-   */
-  getFingerprintRequestById(id: number): Observable<FingerprintRequest> {
-    return this.http.get<{ isSuccess: boolean; value: FingerprintRequest; error: string }>(
-      `${this.fingerprintApiUrl}/${id}`
-    ).pipe(
-      map(response => {
-        if (!response.isSuccess) {
-          throw new Error(response.error || 'Failed to load fingerprint request');
-        }
-        return this.transformFingerprintRequestDates(response.value);
-      }),
-      catchError(error => {
-        const errorMessage = error.error?.error || error.message || 'Failed to load fingerprint request';
-        this.notificationService.error(errorMessage);
-        return throwError(() => error);
-      })
-    );
-  }
-
-  /**
-   * Creates a new fingerprint request
-   */
-  createFingerprintRequest(request: CreateFingerprintRequestRequest): Observable<number> {
-    this._fingerprintRequestsLoading.set(true);
-
-    return this.http.post<{ isSuccess: boolean; value: number; error: string }>(
-      this.fingerprintApiUrl,
-      request
-    ).pipe(
-      map(response => {
-        if (!response.isSuccess) {
-          throw new Error(response.error || 'Failed to create fingerprint request');
-        }
-        return response.value;
-      }),
-      tap(requestId => {
-        this._fingerprintRequestsLoading.set(false);
-        this.notificationService.success('Fingerprint request created successfully');
-        // Refresh the list if we have one
-        const currentResult = this._fingerprintRequestsPagedResult();
-        if (currentResult) {
-          this.loadFingerprintRequests().subscribe();
-        }
-      }),
-      catchError(error => {
-        this._fingerprintRequestsLoading.set(false);
-        const errorMessage = error.error?.error || error.message || 'Failed to create fingerprint request';
-        this.notificationService.error(errorMessage);
-        return throwError(() => error);
-      })
-    );
-  }
-
-  /**
-   * Updates an existing fingerprint request
-   */
-  updateFingerprintRequest(id: number, request: UpdateFingerprintRequestRequest): Observable<void> {
-    this._fingerprintRequestsLoading.set(true);
-
-    return this.http.put<{ isSuccess: boolean; error: string }>(
-      `${this.fingerprintApiUrl}/${id}`,
-      request
-    ).pipe(
-      map(response => {
-        if (!response.isSuccess) {
-          throw new Error(response.error || 'Failed to update fingerprint request');
-        }
-      }),
-      tap(() => {
-        this._fingerprintRequestsLoading.set(false);
-        this.notificationService.success('Fingerprint request updated successfully');
-        // Refresh the list
-        const currentResult = this._fingerprintRequestsPagedResult();
-        if (currentResult) {
-          this.loadFingerprintRequests().subscribe();
-        }
-      }),
-      catchError(error => {
-        this._fingerprintRequestsLoading.set(false);
-        const errorMessage = error.error?.error || error.message || 'Failed to update fingerprint request';
-        this.notificationService.error(errorMessage);
-        return throwError(() => error);
-      })
-    );
-  }
-
-  /**
-   * Completes a fingerprint request (admin only)
-   */
-  completeFingerprintRequest(id: number, request: CompleteFingerprintRequestRequest): Observable<void> {
-    this._fingerprintRequestsLoading.set(true);
-
-    return this.http.post<{ isSuccess: boolean; error: string }>(
-      `${this.fingerprintApiUrl}/${id}/complete`,
-      request
-    ).pipe(
-      map(response => {
-        if (!response.isSuccess) {
-          throw new Error(response.error || 'Failed to complete fingerprint request');
-        }
-      }),
-      tap(() => {
-        this._fingerprintRequestsLoading.set(false);
-        this.notificationService.success('Fingerprint request completed successfully');
-        // Refresh the list
-        const currentResult = this._fingerprintRequestsPagedResult();
-        if (currentResult) {
-          this.loadFingerprintRequests().subscribe();
-        }
-      }),
-      catchError(error => {
-        this._fingerprintRequestsLoading.set(false);
-        const errorMessage = error.error?.error || error.message || 'Failed to complete fingerprint request';
-        this.notificationService.error(errorMessage);
-        return throwError(() => error);
-      })
-    );
-  }
-
-  /**
-   * Cancels a fingerprint request
-   */
-  cancelFingerprintRequest(id: number): Observable<void> {
-    this._fingerprintRequestsLoading.set(true);
-
-    return this.http.post<{ isSuccess: boolean; error: string }>(
-      `${this.fingerprintApiUrl}/${id}/cancel`,
-      {}
-    ).pipe(
-      map(response => {
-        if (!response.isSuccess) {
-          throw new Error(response.error || 'Failed to cancel fingerprint request');
-        }
-      }),
-      tap(() => {
-        this._fingerprintRequestsLoading.set(false);
-        this.notificationService.success('Fingerprint request cancelled successfully');
-        // Refresh the list
-        const currentResult = this._fingerprintRequestsPagedResult();
-        if (currentResult) {
-          this.loadFingerprintRequests().subscribe();
-        }
-      }),
-      catchError(error => {
-        this._fingerprintRequestsLoading.set(false);
-        const errorMessage = error.error?.error || error.message || 'Failed to cancel fingerprint request';
-        this.notificationService.error(errorMessage);
-        return throwError(() => error);
-      })
-    );
-  }
-
-  /**
-   * Transforms date strings to Date objects in fingerprint request data
-   */
-  private transformFingerprintRequestDates(request: FingerprintRequest): FingerprintRequest {
-    return {
-      ...request,
-      preferredDate: request.preferredDate ? new Date(request.preferredDate) : undefined,
-      scheduledDate: request.scheduledDate ? new Date(request.scheduledDate) : undefined,
-      completedDate: request.completedDate ? new Date(request.completedDate) : undefined,
-      createdAtUtc: new Date(request.createdAtUtc),
-      modifiedAtUtc: request.modifiedAtUtc ? new Date(request.modifiedAtUtc) : undefined
-    };
-  }
-
-  /**
-   * Clears fingerprint requests data
-   */
-  clearFingerprintRequests(): void {
-    this._fingerprintRequests.set([]);
-    this._fingerprintRequestsPagedResult.set(null);
-    this._fingerprintRequestsError.set(null);
-  }
-
-  /**
-   * Refreshes fingerprint requests list
-   */
-  refreshFingerprintRequests(): void {
-    const currentResult = this._fingerprintRequestsPagedResult();
-    if (currentResult) {
-      this.loadFingerprintRequests({
-        pageNumber: currentResult.page,
-        pageSize: currentResult.pageSize
-      }).subscribe();
-    } else {
-      this.loadFingerprintRequests().subscribe();
-    }
-  }
-
-  // ===== MY ATTENDANCE METHODS (Phase 3) =====
+  // ===== MY ATTENDANCE METHODS =====
 
   private readonly _myAttendance = signal<any[]>([]);
   private readonly _myAttendanceLoading = signal<boolean>(false);
@@ -832,6 +568,24 @@ export class PortalService {
   getWorkflowInstance(workflowInstanceId: number): Observable<WorkflowInstanceDto> {
     return this.http.get<WorkflowInstanceDto>(
       `${environment.apiUrl}/api/v1/workflows/instances/${workflowInstanceId}`
+    );
+  }
+
+  // ===== REMOTE WORK APPROVAL =====
+
+  /**
+   * Gets a remote work request for approval (manager view).
+   * Includes workflow status and approval history.
+   */
+  getRemoteWorkForApproval(id: number): Observable<any> {
+    return this.http.get<any>(
+      `${this.portalApiUrl}/approval-remote-work/${id}`
+    ).pipe(
+      catchError(error => {
+        const errorMessage = error.error?.error || error.message || 'Failed to load remote work request';
+        this.notificationService.error(errorMessage);
+        return throwError(() => error);
+      })
     );
   }
 

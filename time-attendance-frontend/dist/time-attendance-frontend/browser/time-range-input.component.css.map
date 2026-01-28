@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/shared/components/time-range-input/time-range-input.component.css"],
-  "sourcesContent": [".time-range-input {\r\n  width: 100%;\r\n}\r\n\r\n.time-range-inline {\r\n  display: flex;\r\n  align-items: center;\r\n}\r\n\r\n.time-range-separator {\r\n  color: #6c757d;\r\n  font-size: 0.875rem;\r\n}\r\n\r\n.form-label {\r\n  font-weight: 500;\r\n  margin-bottom: 0.5rem;\r\n}\r\n\r\n.invalid-feedback {\r\n  font-size: 0.875rem;\r\n  margin-top: 0.25rem;\r\n}\r\n\r\n/* Time input styling */\r\ninput[type=\"time\"] {\r\n  min-width: 120px;\r\n}"],
-  "mappings": ";AAAA,CAAC;AACC,SAAO;AACT;AAEA,CAAC;AACC,WAAS;AACT,eAAa;AACf;AAEA,CAAC;AACC,SAAO;AACP,aAAW;AACb;AAEA,CAAC;AACC,eAAa;AACb,iBAAe;AACjB;AAEA,CAAC;AACC,aAAW;AACX,cAAY;AACd;AAGA,KAAK,CAAC;AACJ,aAAW;AACb;",
-  "names": []
-}

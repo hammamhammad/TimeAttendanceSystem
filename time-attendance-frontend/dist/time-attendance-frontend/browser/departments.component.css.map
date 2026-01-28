@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/pages/departments/departments.component.css"],
-  "sourcesContent": ["\r\n/* Selected Department Info */\r\n.selected-info {\r\n  position: fixed;\r\n  top: 50%;\r\n  right: 2rem;\r\n  transform: translateY(-50%);\r\n  width: 350px;\r\n  z-index: 1000;\r\n}\r\n\r\n/* Responsive Design */\r\n@media (max-width: 1200px) {\r\n  .selected-info {\r\n    position: relative;\r\n    top: auto;\r\n    right: auto;\r\n    transform: none;\r\n    width: 100%;\r\n    margin-top: 2rem;\r\n  }\r\n}"],
-  "mappings": ";AAEA,CAAC;AACC,YAAU;AACV,OAAK;AACL,SAAO;AACP,aAAW,WAAW;AACtB,SAAO;AACP,WAAS;AACX;AAGA,OAAO,CAAC,SAAS,EAAE;AACjB,GAXD;AAYG,cAAU;AACV,SAAK;AACL,WAAO;AACP,eAAW;AACX,WAAO;AACP,gBAAY;AACd;AACF;",
-  "names": []
-}

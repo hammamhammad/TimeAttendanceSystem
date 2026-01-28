@@ -42,10 +42,6 @@
     "employee_dashboard": "Employee Dashboard",
     "my_attendance": "My Attendance",
     "my_profile": "My Profile",
-    "fingerprint_requests": "Fingerprint Requests",
-    "new_fingerprint_request": "New Fingerprint Request",
-    "fingerprint_request_details": "Fingerprint Request Details",
-    "edit_fingerprint_request": "Edit Fingerprint Request",
     "vacation_requests": "Vacation Requests",
     "excuse_requests": "Excuse Requests",
     "new_excuse": "New Excuse",
@@ -1899,6 +1895,11 @@
     "inactive": "Inactive",
     "enabled": "Enabled",
     "disabled": "Disabled",
+    "week": "Week",
+    "month": "Month",
+    "year": "Year",
+    "automatic": "Automatic",
+    "basic_information": "Basic Information",
     "yes": "Yes",
     "no": "No",
     "type": "Type",
@@ -1998,6 +1999,8 @@
     "page_info": "Page {{current}} of {{total}} ({{totalItems}} total items)",
     "company_wide": "Company-Wide",
     "audit_information": "Audit Information",
+    "created_at": "Created At",
+    "modified_at": "Modified At",
     "exportToCSV": "Export to CSV",
     "performedBy": "Performed By",
     "reason": "Reason",
@@ -2718,5 +2721,11 @@
     "daysAgo": "{{count}}d ago",
     "unreadCount": "{{count}} unread",
     "newNotification": "New notification"
+  },
+  "remote-work-policy": {
+    "title": "Remote Work Policies",
+    "create": "Create Policy",
+    "edit": "Edit Policy",
+    "view_details": "View Policy Details"
   }
 }

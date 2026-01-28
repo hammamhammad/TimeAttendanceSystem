@@ -135,12 +135,32 @@ export class PortalExcuseRequestDetailsComponent implements OnInit {
 
   canEdit = computed(() => {
     const exc = this.excuse();
-    return exc && exc.canBeModified;
+    if (!exc) return false;
+
+    // Can only edit in non-approval view (employee's own request)
+    if (this.isApprovalView()) return false;
+
+    // Check approval status directly - only allow edit if pending
+    const status = exc.approvalStatus || exc.approvalStatusDisplay || exc.status;
+    const isPending = status === ApprovalStatus.Pending || status === 'Pending';
+
+    // Only allow edit if pending and canBeModified is not explicitly false
+    return isPending && exc.canBeModified !== false;
   });
 
   canCancel = computed(() => {
     const exc = this.excuse();
-    return exc && exc.canBeModified;
+    if (!exc) return false;
+
+    // Can only cancel in non-approval view (employee's own request)
+    if (this.isApprovalView()) return false;
+
+    // Check approval status directly - only allow cancel if pending
+    const status = exc.approvalStatus || exc.approvalStatusDisplay || exc.status;
+    const isPending = status === ApprovalStatus.Pending || status === 'Pending';
+
+    // Only allow cancel if pending and canBeModified is not explicitly false
+    return isPending && exc.canBeModified !== false;
   });
 
   // Computed property for pending approval information

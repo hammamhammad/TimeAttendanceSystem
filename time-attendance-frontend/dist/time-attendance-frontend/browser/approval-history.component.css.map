@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/pages/approvals/approval-history/approval-history.component.css"],
-  "sourcesContent": ["/* Approval History Component Styles */\r\n\r\n.badge {\r\n  font-weight: 500;\r\n}\r\n\r\n/* Filter section */\r\n.card .form-label {\r\n  font-weight: 500;\r\n  margin-bottom: 0.5rem;\r\n}\r\n\r\n/* Table styling */\r\n.table th {\r\n  font-weight: 600;\r\n  white-space: nowrap;\r\n}\r\n\r\n.table td {\r\n  vertical-align: middle;\r\n}\r\n\r\n/* Comments column */\r\n.text-muted[title] {\r\n  cursor: help;\r\n}\r\n\r\n/* Pagination */\r\n.pagination {\r\n  margin-bottom: 0;\r\n}\r\n\r\n.page-link {\r\n  padding: 0.375rem 0.75rem;\r\n}\r\n\r\n/* Responsive adjustments */\r\n@media (max-width: 768px) {\r\n  .row.g-3 > div {\r\n    margin-bottom: 0.5rem;\r\n  }\r\n\r\n  .table-responsive {\r\n    font-size: 0.875rem;\r\n  }\r\n}\r\n"],
-  "mappings": ";AAEA,CAAC;AACC,eAAa;AACf;AAGA,CAAC,KAAK,CAAC;AACL,eAAa;AACb,iBAAe;AACjB;AAGA,CAAC,MAAM;AACL,eAAa;AACb,eAAa;AACf;AAEA,CALC,MAKM;AACL,kBAAgB;AAClB;AAGA,CAAC,UAAU,CAAC;AACV,UAAQ;AACV;AAGA,CAAC;AACC,iBAAe;AACjB;AAEA,CAAC;AACC,WAAS,SAAS;AACpB;AAGA,OAAO,CAAC,SAAS,EAAE;AACjB,GAAC,GAAG,CAAC,IAAI,EAAE;AACT,mBAAe;AACjB;AAEA,GAAC;AACC,eAAW;AACb;AACF;",
-  "names": []
-}

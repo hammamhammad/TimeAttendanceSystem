@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/pages/settings/excuse-policies/view-excuse-policy/view-excuse-policy.component.css"],
-  "sourcesContent": ["/* View Excuse Policy Component Styles */\r\n\r\n.container-fluid {\r\n  padding: 1.5rem;\r\n}\r\n\r\n.card {\r\n  border: 1px solid #dee2e6;\r\n  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);\r\n}\r\n\r\n.card-header {\r\n  border-bottom: 1px solid #dee2e6;\r\n  padding: 0.75rem 1rem;\r\n}\r\n\r\n.card-header h6 {\r\n  font-weight: 600;\r\n  color: #495057;\r\n}\r\n\r\n@media (max-width: 768px) {\r\n  .container-fluid {\r\n    padding: 1rem;\r\n  }\r\n\r\n  .btn-group {\r\n    flex-direction: column;\r\n    width: 100%;\r\n  }\r\n\r\n  .btn-group .btn {\r\n    border-radius: 0.25rem !important;\r\n    margin-bottom: 0.5rem;\r\n  }\r\n}\r\n"],
-  "mappings": ";AAEA,CAAC;AACC,WAAS;AACX;AAEA,CAAC;AACC,UAAQ,IAAI,MAAM;AAClB,cAAY,EAAE,SAAS,QAAQ,KAAK,CAAC,EAAE,CAAC,EAAE,CAAC,EAAE;AAC/C;AAEA,CAAC;AACC,iBAAe,IAAI,MAAM;AACzB,WAAS,QAAQ;AACnB;AAEA,CALC,YAKY;AACX,eAAa;AACb,SAAO;AACT;AAEA,OAAO,CAAC,SAAS,EAAE;AACjB,GApBD;AAqBG,aAAS;AACX;AAEA,GAAC;AACC,oBAAgB;AAChB,WAAO;AACT;AAEA,GALC,UAKU,CAAC;AACV,mBAAe;AACf,mBAAe;AACjB;AACF;",
-  "names": []
-}

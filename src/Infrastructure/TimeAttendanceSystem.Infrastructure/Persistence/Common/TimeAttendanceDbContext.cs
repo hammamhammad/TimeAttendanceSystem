@@ -12,7 +12,6 @@ using TimeAttendanceSystem.Domain.Excuses;
 using TimeAttendanceSystem.Domain.RemoteWork;
 using TimeAttendanceSystem.Domain.Workflows;
 using TimeAttendanceSystem.Domain.LeaveManagement;
-using TimeAttendanceSystem.Domain.FingerprintRequests;
 using TimeAttendanceSystem.Domain.Notifications;
 using TimeAttendanceSystem.Application.Abstractions;
 using TimeAttendanceSystem.Application.Services;
@@ -126,8 +125,8 @@ public class TimeAttendanceDbContext : DbContext, IApplicationDbContext
     public DbSet<LeaveTransaction> LeaveTransactions => Set<LeaveTransaction>();
     public DbSet<LeaveAccrualPolicy> LeaveAccrualPolicies => Set<LeaveAccrualPolicy>();
 
-    // Fingerprint Request entities
-    public DbSet<FingerprintRequest> FingerprintRequests => Set<FingerprintRequest>();
+    // Attendance Correction Request entities
+    public DbSet<AttendanceCorrectionRequest> AttendanceCorrectionRequests => Set<AttendanceCorrectionRequest>();
 
     // Workflow entities
     public DbSet<WorkflowDefinition> WorkflowDefinitions => Set<WorkflowDefinition>();

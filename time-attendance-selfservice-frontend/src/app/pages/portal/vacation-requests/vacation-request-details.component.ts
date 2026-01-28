@@ -157,12 +157,54 @@ export class PortalVacationRequestDetailsComponent implements OnInit {
 
   canEdit = computed(() => {
     const vac = this.vacation();
-    return vac && !vac.isApproved && !vac.isCompleted;
+    if (!vac) return false;
+
+    // Can only edit in non-approval view (employee's own request)
+    if (this.isApprovalView()) return false;
+
+    // Check for approved, rejected, completed or cancelled status
+    const workflowStatus = vac.workflowStatus?.toLowerCase();
+    const isNotPending = vac.isApproved ||
+                         vac.isCompleted ||
+                         workflowStatus === 'approved' ||
+                         workflowStatus === 'rejected' ||
+                         workflowStatus === 'cancelled';
+
+    return !isNotPending;
   });
 
   canDelete = computed(() => {
     const vac = this.vacation();
-    return vac && !vac.isApproved && !vac.isCompleted;
+    if (!vac) return false;
+
+    // Check for approved, rejected, completed or cancelled status
+    const workflowStatus = vac.workflowStatus?.toLowerCase();
+    const isNotPending = vac.isApproved ||
+                         vac.isCompleted ||
+                         workflowStatus === 'approved' ||
+                         workflowStatus === 'rejected' ||
+                         workflowStatus === 'cancelled';
+
+    return !isNotPending;
+  });
+
+  canCancel = computed(() => {
+    const vac = this.vacation();
+    if (!vac) return false;
+
+    // Can only cancel pending requests in non-approval view
+    if (this.isApprovalView()) return false;
+
+    // Check for approved, rejected, completed or cancelled status
+    const workflowStatus = vac.workflowStatus?.toLowerCase();
+    const isNotPending = vac.isApproved ||
+                         vac.isCompleted ||
+                         workflowStatus === 'approved' ||
+                         workflowStatus === 'rejected' ||
+                         workflowStatus === 'cancelled' ||
+                         workflowStatus === 'expired';
+
+    return !isNotPending;
   });
 
   // Computed property for pending approval information
@@ -271,6 +313,34 @@ export class PortalVacationRequestDetailsComponent implements OnInit {
         error: (error) => {
           console.error('Failed to delete vacation:', error);
           this.notificationService.error(this.i18n.t('portal.failed_to_delete_vacation'));
+        }
+      });
+    }
+  }
+
+  async onCancel(): Promise<void> {
+    const vac = this.vacation();
+    if (!vac) return;
+
+    const result = await this.confirmationService.confirm({
+      title: this.i18n.t('portal.cancel_vacation'),
+      message: this.i18n.t('portal.cancel_vacation_confirm'),
+      confirmText: this.i18n.t('common.yes_cancel'),
+      cancelText: this.i18n.t('common.no'),
+      confirmButtonClass: 'btn-danger',
+      icon: 'bi-x',
+      iconClass: 'text-danger'
+    });
+
+    if (result.confirmed) {
+      this.vacationService.deleteVacation(vac.id).subscribe({
+        next: () => {
+          this.notificationService.success(this.i18n.t('portal.vacation_cancelled'));
+          this.router.navigate(['/vacation-requests']);
+        },
+        error: (error) => {
+          console.error('Failed to cancel vacation:', error);
+          this.notificationService.error(this.i18n.t('portal.failed_to_cancel_vacation'));
         }
       });
     }

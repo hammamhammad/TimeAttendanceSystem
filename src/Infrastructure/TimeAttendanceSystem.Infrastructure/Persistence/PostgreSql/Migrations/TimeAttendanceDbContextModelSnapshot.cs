@@ -22,6 +22,129 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.AttendanceCorrectionRequest", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("ApprovalStatus")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1);
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("ApprovedById")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("AttachmentPath")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTime>("CorrectionDate")
+                        .HasColumnType("date");
+
+                    b.Property<TimeOnly>("CorrectionTime")
+                        .HasColumnType("time");
+
+                    b.Property<int>("CorrectionType")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long?>("CreatedTransactionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime>("ModifiedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("ProcessingNotes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<long?>("SubmittedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("WorkflowInstanceId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApprovalStatus")
+                        .HasDatabaseName("IX_AttendanceCorrectionRequests_ApprovalStatus");
+
+                    b.HasIndex("ApprovedById")
+                        .HasDatabaseName("IX_AttendanceCorrectionRequests_ApprovedById");
+
+                    b.HasIndex("CorrectionDate")
+                        .HasDatabaseName("IX_AttendanceCorrectionRequests_CorrectionDate");
+
+                    b.HasIndex("CorrectionType")
+                        .HasDatabaseName("IX_AttendanceCorrectionRequests_CorrectionType");
+
+                    b.HasIndex("CreatedTransactionId");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_AttendanceCorrectionRequests_EmployeeId");
+
+                    b.HasIndex("WorkflowInstanceId");
+
+                    b.HasIndex("CorrectionDate", "ApprovalStatus")
+                        .HasDatabaseName("IX_AttendanceCorrectionRequests_CorrectionDate_ApprovalStatus");
+
+                    b.HasIndex("EmployeeId", "CorrectionDate")
+                        .HasDatabaseName("IX_AttendanceCorrectionRequests_EmployeeId_CorrectionDate");
+
+                    b.HasIndex("EmployeeId", "CorrectionDate", "CorrectionType")
+                        .IsUnique()
+                        .HasDatabaseName("UQ_AttendanceCorrectionRequests_EmployeeId_CorrectionDate_CorrectionType")
+                        .HasFilter("\"IsDeleted\" = false AND \"ApprovalStatus\" = 1");
+
+                    b.ToTable("AttendanceCorrectionRequests", (string)null);
+                });
+
             modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.AttendanceRecord", b =>
                 {
                     b.Property<long>("Id")
@@ -155,7 +278,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<int>("Status")
-                        .HasColumnType("integer");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(2);
 
                     b.Property<int>("WorkLocation")
                         .ValueGeneratedOnAdd()
@@ -3970,6 +4095,38 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasFilter("\"IsDeleted\" = false AND \"Action\" IS NULL");
 
                     b.ToTable("WorkflowStepExecutions", (string)null);
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.AttendanceCorrectionRequest", b =>
+                {
+                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "ApprovedBy")
+                        .WithMany()
+                        .HasForeignKey("ApprovedById")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TimeAttendanceSystem.Domain.Attendance.AttendanceTransaction", "CreatedTransaction")
+                        .WithMany()
+                        .HasForeignKey("CreatedTransactionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TimeAttendanceSystem.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
+                        .WithMany()
+                        .HasForeignKey("WorkflowInstanceId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("ApprovedBy");
+
+                    b.Navigation("CreatedTransaction");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("WorkflowInstance");
                 });
 
             modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.AttendanceRecord", b =>

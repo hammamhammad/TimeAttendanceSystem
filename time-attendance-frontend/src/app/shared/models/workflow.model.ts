@@ -7,8 +7,7 @@ export type WorkflowEntityType =
   | 'RemoteWork'
   | 'Overtime'
   | 'Timesheet'
-  | 'AttendanceCorrection'
-  | 'FingerprintRequest';
+  | 'AttendanceCorrection';
 
 /**
  * Workflow step types

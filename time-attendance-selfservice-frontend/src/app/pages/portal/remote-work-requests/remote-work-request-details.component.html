@@ -20,6 +20,45 @@
     <!-- Page Header -->
     <app-page-header [title]="i18n.t('portal.remote_work_details')">
       <div header-actions>
+        <!-- Approval Actions (for managers viewing pending requests) -->
+        @if (canApprove()) {
+          <button
+            class="btn btn-success btn-sm me-2"
+            (click)="onApprove()"
+            [disabled]="processingApproval()"
+            type="button">
+            @if (processingApproval()) {
+              <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+            } @else {
+              <i class="bi bi-check-circle me-1"></i>
+            }
+            {{ i18n.t('portal.approve') }}
+          </button>
+          <button
+            class="btn btn-danger btn-sm me-2"
+            (click)="onReject()"
+            [disabled]="processingApproval()"
+            type="button">
+            @if (processingApproval()) {
+              <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+            } @else {
+              <i class="bi bi-x-circle me-1"></i>
+            }
+            {{ i18n.t('portal.reject') }}
+          </button>
+          <button
+            class="btn btn-info btn-sm me-2"
+            (click)="onDelegate()"
+            [disabled]="processingApproval()"
+            type="button">
+            @if (processingApproval()) {
+              <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+            } @else {
+              <i class="bi bi-person-plus me-1"></i>
+            }
+            {{ i18n.t('portal.delegate') }}
+          </button>
+        }
         @if (canEdit()) {
           <button
             class="btn btn-primary btn-sm me-2"
@@ -91,21 +130,111 @@
     }
 
     <!-- Status Information -->
-    @if (request()!.status === 1) {
+    @if (request()!.isApproved && request()!.isCurrentlyActive) {
+      <div class="alert alert-info mt-3">
+        <i class="bi bi-briefcase me-2"></i>
+        {{ i18n.t('portal.remote_work_active_message') }}
+      </div>
+    } @else if (request()!.isApproved && request()!.isUpcoming) {
       <div class="alert alert-success mt-3">
         <i class="bi bi-check-circle me-2"></i>
         {{ i18n.t('portal.remote_work_approved_message') }}
       </div>
-    } @else if (request()!.status === 2) {
+    } @else if (request()!.isApproved && request()!.isCompleted) {
+      <div class="alert alert-secondary mt-3">
+        <i class="bi bi-check me-2"></i>
+        {{ i18n.t('portal.remote_work_completed_message') }}
+      </div>
+    } @else if (isRequestExpired()) {
+      <!-- Workflow actually expired (timed out) -->
+      <div class="alert alert-danger mt-3">
+        <i class="bi bi-x-circle me-2"></i>
+        {{ i18n.t('portal.remote_work_expired_message') }}
+      </div>
+    } @else if (request()!.workflowStatus?.toLowerCase() === 'rejected') {
       <div class="alert alert-danger mt-3">
         <i class="bi bi-x-circle me-2"></i>
         {{ i18n.t('portal.remote_work_rejected_message') }}
+        @if (request()!.rejectionReason) {
+          <div class="mt-2">
+            <strong>{{ i18n.t('portal.rejection_reason') }}:</strong> {{ request()!.rejectionReason }}
+          </div>
+        }
       </div>
-    } @else if (request()!.status === 0) {
+    } @else if (request()!.workflowStatus?.toLowerCase() === 'cancelled') {
+      <div class="alert alert-secondary mt-3">
+        <i class="bi bi-x me-2"></i>
+        {{ i18n.t('portal.remote_work_cancelled_message') }}
+      </div>
+    } @else if (!request()!.isApproved) {
+      <!-- Not approved - still pending workflow approval -->
       <div class="alert alert-warning mt-3">
         <i class="bi bi-clock me-2"></i>
-        {{ i18n.t('portal.remote_work_pending_message') }}
+        @if (isApprovalView()) {
+          <!-- Manager viewing for approval -->
+          <span>{{ i18n.t('portal.remote_work_awaiting_your_approval') }}</span>
+        } @else {
+          <!-- Requester viewing their own request -->
+          <span>{{ i18n.t('portal.remote_work_pending_message') }}</span>
+          @if (pendingApprovalInfo()?.pendingWith) {
+            <div class="mt-2">
+              <strong>{{ i18n.t('portal.pending_with') }}:</strong> {{ pendingApprovalInfo()!.pendingWith }}
+              @if (pendingApprovalInfo()?.stepProgress) {
+                <span class="ms-2 text-muted">({{ i18n.t('portal.step') }} {{ pendingApprovalInfo()!.stepProgress }})</span>
+              }
+            </div>
+          }
+        }
       </div>
+    }
+
+    <!-- Approval History Section -->
+    @if (request()?.approvalHistory && request()!.approvalHistory!.length > 0) {
+      <app-detail-card
+        [title]="i18n.t('portal.approval_history')"
+        class="mt-3">
+        <div class="table-responsive">
+          <table class="table table-sm table-hover mb-0">
+            <thead>
+              <tr>
+                <th>{{ i18n.t('portal.step_name') }}</th>
+                <th>{{ i18n.t('portal.status') }}</th>
+                <th>{{ i18n.t('portal.assigned_to') }}</th>
+                <th>{{ i18n.t('portal.action_by') }}</th>
+                <th>{{ i18n.t('portal.assigned_date') }}</th>
+                <th>{{ i18n.t('portal.action_date') }}</th>
+                <th>{{ i18n.t('portal.comments') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (step of request()!.approvalHistory; track step.stepOrder) {
+                <tr>
+                  <td>{{ step.stepName }}</td>
+                  <td>
+                    <app-status-badge
+                      [status]="getStepStatusLabel(step.status)"
+                      [variant]="getStepStatusVariant(step.status)">
+                    </app-status-badge>
+                  </td>
+                  <td>{{ step.assignedToName }}</td>
+                  <td>{{ step.actionByName || '-' }}</td>
+                  <td>{{ formatDateTime(step.assignedAt) }}</td>
+                  <td>{{ step.actionAt ? formatDateTime(step.actionAt) : '-' }}</td>
+                  <td>{{ step.comments || '-' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </app-detail-card>
     }
   </div>
 }
+
+<!-- Delegation Modal -->
+<app-delegation-modal
+  [show]="showDelegationModal()"
+  [title]="i18n.t('portal.delegate_approval')"
+  (close)="onCloseDelegationModal()"
+  (delegate)="onDelegateConfirmed($event)">
+</app-delegation-modal>

@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/pages/approvals/pending-approvals/pending-approvals.component.css"],
-  "sourcesContent": ["/* Pending Approvals Component Styles */\r\n\r\n.badge {\r\n  font-weight: 500;\r\n}\r\n\r\n/* Summary cards */\r\n.card.bg-warning.bg-opacity-10,\r\n.card.bg-danger.bg-opacity-10,\r\n.card.bg-info.bg-opacity-10 {\r\n  border-width: 2px;\r\n}\r\n\r\n.card h3 {\r\n  font-size: 2rem;\r\n  font-weight: 600;\r\n}\r\n\r\n/* Filter section styling */\r\n.card .form-label {\r\n  font-weight: 500;\r\n  margin-bottom: 0.5rem;\r\n}\r\n\r\n/* Modal improvements */\r\n.modal-body .alert {\r\n  margin-bottom: 1rem;\r\n}\r\n\r\n.modal-body .alert h6 {\r\n  margin-bottom: 0.75rem;\r\n}\r\n\r\n/* Responsive adjustments */\r\n@media (max-width: 768px) {\r\n  .row.g-3 > div {\r\n    margin-bottom: 0.5rem;\r\n  }\r\n\r\n  .card h3 {\r\n    font-size: 1.5rem;\r\n  }\r\n}\r\n"],
-  "mappings": ";AAEA,CAAC;AACC,eAAa;AACf;AAGA,CAAC,IAAI,CAAC,UAAU,CAAC;AACjB,CADC,IACI,CAAC,SAAS,CADE;AAEjB,CAFC,IAEI,CAAC,OAAO,CAFI;AAGf,gBAAc;AAChB;AAEA,CANC,KAMK;AACJ,aAAW;AACX,eAAa;AACf;AAGA,CAZC,KAYK,CAAC;AACL,eAAa;AACb,iBAAe;AACjB;AAGA,CAAC,WAAW,CAAC;AACX,iBAAe;AACjB;AAEA,CAJC,WAIW,CAJC,MAIM;AACjB,iBAAe;AACjB;AAGA,OAAO,CAAC,SAAS,EAAE;AACjB,GAAC,GAAG,CAAC,IAAI,EAAE;AACT,mBAAe;AACjB;AAEA,GAhCD,KAgCO;AACJ,eAAW;AACb;AACF;",
-  "names": []
-}

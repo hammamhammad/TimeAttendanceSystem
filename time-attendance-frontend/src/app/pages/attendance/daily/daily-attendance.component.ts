@@ -518,6 +518,7 @@ export class DailyAttendanceComponent implements OnInit, OnDestroy {
   onSearchChange(event: Event): void {
     const target = event.target as HTMLInputElement;
     this.searchTerm.set(target.value);
+    this.currentPage.set(1); // Reset to first page when search term changes
   }
 
   /**
@@ -527,6 +528,7 @@ export class DailyAttendanceComponent implements OnInit, OnDestroy {
     const target = event.target as HTMLSelectElement;
     const value = target.value === '' ? null : parseInt(target.value);
     this.selectedStatus.set(value as AttendanceStatus | null);
+    this.currentPage.set(1); // Reset to first page when status filter changes
   }
 
   /**

@@ -8,7 +8,6 @@ import { ConfirmationService } from '../../../core/confirmation/confirmation.ser
 import { RemoteWorkRequestsService } from '../../../core/services/remote-work-requests.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
-import { FormSectionComponent } from '../../../shared/components/form-section/form-section.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import {
   RemoteWorkRequest,
@@ -28,7 +27,6 @@ import {
     CommonModule,
     ReactiveFormsModule,
     PageHeaderComponent,
-    FormSectionComponent,
     LoadingSpinnerComponent
   ],
   templateUrl: './remote-work-request-form.component.html',
@@ -211,7 +209,9 @@ export class PortalRemoteWorkRequestFormComponent implements OnInit {
       },
       error: (error) => {
         console.error('Failed to create remote work request:', error);
-        this.notificationService.error(this.i18n.t('portal.failed_to_create_remote_work'));
+        // Show the actual error message from the API if available
+        const errorMessage = error?.error?.error || error?.error || this.i18n.t('portal.failed_to_create_remote_work');
+        this.notificationService.error(errorMessage);
         this.saving.set(false);
       }
     });
@@ -238,7 +238,9 @@ export class PortalRemoteWorkRequestFormComponent implements OnInit {
       },
       error: (error) => {
         console.error('Failed to update remote work request:', error);
-        this.notificationService.error(this.i18n.t('portal.failed_to_update_remote_work'));
+        // Show the actual error message from the API if available
+        const errorMessage = error?.error?.error || error?.error || this.i18n.t('portal.failed_to_update_remote_work');
+        this.notificationService.error(errorMessage);
         this.saving.set(false);
       }
     });

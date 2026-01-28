@@ -31,20 +31,30 @@
         </div>
         <div class="card-body">
           <div class="row">
-            <!-- Branch Selection -->
+            <!-- Policy Scope -->
             <div class="col-md-6 mb-3">
-              <label for="branchId" class="form-label required">
-                {{ i18n.t('remoteWork.policy.branch') }}
+              <label class="form-label">
+                {{ i18n.t('remoteWork.policy.policy_scope') }}
               </label>
-              <app-searchable-select
-                [(ngModel)]="policyForm.branchId"
-                name="branchId"
-                [options]="branches()"
-                [placeholder]="i18n.t('remoteWork.policy.select_branch')"
-                [required]="true"
-                valueField="id"
-                labelField="name">
-              </app-searchable-select>
+              @if (isCompanyWide()) {
+                <div class="form-control-plaintext">
+                  <span class="badge bg-info">
+                    <i class="fas fa-building me-1"></i>
+                    {{ i18n.t('remoteWork.policy.company_wide') }}
+                  </span>
+                  <small class="text-muted d-block mt-1">
+                    {{ i18n.t('remoteWork.policy.company_wide_help') }}
+                  </small>
+                </div>
+              } @else {
+                <app-searchable-select
+                  [(ngModel)]="policyForm.branchId"
+                  name="branchId"
+                  [options]="branches()"
+                  [placeholder]="i18n.t('remoteWork.policy.select_branch')"
+                  [required]="true">
+                </app-searchable-select>
+              }
             </div>
 
             <!-- Active Status -->

@@ -71,7 +71,9 @@ public class RejectStepCommandHandler : IRequestHandler<RejectStepCommand, Resul
                 await UpdateRemoteWorkStatusAsync(workflowInstance, cancellationToken);
                 break;
 
-            // Other entity types can be added here
+            case WorkflowEntityType.AttendanceCorrection:
+                await UpdateAttendanceCorrectionStatusAsync(workflowInstance, cancellationToken);
+                break;
         }
     }
 
@@ -107,6 +109,27 @@ public class RejectStepCommandHandler : IRequestHandler<RejectStepCommand, Resul
         if (remoteWork != null)
         {
             remoteWork.Status = Domain.RemoteWork.RemoteWorkRequestStatus.Rejected;
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+    }
+
+    private async Task UpdateAttendanceCorrectionStatusAsync(Domain.Workflows.WorkflowInstance workflowInstance, CancellationToken cancellationToken)
+    {
+        var correction = await _context.AttendanceCorrectionRequests
+            .FirstOrDefaultAsync(acr => acr.Id == workflowInstance.EntityId, cancellationToken);
+
+        if (correction != null)
+        {
+            // Get the rejecter's user ID from the last completed step
+            var lastRejecterStep = await _context.WorkflowStepExecutions
+                .Where(wse => wse.WorkflowInstanceId == workflowInstance.Id && wse.Action.HasValue)
+                .OrderByDescending(wse => wse.ActionTakenAt)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            correction.ApprovalStatus = Domain.Excuses.ApprovalStatus.Rejected;
+            correction.ApprovedById = lastRejecterStep?.ActionTakenByUserId ?? lastRejecterStep?.AssignedToUserId;
+            correction.ApprovedAt = DateTime.UtcNow;
+            correction.RejectionReason = lastRejecterStep?.Comments ?? "Rejected via workflow";
             await _context.SaveChangesAsync(cancellationToken);
         }
     }

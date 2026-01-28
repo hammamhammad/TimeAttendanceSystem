@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/pages/remote-work/assign-remote-work/assign-remote-work.component.css"],
-  "sourcesContent": [".assign-remote-work-page {\r\n  padding: 1.5rem;\r\n}\r\n\r\n.form-label.required::after {\r\n  content: ' *';\r\n  color: var(--bs-danger);\r\n}\r\n"],
-  "mappings": ";AAAA,CAAC;AACC,WAAS;AACX;AAEA,CAAC,UAAU,CAAC,QAAQ;AAClB,WAAS;AACT,SAAO,IAAI;AACb;",
-  "names": []
-}

@@ -105,22 +105,21 @@ export class WorkflowsService {
       'RemoteWork': 'Remote Work Request',
       'Overtime': 'Overtime Request',
       'Timesheet': 'Timesheet',
-      'AttendanceCorrection': 'Attendance Correction',
-      'FingerprintRequest': 'Fingerprint Request'
+      'AttendanceCorrection': 'Attendance Correction'
     };
     return displayNames[entityType] || entityType;
   }
 
   /**
    * Get all entity types for dropdown
-   * Limited to 4 entity types that have default workflows with direct manager approval
+   * Limited to entity types that have default workflows with direct manager approval
    */
   getEntityTypes(): { value: WorkflowEntityType; label: string }[] {
     return [
       { value: 'Vacation', label: 'Vacation Request' },
       { value: 'Excuse', label: 'Excuse Request' },
       { value: 'RemoteWork', label: 'Remote Work Request' },
-      { value: 'FingerprintRequest', label: 'Fingerprint Request' }
+      { value: 'AttendanceCorrection', label: 'Attendance Correction' }
     ];
   }
 }

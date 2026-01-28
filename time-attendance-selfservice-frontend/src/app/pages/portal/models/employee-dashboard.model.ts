@@ -54,7 +54,8 @@ export enum ActivityType {
   Attendance = 'Attendance',
   Vacation = 'Vacation',
   Excuse = 'Excuse',
-  FingerprintRequest = 'FingerprintRequest'
+  RemoteWork = 'RemoteWork',
+  AttendanceCorrection = 'AttendanceCorrection'
 }
 
 /**

@@ -208,21 +208,21 @@ export class ViewRemoteWorkPolicyComponent implements OnInit, OnDestroy {
     if (p.maxDaysPerWeek !== null && p.maxDaysPerWeek !== undefined) {
       items.push({
         label: this.i18n.t('remoteWork.policy.max_days_per_week'),
-        value: `${p.maxDaysPerWeek} ${this.i18n.t('common.days')}`
+        value: `${p.maxDaysPerWeek} ${this.i18n.t('common.days_text')}`
       });
     }
 
     if (p.maxDaysPerMonth !== null && p.maxDaysPerMonth !== undefined) {
       items.push({
         label: this.i18n.t('remoteWork.policy.max_days_per_month'),
-        value: `${p.maxDaysPerMonth} ${this.i18n.t('common.days')}`
+        value: `${p.maxDaysPerMonth} ${this.i18n.t('common.days_text')}`
       });
     }
 
     if (p.maxDaysPerYear !== null && p.maxDaysPerYear !== undefined) {
       items.push({
         label: this.i18n.t('remoteWork.policy.max_days_per_year'),
-        value: `${p.maxDaysPerYear} ${this.i18n.t('common.days')}`
+        value: `${p.maxDaysPerYear} ${this.i18n.t('common.days_text')}`
       });
     }
 
@@ -265,7 +265,7 @@ export class ViewRemoteWorkPolicyComponent implements OnInit, OnDestroy {
     if (p.minAdvanceNoticeDays !== null && p.minAdvanceNoticeDays !== undefined) {
       items.push({
         label: this.i18n.t('remoteWork.policy.min_advance_notice_days'),
-        value: `${p.minAdvanceNoticeDays} ${this.i18n.t('common.days')}`
+        value: `${p.minAdvanceNoticeDays} ${this.i18n.t('common.days_text')}`
       });
     } else {
       items.push({

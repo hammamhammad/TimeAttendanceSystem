@@ -1,0 +1,139 @@
+/* Attendance Correction Details Component Styles */
+
+.correction-details {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+/* Status Section */
+.status-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: var(--bs-light);
+  border-radius: 0.5rem;
+}
+
+.status-label {
+  font-weight: 600;
+  margin-bottom: 0;
+  color: var(--bs-secondary);
+}
+
+/* Attachment Section */
+.attachment-section {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  background-color: var(--bs-light);
+  border-radius: 0.375rem;
+}
+
+.attachment-link {
+  color: var(--bs-primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.attachment-link:hover {
+  color: var(--bs-primary);
+  text-decoration: underline;
+}
+
+/* Alert Styling */
+.alert {
+  display: flex;
+  align-items: flex-start;
+  border-radius: 0.5rem;
+}
+
+.alert i {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--bs-border-color);
+}
+
+/* Table Styling */
+.table-responsive {
+  margin: 0 -0.5rem;
+}
+
+.table {
+  font-size: 0.875rem;
+}
+
+.table th {
+  background-color: var(--bs-light);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .correction-details {
+    padding: 1rem;
+  }
+
+  .status-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .action-buttons button {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .action-buttons button:last-child {
+    margin-bottom: 0;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.correction-details {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Button Hover Effects */
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+/* Spinner in buttons */
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.15em;
+}

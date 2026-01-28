@@ -1828,6 +1828,11 @@
     "deactivate": "إلغاء تفعيل",
     "enabled": "مفعل",
     "disabled": "معطل",
+    "week": "أسبوع",
+    "month": "شهر",
+    "year": "سنة",
+    "automatic": "تلقائي",
+    "basic_information": "المعلومات الأساسية",
     "type": "النوع",
     "category": "الفئة",
     "priority": "الأولوية",
@@ -1916,6 +1921,8 @@
     "page_info": "الصفحة {{current}} من {{total}} ({{totalItems}} عنصر إجمالي)",
     "company_wide": "على مستوى الشركة",
     "audit_information": "معلومات التدقيق",
+    "created_at": "تاريخ الإنشاء",
+    "modified_at": "تاريخ التعديل",
     "exportToCSV": "تصدير إلى CSV",
     "performedBy": "نفذ بواسطة",
     "reason": "السبب",
@@ -2494,5 +2501,11 @@
     "daysAgo": "منذ {{count}} يوم",
     "unreadCount": "{{count}} غير مقروء",
     "newNotification": "إشعار جديد"
+  },
+  "remote-work-policy": {
+    "title": "سياسات العمل عن بُعد",
+    "create": "إنشاء سياسة",
+    "edit": "تعديل السياسة",
+    "view_details": "عرض تفاصيل السياسة"
   }
 }

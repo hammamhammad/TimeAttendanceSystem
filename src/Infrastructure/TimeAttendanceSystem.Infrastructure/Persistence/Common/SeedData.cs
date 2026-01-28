@@ -459,7 +459,7 @@ public static class SeedData
 
     private static async Task SeedDefaultWorkflowsAsync(TimeAttendanceDbContext context)
     {
-        Console.WriteLine("Creating default workflows for Vacation, Excuse, Remote Work, and Fingerprint requests...");
+        Console.WriteLine("Creating default workflows for Vacation, Excuse, Remote Work, and Attendance Correction requests...");
 
         var workflows = new List<WorkflowDefinition>();
 
@@ -565,14 +565,14 @@ public static class SeedData
 
         workflows.Add(remoteWorkWorkflow);
 
-        // 4. Fingerprint Request Workflow
-        var fingerprintWorkflow = new WorkflowDefinition
+        // 4. Attendance Correction Request Workflow
+        var attendanceCorrectionWorkflow = new WorkflowDefinition
         {
-            Name = "Default Fingerprint Request Approval",
-            NameAr = "موافقة طلب البصمة الافتراضية",
-            Description = "Default workflow for fingerprint requests - requires direct manager approval",
-            DescriptionAr = "مسار العمل الافتراضي لطلبات البصمة - يتطلب موافقة المدير المباشر",
-            EntityType = WorkflowEntityType.FingerprintRequest,
+            Name = "Default Attendance Correction Approval",
+            NameAr = "موافقة تصحيح الحضور الافتراضية",
+            Description = "Default workflow for attendance correction requests - requires direct manager approval",
+            DescriptionAr = "مسار العمل الافتراضي لطلبات تصحيح الحضور - يتطلب موافقة المدير المباشر",
+            EntityType = WorkflowEntityType.AttendanceCorrection,
             IsActive = true,
             IsDefault = true,
             BranchId = null,
@@ -583,7 +583,7 @@ public static class SeedData
             RowVersion = new byte[] { 1 }
         };
 
-        fingerprintWorkflow.Steps.Add(new WorkflowStep
+        attendanceCorrectionWorkflow.Steps.Add(new WorkflowStep
         {
             StepOrder = 1,
             Name = "Direct Manager Approval",
@@ -597,12 +597,12 @@ public static class SeedData
             RowVersion = new byte[] { 1 }
         });
 
-        workflows.Add(fingerprintWorkflow);
+        workflows.Add(attendanceCorrectionWorkflow);
 
         await context.WorkflowDefinitions.AddRangeAsync(workflows);
         await context.SaveChangesAsync();
 
-        Console.WriteLine("✅ Created 4 default workflows: Vacation, Excuse, Remote Work, and Fingerprint Request - all with direct manager approval");
+        Console.WriteLine("✅ Created 4 default workflows: Vacation, Excuse, Remote Work, and Attendance Correction - all with direct manager approval");
     }
 
     private static async Task SeedDefaultVacationTypesAsync(TimeAttendanceDbContext context)

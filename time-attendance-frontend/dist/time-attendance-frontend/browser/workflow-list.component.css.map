@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/pages/settings/workflows/workflow-list/workflow-list.component.css"],
-  "sourcesContent": ["/* Workflow List Component Styles */\r\n\r\n.badge {\r\n  font-weight: 500;\r\n}\r\n\r\n/* Filter section styling */\r\n.card .form-label {\r\n  font-weight: 500;\r\n  margin-bottom: 0.5rem;\r\n}\r\n\r\n/* Responsive adjustments */\r\n@media (max-width: 768px) {\r\n  .row.g-3 > div {\r\n    margin-bottom: 0.5rem;\r\n  }\r\n}\r\n"],
-  "mappings": ";AAEA,CAAC;AACC,eAAa;AACf;AAGA,CAAC,KAAK,CAAC;AACL,eAAa;AACb,iBAAe;AACjB;AAGA,OAAO,CAAC,SAAS,EAAE;AACjB,GAAC,GAAG,CAAC,IAAI,EAAE;AACT,mBAAe;AACjB;AACF;",
-  "names": []
-}

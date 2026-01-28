@@ -28,7 +28,7 @@ export interface PendingApprovalsSummary {
   vacations: number;
   excuses: number;
   remoteWork: number;
-  fingerprint: number;
+  attendanceCorrection: number;
   total: number;
 }
 
@@ -59,7 +59,7 @@ export enum ApprovalEntityType {
   Vacation = 'Vacation',
   Excuse = 'Excuse',
   RemoteWork = 'RemoteWork',
-  Fingerprint = 'Fingerprint'
+  AttendanceCorrection = 'AttendanceCorrection'
 }
 
 /**
@@ -85,7 +85,7 @@ export enum TeamActivityType {
   Vacation = 'Vacation',
   Excuse = 'Excuse',
   RemoteWork = 'RemoteWork',
-  FingerprintRequest = 'FingerprintRequest'
+  AttendanceCorrection = 'AttendanceCorrection'
 }
 
 /**

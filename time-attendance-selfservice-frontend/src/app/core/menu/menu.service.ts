@@ -54,9 +54,9 @@ export class MenuService {
       icon: 'bi bi-laptop'
     },
     {
-      path: '/fingerprint-requests',
-      titleKey: 'portal.fingerprint_requests',
-      icon: 'bi bi-fingerprint'
+      path: '/attendance-corrections',
+      titleKey: 'portal.attendance_corrections',
+      icon: 'bi bi-clock-history'
     }
   ];
 

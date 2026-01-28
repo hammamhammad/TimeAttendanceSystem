@@ -59,6 +59,24 @@
             {{ i18n.t('portal.delegate') }}
           </button>
         }
+        @if (canEdit()) {
+          <button
+            class="btn btn-primary btn-sm me-2"
+            (click)="onEdit()"
+            type="button">
+            <i class="bi bi-pencil me-1"></i>
+            {{ i18n.t('common.edit') }}
+          </button>
+        }
+        @if (canCancel()) {
+          <button
+            class="btn btn-danger btn-sm me-2"
+            (click)="onCancel()"
+            type="button">
+            <i class="bi bi-x me-1"></i>
+            {{ i18n.t('common.cancel') }}
+          </button>
+        }
         <button
           class="btn btn-outline-secondary btn-sm"
           (click)="onBack()"

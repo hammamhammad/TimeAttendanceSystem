@@ -354,8 +354,7 @@ export class PendingApprovalsComponent implements OnInit {
       'RemoteWork': '/remote-work',
       'Overtime': '/overtime-requests',
       'Timesheet': '/timesheets',
-      'AttendanceCorrection': '/attendance-corrections',
-      'FingerprintRequest': '/fingerprint-requests'
+      'AttendanceCorrection': '/attendance-corrections'
     };
 
     const basePath = routes[approval.entityType];

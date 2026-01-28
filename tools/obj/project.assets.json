@@ -190,9 +190,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Work\\TimeAttendanceSystem\\tools\\check-saturday.csproj",
-      "projectName": "check-saturday",
-      "projectPath": "D:\\Work\\TimeAttendanceSystem\\tools\\check-saturday.csproj",
+      "projectUniqueName": "D:\\Work\\TimeAttendanceSystem\\tools\\UpdateWorkflow.csproj",
+      "projectName": "UpdateWorkflow",
+      "projectPath": "D:\\Work\\TimeAttendanceSystem\\tools\\UpdateWorkflow.csproj",
       "packagesPath": "C:\\Users\\Hammam\\.nuget\\packages\\",
       "outputPath": "D:\\Work\\TimeAttendanceSystem\\tools\\obj\\",
       "projectStyle": "PackageReference",

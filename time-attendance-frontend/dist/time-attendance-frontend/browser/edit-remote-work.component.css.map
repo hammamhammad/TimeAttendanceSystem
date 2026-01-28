@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/pages/remote-work/edit-remote-work/edit-remote-work.component.css"],
-  "sourcesContent": [".edit-remote-work-page {\r\n  padding: 20px;\r\n}\r\n\r\n.form-control:disabled {\r\n  background-color: #e9ecef;\r\n  cursor: not-allowed;\r\n}\r\n\r\n.invalid-feedback {\r\n  display: block;\r\n}\r\n"],
-  "mappings": ";AAAA,CAAC;AACC,WAAS;AACX;AAEA,CAAC,YAAY;AACX,oBAAkB;AAClB,UAAQ;AACV;AAEA,CAAC;AACC,WAAS;AACX;",
-  "names": []
-}

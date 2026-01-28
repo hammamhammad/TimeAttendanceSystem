@@ -1,0 +1,226 @@
+<!-- Loading State -->
+@if (loading()) {
+  <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+}
+
+<!-- Form -->
+@if (!loading()) {
+  <div class="correction-form">
+    <app-page-header
+      [title]="isEditMode() ? i18n.t('portal.edit_correction') : i18n.t('portal.new_correction')">
+      <div header-actions>
+        <button
+          type="button"
+          class="btn btn-outline-secondary btn-sm"
+          (click)="onCancel()">
+          <i class="bi bi-arrow-left me-1"></i>
+          {{ i18n.t('common.back') }}
+        </button>
+      </div>
+    </app-page-header>
+
+    <!-- Main Form Card -->
+    <div class="card mt-4">
+      <div class="card-header">
+        <h5>
+          <span class="header-icon">
+            <i class="bi bi-clock-history"></i>
+          </span>
+          {{ i18n.t('portal.correction_details') }}
+        </h5>
+      </div>
+      <div class="card-body">
+        <!-- Info Banner -->
+        <div class="info-banner mb-4">
+          <div class="info-icon">
+            <i class="bi bi-info-circle"></i>
+          </div>
+          <div class="info-content">
+            <strong>{{ i18n.t('portal.correction_purpose') }}</strong>
+            <p class="mb-0">{{ i18n.t('portal.correction_purpose_description') }}</p>
+          </div>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <div class="row">
+            <!-- Correction Type -->
+            <div class="col-12 mb-4">
+              <label for="correctionType" class="form-label">
+                <i class="bi bi-arrow-left-right me-1 text-primary"></i>
+                {{ i18n.t('portal.correction_type') }}
+                <span class="text-danger">*</span>
+              </label>
+              <div class="correction-type-buttons">
+                @for (type of correctionTypes; track type.value) {
+                  <button
+                    type="button"
+                    class="correction-type-btn"
+                    [class.active]="form.get('correctionType')?.value == type.value"
+                    (click)="form.patchValue({ correctionType: type.value })">
+                    <i class="bi" [class.bi-box-arrow-in-right]="type.value === 1" [class.bi-box-arrow-right]="type.value === 2"></i>
+                    <span>{{ type.label }}</span>
+                  </button>
+                }
+              </div>
+              @if (hasError('correctionType', 'required')) {
+                <div class="invalid-feedback d-block">
+                  {{ getErrorMessage('correctionType') }}
+                </div>
+              }
+            </div>
+
+            <!-- Correction Date -->
+            <div class="col-md-6 mb-4">
+              <label for="correctionDate" class="form-label">
+                <i class="bi bi-calendar-event me-1 text-info"></i>
+                {{ i18n.t('portal.correction_date') }}
+                <span class="text-danger">*</span>
+              </label>
+              <input
+                type="date"
+                id="correctionDate"
+                formControlName="correctionDate"
+                class="form-control"
+                [min]="minDate"
+                [max]="maxDate"
+                [class.is-invalid]="hasError('correctionDate', 'required')">
+              <div class="form-text">
+                {{ i18n.t('portal.correction_date_help', { days: maxRetroactiveDays }) }}
+              </div>
+              @if (hasError('correctionDate', 'required')) {
+                <div class="invalid-feedback">
+                  {{ getErrorMessage('correctionDate') }}
+                </div>
+              }
+            </div>
+
+            <!-- Correction Time -->
+            <div class="col-md-6 mb-4">
+              <label for="correctionTime" class="form-label">
+                <i class="bi bi-clock me-1 text-success"></i>
+                {{ i18n.t('portal.correction_time') }}
+                <span class="text-danger">*</span>
+              </label>
+              <input
+                type="time"
+                id="correctionTime"
+                formControlName="correctionTime"
+                class="form-control"
+                [class.is-invalid]="hasError('correctionTime', 'required')">
+              <div class="form-text">
+                {{ i18n.t('portal.correction_time_help') }}
+              </div>
+              @if (hasError('correctionTime', 'required')) {
+                <div class="invalid-feedback">
+                  {{ getErrorMessage('correctionTime') }}
+                </div>
+              }
+            </div>
+
+            <!-- Reason -->
+            <div class="col-12 mb-3">
+              <label for="reason" class="form-label">
+                <i class="bi bi-pencil-square me-1 text-secondary"></i>
+                {{ i18n.t('portal.reason') }}
+                <span class="text-danger">*</span>
+              </label>
+              <textarea
+                id="reason"
+                formControlName="reason"
+                class="form-control"
+                rows="4"
+                minlength="10"
+                maxlength="500"
+                [class.is-invalid]="hasError('reason', 'required') || hasError('reason', 'minlength') || hasError('reason', 'maxlength')"
+                [placeholder]="i18n.t('portal.correction_reason_placeholder')">
+              </textarea>
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="form-text">
+                  {{ i18n.t('portal.correction_reason_help') }}
+                </div>
+                <div class="char-count" [class.warning]="(form.get('reason')?.value?.length || 0) > 400" [class.danger]="(form.get('reason')?.value?.length || 0) > 480">
+                  {{ form.get('reason')?.value?.length || 0 }} / 500 {{ i18n.t('common.characters') }}
+                </div>
+              </div>
+              @if (hasError('reason', 'required') || hasError('reason', 'minlength') || hasError('reason', 'maxlength')) {
+                <div class="invalid-feedback d-block">
+                  {{ getErrorMessage('reason') }}
+                </div>
+              }
+            </div>
+
+            <!-- Attachment -->
+            <div class="col-12 mb-3">
+              <label for="attachment" class="form-label">
+                <i class="bi bi-paperclip me-1 text-muted"></i>
+                {{ i18n.t('portal.attachment') }}
+                <span class="text-muted">({{ i18n.t('common.optional') }})</span>
+              </label>
+
+              @if (!selectedFile()) {
+                <input
+                  type="file"
+                  id="attachment"
+                  class="form-control"
+                  (change)="onFileSelected($event)"
+                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                <div class="form-text">
+                  {{ i18n.t('portal.attachment_help') }}
+                </div>
+              } @else {
+                <div class="file-preview">
+                  <div class="file-info">
+                    <i class="bi bi-file-earmark me-2"></i>
+                    <span>{{ selectedFile()!.name }}</span>
+                    <span class="text-muted ms-2">
+                      ({{ (selectedFile()!.size / 1024).toFixed(2) }} KB)
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-danger"
+                    (click)="removeFile()">
+                    <i class="bi bi-x"></i>
+                    {{ i18n.t('common.remove') }}
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Info Alert -->
+          <div class="correction-info-alert">
+            <i class="bi bi-lightbulb alert-icon"></i>
+            <div>
+              <p class="mb-1"><strong>{{ i18n.t('portal.correction_workflow_title') }}</strong></p>
+              <p class="mb-0">{{ i18n.t('portal.correction_workflow_info') }}</p>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="form-actions">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="saving() || form.invalid">
+              @if (saving()) {
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              } @else {
+                <i class="bi bi-check-lg me-1"></i>
+              }
+              {{ isEditMode() ? i18n.t('common.update') : i18n.t('common.submit') }}
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              (click)="onCancel()"
+              [disabled]="saving()">
+              <i class="bi bi-x-lg me-1"></i>
+              {{ i18n.t('common.cancel') }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}

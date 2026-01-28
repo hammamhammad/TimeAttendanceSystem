@@ -12,7 +12,6 @@ using TimeAttendanceSystem.Domain.Excuses;
 using TimeAttendanceSystem.Domain.RemoteWork;
 using TimeAttendanceSystem.Domain.Workflows;
 using TimeAttendanceSystem.Domain.LeaveManagement;
-using TimeAttendanceSystem.Domain.FingerprintRequests;
 using TimeAttendanceSystem.Domain.Notifications;
 
 namespace TimeAttendanceSystem.Application.Abstractions;
@@ -626,19 +625,19 @@ public interface IApplicationDbContext
     DbSet<LeaveAccrualPolicy> LeaveAccrualPolicies { get; }
 
     /// <summary>
-    /// Gets the database set for FingerprintRequest entities representing fingerprint enrollment requests.
-    /// Enables tracking of biometric enrollment requests from employees.
+    /// Gets the database set for AttendanceCorrectionRequest entities representing attendance correction requests.
+    /// Enables employees to request corrections for missed clock-in/clock-out transactions.
     /// </summary>
-    /// <value>DbSet for querying and managing FingerprintRequest entities</value>
+    /// <value>DbSet for querying and managing AttendanceCorrectionRequest entities</value>
     /// <remarks>
-    /// FingerprintRequest Entity Features:
-    /// - Employee-initiated fingerprint enrollment requests
-    /// - Request types: NewEnrollment, Update, Issue, AdditionalFingers, LocationChange
-    /// - Status workflow (Pending, Scheduled, Completed, Cancelled, Rejected)
-    /// - Technician assignment and completion tracking
-    /// - Preferred and scheduled date/time management
+    /// AttendanceCorrectionRequest Entity Features:
+    /// - Employee-initiated correction requests for missed check-in/check-out
+    /// - Approval workflow integration with configurable approval chains
+    /// - Automatic transaction creation upon approval
+    /// - Attendance recalculation integration after approval
+    /// - Complete audit trail for compliance requirements
     /// </remarks>
-    DbSet<FingerprintRequest> FingerprintRequests { get; }
+    DbSet<AttendanceCorrectionRequest> AttendanceCorrectionRequests { get; }
 
     /// <summary>
     /// Gets the database set for Notification entities representing in-app notifications.

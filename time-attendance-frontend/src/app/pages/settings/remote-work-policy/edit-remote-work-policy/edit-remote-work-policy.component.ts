@@ -2,7 +2,7 @@ import { Component, OnInit, signal, inject, OnDestroy } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Subject, takeUntil, switchMap } from 'rxjs';
+import { Subject, takeUntil, switchMap, forkJoin, of } from 'rxjs';
 import { I18nService } from '../../../../core/i18n/i18n.service';
 import { NotificationService } from '../../../../core/notifications/notification.service';
 import { RemoteWorkPoliciesService } from '../../../../core/services/remote-work-policies.service';
@@ -33,6 +33,7 @@ export class EditRemoteWorkPolicyComponent implements OnInit, OnDestroy {
   submitting = signal(false);
   branches = signal<SearchableSelectOption[]>([]);
   policyId = signal<number | null>(null);
+  isCompanyWide = signal(false);
 
   // Form state
   policyForm = {
@@ -51,8 +52,7 @@ export class EditRemoteWorkPolicyComponent implements OnInit, OnDestroy {
   };
 
   ngOnInit(): void {
-    this.loadBranches();
-    this.loadPolicy();
+    this.loadData();
   }
 
   ngOnDestroy(): void {
@@ -61,27 +61,9 @@ export class EditRemoteWorkPolicyComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Load branches for selection
+   * Load branches and policy data together to ensure branches are available when populating form
    */
-  private loadBranches(): void {
-    this.branchesService.getBranchesForDropdown().subscribe({
-      next: (branches) => {
-        this.branches.set(branches.map(b => ({
-          value: b.id,
-          label: b.name
-        })));
-      },
-      error: (err: unknown) => {
-        console.error('Failed to load branches:', err);
-        this.notificationService.error(this.i18n.t('branches.errors.load_failed'));
-      }
-    });
-  }
-
-  /**
-   * Load policy data
-   */
-  private loadPolicy(): void {
+  private loadData(): void {
     this.loading.set(true);
 
     this.route.paramMap.pipe(
@@ -95,16 +77,28 @@ export class EditRemoteWorkPolicyComponent implements OnInit, OnDestroy {
         }
 
         this.policyId.set(id);
-        return this.service.getById(id);
+
+        // Load branches and policy together
+        return forkJoin({
+          branches: this.branchesService.getBranchesForDropdown(),
+          policy: this.service.getById(id)
+        });
       })
     ).subscribe({
-      next: (policy) => {
+      next: ({ branches, policy }) => {
+        // Set branches first
+        this.branches.set(branches.map(b => ({
+          value: b.id,
+          label: b.name
+        })));
+
+        // Then populate form
         this.populateForm(policy);
         this.loading.set(false);
       },
       error: (err: any) => {
         this.loading.set(false);
-        console.error('Failed to load policy:', err);
+        console.error('Failed to load data:', err);
 
         if (err.status === 404) {
           this.notificationService.error(this.i18n.t('remoteWork.policy.errors.not_found'));
@@ -121,6 +115,9 @@ export class EditRemoteWorkPolicyComponent implements OnInit, OnDestroy {
    * Populate form with policy data
    */
   private populateForm(policy: RemoteWorkPolicy): void {
+    // Check if this is a company-wide policy (no branchId)
+    this.isCompanyWide.set(!policy.branchId);
+
     this.policyForm = {
       branchId: policy.branchId,
       maxDaysPerWeek: policy.maxDaysPerWeek ?? undefined,
@@ -185,7 +182,8 @@ export class EditRemoteWorkPolicyComponent implements OnInit, OnDestroy {
    * Validate form data
    */
   private validateForm(): boolean {
-    if (!this.policyForm.branchId) {
+    // Only require branchId for branch-specific policies
+    if (!this.isCompanyWide() && !this.policyForm.branchId) {
       this.notificationService.error(this.i18n.t('remoteWork.policy.errors.branch_required'));
       return false;
     }

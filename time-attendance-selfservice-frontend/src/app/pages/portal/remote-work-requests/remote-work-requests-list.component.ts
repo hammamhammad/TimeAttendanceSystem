@@ -6,8 +6,7 @@ import { NotificationService } from '../../../core/notifications/notification.se
 import { ConfirmationService } from '../../../core/confirmation/confirmation.service';
 import { RemoteWorkRequestsService } from '../../../core/services/remote-work-requests.service';
 import { RemoteWorkRequest, RemoteWorkRequestStatus } from '../../../core/models/remote-work-request.model';
-import { DataTableComponent, TableColumn } from '../../../shared/components/data-table/data-table.component';
-import { TableActionsComponent, TableActionItem } from '../../../shared/components/table-actions/table-actions.component';
+import { DataTableComponent, TableColumn, TableAction } from '../../../shared/components/data-table/data-table.component';
 import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
@@ -22,7 +21,6 @@ import { PageHeaderComponent } from '../../../shared/components/page-header/page
   imports: [
     CommonModule,
     DataTableComponent,
-    TableActionsComponent,
     EmptyStateComponent,
     LoadingSpinnerComponent,
     PageHeaderComponent
@@ -43,31 +41,46 @@ export class RemoteWorkRequestsListComponent implements OnInit {
   error = signal<string | null>(null);
 
   // Table configuration
-  readonly columns: TableColumn[] = [
-    { key: 'startDate', label: 'Start Date', sortable: true },
-    { key: 'endDate', label: 'End Date', sortable: true },
-    { key: 'workingDaysCount', label: 'Days', sortable: true },
-    { key: 'reason', label: 'Reason', sortable: false },
-    { key: 'status', label: 'Status', sortable: true, renderHtml: true },
-    { key: 'createdAtUtc', label: 'Requested', sortable: true },
-    { key: 'actions', label: 'Actions', sortable: false }
-  ];
+  columns: TableColumn[] = [];
 
-  readonly actions: TableActionItem[] = [
-    {
-      id: 'view',
-      label: 'View',
-      icon: 'bi-eye',
-      variant: 'primary'
-    },
-    {
-      id: 'cancel',
-      label: 'Cancel',
-      icon: 'bi-x',
-      variant: 'danger',
-      visible: (item: RemoteWorkRequest) => item.status === RemoteWorkRequestStatus.Pending
-    }
-  ];
+  initColumns(): void {
+    this.columns = [
+      { key: 'startDate', label: this.i18n.t('portal.start_date'), sortable: true },
+      { key: 'endDate', label: this.i18n.t('portal.end_date'), sortable: true },
+      { key: 'workingDaysCount', label: this.i18n.t('portal.days_column'), sortable: true },
+      { key: 'reason', label: this.i18n.t('portal.reason'), sortable: false },
+      { key: 'status', label: this.i18n.t('portal.status'), sortable: true, renderHtml: true },
+      { key: 'createdAtUtc', label: this.i18n.t('portal.requested_column'), sortable: true }
+    ];
+  }
+
+  // Table actions - using DataTableComponent's TableAction interface
+  tableActions: TableAction[] = [];
+
+  initTableActions(): void {
+    this.tableActions = [
+      {
+        key: 'view',
+        label: this.i18n.t('common.view'),
+        icon: 'bi-eye',
+        color: 'primary'
+      },
+      {
+        key: 'edit',
+        label: this.i18n.t('common.edit'),
+        icon: 'bi-pencil',
+        color: 'warning',
+        condition: (item: any) => this.canEdit(item)
+      },
+      {
+        key: 'cancel',
+        label: this.i18n.t('common.cancel'),
+        icon: 'bi-x-circle',
+        color: 'danger',
+        condition: (item: any) => this.canCancel(item)
+      }
+    ];
+  }
 
   // Computed table data with formatted values
   tableData = computed(() => {
@@ -75,27 +88,28 @@ export class RemoteWorkRequestsListComponent implements OnInit {
       ...request,
       startDate: this.formatDate(request.startDate),
       endDate: this.formatDate(request.endDate),
-      workingDaysCount: `${request.workingDaysCount} days`,
+      workingDaysCount: `${request.workingDaysCount} ${request.workingDaysCount === 1 ? this.i18n.t('common.dayUnit') : this.i18n.t('common.days_text')}`,
       status: this.getStatusBadgeHtml(request),
-      createdAtUtc: this.formatDateTime(request.createdAtUtc),
-      actions: request
+      createdAtUtc: this.formatDateTime(request.createdAtUtc)
     }));
   });
 
   ngOnInit(): void {
+    this.initColumns();
+    this.initTableActions();
     this.loadRequests();
   }
 
   /**
-   * Load remote work requests from the service
+   * Load remote work requests from the service (secure endpoint - only current user's requests)
    */
   loadRequests(): void {
     this.loading.set(true);
     this.error.set(null);
 
-    this.remoteWorkService.getAll().subscribe({
-      next: (requests) => {
-        this.requests.set(requests);
+    this.remoteWorkService.getMyRequests().subscribe({
+      next: (response) => {
+        this.requests.set(response.items);
         this.loading.set(false);
       },
       error: (error) => {
@@ -110,12 +124,16 @@ export class RemoteWorkRequestsListComponent implements OnInit {
   /**
    * Handle action clicks from table
    */
-  onActionClick(event: { action: TableActionItem; item: any }): void {
-    const request = event.item as RemoteWorkRequest;
+  onActionClick(event: { action: string; item: any }): void {
+    const request = this.requests().find(r => r.id === event.item.id);
+    if (!request) return;
 
-    switch (event.action.id) {
+    switch (event.action) {
       case 'view':
         this.viewRequest(request);
+        break;
+      case 'edit':
+        this.editRequest(request);
         break;
       case 'cancel':
         this.cancelRequest(request);
@@ -124,10 +142,45 @@ export class RemoteWorkRequestsListComponent implements OnInit {
   }
 
   /**
+   * Check if request can be edited
+   */
+  canEdit(item: any): boolean {
+    const request = this.requests().find(r => r.id === item.id);
+    if (!request) return false;
+
+    const workflowStatus = request.workflowStatus?.toLowerCase();
+    return request.status === RemoteWorkRequestStatus.Pending &&
+           workflowStatus !== 'approved' &&
+           workflowStatus !== 'rejected' &&
+           workflowStatus !== 'expired';
+  }
+
+  /**
+   * Check if request can be cancelled
+   */
+  canCancel(item: any): boolean {
+    const request = this.requests().find(r => r.id === item.id);
+    if (!request) return false;
+
+    const workflowStatus = request.workflowStatus?.toLowerCase();
+    return request.status === RemoteWorkRequestStatus.Pending &&
+           workflowStatus !== 'approved' &&
+           workflowStatus !== 'rejected' &&
+           workflowStatus !== 'expired';
+  }
+
+  /**
    * Navigate to request details
    */
   viewRequest(request: RemoteWorkRequest): void {
     this.router.navigate(['/remote-work-requests', request.id]);
+  }
+
+  /**
+   * Navigate to edit request
+   */
+  editRequest(request: RemoteWorkRequest): void {
+    this.router.navigate(['/remote-work-requests', request.id, 'edit']);
   }
 
   /**
@@ -175,11 +228,50 @@ export class RemoteWorkRequestsListComponent implements OnInit {
   }
 
   /**
-   * Format date for display
+   * Get status badge HTML for table display
+   * Uses workflow status when available for more accurate display
+   */
+  private getStatusBadgeHtml(request: RemoteWorkRequest): string {
+    const workflowStatus = request.workflowStatus?.toLowerCase();
+
+    // Check workflow status first
+    if (workflowStatus === 'expired') {
+      return `<span class="badge bg-danger">${this.i18n.t('portal.status_expired')}</span>`;
+    }
+
+    if (workflowStatus === 'rejected' || request.status === RemoteWorkRequestStatus.Rejected) {
+      return `<span class="badge bg-danger">${this.i18n.t('portal.status_rejected')}</span>`;
+    }
+
+    if (request.status === RemoteWorkRequestStatus.Cancelled) {
+      return `<span class="badge bg-secondary">${this.i18n.t('portal.status_cancelled')}</span>`;
+    }
+
+    // Check for approved with active/completed/upcoming states
+    if (request.isApproved || request.status === RemoteWorkRequestStatus.Approved) {
+      if (request.isCurrentlyActive) {
+        return `<span class="badge bg-info">${this.i18n.t('portal.status_active')}</span>`;
+      }
+      if (request.isCompleted) {
+        return `<span class="badge bg-secondary">${this.i18n.t('portal.status_completed')}</span>`;
+      }
+      if (request.isUpcoming) {
+        return `<span class="badge bg-success">${this.i18n.t('portal.status_approved')}</span>`;
+      }
+      return `<span class="badge bg-success">${this.i18n.t('portal.status_approved')}</span>`;
+    }
+
+    // Default to pending
+    return `<span class="badge bg-warning">${this.i18n.t('portal.status_pending')}</span>`;
+  }
+
+  /**
+   * Format date for display with locale support
    */
   private formatDate(dateString: string): string {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+    const locale = this.i18n.getCurrentLocale() === 'ar' ? 'ar-SA' : 'en-US';
+    return date.toLocaleDateString(locale, {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
@@ -187,34 +279,17 @@ export class RemoteWorkRequestsListComponent implements OnInit {
   }
 
   /**
-   * Format date and time for display
+   * Format date and time for display with locale support
    */
   private formatDateTime(dateString: string): string {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+    const locale = this.i18n.getCurrentLocale() === 'ar' ? 'ar-SA' : 'en-US';
+    return date.toLocaleDateString(locale, {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
     });
-  }
-
-  /**
-   * Get status badge HTML for table display
-   */
-  private getStatusBadgeHtml(request: RemoteWorkRequest): string {
-    switch (request.status) {
-      case RemoteWorkRequestStatus.Pending:
-        return '<span class="badge bg-warning">Pending</span>';
-      case RemoteWorkRequestStatus.Approved:
-        return '<span class="badge bg-success">Approved</span>';
-      case RemoteWorkRequestStatus.Rejected:
-        return '<span class="badge bg-danger">Rejected</span>';
-      case RemoteWorkRequestStatus.Cancelled:
-        return '<span class="badge bg-secondary">Cancelled</span>';
-      default:
-        return `<span class="badge bg-secondary">${request.status}</span>`;
-    }
   }
 }

@@ -13,7 +13,6 @@ using TimeAttendanceSystem.Domain.Excuses;
 using TimeAttendanceSystem.Domain.RemoteWork;
 using TimeAttendanceSystem.Domain.Workflows;
 using TimeAttendanceSystem.Domain.LeaveManagement;
-using TimeAttendanceSystem.Domain.FingerprintRequests;
 using TimeAttendanceSystem.Domain.Notifications;
 
 namespace TimeAttendanceSystem.Infrastructure.Persistence;
@@ -72,8 +71,8 @@ public class ApplicationDbContextAdapter : IApplicationDbContext
     public DbSet<LeaveTransaction> LeaveTransactions => _context.LeaveTransactions;
     public DbSet<LeaveAccrualPolicy> LeaveAccrualPolicies => _context.LeaveAccrualPolicies;
 
-    // Fingerprint Request entities
-    public DbSet<FingerprintRequest> FingerprintRequests => _context.FingerprintRequests;
+    // Attendance Correction Request entities
+    public DbSet<AttendanceCorrectionRequest> AttendanceCorrectionRequests => _context.AttendanceCorrectionRequests;
 
     // Notification entities
     public DbSet<Notification> Notifications => _context.Notifications;

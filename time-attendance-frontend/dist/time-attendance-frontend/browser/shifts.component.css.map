@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/pages/shifts/shifts.component.css"],
-  "sourcesContent": [".required::after {\r\n  content: ' *';\r\n  color: #dc3545;\r\n}\r\n\r\n.table th {\r\n  background-color: #f8f9fa;\r\n  border-top: none;\r\n  font-weight: 600;\r\n}\r\n\r\n.badge {\r\n  font-size: 0.75rem;\r\n}\r\n\r\n.btn-group-sm .btn {\r\n  padding: 0.25rem 0.5rem;\r\n}\r\n\r\n.modal-backdrop {\r\n  backdrop-filter: blur(2px);\r\n}\r\n\r\n.form-text.text-muted {\r\n  font-size: 0.8rem;\r\n}\r\n\r\n.card .card-body {\r\n  padding: 1rem;\r\n}\r\n\r\n.pagination .page-link {\r\n  border-radius: 0.375rem;\r\n  margin: 0 0.125rem;\r\n}\r\n\r\n.spinner-border-sm {\r\n  width: 1rem;\r\n  height: 1rem;\r\n}\r\n\r\n.table-responsive {\r\n  border-radius: 0.375rem;\r\n}\r\n\r\n@media (max-width: 768px) {\r\n  .btn-group-sm .btn {\r\n    padding: 0.2rem 0.4rem;\r\n    font-size: 0.75rem;\r\n  }\r\n\r\n  .table-responsive {\r\n    font-size: 0.9rem;\r\n  }\r\n}"],
-  "mappings": ";AAAA,CAAC,QAAQ;AACP,WAAS;AACT,SAAO;AACT;AAEA,CAAC,MAAM;AACL,oBAAkB;AAClB,cAAY;AACZ,eAAa;AACf;AAEA,CAAC;AACC,aAAW;AACb;AAEA,CAAC,aAAa,CAAC;AACb,WAAS,QAAQ;AACnB;AAEA,CAAC;AACC,2BAAiB,KAAK;AAAtB,mBAAiB,KAAK;AACxB;AAEA,CAAC,SAAS,CAAC;AACT,aAAW;AACb;AAEA,CAAC,KAAK,CAAC;AACL,WAAS;AACX;AAEA,CAAC,WAAW,CAAC;AACX,iBAAe;AACf,UAAQ,EAAE;AACZ;AAEA,CAAC;AACC,SAAO;AACP,UAAQ;AACV;AAEA,CAAC;AACC,iBAAe;AACjB;AAEA,OAAO,CAAC,SAAS,EAAE;AACjB,GA/BD,aA+Be,CA/BD;AAgCX,aAAS,OAAO;AAChB,eAAW;AACb;AAEA,GAVD;AAWG,eAAW;AACb;AACF;",
-  "names": []
-}

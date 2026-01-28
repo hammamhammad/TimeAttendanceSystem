@@ -5,6 +5,17 @@ export enum RemoteWorkRequestStatus {
   Cancelled = 3
 }
 
+export interface RemoteWorkApprovalStep {
+  stepOrder: number;
+  stepName: string;
+  status: string;
+  assignedToName: string;
+  actionByName?: string;
+  assignedAt: string;
+  actionAt?: string;
+  comments?: string;
+}
+
 export interface RemoteWorkRequest {
   id: number;
   employeeId: number;
@@ -24,6 +35,23 @@ export interface RemoteWorkRequest {
   workingDaysCount: number;
   createdAtUtc: string;
   modifiedAtUtc?: string;
+
+  // Workflow information
+  workflowInstanceId?: number;
+  workflowStatus?: string;
+  currentApproverName?: string;
+  currentApproverRole?: string;
+  currentStepOrder?: number;
+  totalSteps?: number;
+
+  // Computed status flags
+  isApproved?: boolean;
+  isCurrentlyActive?: boolean;
+  isUpcoming?: boolean;
+  isCompleted?: boolean;
+
+  // Approval history
+  approvalHistory?: RemoteWorkApprovalStep[];
 }
 
 export interface CreateRemoteWorkRequest {

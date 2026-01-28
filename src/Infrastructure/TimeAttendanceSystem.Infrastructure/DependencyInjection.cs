@@ -448,6 +448,51 @@ public static class DependencyInjection
                     context.User.IsInRole("Admin") ||
                     context.User.HasClaim("permission", "excuse.manage")));
 
+            // ===== ATTENDANCE CORRECTION POLICIES =====
+
+            // Define AttendanceRead policy - users who can view attendance correction requests
+            options.AddPolicy("AttendanceRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.IsInRole("Employee") ||
+                    context.User.HasClaim("permission", "attendanceCorrection.read")));
+
+            // Define AttendanceCreate policy - users who can create attendance correction requests
+            options.AddPolicy("AttendanceCreate", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.IsInRole("Employee") ||
+                    context.User.HasClaim("permission", "attendanceCorrection.create")));
+
+            // Define AttendanceUpdate policy - users who can update their own correction requests
+            options.AddPolicy("AttendanceUpdate", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.IsInRole("Employee") ||
+                    context.User.HasClaim("permission", "attendanceCorrection.update")));
+
+            // Define AttendanceDelete policy - users who can delete/cancel correction requests
+            options.AddPolicy("AttendanceDelete", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("Employee") ||
+                    context.User.HasClaim("permission", "attendanceCorrection.delete")));
+
+            // Define AttendanceApprove policy - users who can approve/reject correction requests
+            options.AddPolicy("AttendanceApprove", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.HasClaim("permission", "attendanceCorrection.approve")));
+
             // ===== PORTAL & SELF-SERVICE POLICIES =====
 
             // Define ManagerAccess policy - users with manager role who can access manager dashboard

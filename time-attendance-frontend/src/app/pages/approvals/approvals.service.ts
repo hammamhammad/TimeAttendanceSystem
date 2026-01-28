@@ -166,8 +166,7 @@ export class ApprovalsService {
       'RemoteWork': 'Remote Work Request',
       'Overtime': 'Overtime Request',
       'Timesheet': 'Timesheet',
-      'AttendanceCorrection': 'Attendance Correction',
-      'FingerprintRequest': 'Fingerprint Request'
+      'AttendanceCorrection': 'Attendance Correction'
     };
     return displayNames[entityType] || entityType;
   }

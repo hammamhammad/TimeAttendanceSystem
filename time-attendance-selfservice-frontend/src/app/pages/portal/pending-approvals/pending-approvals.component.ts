@@ -80,7 +80,7 @@ export class PendingApprovalsComponent implements OnInit, OnDestroy {
       vacation: approvals.filter(a => this.matchesEntityType(a.entityType, ApprovalEntityType.Vacation)).length,
       excuse: approvals.filter(a => this.matchesEntityType(a.entityType, ApprovalEntityType.Excuse)).length,
       remoteWork: approvals.filter(a => this.matchesEntityType(a.entityType, ApprovalEntityType.RemoteWork)).length,
-      fingerprint: approvals.filter(a => this.matchesEntityType(a.entityType, ApprovalEntityType.Fingerprint)).length
+      attendanceCorrection: approvals.filter(a => this.matchesEntityType(a.entityType, ApprovalEntityType.AttendanceCorrection)).length
     };
   });
 
@@ -90,7 +90,7 @@ export class PendingApprovalsComponent implements OnInit, OnDestroy {
     { id: ApprovalEntityType.Vacation, label: 'portal.vacations', icon: 'bi-calendar-event' },
     { id: ApprovalEntityType.Excuse, label: 'portal.excuses', icon: 'bi-clock-history' },
     { id: ApprovalEntityType.RemoteWork, label: 'portal.remote_work', icon: 'bi-house-door' },
-    { id: ApprovalEntityType.Fingerprint, label: 'portal.fingerprint', icon: 'bi-fingerprint' }
+    { id: ApprovalEntityType.AttendanceCorrection, label: 'portal.attendance_corrections', icon: 'bi-clock-history' }
   ];
 
   // Check if all visible items are selected
@@ -136,8 +136,7 @@ export class PendingApprovalsComponent implements OnInit, OnDestroy {
             'Vacation': '/vacation-requests',
             'Excuse': '/excuse-requests',
             'RemoteWork': '/remote-work-requests',
-            'Fingerprint': '/fingerprint-requests',
-            'FingerprintRequest': '/fingerprint-requests'
+            'AttendanceCorrection': '/attendance-corrections'
           };
 
           const route = routeMap[workflow.entityType] || routeMap[workflow.entityTypeName];
@@ -350,7 +349,7 @@ export class PendingApprovalsComponent implements OnInit, OnDestroy {
       [ApprovalEntityType.Vacation]: '/vacation-requests',
       [ApprovalEntityType.Excuse]: '/excuse-requests',
       [ApprovalEntityType.RemoteWork]: '/remote-work-requests',
-      [ApprovalEntityType.Fingerprint]: '/fingerprint-requests'
+      [ApprovalEntityType.AttendanceCorrection]: '/attendance-corrections'
     };
 
     const route = routeMap[entityType];
@@ -365,7 +364,7 @@ export class PendingApprovalsComponent implements OnInit, OnDestroy {
       [ApprovalEntityType.Vacation]: 'bi-calendar-event',
       [ApprovalEntityType.Excuse]: 'bi-clock-history',
       [ApprovalEntityType.RemoteWork]: 'bi-house-door',
-      [ApprovalEntityType.Fingerprint]: 'bi-fingerprint'
+      [ApprovalEntityType.AttendanceCorrection]: 'bi-clock-history'
     };
     return iconMap[type] || 'bi-file-text';
   }
@@ -378,8 +377,7 @@ export class PendingApprovalsComponent implements OnInit, OnDestroy {
       [ApprovalEntityType.Vacation]: this.i18n.t('portal.vacation'),
       [ApprovalEntityType.Excuse]: this.i18n.t('portal.excuse'),
       [ApprovalEntityType.RemoteWork]: this.i18n.t('portal.remote_work'),
-      [ApprovalEntityType.Fingerprint]: this.i18n.t('portal.fingerprint'),
-      'FingerprintRequest': this.i18n.t('portal.fingerprint') // Backend uses FingerprintRequest
+      [ApprovalEntityType.AttendanceCorrection]: this.i18n.t('portal.attendance_correction')
     };
     return labelMap[typeKey] || typeKey?.toString() || this.i18n.t('common.unknown');
   }
@@ -392,8 +390,7 @@ export class PendingApprovalsComponent implements OnInit, OnDestroy {
       [ApprovalEntityType.Vacation]: 'primary',
       [ApprovalEntityType.Excuse]: 'warning',
       [ApprovalEntityType.RemoteWork]: 'success',
-      [ApprovalEntityType.Fingerprint]: 'info',
-      'FingerprintRequest': 'info' // Backend uses FingerprintRequest
+      [ApprovalEntityType.AttendanceCorrection]: 'warning'
     };
     return variantMap[typeKey] || 'primary';
   }
@@ -403,7 +400,7 @@ export class PendingApprovalsComponent implements OnInit, OnDestroy {
       1: ApprovalEntityType.Vacation,
       2: ApprovalEntityType.Excuse,
       3: ApprovalEntityType.RemoteWork,
-      4: ApprovalEntityType.Fingerprint
+      5: ApprovalEntityType.AttendanceCorrection
     };
     return typeMap[type] || '';
   }
@@ -418,11 +415,6 @@ export class PendingApprovalsComponent implements OnInit, OnDestroy {
       ? this.getEntityTypeFromNumber(actualType)
       : actualType;
 
-    // Handle FingerprintRequest from backend
-    if (expectedType === ApprovalEntityType.Fingerprint) {
-      return normalizedActual === expectedType || normalizedActual === 'FingerprintRequest';
-    }
-
     return normalizedActual === expectedType;
   }
 
@@ -432,7 +424,7 @@ export class PendingApprovalsComponent implements OnInit, OnDestroy {
       [ApprovalEntityType.Vacation]: this.counts().vacation,
       [ApprovalEntityType.Excuse]: this.counts().excuse,
       [ApprovalEntityType.RemoteWork]: this.counts().remoteWork,
-      [ApprovalEntityType.Fingerprint]: this.counts().fingerprint
+      [ApprovalEntityType.AttendanceCorrection]: this.counts().attendanceCorrection
     };
     return countMap[tabId] || 0;
   }

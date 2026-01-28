@@ -11,6 +11,7 @@ using TimeAttendanceSystem.Application.Features.Portal.Team.Queries;
 using TimeAttendanceSystem.Application.Workflows.Queries.GetPendingApprovals;
 using TimeAttendanceSystem.Domain.Attendance;
 using TimeAttendanceSystem.Domain.Excuses;
+using TimeAttendanceSystem.Domain.RemoteWork;
 using TimeAttendanceSystem.Domain.Workflows.Enums;
 
 namespace TimeAttendanceSystem.Api.Controllers;
@@ -1464,6 +1465,678 @@ public class PortalController : ControllerBase
         {
             _logger.LogError(ex, "Error cancelling excuse request {ExcuseId}", id);
             return StatusCode(500, new { error = "An error occurred while cancelling excuse request" });
+        }
+    }
+
+    #endregion
+
+    #region Attendance Correction Self-Service Endpoints
+
+    /// <summary>
+    /// Retrieves the current employee's attendance correction requests.
+    /// </summary>
+    /// <param name="page">Page number (1-based). Default: 1</param>
+    /// <param name="pageSize">Page size. Default: 20</param>
+    /// <returns>List of attendance correction requests for the current employee</returns>
+    /// <response code="200">Attendance correction requests retrieved successfully</response>
+    /// <response code="401">Unauthorized - user not authenticated</response>
+    /// <response code="404">Employee profile not found for current user</response>
+    [HttpGet("my-attendance-corrections")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetMyAttendanceCorrections(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+            {
+                return Unauthorized(new { error = "User not authenticated" });
+            }
+
+            // Get current employee from user context
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+            {
+                return NotFound(new { error = "Employee profile not found for current user" });
+            }
+
+            var employeeId = employeeLink.EmployeeId;
+
+            // Query corrections for the current employee
+            var query = new Application.AttendanceCorrections.Queries.GetAttendanceCorrectionRequests.GetAttendanceCorrectionRequestsQuery(
+                EmployeeId: employeeId,
+                StartDate: null,
+                EndDate: null,
+                CorrectionType: null,
+                ApprovalStatus: null,
+                BranchId: null,
+                PageNumber: page,
+                PageSize: pageSize
+            );
+
+            var result = await _mediator.Send(query);
+
+            if (!result.IsSuccess)
+            {
+                return BadRequest(new { error = result.Error });
+            }
+
+            return Ok(result.Value);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving my attendance correction requests");
+            return StatusCode(500, new { error = "An error occurred while retrieving attendance correction requests" });
+        }
+    }
+
+    /// <summary>
+    /// Retrieves a specific attendance correction request for the current employee.
+    /// Only returns correction if it belongs to the current employee.
+    /// </summary>
+    /// <param name="id">Correction request ID</param>
+    /// <returns>Attendance correction request details</returns>
+    /// <response code="200">Correction request retrieved successfully</response>
+    /// <response code="401">Unauthorized - user not authenticated</response>
+    /// <response code="404">Correction not found or doesn't belong to current employee</response>
+    [HttpGet("my-attendance-corrections/{id}")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetMyAttendanceCorrectionById(long id)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+            {
+                return Unauthorized(new { error = "User not authenticated" });
+            }
+
+            // Get current employee from user context
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+            {
+                return NotFound(new { error = "Employee profile not found for current user" });
+            }
+
+            var employeeId = employeeLink.EmployeeId;
+
+            // Query the correction by ID
+            var query = new Application.AttendanceCorrections.Queries.GetAttendanceCorrectionRequestById.GetAttendanceCorrectionRequestByIdQuery(id);
+            var result = await _mediator.Send(query);
+
+            if (!result.IsSuccess || result.Value == null)
+            {
+                return NotFound(new { error = $"Correction request with ID {id} not found" });
+            }
+
+            // Security check: verify it belongs to the current employee
+            if (result.Value.EmployeeId != employeeId)
+            {
+                return NotFound(new { error = $"Correction request with ID {id} not found" });
+            }
+
+            return Ok(result.Value);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving attendance correction request {CorrectionId}", id);
+            return StatusCode(500, new { error = "An error occurred while retrieving attendance correction request" });
+        }
+    }
+
+    /// <summary>
+    /// Cancels the current employee's own attendance correction request.
+    /// Only pending corrections can be cancelled.
+    /// </summary>
+    /// <param name="id">Correction ID</param>
+    /// <returns>Success result</returns>
+    /// <response code="200">Correction cancelled successfully</response>
+    /// <response code="400">Correction cannot be cancelled (already approved/rejected)</response>
+    /// <response code="401">Unauthorized - user not authenticated</response>
+    /// <response code="404">Correction not found or doesn't belong to current employee</response>
+    [HttpDelete("my-attendance-corrections/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> CancelMyAttendanceCorrection(long id)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+            {
+                return Unauthorized(new { error = "User not authenticated" });
+            }
+
+            // Get current employee from user context
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+            {
+                return NotFound(new { error = "Employee profile not found" });
+            }
+
+            var employeeId = employeeLink.EmployeeId;
+
+            // Find the correction and verify it belongs to the current employee
+            var correction = await _context.AttendanceCorrectionRequests
+                .Where(acr => acr.Id == id && acr.EmployeeId == employeeId && !acr.IsDeleted)
+                .FirstOrDefaultAsync();
+
+            if (correction == null)
+            {
+                return NotFound(new { error = $"Correction request with ID {id} not found or doesn't belong to you" });
+            }
+
+            // Only allow cancellation of pending corrections
+            if (correction.ApprovalStatus != ApprovalStatus.Pending)
+            {
+                return BadRequest(new { error = $"Cannot cancel correction with status '{correction.ApprovalStatus}'. Only pending corrections can be cancelled." });
+            }
+
+            // Cancel the correction by setting status to Cancelled
+            correction.ApprovalStatus = ApprovalStatus.Cancelled;
+            correction.ModifiedAtUtc = DateTime.UtcNow;
+            correction.ModifiedBy = _currentUser.Username;
+
+            // Cancel any associated workflow and its pending steps
+            if (correction.WorkflowInstanceId.HasValue)
+            {
+                var workflow = await _context.WorkflowInstances
+                    .Include(wi => wi.StepExecutions)
+                    .FirstOrDefaultAsync(wi => wi.Id == correction.WorkflowInstanceId);
+
+                if (workflow != null && workflow.Status != WorkflowStatus.Approved && workflow.Status != WorkflowStatus.Rejected)
+                {
+                    workflow.Status = WorkflowStatus.Cancelled;
+                    workflow.CompletedAt = DateTime.UtcNow;
+                    workflow.ModifiedAtUtc = DateTime.UtcNow;
+
+                    // Mark all pending step executions as skipped (cancelled)
+                    foreach (var step in workflow.StepExecutions.Where(s => !s.Action.HasValue))
+                    {
+                        step.Skip("Request cancelled by employee");
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            // Mark all notifications related to this correction as read for all users
+            await _notificationService.MarkEntityNotificationsAsReadAsync("AttendanceCorrection", id);
+
+            _logger.LogInformation("User {UserId} cancelled attendance correction {CorrectionId}", _currentUser.UserId, id);
+
+            return Ok(new { message = "Attendance correction request cancelled successfully" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error cancelling attendance correction request {CorrectionId}", id);
+            return StatusCode(500, new { error = "An error occurred while cancelling attendance correction request" });
+        }
+    }
+
+    /// <summary>
+    /// Retrieves an attendance correction request for approval purposes (manager view).
+    /// Returns correction details if the current user is an approver for this request.
+    /// </summary>
+    /// <param name="id">Correction ID</param>
+    /// <returns>Correction request details for approval</returns>
+    /// <response code="200">Correction request retrieved successfully</response>
+    /// <response code="401">Unauthorized - user not authenticated</response>
+    /// <response code="403">Forbidden - user is not an approver for this request</response>
+    /// <response code="404">Correction not found</response>
+    [HttpGet("approval-attendance-correction/{id}")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetAttendanceCorrectionForApproval(long id)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+            {
+                return Unauthorized(new { error = "User not authenticated" });
+            }
+
+            var userId = _currentUser.UserId.Value;
+
+            // Check if user was ever assigned to approve this correction (pending or completed/skipped)
+            var wasAssignedToApprove = await _context.WorkflowStepExecutions
+                .Include(wse => wse.WorkflowInstance)
+                .Where(wse => wse.AssignedToUserId == userId &&
+                             !wse.IsDeleted &&
+                             wse.WorkflowInstance.EntityType == WorkflowEntityType.AttendanceCorrection &&
+                             wse.WorkflowInstance.EntityId == id &&
+                             !wse.WorkflowInstance.IsDeleted)
+                .AnyAsync();
+
+            if (!wasAssignedToApprove)
+            {
+                // Also check if user is a manager of the requesting employee
+                var employeeLink = await _context.EmployeeUserLinks
+                    .FirstOrDefaultAsync(eul => eul.UserId == userId);
+
+                if (employeeLink != null)
+                {
+                    var managerEmployeeId = employeeLink.EmployeeId;
+
+                    // Get the correction to check if it belongs to a direct report
+                    var correctionCheck = await _context.AttendanceCorrectionRequests
+                        .Include(acr => acr.Employee)
+                        .Where(acr => acr.Id == id && !acr.IsDeleted)
+                        .FirstOrDefaultAsync();
+
+                    if (correctionCheck != null)
+                    {
+                        var isDirectReport = correctionCheck.Employee.ManagerEmployeeId == managerEmployeeId;
+                        if (!isDirectReport)
+                        {
+                            return StatusCode(403, new { error = "You are not authorized to view this correction request" });
+                        }
+                    }
+                }
+                else
+                {
+                    return StatusCode(403, new { error = "You are not authorized to view this correction request" });
+                }
+            }
+
+            // Query the correction by ID (without employee filter - manager can view)
+            var query = new Application.AttendanceCorrections.Queries.GetAttendanceCorrectionRequestById.GetAttendanceCorrectionRequestByIdQuery(id);
+            var result = await _mediator.Send(query);
+
+            if (!result.IsSuccess || result.Value == null)
+            {
+                return NotFound(new { error = $"Correction request with ID {id} not found" });
+            }
+
+            return Ok(result.Value);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving attendance correction request for approval {CorrectionId}", id);
+            return StatusCode(500, new { error = "An error occurred while retrieving attendance correction request" });
+        }
+    }
+
+    #endregion
+
+    #region Remote Work Self-Service Endpoints
+
+    /// <summary>
+    /// Retrieves all remote work requests for the current employee.
+    /// Returns a paginated list of the employee's remote work requests with workflow status.
+    /// </summary>
+    /// <param name="page">Page number (default: 1)</param>
+    /// <param name="pageSize">Page size (default: 20, max: 100)</param>
+    /// <returns>Paginated list of remote work requests</returns>
+    /// <response code="200">Remote work requests retrieved successfully</response>
+    /// <response code="401">Unauthorized - user not authenticated</response>
+    /// <response code="404">Employee profile not found for current user</response>
+    [HttpGet("my-remote-work-requests")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetMyRemoteWorkRequests(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+            {
+                return Unauthorized(new { error = "User not authenticated" });
+            }
+
+            // Get current employee from user context
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+            {
+                return NotFound(new { error = "Employee profile not found for current user" });
+            }
+
+            var employeeId = employeeLink.EmployeeId;
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+            // Query remote work requests for the current employee only
+            var query = _context.RemoteWorkRequests
+                .Include(rw => rw.Employee)
+                .Include(rw => rw.CreatedByUser)
+                .Include(rw => rw.ApprovedByUser)
+                .Where(rw => rw.EmployeeId == employeeId && !rw.IsDeleted)
+                .AsQueryable();
+
+            // Get total count
+            var totalCount = await query.CountAsync();
+
+            // Apply pagination
+            var requests = await query
+                .OrderByDescending(rw => rw.StartDate)
+                .Skip((page - 1) * Math.Min(pageSize, 100))
+                .Take(Math.Min(pageSize, 100))
+                .ToListAsync();
+
+            // Get workflow instances for all requests
+            var requestIds = requests.Select(r => r.Id).ToList();
+            var workflows = await _context.WorkflowInstances
+                .Include(wi => wi.CurrentStep)
+                    .ThenInclude(cs => cs!.ApproverRole)
+                .Include(wi => wi.WorkflowDefinition)
+                    .ThenInclude(wd => wd.Steps)
+                .Where(wi => wi.EntityType == WorkflowEntityType.RemoteWork && requestIds.Contains(wi.EntityId))
+                .ToListAsync();
+
+            var workflowLookup = workflows.ToDictionary(w => w.EntityId);
+
+            // Map to DTOs with workflow status
+            var items = requests.Select(rw =>
+            {
+                workflowLookup.TryGetValue(rw.Id, out var workflow);
+                var workflowStatus = workflow?.Status.ToString() ?? "Pending";
+                var isApproved = workflow?.Status == WorkflowStatus.Approved;
+
+                return new
+                {
+                    rw.Id,
+                    rw.EmployeeId,
+                    EmployeeName = $"{rw.Employee?.FirstName} {rw.Employee?.LastName}".Trim(),
+                    rw.StartDate,
+                    rw.EndDate,
+                    rw.WorkingDaysCount,
+                    rw.Reason,
+                    Status = rw.Status,
+                    rw.CreatedAtUtc,
+                    rw.ModifiedAtUtc,
+                    CreatedByUserName = rw.CreatedByUser?.Username,
+                    ApprovedByUserName = rw.ApprovedByUser?.Username,
+                    ApprovedAt = rw.ApprovedAt,
+                    WorkflowStatus = workflowStatus,
+                    WorkflowInstanceId = workflow?.Id,
+                    CurrentStepOrder = workflow?.CurrentStep?.StepOrder,
+                    TotalSteps = workflow?.WorkflowDefinition?.Steps?.Count ?? 0,
+                    IsApproved = isApproved,
+                    IsCurrentlyActive = isApproved && rw.StartDate <= today && rw.EndDate >= today,
+                    IsCompleted = isApproved && rw.EndDate < today,
+                    IsUpcoming = isApproved && rw.StartDate > today
+                };
+            }).ToList();
+
+            return Ok(new
+            {
+                items,
+                totalCount,
+                page,
+                pageSize = Math.Min(pageSize, 100),
+                totalPages = (int)Math.Ceiling((double)totalCount / Math.Min(pageSize, 100))
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving my remote work requests");
+            return StatusCode(500, new { error = "An error occurred while retrieving remote work requests" });
+        }
+    }
+
+    /// <summary>
+    /// Retrieves a remote work request by ID for the current employee.
+    /// Returns the request details with workflow status and approval history.
+    /// </summary>
+    /// <param name="id">Remote work request ID</param>
+    /// <returns>Remote work request details</returns>
+    /// <response code="200">Remote work request retrieved successfully</response>
+    /// <response code="401">Unauthorized - user not authenticated</response>
+    /// <response code="404">Remote work request not found or doesn't belong to current employee</response>
+    [HttpGet("my-remote-work-requests/{id}")]
+    [ProducesResponseType(typeof(Application.Features.RemoteWorkRequests.Queries.RemoteWorkRequestDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetMyRemoteWorkRequestById(long id)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+            {
+                return Unauthorized(new { error = "User not authenticated" });
+            }
+
+            // Get current employee from user context
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+            {
+                return NotFound(new { error = "Employee profile not found for current user" });
+            }
+
+            var employeeId = employeeLink.EmployeeId;
+
+            // Query the remote work request directly with employee filter for security
+            var remoteWorkRequest = await _context.RemoteWorkRequests
+                .Include(rw => rw.Employee)
+                    .ThenInclude(e => e.Department)
+                .Include(rw => rw.Employee)
+                    .ThenInclude(e => e.Branch)
+                .Include(rw => rw.ApprovedByUser)
+                .Include(rw => rw.CreatedByUser)
+                .Where(rw => rw.Id == id && rw.EmployeeId == employeeId && !rw.IsDeleted)
+                .FirstOrDefaultAsync();
+
+            if (remoteWorkRequest == null)
+            {
+                return NotFound(new { error = $"Remote work request with ID {id} not found" });
+            }
+
+            // Get workflow instance for this remote work request
+            var workflow = await _context.WorkflowInstances
+                .Include(wi => wi.CurrentStep)
+                    .ThenInclude(cs => cs!.ApproverRole)
+                .Include(wi => wi.CurrentStep)
+                    .ThenInclude(cs => cs!.ApproverUser)
+                .Include(wi => wi.WorkflowDefinition)
+                    .ThenInclude(wd => wd.Steps)
+                .Where(wi => wi.EntityType == WorkflowEntityType.RemoteWork && wi.EntityId == id)
+                .FirstOrDefaultAsync();
+
+            var currentStep = workflow?.CurrentStep;
+            var totalSteps = workflow?.WorkflowDefinition?.Steps?.Count ?? 0;
+
+            // Determine current approver name/role based on approver type
+            string? approverName = null;
+            string? approverRole = null;
+
+            if (currentStep != null)
+            {
+                if (currentStep.ApproverType == ApproverType.DirectManager)
+                {
+                    approverRole = "Direct Manager";
+                }
+                else if (currentStep.ApproverType == ApproverType.DepartmentHead)
+                {
+                    approverRole = "Department Head";
+                }
+                else if (currentStep.ApproverType == ApproverType.Role && currentStep.ApproverRole != null)
+                {
+                    approverRole = currentStep.ApproverRole.Name;
+                }
+                else if (currentStep.ApproverType == ApproverType.SpecificUser && currentStep.ApproverUser != null)
+                {
+                    approverName = currentStep.ApproverUser.Username;
+                }
+            }
+
+            // Build approval history from workflow step executions
+            var approvalHistory = new List<object>();
+            if (workflow != null)
+            {
+                var stepExecutions = await _context.WorkflowStepExecutions
+                    .Include(wse => wse.Step)
+                        .ThenInclude(s => s.ApproverRole)
+                    .Include(wse => wse.AssignedToUser)
+                    .Include(wse => wse.ActionTakenByUser)
+                    .Where(wse => wse.WorkflowInstanceId == workflow.Id && !wse.IsDeleted)
+                    .OrderBy(wse => wse.Step.StepOrder)
+                    .ToListAsync();
+
+                approvalHistory = stepExecutions.Select(se => new
+                {
+                    stepOrder = se.Step.StepOrder,
+                    stepName = se.Step.Name ?? $"Step {se.Step.StepOrder}",
+                    status = se.Action?.ToString() ?? "Pending",
+                    assignedToName = se.AssignedToUser?.Username ?? se.Step.ApproverRole?.Name ?? "Unknown",
+                    actionByName = se.ActionTakenByUser?.Username,
+                    assignedAt = se.AssignedAt.ToString("o"),
+                    actionAt = se.ActionTakenAt?.ToString("o"),
+                    comments = se.Comments
+                }).ToList<object>();
+            }
+
+            // Map to DTO
+            var dto = new
+            {
+                id = remoteWorkRequest.Id,
+                employeeId = remoteWorkRequest.EmployeeId,
+                employeeName = remoteWorkRequest.Employee.FullName,
+                startDate = remoteWorkRequest.StartDate.ToString("yyyy-MM-dd"),
+                endDate = remoteWorkRequest.EndDate.ToString("yyyy-MM-dd"),
+                reason = remoteWorkRequest.Reason,
+                status = (int)remoteWorkRequest.Status,
+                workingDaysCount = remoteWorkRequest.WorkingDaysCount,
+                createdByUserId = remoteWorkRequest.CreatedByUserId,
+                createdByUserName = remoteWorkRequest.CreatedByUser?.Username,
+                createdAtUtc = remoteWorkRequest.CreatedAtUtc.ToString("o"),
+                modifiedAtUtc = remoteWorkRequest.ModifiedAtUtc?.ToString("o"),
+                approvedByUserId = remoteWorkRequest.ApprovedByUserId,
+                approvedByUserName = remoteWorkRequest.ApprovedByUser?.Username,
+                approvedAt = remoteWorkRequest.ApprovedAt?.ToString("o"),
+                rejectionReason = remoteWorkRequest.RejectionReason,
+                approvalComments = remoteWorkRequest.ApprovalComments,
+
+                // Workflow information
+                workflowInstanceId = workflow?.Id,
+                workflowStatus = workflow?.Status.ToString() ?? "None",
+                currentApproverName = approverName,
+                currentApproverRole = approverRole,
+                currentStepOrder = currentStep?.StepOrder,
+                totalSteps = totalSteps > 0 ? totalSteps : (int?)null,
+
+                // Computed status flags
+                isApproved = remoteWorkRequest.Status == RemoteWorkRequestStatus.Approved,
+                isCurrentlyActive = remoteWorkRequest.Status == RemoteWorkRequestStatus.Approved &&
+                                   remoteWorkRequest.StartDate <= DateOnly.FromDateTime(DateTime.Today) &&
+                                   remoteWorkRequest.EndDate >= DateOnly.FromDateTime(DateTime.Today),
+                isUpcoming = remoteWorkRequest.Status == RemoteWorkRequestStatus.Approved &&
+                            remoteWorkRequest.StartDate > DateOnly.FromDateTime(DateTime.Today),
+                isCompleted = remoteWorkRequest.Status == RemoteWorkRequestStatus.Approved &&
+                             remoteWorkRequest.EndDate < DateOnly.FromDateTime(DateTime.Today),
+
+                // Approval history
+                approvalHistory = approvalHistory
+            };
+
+            return Ok(dto);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving my remote work request {RequestId}", id);
+            return StatusCode(500, new { error = "An error occurred while retrieving remote work request" });
+        }
+    }
+
+    /// <summary>
+    /// Retrieves a remote work request for approval purposes (manager view).
+    /// Returns remote work details if the current user is an approver for this request.
+    /// </summary>
+    /// <param name="id">Remote work request ID</param>
+    /// <returns>Remote work request details for approval</returns>
+    /// <response code="200">Remote work request retrieved successfully</response>
+    /// <response code="401">Unauthorized - user not authenticated</response>
+    /// <response code="403">Forbidden - user is not an approver for this request</response>
+    /// <response code="404">Remote work request not found</response>
+    [HttpGet("approval-remote-work/{id}")]
+    [ProducesResponseType(typeof(Application.Features.RemoteWorkRequests.Queries.RemoteWorkRequestDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetRemoteWorkForApproval(long id)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+            {
+                return Unauthorized(new { error = "User not authenticated" });
+            }
+
+            var userId = _currentUser.UserId.Value;
+
+            // Check if user was ever assigned to approve this remote work request
+            var wasAssignedToApprove = await _context.WorkflowStepExecutions
+                .Include(wse => wse.WorkflowInstance)
+                .Where(wse => wse.AssignedToUserId == userId &&
+                             !wse.IsDeleted &&
+                             wse.WorkflowInstance.EntityType == WorkflowEntityType.RemoteWork &&
+                             wse.WorkflowInstance.EntityId == id &&
+                             !wse.WorkflowInstance.IsDeleted)
+                .AnyAsync();
+
+            if (!wasAssignedToApprove)
+            {
+                // Also check if user is a manager of the requesting employee
+                var employeeLink = await _context.EmployeeUserLinks
+                    .FirstOrDefaultAsync(eul => eul.UserId == userId);
+
+                if (employeeLink != null)
+                {
+                    var managerEmployeeId = employeeLink.EmployeeId;
+
+                    // Get the remote work request to check if it belongs to a direct report
+                    var requestCheck = await _context.RemoteWorkRequests
+                        .Include(rw => rw.Employee)
+                        .Where(rw => rw.Id == id && !rw.IsDeleted)
+                        .FirstOrDefaultAsync();
+
+                    if (requestCheck != null)
+                    {
+                        var isDirectReport = requestCheck.Employee.ManagerEmployeeId == managerEmployeeId;
+                        if (!isDirectReport)
+                        {
+                            return StatusCode(403, new { error = "You are not authorized to view this remote work request" });
+                        }
+                    }
+                }
+                else
+                {
+                    return StatusCode(403, new { error = "You are not authorized to view this remote work request" });
+                }
+            }
+
+            // Use MediatR to get the remote work request with workflow info
+            var query = new Application.Features.RemoteWorkRequests.Queries.GetRemoteWorkRequestById.GetRemoteWorkRequestByIdQuery { Id = id };
+            var result = await _mediator.Send(query);
+
+            if (!result.IsSuccess || result.Value == null)
+            {
+                return NotFound(new { error = $"Remote work request with ID {id} not found" });
+            }
+
+            return Ok(result.Value);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving remote work request for approval {RequestId}", id);
+            return StatusCode(500, new { error = "An error occurred while retrieving remote work request" });
         }
     }
 

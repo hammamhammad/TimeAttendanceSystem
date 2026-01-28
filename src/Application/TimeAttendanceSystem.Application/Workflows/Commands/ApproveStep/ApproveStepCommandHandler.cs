@@ -61,16 +61,28 @@ public class ApproveStepCommandHandler : IRequestHandler<ApproveStepCommand, Res
     /// </summary>
     private async Task UpdateEntityStatusIfWorkflowCompleteAsync(long workflowInstanceId, CancellationToken cancellationToken)
     {
+        Console.WriteLine($"[DEBUG] UpdateEntityStatusIfWorkflowCompleteAsync - WorkflowInstanceId: {workflowInstanceId}");
+
         // Reload workflow instance to check if it's complete
         var workflowInstance = await _context.WorkflowInstances
             .Include(wi => wi.WorkflowDefinition)
             .FirstOrDefaultAsync(wi => wi.Id == workflowInstanceId, cancellationToken);
 
-        if (workflowInstance == null ||
-            (workflowInstance.Status != WorkflowStatus.Approved && workflowInstance.Status != WorkflowStatus.Rejected))
+        if (workflowInstance == null)
         {
+            Console.WriteLine($"[DEBUG] Workflow instance not found for ID: {workflowInstanceId}");
+            return;
+        }
+
+        Console.WriteLine($"[DEBUG] Workflow Status: {workflowInstance.Status}, EntityType: {workflowInstance.EntityType}, EntityId: {workflowInstance.EntityId}, FinalOutcome: {workflowInstance.FinalOutcome}");
+
+        if (workflowInstance.Status != WorkflowStatus.Approved && workflowInstance.Status != WorkflowStatus.Rejected)
+        {
+            Console.WriteLine($"[DEBUG] Workflow not complete yet (Status: {workflowInstance.Status}). Skipping entity status update.");
             return; // Workflow not complete yet
         }
+
+        Console.WriteLine($"[DEBUG] Workflow is complete. Proceeding to update entity status...");
 
         // Update entity status based on workflow outcome and entity type
         switch (workflowInstance.EntityType)
@@ -87,7 +99,9 @@ public class ApproveStepCommandHandler : IRequestHandler<ApproveStepCommand, Res
                 await UpdateRemoteWorkStatusAsync(workflowInstance, cancellationToken);
                 break;
 
-            // Other entity types can be added here
+            case WorkflowEntityType.AttendanceCorrection:
+                await UpdateAttendanceCorrectionStatusAsync(workflowInstance, cancellationToken);
+                break;
         }
     }
 
@@ -207,21 +221,242 @@ public class ApproveStepCommandHandler : IRequestHandler<ApproveStepCommand, Res
 
     private async Task UpdateRemoteWorkStatusAsync(Domain.Workflows.WorkflowInstance workflowInstance, CancellationToken cancellationToken)
     {
+        Console.WriteLine($"[DEBUG] UpdateRemoteWorkStatusAsync - WorkflowInstanceId: {workflowInstance.Id}, Status: {workflowInstance.Status}, FinalOutcome: {workflowInstance.FinalOutcome}");
+
         var remoteWork = await _context.RemoteWorkRequests
             .FirstOrDefaultAsync(rw => rw.Id == workflowInstance.EntityId, cancellationToken);
 
-        if (remoteWork == null) return;
+        if (remoteWork == null)
+        {
+            Console.WriteLine($"[DEBUG] Remote work request not found for EntityId: {workflowInstance.EntityId}");
+            return;
+        }
+
+        Console.WriteLine($"[DEBUG] Found remote work request - Id: {remoteWork.Id}, EmployeeId: {remoteWork.EmployeeId}, StartDate: {remoteWork.StartDate}, EndDate: {remoteWork.EndDate}");
 
         if (workflowInstance.FinalOutcome == ApprovalAction.Approved)
         {
+            Console.WriteLine($"[DEBUG] Workflow outcome is Approved - updating remote work status and attendance");
             remoteWork.Status = Domain.RemoteWork.RemoteWorkRequestStatus.Approved;
+            await _context.SaveChangesAsync(cancellationToken);
+
+            // Update attendance records to mark them as remote work days
+            await UpdateAttendanceForRemoteWorkAsync(remoteWork, cancellationToken);
         }
         else if (workflowInstance.FinalOutcome == ApprovalAction.Rejected)
         {
+            Console.WriteLine($"[DEBUG] Workflow outcome is Rejected");
             remoteWork.Status = Domain.RemoteWork.RemoteWorkRequestStatus.Rejected;
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+        else
+        {
+            Console.WriteLine($"[DEBUG] Workflow FinalOutcome is neither Approved nor Rejected: {workflowInstance.FinalOutcome}");
+        }
+    }
+
+    /// <summary>
+    /// Updates attendance records when a remote work request is approved via workflow.
+    /// Marks attendance records as remote work while preserving working hours.
+    /// Unlike vacation (which clears hours), remote work keeps hours since employee worked.
+    /// </summary>
+    private async Task UpdateAttendanceForRemoteWorkAsync(
+        Domain.RemoteWork.RemoteWorkRequest remoteWork,
+        CancellationToken cancellationToken)
+    {
+        Console.WriteLine($"[DEBUG] UpdateAttendanceForRemoteWorkAsync - RemoteWorkId: {remoteWork.Id}, EmployeeId: {remoteWork.EmployeeId}");
+
+        // Convert DateOnly to DateTime for comparison
+        var startDate = remoteWork.StartDate.ToDateTime(TimeOnly.MinValue);
+        var endDate = remoteWork.EndDate.ToDateTime(TimeOnly.MinValue);
+
+        Console.WriteLine($"[DEBUG] StartDate (raw): {startDate}, EndDate (raw): {endDate}");
+
+        // Normalize dates to UTC for PostgreSQL compatibility
+        var normalizedStartDate = startDate.ToUtcDate();
+        var normalizedEndDate = endDate.ToUtcDate();
+
+        Console.WriteLine($"[DEBUG] NormalizedStartDate: {normalizedStartDate}, NormalizedEndDate: {normalizedEndDate}");
+
+        // Get all attendance records for the remote work period
+        var attendanceRecords = await _context.AttendanceRecords
+            .Where(ar => ar.EmployeeId == remoteWork.EmployeeId &&
+                        ar.AttendanceDate.Date >= normalizedStartDate &&
+                        ar.AttendanceDate.Date <= normalizedEndDate &&
+                        !ar.IsFinalized) // Only update non-finalized records
+            .ToListAsync(cancellationToken);
+
+        Console.WriteLine($"[DEBUG] Found {attendanceRecords.Count} attendance records to update");
+
+        // Update existing records to mark as remote work
+        foreach (var record in attendanceRecords)
+        {
+            // Update status to RemoteWork - remote work employees are considered working
+            // This is important for records that were marked as Absent before approval
+            record.Status = AttendanceStatus.RemoteWork;
+
+            // Set work location to Remote and link to the remote work request
+            record.WorkLocation = Domain.Attendance.WorkLocationType.Remote;
+            record.RemoteWorkRequestId = remoteWork.Id;
+
+            // Add note about remote work approval
+            record.Notes = string.IsNullOrEmpty(record.Notes)
+                ? $"Marked as remote work due to approved request (ID: {remoteWork.Id})"
+                : $"{record.Notes} | Marked as remote work due to approved request (ID: {remoteWork.Id})";
+
+            record.ModifiedAtUtc = DateTime.UtcNow;
+        }
+
+        // Create attendance records for dates that don't have records yet (working days only)
+        var existingDates = attendanceRecords.Select(ar => ar.AttendanceDate.Date).ToHashSet();
+        var currentDate = startDate.Date;
+
+        while (currentDate <= endDate.Date)
+        {
+            // Only create records for weekdays (Monday to Friday)
+            if (currentDate.DayOfWeek != DayOfWeek.Saturday &&
+                currentDate.DayOfWeek != DayOfWeek.Sunday &&
+                !existingDates.Contains(currentDate))
+            {
+                // Create a new attendance record marked as remote work
+                var newRecord = new AttendanceRecord
+                {
+                    EmployeeId = remoteWork.EmployeeId,
+                    AttendanceDate = currentDate,
+                    Status = AttendanceStatus.RemoteWork, // Remote work status
+                    WorkLocation = Domain.Attendance.WorkLocationType.Remote,
+                    RemoteWorkRequestId = remoteWork.Id,
+                    WorkingHours = 0, // Will be calculated when transactions are recorded
+                    OvertimeHours = 0,
+                    LateMinutes = 0,
+                    EarlyLeaveMinutes = 0,
+                    ScheduledHours = 0,
+                    BreakHours = 0,
+                    Notes = $"Created as remote work due to approved request (ID: {remoteWork.Id})"
+                };
+                _context.AttendanceRecords.Add(newRecord);
+            }
+            currentDate = currentDate.AddDays(1);
         }
 
         await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Updates attendance correction request status and creates transaction when approved via workflow.
+    /// Creates an attendance transaction for the correction and triggers attendance recalculation.
+    /// </summary>
+    private async Task UpdateAttendanceCorrectionStatusAsync(Domain.Workflows.WorkflowInstance workflowInstance, CancellationToken cancellationToken)
+    {
+        var correction = await _context.AttendanceCorrectionRequests
+            .Include(acr => acr.Employee)
+            .FirstOrDefaultAsync(acr => acr.Id == workflowInstance.EntityId, cancellationToken);
+
+        if (correction == null) return;
+
+        // Get the approver's user ID from the last completed step
+        var lastApproverStep = await _context.WorkflowStepExecutions
+            .Where(wse => wse.WorkflowInstanceId == workflowInstance.Id && wse.Action.HasValue)
+            .OrderByDescending(wse => wse.ActionTakenAt)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        var approverId = lastApproverStep?.ActionTakenByUserId ?? lastApproverStep?.AssignedToUserId;
+
+        if (workflowInstance.FinalOutcome == ApprovalAction.Approved)
+        {
+            // Update correction status to Approved
+            correction.ApprovalStatus = ApprovalStatus.Approved;
+            correction.ApprovedById = approverId;
+            correction.ApprovedAt = DateTime.UtcNow;
+            correction.ProcessingNotes = lastApproverStep?.Comments;
+
+            // Create attendance transaction for the correction
+            var transactionType = correction.CorrectionType == AttendanceCorrectionType.CheckIn
+                ? TransactionType.CheckIn
+                : TransactionType.CheckOut;
+
+            var correctionDateTime = correction.CorrectionDate.Date.Add(correction.CorrectionTime.ToTimeSpan());
+
+            var newTransaction = new AttendanceTransaction
+            {
+                EmployeeId = correction.EmployeeId,
+                TransactionTimeUtc = DateTime.SpecifyKind(correctionDateTime, DateTimeKind.Utc),
+                TransactionTimeLocal = correctionDateTime,
+                TransactionType = transactionType,
+                IsManual = true,
+                EnteredByUserId = approverId,
+                IsVerified = true,
+                VerifiedByUserId = approverId,
+                VerifiedAtUtc = DateTime.UtcNow,
+                Notes = $"Created from approved attendance correction request (ID: {correction.Id})"
+            };
+
+            _context.AttendanceTransactions.Add(newTransaction);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            // Link the created transaction to the correction request
+            correction.CreatedTransactionId = newTransaction.Id;
+            await _context.SaveChangesAsync(cancellationToken);
+
+            // Recalculate attendance for the correction date
+            await UpdateAttendanceForCorrectionAsync(correction, newTransaction, cancellationToken);
+        }
+        else if (workflowInstance.FinalOutcome == ApprovalAction.Rejected)
+        {
+            // Update correction status to Rejected
+            correction.ApprovalStatus = ApprovalStatus.Rejected;
+            correction.ApprovedById = approverId;
+            correction.ApprovedAt = DateTime.UtcNow;
+            correction.RejectionReason = lastApproverStep?.Comments ?? "Rejected via workflow";
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+    }
+
+    /// <summary>
+    /// Updates attendance record when an attendance correction is approved via workflow.
+    /// Triggers full recalculation to include the new transaction.
+    /// </summary>
+    private async Task UpdateAttendanceForCorrectionAsync(AttendanceCorrectionRequest correction, AttendanceTransaction newTransaction, CancellationToken cancellationToken)
+    {
+        // Normalize the correction date to UTC for PostgreSQL compatibility
+        var normalizedCorrectionDate = correction.CorrectionDate.ToUtcDate();
+
+        // Find existing attendance record for the correction date with shift assignment
+        var attendanceRecord = await _context.AttendanceRecords
+            .Include(ar => ar.ShiftAssignment)
+                .ThenInclude(sa => sa!.Shift)
+                    .ThenInclude(s => s.ShiftPeriods)
+            .FirstOrDefaultAsync(ar => ar.EmployeeId == correction.EmployeeId &&
+                                     ar.AttendanceDate.Date == normalizedCorrectionDate &&
+                                     !ar.IsFinalized,
+                                cancellationToken);
+
+        if (attendanceRecord != null)
+        {
+            // Get all transactions for recalculation (including the newly created one)
+            var transactions = await _transactionRepository.GetByEmployeeAndDateAsync(
+                correction.EmployeeId, correction.CorrectionDate, cancellationToken);
+
+            // Recalculate attendance - this will now include the new transaction
+            var recalculatedRecord = await _calculationService.RecalculateAttendanceAsync(
+                attendanceRecord, transactions, cancellationToken);
+
+            // Copy recalculated values to existing record
+            attendanceRecord.Status = recalculatedRecord.Status;
+            attendanceRecord.LateMinutes = recalculatedRecord.LateMinutes;
+            attendanceRecord.EarlyLeaveMinutes = recalculatedRecord.EarlyLeaveMinutes;
+            attendanceRecord.WorkingHours = recalculatedRecord.WorkingHours;
+            attendanceRecord.OvertimeHours = recalculatedRecord.OvertimeHours;
+            attendanceRecord.BreakHours = recalculatedRecord.BreakHours;
+            attendanceRecord.ActualCheckInTime = recalculatedRecord.ActualCheckInTime;
+            attendanceRecord.ActualCheckOutTime = recalculatedRecord.ActualCheckOutTime;
+            attendanceRecord.Notes = string.IsNullOrEmpty(attendanceRecord.Notes)
+                ? $"Recalculated after attendance correction approval via workflow (ID: {correction.Id})"
+                : $"{attendanceRecord.Notes} | Recalculated after attendance correction approval via workflow (ID: {correction.Id})";
+            attendanceRecord.ModifiedAtUtc = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync(cancellationToken);
+        }
     }
 
     /// <summary>
