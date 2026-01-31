@@ -43,5 +43,10 @@ public enum NotificationType
     /// <summary>
     /// Reminder notification for pending approvals approaching timeout.
     /// </summary>
-    ApprovalReminder = 8
+    ApprovalReminder = 8,
+
+    /// <summary>
+    /// Admin broadcast notification sent to multiple recipients.
+    /// </summary>
+    Broadcast = 9
 }

@@ -509,6 +509,34 @@ public static class DependencyInjection
                     context.User.IsInRole("SystemAdmin") ||
                     context.User.IsInRole("Admin") ||
                     context.User.HasClaim("permission", "fingerprint.complete")));
+
+            // ===== MOBILE ESS POLICIES =====
+
+            // Define NotificationManagement policy - users who can send broadcast notifications
+            options.AddPolicy("NotificationManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.HasClaim("permission", "notification.broadcast") ||
+                    context.User.HasClaim("permission", "notification.manage")));
+
+            // Define NfcTagManagement policy - users who can manage NFC tags for mobile check-in
+            options.AddPolicy("NfcTagManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.HasClaim("permission", "nfcTag.create") ||
+                    context.User.HasClaim("permission", "nfcTag.update") ||
+                    context.User.HasClaim("permission", "nfcTag.delete") ||
+                    context.User.HasClaim("permission", "nfcTag.manage")));
+
+            // Define NfcTagRead policy - users who can view NFC tags
+            options.AddPolicy("NfcTagRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.HasClaim("permission", "nfcTag.read")));
         });
         services.AddHttpContextAccessor();
 

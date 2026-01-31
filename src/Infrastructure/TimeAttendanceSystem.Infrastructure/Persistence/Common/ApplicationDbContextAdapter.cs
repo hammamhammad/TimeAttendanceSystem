@@ -14,6 +14,7 @@ using TimeAttendanceSystem.Domain.RemoteWork;
 using TimeAttendanceSystem.Domain.Workflows;
 using TimeAttendanceSystem.Domain.LeaveManagement;
 using TimeAttendanceSystem.Domain.Notifications;
+using TimeAttendanceSystem.Domain.Tenants;
 
 namespace TimeAttendanceSystem.Infrastructure.Persistence;
 
@@ -76,6 +77,15 @@ public class ApplicationDbContextAdapter : IApplicationDbContext
 
     // Notification entities
     public DbSet<Notification> Notifications => _context.Notifications;
+    public DbSet<NotificationBroadcast> NotificationBroadcasts => _context.NotificationBroadcasts;
+    public DbSet<PushNotificationToken> PushNotificationTokens => _context.PushNotificationTokens;
+
+    // Mobile check-in entities
+    public DbSet<NfcTag> NfcTags => _context.NfcTags;
+    public DbSet<AttendanceVerificationLog> AttendanceVerificationLogs => _context.AttendanceVerificationLogs;
+
+    // Multi-tenant entities
+    public DbSet<Tenant> Tenants => _context.Tenants;
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

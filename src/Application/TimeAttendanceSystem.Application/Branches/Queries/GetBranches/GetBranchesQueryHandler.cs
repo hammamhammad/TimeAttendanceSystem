@@ -46,7 +46,10 @@ public class GetBranchesQueryHandler : BaseHandler<GetBranchesQuery, Result<Page
                 IsActive = b.IsActive,
                 EmployeeCount = Context.Employees.Count(e => e.BranchId == b.Id && !e.IsDeleted),
                 DepartmentCount = Context.Departments.Count(d => d.BranchId == b.Id && !d.IsDeleted),
-                CreatedAtUtc = b.CreatedAtUtc
+                CreatedAtUtc = b.CreatedAtUtc,
+                Latitude = b.Latitude,
+                Longitude = b.Longitude,
+                GeofenceRadiusMeters = b.GeofenceRadiusMeters
             })
             .ToListAsync(cancellationToken);
 

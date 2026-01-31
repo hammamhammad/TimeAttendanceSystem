@@ -25,7 +25,9 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
     <div class="app-view-page">
       <!-- Standardized Page Header -->
       <app-page-header
-        [title]="i18n.t('branches.view_details')">
+        [title]="i18n.t('branches.view_details')"
+        [showBackButton]="true"
+        backRoute="/branches">
       </app-page-header>
 
       @if (loading()) {
@@ -154,12 +156,16 @@ export class ViewBranchComponent implements OnInit {
         badgeVariant: branch.isActive ? 'success' : 'danger'
       },
       {
-        label: this.i18n.t('common.phone'),
-        value: '-'
+        label: this.i18n.t('branches.latitude'),
+        value: branch.latitude != null ? branch.latitude.toString() : '-'
       },
       {
-        label: this.i18n.t('common.email'),
-        value: '-'
+        label: this.i18n.t('branches.longitude'),
+        value: branch.longitude != null ? branch.longitude.toString() : '-'
+      },
+      {
+        label: this.i18n.t('branches.geofence_radius'),
+        value: branch.geofenceRadiusMeters ? `${branch.geofenceRadiusMeters} ${this.i18n.t('common.meters')}` : '-'
       },
       {
         label: this.i18n.t('branches.created_at'),
@@ -181,21 +187,16 @@ export class ViewBranchComponent implements OnInit {
   }
 
   loadBranch(branchId: string): void {
-    // Mock loading branch for now
-    setTimeout(() => {
-      const mockBranch: Branch = {
-        id: parseInt(branchId),
-        name: 'Sample Branch',
-        code: 'SAMPLE',
-        timeZone: 'UTC',
-        isActive: true,
-        employeeCount: 10,
-        departmentCount: 3,
-        createdAtUtc: '2024-01-01T00:00:00Z'
-      };
-      this.branch.set(mockBranch);
-      this.loading.set(false);
-    }, 1000);
+    this.branchesService.getBranchById(parseInt(branchId)).subscribe({
+      next: (branch) => {
+        this.branch.set(branch);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        this.error.set(this.getErrorMessage(err));
+        this.loading.set(false);
+      }
+    });
   }
 
   loadStatistics(branchId: string): void {

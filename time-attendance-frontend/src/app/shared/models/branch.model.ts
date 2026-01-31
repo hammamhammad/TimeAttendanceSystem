@@ -8,6 +8,10 @@ export interface Branch {
   departmentCount: number;
   createdAtUtc: string;
   modifiedAtUtc?: string;
+  // GPS Coordinates for mobile check-in
+  latitude?: number | null;
+  longitude?: number | null;
+  geofenceRadiusMeters: number;
 }
 
 export interface PagedResult<T> {
@@ -25,6 +29,9 @@ export interface CreateBranchRequest {
   name: string;
   timeZone: string;
   isActive?: boolean;
+  latitude?: number | null;
+  longitude?: number | null;
+  geofenceRadiusMeters?: number;
 }
 
 export interface UpdateBranchRequest {
@@ -32,4 +39,13 @@ export interface UpdateBranchRequest {
   name: string;
   timeZone: string;
   isActive: boolean;
+  latitude?: number | null;
+  longitude?: number | null;
+  geofenceRadiusMeters?: number;
+}
+
+export interface UpdateBranchCoordinatesRequest {
+  latitude: number | null;
+  longitude: number | null;
+  geofenceRadiusMeters: number;
 }

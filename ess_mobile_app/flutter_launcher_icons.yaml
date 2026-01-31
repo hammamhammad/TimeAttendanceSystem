@@ -1,0 +1,33 @@
+# App Icon Configuration
+# Run: flutter pub run flutter_launcher_icons:main
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/app_icon.png"
+  
+  # Android specific configuration
+  android_settings:
+    adaptive_icon_background: "#2196F3"
+    adaptive_icon_foreground: "assets/icons/app_icon_foreground.png"
+  
+  # iOS specific configuration
+  remove_alpha_ios: true
+  
+  # Web configuration (optional)
+  web:
+    generate: true
+    image_path: "assets/icons/app_icon.png"
+    background_color: "#2196F3"
+    theme_color: "#2196F3"
+  
+  # Windows configuration (optional)
+  windows:
+    generate: true
+    image_path: "assets/icons/app_icon.png"
+    icon_size: 48
+  
+  # macOS configuration (optional)
+  macos:
+    generate: true
+    image_path: "assets/icons/app_icon.png"

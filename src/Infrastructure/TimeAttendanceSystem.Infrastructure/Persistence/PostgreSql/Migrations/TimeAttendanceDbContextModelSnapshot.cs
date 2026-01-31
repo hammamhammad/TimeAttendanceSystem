@@ -432,6 +432,142 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("AttendanceTransactions", (string)null);
                 });
 
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.AttendanceVerificationLog", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("AppVersion")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasComment("Version of the mobile app used");
+
+                    b.Property<DateTime>("AttemptedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("Timestamp of verification attempt");
+
+                    b.Property<long>("BranchId")
+                        .HasColumnType("bigint")
+                        .HasComment("Branch where verification was attempted");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<string>("DeviceId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("Unique identifier of the mobile device");
+
+                    b.Property<double?>("DeviceLatitude")
+                        .HasColumnType("double precision")
+                        .HasComment("Latitude reported by employee's device");
+
+                    b.Property<double?>("DeviceLongitude")
+                        .HasColumnType("double precision")
+                        .HasComment("Longitude reported by employee's device");
+
+                    b.Property<string>("DeviceModel")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("Device model/manufacturer");
+
+                    b.Property<string>("DevicePlatform")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasComment("Device platform: ios or android");
+
+                    b.Property<double?>("DistanceFromBranch")
+                        .HasColumnType("double precision")
+                        .HasComment("Calculated distance in meters from branch");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint")
+                        .HasComment("Employee attempting check-in/out");
+
+                    b.Property<string>("ExpectedTagUids")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasComment("Expected tag UIDs for the branch (comma-separated)");
+
+                    b.Property<int?>("FailureReason")
+                        .HasColumnType("integer")
+                        .HasComment("Specific reason for failure if applicable");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag - should remain false for audit logs");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
+                        .HasComment("Concurrency control timestamp");
+
+                    b.Property<string>("ScannedTagUid")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("NFC tag UID that was scanned");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasComment("Outcome: Success or Failed");
+
+                    b.Property<int>("TransactionType")
+                        .HasColumnType("integer")
+                        .HasComment("Type of transaction: CheckIn, CheckOut, BreakStart, BreakEnd");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AttemptedAt")
+                        .IsDescending()
+                        .HasDatabaseName("IX_AttendanceVerificationLogs_AttemptedAt");
+
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("IX_AttendanceVerificationLogs_BranchId");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_AttendanceVerificationLogs_EmployeeId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_AttendanceVerificationLogs_Status");
+
+                    b.HasIndex("EmployeeId", "AttemptedAt")
+                        .IsDescending(false, true)
+                        .HasDatabaseName("IX_AttendanceVerificationLogs_EmployeeId_AttemptedAt");
+
+                    b.HasIndex("Status", "AttemptedAt")
+                        .IsDescending(false, true)
+                        .HasDatabaseName("IX_AttendanceVerificationLogs_Status_AttemptedAt")
+                        .HasFilter("\"Status\" = 2");
+
+                    b.ToTable("AttendanceVerificationLogs", (string)null);
+                });
+
             modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.WorkingDay", b =>
                 {
                     b.Property<long>("Id")
@@ -555,11 +691,20 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<int>("GeofenceRadiusMeters")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
+
+                    b.Property<double?>("Latitude")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("Longitude")
+                        .HasColumnType("double precision");
 
                     b.Property<DateTime?>("ModifiedAtUtc")
                         .HasColumnType("timestamp with time zone");
@@ -696,6 +841,102 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasDatabaseName("IX_Departments_BranchId_IsActive_SortOrder");
 
                     b.ToTable("Departments", (string)null);
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Branches.NfcTag", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("BranchId")
+                        .HasColumnType("bigint")
+                        .HasComment("Branch this tag is registered to");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Descriptive name for tag location (e.g., Main Entrance)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasComment("Whether tag is active for verification");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<bool>("IsWriteProtected")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Whether tag has been permanently write-protected");
+
+                    b.Property<DateTime?>("LockedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("Timestamp when tag was write-protected");
+
+                    b.Property<long?>("LockedByUserId")
+                        .HasColumnType("bigint")
+                        .HasComment("User who applied write protection");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
+                        .HasComment("Concurrency control timestamp");
+
+                    b.Property<string>("TagUid")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("Unique hardware identifier of the NFC tag");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("IX_NfcTags_BranchId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("TagUid")
+                        .IsUnique()
+                        .HasDatabaseName("IX_NfcTags_TagUid")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("BranchId", "IsActive")
+                        .HasDatabaseName("IX_NfcTags_BranchId_IsActive")
+                        .HasFilter("\"IsDeleted\" = false AND \"IsActive\" = true");
+
+                    b.ToTable("NfcTags", (string)null);
                 });
 
             modelBuilder.Entity("TimeAttendanceSystem.Domain.Common.AuditChange", b =>
@@ -1213,97 +1454,6 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("ExcusePolicies", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.FingerprintRequests.FingerprintRequest", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("AffectedFingers")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<DateTime?>("CompletedDate")
-                        .HasColumnType("timestamp");
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<long>("EmployeeId")
-                        .HasColumnType("bigint");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("IssueDescription")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
-
-                    b.Property<DateTime?>("ModifiedAtUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("PreferredDate")
-                        .HasColumnType("timestamp");
-
-                    b.Property<TimeSpan?>("PreferredTime")
-                        .HasColumnType("time");
-
-                    b.Property<string>("RequestType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsRequired()
-                        .HasColumnType("bytea");
-
-                    b.Property<DateTime?>("ScheduledDate")
-                        .HasColumnType("timestamp");
-
-                    b.Property<TimeSpan?>("ScheduledTime")
-                        .HasColumnType("time");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<long?>("TechnicianId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("TechnicianNotes")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployeeId")
-                        .HasDatabaseName("IX_FingerprintRequests_EmployeeId");
-
-                    b.HasIndex("ScheduledDate")
-                        .HasDatabaseName("IX_FingerprintRequests_ScheduledDate");
-
-                    b.HasIndex("Status")
-                        .HasDatabaseName("IX_FingerprintRequests_Status");
-
-                    b.HasIndex("TechnicianId");
-
-                    b.HasIndex("EmployeeId", "Status")
-                        .HasDatabaseName("IX_FingerprintRequests_EmployeeId_Status");
-
-                    b.ToTable("FingerprintRequests", (string)null);
-                });
-
             modelBuilder.Entity("TimeAttendanceSystem.Domain.LeaveManagement.LeaveAccrualPolicy", b =>
                 {
                     b.Property<long>("Id")
@@ -1634,6 +1784,16 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasColumnType("character varying(500)")
                         .HasComment("URL to navigate when notification is clicked");
 
+                    b.Property<long?>("BroadcastId")
+                        .HasColumnType("bigint")
+                        .HasComment("ID of the broadcast this notification belongs to");
+
+                    b.Property<int>("Channel")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1)
+                        .HasComment("Delivery channel: InApp, Push, Both");
+
                     b.Property<DateTime>("CreatedAtUtc")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -1645,6 +1805,11 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
                         .HasComment("User who created the record");
+
+                    b.Property<string>("DeepLink")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasComment("Deep link path for mobile app navigation");
 
                     b.Property<long?>("EntityId")
                         .HasColumnType("bigint")
@@ -1726,6 +1891,10 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("BroadcastId")
+                        .HasDatabaseName("IX_Notifications_BroadcastId")
+                        .HasFilter("\"IsDeleted\" = false AND \"BroadcastId\" IS NOT NULL");
+
                     b.HasIndex("CreatedAtUtc")
                         .IsDescending()
                         .HasDatabaseName("IX_Notifications_CreatedAtUtc")
@@ -1748,6 +1917,244 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasFilter("\"IsDeleted\" = false AND \"IsRead\" = false");
 
                     b.ToTable("Notifications", (string)null);
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Notifications.NotificationBroadcast", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("ActionUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasComment("Optional URL to navigate on notification tap");
+
+                    b.Property<int>("Channel")
+                        .HasColumnType("integer")
+                        .HasComment("Delivery channel: InApp, Push, Both");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<int>("DeliveredCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasComment("Number of successfully delivered notifications");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .IsUnicode(true)
+                        .HasColumnType("character varying(2000)")
+                        .HasComment("Broadcast message in English");
+
+                    b.Property<string>("MessageAr")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .IsUnicode(true)
+                        .HasColumnType("character varying(2000)")
+                        .HasComment("Broadcast message in Arabic");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
+                        .HasComment("Concurrency control timestamp");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("When broadcast was initiated");
+
+                    b.Property<long>("SentByUserId")
+                        .HasColumnType("bigint")
+                        .HasComment("Admin user who initiated the broadcast");
+
+                    b.Property<string>("TargetIds")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)")
+                        .HasComment("JSON array of target IDs based on TargetType");
+
+                    b.Property<int>("TargetType")
+                        .HasColumnType("integer")
+                        .HasComment("Target type: All, Branch, Department, Employees");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .IsUnicode(true)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Broadcast title in English");
+
+                    b.Property<string>("TitleAr")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .IsUnicode(true)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Broadcast title in Arabic");
+
+                    b.Property<int>("TotalRecipients")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasComment("Total number of intended recipients");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SentAt")
+                        .IsDescending()
+                        .HasDatabaseName("IX_NotificationBroadcasts_SentAt")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("SentByUserId")
+                        .HasDatabaseName("IX_NotificationBroadcasts_SentByUserId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("TargetType")
+                        .HasDatabaseName("IX_NotificationBroadcasts_TargetType")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("NotificationBroadcasts", (string)null);
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Notifications.PushNotificationToken", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("AppVersion")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasComment("App version when token was registered");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<string>("DeviceId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("Unique identifier for the device");
+
+                    b.Property<string>("DeviceModel")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("Device model/name for admin reference");
+
+                    b.Property<string>("DeviceToken")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasComment("Firebase Cloud Messaging device token");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasComment("Whether token is active for notifications");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<DateTime?>("LastUsedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("When token was last used for notification");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<string>("Platform")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasComment("Device platform: android or ios");
+
+                    b.Property<DateTime>("RegisteredAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("When token was registered");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
+                        .HasComment("Concurrency control timestamp");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint")
+                        .HasComment("User who owns this device");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DeviceId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_PushNotificationTokens_DeviceId")
+                        .HasFilter("\"IsDeleted\" = false AND \"IsActive\" = true");
+
+                    b.HasIndex("DeviceToken")
+                        .HasDatabaseName("IX_PushNotificationTokens_DeviceToken")
+                        .HasFilter("\"IsDeleted\" = false AND \"IsActive\" = true");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("IX_PushNotificationTokens_UserId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("UserId", "IsActive")
+                        .HasDatabaseName("IX_PushNotificationTokens_UserId_IsActive")
+                        .HasFilter("\"IsDeleted\" = false AND \"IsActive\" = true");
+
+                    b.ToTable("PushNotificationTokens", (string)null);
                 });
 
             modelBuilder.Entity("TimeAttendanceSystem.Domain.RemoteWork.RemoteWorkPolicy", b =>
@@ -2601,6 +3008,114 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasFilter("\"IsDeleted\" = false");
 
                     b.ToTable("ShiftPeriods", (string)null);
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Tenants.Tenant", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("ApiBaseUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasComment("Base URL for tenant's API endpoint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<string>("CustomDomain")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Optional custom domain for enterprise tenants");
+
+                    b.Property<string>("DatabaseIdentifier")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Database connection identifier for tenant isolation");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasComment("Whether tenant account is active");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<string>("LogoUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasComment("URL to tenant's logo image");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .IsUnicode(true)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Display name of the tenant organization");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .IsUnicode(true)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Arabic display name of the tenant organization");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
+                        .HasComment("Concurrency control timestamp");
+
+                    b.Property<string>("Subdomain")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("Subdomain identifier for tenant (e.g., acme)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomDomain")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Tenants_CustomDomain")
+                        .HasFilter("\"IsDeleted\" = false AND \"CustomDomain\" IS NOT NULL");
+
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("IX_Tenants_IsActive")
+                        .HasFilter("\"IsDeleted\" = false AND \"IsActive\" = true");
+
+                    b.HasIndex("Subdomain")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Tenants_Subdomain")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("Tenants", (string)null);
                 });
 
             modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.BlacklistedToken", b =>
@@ -4184,6 +4699,27 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("VerifiedByUser");
                 });
 
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.AttendanceVerificationLog", b =>
+                {
+                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_AttendanceVerificationLogs_Branches");
+
+                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_AttendanceVerificationLogs_Employees");
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("Employee");
+                });
+
             modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.WorkingDay", b =>
                 {
                     b.HasOne("TimeAttendanceSystem.Domain.Attendance.AttendanceRecord", "AttendanceRecord")
@@ -4211,6 +4747,18 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("Branch");
 
                     b.Navigation("ParentDepartment");
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Branches.NfcTag", b =>
+                {
+                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_NfcTags_Branches");
+
+                    b.Navigation("Branch");
                 });
 
             modelBuilder.Entity("TimeAttendanceSystem.Domain.Common.AuditChange", b =>
@@ -4307,24 +4855,6 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("Branch");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.FingerprintRequests.FingerprintRequest", b =>
-                {
-                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "Technician")
-                        .WithMany()
-                        .HasForeignKey("TechnicianId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Employee");
-
-                    b.Navigation("Technician");
-                });
-
             modelBuilder.Entity("TimeAttendanceSystem.Domain.LeaveManagement.LeaveAccrualPolicy", b =>
                 {
                     b.HasOne("TimeAttendanceSystem.Domain.VacationTypes.VacationType", "VacationType")
@@ -4387,12 +4917,44 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
 
             modelBuilder.Entity("TimeAttendanceSystem.Domain.Notifications.Notification", b =>
                 {
+                    b.HasOne("TimeAttendanceSystem.Domain.Notifications.NotificationBroadcast", "Broadcast")
+                        .WithMany("Notifications")
+                        .HasForeignKey("BroadcastId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("FK_Notifications_NotificationBroadcasts");
+
                     b.HasOne("TimeAttendanceSystem.Domain.Users.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("FK_Notifications_Users");
+
+                    b.Navigation("Broadcast");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Notifications.NotificationBroadcast", b =>
+                {
+                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "SentByUser")
+                        .WithMany()
+                        .HasForeignKey("SentByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_NotificationBroadcasts_Users");
+
+                    b.Navigation("SentByUser");
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Notifications.PushNotificationToken", b =>
+                {
+                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_PushNotificationTokens_Users");
 
                     b.Navigation("User");
                 });
@@ -4862,6 +5424,11 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
             modelBuilder.Entity("TimeAttendanceSystem.Domain.LeaveManagement.LeaveBalance", b =>
                 {
                     b.Navigation("Transactions");
+                });
+
+            modelBuilder.Entity("TimeAttendanceSystem.Domain.Notifications.NotificationBroadcast", b =>
+                {
+                    b.Navigation("Notifications");
                 });
 
             modelBuilder.Entity("TimeAttendanceSystem.Domain.RemoteWork.RemoteWorkPolicy", b =>

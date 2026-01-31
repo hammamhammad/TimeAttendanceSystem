@@ -84,6 +84,27 @@ public class Branch : BaseEntity
     public bool IsActive { get; set; } = true;
 
     /// <summary>
+    /// Gets or sets the latitude coordinate for this branch location.
+    /// Used for geofence validation during mobile check-in/out operations.
+    /// </summary>
+    /// <value>Latitude in decimal degrees (WGS84), null if not configured</value>
+    public double? Latitude { get; set; }
+
+    /// <summary>
+    /// Gets or sets the longitude coordinate for this branch location.
+    /// Used for geofence validation during mobile check-in/out operations.
+    /// </summary>
+    /// <value>Longitude in decimal degrees (WGS84), null if not configured</value>
+    public double? Longitude { get; set; }
+
+    /// <summary>
+    /// Gets or sets the geofence radius in meters for mobile check-in validation.
+    /// Employees must be within this radius of the branch coordinates to check in.
+    /// </summary>
+    /// <value>Radius in meters, default is 100 meters</value>
+    public int GeofenceRadiusMeters { get; set; } = 100;
+
+    /// <summary>
     /// Gets or sets the collection of departments operating within this branch location.
     /// Represents the organizational subdivision providing functional structure and employee grouping.
     /// </summary>

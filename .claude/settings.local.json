@@ -129,7 +129,10 @@
       "Bash(PGPASSWORD='P@ssw0rd@3213' psql -h localhost -U postgres -d TimeAttendanceSystem -c \"\\\\d \"\"ShiftAssignments\"\"\")",
       "Bash(start /B dotnet run)",
       "Bash(wmic process where \"name=''TimeAttendanceSystem.Api.exe'' or name=''dotnet.exe'' or name=''node.exe''\" get processid)",
-      "Bash(Select-String \"error CS\")"
+      "Bash(Select-String \"error CS\")",
+      "Bash(flutter:*)",
+      "Bash(adb install:*)",
+      "Bash(adb logcat:*)"
     ],
     "deny": [],
     "ask": []

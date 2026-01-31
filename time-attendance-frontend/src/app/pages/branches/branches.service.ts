@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Branch, BranchesResponse, CreateBranchRequest, UpdateBranchRequest } from '../../shared/models/branch.model';
+import { Branch, BranchesResponse, CreateBranchRequest, UpdateBranchRequest, UpdateBranchCoordinatesRequest } from '../../shared/models/branch.model';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -50,5 +50,13 @@ export class BranchesService {
       .pipe(
         map(response => response.items)
       );
+  }
+
+  getBranchById(id: number): Observable<Branch> {
+    return this.http.get<Branch>(`${this.baseUrl}/${id}`);
+  }
+
+  updateBranchCoordinates(id: number, coordinates: UpdateBranchCoordinatesRequest): Observable<void> {
+    return this.http.put<void>(`${this.baseUrl}/${id}/coordinates`, coordinates);
   }
 }

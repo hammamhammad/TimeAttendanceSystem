@@ -1,0 +1,361 @@
+<div class="broadcast-history-container">
+    <app-page-header [title]="t('notifications.broadcast_history')">
+        <button class="btn btn-primary" routerLink="/notifications/send">
+            <i class="fa-solid fa-plus me-2"></i>{{ t('notifications.new_broadcast') }}
+        </button>
+    </app-page-header>
+
+    <!-- Statistics Cards -->
+    @if (stats()) {
+    <div class="stats-grid mb-4">
+        <div class="stat-card">
+            <div class="stat-icon bg-primary-subtle">
+                <i class="fa-solid fa-paper-plane text-primary"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-value">{{ stats()!.totalBroadcasts }}</span>
+                <span class="stat-label">{{ t('notifications.total_sent') }}</span>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon bg-success-subtle">
+                <i class="fa-solid fa-users text-success"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-value">{{ stats()!.totalRecipients | number }}</span>
+                <span class="stat-label">{{ t('notifications.total_recipients') }}</span>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon bg-info-subtle">
+                <i class="fa-solid fa-check-double text-info"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-value">{{ deliveryRate() }}%</span>
+                <span class="stat-label">{{ t('notifications.delivery_rate') }}</span>
+            </div>
+            <div class="progress mt-2" style="height: 4px;">
+                <div class="progress-bar bg-info" [style.width.%]="deliveryRate()"></div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon bg-warning-subtle">
+                <i class="fa-solid fa-eye text-warning"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-value">{{ readRate() }}%</span>
+                <span class="stat-label">{{ t('notifications.read_rate') }}</span>
+            </div>
+            <div class="progress mt-2" style="height: 4px;">
+                <div class="progress-bar bg-warning" [style.width.%]="readRate()"></div>
+            </div>
+        </div>
+    </div>
+    }
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="filters-row">
+                <div class="filter-item">
+                    <input type="text" class="form-control" [placeholder]="t('notifications.search_broadcasts')"
+                        [ngModel]="filters().searchTerm" (ngModelChange)="updateFilters({ searchTerm: $event })">
+                </div>
+
+                <div class="filter-item">
+                    <select class="form-select" [ngModel]="filters().targetType"
+                        (ngModelChange)="updateFilters({ targetType: $event })">
+                        @for (option of targetTypeOptions; track option.value) {
+                        <option [ngValue]="option.value">{{ option.label }}</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="filter-item">
+                    <select class="form-select" [ngModel]="filters().status"
+                        (ngModelChange)="updateFilters({ status: $event })">
+                        @for (option of statusOptions; track option.value) {
+                        <option [ngValue]="option.value">{{ option.label }}</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="filter-item">
+                    <input type="date" class="form-control" [ngModel]="filters().startDate"
+                        (ngModelChange)="updateFilters({ startDate: $event })">
+                </div>
+
+                <div class="filter-item">
+                    <input type="date" class="form-control" [ngModel]="filters().endDate"
+                        (ngModelChange)="updateFilters({ endDate: $event })">
+                </div>
+
+                <button class="btn btn-outline-secondary" (click)="clearFilters()">
+                    <i class="fa-solid fa-times me-1"></i>{{ t('common.clear') }}
+                </button>
+
+                <div class="view-toggle ms-auto">
+                    <button class="btn btn-icon" [class.active]="viewMode() === 'table'"
+                        (click)="viewMode.set('table')">
+                        <i class="fa-solid fa-list"></i>
+                    </button>
+                    <button class="btn btn-icon" [class.active]="viewMode() === 'cards'"
+                        (click)="viewMode.set('cards')">
+                        <i class="fa-solid fa-grip"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    @if (loading()) {
+    <app-loading-spinner [message]="t('common.loading')" [centered]="true"></app-loading-spinner>
+    }
+
+    <!-- Error State -->
+    @if (error() && !loading()) {
+    <div class="alert alert-danger">
+        <i class="fa-solid fa-exclamation-triangle me-2"></i>
+        {{ error() }}
+        <button class="btn btn-sm btn-outline-danger ms-2" (click)="loadData()">
+            {{ t('common.retry') }}
+        </button>
+    </div>
+    }
+
+    <!-- Table View -->
+    @if (!loading() && !error() && viewMode() === 'table') {
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>{{ t('notifications.title') }}</th>
+                        <th>{{ t('notifications.target') }}</th>
+                        <th>{{ t('notifications.recipients') }}</th>
+                        <th>{{ t('notifications.delivery') }}</th>
+                        <th>{{ t('notifications.status') }}</th>
+                        <th>{{ t('notifications.sent_at') }}</th>
+                        <th class="text-end">{{ t('common.actions') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (filteredBroadcasts().length === 0) {
+                    <tr>
+                        <td colspan="7" class="text-center py-5">
+                            <i class="fa-solid fa-inbox fa-3x text-muted mb-3"></i>
+                            <p class="text-muted mb-0">{{ t('notifications.no_broadcasts') }}</p>
+                        </td>
+                    </tr>
+                    }
+                    @for (broadcast of filteredBroadcasts(); track broadcast.id) {
+                    <tr>
+                        <td>
+                            <div class="broadcast-title">
+                                <strong>{{ broadcast.title }}</strong>
+                                <small class="text-muted d-block">{{ broadcast.message | slice:0:50 }}...</small>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="target-badge">
+                                <i class="fa-solid {{ getTargetTypeIcon(broadcast.targetType) }} me-1"></i>
+                                {{ broadcast.targetName || getTargetTypeLabel(broadcast.targetType) }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="fw-semibold">{{ broadcast.recipientCount }}</span>
+                        </td>
+                        <td>
+                            <div class="delivery-progress">
+                                <div class="progress" style="height: 8px; width: 100px;">
+                                    <div class="progress-bar bg-success" [style.width.%]="calculateProgress(broadcast)">
+                                    </div>
+                                </div>
+                                <small class="text-muted">
+                                    {{ broadcast.deliveredCount }}/{{ broadcast.recipientCount }}
+                                </small>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge {{ getStatusBadgeClass(broadcast.status) }}">
+                                {{ getStatusLabel(broadcast.status) }}
+                            </span>
+                        </td>
+                        <td>
+                            <span>{{ broadcast.sentAt | date:'short' }}</span>
+                            <small class="text-muted d-block">{{ broadcast.sentByName }}</small>
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-primary" (click)="viewDetails(broadcast)"
+                                    title="View Details">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                                @if (broadcast.status === BroadcastStatus.Failed) {
+                                <button class="btn btn-outline-warning" (click)="resend(broadcast)" title="Resend">
+                                    <i class="fa-solid fa-redo"></i>
+                                </button>
+                                }
+                                @if (broadcast.status === BroadcastStatus.Pending) {
+                                <button class="btn btn-outline-danger" (click)="cancel(broadcast)" title="Cancel">
+                                    <i class="fa-solid fa-times"></i>
+                                </button>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    }
+
+    <!-- Cards View -->
+    @if (!loading() && !error() && viewMode() === 'cards') {
+    <div class="broadcasts-grid">
+        @if (filteredBroadcasts().length === 0) {
+        <div class="col-12 text-center py-5">
+            <i class="fa-solid fa-inbox fa-3x text-muted mb-3"></i>
+            <p class="text-muted mb-0">{{ t('notifications.no_broadcasts') }}</p>
+        </div>
+        }
+        @for (broadcast of filteredBroadcasts(); track broadcast.id) {
+        <div class="broadcast-card" (click)="viewDetails(broadcast)">
+            <div class="broadcast-card-header">
+                <span class="badge {{ getStatusBadgeClass(broadcast.status) }}">
+                    {{ getStatusLabel(broadcast.status) }}
+                </span>
+                <span class="broadcast-date">{{ broadcast.sentAt | date:'mediumDate' }}</span>
+            </div>
+            <h5 class="broadcast-card-title">{{ broadcast.title }}</h5>
+            <p class="broadcast-card-message">{{ broadcast.message | slice:0:100 }}...</p>
+            <div class="broadcast-card-footer">
+                <div class="target-info">
+                    <i class="fa-solid {{ getTargetTypeIcon(broadcast.targetType) }}"></i>
+                    <span>{{ broadcast.targetName || getTargetTypeLabel(broadcast.targetType) }}</span>
+                </div>
+                <div class="delivery-info">
+                    <i class="fa-solid fa-users"></i>
+                    <span>{{ broadcast.deliveredCount }}/{{ broadcast.recipientCount }}</span>
+                </div>
+            </div>
+        </div>
+        }
+    </div>
+    }
+
+    <!-- Pagination -->
+    @if (totalPages > 1) {
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" [class.disabled]="currentPage() === 1">
+                <button class="page-link" (click)="changePage(currentPage() - 1)">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+            </li>
+            @for (page of pageNumbers; track page) {
+            <li class="page-item" [class.active]="page === currentPage()">
+                <button class="page-link" (click)="changePage(page)">{{ page }}</button>
+            </li>
+            }
+            <li class="page-item" [class.disabled]="currentPage() === totalPages">
+                <button class="page-link" (click)="changePage(currentPage() + 1)">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </li>
+        </ul>
+    </nav>
+    }
+</div>
+
+<!-- Detail Modal -->
+@if (selectedBroadcast()) {
+<div class="modal-overlay" (click)="closeDetails()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h5 class="modal-title">{{ t('notifications.broadcast_details') }}</h5>
+            <button class="btn-close" (click)="closeDetails()"></button>
+        </div>
+        <div class="modal-body">
+            <div class="detail-section">
+                <h6>{{ selectedBroadcast()!.title }}</h6>
+                <p class="text-muted">{{ selectedBroadcast()!.message }}</p>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-6">
+                    <div class="detail-item">
+                        <span class="detail-label">{{ t('notifications.status') }}</span>
+                        <span class="badge {{ getStatusBadgeClass(selectedBroadcast()!.status) }}">
+                            {{ getStatusLabel(selectedBroadcast()!.status) }}
+                        </span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="detail-item">
+                        <span class="detail-label">{{ t('notifications.target') }}</span>
+                        <span>
+                            <i class="fa-solid {{ getTargetTypeIcon(selectedBroadcast()!.targetType) }} me-1"></i>
+                            {{ selectedBroadcast()!.targetName || getTargetTypeLabel(selectedBroadcast()!.targetType) }}
+                        </span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="detail-item">
+                        <span class="detail-label">{{ t('notifications.sent_by') }}</span>
+                        <span>{{ selectedBroadcast()!.sentByName }}</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="detail-item">
+                        <span class="detail-label">{{ t('notifications.sent_at') }}</span>
+                        <span>{{ selectedBroadcast()!.sentAt | date:'medium' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="delivery-stats">
+                <h6>{{ t('notifications.delivery_statistics') }}</h6>
+                <div class="row g-3">
+                    <div class="col-4 text-center">
+                        <div class="stat-value text-primary">{{ selectedBroadcast()!.recipientCount }}</div>
+                        <div class="stat-label">{{ t('notifications.recipients') }}</div>
+                    </div>
+                    <div class="col-4 text-center">
+                        <div class="stat-value text-success">{{ selectedBroadcast()!.deliveredCount }}</div>
+                        <div class="stat-label">{{ t('notifications.delivered') }}</div>
+                    </div>
+                    <div class="col-4 text-center">
+                        <div class="stat-value text-info">{{ selectedBroadcast()!.readCount }}</div>
+                        <div class="stat-label">{{ t('notifications.read') }}</div>
+                    </div>
+                </div>
+
+                <div class="progress mt-3" style="height: 10px;">
+                    <div class="progress-bar bg-success"
+                        [style.width.%]="(selectedBroadcast()!.deliveredCount / selectedBroadcast()!.recipientCount) * 100"
+                        title="Delivered">
+                    </div>
+                    <div class="progress-bar bg-info"
+                        [style.width.%]="(selectedBroadcast()!.readCount / selectedBroadcast()!.recipientCount) * 100"
+                        title="Read">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            @if (selectedBroadcast()!.status === BroadcastStatus.Failed) {
+            <button class="btn btn-warning" (click)="resend(selectedBroadcast()!)">
+                <i class="fa-solid fa-redo me-2"></i>{{ t('notifications.resend') }}
+            </button>
+            }
+            <button class="btn btn-secondary" (click)="closeDetails()">{{ t('common.close') }}</button>
+        </div>
+    </div>
+</div>
+}

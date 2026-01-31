@@ -1,0 +1,14 @@
+{
+    "@@locale": "en",
+    "appName": "Time Attendance",
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "ok": "OK",
+    "save": "Save",
+    "submit": "Submit",
+    "next": "Next",
+    "back": "Back",
+    "done": "Done"
+}

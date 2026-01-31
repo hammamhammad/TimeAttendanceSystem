@@ -150,6 +150,81 @@ import { I18nService } from '../../../core/i18n/i18n.service';
 
               <hr>
 
+              <!-- GPS Location Section (for Mobile Check-in) -->
+              <div class="mb-4">
+                <h6 class="text-success mb-3">
+                  <i class="fa-solid fa-location-dot me-2"></i>
+                  {{ i18n.t('branches.gps_settings') }}
+                </h6>
+                <div class="alert alert-info mb-3">
+                  <i class="fa-solid fa-info-circle me-2"></i>
+                  {{ i18n.t('branches.gps_settings_hint') }}
+                </div>
+                <div class="row g-3">
+                  <!-- Latitude -->
+                  <div class="col-md-4">
+                    <label class="form-label">
+                      {{ i18n.t('branches.latitude') }}
+                    </label>
+                    <input
+                      type="number"
+                      step="0.000001"
+                      class="form-control"
+                      formControlName="latitude"
+                      [class.is-invalid]="isFieldInvalid('latitude')"
+                      placeholder="-90 to 90"
+                    />
+                    @if (isFieldInvalid('latitude')) {
+                      <div class="invalid-feedback">{{ getFieldError('latitude') }}</div>
+                    }
+                    <div class="form-text">{{ i18n.t('branches.latitude_hint') }}</div>
+                  </div>
+
+                  <!-- Longitude -->
+                  <div class="col-md-4">
+                    <label class="form-label">
+                      {{ i18n.t('branches.longitude') }}
+                    </label>
+                    <input
+                      type="number"
+                      step="0.000001"
+                      class="form-control"
+                      formControlName="longitude"
+                      [class.is-invalid]="isFieldInvalid('longitude')"
+                      placeholder="-180 to 180"
+                    />
+                    @if (isFieldInvalid('longitude')) {
+                      <div class="invalid-feedback">{{ getFieldError('longitude') }}</div>
+                    }
+                    <div class="form-text">{{ i18n.t('branches.longitude_hint') }}</div>
+                  </div>
+
+                  <!-- Geofence Radius -->
+                  <div class="col-md-4">
+                    <label class="form-label">
+                      {{ i18n.t('branches.geofence_radius') }}
+                    </label>
+                    <div class="input-group">
+                      <input
+                        type="number"
+                        min="10"
+                        max="1000"
+                        class="form-control"
+                        formControlName="geofenceRadiusMeters"
+                        [class.is-invalid]="isFieldInvalid('geofenceRadiusMeters')"
+                      />
+                      <span class="input-group-text">{{ i18n.t('common.meters') }}</span>
+                    </div>
+                    @if (isFieldInvalid('geofenceRadiusMeters')) {
+                      <div class="invalid-feedback d-block">{{ getFieldError('geofenceRadiusMeters') }}</div>
+                    }
+                    <div class="form-text">{{ i18n.t('branches.geofence_radius_hint') }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <hr>
+
               <!-- Contact Information Section -->
               <div class="mb-4">
                 <h6 class="text-secondary mb-3">
@@ -311,27 +386,26 @@ export class EditBranchComponent implements OnInit {
       email: ['', Validators.email],
       address: [''],
       description: [''],
-      isActive: [true]
+      isActive: [true],
+      // GPS Coordinates
+      latitude: [null, [Validators.min(-90), Validators.max(90)]],
+      longitude: [null, [Validators.min(-180), Validators.max(180)]],
+      geofenceRadiusMeters: [100, [Validators.required, Validators.min(10), Validators.max(1000)]]
     });
   }
 
   loadBranch(branchId: string): void {
-    // Mock loading branch for now - replace with actual service call when available
-    setTimeout(() => {
-      const mockBranch: Branch = {
-        id: parseInt(branchId),
-        name: 'Sample Branch',
-        code: 'SAMPLE',
-        timeZone: 'UTC',
-        isActive: true,
-        employeeCount: 10,
-        departmentCount: 3,
-        createdAtUtc: '2024-01-01T00:00:00Z'
-      };
-      this.branch.set(mockBranch);
-      this.populateForm(mockBranch);
-      this.loading.set(false);
-    }, 1000);
+    this.branchesService.getBranchById(parseInt(branchId)).subscribe({
+      next: (branch) => {
+        this.branch.set(branch);
+        this.populateForm(branch);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        this.error.set(this.getErrorMessage(err));
+        this.loading.set(false);
+      }
+    });
   }
 
   populateForm(branch: Branch): void {
@@ -343,7 +417,11 @@ export class EditBranchComponent implements OnInit {
       email: '',
       address: '',
       description: '',
-      isActive: branch.isActive
+      isActive: branch.isActive,
+      // GPS Coordinates
+      latitude: branch.latitude,
+      longitude: branch.longitude,
+      geofenceRadiusMeters: branch.geofenceRadiusMeters || 100
     });
   }
 
@@ -357,6 +435,8 @@ export class EditBranchComponent implements OnInit {
     this.error.set('');
 
     const formValue = this.branchForm.value;
+    const branchId = this.branch()!.id;
+
     const updateRequest = {
       name: formValue.name,
       code: formValue.code.toUpperCase(),
@@ -364,11 +444,32 @@ export class EditBranchComponent implements OnInit {
       isActive: formValue.isActive
     };
 
-    // Mock update for now - replace with actual service call when available
-    setTimeout(() => {
-      this.saving.set(false);
-      this.router.navigate(['/branches', this.branch()!.id, 'view']);
-    }, 1000);
+    const coordinatesRequest = {
+      latitude: formValue.latitude,
+      longitude: formValue.longitude,
+      geofenceRadiusMeters: formValue.geofenceRadiusMeters
+    };
+
+    // Update branch info first, then coordinates
+    this.branchesService.updateBranch(branchId, updateRequest).subscribe({
+      next: () => {
+        // Now update coordinates
+        this.branchesService.updateBranchCoordinates(branchId, coordinatesRequest).subscribe({
+          next: () => {
+            this.saving.set(false);
+            this.router.navigate(['/branches', branchId, 'view']);
+          },
+          error: (err) => {
+            this.saving.set(false);
+            this.error.set(this.getErrorMessage(err));
+          }
+        });
+      },
+      error: (err) => {
+        this.saving.set(false);
+        this.error.set(this.getErrorMessage(err));
+      }
+    });
   }
 
   onCancel(): void {

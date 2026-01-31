@@ -1,0 +1,98 @@
+<div class="notification-center-widget">
+    <div class="widget-header">
+        <div class="widget-title">
+            <i class="fa-solid fa-bell me-2"></i>
+            {{ t('notifications.notification_center') }}
+        </div>
+        <div class="widget-actions">
+            <button class="btn btn-sm btn-icon" (click)="refresh()" [disabled]="loading()">
+                <i class="fa-solid fa-refresh" [class.fa-spin]="loading()"></i>
+            </button>
+            <a routerLink="/notifications/history" class="btn btn-sm btn-link">
+                {{ t('common.view_all') }}
+            </a>
+        </div>
+    </div>
+
+    <div class="widget-content">
+        @if (loading()) {
+        <div class="loading-state">
+            <div class="spinner-border spinner-border-sm text-primary"></div>
+            <span class="ms-2">{{ t('common.loading') }}</span>
+        </div>
+        } @else {
+        <!-- Quick Stats -->
+        <div class="quick-stats">
+            <div class="quick-stat">
+                <span class="quick-stat-value">{{ todayCount() }}</span>
+                <span class="quick-stat-label">{{ t('notifications.today') }}</span>
+            </div>
+            <div class="quick-stat">
+                <span class="quick-stat-value">{{ weekCount() }}</span>
+                <span class="quick-stat-label">{{ t('notifications.this_week') }}</span>
+            </div>
+            <div class="quick-stat">
+                <span class="quick-stat-value">{{ monthCount() }}</span>
+                <span class="quick-stat-label">{{ t('notifications.this_month') }}</span>
+            </div>
+            <div class="quick-stat highlight">
+                <span class="quick-stat-value">{{ deliveryRate() }}%</span>
+                <span class="quick-stat-label">{{ t('notifications.delivery') }}</span>
+            </div>
+        </div>
+
+        <!-- Recent Broadcasts -->
+        <div class="recent-broadcasts">
+            <h6 class="section-title">{{ t('notifications.recent_broadcasts') }}</h6>
+
+            @if (recentBroadcasts().length === 0) {
+            <div class="empty-state">
+                <i class="fa-solid fa-inbox"></i>
+                <span>{{ t('notifications.no_recent_broadcasts') }}</span>
+            </div>
+            } @else {
+            <div class="broadcast-list">
+                @for (broadcast of recentBroadcasts(); track broadcast.id) {
+                <div class="broadcast-item">
+                    <div class="broadcast-info">
+                        <span class="broadcast-title">{{ broadcast.title }}</span>
+                        <span class="broadcast-meta">
+                            <i class="fa-solid fa-users me-1"></i>{{ broadcast.recipientCount }}
+                            <span class="mx-2">•</span>
+                            {{ broadcast.sentAt | date:'shortDate' }}
+                        </span>
+                    </div>
+                    <div class="broadcast-delivery">
+                        <div class="delivery-ring"
+                            [attr.data-progress]="(broadcast.deliveredCount / broadcast.recipientCount * 100).toFixed(0) + '%'">
+                            <svg viewBox="0 0 36 36">
+                                <path class="ring-bg"
+                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path class="ring-progress"
+                                    [attr.stroke-dasharray]="(broadcast.deliveredCount / broadcast.recipientCount * 100) + ', 100'"
+                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+            }
+        </div>
+
+        <!-- Quick Actions -->
+        @if (showQuickActions) {
+        <div class="quick-actions">
+            <a routerLink="/notifications/send" class="action-btn primary">
+                <i class="fa-solid fa-paper-plane"></i>
+                <span>{{ t('notifications.send_new') }}</span>
+            </a>
+            <a routerLink="/notifications/history" class="action-btn secondary">
+                <i class="fa-solid fa-history"></i>
+                <span>{{ t('notifications.view_history') }}</span>
+            </a>
+        </div>
+        }
+        }
+    </div>
+</div>

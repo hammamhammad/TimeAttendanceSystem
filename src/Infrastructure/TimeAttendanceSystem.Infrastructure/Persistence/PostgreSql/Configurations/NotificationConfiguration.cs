@@ -72,12 +72,31 @@ public class NotificationConfiguration : IEntityTypeConfiguration<Notification>
             .HasMaxLength(500)
             .HasComment("URL to navigate when notification is clicked");
 
+        builder.Property(n => n.Channel)
+            .IsRequired()
+            .HasConversion<int>()
+            .HasDefaultValue(NotificationChannel.InApp)
+            .HasComment("Delivery channel: InApp, Push, Both");
+
+        builder.Property(n => n.BroadcastId)
+            .HasComment("ID of the broadcast this notification belongs to");
+
+        builder.Property(n => n.DeepLink)
+            .HasMaxLength(500)
+            .HasComment("Deep link path for mobile app navigation");
+
         // Relationships
         builder.HasOne(n => n.User)
             .WithMany()
             .HasForeignKey(n => n.UserId)
             .OnDelete(DeleteBehavior.Cascade)
             .HasConstraintName("FK_Notifications_Users");
+
+        builder.HasOne(n => n.Broadcast)
+            .WithMany(b => b.Notifications)
+            .HasForeignKey(n => n.BroadcastId)
+            .OnDelete(DeleteBehavior.SetNull)
+            .HasConstraintName("FK_Notifications_NotificationBroadcasts");
 
         // Indexes
         builder.HasIndex(n => n.UserId)
@@ -100,6 +119,10 @@ public class NotificationConfiguration : IEntityTypeConfiguration<Notification>
         builder.HasIndex(n => new { n.EntityType, n.EntityId })
             .HasDatabaseName("IX_Notifications_EntityType_EntityId")
             .HasFilter("\"IsDeleted\" = false AND \"EntityType\" IS NOT NULL");
+
+        builder.HasIndex(n => n.BroadcastId)
+            .HasDatabaseName("IX_Notifications_BroadcastId")
+            .HasFilter("\"IsDeleted\" = false AND \"BroadcastId\" IS NOT NULL");
 
         // Query filter for soft delete
         builder.HasQueryFilter(n => !n.IsDeleted);

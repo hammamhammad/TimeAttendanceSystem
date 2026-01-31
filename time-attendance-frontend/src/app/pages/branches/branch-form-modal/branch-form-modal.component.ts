@@ -99,7 +99,86 @@ import { ModalWrapperComponent } from '../../../shared/components/modal-wrapper/
           </div>
           <div class="form-text">Inactive branches will not be available for new employee assignments.</div>
         </div>
-    
+
+        <!-- GPS Location Settings -->
+        <div class="card mb-3">
+          <div class="card-header py-2">
+            <h6 class="mb-0">
+              <i class="fa-solid fa-location-dot me-2"></i>
+              {{ i18n.t('branches.gps_settings') }}
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="latitude" class="form-label">{{ i18n.t('branches.latitude') }}</label>
+                <input type="number"
+                  id="latitude"
+                  class="form-control"
+                  formControlName="latitude"
+                  [class.is-invalid]="branchForm.get('latitude')?.invalid && branchForm.get('latitude')?.touched"
+                  placeholder="{{ i18n.t('branches.latitude_placeholder') }}"
+                  step="0.000001">
+                @if (branchForm.get('latitude')?.invalid && branchForm.get('latitude')?.touched) {
+                  <div class="invalid-feedback">
+                    @if (branchForm.get('latitude')?.errors?.['min']) {
+                      <div>{{ i18n.t('branches.latitude_min_error') }}</div>
+                    }
+                    @if (branchForm.get('latitude')?.errors?.['max']) {
+                      <div>{{ i18n.t('branches.latitude_max_error') }}</div>
+                    }
+                  </div>
+                }
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="longitude" class="form-label">{{ i18n.t('branches.longitude') }}</label>
+                <input type="number"
+                  id="longitude"
+                  class="form-control"
+                  formControlName="longitude"
+                  [class.is-invalid]="branchForm.get('longitude')?.invalid && branchForm.get('longitude')?.touched"
+                  placeholder="{{ i18n.t('branches.longitude_placeholder') }}"
+                  step="0.000001">
+                @if (branchForm.get('longitude')?.invalid && branchForm.get('longitude')?.touched) {
+                  <div class="invalid-feedback">
+                    @if (branchForm.get('longitude')?.errors?.['min']) {
+                      <div>{{ i18n.t('branches.longitude_min_error') }}</div>
+                    }
+                    @if (branchForm.get('longitude')?.errors?.['max']) {
+                      <div>{{ i18n.t('branches.longitude_max_error') }}</div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+            <div class="mb-0">
+              <label for="geofenceRadiusMeters" class="form-label">{{ i18n.t('branches.geofence_radius') }}</label>
+              <div class="input-group">
+                <input type="number"
+                  id="geofenceRadiusMeters"
+                  class="form-control"
+                  formControlName="geofenceRadiusMeters"
+                  [class.is-invalid]="branchForm.get('geofenceRadiusMeters')?.invalid && branchForm.get('geofenceRadiusMeters')?.touched"
+                  placeholder="{{ i18n.t('branches.geofence_radius_placeholder') }}"
+                  min="10"
+                  max="5000">
+                <span class="input-group-text">{{ i18n.t('common.meters') }}</span>
+              </div>
+              @if (branchForm.get('geofenceRadiusMeters')?.invalid && branchForm.get('geofenceRadiusMeters')?.touched) {
+                <div class="invalid-feedback d-block">
+                  @if (branchForm.get('geofenceRadiusMeters')?.errors?.['min']) {
+                    <div>{{ i18n.t('branches.geofence_min_error') }}</div>
+                  }
+                  @if (branchForm.get('geofenceRadiusMeters')?.errors?.['max']) {
+                    <div>{{ i18n.t('branches.geofence_max_error') }}</div>
+                  }
+                </div>
+              }
+              <div class="form-text">{{ i18n.t('branches.geofence_hint') }}</div>
+            </div>
+          </div>
+        </div>
+
         <!-- Footer Buttons -->
         <div modal-footer class="d-flex gap-2 justify-content-end">
           <button type="button"
@@ -126,7 +205,7 @@ import { ModalWrapperComponent } from '../../../shared/components/modal-wrapper/
 })
 export class BranchFormModalComponent implements OnInit {
   private fb = inject(FormBuilder);
-  private i18n = inject(I18nService);
+  public i18n = inject(I18nService);
 
   @Input() show = false;
   @Input() branch: Branch | null = null;
@@ -152,7 +231,10 @@ export class BranchFormModalComponent implements OnInit {
       code: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(10)]],
       name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
       timeZone: ['', Validators.required],
-      isActive: [true]
+      isActive: [true],
+      latitude: [null, [Validators.min(-90), Validators.max(90)]],
+      longitude: [null, [Validators.min(-180), Validators.max(180)]],
+      geofenceRadiusMeters: [100, [Validators.min(10), Validators.max(5000)]]
     });
   }
 
@@ -178,7 +260,10 @@ export class BranchFormModalComponent implements OnInit {
         code: this.branch.code,
         name: this.branch.name,
         timeZone: this.branch.timeZone,
-        isActive: this.branch.isActive
+        isActive: this.branch.isActive,
+        latitude: this.branch.latitude,
+        longitude: this.branch.longitude,
+        geofenceRadiusMeters: this.branch.geofenceRadiusMeters || 100
       });
     }
   }
@@ -188,7 +273,10 @@ export class BranchFormModalComponent implements OnInit {
       code: '',
       name: '',
       timeZone: 'UTC',
-      isActive: true
+      isActive: true,
+      latitude: null,
+      longitude: null,
+      geofenceRadiusMeters: 100
     });
   }
 
@@ -209,7 +297,10 @@ export class BranchFormModalComponent implements OnInit {
       code: formValue.code.trim(),
       name: formValue.name.trim(),
       timeZone: formValue.timeZone,
-      isActive: formValue.isActive
+      isActive: formValue.isActive,
+      latitude: formValue.latitude || null,
+      longitude: formValue.longitude || null,
+      geofenceRadiusMeters: formValue.geofenceRadiusMeters || 100
     };
 
     this.save.emit(branchData);

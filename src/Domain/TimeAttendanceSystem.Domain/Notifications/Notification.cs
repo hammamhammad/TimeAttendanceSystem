@@ -67,7 +67,30 @@ public class Notification : BaseEntity
     public string? ActionUrl { get; set; }
 
     /// <summary>
+    /// Gets or sets the delivery channel for this notification.
+    /// </summary>
+    public NotificationChannel Channel { get; set; } = NotificationChannel.InApp;
+
+    /// <summary>
+    /// Gets or sets the ID of the broadcast this notification belongs to.
+    /// Null if the notification was sent directly (not as part of a broadcast).
+    /// </summary>
+    public long? BroadcastId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the deep link path for mobile app navigation.
+    /// When the user taps this notification, the app navigates to this path.
+    /// </summary>
+    /// <value>Mobile deep link path (e.g., "/approvals/vacation/123")</value>
+    public string? DeepLink { get; set; }
+
+    /// <summary>
     /// Navigation property to the user who receives this notification.
     /// </summary>
     public virtual User User { get; set; } = null!;
+
+    /// <summary>
+    /// Navigation property to the broadcast this notification belongs to.
+    /// </summary>
+    public virtual NotificationBroadcast? Broadcast { get; set; }
 }

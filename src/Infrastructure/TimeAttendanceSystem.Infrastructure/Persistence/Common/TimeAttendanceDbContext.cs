@@ -13,6 +13,7 @@ using TimeAttendanceSystem.Domain.RemoteWork;
 using TimeAttendanceSystem.Domain.Workflows;
 using TimeAttendanceSystem.Domain.LeaveManagement;
 using TimeAttendanceSystem.Domain.Notifications;
+using TimeAttendanceSystem.Domain.Tenants;
 using TimeAttendanceSystem.Application.Abstractions;
 using TimeAttendanceSystem.Application.Services;
 
@@ -87,6 +88,7 @@ public class TimeAttendanceDbContext : DbContext, IApplicationDbContext
 
     public DbSet<Branch> Branches => Set<Branch>();
     public DbSet<Department> Departments => Set<Department>();
+    public DbSet<NfcTag> NfcTags => Set<NfcTag>();
     public DbSet<User> Users => Set<User>();
     public DbSet<Role> Roles => Set<Role>();
     public DbSet<Permission> Permissions => Set<Permission>();
@@ -108,6 +110,7 @@ public class TimeAttendanceDbContext : DbContext, IApplicationDbContext
     public DbSet<ShiftAssignment> ShiftAssignments => Set<ShiftAssignment>();
     public DbSet<AttendanceRecord> AttendanceRecords => Set<AttendanceRecord>();
     public DbSet<AttendanceTransaction> AttendanceTransactions => Set<AttendanceTransaction>();
+    public DbSet<AttendanceVerificationLog> AttendanceVerificationLogs => Set<AttendanceVerificationLog>();
     public DbSet<WorkingDay> WorkingDays => Set<WorkingDay>();
     public DbSet<OvertimeConfiguration> OvertimeConfigurations => Set<OvertimeConfiguration>();
     public DbSet<PublicHoliday> PublicHolidays => Set<PublicHoliday>();
@@ -137,6 +140,11 @@ public class TimeAttendanceDbContext : DbContext, IApplicationDbContext
 
     // Notification entities
     public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<NotificationBroadcast> NotificationBroadcasts => Set<NotificationBroadcast>();
+    public DbSet<PushNotificationToken> PushNotificationTokens => Set<PushNotificationToken>();
+
+    // Multi-tenant entities
+    public DbSet<Tenant> Tenants => Set<Tenant>();
 
     /// <summary>
     /// Configures the database model using Fluent API configurations from the current assembly.

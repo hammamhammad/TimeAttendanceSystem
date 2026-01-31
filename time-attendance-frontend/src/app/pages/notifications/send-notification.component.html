@@ -1,0 +1,285 @@
+<div class="send-notification-container">
+  <app-page-header [title]="t('notifications.send_notification')">
+    <button class="btn btn-outline-secondary" routerLink="/notifications/history">
+      <i class="fa-solid fa-history me-2"></i>{{ t('notifications.view_history') }}
+    </button>
+  </app-page-header>
+
+  <div class="row">
+    <!-- Main Form -->
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="fa-solid fa-paper-plane me-2"></i>{{ t('notifications.compose') }}
+          </h5>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="notificationForm" (ngSubmit)="onSubmit()">
+            <!-- Title -->
+            <div class="mb-4">
+              <label for="title" class="form-label">{{ t('notifications.title') }} *</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="title" 
+                formControlName="title"
+                [placeholder]="t('notifications.title_placeholder')"
+                [class.is-invalid]="titleControl?.invalid && titleControl?.touched">
+              @if (titleControl?.errors?.['required'] && titleControl?.touched) {
+                <div class="invalid-feedback">{{ t('validation.required') }}</div>
+              }
+              @if (titleControl?.errors?.['maxlength']) {
+                <div class="invalid-feedback">{{ t('validation.maxlength', { max: 100 }) }}</div>
+              }
+              <small class="text-muted">{{ titleControl?.value?.length || 0 }}/100</small>
+            </div>
+
+            <!-- Message -->
+            <div class="mb-4">
+              <label for="message" class="form-label">{{ t('notifications.message') }} *</label>
+              <textarea 
+                class="form-control" 
+                id="message" 
+                formControlName="message"
+                rows="5"
+                [placeholder]="t('notifications.message_placeholder')"
+                [class.is-invalid]="messageControl?.invalid && messageControl?.touched">
+              </textarea>
+              @if (messageControl?.errors?.['required'] && messageControl?.touched) {
+                <div class="invalid-feedback">{{ t('validation.required') }}</div>
+              }
+              @if (messageControl?.errors?.['maxlength']) {
+                <div class="invalid-feedback">{{ t('validation.maxlength', { max: 500 }) }}</div>
+              }
+              <small class="text-muted">{{ messageControl?.value?.length || 0 }}/500</small>
+            </div>
+
+            <!-- Target Type Selection -->
+            <div class="mb-4">
+              <label class="form-label">{{ t('notifications.send_to') }} *</label>
+              <div class="target-type-grid">
+                @for (type of targetTypes; track type.value) {
+                  <div 
+                    class="target-type-card" 
+                    [class.selected]="selectedTargetType() === type.value"
+                    (click)="notificationForm.get('targetType')?.setValue(type.value)">
+                    <i class="fa-solid {{ type.icon }}"></i>
+                    <span>{{ type.label }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Target Selection (if not All) -->
+            @if (showTargetSelection()) {
+              <div class="mb-4 target-selection">
+                <label class="form-label">{{ t('notifications.select_target') }} *</label>
+                
+                @if (selectedTargetType() === 4) {
+                  <!-- Search for Individual -->
+                  <input 
+                    type="text" 
+                    class="form-control mb-2" 
+                    [placeholder]="t('notifications.search_employees')"
+                    [ngModel]="searchTerm()"
+                    [ngModelOptions]="{standalone: true}"
+                    (ngModelChange)="searchTerm.set($event); searchEmployees()">
+                }
+                
+                <div class="targets-list">
+                  @if (loading()) {
+                    <app-loading-spinner [message]="t('common.loading')" [centered]="true"></app-loading-spinner>
+                  } @else if (availableTargets().length === 0) {
+                    <div class="text-center text-muted py-4">
+                      <i class="fa-solid fa-inbox fa-2x mb-2"></i>
+                      <p>{{ t('notifications.no_targets_found') }}</p>
+                    </div>
+                  } @else {
+                    @for (target of availableTargets(); track target.id) {
+                      <div 
+                        class="target-item" 
+                        [class.selected]="isTargetSelected(target)"
+                        (click)="selectTarget(target)">
+                        <div class="target-info">
+                          <span class="target-name">{{ target.name }}</span>
+                          @if (target.employeeCount) {
+                            <small class="text-muted">{{ target.employeeCount }} {{ t('notifications.employees') }}</small>
+                          }
+                        </div>
+                        @if (isTargetSelected(target)) {
+                          <i class="fa-solid fa-check text-success"></i>
+                        }
+                      </div>
+                    }
+                  }
+                </div>
+                
+                @if (targetIdControl?.errors?.['required'] && targetIdControl?.touched) {
+                  <div class="text-danger small mt-2">{{ t('notifications.select_target_required') }}</div>
+                }
+              </div>
+            }
+
+            <!-- Priority -->
+            <div class="mb-4">
+              <label class="form-label">{{ t('notifications.priority') }}</label>
+              <div class="priority-options">
+                @for (priority of priorities; track priority.value) {
+                  <label class="priority-option">
+                    <input 
+                      type="radio" 
+                      formControlName="priority" 
+                      [value]="priority.value">
+                    <span class="priority-label {{ priority.color }}">
+                      <i class="fa-solid {{ priority.icon }} me-1"></i>
+                      {{ priority.label }}
+                    </span>
+                  </label>
+                }
+              </div>
+            </div>
+
+            <!-- Options -->
+            <div class="mb-4">
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" formControlName="sendPush" id="sendPush">
+                <label class="form-check-label" for="sendPush">
+                  <i class="fa-solid fa-mobile-alt me-1"></i>
+                  {{ t('notifications.send_push') }}
+                </label>
+              </div>
+              
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" formControlName="scheduleDelivery" id="scheduleDelivery">
+                <label class="form-check-label" for="scheduleDelivery">
+                  <i class="fa-solid fa-clock me-1"></i>
+                  {{ t('notifications.schedule_delivery') }}
+                </label>
+              </div>
+            </div>
+
+            <!-- Schedule Time (if scheduling) -->
+            @if (notificationForm.get('scheduleDelivery')?.value) {
+              <div class="mb-4">
+                <label for="scheduledAt" class="form-label">{{ t('notifications.scheduled_time') }}</label>
+                <input 
+                  type="datetime-local" 
+                  class="form-control" 
+                  id="scheduledAt" 
+                  formControlName="scheduledAt">
+              </div>
+            }
+
+            <!-- Submit Buttons -->
+            <div class="d-flex gap-2">
+              <button 
+                type="submit" 
+                class="btn btn-primary btn-lg"
+                [disabled]="submitting() || notificationForm.invalid">
+                @if (submitting()) {
+                  <span class="spinner-border spinner-border-sm me-2"></span>
+                } @else {
+                  <i class="fa-solid fa-paper-plane me-2"></i>
+                }
+                {{ notificationForm.get('scheduleDelivery')?.value ? t('notifications.schedule') : t('notifications.send_now') }}
+              </button>
+              <button type="button" class="btn btn-outline-secondary btn-lg" (click)="resetForm()">
+                <i class="fa-solid fa-redo me-2"></i>{{ t('common.reset') }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview Panel -->
+    <div class="col-lg-4">
+      <div class="card preview-card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="fa-solid fa-eye me-2"></i>{{ t('notifications.preview') }}
+          </h5>
+        </div>
+        <div class="card-body">
+          <!-- Notification Preview -->
+          <div class="notification-preview">
+            <div class="preview-header">
+              <i class="fa-solid fa-bell"></i>
+              <span class="preview-app">Time Attendance</span>
+              <span class="preview-time">now</span>
+            </div>
+            <div class="preview-content">
+              <h6 class="preview-title">{{ notificationForm.get('title')?.value || t('notifications.title_placeholder') }}</h6>
+              <p class="preview-message">{{ notificationForm.get('message')?.value || t('notifications.message_placeholder') }}</p>
+            </div>
+          </div>
+
+          <!-- Summary -->
+          <div class="delivery-summary mt-4">
+            <h6>{{ t('notifications.delivery_summary') }}</h6>
+            
+            <div class="summary-item">
+              <span class="summary-label">{{ t('notifications.recipients') }}</span>
+              <span class="summary-value">
+                <i class="fa-solid fa-users me-1"></i>
+                {{ estimatedRecipients() }}
+              </span>
+            </div>
+            
+            <div class="summary-item">
+              <span class="summary-label">{{ t('notifications.target') }}</span>
+              <span class="summary-value">
+                @for (type of targetTypes; track type.value) {
+                  @if (type.value === selectedTargetType()) {
+                    <i class="fa-solid {{ type.icon }} me-1"></i>
+                    {{ type.label }}
+                  }
+                }
+              </span>
+            </div>
+            
+            <div class="summary-item">
+              <span class="summary-label">{{ t('notifications.channels') }}</span>
+              <span class="summary-value">
+                <i class="fa-solid fa-inbox me-1"></i>In-App
+                @if (notificationForm.get('sendPush')?.value) {
+                  <span class="ms-2">
+                    <i class="fa-solid fa-mobile-alt me-1"></i>Push
+                  </span>
+                }
+              </span>
+            </div>
+            
+            @if (notificationForm.get('scheduleDelivery')?.value && notificationForm.get('scheduledAt')?.value) {
+              <div class="summary-item">
+                <span class="summary-label">{{ t('notifications.scheduled_for') }}</span>
+                <span class="summary-value">
+                  <i class="fa-solid fa-clock me-1"></i>
+                  {{ notificationForm.get('scheduledAt')?.value | date:'medium' }}
+                </span>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Tips -->
+      <div class="card mt-3">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="fa-solid fa-lightbulb me-2"></i>{{ t('notifications.tips') }}
+          </h5>
+        </div>
+        <div class="card-body">
+          <ul class="tips-list">
+            <li><i class="fa-solid fa-check text-success me-2"></i>{{ t('notifications.tip_short_title') }}</li>
+            <li><i class="fa-solid fa-check text-success me-2"></i>{{ t('notifications.tip_clear_message') }}</li>
+            <li><i class="fa-solid fa-check text-success me-2"></i>{{ t('notifications.tip_target_audience') }}</li>
+            <li><i class="fa-solid fa-check text-success me-2"></i>{{ t('notifications.tip_timing') }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
