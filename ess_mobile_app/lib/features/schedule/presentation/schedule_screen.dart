@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/theme/app_theme.dart';
@@ -32,6 +33,10 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
     
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.pop(),
+        ),
         title: const Text('My Schedule'),
         actions: [
           IconButton(
@@ -266,7 +271,7 @@ class _WeeklySummary extends StatelessWidget {
           Container(
             width: 1,
             height: 30,
-            color: AppColors.divider,
+            color: AppColors.outlineVariant,
           ),
           _SummaryItem(
             icon: Icons.access_time,
@@ -276,7 +281,7 @@ class _WeeklySummary extends StatelessWidget {
           Container(
             width: 1,
             height: 30,
-            color: AppColors.divider,
+            color: AppColors.outlineVariant,
           ),
           _SummaryItem(
             icon: Icons.trending_up,
@@ -408,7 +413,7 @@ class _DayShiftCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: isToday
             ? Border.all(color: AppColors.primary, width: 2)
-            : Border.all(color: AppColors.divider),
+            : Border.all(color: AppColors.outlineVariant),
       ),
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -506,7 +511,7 @@ class _ShiftTypeIndicator extends StatelessWidget {
       label = 'Night';
     } else if (shift.shiftType == ShiftType.remote) {
       icon = Icons.home_work;
-      color = AppColors.info;
+      color = AppColors.primary;
       label = 'Remote';
     } else if (shift.shiftType == ShiftType.overtime) {
       icon = Icons.add_circle_outline;

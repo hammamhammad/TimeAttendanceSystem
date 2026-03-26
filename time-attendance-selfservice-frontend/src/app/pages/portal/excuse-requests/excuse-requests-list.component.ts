@@ -49,7 +49,7 @@ export class ExcuseRequestsListComponent implements OnInit, OnDestroy {
 
   initColumns(): void {
     this.columns = [
-      { key: 'id', label: 'ID', sortable: true, width: '80px' },
+      { key: 'id', label: this.i18n.t('portal.columns.id'), sortable: true, width: '80px' },
       { key: 'excuseDate', label: this.i18n.t('portal.excuse_date'), sortable: true },
       { key: 'excuseType', label: this.i18n.t('portal.excuse_type'), sortable: true },
       { key: 'startTime', label: this.i18n.t('portal.start_time'), sortable: false },
@@ -67,13 +67,13 @@ export class ExcuseRequestsListComponent implements OnInit, OnDestroy {
     this.tableActions = [
       {
         key: 'view',
-        label: 'View',
+        label: this.i18n.t('portal.actions.view'),
         icon: 'bi-eye',
         color: 'primary'
       },
       {
         key: 'edit',
-        label: 'Edit',
+        label: this.i18n.t('portal.actions.edit'),
         icon: 'bi-pencil',
         color: 'warning',
         // Only allow edit for pending requests that haven't been finalized
@@ -81,7 +81,7 @@ export class ExcuseRequestsListComponent implements OnInit, OnDestroy {
       },
       {
         key: 'cancel',
-        label: 'Cancel',
+        label: this.i18n.t('portal.actions.cancel'),
         icon: 'bi-x-circle',
         color: 'danger',
         // Only allow cancel for pending requests
@@ -181,7 +181,7 @@ export class ExcuseRequestsListComponent implements OnInit, OnDestroy {
       startTime: this.formatTime(excuse.startTime),
       endTime: this.formatTime(excuse.endTime),
       durationHours: this.formatDuration(excuse.durationHours),
-      createdAtUtc: this.formatDate(excuse.createdAtUtc),
+      createdAtUtc: this.formatDateTime(excuse.createdAtUtc),
       status: this.getStatusBadgeHtml(excuse)
     }));
   });
@@ -354,7 +354,14 @@ export class ExcuseRequestsListComponent implements OnInit, OnDestroy {
 
   formatDate(date: Date | string): string {
     const d = typeof date === 'string' ? new Date(date) : date;
-    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    const locale = this.i18n.locale() === 'ar' ? 'ar-u-nu-latn' : 'en-US';
+    return d.toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric' });
+  }
+
+  formatDateTime(date: Date | string): string {
+    const d = typeof date === 'string' ? new Date(date) : date;
+    const locale = this.i18n.locale() === 'ar' ? 'ar-u-nu-latn' : 'en-US';
+    return d.toLocaleString(locale, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
   }
 
   /**

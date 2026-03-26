@@ -1,5 +1,6 @@
-/* Edit Shift Component Styles */
+/* Edit Shift Component - Modern Form Styles */
 
+/* Radio button styling for shift type selection */
 .form-check.p-3.border {
   cursor: pointer;
   transition: all 0.2s ease;
@@ -14,6 +15,7 @@
   color: var(--bs-primary);
 }
 
+/* Period card styling */
 .card .card-header {
   border-bottom: 1px solid rgba(0, 0, 0, 0.125);
 }
@@ -22,16 +24,19 @@
   font-size: 0.75em;
 }
 
+/* Alert styling */
 .alert-info {
   background-color: rgba(13, 202, 240, 0.1);
   border-color: rgba(13, 202, 240, 0.2);
   color: #055160;
 }
 
+/* Form switches */
 .form-switch .form-check-input {
   cursor: pointer;
 }
 
+/* Button styling */
 .btn-outline-danger.btn-sm {
   --bs-btn-padding-y: 0.25rem;
   --bs-btn-padding-x: 0.5rem;
@@ -42,15 +47,6 @@
 .spinner-border {
   width: 2rem;
   height: 2rem;
-}
-
-/* Form validation styles */
-.form-control:invalid {
-  border-color: #dc3545;
-}
-
-.form-control:valid {
-  border-color: #198754;
 }
 
 /* Responsive adjustments */

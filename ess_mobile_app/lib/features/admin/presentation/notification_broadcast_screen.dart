@@ -503,7 +503,7 @@ class _CreateBroadcastSheetState extends ConsumerState<_CreateBroadcastSheet> {
             
             // Target selection
             if (_targetType == BroadcastTargetType.branch)
-              AppDropdownField<String>(
+              AppDropdown<String>(
                 label: 'Select Branch',
                 hint: 'Choose a branch',
                 value: _targetId,
@@ -514,7 +514,7 @@ class _CreateBroadcastSheetState extends ConsumerState<_CreateBroadcastSheet> {
                 onChanged: (value) => setState(() => _targetId = value),
               )
             else if (_targetType == BroadcastTargetType.department)
-              AppDropdownField<String>(
+              AppDropdown<String>(
                 label: 'Select Department',
                 hint: 'Choose a department',
                 value: _targetId,

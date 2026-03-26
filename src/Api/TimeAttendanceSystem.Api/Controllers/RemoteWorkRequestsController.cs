@@ -1,6 +1,8 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using TimeAttendanceSystem.Application.Abstractions;
 using TimeAttendanceSystem.Application.Features.RemoteWorkRequests.Commands.CreateRemoteWorkRequest;
 using TimeAttendanceSystem.Application.Features.RemoteWorkRequests.Commands.CancelRemoteWorkRequest;
 using TimeAttendanceSystem.Application.Features.RemoteWorkRequests.Commands.UpdateRemoteWorkRequest;
@@ -22,10 +24,17 @@ namespace TimeAttendanceSystem.Api.Controllers;
 public class RemoteWorkRequestsController : ControllerBase
 {
     private readonly IMediator _mediator;
+    private readonly IApplicationDbContext _context;
+    private readonly ICurrentUser _currentUser;
 
-    public RemoteWorkRequestsController(IMediator mediator)
+    public RemoteWorkRequestsController(
+        IMediator mediator,
+        IApplicationDbContext context,
+        ICurrentUser currentUser)
     {
         _mediator = mediator;
+        _context = context;
+        _currentUser = currentUser;
     }
 
     /// <summary>
@@ -142,5 +151,74 @@ public class RemoteWorkRequestsController : ControllerBase
         }
 
         return BadRequest(result);
+    }
+
+    /// <summary>
+    /// Gets the remaining remote work days for the current user in the current month.
+    /// Returns the policy limit, used days, and remaining days.
+    /// </summary>
+    /// <returns>Remaining days information for the current month</returns>
+    /// <response code="200">Remaining days data retrieved successfully</response>
+    /// <response code="401">Unauthorized - user not authenticated</response>
+    /// <response code="404">Employee profile or remote work policy not found</response>
+    [HttpGet("remaining-days")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetRemainingDays()
+    {
+        if (_currentUser.UserId == null)
+        {
+            return Unauthorized(new { error = "User not authenticated" });
+        }
+
+        // Get current employee from user context through EmployeeUserLink
+        var employeeLink = await _context.EmployeeUserLinks
+            .Include(eul => eul.Employee)
+            .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+        if (employeeLink?.Employee == null)
+        {
+            return NotFound(new { error = "Employee profile not found for current user" });
+        }
+
+        var employeeId = employeeLink.EmployeeId;
+        var branchId = employeeLink.Employee.BranchId;
+
+        // Find the active remote work policy for the employee's branch
+        var policy = await _context.RemoteWorkPolicies
+            .Where(p => p.IsActive && (p.BranchId == branchId || p.BranchId == null))
+            .OrderByDescending(p => p.BranchId) // Prefer branch-specific over company-wide
+            .FirstOrDefaultAsync();
+
+        if (policy == null)
+        {
+            return NotFound(new { error = "No active remote work policy found for your branch" });
+        }
+
+        var maxDaysPerMonth = policy.MaxDaysPerMonth ?? 0;
+
+        // Calculate the current month boundaries
+        var now = DateTime.UtcNow;
+        var monthStart = new DateOnly(now.Year, now.Month, 1);
+        var monthEnd = monthStart.AddMonths(1).AddDays(-1);
+
+        // Count approved remote work request days in the current month
+        var usedDaysThisMonth = await _context.RemoteWorkRequests
+            .Where(r => r.EmployeeId == employeeId
+                && r.Status == RemoteWorkRequestStatus.Approved
+                && !r.IsDeleted
+                && r.StartDate <= monthEnd
+                && r.EndDate >= monthStart)
+            .SumAsync(r => r.WorkingDaysCount);
+
+        var remainingDays = Math.Max(0, maxDaysPerMonth - usedDaysThisMonth);
+
+        return Ok(new
+        {
+            remainingDays,
+            maxDaysPerMonth,
+            usedDaysThisMonth
+        });
     }
 }

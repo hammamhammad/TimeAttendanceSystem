@@ -45,10 +45,8 @@ Map<String, dynamic> _$$ExcuseRequestImplToJson(_$ExcuseRequestImpl instance) =>
     };
 
 const _$ExcuseTypeEnumMap = {
-  ExcuseType.lateArrival: 0,
-  ExcuseType.earlyDeparture: 1,
-  ExcuseType.missedPunch: 2,
-  ExcuseType.other: 3,
+  ExcuseType.personalExcuse: 1,
+  ExcuseType.officialDuty: 2,
 };
 
 const _$ExcuseStatusEnumMap = {
@@ -60,19 +58,23 @@ const _$ExcuseStatusEnumMap = {
 _$CreateExcuseRequestImpl _$$CreateExcuseRequestImplFromJson(
         Map<String, dynamic> json) =>
     _$CreateExcuseRequestImpl(
+      employeeId: (json['employeeId'] as num).toInt(),
       type: $enumDecode(_$ExcuseTypeEnumMap, json['type']),
       excuseDate: DateTime.parse(json['excuseDate'] as String),
       reason: json['reason'] as String,
-      requestedTime: json['requestedTime'] == null
-          ? null
-          : DateTime.parse(json['requestedTime'] as String),
+      startTime: json['startTime'] as String,
+      endTime: json['endTime'] as String,
+      attachmentPath: json['attachmentPath'] as String?,
     );
 
 Map<String, dynamic> _$$CreateExcuseRequestImplToJson(
         _$CreateExcuseRequestImpl instance) =>
     <String, dynamic>{
+      'employeeId': instance.employeeId,
       'type': _$ExcuseTypeEnumMap[instance.type]!,
       'excuseDate': instance.excuseDate.toIso8601String(),
       'reason': instance.reason,
-      'requestedTime': instance.requestedTime?.toIso8601String(),
+      'startTime': instance.startTime,
+      'endTime': instance.endTime,
+      'attachmentPath': instance.attachmentPath,
     };

@@ -69,7 +69,7 @@ class AdminDashboardRepository {
   /// Get dashboard statistics.
   Future<AdminDashboardStats> getStats() async {
     try {
-      final response = await _dio.get('/api/v1/admin/dashboard/stats');
+      final response = await _dio.get('/api/v1/dashboard/overview');
       return AdminDashboardStats.fromJson(response.data);
     } on DioException catch (e) {
       throw Exception(e.response?.data?['message'] ?? 'Failed to get stats');

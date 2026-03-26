@@ -34,20 +34,20 @@
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 999;
+  z-index: 1040;
 }
 
 /* RTL Support */
-:root[dir="rtl"] .main-content {
+:host-context([dir="rtl"]) .main-content {
   margin-left: 0 !important;
   margin-right: 250px !important;
 }
 
-:root[dir="rtl"] .main-content.sidenav-collapsed {
+:host-context([dir="rtl"]) .main-content.sidenav-collapsed {
   margin-right: 72px !important;
 }
 
-:root[dir="rtl"] .main-content.mobile {
+:host-context([dir="rtl"]) .main-content.mobile {
   margin-right: 0 !important;
 }
 
@@ -57,7 +57,7 @@
     margin-left: 0;
   }
   
-  :root[dir="rtl"] .main-content {
+  :host-context([dir="rtl"]) .main-content {
     margin-right: 0 !important;
   }
   

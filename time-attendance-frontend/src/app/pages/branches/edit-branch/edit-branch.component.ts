@@ -372,7 +372,7 @@ export class EditBranchComponent implements OnInit {
     if (branchId) {
       this.loadBranch(branchId);
     } else {
-      this.error.set('Invalid branch ID');
+      this.error.set(this.i18n.t('branches.invalid_id'));
       this.loading.set(false);
     }
   }

@@ -4,10 +4,10 @@
 }
 
 .table th {
-  background-color: #f8f9fa;
+  background-color: var(--app-gray-100);
   border-top: none;
   font-weight: 600;
-  color: #495057;
+  color: var(--app-gray-700);
 }
 
 .table td {
@@ -29,12 +29,12 @@
 
 .form-label {
   font-weight: 500;
-  color: #495057;
+  color: var(--app-gray-700);
 }
 
 .card-header {
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #dee2e6;
+  background-color: var(--app-gray-100);
+  border-bottom: 1px solid var(--app-gray-300);
 }
 
 .pagination {
@@ -48,15 +48,15 @@
 }
 
 .vacation-status.approved {
-  color: #198754;
+  color: var(--app-success);
 }
 
 .vacation-status.pending {
-  color: #ffc107;
+  color: var(--app-warning);
 }
 
 .vacation-status.active {
-  color: #0d6efd;
+  color: var(--bs-primary);
 }
 
 .vacation-status.upcoming {
@@ -64,7 +64,7 @@
 }
 
 .vacation-status.completed {
-  color: #6c757d;
+  color: var(--app-gray-600);
 }
 
 /* Avatar styling to match Employee Management */
@@ -96,14 +96,14 @@
 }
 
 .modal-header {
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #dee2e6;
+  background-color: var(--app-gray-100);
+  border-bottom: 1px solid var(--app-gray-300);
   border-radius: 8px 8px 0 0;
 }
 
 .modal-title {
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--app-gray-800);
 }
 
 .modal-body {
@@ -111,8 +111,8 @@
 }
 
 .modal-footer {
-  background-color: #f8f9fa;
-  border-top: 1px solid #dee2e6;
+  background-color: var(--app-gray-100);
+  border-top: 1px solid var(--app-gray-300);
   border-radius: 0 0 8px 8px;
 }
 
@@ -120,7 +120,7 @@
 .form-control,
 .form-select {
   border-radius: 6px;
-  border: 1px solid #ced4da;
+  border: 1px solid var(--app-gray-400);
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
@@ -132,14 +132,14 @@
 
 .form-control.is-invalid,
 .form-select.is-invalid {
-  border-color: #dc3545;
-  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+  border-color: var(--app-danger);
+  box-shadow: 0 0 0 0.2rem rgba(var(--app-danger-rgb), 0.25);
 }
 
 .invalid-feedback {
   display: block;
   font-size: 0.875rem;
-  color: #dc3545;
+  color: var(--app-danger);
   margin-top: 0.25rem;
 }
 
@@ -161,8 +161,8 @@
 }
 
 .btn-secondary {
-  background-color: #6c757d;
-  border-color: #6c757d;
+  background-color: var(--app-gray-600);
+  border-color: var(--app-gray-600);
 }
 
 .btn-secondary:hover {
@@ -177,11 +177,11 @@
 
 /* Text colors for consistency */
 .text-danger {
-  color: #dc3545 !important;
+  color: var(--app-danger) !important;
 }
 
 .text-muted {
-  color: #6c757d !important;
+  color: var(--app-gray-600) !important;
 }
 
 /* Badge colors matching Employee Management */
@@ -191,8 +191,8 @@
 }
 
 .bg-warning {
-  background-color: #ffc107 !important;
-  color: #212529;
+  background-color: var(--app-warning) !important;
+  color: var(--app-gray-900);
 }
 
 .bg-info {
@@ -201,17 +201,17 @@
 }
 
 .bg-light {
-  background-color: #f8f9fa !important;
-  color: #495057;
+  background-color: var(--app-gray-100) !important;
+  color: var(--app-gray-700);
 }
 
 .bg-secondary {
-  background-color: #6c757d !important;
+  background-color: var(--app-gray-600) !important;
   color: white;
 }
 
 .bg-danger {
-  background-color: #dc3545 !important;
+  background-color: var(--app-danger) !important;
   color: white;
 }
 

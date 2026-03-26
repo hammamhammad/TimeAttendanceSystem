@@ -15,7 +15,7 @@ import { SearchableSelectOption } from '../../../shared/components/searchable-se
       [filterFields]="filterFields()"
       [showAddButton]="showAddButton"
       [addButtonText]="addButtonText"
-      [searchPlaceholder]="'Search employees...'"
+      [searchPlaceholder]="i18n.t('employees.search_employees')"
       [refreshing]="refreshing"
       (search)="onSearch($event)"
       (filterChange)="onFilterChange($event)"
@@ -26,7 +26,7 @@ import { SearchableSelectOption } from '../../../shared/components/searchable-se
 })
 export class EmployeeFiltersComponent implements OnInit {
   private employeesService = inject(EmployeesService);
-  private i18n = inject(I18nService);
+  i18n = inject(I18nService);
 
   @Input() showAddButton = true;
   @Input() addButtonText = 'Add Employee';
@@ -81,12 +81,12 @@ export class EmployeeFiltersComponent implements OnInit {
 
     const employmentStatusOptions: SearchableSelectOption[] = [
       { value: '', label: this.i18n.t('common.all') },
-      { value: EmploymentStatus.FullTime.toString(), label: 'Full Time' },
-      { value: EmploymentStatus.PartTime.toString(), label: 'Part Time' },
-      { value: EmploymentStatus.Contract.toString(), label: 'Contract' },
-      { value: EmploymentStatus.Intern.toString(), label: 'Intern' },
-      { value: EmploymentStatus.Consultant.toString(), label: 'Consultant' },
-      { value: EmploymentStatus.Terminated.toString(), label: 'Terminated' }
+      { value: EmploymentStatus.FullTime.toString(), label: this.i18n.t('employees.employment_status.fulltime') },
+      { value: EmploymentStatus.PartTime.toString(), label: this.i18n.t('employees.employment_status.parttime') },
+      { value: EmploymentStatus.Contract.toString(), label: this.i18n.t('employees.employment_status.contract') },
+      { value: EmploymentStatus.Intern.toString(), label: this.i18n.t('employees.employment_status.intern') },
+      { value: EmploymentStatus.Consultant.toString(), label: this.i18n.t('employees.employment_status.consultant') },
+      { value: EmploymentStatus.Terminated.toString(), label: this.i18n.t('employees.employment_status.terminated') }
     ];
 
     const statusOptions: SearchableSelectOption[] = [
@@ -98,25 +98,25 @@ export class EmployeeFiltersComponent implements OnInit {
     this.filterFields.set([
       {
         key: 'branchId',
-        label: 'Branch',
+        label: this.i18n.t('employees.branch'),
         type: 'select',
         options: branchOptions
       },
       {
         key: 'departmentId',
-        label: 'Department',
+        label: this.i18n.t('employees.department'),
         type: 'select',
         options: departmentOptions
       },
       {
         key: 'employmentStatus',
-        label: 'Employment Status',
+        label: this.i18n.t('employees.employment_status.title'),
         type: 'select',
         options: employmentStatusOptions
       },
       {
         key: 'isActive',
-        label: 'Status',
+        label: this.i18n.t('common.status'),
         type: 'select',
         options: statusOptions
       }

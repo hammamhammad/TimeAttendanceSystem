@@ -1,8 +1,9 @@
 import { Component, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DatePipe, NgClass } from '@angular/common';
 import { ReportsService } from './reports.service';
 import { LeaveReportSummary, ReportFilter } from './reports.model';
+import { I18nService } from '../../core/i18n/i18n.service';
 
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 import { StatCardComponent } from '../../shared/components/stat-card/stat-card.component';
@@ -10,11 +11,12 @@ import { StatCardComponent } from '../../shared/components/stat-card/stat-card.c
 @Component({
   selector: 'app-leave-report',
   standalone: true,
-  imports: [CommonModule, FormsModule, PageHeaderComponent, StatCardComponent],
+  imports: [FormsModule, DatePipe, NgClass, PageHeaderComponent, StatCardComponent],
   templateUrl: './leave-report.html'
 })
 export class LeaveReportComponent {
   private reportsService = inject(ReportsService);
+  i18n = inject(I18nService);
 
   filter = signal<ReportFilter>({
     fromDate: new Date().toISOString().split('T')[0],

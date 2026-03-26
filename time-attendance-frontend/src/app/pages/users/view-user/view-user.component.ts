@@ -80,7 +80,8 @@ export class ViewUserComponent implements OnInit {
   }
 
   formatDate(dateString: string): string {
-    return new Date(dateString).toLocaleDateString();
+    const locale = this.i18n.getDateLocale();
+    return new Date(dateString).toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric' });
   }
 
   t(key: string): string {

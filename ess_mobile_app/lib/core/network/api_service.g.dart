@@ -96,7 +96,7 @@ class _ApiService implements ApiService {
     )
         .compose(
           _dio.options,
-          '/api/v1/auth/refresh-token',
+          '/api/v1/auth/refresh',
           queryParameters: queryParameters,
           data: _data,
         )

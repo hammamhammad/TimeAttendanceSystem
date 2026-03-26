@@ -44,9 +44,14 @@ export class AttendanceComponent implements OnInit {
     }
 
     const chartData = {
-      labels: ['Present', 'Absent', 'Late', 'Overtime'],
+      labels: [
+        this.i18nService.t('attendance.status.present'),
+        this.i18nService.t('attendance.status.absent'),
+        this.i18nService.t('attendance.status.late'),
+        this.i18nService.t('attendance.status.overtime')
+      ],
       datasets: [{
-        label: 'Today\'s Attendance',
+        label: this.i18nService.t('attendance.dashboard_cards.todays_attendance'),
         data: [stats.presentEmployees, stats.absentEmployees, stats.lateEmployees, stats.overtimeEmployees],
         backgroundColor: ['#198754', '#dc3545', '#ffc107', '#0d6efd'],
         borderWidth: 2
@@ -67,7 +72,7 @@ export class AttendanceComponent implements OnInit {
       labels: weeklyTrend.map((d: any) => this.formatDateLabel(d.date)),
       datasets: [
         {
-          label: 'Present',
+          label: this.i18nService.t('attendance.status.present'),
           data: weeklyTrend.map(d => d.presentEmployees),
           backgroundColor: '#198754',
           borderColor: '#198754',
@@ -75,7 +80,7 @@ export class AttendanceComponent implements OnInit {
           fill: false
         },
         {
-          label: 'Absent',
+          label: this.i18nService.t('attendance.status.absent'),
           data: weeklyTrend.map(d => d.absentEmployees),
           backgroundColor: '#dc3545',
           borderColor: '#dc3545',
@@ -95,15 +100,15 @@ export class AttendanceComponent implements OnInit {
 
     return [
       {
-        title: 'Total Employees',
+        title: this.i18nService.t('attendance.dashboard_cards.total_employees'),
         value: stats.totalEmployees,
         icon: 'fa-users',
         color: 'primary',
         link: '/employees',
-        actionLabel: 'View All'
+        actionLabel: this.i18nService.t('attendance.dashboard_cards.view_all')
       },
       {
-        title: 'Present Today',
+        title: this.i18nService.t('attendance.dashboard_cards.present_today'),
         value: stats.presentEmployees,
         icon: 'fa-user-check',
         color: 'success',
@@ -111,11 +116,11 @@ export class AttendanceComponent implements OnInit {
         trend: {
           value: 5.2,
           isPositive: true,
-          label: 'vs yesterday'
+          label: this.i18nService.t('attendance.dashboard_cards.vs_yesterday')
         }
       },
       {
-        title: 'Absent Today',
+        title: this.i18nService.t('attendance.dashboard_cards.absent_today'),
         value: stats.absentEmployees,
         icon: 'fa-user-times',
         color: 'danger',
@@ -123,33 +128,33 @@ export class AttendanceComponent implements OnInit {
         trend: {
           value: 2.1,
           isPositive: false,
-          label: 'vs yesterday'
+          label: this.i18nService.t('attendance.dashboard_cards.vs_yesterday')
         }
       },
       {
-        title: 'Late Arrivals',
+        title: this.i18nService.t('attendance.dashboard_cards.late_arrivals'),
         value: stats.lateEmployees,
         icon: 'fa-clock',
         color: 'warning',
         link: '/attendance/reports?status=late',
-        actionLabel: 'View Details'
+        actionLabel: this.i18nService.t('attendance.dashboard_cards.view_details')
       },
       {
-        title: 'Overtime Workers',
+        title: this.i18nService.t('attendance.dashboard_cards.overtime_workers'),
         value: stats.overtimeEmployees,
         icon: 'fa-business-time',
         color: 'info',
-        subtitle: `${this.formatDuration(stats.totalOvertimeHours)} total`
+        subtitle: `${this.formatDuration(stats.totalOvertimeHours)} ${this.i18nService.t('attendance.dashboard_cards.total')}`
       },
       {
-        title: 'Attendance Rate',
+        title: this.i18nService.t('attendance.dashboard_cards.attendance_rate'),
         value: `${Math.round(stats.attendanceRate)}%`,
         icon: 'fa-percentage',
         color: stats.attendanceRate >= 90 ? 'success' : stats.attendanceRate >= 80 ? 'warning' : 'danger',
         trend: {
           value: 1.8,
           isPositive: true,
-          label: 'this month'
+          label: this.i18nService.t('attendance.dashboard_cards.this_month')
         }
       }
     ];
@@ -208,9 +213,9 @@ export class AttendanceComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading dashboard data:', error);
-        this.error.set('Failed to load dashboard data');
+        this.error.set(this.i18nService.t('attendance.dashboard_cards.failed_to_load_dashboard_data'));
         this.loading.set(false);
-        this.notificationService.error('Failed to load attendance dashboard');
+        this.notificationService.error(this.i18nService.t('attendance.dashboard_cards.failed_to_load_dashboard'));
       }
     });
   }
@@ -221,7 +226,8 @@ export class AttendanceComponent implements OnInit {
    */
   private formatDateLabel(dateString: string): string {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const locale = this.i18nService.getDateLocale();
+    return date.toLocaleDateString(locale, { month: 'short', day: 'numeric' });
   }
 
   /**

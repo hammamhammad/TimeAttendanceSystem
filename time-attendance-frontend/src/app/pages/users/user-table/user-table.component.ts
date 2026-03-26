@@ -23,8 +23,8 @@ import { BadgeListComponent } from '../../../shared/components/badge-list/badge-
       [totalItems]="totalItems"
       [pageSize]="pageSize"
       [allowSelection]="true"
-      [emptyMessage]="'No users found'"
-      [emptyTitle]="'No Users'"
+      [emptyMessage]="i18n.t('users.no_users_found')"
+      [emptyTitle]="i18n.t('users.no_users')"
       (actionClick)="onActionClick($event)"
       (pageChange)="onPageChange($event)"
       (pageSizeChange)="onPageSizeChange($event)"
@@ -63,7 +63,7 @@ import { BadgeListComponent } from '../../../shared/components/badge-list/badge-
             <div>
               <app-badge-list
                 [items]="getRoleBadges(user.roles)"
-                [emptyMessage]="'No roles assigned'">
+                [emptyMessage]="i18n.t('users.no_roles')">
               </app-badge-list>
             </div>
           }
@@ -72,7 +72,7 @@ import { BadgeListComponent } from '../../../shared/components/badge-list/badge-
             <span>
               <app-status-badge
                 [status]="user.isActive ? 'active' : 'inactive'"
-                [label]="user.isActive ? 'Active' : 'Inactive'"
+                [label]="user.isActive ? i18n.t('common.active') : i18n.t('common.inactive')"
                 [showIcon]="true">
               </app-status-badge>
             </span>
@@ -82,7 +82,7 @@ import { BadgeListComponent } from '../../../shared/components/badge-list/badge-
             <span>
               <app-status-badge
                 [status]="isUserLocked(user.lockoutEndUtc) ? 'warning' : 'success'"
-                [label]="isUserLocked(user.lockoutEndUtc) ? 'Locked' : 'Unlocked'"
+                [label]="isUserLocked(user.lockoutEndUtc) ? i18n.t('users.locked') : i18n.t('users.unlocked')"
                 [icon]="isUserLocked(user.lockoutEndUtc) ? 'fa-lock' : 'fa-unlock'"
                 [showIcon]="true">
               </app-status-badge>
@@ -93,7 +93,7 @@ import { BadgeListComponent } from '../../../shared/components/badge-list/badge-
             <span>
               <app-status-badge
                 [status]="user.mustChangePassword ? 'warning' : 'success'"
-                [label]="user.mustChangePassword ? 'Must Change' : 'OK'"
+                [label]="user.mustChangePassword ? i18n.t('users.must_change') : i18n.t('users.password_ok')"
                 [icon]="user.mustChangePassword ? 'fa-key' : 'fa-check'"
                 [showIcon]="true">
               </app-status-badge>
@@ -112,7 +112,7 @@ import { BadgeListComponent } from '../../../shared/components/badge-list/badge-
                 <span>{{ formatDate(user.lastLoginAt) }}</span>
               }
               @if (!user.lastLoginAt) {
-                <span class="text-muted">Never</span>
+                <span class="text-muted">{{ i18n.t('users.never_logged_in') }}</span>
               }
             </span>
           }
@@ -138,7 +138,7 @@ import { BadgeListComponent } from '../../../shared/components/badge-list/badge-
   `]
 })
 export class UserTableComponent {
-  private i18n = inject(I18nService);
+  i18n = inject(I18nService);
   private permissionService = inject(PermissionService);
 
   @Input() users: UserDto[] = [];
@@ -157,16 +157,18 @@ export class UserTableComponent {
   @Output() selectionChange = new EventEmitter<UserDto[]>();
   @Output() sortChange = new EventEmitter<{column: string, direction: 'asc' | 'desc'}>();
 
-  columns: TableColumn[] = [
-    { key: 'user', label: 'User', width: '250px', sortable: true },
-    { key: 'username', label: 'Username', width: '150px', sortable: true },
-    { key: 'roles', label: 'Roles', width: '200px' },
-    { key: 'status', label: 'Status', width: '100px', align: 'center', sortable: true },
-    { key: 'lockStatus', label: 'Access', width: '100px', align: 'center' },
-    { key: 'mustChangePassword', label: 'Password Status', width: '130px', align: 'center' },
-    { key: 'created', label: 'Created', width: '120px', sortable: true },
-    { key: 'lastLogin', label: 'Last Login', width: '120px', sortable: true }
-  ];
+  get columns(): TableColumn[] {
+    return [
+      { key: 'user', label: this.i18n.t('users.columns.user'), width: '250px', sortable: true },
+      { key: 'username', label: this.i18n.t('users.columns.username'), width: '150px', sortable: true },
+      { key: 'roles', label: this.i18n.t('users.columns.roles'), width: '200px' },
+      { key: 'status', label: this.i18n.t('users.columns.status'), width: '100px', align: 'center', sortable: true },
+      { key: 'lockStatus', label: this.i18n.t('users.columns.access'), width: '100px', align: 'center' },
+      { key: 'mustChangePassword', label: this.i18n.t('users.columns.password_status'), width: '130px', align: 'center' },
+      { key: 'created', label: this.i18n.t('users.columns.created'), width: '120px', sortable: true },
+      { key: 'lastLogin', label: this.i18n.t('users.columns.last_login'), width: '120px', sortable: true }
+    ];
+  }
 
   get actions(): TableAction[] {
     const actions: TableAction[] = [];
@@ -174,7 +176,7 @@ export class UserTableComponent {
     if (this.permissionService.has(`${PermissionResources.USER}.${PermissionActions.READ}`)) {
       actions.push({
         key: 'view',
-        label: 'View',
+        label: this.i18n.t('common.view'),
         icon: 'fa-eye',
         color: 'info'
       });
@@ -183,7 +185,7 @@ export class UserTableComponent {
     if (this.permissionService.has(`${PermissionResources.USER}.${PermissionActions.UPDATE}`)) {
       actions.push({
         key: 'edit',
-        label: 'Edit',
+        label: this.i18n.t('common.edit'),
         icon: 'fa-edit',
         color: 'primary',
         condition: (user: UserDto) => this.canEditUser(user)
@@ -191,7 +193,7 @@ export class UserTableComponent {
 
       actions.push({
         key: 'manageRoles',
-        label: 'Manage Roles',
+        label: this.i18n.t('users.manage_roles'),
         icon: 'fa-user-tag',
         color: 'warning',
         condition: (user: UserDto) => this.canEditUser(user)
@@ -201,7 +203,7 @@ export class UserTableComponent {
     if (this.permissionService.has(`${PermissionResources.USER}.${PermissionActions.DELETE}`)) {
       actions.push({
         key: 'delete',
-        label: 'Delete',
+        label: this.i18n.t('common.delete'),
         icon: 'fa-trash',
         color: 'danger',
         condition: (user: UserDto) => this.canDeleteUser(user)
@@ -277,7 +279,7 @@ export class UserTableComponent {
   }
 
   formatDate(dateString: string | undefined): string {
-    if (!dateString) return 'N/A';
+    if (!dateString) return this.i18n.t('common.notAvailable');
 
     const date = new Date(dateString);
 
@@ -286,7 +288,7 @@ export class UserTableComponent {
       return 'Invalid Date';
     }
 
-    return date.toLocaleDateString(this.i18n.getCurrentLocale(), {
+    return date.toLocaleDateString(this.i18n.getDateLocale(), {
       year: 'numeric',
       month: 'short',
       day: 'numeric'

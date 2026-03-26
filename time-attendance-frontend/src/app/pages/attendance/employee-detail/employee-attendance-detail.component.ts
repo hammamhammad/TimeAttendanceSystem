@@ -574,7 +574,8 @@ export class EmployeeAttendanceDetailComponent implements OnInit, OnDestroy {
    */
   formatDate(date: string): string {
     try {
-      return new Date(date).toLocaleDateString();
+      const locale = this.i18n.getDateLocale();
+      return new Date(date).toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric' });
     } catch {
       return date;
     }
@@ -597,7 +598,8 @@ export class EmployeeAttendanceDetailComponent implements OnInit, OnDestroy {
       if (timeToFormat.includes(':')) {
         const date = new Date(`1970-01-01T${timeToFormat}`);
         if (!isNaN(date.getTime())) {
-          return date.toLocaleTimeString('en-US', {
+          const locale = this.i18n.getDateLocale();
+          return date.toLocaleTimeString(locale, {
             hour: '2-digit',
             minute: '2-digit',
             hour12: false

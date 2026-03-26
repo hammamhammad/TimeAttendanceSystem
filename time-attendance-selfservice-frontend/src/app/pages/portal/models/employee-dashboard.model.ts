@@ -45,6 +45,10 @@ export interface Activity {
   timestamp: Date;
   icon: string;
   variant: StatusVariant;
+  startDate?: Date;
+  endDate?: Date;
+  workingHours?: number;
+  statusLabel?: string;
 }
 
 /**

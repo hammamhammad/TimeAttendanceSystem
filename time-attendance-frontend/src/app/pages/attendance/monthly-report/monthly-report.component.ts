@@ -92,9 +92,14 @@ export class MonthlyReportComponent implements OnInit {
     if (!stats) return { labels: [], datasets: [] };
 
     return {
-      labels: ['Present Days', 'Absent Days', 'Late Days', 'Overtime Days'],
+      labels: [
+        this.i18nService.t('attendance.monthly_report_details.present_days'),
+        this.i18nService.t('attendance.monthly_report_details.absent_days'),
+        this.i18nService.t('attendance.monthly_report_details.late_days'),
+        this.i18nService.t('attendance.monthly_report_details.overtime_days')
+      ],
       datasets: [{
-        label: 'Monthly Attendance Overview',
+        label: this.i18nService.t('attendance.monthly_report_details.monthly_attendance_overview'),
         data: [
           stats.totalPresentDays,
           stats.totalAbsentDays,
@@ -116,7 +121,7 @@ export class MonthlyReportComponent implements OnInit {
     return {
       labels: dailyData.map((d: any) => new Date(d.date).getDate().toString()),
       datasets: [{
-        label: 'Daily Overtime Hours',
+        label: this.i18nService.t('attendance.monthly_report_details.daily_overtime_hours'),
         data: dailyData.map((d: any) => d.totalOvertimeHours),
         backgroundColor: '#0d6efd',
         borderColor: '#0d6efd',
@@ -135,14 +140,14 @@ export class MonthlyReportComponent implements OnInit {
 
     return [
       {
-        title: 'Total Employees',
+        title: this.i18nService.t('attendance.dashboard_cards.total_employees'),
         value: stats.totalEmployees,
         icon: 'fa-users',
         color: 'primary',
-        subtitle: 'In selected period'
+        subtitle: this.i18nService.t('attendance.monthly_report_details.in_selected_period')
       },
       {
-        title: 'Average Attendance Rate',
+        title: this.i18nService.t('attendance.monthly_report_details.average_attendance_rate'),
         value: `${Math.round(stats.averageAttendanceRate)}%`,
         icon: 'fa-percentage',
         color: stats.averageAttendanceRate >= 90 ? 'success' : stats.averageAttendanceRate >= 80 ? 'warning' : 'danger',
@@ -150,57 +155,44 @@ export class MonthlyReportComponent implements OnInit {
         trend: {
           value: 2.3,
           isPositive: true,
-          label: 'vs last month'
+          label: this.i18nService.t('attendance.monthly_report_details.vs_last_month')
         }
       },
       {
-        title: 'Total Overtime Hours',
+        title: this.i18nService.t('attendance.monthly_report_details.total_overtime_hours'),
         value: `${Math.round(stats.totalOvertimeHours)}h`,
         icon: 'fa-business-time',
         color: 'info',
-        subtitle: `${Math.round(stats.totalOvertimeHours / stats.totalEmployees)}h avg per employee`
+        subtitle: `${Math.round(stats.totalOvertimeHours / stats.totalEmployees)}h ${this.i18nService.t('attendance.monthly_report_details.avg_per_employee')}`
       },
       {
-        title: 'Perfect Attendance',
+        title: this.i18nService.t('attendance.perfect_attendance'),
         value: stats.perfectAttendanceEmployees,
         icon: 'fa-award',
         color: 'success',
         percentage: stats.totalEmployees > 0 ? (stats.perfectAttendanceEmployees / stats.totalEmployees) * 100 : 0,
-        subtitle: 'Employees with no absences'
+        subtitle: this.i18nService.t('attendance.monthly_report_details.employees_with_no_absences')
       },
       {
-        title: 'Late Arrivals',
+        title: this.i18nService.t('attendance.dashboard_cards.late_arrivals'),
         value: stats.totalLateDays,
         icon: 'fa-clock',
         color: 'warning',
-        subtitle: `${Math.round(stats.totalLateDays / workingDays)} avg per day`
+        subtitle: `${Math.round(stats.totalLateDays / workingDays)} ${this.i18nService.t('attendance.monthly_report_details.avg_per_day')}`
       },
       {
-        title: 'Absent Days',
+        title: this.i18nService.t('attendance.monthly_report_details.absent_days'),
         value: stats.totalAbsentDays,
         icon: 'fa-user-times',
         color: 'danger',
         percentage: workingDays > 0 ? ((workingDays * stats.totalEmployees - stats.totalPresentDays) / (workingDays * stats.totalEmployees)) * 100 : 0,
-        subtitle: `${Math.round(stats.totalAbsentDays / workingDays)} avg per day`
+        subtitle: `${Math.round(stats.totalAbsentDays / workingDays)} ${this.i18nService.t('attendance.monthly_report_details.avg_per_day')}`
       }
     ];
   });
 
   // Table configuration
-  tableColumns = [
-    { key: 'employeeName', label: 'Employee', sortable: true },
-    { key: 'employeeNumber', label: 'Number', sortable: true },
-    { key: 'department', label: 'Department', sortable: true },
-    { key: 'totalWorkingDays', label: 'Working Days', sortable: true },
-    { key: 'presentDays', label: 'Present', sortable: true },
-    { key: 'absentDays', label: 'Absent', sortable: true },
-    { key: 'lateDays', label: 'Late', sortable: true },
-    { key: 'overtimeDays', label: 'Overtime Days', sortable: true },
-    { key: 'totalWorkingHours', label: 'Total Hours', sortable: true },
-    { key: 'totalOvertimeHours', label: 'Overtime Hours', sortable: true },
-    { key: 'attendanceRate', label: 'Rate %', sortable: true },
-    { key: 'actions', label: 'Actions', sortable: false }
-  ];
+  tableColumns: any[] = [];
 
   // Constants for template
   AttendanceStatus = AttendanceStatus;
@@ -214,9 +206,27 @@ export class MonthlyReportComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.initTableColumns();
     this.createFilterForm();
     this.setupFilterConfig();
     this.loadMonthlyReport();
+  }
+
+  private initTableColumns(): void {
+    this.tableColumns = [
+      { key: 'employeeName', label: this.i18nService.t('attendance.monthly_report_details.col_employee'), sortable: true },
+      { key: 'employeeNumber', label: this.i18nService.t('attendance.monthly_report_details.col_number'), sortable: true },
+      { key: 'department', label: this.i18nService.t('attendance.monthly_report_details.col_department'), sortable: true },
+      { key: 'totalWorkingDays', label: this.i18nService.t('attendance.monthly_report_details.col_working_days'), sortable: true },
+      { key: 'presentDays', label: this.i18nService.t('attendance.monthly_report_details.col_present'), sortable: true },
+      { key: 'absentDays', label: this.i18nService.t('attendance.monthly_report_details.col_absent'), sortable: true },
+      { key: 'lateDays', label: this.i18nService.t('attendance.monthly_report_details.col_late'), sortable: true },
+      { key: 'overtimeDays', label: this.i18nService.t('attendance.monthly_report_details.col_overtime_days'), sortable: true },
+      { key: 'totalWorkingHours', label: this.i18nService.t('attendance.monthly_report_details.col_total_hours'), sortable: true },
+      { key: 'totalOvertimeHours', label: this.i18nService.t('attendance.monthly_report_details.col_overtime_hours'), sortable: true },
+      { key: 'attendanceRate', label: this.i18nService.t('attendance.monthly_report_details.col_rate'), sortable: true },
+      { key: 'actions', label: this.i18nService.t('common.actions'), sortable: false }
+    ];
   }
 
   private createFilterForm(): void {
@@ -269,9 +279,9 @@ export class MonthlyReportComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading monthly report:', error);
-        this.error.set('Failed to load monthly report');
+        this.error.set(this.i18nService.t('attendance.monthly_report_details.failed_to_load'));
         this.loading.set(false);
-        this.notificationService.error('Failed to load monthly report');
+        this.notificationService.error(this.i18nService.t('attendance.monthly_report_details.failed_to_load'));
       }
     });
   }
@@ -387,7 +397,7 @@ export class MonthlyReportComponent implements OnInit {
     // Mock export functionality
     setTimeout(() => {
       this.exporting.set(false);
-      this.notificationService.success('Monthly report exported successfully');
+      this.notificationService.success(this.i18nService.t('attendance.monthly_report_details.exported_excel'));
     }, 2000);
   }
 
@@ -397,16 +407,17 @@ export class MonthlyReportComponent implements OnInit {
     // Mock export functionality
     setTimeout(() => {
       this.exporting.set(false);
-      this.notificationService.success('Monthly report exported to PDF successfully');
+      this.notificationService.success(this.i18nService.t('attendance.monthly_report_details.exported_pdf'));
     }, 2000);
   }
 
   getMonthName(month: number): string {
-    const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
+    const monthKeys = [
+      'january', 'february', 'march', 'april', 'may', 'june',
+      'july', 'august', 'september', 'october', 'november', 'december'
     ];
-    return months[month - 1] || '';
+    const key = monthKeys[month - 1];
+    return key ? this.i18nService.t(`months.${key}`) : '';
   }
 
   getAttendanceRateClass(rate: number): string {
@@ -442,6 +453,6 @@ export class MonthlyReportComponent implements OnInit {
   }
 
   private exportEmployeeReport(employee: MonthlyEmployeeRecord): void {
-    this.notificationService.success(`Exporting report for ${employee.employeeName}`);
+    this.notificationService.success(`${this.i18nService.t('attendance.monthly_report_details.exporting_report_for')} ${employee.employeeName}`);
   }
 }

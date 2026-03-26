@@ -29,6 +29,9 @@ public class GetNfcTagByIdQueryHandler : BaseHandler<GetNfcTagByIdQuery, Result<
                 t.IsWriteProtected,
                 t.LockedAt,
                 t.IsActive,
+                t.Status,
+                t.LastScannedAt,
+                t.ScanCount,
                 t.CreatedAtUtc
             ))
             .FirstOrDefaultAsync(cancellationToken);

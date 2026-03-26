@@ -1,5 +1,6 @@
 using MediatR;
 using TimeAttendanceSystem.Application.Common;
+using TimeAttendanceSystem.Domain.Branches;
 
 namespace TimeAttendanceSystem.Application.NfcTags.Queries.GetNfcTags;
 
@@ -22,5 +23,8 @@ public record NfcTagDto(
     bool IsWriteProtected,
     DateTime? LockedAt,
     bool IsActive,
+    NfcTagStatus Status,
+    DateTime? LastScannedAt,
+    int ScanCount,
     DateTime CreatedAtUtc
 );

@@ -223,7 +223,7 @@ export class ViewExcusePolicyComponent implements OnInit, OnDestroy {
 
   formatDate(dateString: string): string {
     const date = new Date(dateString);
-    return date.toLocaleDateString(this.i18n.getCurrentLocale(), {
+    return date.toLocaleDateString(this.i18n.getDateLocale(), {
       year: 'numeric',
       month: 'long',
       day: 'numeric',

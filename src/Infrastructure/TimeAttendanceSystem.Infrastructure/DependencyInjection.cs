@@ -37,6 +37,7 @@ public static class DependencyInjection
         services.AddScoped<IAttendanceTransactionRepository, AttendanceTransactionRepository>();
         services.AddScoped<ISettingsRepository, SettingsRepository>();
         services.AddScoped<IInAppNotificationService, InAppNotificationService>();
+        services.AddScoped<INfcTagEncryptionService, NfcTagEncryptionService>();
 
         // Add Coravel for background jobs
         services.AddScheduler();

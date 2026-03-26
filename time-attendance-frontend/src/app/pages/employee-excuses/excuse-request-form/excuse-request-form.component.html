@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div class="container-fluid app-modern-form">
   <!-- Header -->
   <app-form-header [mode]="getFormMode()" [title]="getPageTitle()" moduleName="employee-excuses"
     moduleRoute="employee-excuses" [entityId]="getExcuseId()" [loading]="saving()">
@@ -31,60 +31,71 @@
 
       <form [formGroup]="form" (ngSubmit)="onSubmit()" [class.pe-none]="noPolicyActive()">
         <!-- Required Information Section -->
-        <app-form-section [title]="i18n.t('employee_excuses.required_information')">
+        <app-form-section [title]="i18n.t('employee_excuses.required_information')" variant="modern">
           <div class="row g-3">
             <!-- Employee Selection -->
             <div class="col-md-6">
-              <label class="form-label">
-                {{ i18n.t('employee_excuses.employee') }}
-                <span class="text-danger">*</span>
-              </label>
-              <app-searchable-select [options]="employeeOptions()"
-                [placeholder]="i18n.t('employee_excuses.select_employee')" [searchable]="true" [clearable]="true"
-                [disabled]="noPolicyActive() || isEditMode()" formControlName="employeeId"
-                [class.is-invalid]="isFieldInvalid('employeeId')">
-              </app-searchable-select>
+              <div class="app-modern-field">
+                <label class="app-modern-label">
+                  {{ i18n.t('employee_excuses.employee') }}
+                  <span class="text-danger">*</span>
+                </label>
+                <app-searchable-select [options]="employeeOptions()"
+                  [placeholder]="i18n.t('employee_excuses.select_employee')" [searchable]="true" [clearable]="true"
+                  [disabled]="noPolicyActive() || isEditMode()" formControlName="employeeId"
+                  [class.is-invalid]="isFieldInvalid('employeeId')">
+                </app-searchable-select>
+              </div>
               @if (isFieldInvalid('employeeId')) {
-              <div class="invalid-feedback">{{ getFieldError('employeeId') }}</div>
+              <div class="invalid-feedback d-block">{{ getFieldError('employeeId') }}</div>
               }
             </div>
 
             <!-- Excuse Date -->
             <div class="col-md-6">
-              <label class="form-label">
-                {{ i18n.t('employee_excuses.excuse_date') }}
-                <span class="text-danger">*</span>
-              </label>
-              <input type="date" class="form-control" formControlName="excuseDate"
-                [class.is-invalid]="isFieldInvalid('excuseDate')">
+              <div class="form-floating">
+                <input type="date" class="form-control" id="excuseDate" formControlName="excuseDate"
+                  placeholder="{{ i18n.t('employee_excuses.excuse_date') }}"
+                  [class.is-invalid]="isFieldInvalid('excuseDate')">
+                <label for="excuseDate">
+                  {{ i18n.t('employee_excuses.excuse_date') }}
+                  <span class="text-danger">*</span>
+                </label>
+              </div>
               @if (isFieldInvalid('excuseDate')) {
-              <div class="invalid-feedback">{{ getFieldError('excuseDate') }}</div>
+              <div class="invalid-feedback d-block">{{ getFieldError('excuseDate') }}</div>
               }
             </div>
 
             <!-- Start Time -->
             <div class="col-md-6">
-              <label class="form-label">
-                {{ i18n.t('employee_excuses.start_time') }}
-                <span class="text-danger">*</span>
-              </label>
-              <input type="time" class="form-control" formControlName="startTime"
-                [class.is-invalid]="isFieldInvalid('startTime')">
+              <div class="form-floating">
+                <input type="time" class="form-control" id="startTime" formControlName="startTime"
+                  placeholder="{{ i18n.t('employee_excuses.start_time') }}"
+                  [class.is-invalid]="isFieldInvalid('startTime')">
+                <label for="startTime">
+                  {{ i18n.t('employee_excuses.start_time') }}
+                  <span class="text-danger">*</span>
+                </label>
+              </div>
               @if (isFieldInvalid('startTime')) {
-              <div class="invalid-feedback">{{ getFieldError('startTime') }}</div>
+              <div class="invalid-feedback d-block">{{ getFieldError('startTime') }}</div>
               }
             </div>
 
             <!-- End Time -->
             <div class="col-md-6">
-              <label class="form-label">
-                {{ i18n.t('employee_excuses.end_time') }}
-                <span class="text-danger">*</span>
-              </label>
-              <input type="time" class="form-control" formControlName="endTime"
-                [class.is-invalid]="isFieldInvalid('endTime')">
+              <div class="form-floating">
+                <input type="time" class="form-control" id="endTime" formControlName="endTime"
+                  placeholder="{{ i18n.t('employee_excuses.end_time') }}"
+                  [class.is-invalid]="isFieldInvalid('endTime')">
+                <label for="endTime">
+                  {{ i18n.t('employee_excuses.end_time') }}
+                  <span class="text-danger">*</span>
+                </label>
+              </div>
               @if (isFieldInvalid('endTime')) {
-              <div class="invalid-feedback">{{ getFieldError('endTime') }}</div>
+              <div class="invalid-feedback d-block">{{ getFieldError('endTime') }}</div>
               }
             </div>
 
@@ -103,31 +114,35 @@
 
             <!-- Excuse Type -->
             <div class="col-md-6">
-              <label class="form-label">
-                {{ i18n.t('employee_excuses.excuse_type') }}
-                <span class="text-danger">*</span>
-              </label>
-              <select class="form-select" formControlName="excuseType"
-                [class.is-invalid]="isFieldInvalid('excuseType')">
-                <option value="PersonalExcuse">{{ i18n.t('employee_excuses.personal') }}</option>
-                <option value="OfficialDuty">{{ i18n.t('employee_excuses.official') }}</option>
-              </select>
+              <div class="form-floating">
+                <select class="form-select" id="excuseType" formControlName="excuseType"
+                  [class.is-invalid]="isFieldInvalid('excuseType')">
+                  <option value="PersonalExcuse">{{ i18n.t('employee_excuses.personal') }}</option>
+                  <option value="OfficialDuty">{{ i18n.t('employee_excuses.official') }}</option>
+                </select>
+                <label for="excuseType">
+                  {{ i18n.t('employee_excuses.excuse_type') }}
+                  <span class="text-danger">*</span>
+                </label>
+              </div>
               @if (isFieldInvalid('excuseType')) {
-              <div class="invalid-feedback">{{ getFieldError('excuseType') }}</div>
+              <div class="invalid-feedback d-block">{{ getFieldError('excuseType') }}</div>
               }
             </div>
 
             <!-- Reason -->
             <div class="col-12">
-              <label class="form-label">
-                {{ i18n.t('employee_excuses.reason') }}
-                <span class="text-danger">*</span>
-              </label>
-              <textarea class="form-control" rows="3" formControlName="reason"
-                [placeholder]="i18n.t('employee_excuses.reason_placeholder')"
-                [class.is-invalid]="isFieldInvalid('reason')" maxlength="500"></textarea>
+              <div class="form-floating">
+                <textarea class="form-control" id="reason" rows="3" formControlName="reason"
+                  placeholder="{{ i18n.t('employee_excuses.reason') }}"
+                  [class.is-invalid]="isFieldInvalid('reason')" maxlength="500"></textarea>
+                <label for="reason">
+                  {{ i18n.t('employee_excuses.reason') }}
+                  <span class="text-danger">*</span>
+                </label>
+              </div>
               @if (isFieldInvalid('reason')) {
-              <div class="invalid-feedback">{{ getFieldError('reason') }}</div>
+              <div class="invalid-feedback d-block">{{ getFieldError('reason') }}</div>
               }
               <div class="form-text">
                 {{ form.get('reason')?.value?.length || 0 }}/500 {{ i18n.t('common.characters') }}
@@ -137,31 +152,35 @@
         </app-form-section>
 
         <!-- Additional Information Section -->
-        <app-form-section [title]="i18n.t('employee_excuses.additional_information')">
+        <app-form-section [title]="i18n.t('employee_excuses.additional_information')" variant="modern">
           <div class="row g-3">
             <!-- Approval Status -->
             <div class="col-md-6">
-              <label class="form-label">
-                {{ i18n.t('employee_excuses.status') }}
-                <span class="text-danger">*</span>
-              </label>
-              <select class="form-select" formControlName="approvalStatus"
-                [class.is-invalid]="isFieldInvalid('approvalStatus')">
-                <option value="Pending">{{ i18n.t('employee_excuses.status_pending') }}</option>
-                <option value="Approved">{{ i18n.t('employee_excuses.status_approved') }}</option>
-                <option value="Rejected">{{ i18n.t('employee_excuses.status_rejected') }}</option>
-                <option value="Cancelled">{{ i18n.t('employee_excuses.status_cancelled') }}</option>
-              </select>
+              <div class="form-floating">
+                <select class="form-select" id="approvalStatus" formControlName="approvalStatus"
+                  [class.is-invalid]="isFieldInvalid('approvalStatus')">
+                  <option value="Pending">{{ i18n.t('employee_excuses.status_pending') }}</option>
+                  <option value="Approved">{{ i18n.t('employee_excuses.status_approved') }}</option>
+                  <option value="Rejected">{{ i18n.t('employee_excuses.status_rejected') }}</option>
+                  <option value="Cancelled">{{ i18n.t('employee_excuses.status_cancelled') }}</option>
+                </select>
+                <label for="approvalStatus">
+                  {{ i18n.t('employee_excuses.status') }}
+                  <span class="text-danger">*</span>
+                </label>
+              </div>
               @if (isFieldInvalid('approvalStatus')) {
-              <div class="invalid-feedback">{{ getFieldError('approvalStatus') }}</div>
+              <div class="invalid-feedback d-block">{{ getFieldError('approvalStatus') }}</div>
               }
             </div>
 
             <!-- Reviewer Comments -->
             <div class="col-md-6">
-              <label class="form-label">{{ i18n.t('employee_excuses.reviewer_comments') }}</label>
-              <textarea class="form-control" rows="3" formControlName="reviewerComments"
-                [placeholder]="i18n.t('employee_excuses.reviewer_comments_placeholder')" maxlength="1000"></textarea>
+              <div class="form-floating">
+                <textarea class="form-control" id="reviewerComments" rows="3" formControlName="reviewerComments"
+                  placeholder="{{ i18n.t('employee_excuses.reviewer_comments') }}" maxlength="1000"></textarea>
+                <label for="reviewerComments">{{ i18n.t('employee_excuses.reviewer_comments') }}</label>
+              </div>
               <div class="form-text">
                 {{ form.get('reviewerComments')?.value?.length || 0 }}/1000 {{ i18n.t('common.characters') }}
               </div>
@@ -223,7 +242,7 @@
         </div>
 
         <!-- Form Actions -->
-        <div class="d-flex justify-content-end gap-2">
+        <div class="app-form-actions">
           <button type="button" class="btn btn-outline-secondary" (click)="onCancel()" [disabled]="saving()">
             <i class="fa-solid fa-times me-2"></i>
             {{ i18n.t('common.cancel') }}

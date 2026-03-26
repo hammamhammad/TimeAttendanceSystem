@@ -28,6 +28,7 @@ class AppLocalizations {
   String get submit => isArabic ? 'إرسال' : 'Submit';
   String get next => isArabic ? 'التالي' : 'Next';
   String get back => isArabic ? 'رجوع' : 'Back';
+  String get pressBackToExit => isArabic ? 'اضغط مرة أخرى للخروج' : 'Press back again to exit';
   String get done => isArabic ? 'تم' : 'Done';
   
   // Tenant Discovery
@@ -118,13 +119,49 @@ class AppLocalizations {
   String get profile => isArabic ? 'الملف الشخصي' : 'Profile';
   String get settings => isArabic ? 'الإعدادات' : 'Settings';
   String get language => isArabic ? 'اللغة' : 'Language';
-  String get enableBiometric => isArabic 
-      ? 'تفعيل البصمة' 
+  String get enableBiometric => isArabic
+      ? 'تفعيل البصمة'
       : 'Enable Biometric';
   String get logout => isArabic ? 'تسجيل الخروج' : 'Logout';
-  String get logoutConfirm => isArabic 
-      ? 'هل تريد تسجيل الخروج؟' 
+  String get logoutConfirm => isArabic
+      ? 'هل تريد تسجيل الخروج؟'
       : 'Are you sure you want to logout?';
+
+  // Requests Hub
+  String get requests => isArabic ? 'الطلبات' : 'Requests';
+  String get leaveRequests => isArabic ? 'طلبات الإجازة' : 'Leave Requests';
+  String get leaveRequestsDesc => isArabic
+      ? 'إدارة طلبات الإجازات والعطل'
+      : 'Manage your vacation and leave requests';
+  String get excuseRequests => isArabic ? 'طلبات الاستئذان' : 'Excuse Requests';
+  String get excuseRequestsDesc => isArabic
+      ? 'تقديم طلبات التأخر أو المغادرة المبكرة'
+      : 'Submit late arrival or early departure excuses';
+  String get remoteWork => isArabic ? 'العمل عن بعد' : 'Remote Work';
+  String get remoteWorkDesc => isArabic
+      ? 'طلب العمل من المنزل أو موقع بعيد'
+      : 'Request to work from home or remote location';
+  String get attendanceCorrections => isArabic ? 'تصحيحات الحضور' : 'Attendance Corrections';
+  String get attendanceCorrectionsDesc => isArabic
+      ? 'طلب تصحيح تسجيل الحضور أو الانصراف المفقود'
+      : 'Request corrections for missed check-in/out';
+  String get mySchedule => isArabic ? 'جدول العمل' : 'My Schedule';
+  String get myScheduleDesc => isArabic
+      ? 'عرض جدول العمل وتفاصيل الورديات'
+      : 'View your work schedule and shift details';
+
+  // Edit requests
+  String get edit => isArabic ? 'تعديل' : 'Edit';
+  String get editLeave => isArabic ? 'تعديل طلب الإجازة' : 'Edit Leave Request';
+  String get editExcuse => isArabic ? 'تعديل طلب الاستئذان' : 'Edit Excuse Request';
+  String get editRemoteWork => isArabic ? 'تعديل طلب العمل عن بعد' : 'Edit Remote Work Request';
+  String get updateRequest => isArabic ? 'تحديث الطلب' : 'Update Request';
+  String get requestUpdated => isArabic ? 'تم تحديث الطلب بنجاح' : 'Request updated successfully';
+
+  // Manager
+  String get managerDashboard => isArabic ? 'لوحة المدير' : 'Manager Dashboard';
+  String get teamMembers => isArabic ? 'أعضاء الفريق' : 'Team Members';
+  String get pendingApprovals => isArabic ? 'الموافقات المعلقة' : 'Pending Approvals';
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

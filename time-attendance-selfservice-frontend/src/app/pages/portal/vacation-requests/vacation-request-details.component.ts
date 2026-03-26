@@ -352,7 +352,8 @@ export class PortalVacationRequestDetailsComponent implements OnInit {
 
   private formatDate(date: Date | string): string {
     const d = typeof date === 'string' ? new Date(date) : date;
-    return d.toLocaleDateString('en-US', {
+    const locale = this.i18n.getCurrentLocale() === 'ar' ? 'ar-u-nu-latn' : 'en-US';
+    return d.toLocaleDateString(locale, {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
@@ -362,7 +363,7 @@ export class PortalVacationRequestDetailsComponent implements OnInit {
   formatDateTime(date: Date | string): string {
     const d = typeof date === 'string' ? new Date(date) : date;
     // Use toLocaleString with locale from i18n service for consistent display
-    return d.toLocaleString(this.i18n.getCurrentLocale() === 'ar' ? 'ar-SA' : 'en-US', {
+    return d.toLocaleString(this.i18n.getCurrentLocale() === 'ar' ? 'ar-u-nu-latn' : 'en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',

@@ -21,7 +21,7 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
       [totalPages]="totalPages"
       [totalItems]="totalItems"
       [pageSize]="pageSize"
-      [emptyMessage]="'No employees found'"
+      [emptyMessage]="i18n.t('employees.no_employees_found')"
       (actionClick)="onActionClick($event)"
       (pageChange)="onPageChange($event)"
       (pageSizeChange)="onPageSizeChange($event)"
@@ -86,7 +86,7 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
             <span>
               <app-status-badge
                 [status]="employee.isActive ? 'active' : 'inactive'"
-                [label]="employee.isActive ? 'Active' : 'Inactive'"
+                [label]="employee.isActive ? i18n.t('common.active') : i18n.t('common.inactive')"
                 [showIcon]="true">
               </app-status-badge>
             </span>
@@ -104,7 +104,7 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
                 <div>{{ employee.currentShiftName }}</div>
               }
               @if (!employee.currentShiftName) {
-                <span class="text-muted">No shift assigned</span>
+                <span class="text-muted">{{ i18n.t('employees.no_shift_assigned') }}</span>
               }
             </div>
           }
@@ -130,7 +130,7 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
   `]
 })
 export class EmployeeTableComponent {
-  private i18n = inject(I18nService);
+  i18n = inject(I18nService);
   private permissionService = inject(PermissionService);
 
   @Input() employees: EmployeeDto[] = [];
@@ -149,78 +149,80 @@ export class EmployeeTableComponent {
   @Output() selectionChange = new EventEmitter<EmployeeDto[]>();
   @Output() sortChange = new EventEmitter<{column: string, direction: 'asc' | 'desc'}>();
 
-  columns: TableColumn[] = [
-    {
-      key: 'name',
-      label: 'Employee',
-      width: '250px',
-      sortable: true,
-      priority: 'high',
-      mobileLabel: 'Employee'
-    },
-    {
-      key: 'employeeCode',
-      label: 'Code',
-      width: '100px',
-      sortable: true,
-      priority: 'high',
-      mobileLabel: 'Code'
-    },
-    {
-      key: 'department',
-      label: 'Department',
-      width: '200px',
-      sortable: true,
-      priority: 'medium',
-      hideOnMobile: false,
-      mobileLabel: 'Dept'
-    },
-    {
-      key: 'employmentStatus',
-      label: 'Employment',
-      width: '120px',
-      align: 'center',
-      sortable: true,
-      priority: 'low',
-      hideOnMobile: true,
-      mobileLabel: 'Status'
-    },
-    {
-      key: 'workLocation',
-      label: 'Location',
-      width: '100px',
-      align: 'center',
-      priority: 'low',
-      hideOnMobile: true,
-      mobileLabel: 'Location'
-    },
-    {
-      key: 'shift',
-      label: 'Current Shift',
-      width: '150px',
-      priority: 'medium',
-      hideOnMobile: false,
-      mobileLabel: 'Shift'
-    },
-    {
-      key: 'hireDate',
-      label: 'Hire Date',
-      width: '120px',
-      sortable: true,
-      priority: 'low',
-      hideOnMobile: true,
-      mobileLabel: 'Hired'
-    },
-    {
-      key: 'status',
-      label: 'Status',
-      width: '100px',
-      align: 'center',
-      sortable: true,
-      priority: 'high',
-      mobileLabel: 'Status'
-    }
-  ];
+  get columns(): TableColumn[] {
+    return [
+      {
+        key: 'name',
+        label: this.i18n.t('employees.columns.employee'),
+        width: '250px',
+        sortable: true,
+        priority: 'high',
+        mobileLabel: this.i18n.t('employees.columns.employee')
+      },
+      {
+        key: 'employeeCode',
+        label: this.i18n.t('employees.columns.code'),
+        width: '100px',
+        sortable: true,
+        priority: 'high',
+        mobileLabel: this.i18n.t('employees.columns.code')
+      },
+      {
+        key: 'department',
+        label: this.i18n.t('employees.columns.department'),
+        width: '200px',
+        sortable: true,
+        priority: 'medium',
+        hideOnMobile: false,
+        mobileLabel: this.i18n.t('employees.columns.department')
+      },
+      {
+        key: 'employmentStatus',
+        label: this.i18n.t('employees.columns.employment'),
+        width: '120px',
+        align: 'center',
+        sortable: true,
+        priority: 'low',
+        hideOnMobile: true,
+        mobileLabel: this.i18n.t('employees.columns.status')
+      },
+      {
+        key: 'workLocation',
+        label: this.i18n.t('employees.columns.location'),
+        width: '100px',
+        align: 'center',
+        priority: 'low',
+        hideOnMobile: true,
+        mobileLabel: this.i18n.t('employees.columns.location')
+      },
+      {
+        key: 'shift',
+        label: this.i18n.t('employees.columns.current_shift'),
+        width: '150px',
+        priority: 'medium',
+        hideOnMobile: false,
+        mobileLabel: this.i18n.t('employees.columns.current_shift')
+      },
+      {
+        key: 'hireDate',
+        label: this.i18n.t('employees.columns.hire_date'),
+        width: '120px',
+        sortable: true,
+        priority: 'low',
+        hideOnMobile: true,
+        mobileLabel: this.i18n.t('employees.columns.hire_date')
+      },
+      {
+        key: 'status',
+        label: this.i18n.t('employees.columns.status'),
+        width: '100px',
+        align: 'center',
+        sortable: true,
+        priority: 'high',
+        mobileLabel: this.i18n.t('employees.columns.status')
+      }
+    ];
+  }
 
   get actions(): TableAction[] {
     const actions: TableAction[] = [];
@@ -228,7 +230,7 @@ export class EmployeeTableComponent {
     if (this.permissionService.has(`${PermissionResources.EMPLOYEE}.${PermissionActions.READ}`)) {
       actions.push({
         key: 'view',
-        label: 'View',
+        label: this.i18n.t('common.view'),
         icon: 'fa-eye',
         color: 'info'
       });
@@ -237,14 +239,14 @@ export class EmployeeTableComponent {
     if (this.permissionService.has(`${PermissionResources.EMPLOYEE}.${PermissionActions.UPDATE}`)) {
       actions.push({
         key: 'edit',
-        label: 'Edit',
+        label: this.i18n.t('common.edit'),
         icon: 'fa-edit',
         color: 'primary'
       });
 
       actions.push({
         key: 'changeShift',
-        label: 'Change Shift',
+        label: this.i18n.t('employees.change_shift'),
         icon: 'fa-clock',
         color: 'warning'
       });
@@ -253,7 +255,7 @@ export class EmployeeTableComponent {
     if (this.permissionService.has(`${PermissionResources.EMPLOYEE}.${PermissionActions.DELETE}`)) {
       actions.push({
         key: 'delete',
-        label: 'Delete',
+        label: this.i18n.t('common.delete'),
         icon: 'fa-trash',
         color: 'danger'
       });
@@ -303,59 +305,68 @@ export class EmployeeTableComponent {
     return first + last;
   }
 
-  getEmploymentStatusLabel(status: EmploymentStatus): string {
-    const statusMap: { [key: number]: string } = {
-      [EmploymentStatus.Active]: 'Active',
-      [EmploymentStatus.FullTime]: 'Full Time',
-      [EmploymentStatus.PartTime]: 'Part Time',
-      [EmploymentStatus.Contract]: 'Contract',
-      [EmploymentStatus.Intern]: 'Intern',
-      [EmploymentStatus.Consultant]: 'Consultant',
-      [EmploymentStatus.Terminated]: 'Terminated',
-      [EmploymentStatus.Inactive]: 'Inactive'
+  getEmploymentStatusLabel(status: EmploymentStatus | string): string {
+    const statusMap: { [key: string]: string } = {
+      [EmploymentStatus.Active]: this.i18n.t('employees.employment_status.active'),
+      [EmploymentStatus.FullTime]: this.i18n.t('employees.employment_status.fulltime'),
+      [EmploymentStatus.PartTime]: this.i18n.t('employees.employment_status.parttime'),
+      [EmploymentStatus.Contract]: this.i18n.t('employees.employment_status.contract'),
+      [EmploymentStatus.Intern]: this.i18n.t('employees.employment_status.intern'),
+      [EmploymentStatus.Consultant]: this.i18n.t('employees.employment_status.consultant'),
+      [EmploymentStatus.Terminated]: this.i18n.t('employees.employment_status.terminated'),
+      [EmploymentStatus.Inactive]: this.i18n.t('employees.employment_status.inactive'),
+      // String keys from API (JsonStringEnumConverter)
+      'Active': this.i18n.t('employees.employment_status.active'),
+      'FullTime': this.i18n.t('employees.employment_status.fulltime'),
+      'PartTime': this.i18n.t('employees.employment_status.parttime'),
+      'Contract': this.i18n.t('employees.employment_status.contract'),
+      'Intern': this.i18n.t('employees.employment_status.intern'),
+      'Consultant': this.i18n.t('employees.employment_status.consultant'),
+      'Terminated': this.i18n.t('employees.employment_status.terminated'),
+      'Inactive': this.i18n.t('employees.employment_status.inactive')
     };
-    return statusMap[status] || 'Unknown';
+    return statusMap[status] || this.i18n.t('common.unknown');
   }
 
-  getEmploymentStatusClass(status: EmploymentStatus): string {
-    const classMap: { [key: number]: string } = {
-      [EmploymentStatus.Active]: 'bg-success',
-      [EmploymentStatus.FullTime]: 'bg-success',
-      [EmploymentStatus.PartTime]: 'bg-info',
-      [EmploymentStatus.Contract]: 'bg-warning',
-      [EmploymentStatus.Intern]: 'bg-primary',
-      [EmploymentStatus.Consultant]: 'bg-light text-dark border',
-      [EmploymentStatus.Terminated]: 'bg-danger',
-      [EmploymentStatus.Inactive]: 'bg-light text-dark border'
+  getEmploymentStatusClass(status: EmploymentStatus | string): string {
+    const classMap: { [key: string]: string } = {
+      [EmploymentStatus.Active]: 'bg-success', 'Active': 'bg-success',
+      [EmploymentStatus.FullTime]: 'bg-success', 'FullTime': 'bg-success',
+      [EmploymentStatus.PartTime]: 'bg-info', 'PartTime': 'bg-info',
+      [EmploymentStatus.Contract]: 'bg-warning', 'Contract': 'bg-warning',
+      [EmploymentStatus.Intern]: 'bg-primary', 'Intern': 'bg-primary',
+      [EmploymentStatus.Consultant]: 'bg-light text-dark border', 'Consultant': 'bg-light text-dark border',
+      [EmploymentStatus.Terminated]: 'bg-danger', 'Terminated': 'bg-danger',
+      [EmploymentStatus.Inactive]: 'bg-light text-dark border', 'Inactive': 'bg-light text-dark border'
     };
     return classMap[status] || 'bg-light text-dark border';
   }
 
-  getEmploymentStatusBadgeStatus(status: EmploymentStatus): 'success' | 'info' | 'warning' | 'primary' | 'danger' | 'secondary' {
-    const statusMap: { [key: number]: 'success' | 'info' | 'warning' | 'primary' | 'danger' | 'secondary' } = {
-      [EmploymentStatus.Active]: 'success',
-      [EmploymentStatus.FullTime]: 'success',
-      [EmploymentStatus.PartTime]: 'info',
-      [EmploymentStatus.Contract]: 'warning',
-      [EmploymentStatus.Intern]: 'primary',
-      [EmploymentStatus.Consultant]: 'secondary',
-      [EmploymentStatus.Terminated]: 'danger',
-      [EmploymentStatus.Inactive]: 'secondary'
+  getEmploymentStatusBadgeStatus(status: EmploymentStatus | string): 'success' | 'info' | 'warning' | 'primary' | 'danger' | 'secondary' {
+    const statusMap: { [key: string]: 'success' | 'info' | 'warning' | 'primary' | 'danger' | 'secondary' } = {
+      [EmploymentStatus.Active]: 'success', 'Active': 'success',
+      [EmploymentStatus.FullTime]: 'success', 'FullTime': 'success',
+      [EmploymentStatus.PartTime]: 'info', 'PartTime': 'info',
+      [EmploymentStatus.Contract]: 'warning', 'Contract': 'warning',
+      [EmploymentStatus.Intern]: 'primary', 'Intern': 'primary',
+      [EmploymentStatus.Consultant]: 'secondary', 'Consultant': 'secondary',
+      [EmploymentStatus.Terminated]: 'danger', 'Terminated': 'danger',
+      [EmploymentStatus.Inactive]: 'secondary', 'Inactive': 'secondary'
     };
     return statusMap[status] || 'secondary';
   }
 
   getGenderLabel(gender: Gender): string {
-    return gender === Gender.Male ? 'Male' : 'Female';
+    return gender === Gender.Male ? this.i18n.t('employees.gender.male') : this.i18n.t('employees.gender.female');
   }
 
-  getWorkLocationLabel(type: WorkLocationType): string {
-    const typeMap = {
-      [WorkLocationType.OnSite]: 'On-site',
-      [WorkLocationType.Remote]: 'Remote',
-      [WorkLocationType.Hybrid]: 'Hybrid'
+  getWorkLocationLabel(type: WorkLocationType | string): string {
+    const typeMap: { [key: string]: string } = {
+      [WorkLocationType.OnSite]: this.i18n.t('employees.work_location.onsite'), 'OnSite': this.i18n.t('employees.work_location.onsite'),
+      [WorkLocationType.Remote]: this.i18n.t('employees.work_location.remote'), 'Remote': this.i18n.t('employees.work_location.remote'),
+      [WorkLocationType.Hybrid]: this.i18n.t('employees.work_location.hybrid'), 'Hybrid': this.i18n.t('employees.work_location.hybrid')
     };
-    return typeMap[type] || 'Unknown';
+    return typeMap[type] || this.i18n.t('common.unknown');
   }
 
   formatDate(dateString: string | null | undefined): string {
@@ -368,11 +379,13 @@ export class EmployeeTableComponent {
       const [, year, month, day] = dateMatch;
       // Create date using local timezone to prevent shifting
       const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-      return date.toLocaleDateString();
+      const locale = this.i18n.getDateLocale();
+      return date.toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric' });
     }
 
     // Fallback for other date formats
     const date = new Date(dateString);
-    return date.toLocaleDateString();
+    const locale = this.i18n.getDateLocale();
+    return date.toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric' });
   }
 }

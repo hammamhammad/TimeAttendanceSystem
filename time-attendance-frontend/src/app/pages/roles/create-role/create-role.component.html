@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div class="container-fluid app-modern-form">
   <!-- Header -->
   <app-form-header
     mode="create"
@@ -16,7 +16,7 @@
     </div>
   } @else {
     <!-- Main Form -->
-    <app-form-section [title]="t('roles.role_information')">
+    <app-form-section [title]="t('roles.role_information')" variant="modern">
       <div class="card-body">
         @if (error()) {
           <div class="alert alert-danger" role="alert">
@@ -27,23 +27,26 @@
 
         <form (ngSubmit)="onSubmit()">
           <!-- Basic Information Section -->
-          <app-form-section [title]="t('roles.basic_information')">
+          <app-form-section [title]="t('roles.basic_information')" variant="modern">
             <!-- Role Name -->
             <div class="row g-3">
               <div class="col-md-6">
-                <label class="form-label">
-                  {{ t('roles.role_name') }}
-                  <span class="text-danger">*</span>
-                </label>
-                <input
-                  type="text"
-                  class="form-control"
-                  [(ngModel)]="roleForm.name"
-                  name="roleName"
-                  [placeholder]="t('roles.role_name_placeholder')"
-                  [disabled]="submitting()"
-                  required
-                />
+                <div class="form-floating">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="roleName"
+                    [(ngModel)]="roleForm.name"
+                    name="roleName"
+                    placeholder="{{ t('roles.role_name_placeholder') }}"
+                    [disabled]="submitting()"
+                    required
+                  />
+                  <label for="roleName">
+                    {{ t('roles.role_name') }}
+                    <span class="text-danger">*</span>
+                  </label>
+                </div>
               </div>
             </div>
           </app-form-section>
@@ -51,7 +54,7 @@
           <hr>
 
           <!-- Permissions Section -->
-          <app-form-section [title]="t('roles.select_permissions')">
+          <app-form-section [title]="t('roles.select_permissions')" variant="modern">
             <div class="d-flex justify-content-end align-items-center mb-3">
               <div class="btn-group btn-group-sm" role="group">
                 <button 
@@ -191,17 +194,17 @@
           </app-form-section>
 
           <!-- Form Actions -->
-          <div class="d-flex justify-content-end gap-2">
-            <button 
-              type="button" 
+          <div class="app-form-actions">
+            <button
+              type="button"
               class="btn btn-outline-secondary"
               (click)="onCancel()"
               [disabled]="submitting()">
               <i class="fa-solid fa-times me-2"></i>
               {{ t('common.cancel') }}
             </button>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               class="btn btn-primary"
               [disabled]="!roleForm.name.trim() || submitting()">
               @if (submitting()) {

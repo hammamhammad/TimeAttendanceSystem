@@ -20,13 +20,13 @@ import { PermissionResources, PermissionActions } from '../../../shared/utils/pe
       [totalPages]="totalPages"
       [totalItems]="totalItems"
       [pageSize]="pageSize"
-      [emptyMessage]="'No vacation records found'"
+      [emptyMessage]="i18n.t('employee_vacations.no_vacations_found')"
       (actionClick)="onActionClick($event)"
       (pageChange)="onPageChange($event)"
       (pageSizeChange)="onPageSizeChange($event)"
       (selectionChange)="onSelectionChange($event)"
       (sortChange)="onSortChange($event)">
-    
+
       <ng-template #cellTemplate let-vacation let-column="column">
         @switch (column.key) {
           <!-- Employee name with avatar -->
@@ -65,7 +65,7 @@ import { PermissionResources, PermissionActions } from '../../../shared/utils/pe
           @case ('totalDays') {
             <span class="badge bg-secondary">
               {{ vacation.totalDays }}
-              {{ vacation.totalDays === 1 ? 'day' : 'days' }}
+              {{ vacation.totalDays === 1 ? i18n.t('common.dayUnit') : i18n.t('common.days_text') }}
             </span>
           }
           <!-- Approval Status -->
@@ -77,7 +77,7 @@ import { PermissionResources, PermissionActions } from '../../../shared/utils/pe
               <i class="fas"
                 [class.fa-check-circle]="vacation.isApproved"
               [class.fa-clock]="!vacation.isApproved"></i>
-              {{ vacation.isApproved ? 'Approved' : 'Pending' }}
+              {{ vacation.isApproved ? i18n.t('employee_vacations.approved') : i18n.t('employee_vacations.pending') }}
             </span>
           }
           <!-- Current Status -->
@@ -120,7 +120,7 @@ import { PermissionResources, PermissionActions } from '../../../shared/utils/pe
   `]
 })
 export class EmployeeVacationTableComponent {
-  private i18n = inject(I18nService);
+  i18n = inject(I18nService);
   private permissionService = inject(PermissionService);
 
   @Input() vacations: EmployeeVacation[] = [];
@@ -139,78 +139,82 @@ export class EmployeeVacationTableComponent {
   @Output() selectionChange = new EventEmitter<EmployeeVacation[]>();
   @Output() sortChange = new EventEmitter<{column: string, direction: 'asc' | 'desc'}>();
 
-  columns: TableColumn[] = [
-    {
-      key: 'employee',
-      label: 'Employee',
-      width: '200px',
-      sortable: true,
-      priority: 'high',
-      mobileLabel: 'Employee'
-    },
-    {
-      key: 'vacationType',
-      label: 'Vacation Type',
-      width: '150px',
-      sortable: true,
-      priority: 'high',
-      mobileLabel: 'Type'
-    },
-    {
-      key: 'startDate',
-      label: 'Start Date',
-      width: '120px',
-      sortable: true,
-      priority: 'medium',
-      hideOnMobile: false,
-      mobileLabel: 'Start'
-    },
-    {
-      key: 'endDate',
-      label: 'End Date',
-      width: '120px',
-      sortable: true,
-      priority: 'medium',
-      hideOnMobile: false,
-      mobileLabel: 'End'
-    },
-    {
-      key: 'totalDays',
-      label: 'Total Days',
-      width: '100px',
-      align: 'center',
-      sortable: true,
-      priority: 'medium',
-      hideOnMobile: true,
-      mobileLabel: 'Days'
-    },
-    {
-      key: 'status',
-      label: 'Status',
-      width: '100px',
-      align: 'center',
-      sortable: true,
-      priority: 'high',
-      mobileLabel: 'Status'
-    },
-    {
-      key: 'currentStatus',
-      label: 'Current Status',
-      width: '120px',
-      align: 'center',
-      priority: 'medium',
-      hideOnMobile: true,
-      mobileLabel: 'Current'
-    },
-    {
-      key: 'notes',
-      label: 'Notes',
-      width: '150px',
-      priority: 'low',
-      hideOnMobile: true,
-      mobileLabel: 'Notes'
-    }
-  ];
+  columns: TableColumn[] = [];
+
+  ngOnInit() {
+    this.columns = [
+      {
+        key: 'employee',
+        label: this.i18n.t('employee_vacations.employee'),
+        width: '200px',
+        sortable: true,
+        priority: 'high',
+        mobileLabel: this.i18n.t('employee_vacations.employee')
+      },
+      {
+        key: 'vacationType',
+        label: this.i18n.t('employee_vacations.vacation_type'),
+        width: '150px',
+        sortable: true,
+        priority: 'high',
+        mobileLabel: this.i18n.t('common.type')
+      },
+      {
+        key: 'startDate',
+        label: this.i18n.t('employee_vacations.start_date'),
+        width: '120px',
+        sortable: true,
+        priority: 'medium',
+        hideOnMobile: false,
+        mobileLabel: this.i18n.t('employee_vacations.start_date')
+      },
+      {
+        key: 'endDate',
+        label: this.i18n.t('employee_vacations.end_date'),
+        width: '120px',
+        sortable: true,
+        priority: 'medium',
+        hideOnMobile: false,
+        mobileLabel: this.i18n.t('employee_vacations.end_date')
+      },
+      {
+        key: 'totalDays',
+        label: this.i18n.t('employee_vacations.total_days'),
+        width: '100px',
+        align: 'center',
+        sortable: true,
+        priority: 'medium',
+        hideOnMobile: true,
+        mobileLabel: this.i18n.t('common.days_text')
+      },
+      {
+        key: 'status',
+        label: this.i18n.t('common.status'),
+        width: '100px',
+        align: 'center',
+        sortable: true,
+        priority: 'high',
+        mobileLabel: this.i18n.t('common.status')
+      },
+      {
+        key: 'currentStatus',
+        label: this.i18n.t('employee_vacations.current_status'),
+        width: '120px',
+        align: 'center',
+        priority: 'medium',
+        hideOnMobile: true,
+        mobileLabel: this.i18n.t('employee_vacations.current_status')
+      },
+      {
+        key: 'notes',
+        label: this.i18n.t('employee_vacations.notes'),
+        width: '150px',
+        priority: 'low',
+        hideOnMobile: true,
+        mobileLabel: this.i18n.t('employee_vacations.notes')
+      }
+    ];
+  }
 
   get actions(): TableAction[] {
     const actions: TableAction[] = [];
@@ -218,7 +222,7 @@ export class EmployeeVacationTableComponent {
     if (this.permissionService.has(`${PermissionResources.VACATION}.${PermissionActions.READ}`)) {
       actions.push({
         key: 'view',
-        label: 'View',
+        label: this.i18n.t('common.view'),
         icon: 'fa-eye',
         color: 'info'
       });
@@ -227,14 +231,14 @@ export class EmployeeVacationTableComponent {
     if (this.permissionService.has(`${PermissionResources.VACATION}.${PermissionActions.UPDATE}`)) {
       actions.push({
         key: 'edit',
-        label: 'Edit',
+        label: this.i18n.t('common.edit'),
         icon: 'fa-edit',
         color: 'primary'
       });
 
       actions.push({
         key: 'toggleStatus',
-        label: 'Toggle Status',
+        label: this.i18n.t('employee_vacations.toggle_status'),
         icon: 'fa-toggle-on',
         color: 'warning'
       });
@@ -243,7 +247,7 @@ export class EmployeeVacationTableComponent {
     if (this.permissionService.has(`${PermissionResources.VACATION}.${PermissionActions.DELETE}`)) {
       actions.push({
         key: 'delete',
-        label: 'Delete',
+        label: this.i18n.t('common.delete'),
         icon: 'fa-trash',
         color: 'danger'
       });
@@ -298,13 +302,13 @@ export class EmployeeVacationTableComponent {
 
   getCurrentStatusLabel(vacation: EmployeeVacation): string {
     if (vacation.isCurrentlyActive) {
-      return 'Active';
+      return this.i18n.t('employee_vacations.active');
     } else if (vacation.isUpcoming) {
-      return 'Upcoming';
+      return this.i18n.t('employee_vacations.upcoming');
     } else if (this.isVacationPeriodActive(vacation) && !vacation.isApproved) {
-      return 'Pending';
+      return this.i18n.t('employee_vacations.pending');
     } else {
-      return 'Past';
+      return this.i18n.t('employee_vacations.past');
     }
   }
 
@@ -336,6 +340,6 @@ export class EmployeeVacationTableComponent {
   formatDate(date: Date): string {
     if (!date) return '';
     const d = new Date(date);
-    return d.toLocaleDateString();
+    return d.toLocaleDateString(this.i18n.getDateLocale(), { year: 'numeric', month: 'short', day: 'numeric' });
   }
 }

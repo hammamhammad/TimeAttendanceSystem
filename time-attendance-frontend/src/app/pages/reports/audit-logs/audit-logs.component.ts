@@ -278,6 +278,7 @@ export class AuditLogsComponent implements OnInit {
   formatDateTime(date: string): string {
     if (!date) return '-';
     const d = new Date(date);
-    return d.toLocaleString();
+    const locale = this.i18n.getDateLocale();
+    return d.toLocaleString(locale, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
   }
 }

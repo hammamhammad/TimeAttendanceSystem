@@ -190,9 +190,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Work\\TimeAttendanceSystem\\tools\\UpdateWorkflow.csproj",
-      "projectName": "UpdateWorkflow",
-      "projectPath": "D:\\Work\\TimeAttendanceSystem\\tools\\UpdateWorkflow.csproj",
+      "projectUniqueName": "D:\\Work\\TimeAttendanceSystem\\tools\\RunSampleData.csproj",
+      "projectName": "RunSampleData",
+      "projectPath": "D:\\Work\\TimeAttendanceSystem\\tools\\RunSampleData.csproj",
       "packagesPath": "C:\\Users\\Hammam\\.nuget\\packages\\",
       "outputPath": "D:\\Work\\TimeAttendanceSystem\\tools\\obj\\",
       "projectStyle": "PackageReference",

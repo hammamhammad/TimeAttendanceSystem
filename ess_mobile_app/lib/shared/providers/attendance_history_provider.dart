@@ -17,15 +17,24 @@ class AttendanceHistoryRepository {
   }) async {
     try {
       final response = await _dio.get(
-        '/api/v1/mobile/attendance/history',
+        '/api/v1/portal/my-attendance',
         queryParameters: {
-          'startDate': startDate.toIso8601String(),
-          'endDate': endDate.toIso8601String(),
+          'startDate': startDate.toIso8601String().split('T')[0],
+          'endDate': endDate.toIso8601String().split('T')[0],
         },
       );
-      
-      final List<dynamic> data = response.data;
-      return data.map((e) => DailyAttendance.fromJson(e)).toList();
+
+      // Handle paginated response
+      final data = response.data;
+      List<dynamic> items;
+      if (data is Map<String, dynamic>) {
+        items = data['items'] ?? data['data'] ?? [];
+      } else if (data is List) {
+        items = data;
+      } else {
+        items = [];
+      }
+      return items.map((e) => DailyAttendance.fromJson(e as Map<String, dynamic>)).toList();
     } on DioException catch (e) {
       throw Exception(e.response?.data?['message'] ?? 'Failed to get history');
     }

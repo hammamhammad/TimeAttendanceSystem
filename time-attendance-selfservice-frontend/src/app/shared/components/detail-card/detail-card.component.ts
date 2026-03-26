@@ -1,5 +1,5 @@
 import { Component, Input, TemplateRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 
 export interface DetailField {
   label: string;
@@ -15,7 +15,7 @@ export interface DetailField {
 @Component({
   selector: 'app-detail-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [NgTemplateOutlet],
   template: `
     <div class="app-detail-card card">
       @if (title) {
@@ -43,59 +43,46 @@ export interface DetailField {
                     <div class="app-definition-item">
                       <dt class="app-data-label">{{ field.label }}:</dt>
                       <dd class="app-data-value">
-                        <ng-container [ngSwitch]="field.type || 'text'">
-                          <!-- Badge type -->
-                          <span *ngSwitchCase="'badge'"
-                                [class]="'badge bg-' + (field.badgeVariant || 'primary')">
-                            {{ field.value }}
-                          </span>
-
-                          <!-- Date type -->
-                          <span *ngSwitchCase="'date'">
-                            {{ formatDate(field.value) }}
-                          </span>
-
-                          <!-- Time type -->
-                          <span *ngSwitchCase="'time'">
-                            {{ formatTime(field.value) }}
-                          </span>
-
-                          <!-- DateTime type -->
-                          <span *ngSwitchCase="'datetime'">
-                            {{ formatDateTime(field.value) }}
-                          </span>
-
-                          <!-- Currency type -->
-                          <span *ngSwitchCase="'currency'">
-                            {{ formatCurrency(field.value) }}
-                          </span>
-
-                          <!-- Percentage type -->
-                          <span *ngSwitchCase="'percentage'">
-                            {{ field.value }}%
-                          </span>
-
-                          <!-- Custom template -->
-                          <ng-container *ngSwitchCase="'custom'">
+                        @switch (field.type || 'text') {
+                          @case ('badge') {
+                            <span [class]="'badge bg-' + (field.badgeVariant || 'primary')">
+                              {{ field.value }}
+                            </span>
+                          }
+                          @case ('date') {
+                            <span>{{ formatDate(field.value) }}</span>
+                          }
+                          @case ('time') {
+                            <span>{{ formatTime(field.value) }}</span>
+                          }
+                          @case ('datetime') {
+                            <span>{{ formatDateTime(field.value) }}</span>
+                          }
+                          @case ('currency') {
+                            <span>{{ formatCurrency(field.value) }}</span>
+                          }
+                          @case ('percentage') {
+                            <span>{{ field.value }}%</span>
+                          }
+                          @case ('custom') {
                             @if (field.customTemplate) {
                               <ng-container [ngTemplateOutlet]="field.customTemplate"
                                           [ngTemplateOutletContext]="{ $implicit: field.value, field: field }"></ng-container>
                             }
-                          </ng-container>
-
-                          <!-- Default text -->
-                          <span *ngSwitchDefault
-                                [class.text-muted]="!field.value || field.value === '-'"
-                                [class.app-clickable]="field.onClick"
-                                (click)="field.onClick && field.onClick()">
-                            {{ field.value || '-' }}
-                            @if (field.copyable && field.value) {
-                              <i class="fas fa-copy ms-2 text-muted app-clickable"
-                                 (click)="copyToClipboard(field.value)"
-                                 title="Copy to clipboard"></i>
-                            }
-                          </span>
-                        </ng-container>
+                          }
+                          @default {
+                            <span [class.text-muted]="!field.value || field.value === '-'"
+                                  [class.app-clickable]="field.onClick"
+                                  (click)="field.onClick && field.onClick()">
+                              {{ field.value || '-' }}
+                              @if (field.copyable && field.value) {
+                                <i class="fas fa-copy ms-2 text-muted app-clickable"
+                                   (click)="copyToClipboard(field.value)"
+                                   title="Copy to clipboard"></i>
+                              }
+                            </span>
+                          }
+                        }
                       </dd>
                     </div>
                   }
@@ -110,59 +97,46 @@ export interface DetailField {
                     <div class="app-definition-item">
                       <dt class="app-data-label">{{ field.label }}:</dt>
                       <dd class="app-data-value">
-                        <ng-container [ngSwitch]="field.type || 'text'">
-                          <!-- Badge type -->
-                          <span *ngSwitchCase="'badge'"
-                                [class]="'badge bg-' + (field.badgeVariant || 'primary')">
-                            {{ field.value }}
-                          </span>
-
-                          <!-- Date type -->
-                          <span *ngSwitchCase="'date'">
-                            {{ formatDate(field.value) }}
-                          </span>
-
-                          <!-- Time type -->
-                          <span *ngSwitchCase="'time'">
-                            {{ formatTime(field.value) }}
-                          </span>
-
-                          <!-- DateTime type -->
-                          <span *ngSwitchCase="'datetime'">
-                            {{ formatDateTime(field.value) }}
-                          </span>
-
-                          <!-- Currency type -->
-                          <span *ngSwitchCase="'currency'">
-                            {{ formatCurrency(field.value) }}
-                          </span>
-
-                          <!-- Percentage type -->
-                          <span *ngSwitchCase="'percentage'">
-                            {{ field.value }}%
-                          </span>
-
-                          <!-- Custom template -->
-                          <ng-container *ngSwitchCase="'custom'">
+                        @switch (field.type || 'text') {
+                          @case ('badge') {
+                            <span [class]="'badge bg-' + (field.badgeVariant || 'primary')">
+                              {{ field.value }}
+                            </span>
+                          }
+                          @case ('date') {
+                            <span>{{ formatDate(field.value) }}</span>
+                          }
+                          @case ('time') {
+                            <span>{{ formatTime(field.value) }}</span>
+                          }
+                          @case ('datetime') {
+                            <span>{{ formatDateTime(field.value) }}</span>
+                          }
+                          @case ('currency') {
+                            <span>{{ formatCurrency(field.value) }}</span>
+                          }
+                          @case ('percentage') {
+                            <span>{{ field.value }}%</span>
+                          }
+                          @case ('custom') {
                             @if (field.customTemplate) {
                               <ng-container [ngTemplateOutlet]="field.customTemplate"
                                           [ngTemplateOutletContext]="{ $implicit: field.value, field: field }"></ng-container>
                             }
-                          </ng-container>
-
-                          <!-- Default text -->
-                          <span *ngSwitchDefault
-                                [class.text-muted]="!field.value || field.value === '-'"
-                                [class.app-clickable]="field.onClick"
-                                (click)="field.onClick && field.onClick()">
-                            {{ field.value || '-' }}
-                            @if (field.copyable && field.value) {
-                              <i class="fas fa-copy ms-2 text-muted app-clickable"
-                                 (click)="copyToClipboard(field.value)"
-                                 title="Copy to clipboard"></i>
-                            }
-                          </span>
-                        </ng-container>
+                          }
+                          @default {
+                            <span [class.text-muted]="!field.value || field.value === '-'"
+                                  [class.app-clickable]="field.onClick"
+                                  (click)="field.onClick && field.onClick()">
+                              {{ field.value || '-' }}
+                              @if (field.copyable && field.value) {
+                                <i class="fas fa-copy ms-2 text-muted app-clickable"
+                                   (click)="copyToClipboard(field.value)"
+                                   title="Copy to clipboard"></i>
+                              }
+                            </span>
+                          }
+                        }
                       </dd>
                     </div>
                   }
@@ -178,59 +152,46 @@ export interface DetailField {
                 <div class="app-definition-item">
                   <dt class="app-data-label">{{ field.label }}:</dt>
                   <dd class="app-data-value">
-                    <ng-container [ngSwitch]="field.type || 'text'">
-                      <!-- Badge type -->
-                      <span *ngSwitchCase="'badge'"
-                            [class]="'badge bg-' + (field.badgeVariant || 'primary')">
-                        {{ field.value }}
-                      </span>
-
-                      <!-- Date type -->
-                      <span *ngSwitchCase="'date'">
-                        {{ formatDate(field.value) }}
-                      </span>
-
-                      <!-- Time type -->
-                      <span *ngSwitchCase="'time'">
-                        {{ formatTime(field.value) }}
-                      </span>
-
-                      <!-- DateTime type -->
-                      <span *ngSwitchCase="'datetime'">
-                        {{ formatDateTime(field.value) }}
-                      </span>
-
-                      <!-- Currency type -->
-                      <span *ngSwitchCase="'currency'">
-                        {{ formatCurrency(field.value) }}
-                      </span>
-
-                      <!-- Percentage type -->
-                      <span *ngSwitchCase="'percentage'">
-                        {{ field.value }}%
-                      </span>
-
-                      <!-- Custom template -->
-                      <ng-container *ngSwitchCase="'custom'">
+                    @switch (field.type || 'text') {
+                      @case ('badge') {
+                        <span [class]="'badge bg-' + (field.badgeVariant || 'primary')">
+                          {{ field.value }}
+                        </span>
+                      }
+                      @case ('date') {
+                        <span>{{ formatDate(field.value) }}</span>
+                      }
+                      @case ('time') {
+                        <span>{{ formatTime(field.value) }}</span>
+                      }
+                      @case ('datetime') {
+                        <span>{{ formatDateTime(field.value) }}</span>
+                      }
+                      @case ('currency') {
+                        <span>{{ formatCurrency(field.value) }}</span>
+                      }
+                      @case ('percentage') {
+                        <span>{{ field.value }}%</span>
+                      }
+                      @case ('custom') {
                         @if (field.customTemplate) {
                           <ng-container [ngTemplateOutlet]="field.customTemplate"
                                       [ngTemplateOutletContext]="{ $implicit: field.value, field: field }"></ng-container>
                         }
-                      </ng-container>
-
-                      <!-- Default text -->
-                      <span *ngSwitchDefault
-                            [class.text-muted]="!field.value || field.value === '-'"
-                            [class.app-clickable]="field.onClick"
-                            (click)="field.onClick && field.onClick()">
-                        {{ field.value || '-' }}
-                        @if (field.copyable && field.value) {
-                          <i class="fas fa-copy ms-2 text-muted app-clickable"
-                             (click)="copyToClipboard(field.value)"
-                             title="Copy to clipboard"></i>
-                        }
-                      </span>
-                    </ng-container>
+                      }
+                      @default {
+                        <span [class.text-muted]="!field.value || field.value === '-'"
+                              [class.app-clickable]="field.onClick"
+                              (click)="field.onClick && field.onClick()">
+                          {{ field.value || '-' }}
+                          @if (field.copyable && field.value) {
+                            <i class="fas fa-copy ms-2 text-muted app-clickable"
+                               (click)="copyToClipboard(field.value)"
+                               title="Copy to clipboard"></i>
+                          }
+                        </span>
+                      }
+                    }
                   </dd>
                 </div>
               }

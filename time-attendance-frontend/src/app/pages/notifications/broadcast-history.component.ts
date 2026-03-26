@@ -86,22 +86,22 @@ export class BroadcastHistoryComponent implements OnInit {
     });
 
     // Filter options
-    targetTypeOptions = [
-        { value: null, label: 'All Targets' },
-        { value: BroadcastTargetType.All, label: 'All Employees' },
-        { value: BroadcastTargetType.Branch, label: 'Branch' },
-        { value: BroadcastTargetType.Department, label: 'Department' },
-        { value: BroadcastTargetType.Role, label: 'Role' },
-        { value: BroadcastTargetType.Individual, label: 'Individual' }
-    ];
+    targetTypeOptions = computed(() => [
+        { value: null, label: this.i18n.t('notifications.filter_all_targets') },
+        { value: BroadcastTargetType.All, label: this.i18n.t('notifications.filter_all_employees') },
+        { value: BroadcastTargetType.Branch, label: this.i18n.t('notifications.filter_branch') },
+        { value: BroadcastTargetType.Department, label: this.i18n.t('notifications.filter_department') },
+        { value: BroadcastTargetType.Role, label: this.i18n.t('notifications.filter_role') },
+        { value: BroadcastTargetType.Individual, label: this.i18n.t('notifications.filter_individual') }
+    ]);
 
-    statusOptions = [
-        { value: null, label: 'All Status' },
-        { value: BroadcastStatus.Pending, label: 'Pending', color: 'warning' },
-        { value: BroadcastStatus.Sent, label: 'Sent', color: 'success' },
-        { value: BroadcastStatus.PartiallyDelivered, label: 'Partial', color: 'info' },
-        { value: BroadcastStatus.Failed, label: 'Failed', color: 'danger' }
-    ];
+    statusOptions = computed(() => [
+        { value: null, label: this.i18n.t('notifications.filter_all_status'), color: '' },
+        { value: BroadcastStatus.Pending, label: this.i18n.t('notifications.status_pending'), color: 'warning' },
+        { value: BroadcastStatus.Sent, label: this.i18n.t('notifications.status_sent'), color: 'success' },
+        { value: BroadcastStatus.PartiallyDelivered, label: this.i18n.t('notifications.status_partial'), color: 'info' },
+        { value: BroadcastStatus.Failed, label: this.i18n.t('notifications.status_failed'), color: 'danger' }
+    ]);
 
     // Expose enums to template
     BroadcastStatus = BroadcastStatus;
@@ -194,8 +194,8 @@ export class BroadcastHistoryComponent implements OnInit {
     }
 
     getStatusLabel(status: BroadcastStatus): string {
-        const option = this.statusOptions.find(o => o.value === status);
-        return option?.label || 'Unknown';
+        const option = this.statusOptions().find(o => o.value === status);
+        return option?.label || this.i18n.t('notifications.status_unknown');
     }
 
     getTargetTypeIcon(type: BroadcastTargetType): string {
@@ -210,8 +210,8 @@ export class BroadcastHistoryComponent implements OnInit {
     }
 
     getTargetTypeLabel(type: BroadcastTargetType): string {
-        const option = this.targetTypeOptions.find(o => o.value === type);
-        return option?.label || 'Unknown';
+        const option = this.targetTypeOptions().find(o => o.value === type);
+        return option?.label || this.i18n.t('notifications.target_unknown');
     }
 
     calculateProgress(broadcast: NotificationBroadcast): number {

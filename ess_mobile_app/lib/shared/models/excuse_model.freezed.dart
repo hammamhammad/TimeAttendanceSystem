@@ -392,10 +392,13 @@ CreateExcuseRequest _$CreateExcuseRequestFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$CreateExcuseRequest {
+  int get employeeId => throw _privateConstructorUsedError;
   ExcuseType get type => throw _privateConstructorUsedError;
   DateTime get excuseDate => throw _privateConstructorUsedError;
   String get reason => throw _privateConstructorUsedError;
-  DateTime? get requestedTime => throw _privateConstructorUsedError;
+  String get startTime => throw _privateConstructorUsedError;
+  String get endTime => throw _privateConstructorUsedError;
+  String? get attachmentPath => throw _privateConstructorUsedError;
 
   /// Serializes this CreateExcuseRequest to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -414,10 +417,13 @@ abstract class $CreateExcuseRequestCopyWith<$Res> {
       _$CreateExcuseRequestCopyWithImpl<$Res, CreateExcuseRequest>;
   @useResult
   $Res call(
-      {ExcuseType type,
+      {int employeeId,
+      ExcuseType type,
       DateTime excuseDate,
       String reason,
-      DateTime? requestedTime});
+      String startTime,
+      String endTime,
+      String? attachmentPath});
 }
 
 /// @nodoc
@@ -435,12 +441,19 @@ class _$CreateExcuseRequestCopyWithImpl<$Res, $Val extends CreateExcuseRequest>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? employeeId = null,
     Object? type = null,
     Object? excuseDate = null,
     Object? reason = null,
-    Object? requestedTime = freezed,
+    Object? startTime = null,
+    Object? endTime = null,
+    Object? attachmentPath = freezed,
   }) {
     return _then(_value.copyWith(
+      employeeId: null == employeeId
+          ? _value.employeeId
+          : employeeId // ignore: cast_nullable_to_non_nullable
+              as int,
       type: null == type
           ? _value.type
           : type // ignore: cast_nullable_to_non_nullable
@@ -453,10 +466,18 @@ class _$CreateExcuseRequestCopyWithImpl<$Res, $Val extends CreateExcuseRequest>
           ? _value.reason
           : reason // ignore: cast_nullable_to_non_nullable
               as String,
-      requestedTime: freezed == requestedTime
-          ? _value.requestedTime
-          : requestedTime // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
+      startTime: null == startTime
+          ? _value.startTime
+          : startTime // ignore: cast_nullable_to_non_nullable
+              as String,
+      endTime: null == endTime
+          ? _value.endTime
+          : endTime // ignore: cast_nullable_to_non_nullable
+              as String,
+      attachmentPath: freezed == attachmentPath
+          ? _value.attachmentPath
+          : attachmentPath // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -470,10 +491,13 @@ abstract class _$$CreateExcuseRequestImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {ExcuseType type,
+      {int employeeId,
+      ExcuseType type,
       DateTime excuseDate,
       String reason,
-      DateTime? requestedTime});
+      String startTime,
+      String endTime,
+      String? attachmentPath});
 }
 
 /// @nodoc
@@ -489,12 +513,19 @@ class __$$CreateExcuseRequestImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? employeeId = null,
     Object? type = null,
     Object? excuseDate = null,
     Object? reason = null,
-    Object? requestedTime = freezed,
+    Object? startTime = null,
+    Object? endTime = null,
+    Object? attachmentPath = freezed,
   }) {
     return _then(_$CreateExcuseRequestImpl(
+      employeeId: null == employeeId
+          ? _value.employeeId
+          : employeeId // ignore: cast_nullable_to_non_nullable
+              as int,
       type: null == type
           ? _value.type
           : type // ignore: cast_nullable_to_non_nullable
@@ -507,10 +538,18 @@ class __$$CreateExcuseRequestImplCopyWithImpl<$Res>
           ? _value.reason
           : reason // ignore: cast_nullable_to_non_nullable
               as String,
-      requestedTime: freezed == requestedTime
-          ? _value.requestedTime
-          : requestedTime // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
+      startTime: null == startTime
+          ? _value.startTime
+          : startTime // ignore: cast_nullable_to_non_nullable
+              as String,
+      endTime: null == endTime
+          ? _value.endTime
+          : endTime // ignore: cast_nullable_to_non_nullable
+              as String,
+      attachmentPath: freezed == attachmentPath
+          ? _value.attachmentPath
+          : attachmentPath // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -519,14 +558,19 @@ class __$$CreateExcuseRequestImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$CreateExcuseRequestImpl implements _CreateExcuseRequest {
   const _$CreateExcuseRequestImpl(
-      {required this.type,
+      {required this.employeeId,
+      required this.type,
       required this.excuseDate,
       required this.reason,
-      this.requestedTime});
+      required this.startTime,
+      required this.endTime,
+      this.attachmentPath});
 
   factory _$CreateExcuseRequestImpl.fromJson(Map<String, dynamic> json) =>
       _$$CreateExcuseRequestImplFromJson(json);
 
+  @override
+  final int employeeId;
   @override
   final ExcuseType type;
   @override
@@ -534,11 +578,15 @@ class _$CreateExcuseRequestImpl implements _CreateExcuseRequest {
   @override
   final String reason;
   @override
-  final DateTime? requestedTime;
+  final String startTime;
+  @override
+  final String endTime;
+  @override
+  final String? attachmentPath;
 
   @override
   String toString() {
-    return 'CreateExcuseRequest(type: $type, excuseDate: $excuseDate, reason: $reason, requestedTime: $requestedTime)';
+    return 'CreateExcuseRequest(employeeId: $employeeId, type: $type, excuseDate: $excuseDate, reason: $reason, startTime: $startTime, endTime: $endTime, attachmentPath: $attachmentPath)';
   }
 
   @override
@@ -546,18 +594,23 @@ class _$CreateExcuseRequestImpl implements _CreateExcuseRequest {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$CreateExcuseRequestImpl &&
+            (identical(other.employeeId, employeeId) ||
+                other.employeeId == employeeId) &&
             (identical(other.type, type) || other.type == type) &&
             (identical(other.excuseDate, excuseDate) ||
                 other.excuseDate == excuseDate) &&
             (identical(other.reason, reason) || other.reason == reason) &&
-            (identical(other.requestedTime, requestedTime) ||
-                other.requestedTime == requestedTime));
+            (identical(other.startTime, startTime) ||
+                other.startTime == startTime) &&
+            (identical(other.endTime, endTime) || other.endTime == endTime) &&
+            (identical(other.attachmentPath, attachmentPath) ||
+                other.attachmentPath == attachmentPath));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, type, excuseDate, reason, requestedTime);
+  int get hashCode => Object.hash(runtimeType, employeeId, type, excuseDate,
+      reason, startTime, endTime, attachmentPath);
 
   /// Create a copy of CreateExcuseRequest
   /// with the given fields replaced by the non-null parameter values.
@@ -578,14 +631,19 @@ class _$CreateExcuseRequestImpl implements _CreateExcuseRequest {
 
 abstract class _CreateExcuseRequest implements CreateExcuseRequest {
   const factory _CreateExcuseRequest(
-      {required final ExcuseType type,
+      {required final int employeeId,
+      required final ExcuseType type,
       required final DateTime excuseDate,
       required final String reason,
-      final DateTime? requestedTime}) = _$CreateExcuseRequestImpl;
+      required final String startTime,
+      required final String endTime,
+      final String? attachmentPath}) = _$CreateExcuseRequestImpl;
 
   factory _CreateExcuseRequest.fromJson(Map<String, dynamic> json) =
       _$CreateExcuseRequestImpl.fromJson;
 
+  @override
+  int get employeeId;
   @override
   ExcuseType get type;
   @override
@@ -593,7 +651,11 @@ abstract class _CreateExcuseRequest implements CreateExcuseRequest {
   @override
   String get reason;
   @override
-  DateTime? get requestedTime;
+  String get startTime;
+  @override
+  String get endTime;
+  @override
+  String? get attachmentPath;
 
   /// Create a copy of CreateExcuseRequest
   /// with the given fields replaced by the non-null parameter values.

@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="app-form-section">
+    <div class="app-form-section" [class.app-form-section-modern]="variant === 'modern'">
       @if (title || description) {
         <div class="app-form-section-header">
           @if (title) {
@@ -96,7 +96,7 @@ export class FormSectionComponent {
   @Input() icon?: string;
   @Input() required = false;
   @Input() layout: 'single' | 'two-column' | 'three-column' | 'sidebar' = 'single';
-  @Input() variant: 'default' | 'card' | 'bordered' = 'default';
+  @Input() variant: 'default' | 'card' | 'bordered' | 'modern' = 'default';
   @Input() collapsible = false;
   @Input() collapsed = false;
   @Input() disabled = false;

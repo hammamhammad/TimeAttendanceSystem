@@ -18,10 +18,11 @@
 
 .sidenav-header {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  min-height: 60px;
+  min-height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0.5rem 0.75rem !important;
 }
 
 .sidenav-header h5 {
@@ -29,9 +30,27 @@
   font-weight: 600;
 }
 
+.sidenav-logo {
+  max-width: 140px;
+  max-height: 32px;
+  height: auto;
+}
+
+.sidenav-logo-collapsed {
+  max-width: 40px;
+  height: auto;
+}
+
+/* Override Bootstrap nav padding variable */
+.nav {
+  --bs-nav-link-padding-x: 0.6rem;
+  --bs-nav-link-padding-y: 0.5rem;
+}
+
+/* Nav link base - LTR */
 .nav-link {
   color: rgba(255, 255, 255, 0.8);
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 0.6rem !important;
   border-radius: 0;
   transition: all 0.2s ease;
   border-left: 3px solid transparent;
@@ -48,10 +67,20 @@
   border-left-color: var(--bs-primary);
 }
 
-.nav-link i {
+/* Icon styling - LTR */
+.nav-icon {
   width: 20px;
   text-align: center;
   flex-shrink: 0;
+  margin-right: 0.5rem;
+  margin-left: 0;
+}
+
+.nav-link span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 .collapsed .nav-link {
@@ -60,8 +89,9 @@
   padding-right: 1rem;
 }
 
-.collapsed .nav-link i {
+.collapsed .nav-icon {
   margin-right: 0 !important;
+  margin-left: 0 !important;
 }
 
 /* Separator styles */
@@ -97,8 +127,8 @@
 }
 
 .submenu .nav-link {
-  padding: 0.5rem 1rem 0.5rem 2.5rem;
-  font-size: 0.875rem;
+  padding: 0.4rem 0.75rem 0.4rem 2rem;
+  font-size: 0.85rem;
   border-left: none;
 }
 
@@ -116,35 +146,73 @@
   transform: rotate(180deg);
 }
 
-/* RTL Support for submenus */
-:root[dir="rtl"] .submenu .nav-link {
-  padding-left: 1rem;
-  padding-right: 2.5rem;
+/* ========================================
+   RTL Support
+   ======================================== */
+
+/* Force RTL direction on the entire sidenav */
+:host-context([dir="rtl"]) .sidenav {
+  left: auto;
+  right: 0;
+  width: 260px;
+  direction: rtl;
+}
+
+/* Fix: Browser default ul padding-inline-start shifts to right in RTL */
+:host-context([dir="rtl"]) .nav {
+  padding-right: 0 !important;
+  padding-left: 0 !important;
+}
+
+:host-context([dir="rtl"]) .submenu {
+  padding-right: 0 !important;
+  padding-left: 0 !important;
+}
+
+:host-context([dir="rtl"]) .sidenav.collapsed {
+  width: 72px;
+}
+
+/* Nav-link in RTL */
+:host-context([dir="rtl"]) .nav-link {
+  border-left: none;
+  border-right: 3px solid transparent;
+  padding: 0.5rem 0.6rem !important;
+  direction: rtl;
+}
+
+:host-context([dir="rtl"]) .nav-link.active {
+  border-right-color: var(--bs-primary);
+  border-left: none;
+}
+
+/* Icon in RTL */
+:host-context([dir="rtl"]) .nav-icon {
+  margin-right: 0 !important;
+  margin-left: 0.5rem !important;
+}
+
+/* Force all flex containers inside sidenav to respect RTL */
+:host-context([dir="rtl"]) .sidenav .d-flex {
+  direction: rtl;
+}
+
+/* Submenu in RTL */
+:host-context([dir="rtl"]) .submenu .nav-link {
+  padding-right: 2rem;
+  padding-left: 0.75rem;
   border-left: none;
   border-right: none;
 }
 
-:root[dir="rtl"] .submenu .nav-link.active {
+:host-context([dir="rtl"]) .submenu .nav-link.active {
+  border-left: none;
   border-right: 3px solid var(--bs-primary);
 }
 
-/* RTL Support */
-:root[dir="rtl"] .sidenav {
-  left: auto !important;
-  right: 0 !important;
-}
-
-:root[dir="rtl"] .nav-link {
-  border-left: none;
-  border-right: 3px solid transparent;
-}
-
-:root[dir="rtl"] .nav-link.active {
-  border-right-color: var(--bs-primary);
-}
-
-:root[dir="rtl"] .me-2 {
-  margin-left: 0.5rem !important;
+/* Collapsed in RTL */
+:host-context([dir="rtl"]) .collapsed .nav-icon {
+  margin-left: 0 !important;
   margin-right: 0 !important;
 }
 
@@ -153,17 +221,18 @@
   .sidenav {
     transform: translateX(-100%);
     transition: transform 0.3s ease;
+    z-index: 1050;
   }
-  
+
   .sidenav.show {
     transform: translateX(0);
   }
-  
-  :root[dir="rtl"] .sidenav {
-    transform: translateX(100%) !important;
+
+  :host-context([dir="rtl"]) .sidenav {
+    transform: translateX(100%);
   }
-  
-  :root[dir="rtl"] .sidenav.show {
-    transform: translateX(0) !important;
+
+  :host-context([dir="rtl"]) .sidenav.show {
+    transform: translateX(0);
   }
 }

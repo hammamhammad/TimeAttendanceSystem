@@ -20,14 +20,18 @@ AppNotification _$AppNotificationFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$AppNotification {
-  String get id => throw _privateConstructorUsedError;
-  String get title => throw _privateConstructorUsedError;
-  String get message => throw _privateConstructorUsedError;
+  int get id => throw _privateConstructorUsedError;
+  String get titleEn => throw _privateConstructorUsedError;
+  String? get titleAr => throw _privateConstructorUsedError;
+  String get messageEn => throw _privateConstructorUsedError;
+  String? get messageAr => throw _privateConstructorUsedError;
   NotificationType get type => throw _privateConstructorUsedError;
-  DateTime get createdAt => throw _privateConstructorUsedError;
   bool get isRead => throw _privateConstructorUsedError;
+  DateTime? get readAt => throw _privateConstructorUsedError;
+  String? get entityType => throw _privateConstructorUsedError;
+  int? get entityId => throw _privateConstructorUsedError;
   String? get actionUrl => throw _privateConstructorUsedError;
-  Map<String, dynamic>? get data => throw _privateConstructorUsedError;
+  DateTime get createdAtUtc => throw _privateConstructorUsedError;
 
   /// Serializes this AppNotification to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -46,14 +50,18 @@ abstract class $AppNotificationCopyWith<$Res> {
       _$AppNotificationCopyWithImpl<$Res, AppNotification>;
   @useResult
   $Res call(
-      {String id,
-      String title,
-      String message,
+      {int id,
+      String titleEn,
+      String? titleAr,
+      String messageEn,
+      String? messageAr,
       NotificationType type,
-      DateTime createdAt,
       bool isRead,
+      DateTime? readAt,
+      String? entityType,
+      int? entityId,
       String? actionUrl,
-      Map<String, dynamic>? data});
+      DateTime createdAtUtc});
 }
 
 /// @nodoc
@@ -72,47 +80,67 @@ class _$AppNotificationCopyWithImpl<$Res, $Val extends AppNotification>
   @override
   $Res call({
     Object? id = null,
-    Object? title = null,
-    Object? message = null,
+    Object? titleEn = null,
+    Object? titleAr = freezed,
+    Object? messageEn = null,
+    Object? messageAr = freezed,
     Object? type = null,
-    Object? createdAt = null,
     Object? isRead = null,
+    Object? readAt = freezed,
+    Object? entityType = freezed,
+    Object? entityId = freezed,
     Object? actionUrl = freezed,
-    Object? data = freezed,
+    Object? createdAtUtc = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      titleEn: null == titleEn
+          ? _value.titleEn
+          : titleEn // ignore: cast_nullable_to_non_nullable
               as String,
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
+      titleAr: freezed == titleAr
+          ? _value.titleAr
+          : titleAr // ignore: cast_nullable_to_non_nullable
+              as String?,
+      messageEn: null == messageEn
+          ? _value.messageEn
+          : messageEn // ignore: cast_nullable_to_non_nullable
               as String,
-      message: null == message
-          ? _value.message
-          : message // ignore: cast_nullable_to_non_nullable
-              as String,
+      messageAr: freezed == messageAr
+          ? _value.messageAr
+          : messageAr // ignore: cast_nullable_to_non_nullable
+              as String?,
       type: null == type
           ? _value.type
           : type // ignore: cast_nullable_to_non_nullable
               as NotificationType,
-      createdAt: null == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
       isRead: null == isRead
           ? _value.isRead
           : isRead // ignore: cast_nullable_to_non_nullable
               as bool,
+      readAt: freezed == readAt
+          ? _value.readAt
+          : readAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      entityType: freezed == entityType
+          ? _value.entityType
+          : entityType // ignore: cast_nullable_to_non_nullable
+              as String?,
+      entityId: freezed == entityId
+          ? _value.entityId
+          : entityId // ignore: cast_nullable_to_non_nullable
+              as int?,
       actionUrl: freezed == actionUrl
           ? _value.actionUrl
           : actionUrl // ignore: cast_nullable_to_non_nullable
               as String?,
-      data: freezed == data
-          ? _value.data
-          : data // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>?,
+      createdAtUtc: null == createdAtUtc
+          ? _value.createdAtUtc
+          : createdAtUtc // ignore: cast_nullable_to_non_nullable
+              as DateTime,
     ) as $Val);
   }
 }
@@ -126,14 +154,18 @@ abstract class _$$AppNotificationImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String id,
-      String title,
-      String message,
+      {int id,
+      String titleEn,
+      String? titleAr,
+      String messageEn,
+      String? messageAr,
       NotificationType type,
-      DateTime createdAt,
       bool isRead,
+      DateTime? readAt,
+      String? entityType,
+      int? entityId,
       String? actionUrl,
-      Map<String, dynamic>? data});
+      DateTime createdAtUtc});
 }
 
 /// @nodoc
@@ -150,47 +182,67 @@ class __$$AppNotificationImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = null,
-    Object? title = null,
-    Object? message = null,
+    Object? titleEn = null,
+    Object? titleAr = freezed,
+    Object? messageEn = null,
+    Object? messageAr = freezed,
     Object? type = null,
-    Object? createdAt = null,
     Object? isRead = null,
+    Object? readAt = freezed,
+    Object? entityType = freezed,
+    Object? entityId = freezed,
     Object? actionUrl = freezed,
-    Object? data = freezed,
+    Object? createdAtUtc = null,
   }) {
     return _then(_$AppNotificationImpl(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      titleEn: null == titleEn
+          ? _value.titleEn
+          : titleEn // ignore: cast_nullable_to_non_nullable
               as String,
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
+      titleAr: freezed == titleAr
+          ? _value.titleAr
+          : titleAr // ignore: cast_nullable_to_non_nullable
+              as String?,
+      messageEn: null == messageEn
+          ? _value.messageEn
+          : messageEn // ignore: cast_nullable_to_non_nullable
               as String,
-      message: null == message
-          ? _value.message
-          : message // ignore: cast_nullable_to_non_nullable
-              as String,
+      messageAr: freezed == messageAr
+          ? _value.messageAr
+          : messageAr // ignore: cast_nullable_to_non_nullable
+              as String?,
       type: null == type
           ? _value.type
           : type // ignore: cast_nullable_to_non_nullable
               as NotificationType,
-      createdAt: null == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
       isRead: null == isRead
           ? _value.isRead
           : isRead // ignore: cast_nullable_to_non_nullable
               as bool,
+      readAt: freezed == readAt
+          ? _value.readAt
+          : readAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      entityType: freezed == entityType
+          ? _value.entityType
+          : entityType // ignore: cast_nullable_to_non_nullable
+              as String?,
+      entityId: freezed == entityId
+          ? _value.entityId
+          : entityId // ignore: cast_nullable_to_non_nullable
+              as int?,
       actionUrl: freezed == actionUrl
           ? _value.actionUrl
           : actionUrl // ignore: cast_nullable_to_non_nullable
               as String?,
-      data: freezed == data
-          ? _value._data
-          : data // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>?,
+      createdAtUtc: null == createdAtUtc
+          ? _value.createdAtUtc
+          : createdAtUtc // ignore: cast_nullable_to_non_nullable
+              as DateTime,
     ));
   }
 }
@@ -200,45 +252,50 @@ class __$$AppNotificationImplCopyWithImpl<$Res>
 class _$AppNotificationImpl implements _AppNotification {
   const _$AppNotificationImpl(
       {required this.id,
-      required this.title,
-      required this.message,
-      required this.type,
-      required this.createdAt,
+      required this.titleEn,
+      this.titleAr,
+      required this.messageEn,
+      this.messageAr,
+      this.type = NotificationType.info,
       required this.isRead,
+      this.readAt,
+      this.entityType,
+      this.entityId,
       this.actionUrl,
-      final Map<String, dynamic>? data})
-      : _data = data;
+      required this.createdAtUtc});
 
   factory _$AppNotificationImpl.fromJson(Map<String, dynamic> json) =>
       _$$AppNotificationImplFromJson(json);
 
   @override
-  final String id;
+  final int id;
   @override
-  final String title;
+  final String titleEn;
   @override
-  final String message;
+  final String? titleAr;
   @override
+  final String messageEn;
+  @override
+  final String? messageAr;
+  @override
+  @JsonKey()
   final NotificationType type;
-  @override
-  final DateTime createdAt;
   @override
   final bool isRead;
   @override
-  final String? actionUrl;
-  final Map<String, dynamic>? _data;
+  final DateTime? readAt;
   @override
-  Map<String, dynamic>? get data {
-    final value = _data;
-    if (value == null) return null;
-    if (_data is EqualUnmodifiableMapView) return _data;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableMapView(value);
-  }
+  final String? entityType;
+  @override
+  final int? entityId;
+  @override
+  final String? actionUrl;
+  @override
+  final DateTime createdAtUtc;
 
   @override
   String toString() {
-    return 'AppNotification(id: $id, title: $title, message: $message, type: $type, createdAt: $createdAt, isRead: $isRead, actionUrl: $actionUrl, data: $data)';
+    return 'AppNotification(id: $id, titleEn: $titleEn, titleAr: $titleAr, messageEn: $messageEn, messageAr: $messageAr, type: $type, isRead: $isRead, readAt: $readAt, entityType: $entityType, entityId: $entityId, actionUrl: $actionUrl, createdAtUtc: $createdAtUtc)';
   }
 
   @override
@@ -247,21 +304,41 @@ class _$AppNotificationImpl implements _AppNotification {
         (other.runtimeType == runtimeType &&
             other is _$AppNotificationImpl &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.title, title) || other.title == title) &&
-            (identical(other.message, message) || other.message == message) &&
+            (identical(other.titleEn, titleEn) || other.titleEn == titleEn) &&
+            (identical(other.titleAr, titleAr) || other.titleAr == titleAr) &&
+            (identical(other.messageEn, messageEn) ||
+                other.messageEn == messageEn) &&
+            (identical(other.messageAr, messageAr) ||
+                other.messageAr == messageAr) &&
             (identical(other.type, type) || other.type == type) &&
-            (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt) &&
             (identical(other.isRead, isRead) || other.isRead == isRead) &&
+            (identical(other.readAt, readAt) || other.readAt == readAt) &&
+            (identical(other.entityType, entityType) ||
+                other.entityType == entityType) &&
+            (identical(other.entityId, entityId) ||
+                other.entityId == entityId) &&
             (identical(other.actionUrl, actionUrl) ||
                 other.actionUrl == actionUrl) &&
-            const DeepCollectionEquality().equals(other._data, _data));
+            (identical(other.createdAtUtc, createdAtUtc) ||
+                other.createdAtUtc == createdAtUtc));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, title, message, type,
-      createdAt, isRead, actionUrl, const DeepCollectionEquality().hash(_data));
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      titleEn,
+      titleAr,
+      messageEn,
+      messageAr,
+      type,
+      isRead,
+      readAt,
+      entityType,
+      entityId,
+      actionUrl,
+      createdAtUtc);
 
   /// Create a copy of AppNotification
   /// with the given fields replaced by the non-null parameter values.
@@ -282,34 +359,46 @@ class _$AppNotificationImpl implements _AppNotification {
 
 abstract class _AppNotification implements AppNotification {
   const factory _AppNotification(
-      {required final String id,
-      required final String title,
-      required final String message,
-      required final NotificationType type,
-      required final DateTime createdAt,
+      {required final int id,
+      required final String titleEn,
+      final String? titleAr,
+      required final String messageEn,
+      final String? messageAr,
+      final NotificationType type,
       required final bool isRead,
+      final DateTime? readAt,
+      final String? entityType,
+      final int? entityId,
       final String? actionUrl,
-      final Map<String, dynamic>? data}) = _$AppNotificationImpl;
+      required final DateTime createdAtUtc}) = _$AppNotificationImpl;
 
   factory _AppNotification.fromJson(Map<String, dynamic> json) =
       _$AppNotificationImpl.fromJson;
 
   @override
-  String get id;
+  int get id;
   @override
-  String get title;
+  String get titleEn;
   @override
-  String get message;
+  String? get titleAr;
+  @override
+  String get messageEn;
+  @override
+  String? get messageAr;
   @override
   NotificationType get type;
   @override
-  DateTime get createdAt;
-  @override
   bool get isRead;
+  @override
+  DateTime? get readAt;
+  @override
+  String? get entityType;
+  @override
+  int? get entityId;
   @override
   String? get actionUrl;
   @override
-  Map<String, dynamic>? get data;
+  DateTime get createdAtUtc;
 
   /// Create a copy of AppNotification
   /// with the given fields replaced by the non-null parameter values.

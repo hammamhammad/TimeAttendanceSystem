@@ -3,16 +3,12 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'excuse_model.freezed.dart';
 part 'excuse_model.g.dart';
 
-/// Excuse type.
+/// Excuse type matching backend ExcuseType enum.
 enum ExcuseType {
-  @JsonValue(0)
-  lateArrival,
   @JsonValue(1)
-  earlyDeparture,
+  personalExcuse,
   @JsonValue(2)
-  missedPunch,
-  @JsonValue(3)
-  other,
+  officialDuty,
 }
 
 /// Excuse status.
@@ -46,14 +42,17 @@ class ExcuseRequest with _$ExcuseRequest {
       _$ExcuseRequestFromJson(json);
 }
 
-/// Create excuse request payload.
+/// Create excuse request payload matching backend CreateEmployeeExcuseCommand.
 @freezed
 class CreateExcuseRequest with _$CreateExcuseRequest {
   const factory CreateExcuseRequest({
+    required int employeeId,
     required ExcuseType type,
     required DateTime excuseDate,
     required String reason,
-    DateTime? requestedTime,
+    required String startTime,
+    required String endTime,
+    String? attachmentPath,
   }) = _CreateExcuseRequest;
 
   factory CreateExcuseRequest.fromJson(Map<String, dynamic> json) =>

@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div class="container-fluid app-modern-form">
   <app-form-header
     mode="edit"
     [title]="t('settings.overtime.editPolicy')"
@@ -48,7 +48,7 @@
         <!-- Main Configuration -->
         <div class="col-lg-8">
           <!-- Overtime Types Section -->
-          <app-form-section [title]="t('settings.overtime.overtimeTypes')">
+          <app-form-section [title]="t('settings.overtime.overtimeTypes')" variant="modern">
             <div class="card-body">
               <div class="row">
                 <div class="col-md-6">
@@ -89,12 +89,12 @@
           </app-form-section>
 
           <!-- Overtime Rates Section -->
-          <app-form-section [title]="t('settings.overtime.overtimeRates')">
+          <app-form-section [title]="t('settings.overtime.overtimeRates')" variant="modern">
             <div class="card-body">
               <div class="row">
                 <div class="col-md-4">
-                  <div class="mb-3">
-                    <label for="normalDayRate" class="form-label">
+                  <div class="app-modern-field">
+                    <label class="app-modern-label">
                       {{ t('settings.overtime.normalDayRate') }} <span class="text-danger">*</span>
                     </label>
                     <div class="input-group">
@@ -116,8 +116,8 @@
                   </div>
                 </div>
                 <div class="col-md-4">
-                  <div class="mb-3">
-                    <label for="publicHolidayRate" class="form-label">
+                  <div class="app-modern-field">
+                    <label class="app-modern-label">
                       {{ t('settings.overtime.publicHolidayRate') }} <span class="text-danger">*</span>
                     </label>
                     <div class="input-group">
@@ -139,8 +139,8 @@
                   </div>
                 </div>
                 <div class="col-md-4">
-                  <div class="mb-3">
-                    <label for="offDayRate" class="form-label">
+                  <div class="app-modern-field">
+                    <label class="app-modern-label">
                       {{ t('settings.overtime.offDayRate') }} <span class="text-danger">*</span>
                     </label>
                     <div class="input-group">
@@ -166,12 +166,12 @@
           </app-form-section>
 
           <!-- Overtime Limits Section -->
-          <app-form-section [title]="t('settings.overtime.overtimeLimits')">
+          <app-form-section [title]="t('settings.overtime.overtimeLimits')" variant="modern">
             <div class="card-body">
               <div class="row">
                 <div class="col-md-6">
-                  <div class="mb-3">
-                    <label for="maxPreShiftOvertimeHours" class="form-label">
+                  <div class="app-modern-field">
+                    <label class="app-modern-label">
                       {{ t('settings.overtime.maxPreShiftHours') }}
                     </label>
                     <div class="input-group">
@@ -192,8 +192,8 @@
                   </div>
                 </div>
                 <div class="col-md-6">
-                  <div class="mb-3">
-                    <label for="maxPostShiftOvertimeHours" class="form-label">
+                  <div class="app-modern-field">
+                    <label class="app-modern-label">
                       {{ t('settings.overtime.maxPostShiftHours') }}
                     </label>
                     <div class="input-group">
@@ -218,12 +218,12 @@
           </app-form-section>
 
           <!-- Calculation Settings Section -->
-          <app-form-section [title]="t('settings.overtime.calculationSettings')">
+          <app-form-section [title]="t('settings.overtime.calculationSettings')" variant="modern">
             <div class="card-body">
               <div class="row">
                 <div class="col-md-4">
-                  <div class="mb-3">
-                    <label for="minimumOvertimeMinutes" class="form-label">
+                  <div class="app-modern-field">
+                    <label class="app-modern-label">
                       {{ t('settings.overtime.minimumOvertimeMinutes') }}
                     </label>
                     <div class="input-group">
@@ -243,8 +243,8 @@
                   </div>
                 </div>
                 <div class="col-md-4">
-                  <div class="mb-3">
-                    <label for="overtimeGracePeriodMinutes" class="form-label">
+                  <div class="app-modern-field">
+                    <label class="app-modern-label">
                       {{ t('settings.overtime.gracePeriodMinutes') }}
                     </label>
                     <div class="input-group">
@@ -264,8 +264,8 @@
                   </div>
                 </div>
                 <div class="col-md-4">
-                  <div class="mb-3">
-                    <label for="roundingIntervalMinutes" class="form-label">
+                  <div class="app-modern-field">
+                    <label class="app-modern-label">
                       {{ t('settings.overtime.roundingIntervalMinutes') }}
                     </label>
                     <div class="input-group">
@@ -322,21 +322,20 @@
           </app-form-section>
 
           <!-- Policy Notes Section -->
-          <app-form-section [title]="t('settings.overtime.policyNotes')">
+          <app-form-section [title]="t('settings.overtime.policyNotes')" variant="modern">
             <div class="card-body">
-              <div class="mb-3">
-                <label for="policyNotes" class="form-label">
-                  {{ t('settings.overtime.policyNotesLabel') }}
-                </label>
+              <div class="form-floating">
                 <textarea
                   class="form-control"
                   id="policyNotes"
                   [(ngModel)]="configForm.policyNotes"
                   name="policyNotes"
                   rows="4"
-                  [placeholder]="t('settings.overtime.policyNotesPlaceholder')">
+                  placeholder="{{ t('settings.overtime.policyNotesLabel') }}"
+                  style="height: 120px">
                 </textarea>
-                <div class="form-text">{{ t('settings.overtime.policyNotesDescription') }}</div>
+                <label for="policyNotes">{{ t('settings.overtime.policyNotesLabel') }}</label>
+                <div class="form-text mt-2">{{ t('settings.overtime.policyNotesDescription') }}</div>
               </div>
             </div>
           </app-form-section>
@@ -373,44 +372,44 @@
           }
 
           <!-- Effective Period Section -->
-          <app-form-section [title]="t('settings.overtime.effectivePeriod')">
+          <app-form-section [title]="t('settings.overtime.effectivePeriod')" variant="modern">
             <div class="card-body">
-              <div class="mb-3">
-                <label for="effectiveFromDate" class="form-label">
-                  {{ t('settings.overtime.effectiveFrom') }} <span class="text-danger">*</span>
-                </label>
+              <div class="form-floating mb-3">
                 <input
                   type="date"
                   [class]="getFieldClasses('effectiveFromDate')"
                   id="effectiveFromDate"
                   [(ngModel)]="configForm.effectiveFromDate"
                   name="effectiveFromDate"
+                  placeholder="{{ t('settings.overtime.effectiveFrom') }}"
                   required>
-                @if (hasError('effectiveFromDate')) {
-                  <div class="invalid-feedback d-block">{{ getError('effectiveFromDate') }}</div>
-                }
-                <div class="form-text">{{ t('settings.overtime.effectiveFromDescription') }}</div>
-              </div>
-              <div class="mb-3">
-                <label for="effectiveToDate" class="form-label">
-                  {{ t('settings.overtime.effectiveTo') }}
+                <label for="effectiveFromDate">
+                  {{ t('settings.overtime.effectiveFrom') }} <span class="text-danger">*</span>
                 </label>
+              </div>
+              @if (hasError('effectiveFromDate')) {
+                <div class="invalid-feedback d-block">{{ getError('effectiveFromDate') }}</div>
+              }
+              <div class="form-text mb-3">{{ t('settings.overtime.effectiveFromDescription') }}</div>
+              <div class="form-floating mb-3">
                 <input
                   type="date"
                   [class]="getFieldClasses('effectiveToDate')"
                   id="effectiveToDate"
                   [(ngModel)]="configForm.effectiveToDate"
-                  name="effectiveToDate">
-                @if (hasError('effectiveToDate')) {
-                  <div class="invalid-feedback d-block">{{ getError('effectiveToDate') }}</div>
-                }
-                <div class="form-text">{{ t('settings.overtime.effectiveToDescription') }}</div>
+                  name="effectiveToDate"
+                  placeholder="{{ t('settings.overtime.effectiveTo') }}">
+                <label for="effectiveToDate">{{ t('settings.overtime.effectiveTo') }}</label>
               </div>
+              @if (hasError('effectiveToDate')) {
+                <div class="invalid-feedback d-block">{{ getError('effectiveToDate') }}</div>
+              }
+              <div class="form-text mb-3">{{ t('settings.overtime.effectiveToDescription') }}</div>
             </div>
           </app-form-section>
 
           <!-- Additional Settings Section -->
-          <app-form-section [title]="t('settings.overtime.additionalSettings')">
+          <app-form-section [title]="t('settings.overtime.additionalSettings')" variant="modern">
             <div class="card-body">
               <div class="form-check mb-3">
                 <input
@@ -431,7 +430,7 @@
           <!-- Submit Section -->
           <div class="card">
             <div class="card-body">
-              <div class="d-grid gap-2">
+              <div class="app-form-actions">
                 <button
                   type="submit"
                   class="btn btn-primary"

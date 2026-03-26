@@ -103,7 +103,7 @@ export class MenuService {
       children: [
         {
           path: '/reports/attendance',
-          titleKey: 'reports.attendance',
+          titleKey: 'reports.attendance.title',
           icon: 'fa-solid fa-list-check',
           permission: 'attendance.read'
         },

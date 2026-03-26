@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+import { I18nService } from '../../../core/i18n/i18n.service';
 import {
   WorkflowDefinition,
   WorkflowEntityType,
@@ -15,6 +16,7 @@ import {
 })
 export class WorkflowsService {
   private http = inject(HttpClient);
+  private i18n = inject(I18nService);
   private baseUrl = `${environment.apiUrl}/api/v1/workflows`;
 
   /**
@@ -100,12 +102,12 @@ export class WorkflowsService {
    */
   getEntityTypeDisplayName(entityType: WorkflowEntityType): string {
     const displayNames: Record<WorkflowEntityType, string> = {
-      'Vacation': 'Vacation Request',
-      'Excuse': 'Excuse Request',
-      'RemoteWork': 'Remote Work Request',
-      'Overtime': 'Overtime Request',
-      'Timesheet': 'Timesheet',
-      'AttendanceCorrection': 'Attendance Correction'
+      'Vacation': this.i18n.t('workflows.entity_type_vacation'),
+      'Excuse': this.i18n.t('workflows.entity_type_excuse'),
+      'RemoteWork': this.i18n.t('workflows.entity_type_remote_work'),
+      'Overtime': this.i18n.t('workflows.entity_type_overtime'),
+      'Timesheet': this.i18n.t('workflows.entity_type_timesheet'),
+      'AttendanceCorrection': this.i18n.t('workflows.entity_type_attendance_correction')
     };
     return displayNames[entityType] || entityType;
   }
@@ -116,10 +118,10 @@ export class WorkflowsService {
    */
   getEntityTypes(): { value: WorkflowEntityType; label: string }[] {
     return [
-      { value: 'Vacation', label: 'Vacation Request' },
-      { value: 'Excuse', label: 'Excuse Request' },
-      { value: 'RemoteWork', label: 'Remote Work Request' },
-      { value: 'AttendanceCorrection', label: 'Attendance Correction' }
+      { value: 'Vacation', label: this.i18n.t('workflows.entity_type_vacation') },
+      { value: 'Excuse', label: this.i18n.t('workflows.entity_type_excuse') },
+      { value: 'RemoteWork', label: this.i18n.t('workflows.entity_type_remote_work') },
+      { value: 'AttendanceCorrection', label: this.i18n.t('workflows.entity_type_attendance_correction') }
     ];
   }
 }

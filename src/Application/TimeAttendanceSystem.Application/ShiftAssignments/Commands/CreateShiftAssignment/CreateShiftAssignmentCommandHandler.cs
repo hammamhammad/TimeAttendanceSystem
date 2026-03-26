@@ -250,9 +250,11 @@ public class CreateShiftAssignmentCommandHandler : BaseHandler<CreateShiftAssign
         }
 
         // Check for date range overlaps
+        var newEndDate = newAssignment.EffectiveToDate ?? DateTime.MaxValue;
+        var newStartDate = newAssignment.EffectiveFromDate;
         query = query.Where(sa => sa.Status == ShiftAssignmentStatus.Active &&
-                                sa.EffectiveFromDate <= (newAssignment.EffectiveToDate ?? DateTime.MaxValue) &&
-                                (sa.EffectiveToDate == null || sa.EffectiveToDate >= newAssignment.EffectiveFromDate));
+                                sa.EffectiveFromDate <= newEndDate &&
+                                (sa.EffectiveToDate == null || sa.EffectiveToDate >= newStartDate));
 
         var conflictingAssignments = await query.ToListAsync(cancellationToken);
 

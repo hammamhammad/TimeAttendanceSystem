@@ -354,37 +354,45 @@ class _QuickActionsGrid extends StatelessWidget {
           icon: Icons.business,
           label: 'Branches',
           color: AppColors.primary,
-          onTap: () => context.push('/admin/branches'),
+          onTap: () => context.push('/branch-management'),
         ),
         _QuickActionItem(
           icon: Icons.nfc,
           label: 'NFC Tags',
           color: AppColors.secondary,
-          onTap: () => context.push('/admin/nfc-tags'),
+          onTap: () => context.push('/nfc-management'),
         ),
         _QuickActionItem(
           icon: Icons.notifications,
           label: 'Broadcast',
           color: AppColors.info,
-          onTap: () => context.push('/admin/broadcast'),
+          onTap: () => context.push('/notification-broadcast'),
         ),
         _QuickActionItem(
           icon: Icons.approval,
           label: 'Approvals',
           color: AppColors.warning,
-          onTap: () => context.push('/admin/approvals'),
+          onTap: () => context.push('/pending-approvals'),
         ),
         _QuickActionItem(
           icon: Icons.people,
           label: 'Employees',
           color: AppColors.success,
-          onTap: () => context.push('/admin/employees'),
+          onTap: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
+            );
+          },
         ),
         _QuickActionItem(
           icon: Icons.analytics,
           label: 'Reports',
           color: AppColors.error,
-          onTap: () => context.push('/admin/reports'),
+          onTap: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Coming soon'), behavior: SnackBarBehavior.floating),
+            );
+          },
         ),
       ],
     );

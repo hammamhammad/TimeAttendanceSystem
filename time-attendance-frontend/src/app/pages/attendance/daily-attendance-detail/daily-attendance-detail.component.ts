@@ -133,7 +133,8 @@ export class DailyAttendanceDetailComponent implements OnInit {
     }
     // Fallback to Date parsing if pattern doesn't match
     const date = new Date(time);
-    return date.toLocaleTimeString('en-US', {
+    const locale = this.i18n.getDateLocale();
+    return date.toLocaleTimeString(locale, {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false
@@ -230,7 +231,8 @@ export class DailyAttendanceDetailComponent implements OnInit {
   formatDate(date: Date | string): string {
     if (!date) return '';
     const dateObj = typeof date === 'string' ? new Date(date) : date;
-    return dateObj.toLocaleDateString('en-US', {
+    const locale = this.i18n.getDateLocale();
+    return dateObj.toLocaleDateString(locale, {
       year: 'numeric',
       month: 'short',
       day: 'numeric'

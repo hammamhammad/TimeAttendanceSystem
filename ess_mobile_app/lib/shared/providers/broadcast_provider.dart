@@ -5,22 +5,61 @@ import '../../core/network/api_client.dart';
 import '../models/notification_broadcast_model.dart';
 import '../models/branch_model.dart';
 
+/// Helper to extract list from a paginated or raw API response.
+List<dynamic> _extractItems(dynamic data) {
+  if (data is List) return data;
+  if (data is Map<String, dynamic>) {
+    if (data.containsKey('items')) return data['items'] as List<dynamic>;
+    if (data.containsKey('value') && data['value'] is List) return data['value'];
+  }
+  return [];
+}
+
+/// Target type string to int mapping for BroadcastTargetType enum.
+const _targetTypeMap = {
+  'all': 0,
+  'branch': 1,
+  'department': 2,
+  'individual': 3,
+};
+
+/// Normalize broadcast JSON from backend (int IDs → String, enum strings → int).
+Map<String, dynamic> _normalizeBroadcastJson(Map<String, dynamic> raw) {
+  return {
+    ...raw,
+    'id': raw['id']?.toString(),
+    'targetId': raw['targetId']?.toString(),
+    'targetType': raw['targetType'] is String
+        ? _targetTypeMap[raw['targetType'].toString().toLowerCase()] ?? 0
+        : raw['targetType'],
+  };
+}
+
+/// Normalize branch JSON from backend (int IDs → String).
+Map<String, dynamic> _normalizeBranchJson(Map<String, dynamic> raw) {
+  return {
+    ...raw,
+    'id': raw['id']?.toString(),
+    'geofenceRadius': raw['geofenceRadius'] ?? raw['geofenceRadiusMeters'],
+  };
+}
+
 /// Department model for broadcast targeting.
 class Department {
   final String id;
   final String name;
   final int employeeCount;
-  
+
   Department({
     required this.id,
     required this.name,
     required this.employeeCount,
   });
-  
+
   factory Department.fromJson(Map<String, dynamic> json) {
     return Department(
-      id: json['id'],
-      name: json['name'],
+      id: json['id']?.toString() ?? '',
+      name: json['name'] ?? '',
       employeeCount: json['employeeCount'] ?? 0,
     );
   }
@@ -35,9 +74,15 @@ class BroadcastRepository {
   /// Get broadcast history.
   Future<List<NotificationBroadcast>> getBroadcasts() async {
     try {
-      final response = await _dio.get('/api/v1/notifications/broadcasts');
-      final List<dynamic> data = response.data;
-      return data.map((e) => NotificationBroadcast.fromJson(e)).toList();
+      final response = await _dio.get(
+        '/api/v1/notification-broadcasts',
+        queryParameters: {'pageSize': 1000},
+      );
+      final items = _extractItems(response.data);
+      return items
+          .map((e) => NotificationBroadcast.fromJson(
+              _normalizeBroadcastJson(e as Map<String, dynamic>)))
+          .toList();
     } on DioException catch (e) {
       throw Exception(e.response?.data?['message'] ?? 'Failed to get broadcasts');
     }
@@ -47,7 +92,7 @@ class BroadcastRepository {
   Future<NotificationBroadcast> sendBroadcast(CreateBroadcastRequest request) async {
     try {
       final response = await _dio.post(
-        '/api/v1/notifications/broadcasts',
+        '/api/v1/notification-broadcasts',
         data: {
           'title': request.title,
           'message': request.message,
@@ -56,7 +101,10 @@ class BroadcastRepository {
           'sendPush': request.sendPush ?? true,
         },
       );
-      return NotificationBroadcast.fromJson(response.data);
+      final data = response.data is Map<String, dynamic>
+          ? response.data as Map<String, dynamic>
+          : <String, dynamic>{};
+      return NotificationBroadcast.fromJson(_normalizeBroadcastJson(data));
     } on DioException catch (e) {
       throw Exception(e.response?.data?['message'] ?? 'Failed to send broadcast');
     }
@@ -65,9 +113,14 @@ class BroadcastRepository {
   /// Get departments for targeting.
   Future<List<Department>> getDepartments() async {
     try {
-      final response = await _dio.get('/api/v1/departments');
-      final List<dynamic> data = response.data;
-      return data.map((e) => Department.fromJson(e)).toList();
+      final response = await _dio.get(
+        '/api/v1/departments',
+        queryParameters: {'pageSize': 1000},
+      );
+      final items = _extractItems(response.data);
+      return items
+          .map((e) => Department.fromJson(e as Map<String, dynamic>))
+          .toList();
     } on DioException catch (e) {
       throw Exception(e.response?.data?['message'] ?? 'Failed to get departments');
     }
@@ -76,9 +129,15 @@ class BroadcastRepository {
   /// Get branches for targeting.
   Future<List<Branch>> getBranches() async {
     try {
-      final response = await _dio.get('/api/v1/branches');
-      final List<dynamic> data = response.data;
-      return data.map((e) => Branch.fromJson(e)).toList();
+      final response = await _dio.get(
+        '/api/v1/branches',
+        queryParameters: {'pageSize': 1000},
+      );
+      final items = _extractItems(response.data);
+      return items
+          .map((e) => Branch.fromJson(
+              _normalizeBranchJson(e as Map<String, dynamic>)))
+          .toList();
     } on DioException catch (e) {
       throw Exception(e.response?.data?['message'] ?? 'Failed to get branches');
     }
@@ -98,7 +157,7 @@ class BroadcastState {
   final List<NotificationBroadcast> broadcasts;
   final List<Branch> branches;
   final List<Department> departments;
-  
+
   const BroadcastState({
     this.isLoading = false,
     this.error,
@@ -106,7 +165,7 @@ class BroadcastState {
     this.branches = const [],
     this.departments = const [],
   });
-  
+
   BroadcastState copyWith({
     bool? isLoading,
     String? error,
@@ -127,20 +186,20 @@ class BroadcastState {
 /// Broadcast notifier.
 class BroadcastNotifier extends StateNotifier<BroadcastState> {
   final BroadcastRepository _repository;
-  
+
   BroadcastNotifier(this._repository) : super(const BroadcastState());
-  
+
   /// Load all data.
   Future<void> loadAll() async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
       final results = await Future.wait([
         _repository.getBroadcasts(),
         _repository.getBranches(),
         _repository.getDepartments(),
       ]);
-      
+
       state = state.copyWith(
         isLoading: false,
         broadcasts: results[0] as List<NotificationBroadcast>,
@@ -154,7 +213,7 @@ class BroadcastNotifier extends StateNotifier<BroadcastState> {
       );
     }
   }
-  
+
   /// Send broadcast.
   Future<bool> sendBroadcast({
     required String title,
@@ -164,7 +223,7 @@ class BroadcastNotifier extends StateNotifier<BroadcastState> {
     bool sendPush = true,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
       final request = CreateBroadcastRequest(
         title: title,
@@ -173,14 +232,14 @@ class BroadcastNotifier extends StateNotifier<BroadcastState> {
         targetId: targetId,
         sendPush: sendPush,
       );
-      
+
       final broadcast = await _repository.sendBroadcast(request);
-      
+
       state = state.copyWith(
         isLoading: false,
         broadcasts: [broadcast, ...state.broadcasts],
       );
-      
+
       return true;
     } catch (e) {
       state = state.copyWith(

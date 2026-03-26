@@ -170,4 +170,12 @@ export class I18nService {
   public isRtl(): boolean {
     return this.locale() === 'ar';
   }
+
+  /**
+   * Returns the locale string for date/number formatting.
+   * Uses 'ar-u-nu-latn' for Arabic (Arabic text with Western/English numerals).
+   */
+  public getDateLocale(): string {
+    return this.locale() === 'ar' ? 'ar-u-nu-latn' : 'en-US';
+  }
 }

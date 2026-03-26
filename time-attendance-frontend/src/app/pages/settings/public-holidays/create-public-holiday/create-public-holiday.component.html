@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div class="container-fluid app-modern-form">
   <!-- Page Header -->
   <app-form-header
     mode="create"
@@ -15,21 +15,23 @@
         <div class="row">
           <!-- Basic Information -->
           <div class="col-md-6">
-            <app-form-section [title]="t('settings.holidays.basicInformation')">
+            <app-form-section [title]="t('settings.holidays.basicInformation')" variant="modern">
             <!-- Name -->
             <div class="mb-3">
-              <label for="name" class="form-label">
-                {{ t('settings.holidays.name') }}
-                <span class="text-danger">*</span>
-              </label>
-              <input type="text"
-                     id="name"
-                     class="form-control"
-                     formControlName="name"
-                     [class.is-invalid]="isFieldInvalid('name')"
-                     [placeholder]="t('settings.holidays.namePlaceholder')">
+              <div class="form-floating">
+                <input type="text"
+                       id="name"
+                       class="form-control"
+                       formControlName="name"
+
+                       [class.is-invalid]="isFieldInvalid('name')">
+                <label for="name">
+                  {{ t('settings.holidays.name') }}
+                  <span class="text-danger">*</span>
+                </label>
+              </div>
               @if (isFieldInvalid('name')) {
-                <div class="invalid-feedback">
+                <div class="invalid-feedback d-block">
                   {{ getFieldError('name') }}
                 </div>
               }
@@ -37,15 +39,17 @@
 
             <!-- Arabic Name -->
             <div class="mb-3">
-              <label for="nameAr" class="form-label">{{ t('settings.holidays.nameAr') }}</label>
-              <input type="text"
-                     id="nameAr"
-                     class="form-control"
-                     formControlName="nameAr"
-                     [class.is-invalid]="isFieldInvalid('nameAr')"
-                     [placeholder]="t('settings.holidays.nameArPlaceholder')">
+              <div class="form-floating">
+                <input type="text"
+                       id="nameAr"
+                       class="form-control"
+                       formControlName="nameAr"
+
+                       [class.is-invalid]="isFieldInvalid('nameAr')">
+                <label for="nameAr">{{ t('settings.holidays.nameAr') }}</label>
+              </div>
               @if (isFieldInvalid('nameAr')) {
-                <div class="invalid-feedback">
+                <div class="invalid-feedback d-block">
                   {{ getFieldError('nameAr') }}
                 </div>
               }
@@ -53,20 +57,23 @@
 
             <!-- Holiday Type -->
             <div class="mb-3">
-              <label for="holidayType" class="form-label">
-                {{ t('settings.holidays.type') }}
-                <span class="text-danger">*</span>
-              </label>
-              <select id="holidayType"
-                      class="form-select"
-                      formControlName="holidayType"
-                      [class.is-invalid]="isFieldInvalid('holidayType')">
-                @for (type of holidayTypes(); track type.value) {
-                  <option [value]="type.value">{{ type.label }}</option>
-                }
-              </select>
+              <div class="form-floating">
+                <select id="holidayType"
+                        class="form-select"
+                        formControlName="holidayType"
+
+                        [class.is-invalid]="isFieldInvalid('holidayType')">
+                  @for (type of holidayTypes(); track type.value) {
+                    <option [value]="type.value">{{ type.label }}</option>
+                  }
+                </select>
+                <label for="holidayType">
+                  {{ t('settings.holidays.type') }}
+                  <span class="text-danger">*</span>
+                </label>
+              </div>
               @if (isFieldInvalid('holidayType')) {
-                <div class="invalid-feedback">
+                <div class="invalid-feedback d-block">
                   {{ getFieldError('holidayType') }}
                 </div>
               }
@@ -77,16 +84,18 @@
 
             <!-- Description -->
             <div class="mb-3">
-              <label for="description" class="form-label">{{ t('settings.holidays.description') }}</label>
-              <textarea id="description"
-                        class="form-control"
-                        formControlName="description"
-                        rows="3"
-                        [class.is-invalid]="isFieldInvalid('description')"
-                        [placeholder]="t('settings.holidays.descriptionPlaceholder')">
-              </textarea>
+              <div class="form-floating">
+                <textarea id="description"
+                          class="form-control"
+                          formControlName="description"
+                          rows="3"
+
+                          [class.is-invalid]="isFieldInvalid('description')">
+                </textarea>
+                <label for="description">{{ t('settings.holidays.description') }}</label>
+              </div>
               @if (isFieldInvalid('description')) {
-                <div class="invalid-feedback">
+                <div class="invalid-feedback d-block">
                   {{ getFieldError('description') }}
                 </div>
               }
@@ -96,21 +105,24 @@
 
           <!-- Date Configuration -->
           <div class="col-md-6">
-            <app-form-section [title]="t('settings.holidays.dateConfiguration')">
+            <app-form-section [title]="t('settings.holidays.dateConfiguration')" variant="modern">
             <!-- Specific Date (One Time only) -->
             @if (showSpecificDateField()) {
               <div class="mb-3">
-                <label for="specificDate" class="form-label">
-                  {{ t('settings.holidays.specificDate') }}
-                  <span class="text-danger">*</span>
-                </label>
-                <input type="date"
-                       id="specificDate"
-                       class="form-control"
-                       formControlName="specificDate"
-                       [class.is-invalid]="isFieldInvalid('specificDate')">
+                <div class="form-floating">
+                  <input type="date"
+                         id="specificDate"
+                         class="form-control"
+                         formControlName="specificDate"
+
+                         [class.is-invalid]="isFieldInvalid('specificDate')">
+                  <label for="specificDate">
+                    {{ t('settings.holidays.specificDate') }}
+                    <span class="text-danger">*</span>
+                  </label>
+                </div>
                 @if (isFieldInvalid('specificDate')) {
-                  <div class="invalid-feedback">
+                  <div class="invalid-feedback d-block">
                     {{ getFieldError('specificDate') }}
                   </div>
                 }
@@ -120,21 +132,24 @@
             <!-- Month (Annual and Floating) -->
             @if (showMonthField()) {
               <div class="mb-3">
-                <label for="month" class="form-label">
-                  {{ t('settings.holidays.month') }}
-                  <span class="text-danger">*</span>
-                </label>
-                <select id="month"
-                        class="form-select"
-                        formControlName="month"
-                        [class.is-invalid]="isFieldInvalid('month')">
-                  <option value="">{{ t('common.select') }}</option>
-                  @for (month of getMonthOptions(); track month.value) {
-                    <option [value]="month.value">{{ month.label }}</option>
-                  }
-                </select>
+                <div class="form-floating">
+                  <select id="month"
+                          class="form-select"
+                          formControlName="month"
+
+                          [class.is-invalid]="isFieldInvalid('month')">
+                    <option value="">{{ t('common.select') }}</option>
+                    @for (month of getMonthOptions(); track month.value) {
+                      <option [value]="month.value">{{ month.label }}</option>
+                    }
+                  </select>
+                  <label for="month">
+                    {{ t('settings.holidays.month') }}
+                    <span class="text-danger">*</span>
+                  </label>
+                </div>
                 @if (isFieldInvalid('month')) {
-                  <div class="invalid-feedback">
+                  <div class="invalid-feedback d-block">
                     {{ getFieldError('month') }}
                   </div>
                 }
@@ -144,21 +159,24 @@
             <!-- Day (Annual and Monthly) -->
             @if (showDayField()) {
               <div class="mb-3">
-                <label for="day" class="form-label">
-                  {{ t('settings.holidays.day') }}
-                  <span class="text-danger">*</span>
-                </label>
-                <select id="day"
-                        class="form-select"
-                        formControlName="day"
-                        [class.is-invalid]="isFieldInvalid('day')">
-                  <option value="">{{ t('common.select') }}</option>
-                  @for (day of getDayOptions(); track day) {
-                    <option [value]="day">{{ day }}</option>
-                  }
-                </select>
+                <div class="form-floating">
+                  <select id="day"
+                          class="form-select"
+                          formControlName="day"
+
+                          [class.is-invalid]="isFieldInvalid('day')">
+                    <option value="">{{ t('common.select') }}</option>
+                    @for (day of getDayOptions(); track day) {
+                      <option [value]="day">{{ day }}</option>
+                    }
+                  </select>
+                  <label for="day">
+                    {{ t('settings.holidays.day') }}
+                    <span class="text-danger">*</span>
+                  </label>
+                </div>
                 @if (isFieldInvalid('day')) {
-                  <div class="invalid-feedback">
+                  <div class="invalid-feedback d-block">
                     {{ getFieldError('day') }}
                   </div>
                 }
@@ -168,21 +186,24 @@
             <!-- Week of Month (Floating only) -->
             @if (showWeekOfMonthField()) {
               <div class="mb-3">
-                <label for="weekOfMonth" class="form-label">
-                  {{ t('settings.holidays.weekOfMonth') }}
-                  <span class="text-danger">*</span>
-                </label>
-                <select id="weekOfMonth"
-                        class="form-select"
-                        formControlName="weekOfMonth"
-                        [class.is-invalid]="isFieldInvalid('weekOfMonth')">
-                  <option value="">{{ t('common.select') }}</option>
-                  @for (week of getWeekOfMonthOptions(); track week.value) {
-                    <option [value]="week.value">{{ week.label }}</option>
-                  }
-                </select>
+                <div class="form-floating">
+                  <select id="weekOfMonth"
+                          class="form-select"
+                          formControlName="weekOfMonth"
+
+                          [class.is-invalid]="isFieldInvalid('weekOfMonth')">
+                    <option value="">{{ t('common.select') }}</option>
+                    @for (week of getWeekOfMonthOptions(); track week.value) {
+                      <option [value]="week.value">{{ week.label }}</option>
+                    }
+                  </select>
+                  <label for="weekOfMonth">
+                    {{ t('settings.holidays.weekOfMonth') }}
+                    <span class="text-danger">*</span>
+                  </label>
+                </div>
                 @if (isFieldInvalid('weekOfMonth')) {
-                  <div class="invalid-feedback">
+                  <div class="invalid-feedback d-block">
                     {{ getFieldError('weekOfMonth') }}
                   </div>
                 }
@@ -192,21 +213,24 @@
             <!-- Day of Week (Floating only) -->
             @if (showDayOfWeekField()) {
               <div class="mb-3">
-                <label for="dayOfWeek" class="form-label">
-                  {{ t('settings.holidays.dayOfWeek') }}
-                  <span class="text-danger">*</span>
-                </label>
-                <select id="dayOfWeek"
-                        class="form-select"
-                        formControlName="dayOfWeek"
-                        [class.is-invalid]="isFieldInvalid('dayOfWeek')">
-                  <option value="">{{ t('common.select') }}</option>
-                  @for (dayOfWeek of getDayOfWeekOptions(); track dayOfWeek.value) {
-                    <option [value]="dayOfWeek.value">{{ dayOfWeek.label }}</option>
-                  }
-                </select>
+                <div class="form-floating">
+                  <select id="dayOfWeek"
+                          class="form-select"
+                          formControlName="dayOfWeek"
+
+                          [class.is-invalid]="isFieldInvalid('dayOfWeek')">
+                    <option value="">{{ t('common.select') }}</option>
+                    @for (dayOfWeek of getDayOfWeekOptions(); track dayOfWeek.value) {
+                      <option [value]="dayOfWeek.value">{{ dayOfWeek.label }}</option>
+                    }
+                  </select>
+                  <label for="dayOfWeek">
+                    {{ t('settings.holidays.dayOfWeek') }}
+                    <span class="text-danger">*</span>
+                  </label>
+                </div>
                 @if (isFieldInvalid('dayOfWeek')) {
-                  <div class="invalid-feedback">
+                  <div class="invalid-feedback d-block">
                     {{ getFieldError('dayOfWeek') }}
                   </div>
                 }
@@ -215,16 +239,19 @@
 
             <!-- Priority -->
             <div class="mb-3">
-              <label for="priority" class="form-label">{{ t('settings.holidays.priority') }}</label>
-              <input type="number"
-                     id="priority"
-                     class="form-control"
-                     formControlName="priority"
-                     min="1"
-                     max="100"
-                     [class.is-invalid]="isFieldInvalid('priority')">
+              <div class="form-floating">
+                <input type="number"
+                       id="priority"
+                       class="form-control"
+                       formControlName="priority"
+
+                       min="1"
+                       max="100"
+                       [class.is-invalid]="isFieldInvalid('priority')">
+                <label for="priority">{{ t('settings.holidays.priority') }}</label>
+              </div>
               @if (isFieldInvalid('priority')) {
-                <div class="invalid-feedback">
+                <div class="invalid-feedback d-block">
                   {{ getFieldError('priority') }}
                 </div>
               }
@@ -235,7 +262,7 @@
         </div>
 
         <!-- Additional Settings -->
-        <app-form-section [title]="t('settings.holidays.additionalSettings')">
+        <app-form-section [title]="t('settings.holidays.additionalSettings')" variant="modern">
         <div class="row">
           <div class="col-md-6">
             <!-- Scope -->
@@ -268,15 +295,17 @@
 
             <!-- Country Code -->
             <div class="mb-3">
-              <label for="countryCode" class="form-label">{{ t('settings.holidays.countryCode') }}</label>
-              <input type="text"
-                     id="countryCode"
-                     class="form-control"
-                     formControlName="countryCode"
-                     [class.is-invalid]="isFieldInvalid('countryCode')"
-                     [placeholder]="t('settings.holidays.countryCodePlaceholder')">
+              <div class="form-floating">
+                <input type="text"
+                       id="countryCode"
+                       class="form-control"
+                       formControlName="countryCode"
+
+                       [class.is-invalid]="isFieldInvalid('countryCode')">
+                <label for="countryCode">{{ t('settings.holidays.countryCode') }}</label>
+              </div>
               @if (isFieldInvalid('countryCode')) {
-                <div class="invalid-feedback">
+                <div class="invalid-feedback d-block">
                   {{ getFieldError('countryCode') }}
                 </div>
               }
@@ -287,18 +316,21 @@
           <div class="col-md-6">
             <!-- Effective From Year -->
             <div class="mb-3">
-              <label for="effectiveFromYear" class="form-label">{{ t('settings.holidays.effectiveFromYear') }}</label>
-              <select id="effectiveFromYear"
-                      class="form-select"
-                      formControlName="effectiveFromYear"
-                      [class.is-invalid]="isFieldInvalid('effectiveFromYear')">
-                <option value="">{{ t('settings.holidays.noLimit') }}</option>
-                @for (year of getYearOptions(); track year) {
-                  <option [value]="year">{{ year }}</option>
-                }
-              </select>
+              <div class="form-floating">
+                <select id="effectiveFromYear"
+                        class="form-select"
+                        formControlName="effectiveFromYear"
+
+                        [class.is-invalid]="isFieldInvalid('effectiveFromYear')">
+                  <option value="">{{ t('settings.holidays.noLimit') }}</option>
+                  @for (year of getYearOptions(); track year) {
+                    <option [value]="year">{{ year }}</option>
+                  }
+                </select>
+                <label for="effectiveFromYear">{{ t('settings.holidays.effectiveFromYear') }}</label>
+              </div>
               @if (isFieldInvalid('effectiveFromYear')) {
-                <div class="invalid-feedback">
+                <div class="invalid-feedback d-block">
                   {{ getFieldError('effectiveFromYear') }}
                 </div>
               }
@@ -306,18 +338,21 @@
 
             <!-- Effective To Year -->
             <div class="mb-3">
-              <label for="effectiveToYear" class="form-label">{{ t('settings.holidays.effectiveToYear') }}</label>
-              <select id="effectiveToYear"
-                      class="form-select"
-                      formControlName="effectiveToYear"
-                      [class.is-invalid]="isFieldInvalid('effectiveToYear')">
-                <option value="">{{ t('settings.holidays.noLimit') }}</option>
-                @for (year of getYearOptions(); track year) {
-                  <option [value]="year">{{ year }}</option>
-                }
-              </select>
+              <div class="form-floating">
+                <select id="effectiveToYear"
+                        class="form-select"
+                        formControlName="effectiveToYear"
+
+                        [class.is-invalid]="isFieldInvalid('effectiveToYear')">
+                  <option value="">{{ t('settings.holidays.noLimit') }}</option>
+                  @for (year of getYearOptions(); track year) {
+                    <option [value]="year">{{ year }}</option>
+                  }
+                </select>
+                <label for="effectiveToYear">{{ t('settings.holidays.effectiveToYear') }}</label>
+              </div>
               @if (isFieldInvalid('effectiveToYear')) {
-                <div class="invalid-feedback">
+                <div class="invalid-feedback d-block">
                   {{ getFieldError('effectiveToYear') }}
                 </div>
               }
@@ -326,16 +361,19 @@
             <!-- Branch (shown when not national) -->
             @if (!holidayForm.get('isNational')?.value) {
               <div class="mb-3">
-                <label for="branchId" class="form-label">{{ t('settings.holidays.branch') }}</label>
-                <select id="branchId"
-                        class="form-select"
-                        formControlName="branchId"
-                        [class.is-invalid]="isFieldInvalid('branchId')">
-                  <option value="">{{ t('common.select') }}</option>
-                  <!-- Branch options would be loaded from a branches service -->
-                </select>
+                <div class="form-floating">
+                  <select id="branchId"
+                          class="form-select"
+                          formControlName="branchId"
+
+                          [class.is-invalid]="isFieldInvalid('branchId')">
+                    <option value="">{{ t('common.select') }}</option>
+                    <!-- Branch options would be loaded from a branches service -->
+                  </select>
+                  <label for="branchId">{{ t('settings.holidays.branch') }}</label>
+                </div>
                 @if (isFieldInvalid('branchId')) {
-                  <div class="invalid-feedback">
+                  <div class="invalid-feedback d-block">
                     {{ getFieldError('branchId') }}
                   </div>
                 }
@@ -346,7 +384,7 @@
         </app-form-section>
 
         <!-- Form Actions -->
-        <div class="d-flex justify-content-end gap-2 mt-4">
+        <div class="app-form-actions">
           <button type="button"
                   class="btn btn-outline-secondary"
                   (click)="onCancel()"

@@ -1,9 +1,13 @@
 /* Design Token System - CSS Custom Properties */
 
 :root {
-  /* Color Palette - Bootstrap Based */
-  --app-primary: #0d6efd;
-  --app-primary-rgb: 13, 110, 253;
+  /* Color Palette - ClockN Brand */
+  --app-primary: #9D99EA;
+  --app-primary-rgb: 157, 153, 234;
+  --app-secondary: #747A90;
+  --app-secondary-rgb: 116, 122, 144;
+  --app-accent: #E1DD8B;
+  --app-accent-rgb: 225, 221, 139;
   --app-success: #198754;
   --app-success-rgb: 25, 135, 84;
   --app-danger: #dc3545;
@@ -16,8 +20,6 @@
   --app-light-rgb: 248, 249, 250;
   --app-dark: #212529;
   --app-dark-rgb: 33, 37, 41;
-  --app-secondary: #6c757d;
-  --app-secondary-rgb: 108, 117, 125;
 
   /* Grayscale */
   --app-gray-100: #f8f9fa;
@@ -52,23 +54,37 @@
   --app-transition-ease: ease-in-out;
 
   /* Spacing Scale */
-  --app-spacing-xs: 0.25rem;    /* 4px */
-  --app-spacing-sm: 0.5rem;     /* 8px */
-  --app-spacing-md: 1rem;       /* 16px */
-  --app-spacing-lg: 1.5rem;     /* 24px */
-  --app-spacing-xl: 2rem;       /* 32px */
-  --app-spacing-2xl: 3rem;      /* 48px */
-  --app-spacing-3xl: 4rem;      /* 64px */
+  --app-spacing-xs: 0.25rem;
+  /* 4px */
+  --app-spacing-sm: 0.5rem;
+  /* 8px */
+  --app-spacing-md: 1rem;
+  /* 16px */
+  --app-spacing-lg: 1.5rem;
+  /* 24px */
+  --app-spacing-xl: 2rem;
+  /* 32px */
+  --app-spacing-2xl: 3rem;
+  /* 48px */
+  --app-spacing-3xl: 4rem;
+  /* 64px */
 
   /* Typography */
   --app-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --app-font-size-xs: 0.75rem;  /* 12px */
-  --app-font-size-sm: 0.875rem; /* 14px */
-  --app-font-size-md: 1rem;     /* 16px */
-  --app-font-size-lg: 1.125rem; /* 18px */
-  --app-font-size-xl: 1.25rem;  /* 20px */
-  --app-font-size-2xl: 1.5rem;  /* 24px */
-  --app-font-size-3xl: 1.875rem; /* 30px */
+  --app-font-size-xs: 0.75rem;
+  /* 12px */
+  --app-font-size-sm: 0.875rem;
+  /* 14px */
+  --app-font-size-md: 1rem;
+  /* 16px */
+  --app-font-size-lg: 1.125rem;
+  /* 18px */
+  --app-font-size-xl: 1.25rem;
+  /* 20px */
+  --app-font-size-2xl: 1.5rem;
+  /* 24px */
+  --app-font-size-3xl: 1.875rem;
+  /* 30px */
 
   --app-font-weight-light: 300;
   --app-font-weight-normal: 400;
@@ -112,19 +128,30 @@
   --app-gradient-dark: linear-gradient(135deg, var(--app-gray-800) 0%, var(--app-gray-900) 100%);
 
   /* Avatar Sizes */
-  --app-avatar-xs: 1.5rem;   /* 24px */
-  --app-avatar-sm: 2rem;     /* 32px */
-  --app-avatar-md: 3rem;     /* 48px */
-  --app-avatar-lg: 4rem;     /* 64px */
-  --app-avatar-xl: 5rem;     /* 80px */
+  --app-avatar-xs: 1.5rem;
+  /* 24px */
+  --app-avatar-sm: 2rem;
+  /* 32px */
+  --app-avatar-md: 3rem;
+  /* 48px */
+  --app-avatar-lg: 4rem;
+  /* 64px */
+  --app-avatar-xl: 5rem;
+  /* 80px */
 
   /* Icon Sizes */
-  --app-icon-xs: 0.75rem;    /* 12px */
-  --app-icon-sm: 1rem;       /* 16px */
-  --app-icon-md: 1.25rem;    /* 20px */
-  --app-icon-lg: 1.5rem;     /* 24px */
-  --app-icon-xl: 2rem;       /* 32px */
-  --app-icon-2xl: 3rem;      /* 48px */
+  --app-icon-xs: 0.75rem;
+  /* 12px */
+  --app-icon-sm: 1rem;
+  /* 16px */
+  --app-icon-md: 1.25rem;
+  /* 20px */
+  --app-icon-lg: 1.5rem;
+  /* 24px */
+  --app-icon-xl: 2rem;
+  /* 32px */
+  --app-icon-2xl: 3rem;
+  /* 48px */
 
   /* Card Padding */
   --app-card-padding-sm: 0.75rem;
@@ -142,6 +169,29 @@
   --app-input-border-color: var(--app-gray-400);
   --app-input-focus-border-color: rgba(var(--app-primary-rgb), 0.5);
   --app-input-focus-shadow: 0 0 0 0.2rem rgba(var(--app-primary-rgb), 0.25);
+
+  /* Floating Label / Modern Form Settings */
+  --app-float-input-height: 3.5rem;
+  --app-float-input-padding-top: 1.625rem;
+  --app-float-input-padding-bottom: 0.625rem;
+  --app-float-label-scale: 0.85;
+  --app-float-label-translate-y: -0.5rem;
+  --app-float-border-width: 2px;
+  --app-float-transition-speed: 0.15s;
+  --app-float-focus-bg: rgba(var(--app-primary-rgb), 0.02);
+  --app-float-underline-speed: 0.3s;
+  --app-float-section-padding: 2rem;
+
+  /* Modern View Page Settings */
+  --app-view-card-radius: 0.75rem;
+  --app-view-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --app-view-card-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --app-view-accent: var(--app-primary);
+  --app-view-accent-width: 3px;
+  --app-view-header-bg: linear-gradient(135deg, var(--app-primary), #6f42c1);
+  --app-view-stripe-bg: rgba(0, 0, 0, 0.018);
+  --app-view-divider: var(--app-gray-200);
+  --app-view-transition: 0.2s ease;
 
   /* Button Settings */
   --app-btn-padding-y: 0.5rem;

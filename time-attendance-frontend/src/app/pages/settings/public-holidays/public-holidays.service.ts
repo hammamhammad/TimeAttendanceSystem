@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+import { I18nService } from '../../../core/i18n/i18n.service';
 import {
   PublicHoliday,
   CreatePublicHolidayRequest,
@@ -21,6 +22,7 @@ import {
 })
 export class PublicHolidaysService {
   private http = inject(HttpClient);
+  private i18n = inject(I18nService);
   private baseUrl = `${environment.apiUrl}/api/v1/public-holidays`;
 
   /**
@@ -204,23 +206,23 @@ export class PublicHolidaysService {
     return [
       {
         value: HolidayType.OneTime,
-        label: 'One Time',
-        description: 'Holiday occurs only once on a specific date'
+        label: this.i18n.t('settings.holidays.types.oneTime'),
+        description: this.i18n.t('settings.holidays.types.oneTime_description')
       },
       {
         value: HolidayType.Annual,
-        label: 'Annual',
-        description: 'Holiday occurs every year on the same date'
+        label: this.i18n.t('settings.holidays.types.annual'),
+        description: this.i18n.t('settings.holidays.types.annual_description')
       },
       {
         value: HolidayType.Monthly,
-        label: 'Monthly',
-        description: 'Holiday occurs every month on the same day'
+        label: this.i18n.t('settings.holidays.types.monthly'),
+        description: this.i18n.t('settings.holidays.types.monthly_description')
       },
       {
         value: HolidayType.Floating,
-        label: 'Floating',
-        description: 'Holiday occurs on a relative date (e.g., first Monday of March)'
+        label: this.i18n.t('settings.holidays.types.floating'),
+        description: this.i18n.t('settings.holidays.types.floating_description')
       }
     ];
   }
@@ -245,29 +247,29 @@ export class PublicHolidaysService {
     const errors: string[] = [];
 
     if (!request.name || request.name.trim().length === 0) {
-      errors.push('Holiday name is required');
+      errors.push(this.i18n.t('settings.holidays.validation.nameRequired'));
     }
 
     if (request.holidayType === HolidayType.OneTime || request.holidayType === HolidayType.Annual) {
       if (!request.specificDate && (!request.month || !request.day)) {
-        errors.push('Specific date or month/day is required for this holiday type');
+        errors.push(this.i18n.t('settings.holidays.validation.specificDateOrMonthDayRequired'));
       }
     }
 
     if (request.holidayType === HolidayType.Floating) {
       if (!request.weekOfMonth || !request.dayOfWeek || !request.month) {
-        errors.push('Week of month, day of week, and month are required for floating holidays');
+        errors.push(this.i18n.t('settings.holidays.validation.floatingFieldsRequired'));
       }
     }
 
     if (request.effectiveFromYear && request.effectiveToYear) {
       if (request.effectiveFromYear > request.effectiveToYear) {
-        errors.push('Effective from year cannot be after effective to year');
+        errors.push(this.i18n.t('settings.holidays.validation.invalidDateRange'));
       }
     }
 
     if (request.priority !== undefined && (request.priority < 1 || request.priority > 100)) {
-      errors.push('Priority must be between 1 and 100');
+      errors.push(this.i18n.t('settings.holidays.validation.priorityRange'));
     }
 
     return errors;

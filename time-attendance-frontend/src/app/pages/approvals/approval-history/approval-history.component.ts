@@ -224,7 +224,7 @@ export class ApprovalHistoryComponent implements OnInit {
 
   formatDate(date: string | null): string {
     if (!date) return '-';
-    return new Date(date).toLocaleDateString(this.i18n.getCurrentLocale(), {
+    return new Date(date).toLocaleDateString(this.i18n.getDateLocale(), {
       year: 'numeric',
       month: 'short',
       day: 'numeric',

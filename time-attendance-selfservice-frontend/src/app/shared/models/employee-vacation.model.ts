@@ -9,6 +9,7 @@ export interface EmployeeVacation {
   employeeName: string;
   vacationTypeId: number;
   vacationTypeName: string;
+  vacationTypeNameAr?: string;
   startDate: Date;
   endDate: Date;
   totalDays: number;

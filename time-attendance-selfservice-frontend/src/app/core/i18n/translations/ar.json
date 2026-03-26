@@ -31,7 +31,10 @@
     "coming_soon": "قريباً",
     "view_details": "عرض التفاصيل",
     "export": "تصدير",
-    "employees": "الموظفين"
+    "employees": "الموظفين",
+    "checkForm": "يرجى التحقق من النموذج وإصلاح أي أخطاء قبل الحفظ.",
+    "saving": "جاري الحفظ...",
+    "validationError": "خطأ في التحقق"
   },
   "auth": {
     "login": "تسجيل الدخول",
@@ -72,7 +75,8 @@
     "logout": "تسجيل الخروج",
     "administration": "الإدارة",
     "user_management": "إدارة المستخدمين",
-    "employee_management": "إدارة الموظفين"
+    "employee_management": "إدارة الموظفين",
+    "reports": "التقارير"
   },
   "nav": {
     "dashboard": "لوحة التحكم",
@@ -688,7 +692,8 @@
     "success": {
       "created": "تم إنشاء الوردیة بنجاح",
       "updated": "تم تحدیث الوردیة بنجاح",
-      "deleted": "تم حذف الوردیة بنجاح"
+      "deleted": "تم حذف الوردیة بنجاح",
+      "defaultSet": "تم تعيين الدوام الافتراضي بنجاح"
     },
     "loading": {
       "creating": "جاري إنشاء الوردیة...",
@@ -904,6 +909,20 @@
     },
     "period": "الفترة الزمنية",
     "status": {
+      "1": "حاضر",
+      "2": "غائب",
+      "3": "متأخر",
+      "4": "مغادرة مبكرة",
+      "5": "في إجازة",
+      "6": "يوم عطلة",
+      "7": "وقت إضافي",
+      "8": "غير مكتمل",
+      "9": "عطلة رسمية",
+      "10": "إجازة مرضية",
+      "11": "في الانتظار",
+      "12": "في مهمة رسمية",
+      "13": "معذور",
+      "14": "عمل عن بعد",
       "present": "حاضر",
       "absent": "غائب",
       "late": "متأخر",
@@ -918,21 +937,7 @@
       "manual_override": "تعديل يدوي",
       "on_duty": "في مهمة رسمية",
       "excused": "معذور",
-      "remote_work": "عمل عن بعد",
-      "1": "حاضر",
-      "2": "غائب",
-      "3": "متأخر",
-      "4": "مغادرة مبكرة",
-      "5": "في إجازة",
-      "6": "يوم عطلة",
-      "7": "وقت إضافي",
-      "8": "غير مكتمل",
-      "9": "عطلة رسمية",
-      "10": "إجازة مرضية",
-      "11": "في الانتظار",
-      "12": "في مهمة رسمية",
-      "13": "معذور",
-      "14": "عمل عن بعد"
+      "remote_work": "عمل عن بعد"
     },
     "transaction_types": {
       "check_in": "تسجيل الحضور",
@@ -1115,7 +1120,8 @@
       "records": "السجلات",
       "attendance_breakdown": "تفصيل الحضور",
       "time_summary": "ملخص الوقت",
-      "total_working_days": "إجمالي أيام العمل"
+      "total_working_days": "إجمالي أيام العمل",
+      "transactions": "المعاملات"
     },
     "placeholders": {
       "location": "أدخل الموقع (مثال: المكتب، العمل من المنزل)",
@@ -1402,7 +1408,11 @@
       },
       "errors": {
         "configurationNotFound": "لم يتم العثور على إعداد العمل الإضافي"
-      }
+      },
+      "gracePeriodDescription": "فترة السماح بالدقائق قبل بدء حساب العمل الإضافي",
+      "minimumOvertimeDescription": "الحد الأدنى من الدقائق المطلوبة لاحتساب العمل الإضافي",
+      "roundingIntervalDescription": "فاصل التقريب بالدقائق لحساب العمل الإضافي",
+      "view_details": "عرض التفاصيل"
     },
     "holidays": {
       "title": "العطل الرسمية",
@@ -1502,7 +1512,16 @@
         "dayOfWeekRequired": "يوم الأسبوع مطلوب",
         "invalidDateRange": "سنة الانتهاء يجب أن تكون بعد سنة البداية",
         "priorityRange": "الأولوية يجب أن تكون بين 1 و 100"
-      }
+      },
+      "conflicts": "التعارضات",
+      "conflicts_description": "العطل الرسمية التي تتعارض مع هذه العطلة",
+      "conflicts_detected": "تم اكتشاف تعارضات",
+      "effective_period": "فترة السريان",
+      "pattern_description": "وصف النمط",
+      "subtitle": "إدارة العطل الرسمية والمناسبات",
+      "summary": "الملخص",
+      "until": "حتى",
+      "view_details": "عرض التفاصيل"
     }
   },
   "vacation_types": {
@@ -1687,7 +1706,47 @@
       "duration": "المدة",
       "status": "الحالة",
       "notes": "الملاحظات"
-    }
+    },
+    "additional_information": "معلومات إضافية",
+    "approve": "موافقة",
+    "approve_error": "فشل في الموافقة على الإجازة",
+    "approve_failed": "فشل في الموافقة على الإجازة",
+    "approve_success": "تمت الموافقة على الإجازة بنجاح",
+    "basic_information": "المعلومات الأساسية",
+    "create_error": "فشل في إنشاء الإجازة",
+    "create_success": "تم إنشاء الإجازة بنجاح",
+    "delete_failed": "فشل في حذف الإجازة",
+    "help": {
+      "approval_info": "يمكن للمدراء تغيير حالة الموافقة",
+      "date_validation": "يجب أن يكون تاريخ الانتهاء بعد تاريخ البدء",
+      "edit_instructions": "عدّل تفاصيل الإجازة أدناه واحفظ التغييرات.",
+      "required_fields": "يجب إكمال جميع الحقول المطلوبة"
+    },
+    "help_date_range": "حدد تاريخ البدء والانتهاء للإجازة",
+    "help_notes_optional": "أضف ملاحظات اختيارية حول هذه الإجازة",
+    "help_select_employee": "اختر الموظف لهذه الإجازة",
+    "help_select_type": "اختر نوع الإجازة المناسب",
+    "help_text": "استخدم هذا النموذج لإدارة سجلات إجازات الموظفين.",
+    "help_title": "مساعدة",
+    "is_approved": "تمت الموافقة",
+    "load_employees_error": "فشل في تحميل الموظفين",
+    "load_error": "فشل في تحميل تفاصيل الإجازة",
+    "load_vacation_types_failed": "فشل في تحميل أنواع الإجازات",
+    "loading_data": "جاري تحميل البيانات...",
+    "loading_details": "جاري تحميل تفاصيل الإجازة...",
+    "not_found": "الإجازة غير موجودة",
+    "placeholders": {
+      "enter_notes": "أدخل ملاحظات اختيارية...",
+      "select_end_date": "اختر تاريخ الانتهاء",
+      "select_start_date": "اختر تاريخ البدء",
+      "select_vacation_type": "اختر نوع الإجازة..."
+    },
+    "required_information": "المعلومات المطلوبة",
+    "update_error": "فشل في تحديث الإجازة",
+    "update_success": "تم تحديث الإجازة بنجاح",
+    "vacation_id": "رقم الإجازة",
+    "vacation_information": "معلومات الإجازة",
+    "vacation_summary": "ملخص الإجازة"
   },
   "pages": {
     "employeeVacations": {
@@ -1710,7 +1769,10 @@
     "search": "بحث",
     "createdAt": "تاريخ الإنشاء",
     "daysUnit": "أيام",
-    "dayUnit": "يوم"
+    "dayUnit": "يوم",
+    "createdBy": "أنشأه",
+    "updatedAt": "تاريخ التحديث",
+    "updatedBy": "حدّثه"
   },
   "placeholders": {
     "selectEmployee": "اختر موظفاً",
@@ -1897,7 +1959,10 @@
     "start_date": "تاريخ البدء",
     "end_date": "تاريخ الانتهاء",
     "errors": {
-      "insufficient_permissions": "ليس لديك صلاحيات كافية لتنفيذ هذا الإجراء"
+      "insufficient_permissions": "ليس لديك صلاحيات كافية لتنفيذ هذا الإجراء",
+      "delete_failed": "فشل في الحذف. يرجى المحاولة مرة أخرى.",
+      "load_failed": "فشل في تحميل البيانات. يرجى المحاولة مرة أخرى.",
+      "operation_failed": "فشلت العملية. يرجى المحاولة مرة أخرى."
     },
     "edit_profile": "تعديل الملف الشخصي",
     "display_name": "الاسم المعروض",
@@ -1919,7 +1984,47 @@
     "pending": "قيد الانتظار",
     "rejected": "مرفوض",
     "info": "معلومات",
-    "completed": "مكتمل"
+    "completed": "مكتمل",
+    "audit_information": "معلومات التدقيق",
+    "company_wide": "على مستوى الشركة",
+    "confirm": "تأكيد",
+    "entries": "سجلات",
+    "filters": "التصفية",
+    "indefinite": "غير محدد",
+    "navigation": "التنقل",
+    "no": "لا",
+    "per_page": "لكل صفحة",
+    "required": "مطلوب",
+    "show": "عرض",
+    "yes": "نعم",
+    "statuses": {
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "pending": "قيد الانتظار",
+      "approved": "معتمد",
+      "rejected": "مرفوض",
+      "cancelled": "ملغى",
+      "processing": "قيد المعالجة",
+      "draft": "مسودة",
+      "published": "منشور",
+      "archived": "مؤرشف",
+      "online": "متصل",
+      "offline": "غير متصل",
+      "present": "حاضر",
+      "absent": "غائب",
+      "late": "متأخر",
+      "early": "مبكر",
+      "overtime": "عمل إضافي",
+      "full_time": "دوام كامل",
+      "part_time": "دوام جزئي",
+      "contract": "عقد",
+      "intern": "متدرب",
+      "male": "ذكر",
+      "female": "أنثى",
+      "office": "مكتب",
+      "remote": "عن بعد",
+      "hybrid": "هجين"
+    }
   },
   "validation": {
     "required": "هذا الحقل مطلوب",
@@ -1988,7 +2093,60 @@
     "activate_success": "تم تفعيل سياسة العذر بنجاح",
     "deactivate_success": "تم إلغاء تفعيل سياسة العذر بنجاح",
     "activate_error": "فشل في تفعيل سياسة العذر",
-    "deactivate_error": "فشل في إلغاء تفعيل سياسة العذر"
+    "deactivate_error": "فشل في إلغاء تفعيل سياسة العذر",
+    "activate_policy": "تفعيل السياسة",
+    "additional_settings": "إعدادات إضافية",
+    "allow_partial_hour_excuses": "السماح بأعذار جزئية بالساعة",
+    "allow_self_service_requests": "السماح بطلبات الخدمة الذاتية",
+    "audit_information": "معلومات التدقيق",
+    "basic_information": "المعلومات الأساسية",
+    "calculation_settings": "إعدادات الحساب",
+    "deactivate_policy": "تعطيل السياسة",
+    "errors": {
+      "delete_failed": "فشل في حذف السياسة",
+      "load_failed": "فشل في تحميل السياسة",
+      "toggle_status_failed": "فشل في تغيير حالة السياسة"
+    },
+    "excuses": "الأعذار",
+    "is_active": "نشط",
+    "is_active_help": "تحديد ما إذا كانت هذه السياسة نشطة حالياً",
+    "loading_details": "جاري تحميل التفاصيل...",
+    "max_excuses_month_help": "الحد الأقصى لعدد الأعذار المسموح بها شهرياً",
+    "max_hours_day_help": "الحد الأقصى لساعات الأعذار يومياً",
+    "max_hours_month_help": "الحد الأقصى لساعات الأعذار شهرياً",
+    "max_hours_per_excuse_help": "الحد الأقصى للساعات لكل عذر",
+    "max_per_month": "الحد الأقصى شهرياً",
+    "max_personal_excuse_hours_per_day": "الحد الأقصى لساعات الأعذار الشخصية يومياً",
+    "max_personal_excuse_hours_per_month": "الحد الأقصى لساعات الأعذار الشخصية شهرياً",
+    "max_personal_excuses_per_month": "الحد الأقصى للأعذار الشخصية شهرياً",
+    "minimum_excuse_duration": "الحد الأدنى لمدة العذر",
+    "policy_description": "وصف السياسة",
+    "policy_description_help": "أدخل وصفاً تفصيلياً لسياسة الأعذار",
+    "policy_description_placeholder": "أدخل وصف السياسة...",
+    "policy_details": "تفاصيل السياسة",
+    "policy_name": "اسم السياسة",
+    "policy_name_help": "أدخل اسماً فريداً لتحديد هذه السياسة",
+    "policy_name_placeholder": "أدخل اسم السياسة...",
+    "policy_notes": "ملاحظات السياسة",
+    "policy_settings": "إعدادات السياسة",
+    "scope_configuration": "تهيئة النطاق",
+    "scope_description": "حدد نطاق تطبيق هذه السياسة",
+    "success": {
+      "activated": "تم تفعيل السياسة بنجاح",
+      "deactivated": "تم تعطيل السياسة بنجاح",
+      "deleted": "تم حذف السياسة بنجاح"
+    },
+    "summary": "الملخص",
+    "validation": {
+      "excusesPerMonthRange": "يجب أن يكون عدد الأعذار شهرياً بين 1 و 31",
+      "hoursPerDayRange": "يجب أن تكون الساعات يومياً بين 0.5 و 24",
+      "hoursPerExcuseRange": "يجب أن تكون الساعات لكل عذر بين 0.5 و 24",
+      "hoursPerMonthRange": "يجب أن تكون الساعات شهرياً بين 1 و 744",
+      "pleaseFix": "يرجى إصلاح الأخطاء التالية",
+      "retroactiveDaysRange": "يجب أن تكون أيام الأثر الرجعي بين 0 و 365",
+      "serverErrors": "أخطاء من الخادم"
+    },
+    "view_policy": "عرض السياسة"
   },
   "employee_excuses": {
     "title": "أعذار الموظفين",
@@ -2011,7 +2169,6 @@
     "policy_info_title": "معلومات السياسة",
     "select_employee": "اختر موظف",
     "load_employees_error": "فشل في تحميل الموظفين",
-
     "employee": "الموظف",
     "excuse_type": "نوع العذر",
     "select_excuse_type": "اختر نوع العذر",
@@ -2042,7 +2199,6 @@
     "attachment_available": "مرفق متوفر",
     "existing_attachment": "سيتم الاحتفاظ بالمرفق الحالي",
     "will_replace_existing": "ملف جديد سيحل محل المرفق الموجود",
-
     "total_requests": "إجمالي الطلبات",
     "pending_requests": "الطلبات المعلقة",
     "approved_requests": "الطلبات المعتمدة",
@@ -2050,7 +2206,6 @@
     "current_month_hours": "ساعات الشهر الحالي",
     "remaining": "المتبقي",
     "remaining_monthly_hours": "الساعات المتبقية شهرياً",
-
     "search_placeholder": "البحث بالاسم أو رقم الموظف أو السبب...",
     "no_requests_found": "لم يتم العثور على طلبات أعذار",
     "no_requests_message": "لا توجد طلبات أعذار للعرض. قم بإنشاء طلب عذر جديد للبدء.",
@@ -2059,25 +2214,21 @@
     "last_30_days": "آخر 30 يوماً",
     "this_month": "هذا الشهر",
     "select_time_range": "حدد نطاق الوقت لحساب المدة",
-
     "status_pending": "في الانتظار",
     "status_approved": "معتمد",
     "status_rejected": "مرفوض",
     "status_cancelled": "ملغي",
-
     "approve": "موافقة",
     "reject": "رفض",
     "cancel": "إلغاء",
     "download": "تحميل",
     "download_attachment": "تحميل المرفق",
-
     "approve_title": "الموافقة على طلب العذر",
     "reject_title": "رفض طلب العذر",
     "cancel_title": "إلغاء طلب العذر",
     "confirm_approve": "هل أنت متأكد من الموافقة على طلب العذر؟",
     "confirm_reject": "هل أنت متأكد من رفض طلب العذر؟ يرجى تقديم تعليقات توضح السبب.",
     "confirm_cancel": "هل أنت متأكد من إلغاء طلب العذر؟",
-
     "creating": "جاري الإنشاء...",
     "updating": "جاري التحديث...",
     "submit_request": "إرسال الطلب",
@@ -2086,7 +2237,6 @@
     "file_too_large": "حجم الملف يتجاوز حد 5 ميجابايت",
     "invalid_file_type": "نوع ملف غير صالح. يرجى اختيار صيغة مدعومة.",
     "invalid_time_range": "وقت النهاية يجب أن يكون بعد وقت البداية",
-
     "load_error": "فشل في تحميل طلبات الأعذار",
     "loading_excuse": "جاري تحميل تفاصيل العذر...",
     "loading_details": "جاري تحميل التفاصيل...",
@@ -2096,13 +2246,11 @@
     "reject_error": "فشل في رفض طلب العذر",
     "cancel_error": "فشل في إلغاء طلب العذر",
     "download_error": "فشل في تحميل المرفق",
-
     "create_success": "تم إنشاء طلب العذر بنجاح",
     "update_success": "تم تحديث طلب العذر بنجاح",
     "approve_success": "تم قبول طلب العذر بنجاح",
     "reject_success": "تم رفض طلب العذر بنجاح",
     "cancel_success": "تم إلغاء طلب العذر بنجاح",
-
     "policy_rule_1": "يجب تقديم طلبات الأعذار في أقرب وقت ممكن",
     "policy_rule_2": "الطلبات بأثر رجعي قد تتطلب موافقة إضافية",
     "policy_rule_3": "يُنصح بالوثائق الداعمة للغيابات الأطول",
@@ -2135,7 +2283,87 @@
     "policy": {
       "title": "سياسات العمل عن بعد",
       "create": "إنشاء سياسة",
-      "company_wide": "على مستوى الشركة"
+      "company_wide": "على مستوى الشركة",
+      "activate_policy": "تفعيل السياسة",
+      "advance_notice": "إشعار مسبق",
+      "advance_notice_help": "عدد الأيام التي يجب على الموظفين طلب العمل عن بعد قبلها",
+      "allowConsecutiveDays": "السماح بأيام متتالية",
+      "approval_automatic_help": "سيتم الموافقة على طلبات العمل عن بعد تلقائياً",
+      "approval_required_help": "ستحتاج طلبات العمل عن بعد إلى موافقة المدير",
+      "approval_settings": "إعدادات الموافقة",
+      "attendanceSettings": "إعدادات الحضور",
+      "branch": "الفرع",
+      "branch_policy": "سياسة العمل عن بعد للفرع",
+      "branch_specific": "خاص بالفرع",
+      "branch_specific_help": "ستطبق هذه السياسة فقط على الفرع المحدد",
+      "company_wide_help": "ستطبق هذه السياسة على جميع الفروع في الشركة",
+      "company_wide_policy": "سياسة عمل عن بعد على مستوى الشركة",
+      "confirm_activate": "هل أنت متأكد من تفعيل سياسة العمل عن بعد هذه؟",
+      "confirm_deactivate": "هل أنت متأكد من تعطيل سياسة العمل عن بعد هذه؟",
+      "confirm_delete": "هل أنت متأكد من حذف سياسة العمل عن بعد هذه؟",
+      "countForOvertime": "احتساب العمل الإضافي",
+      "create_policy": "إنشاء سياسة عمل عن بعد",
+      "deactivate_policy": "تعطيل السياسة",
+      "deleteConfirm": "حذف سياسة العمل عن بعد",
+      "deleteMessage": "هل أنت متأكد من حذف هذه السياسة؟",
+      "delete_policy": "حذف السياسة",
+      "edit": "تعديل السياسة",
+      "edit_policy": "تعديل سياسة العمل عن بعد",
+      "enforceShiftTimes": "فرض أوقات الدوام",
+      "errors": {
+        "branch_required": "الفرع مطلوب",
+        "create_failed": "فشل في إنشاء سياسة العمل عن بعد",
+        "delete_failed": "فشل في حذف سياسة العمل عن بعد",
+        "invalid_advance_notice": "يجب أن تكون أيام الإشعار المسبق 0 أو أكثر",
+        "invalid_id": "معرف السياسة غير صالح",
+        "invalid_max_days_per_month": "يجب أن يكون الحد الأقصى للأيام شهرياً بين 0 و 31",
+        "invalid_max_days_per_week": "يجب أن يكون الحد الأقصى للأيام أسبوعياً بين 0 و 7",
+        "invalid_max_days_per_year": "يجب أن يكون الحد الأقصى للأيام سنوياً بين 0 و 365",
+        "load_failed": "فشل في تحميل سياسات العمل عن بعد",
+        "not_found": "سياسة العمل عن بعد غير موجودة",
+        "status_toggle_failed": "فشل في تغيير حالة السياسة",
+        "toggle_failed": "فشل في تحديث حالة السياسة",
+        "update_failed": "فشل في تحديث سياسة العمل عن بعد"
+      },
+      "loadError": "فشل في تحميل سياسات العمل عن بعد",
+      "loading_details": "جاري تحميل تفاصيل السياسة...",
+      "managerApproval": "موافقة المدير",
+      "maxConsecutiveDays": "الحد الأقصى للأيام المتتالية",
+      "max_31_days": "الحد الأقصى 31 يوماً",
+      "max_365_days": "الحد الأقصى 365 يوماً",
+      "max_7_days": "الحد الأقصى 7 أيام",
+      "max_days_per_month": "الحد الأقصى للأيام شهرياً",
+      "max_days_per_week": "الحد الأقصى للأيام أسبوعياً",
+      "max_days_per_year": "الحد الأقصى للأيام سنوياً",
+      "min_advance_notice_days": "الحد الأدنى لأيام الإشعار المسبق",
+      "noData": "لا توجد سياسات عمل عن بعد",
+      "noDataMessage": "ابدأ بإنشاء سياسة عمل عن بعد لفرعك",
+      "no_advance_notice": "لا يلزم إشعار مسبق",
+      "no_advance_notice_required": "لا يلزم إشعار مسبق",
+      "no_limit": "بدون حد",
+      "no_quotas_set": "لم يتم تعيين حصص",
+      "policy_details": "تفاصيل سياسة العمل عن بعد",
+      "policy_not_found": "السياسة غير موجودة",
+      "policy_not_found_message": "لم يتم العثور على سياسة العمل عن بعد المطلوبة",
+      "policy_scope": "نطاق السياسة",
+      "quota_settings": "إعدادات الحصص",
+      "quota_settings_help": "حدد الحدود لعدد أيام العمل عن بعد. اتركه فارغاً بدون حد.",
+      "quotas": "الحصص",
+      "requires_manager_approval": "يتطلب موافقة المدير",
+      "rules": "القواعد",
+      "select_branch": "اختر الفرع",
+      "success": {
+        "activated": "تم تفعيل سياسة العمل عن بعد بنجاح",
+        "created": "تم إنشاء سياسة العمل عن بعد بنجاح",
+        "deactivated": "تم تعطيل سياسة العمل عن بعد بنجاح",
+        "deleted": "تم حذف سياسة العمل عن بعد بنجاح",
+        "status_toggled": "تم تحديث حالة السياسة بنجاح",
+        "updated": "تم تحديث سياسة العمل عن بعد بنجاح"
+      },
+      "view": "عرض السياسة",
+      "warnings": {
+        "no_quotas": "لم يتم تعيين حصص. لن يكون للسياسة حدود."
+      }
     },
     "request": {
       "title": "العمل عن بعد",
@@ -2630,7 +2858,81 @@
     "enter_delegate_user_id": "أدخل معرف المستخدم للتفويض إليه:",
     "invalid_user_id": "معرف مستخدم غير صالح. يرجى إدخال رقم صحيح.",
     "approval_error": "فشل في الموافقة على الطلب",
-    "error_loading_approvals": "فشل في تحميل الموافقات المعلقة"
+    "error_loading_approvals": "فشل في تحميل الموافقات المعلقة",
+    "profile_updated_success": "تم تحديث الملف الشخصي بنجاح",
+    "profile_update_failed": "فشل في تحديث الملف الشخصي",
+    "columns": {
+      "id": "المعرف"
+    },
+    "actions": {
+      "view": "عرض",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "cancel": "إلغاء"
+    },
+    "nav": {
+      "dashboard": "لوحة التحكم",
+      "dashboard_desc": "عرض لوحة التحكم والإحصائيات السريعة",
+      "my_attendance": "حضوري",
+      "my_attendance_desc": "عرض سجل الحضور الخاص بك",
+      "my_profile": "ملفي الشخصي",
+      "my_profile_desc": "إدارة معلومات ملفك الشخصي",
+      "fingerprint_requests": "طلبات البصمة",
+      "fingerprint_requests_desc": "إدارة تسجيل البصمة",
+      "vacation_requests": "طلبات الإجازات",
+      "vacation_requests_desc": "طلب وإدارة الإجازات",
+      "excuse_requests": "طلبات الأعذار",
+      "excuse_requests_desc": "طلب أعذار الوقت",
+      "remote_work_requests": "طلبات العمل عن بعد",
+      "remote_work_requests_desc": "طلب العمل عن بعد"
+    },
+    "profile": {
+      "personal_information": "المعلومات الشخصية",
+      "employee_information": "معلومات الموظف",
+      "account_information": "معلومات الحساب",
+      "username": "اسم المستخدم",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف",
+      "display_name": "الاسم المعروض",
+      "employee_code": "رمز الموظف",
+      "full_name": "الاسم الكامل",
+      "department": "القسم",
+      "branch": "الفرع",
+      "position": "المنصب",
+      "hire_date": "تاريخ التعيين",
+      "status": "الحالة",
+      "roles": "الأدوار",
+      "created": "تاريخ الإنشاء",
+      "last_login": "آخر تسجيل دخول",
+      "never": "أبداً",
+      "field_required": "هذا الحقل مطلوب",
+      "invalid_email": "صيغة البريد الإلكتروني غير صالحة"
+    },
+    "correction_types": {
+      "check_in": "تسجيل الدخول",
+      "check_out": "تسجيل الخروج",
+      "unknown": "غير معروف"
+    },
+    "approval_statuses": {
+      "pending": "قيد الانتظار",
+      "approved": "معتمد",
+      "rejected": "مرفوض",
+      "cancelled": "ملغى",
+      "unknown": "غير معروف"
+    },
+    "stats_attendance_rate": "معدل الحضور",
+    "stats_vacation_days": "أيام الإجازة",
+    "stats_remaining_this_year": "المتبقي هذا العام",
+    "stats_from_last_month": "عن الشهر الماضي",
+    "quick_submit_vacation": "تقديم طلب إجازة جديد",
+    "quick_submit_excuse": "تقديم طلب عذر غياب",
+    "quick_view_attendance": "عرض سجل الحضور",
+    "quick_attendance_correction": "تصحيح الحضور",
+    "quick_correction_desc": "طلب تصحيح لتسجيل دخول/خروج فائت",
+    "activity_attended": "حضور بتاريخ {{date}} - {{hours}} ساعة عمل",
+    "activity_vacation": "طلب إجازة من {{start}} إلى {{end}} - {{status}}",
+    "activity_excuse": "طلب عذر بتاريخ {{date}} - {{status}}",
+    "activity_remote_work": "عمل عن بعد من {{start}} إلى {{end}} - {{status}}"
   },
   "notifications": {
     "title": "الإشعارات",
@@ -2644,5 +2946,27 @@
     "daysAgo": "منذ {{count}} يوم",
     "unreadCount": "{{count}} غير مقروء",
     "newNotification": "إشعار جديد"
+  },
+  "branches": {
+    "code": "رمز الفرع",
+    "code_placeholder": "أدخل رمز الفرع",
+    "create_branch": "إنشاء فرع",
+    "created": "تاريخ الإنشاء",
+    "delete_branch": "حذف الفرع",
+    "delete_confirmation": "هل أنت متأكد من حذف هذا الفرع؟ لا يمكن التراجع عن هذا الإجراء.",
+    "departments": "الأقسام",
+    "edit_branch": "تعديل الفرع",
+    "employees": "الموظفون",
+    "loading": "جاري تحميل الفروع...",
+    "name": "اسم الفرع",
+    "name_placeholder": "أدخل اسم الفرع",
+    "no_branches_found": "لم يتم العثور على فروع",
+    "no_branches_message": "لا توجد فروع تطابق معايير البحث الحالية. حاول تعديل معايير البحث.",
+    "results": "نتائج",
+    "search_placeholder": "ابحث باسم الفرع أو الرمز...",
+    "status": "الحالة",
+    "subtitle": "إدارة فروع المنظمة والمواقع",
+    "timezone": "المنطقة الزمنية",
+    "title": "إدارة الفروع"
   }
 }

@@ -1,4 +1,4 @@
-<div class="edit-remote-work-policy-page">
+<div class="edit-remote-work-policy-page app-modern-form">
   <!-- Page Header -->
   <app-form-header
     mode="edit"
@@ -47,13 +47,18 @@
                   </small>
                 </div>
               } @else {
-                <app-searchable-select
-                  [(ngModel)]="policyForm.branchId"
-                  name="branchId"
-                  [options]="branches()"
-                  [placeholder]="i18n.t('remoteWork.policy.select_branch')"
-                  [required]="true">
-                </app-searchable-select>
+                <div class="app-modern-field">
+                  <label for="branchId" class="app-modern-label required">
+                    {{ i18n.t('remoteWork.policy.branch') }}
+                  </label>
+                  <app-searchable-select
+                    [(ngModel)]="policyForm.branchId"
+                    name="branchId"
+                    [options]="branches()"
+                    [placeholder]="i18n.t('remoteWork.policy.select_branch')"
+                    [required]="true">
+                  </app-searchable-select>
+                </div>
               }
             </div>
 
@@ -94,52 +99,58 @@
           <div class="row">
             <!-- Max Days Per Week -->
             <div class="col-md-4 mb-3">
-              <label for="maxDaysPerWeek" class="form-label">
-                {{ i18n.t('remoteWork.policy.max_days_per_week') }}
-              </label>
-              <input
-                type="number"
-                class="form-control"
-                id="maxDaysPerWeek"
-                [(ngModel)]="policyForm.maxDaysPerWeek"
-                name="maxDaysPerWeek"
-                min="0"
-                max="7"
-                [placeholder]="i18n.t('remoteWork.policy.no_limit')">
+              <div class="form-floating">
+                <input
+                  type="number"
+                  class="form-control"
+                  id="maxDaysPerWeek"
+                  [(ngModel)]="policyForm.maxDaysPerWeek"
+                  name="maxDaysPerWeek"
+                  min="0"
+                  max="7"
+                  placeholder="{{ i18n.t('remoteWork.policy.max_days_per_week') }}">
+                <label for="maxDaysPerWeek">
+                  {{ i18n.t('remoteWork.policy.max_days_per_week') }}
+                </label>
+              </div>
               <div class="form-text">{{ i18n.t('remoteWork.policy.max_7_days') }}</div>
             </div>
 
             <!-- Max Days Per Month -->
             <div class="col-md-4 mb-3">
-              <label for="maxDaysPerMonth" class="form-label">
-                {{ i18n.t('remoteWork.policy.max_days_per_month') }}
-              </label>
-              <input
-                type="number"
-                class="form-control"
-                id="maxDaysPerMonth"
-                [(ngModel)]="policyForm.maxDaysPerMonth"
-                name="maxDaysPerMonth"
-                min="0"
-                max="31"
-                [placeholder]="i18n.t('remoteWork.policy.no_limit')">
+              <div class="form-floating">
+                <input
+                  type="number"
+                  class="form-control"
+                  id="maxDaysPerMonth"
+                  [(ngModel)]="policyForm.maxDaysPerMonth"
+                  name="maxDaysPerMonth"
+                  min="0"
+                  max="31"
+                  placeholder="{{ i18n.t('remoteWork.policy.max_days_per_month') }}">
+                <label for="maxDaysPerMonth">
+                  {{ i18n.t('remoteWork.policy.max_days_per_month') }}
+                </label>
+              </div>
               <div class="form-text">{{ i18n.t('remoteWork.policy.max_31_days') }}</div>
             </div>
 
             <!-- Max Days Per Year -->
             <div class="col-md-4 mb-3">
-              <label for="maxDaysPerYear" class="form-label">
-                {{ i18n.t('remoteWork.policy.max_days_per_year') }}
-              </label>
-              <input
-                type="number"
-                class="form-control"
-                id="maxDaysPerYear"
-                [(ngModel)]="policyForm.maxDaysPerYear"
-                name="maxDaysPerYear"
-                min="0"
-                max="365"
-                [placeholder]="i18n.t('remoteWork.policy.no_limit')">
+              <div class="form-floating">
+                <input
+                  type="number"
+                  class="form-control"
+                  id="maxDaysPerYear"
+                  [(ngModel)]="policyForm.maxDaysPerYear"
+                  name="maxDaysPerYear"
+                  min="0"
+                  max="365"
+                  placeholder="{{ i18n.t('remoteWork.policy.max_days_per_year') }}">
+                <label for="maxDaysPerYear">
+                  {{ i18n.t('remoteWork.policy.max_days_per_year') }}
+                </label>
+              </div>
               <div class="form-text">{{ i18n.t('remoteWork.policy.max_365_days') }}</div>
             </div>
           </div>
@@ -191,17 +202,19 @@
           <div class="row">
             <!-- Minimum Advance Notice Days -->
             <div class="col-md-6 mb-3">
-              <label for="minAdvanceNoticeDays" class="form-label">
-                {{ i18n.t('remoteWork.policy.min_advance_notice_days') }}
-              </label>
-              <input
-                type="number"
-                class="form-control"
-                id="minAdvanceNoticeDays"
-                [(ngModel)]="policyForm.minAdvanceNoticeDays"
-                name="minAdvanceNoticeDays"
-                min="0"
-                [placeholder]="i18n.t('remoteWork.policy.no_advance_notice')">
+              <div class="form-floating">
+                <input
+                  type="number"
+                  class="form-control"
+                  id="minAdvanceNoticeDays"
+                  [(ngModel)]="policyForm.minAdvanceNoticeDays"
+                  name="minAdvanceNoticeDays"
+                  min="0"
+                  placeholder="{{ i18n.t('remoteWork.policy.min_advance_notice_days') }}">
+                <label for="minAdvanceNoticeDays">
+                  {{ i18n.t('remoteWork.policy.min_advance_notice_days') }}
+                </label>
+              </div>
               <div class="form-text">{{ i18n.t('remoteWork.policy.advance_notice_help') }}</div>
             </div>
           </div>
@@ -211,7 +224,7 @@
       <!-- Form Actions -->
       <div class="card">
         <div class="card-body">
-          <div class="d-flex justify-content-end gap-2">
+          <div class="app-form-actions">
             <button
               type="button"
               class="btn btn-secondary"

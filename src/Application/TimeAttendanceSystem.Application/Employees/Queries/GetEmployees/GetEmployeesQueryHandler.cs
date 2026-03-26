@@ -89,22 +89,29 @@ public class GetEmployeesQueryHandler : BaseHandler<GetEmployeesQuery, Result<Pa
                 ManagerEmployeeId = e.ManagerEmployeeId,
                 ManagerName = e.Manager != null ? $"{e.Manager.FirstName} {e.Manager.LastName}" : null,
                 WorkLocationType = e.WorkLocationType,
+                // Resolve shift: Employee-level > Department-level > Branch-level
                 CurrentShiftId = Context.ShiftAssignments
-                    .Where(sa => sa.EmployeeId == e.Id &&
-                                sa.AssignmentType == ShiftAssignmentType.Employee &&
-                                sa.Status == ShiftAssignmentStatus.Active &&
+                    .Where(sa => sa.Status == ShiftAssignmentStatus.Active &&
                                 sa.EffectiveFromDate <= DateTime.UtcNow &&
-                                (sa.EffectiveToDate == null || sa.EffectiveToDate >= DateTime.UtcNow))
+                                (sa.EffectiveToDate == null || sa.EffectiveToDate >= DateTime.UtcNow) &&
+                                (
+                                    (sa.AssignmentType == ShiftAssignmentType.Employee && sa.EmployeeId == e.Id) ||
+                                    (sa.AssignmentType == ShiftAssignmentType.Department && sa.DepartmentId == e.DepartmentId) ||
+                                    (sa.AssignmentType == ShiftAssignmentType.Branch && sa.BranchId == e.BranchId)
+                                ))
                     .OrderByDescending(sa => sa.Priority)
                     .ThenByDescending(sa => sa.EffectiveFromDate)
                     .Select(sa => sa.ShiftId)
                     .FirstOrDefault(),
                 CurrentShiftName = Context.ShiftAssignments
-                    .Where(sa => sa.EmployeeId == e.Id &&
-                                sa.AssignmentType == ShiftAssignmentType.Employee &&
-                                sa.Status == ShiftAssignmentStatus.Active &&
+                    .Where(sa => sa.Status == ShiftAssignmentStatus.Active &&
                                 sa.EffectiveFromDate <= DateTime.UtcNow &&
-                                (sa.EffectiveToDate == null || sa.EffectiveToDate >= DateTime.UtcNow))
+                                (sa.EffectiveToDate == null || sa.EffectiveToDate >= DateTime.UtcNow) &&
+                                (
+                                    (sa.AssignmentType == ShiftAssignmentType.Employee && sa.EmployeeId == e.Id) ||
+                                    (sa.AssignmentType == ShiftAssignmentType.Department && sa.DepartmentId == e.DepartmentId) ||
+                                    (sa.AssignmentType == ShiftAssignmentType.Branch && sa.BranchId == e.BranchId)
+                                ))
                     .OrderByDescending(sa => sa.Priority)
                     .ThenByDescending(sa => sa.EffectiveFromDate)
                     .Join(Context.Shifts, sa => sa.ShiftId, s => s.Id, (sa, s) => s.Name)

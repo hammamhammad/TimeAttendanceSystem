@@ -7,8 +7,8 @@
 
 .table-controls {
   padding: 1rem;
-  border-bottom: 1px solid #e9ecef;
-  background-color: #f8f9fa;
+  border-bottom: 1px solid var(--app-gray-200);
+  background-color: var(--app-gray-100);
   border-radius: 8px 8px 0 0;
 }
 
@@ -79,8 +79,8 @@
 }
 
 .form-check-input:indeterminate {
-  background-color: #ffc107;
-  border-color: #ffc107;
+  background-color: var(--app-warning);
+  border-color: var(--app-warning);
 }
 
 .form-select:focus {
@@ -91,8 +91,8 @@
 /* Component-Specific Pagination Colors */
 .page-link:hover {
   color: #2196f3;
-  background-color: #f8f9fa;
-  border-color: #dee2e6;
+  background-color: var(--app-gray-100);
+  border-color: var(--app-gray-300);
 }
 
 .page-item.active .page-link {

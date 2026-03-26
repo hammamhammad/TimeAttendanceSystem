@@ -40,6 +40,9 @@ public class GetNfcTagsByBranchQueryHandler : BaseHandler<GetNfcTagsByBranchQuer
                 t.IsWriteProtected,
                 t.LockedAt,
                 t.IsActive,
+                t.Status,
+                t.LastScannedAt,
+                t.ScanCount,
                 t.CreatedAtUtc
             ))
             .ToListAsync(cancellationToken);

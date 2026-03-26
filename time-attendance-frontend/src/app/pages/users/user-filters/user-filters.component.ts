@@ -19,7 +19,7 @@ interface Role {
       [filterFields]="filterFields()"
       [showAddButton]="showAddButton"
       [addButtonText]="addButtonText"
-      [searchPlaceholder]="'Search users...'"
+      [searchPlaceholder]="i18n.t('users.search_users')"
       [refreshing]="refreshing"
       (search)="onSearch($event)"
       (filterChange)="onFilterChange($event)"
@@ -29,7 +29,7 @@ interface Role {
   `
 })
 export class UserFiltersComponent {
-  private i18n = inject(I18nService);
+  i18n = inject(I18nService);
 
   @Input() showAddButton = true;
   @Input() addButtonText = 'Add User';
@@ -69,13 +69,13 @@ export class UserFiltersComponent {
     this.filterFields.set([
       {
         key: 'roleId',
-        label: 'Role',
+        label: this.i18n.t('common.role'),
         type: 'select',
         options: roleOptions
       },
       {
         key: 'isActive',
-        label: 'Status',
+        label: this.i18n.t('common.status'),
         type: 'select',
         options: statusOptions
       }

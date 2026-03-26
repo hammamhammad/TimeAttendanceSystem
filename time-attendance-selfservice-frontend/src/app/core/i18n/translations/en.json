@@ -485,7 +485,8 @@
     "create_subdepartment": "Create Sub-department",
     "department_not_found": "Department not found",
     "root_department": "Root Department",
-    "description_ar": "Description (Arabic)"
+    "description_ar": "Description (Arabic)",
+    "statistics": "Statistics"
   },
   "departments": {
     "title": "Departments",
@@ -507,7 +508,8 @@
     "sub_departments": "Sub-departments",
     "hierarchy": "Hierarchy",
     "department_not_found": "Department not found",
-    "root_department": "Root Department"
+    "root_department": "Root Department",
+    "statistics": "Statistics"
   },
   "shifts": {
     "title": "Shift Management",
@@ -928,6 +930,20 @@
       "time_not_specified": "Time not specified"
     },
     "status": {
+      "1": "Present",
+      "2": "Absent",
+      "3": "Late",
+      "4": "Early Leave",
+      "5": "On Leave",
+      "6": "Day Off",
+      "7": "Overtime",
+      "8": "Incomplete",
+      "9": "Holiday",
+      "10": "Sick Leave",
+      "11": "Pending",
+      "12": "On Duty",
+      "13": "Excused",
+      "14": "Remote Work",
       "present": "Present",
       "absent": "Absent",
       "late": "Late",
@@ -942,21 +958,7 @@
       "manual_override": "Manual Override",
       "on_duty": "On Duty",
       "excused": "Excused",
-      "remote_work": "Remote Work",
-      "1": "Present",
-      "2": "Absent",
-      "3": "Late",
-      "4": "Early Leave",
-      "5": "On Leave",
-      "6": "Day Off",
-      "7": "Overtime",
-      "8": "Incomplete",
-      "9": "Holiday",
-      "10": "Sick Leave",
-      "11": "Pending",
-      "12": "On Duty",
-      "13": "Excused",
-      "14": "Remote Work"
+      "remote_work": "Remote Work"
     },
     "transaction_types": {
       "check_in": "Check In",
@@ -990,7 +992,8 @@
       "recalculate_all": "Recalculate All",
       "confirm_recalculate": "Are you sure you want to recalculate this employee's attendance? This will update the record based on current shift assignments and transactions.",
       "confirm_calculate_all": "Are you sure you want to generate attendance records for all employees without records on this date?",
-      "confirm_recalculate_all_force": "Are you sure you want to force recalculate ALL attendance records for this date? This will override existing calculations."
+      "confirm_recalculate_all_force": "Are you sure you want to force recalculate ALL attendance records for this date? This will override existing calculations.",
+      "create": "Create"
     },
     "filters": {
       "date_range": "Date Range",
@@ -1021,7 +1024,8 @@
       "year": "Year",
       "employees": "Employees",
       "departments": "Departments",
-      "branches": "Branches"
+      "branches": "Branches",
+      "options": "Filter Options"
     },
     "hints": {
       "better_performance": "For better performance, consider using filters when viewing large datasets.",
@@ -1177,7 +1181,11 @@
       "invalid_date_range": "End date must be after start date",
       "max_date_range": "Date range cannot exceed {{days}} days",
       "future_date_not_allowed": "Future dates are not allowed",
-      "duplicate_transaction": "A similar transaction already exists for this time period"
+      "duplicate_transaction": "A similar transaction already exists for this time period",
+      "end_date_after_start": "End date must be after start date",
+      "end_date_required": "End date is required",
+      "start_date_required": "Start date is required",
+      "time_required": "Time is required"
     },
     "confirmations": {
       "generate_missing": "Are you sure you want to generate missing attendance records for {{date}}? This will create records for employees who don't have attendance on this date.",
@@ -1253,7 +1261,41 @@
       "monthly_overview": "Monthly Overview",
       "overtime_trend": "Overtime Trend"
     },
-    "export_options": "Export Options"
+    "export_options": "Export Options",
+    "add_notes_or_comments": "Add notes or comments",
+    "all_employees": "All Employees",
+    "all_statuses": "All Statuses",
+    "all_types": "All Types",
+    "clear_filters": "Clear Filters",
+    "date": "Date",
+    "employee": "Employee",
+    "end_date": "End Date",
+    "export_data": "Export Data",
+    "failed_to_load": "Failed to load attendance data",
+    "failed_to_load_attendance_data": "Failed to load attendance data",
+    "failed_to_load_daily_attendance_records": "Failed to load daily attendance records",
+    "failed_to_load_transactions": "Failed to load transactions",
+    "generate_report": "Generate Report",
+    "include_transactions": "Include Transactions",
+    "include_working_day_analysis": "Include Working Day Analysis",
+    "location": "Location",
+    "manage_manual_entries": "Manage Manual Entries",
+    "manual_entry": "Manual Entry",
+    "manual_only": "Manual Only",
+    "notes": "Notes",
+    "now": "Now",
+    "period": "Period",
+    "real_time": "Real Time",
+    "refresh": "Refresh",
+    "refresh_data": "Refresh Data",
+    "reset": "Reset",
+    "search": "Search",
+    "search_by_employee_location_notes": "Search by employee, location, or notes",
+    "start_date": "Start Date",
+    "time": "Time",
+    "transaction_records": "Transaction Records",
+    "transaction_type": "Transaction Type",
+    "view_and_manage": "View and Manage"
   },
   "settings": {
     "title": "Settings",
@@ -1391,7 +1433,8 @@
       },
       "errors": {
         "configurationNotFound": "Overtime configuration not found"
-      }
+      },
+      "policyNotesDescription": "Add any additional notes about this overtime policy"
     },
     "holidays": {
       "title": "Public Holidays",
@@ -1975,7 +2018,35 @@
     "pending": "Pending",
     "rejected": "Rejected",
     "info": "Info",
-    "completed": "Completed"
+    "completed": "Completed",
+    "statuses": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled",
+      "processing": "Processing",
+      "draft": "Draft",
+      "published": "Published",
+      "archived": "Archived",
+      "online": "Online",
+      "offline": "Offline",
+      "present": "Present",
+      "absent": "Absent",
+      "late": "Late",
+      "early": "Early",
+      "overtime": "Overtime",
+      "full_time": "Full Time",
+      "part_time": "Part Time",
+      "contract": "Contract",
+      "intern": "Intern",
+      "male": "Male",
+      "female": "Female",
+      "office": "Office",
+      "remote": "Remote",
+      "hybrid": "Hybrid"
+    }
   },
   "validation": {
     "required": "This field is required",
@@ -2120,7 +2191,6 @@
     "policy_info_title": "Policy Information",
     "select_employee": "Select Employee",
     "load_employees_error": "Failed to load employees",
-
     "employee": "Employee",
     "excuse_type": "Excuse Type",
     "select_excuse_type": "Select Excuse Type",
@@ -2151,7 +2221,6 @@
     "attachment_available": "Attachment Available",
     "existing_attachment": "Current attachment will be preserved",
     "will_replace_existing": "A new file will replace the existing attachment",
-
     "total_requests": "Total Requests",
     "pending_requests": "Pending Requests",
     "approved_requests": "Approved Requests",
@@ -2159,7 +2228,6 @@
     "current_month_hours": "Current Month Hours",
     "remaining": "Remaining",
     "remaining_monthly_hours": "Remaining Monthly Hours",
-
     "search_placeholder": "Search by employee name, number, or reason...",
     "no_requests_found": "No excuse requests found",
     "no_requests_message": "There are no excuse requests to display. Create a new excuse request to get started.",
@@ -2168,25 +2236,21 @@
     "last_30_days": "Last 30 Days",
     "this_month": "This Month",
     "select_time_range": "Select time range to calculate duration",
-
     "status_pending": "Pending",
     "status_approved": "Approved",
     "status_rejected": "Rejected",
     "status_cancelled": "Cancelled",
-
     "approve": "Approve",
     "reject": "Reject",
     "cancel": "Cancel",
     "download": "Download",
     "download_attachment": "Download Attachment",
-
     "approve_title": "Approve Excuse Request",
     "reject_title": "Reject Excuse Request",
     "cancel_title": "Cancel Excuse Request",
     "confirm_approve": "Are you sure you want to approve this excuse request?",
     "confirm_reject": "Are you sure you want to reject this excuse request? Please provide comments explaining the reason.",
     "confirm_cancel": "Are you sure you want to cancel this excuse request?",
-
     "creating": "Creating...",
     "updating": "Updating...",
     "submit_request": "Submit Request",
@@ -2195,7 +2259,6 @@
     "file_too_large": "File size exceeds 5MB limit",
     "invalid_file_type": "Invalid file type. Please select a supported format.",
     "invalid_time_range": "End time must be after start time",
-
     "load_error": "Failed to load excuse requests",
     "loading_excuse": "Loading excuse details...",
     "loading_details": "Loading details...",
@@ -2205,13 +2268,11 @@
     "reject_error": "Failed to reject excuse request",
     "cancel_error": "Failed to cancel excuse request",
     "download_error": "Failed to download attachment",
-
     "create_success": "Excuse request created successfully",
     "update_success": "Excuse request updated successfully",
     "approve_success": "Excuse request approved successfully",
     "reject_success": "Excuse request rejected successfully",
     "cancel_success": "Excuse request cancelled successfully",
-
     "policy_rule_1": "Excuse requests should be submitted as soon as possible",
     "policy_rule_2": "Retroactive requests may require additional approval",
     "policy_rule_3": "Supporting documentation is recommended for longer absences",
@@ -2818,7 +2879,82 @@
     "enter_delegate_user_id": "Enter the User ID to delegate to:",
     "invalid_user_id": "Invalid user ID. Please enter a valid number.",
     "approval_error": "Failed to approve request",
-    "error_loading_approvals": "Failed to load pending approvals"
+    "error_loading_approvals": "Failed to load pending approvals",
+    "profile_updated_success": "Profile updated successfully",
+    "profile_update_failed": "Failed to update profile",
+    "describe_issue_placeholder": "Describe your issue...",
+    "columns": {
+      "id": "ID"
+    },
+    "actions": {
+      "view": "View",
+      "edit": "Edit",
+      "delete": "Delete",
+      "cancel": "Cancel"
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "dashboard_desc": "View your dashboard and quick stats",
+      "my_attendance": "My Attendance",
+      "my_attendance_desc": "View your attendance history",
+      "my_profile": "My Profile",
+      "my_profile_desc": "Manage your profile information",
+      "fingerprint_requests": "Fingerprint Requests",
+      "fingerprint_requests_desc": "Manage fingerprint enrollment",
+      "vacation_requests": "Vacation Requests",
+      "vacation_requests_desc": "Request and manage vacations",
+      "excuse_requests": "Excuse Requests",
+      "excuse_requests_desc": "Request time excuses",
+      "remote_work_requests": "Remote Work Requests",
+      "remote_work_requests_desc": "Request remote work"
+    },
+    "profile": {
+      "personal_information": "Personal Information",
+      "employee_information": "Employee Information",
+      "account_information": "Account Information",
+      "username": "Username",
+      "email": "Email",
+      "phone": "Phone",
+      "display_name": "Display Name",
+      "employee_code": "Employee Code",
+      "full_name": "Full Name",
+      "department": "Department",
+      "branch": "Branch",
+      "position": "Position",
+      "hire_date": "Hire Date",
+      "status": "Status",
+      "roles": "Roles",
+      "created": "Created",
+      "last_login": "Last Login",
+      "never": "Never",
+      "field_required": "This field is required",
+      "invalid_email": "Invalid email format"
+    },
+    "correction_types": {
+      "check_in": "Check In",
+      "check_out": "Check Out",
+      "unknown": "Unknown"
+    },
+    "approval_statuses": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled",
+      "unknown": "Unknown"
+    },
+    "stats_attendance_rate": "Attendance Rate",
+    "stats_vacation_days": "Vacation Days",
+    "stats_remaining_this_year": "Remaining this year",
+    "stats_from_last_month": "from last month",
+    "quick_submit_vacation": "Submit a new vacation request",
+    "quick_submit_excuse": "Submit an absence excuse",
+    "quick_view_attendance": "View attendance history",
+    "quick_attendance_correction": "Attendance Correction",
+    "quick_correction_desc": "Request correction for missed clock-in/out",
+    "activity_attended": "Attended on {{date}} - {{hours}}h worked",
+    "activity_vacation": "Vacation request from {{start}} to {{end}} - {{status}}",
+    "activity_excuse": "Excuse request for {{date}} - {{status}}",
+    "activity_remote_work": "Remote work from {{start}} to {{end}} - {{status}}"
   },
   "notifications": {
     "title": "Notifications",

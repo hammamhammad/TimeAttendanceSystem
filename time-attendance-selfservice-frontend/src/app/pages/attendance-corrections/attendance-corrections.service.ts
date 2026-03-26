@@ -1,7 +1,8 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, tap, finalize, catchError, of, map, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { I18nService } from '../../core/i18n/i18n.service';
 import {
   AttendanceCorrectionRequestDto,
   AttendanceCorrectionRequestsPagedResult,
@@ -20,6 +21,7 @@ import {
 export class AttendanceCorrectionsService {
   private readonly apiUrl = `${environment.apiUrl}/api/v1/attendance-corrections`;
   private readonly portalApiUrl = `${environment.apiUrl}/api/v1/portal`;
+  private readonly i18n = inject(I18nService);
 
   // Signals for state management
   correctionRequests = signal<AttendanceCorrectionRequestDto[]>([]);
@@ -259,8 +261,8 @@ export class AttendanceCorrectionsService {
    */
   getCorrectionTypes(): { value: AttendanceCorrectionType; label: string }[] {
     return [
-      { value: AttendanceCorrectionType.CheckIn, label: 'Check In' },
-      { value: AttendanceCorrectionType.CheckOut, label: 'Check Out' }
+      { value: AttendanceCorrectionType.CheckIn, label: this.i18n.t('portal.correction_types.check_in') },
+      { value: AttendanceCorrectionType.CheckOut, label: this.i18n.t('portal.correction_types.check_out') }
     ];
   }
 
@@ -449,11 +451,11 @@ export class AttendanceCorrectionsService {
   private getCorrectionTypeDisplayText(type: AttendanceCorrectionType): string {
     switch (type) {
       case AttendanceCorrectionType.CheckIn:
-        return 'Check In';
+        return this.i18n.t('portal.correction_types.check_in');
       case AttendanceCorrectionType.CheckOut:
-        return 'Check Out';
+        return this.i18n.t('portal.correction_types.check_out');
       default:
-        return 'Unknown';
+        return this.i18n.t('portal.correction_types.unknown');
     }
   }
 
@@ -465,18 +467,18 @@ export class AttendanceCorrectionsService {
     switch (statusStr) {
       case '1':
       case 'Pending':
-        return 'Pending';
+        return this.i18n.t('portal.approval_statuses.pending');
       case '2':
       case 'Approved':
-        return 'Approved';
+        return this.i18n.t('portal.approval_statuses.approved');
       case '3':
       case 'Rejected':
-        return 'Rejected';
+        return this.i18n.t('portal.approval_statuses.rejected');
       case '4':
       case 'Cancelled':
-        return 'Cancelled';
+        return this.i18n.t('portal.approval_statuses.cancelled');
       default:
-        return 'Unknown';
+        return this.i18n.t('portal.approval_statuses.unknown');
     }
   }
 

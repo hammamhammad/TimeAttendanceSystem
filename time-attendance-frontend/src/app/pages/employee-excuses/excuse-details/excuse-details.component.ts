@@ -328,11 +328,13 @@ export class ExcuseDetailsComponent implements OnInit {
   }
 
   formatDate(dateString: string): string {
-    return new Date(dateString).toLocaleDateString();
+    const locale = this.i18n.getDateLocale();
+    return new Date(dateString).toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric' });
   }
 
   formatDateTime(dateString: string): string {
-    return new Date(dateString).toLocaleString();
+    const locale = this.i18n.getDateLocale();
+    return new Date(dateString).toLocaleString(locale, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
   }
 
   hasActiveActions(): boolean {

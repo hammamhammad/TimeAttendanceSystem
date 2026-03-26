@@ -51,7 +51,7 @@ export class WorkflowListComponent implements OnInit {
   selectedActiveStatus = signal<boolean | undefined>(undefined);
 
   // Entity types for filter dropdown
-  entityTypes = this.workflowsService.getEntityTypes();
+  entityTypes = computed(() => this.workflowsService.getEntityTypes());
 
   // Data table configuration
   tableColumns = computed<TableColumn[]>(() => [
@@ -215,7 +215,7 @@ export class WorkflowListComponent implements OnInit {
     if (isNaN(date.getTime())) {
       return '-';
     }
-    return date.toLocaleDateString(this.i18n.getCurrentLocale(), {
+    return date.toLocaleDateString(this.i18n.getDateLocale(), {
       year: 'numeric',
       month: 'short',
       day: 'numeric'

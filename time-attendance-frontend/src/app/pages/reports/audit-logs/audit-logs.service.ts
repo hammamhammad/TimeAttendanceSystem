@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
+import { I18nService } from '../../../core/i18n/i18n.service';
 
 export interface AuditLog {
   id: number;
@@ -46,6 +47,7 @@ export interface AuditLogsFilters {
 })
 export class AuditLogsService {
   private http = inject(HttpClient);
+  private i18n = inject(I18nService);
   private apiUrl = `${environment.apiUrl}/api/v1/audit-logs`;
 
   /**
@@ -115,72 +117,72 @@ export class AuditLogsService {
   getAuditActions(): { value: string; label: string }[] {
     return [
       // Authentication & Authorization
-      { value: 'Login', label: 'Login' },
-      { value: 'Logout', label: 'Logout' },
-      { value: 'LogoutAllDevices', label: 'Logout All Devices' },
-      { value: 'TokenRefresh', label: 'Token Refresh' },
-      { value: 'PasswordChange', label: 'Password Change' },
-      { value: 'PasswordReset', label: 'Password Reset' },
-      { value: 'PasswordResetRequest', label: 'Password Reset Request' },
-      { value: 'AccountLockout', label: 'Account Lockout' },
-      { value: 'AccountUnlock', label: 'Account Unlock' },
-      { value: 'TwoFactorEnabled', label: 'Two-Factor Enabled' },
-      { value: 'TwoFactorDisabled', label: 'Two-Factor Disabled' },
-      { value: 'TwoFactorVerified', label: 'Two-Factor Verified' },
-      { value: 'SessionCreated', label: 'Session Created' },
-      { value: 'SessionTerminated', label: 'Session Terminated' },
-      { value: 'SessionExpired', label: 'Session Expired' },
+      { value: 'Login', label: this.i18n.t('audit_logs.actions.login') },
+      { value: 'Logout', label: this.i18n.t('audit_logs.actions.logout') },
+      { value: 'LogoutAllDevices', label: this.i18n.t('audit_logs.actions.logout_all_devices') },
+      { value: 'TokenRefresh', label: this.i18n.t('audit_logs.actions.token_refresh') },
+      { value: 'PasswordChange', label: this.i18n.t('audit_logs.actions.password_change') },
+      { value: 'PasswordReset', label: this.i18n.t('audit_logs.actions.password_reset') },
+      { value: 'PasswordResetRequest', label: this.i18n.t('audit_logs.actions.password_reset_request') },
+      { value: 'AccountLockout', label: this.i18n.t('audit_logs.actions.account_lockout') },
+      { value: 'AccountUnlock', label: this.i18n.t('audit_logs.actions.account_unlock') },
+      { value: 'TwoFactorEnabled', label: this.i18n.t('audit_logs.actions.two_factor_enabled') },
+      { value: 'TwoFactorDisabled', label: this.i18n.t('audit_logs.actions.two_factor_disabled') },
+      { value: 'TwoFactorVerified', label: this.i18n.t('audit_logs.actions.two_factor_verified') },
+      { value: 'SessionCreated', label: this.i18n.t('audit_logs.actions.session_created') },
+      { value: 'SessionTerminated', label: this.i18n.t('audit_logs.actions.session_terminated') },
+      { value: 'SessionExpired', label: this.i18n.t('audit_logs.actions.session_expired') },
 
       // User Management
-      { value: 'UserCreated', label: 'User Created' },
-      { value: 'UserUpdated', label: 'User Updated' },
-      { value: 'UserDeleted', label: 'User Deleted' },
-      { value: 'UserActivated', label: 'User Activated' },
-      { value: 'UserDeactivated', label: 'User Deactivated' },
-      { value: 'UserRoleAssigned', label: 'User Role Assigned' },
-      { value: 'UserRoleRevoked', label: 'User Role Revoked' },
-      { value: 'UserBranchScopeAssigned', label: 'User Branch Scope Assigned' },
-      { value: 'UserBranchScopeRevoked', label: 'User Branch Scope Revoked' },
+      { value: 'UserCreated', label: this.i18n.t('audit_logs.actions.user_created') },
+      { value: 'UserUpdated', label: this.i18n.t('audit_logs.actions.user_updated') },
+      { value: 'UserDeleted', label: this.i18n.t('audit_logs.actions.user_deleted') },
+      { value: 'UserActivated', label: this.i18n.t('audit_logs.actions.user_activated') },
+      { value: 'UserDeactivated', label: this.i18n.t('audit_logs.actions.user_deactivated') },
+      { value: 'UserRoleAssigned', label: this.i18n.t('audit_logs.actions.user_role_assigned') },
+      { value: 'UserRoleRevoked', label: this.i18n.t('audit_logs.actions.user_role_revoked') },
+      { value: 'UserBranchScopeAssigned', label: this.i18n.t('audit_logs.actions.user_branch_scope_assigned') },
+      { value: 'UserBranchScopeRevoked', label: this.i18n.t('audit_logs.actions.user_branch_scope_revoked') },
 
       // Employee Management
-      { value: 'EmployeeCreated', label: 'Employee Created' },
-      { value: 'EmployeeUpdated', label: 'Employee Updated' },
-      { value: 'EmployeeDeleted', label: 'Employee Deleted' },
-      { value: 'EmployeeActivated', label: 'Employee Activated' },
-      { value: 'EmployeeDeactivated', label: 'Employee Deactivated' },
+      { value: 'EmployeeCreated', label: this.i18n.t('audit_logs.actions.employee_created') },
+      { value: 'EmployeeUpdated', label: this.i18n.t('audit_logs.actions.employee_updated') },
+      { value: 'EmployeeDeleted', label: this.i18n.t('audit_logs.actions.employee_deleted') },
+      { value: 'EmployeeActivated', label: this.i18n.t('audit_logs.actions.employee_activated') },
+      { value: 'EmployeeDeactivated', label: this.i18n.t('audit_logs.actions.employee_deactivated') },
 
       // Shift Management
-      { value: 'ShiftCreated', label: 'Shift Created' },
-      { value: 'ShiftUpdated', label: 'Shift Updated' },
-      { value: 'ShiftDeleted', label: 'Shift Deleted' },
+      { value: 'ShiftCreated', label: this.i18n.t('audit_logs.actions.shift_created') },
+      { value: 'ShiftUpdated', label: this.i18n.t('audit_logs.actions.shift_updated') },
+      { value: 'ShiftDeleted', label: this.i18n.t('audit_logs.actions.shift_deleted') },
 
       // Shift Assignment Management
-      { value: 'ShiftAssignmentCreated', label: 'Shift Assignment Created' },
-      { value: 'ShiftAssignmentUpdated', label: 'Shift Assignment Updated' },
-      { value: 'ShiftAssignmentDeleted', label: 'Shift Assignment Deleted' },
-      { value: 'ShiftAssignmentActivated', label: 'Shift Assignment Activated' },
-      { value: 'ShiftAssignmentDeactivated', label: 'Shift Assignment Deactivated' },
+      { value: 'ShiftAssignmentCreated', label: this.i18n.t('audit_logs.actions.shift_assignment_created') },
+      { value: 'ShiftAssignmentUpdated', label: this.i18n.t('audit_logs.actions.shift_assignment_updated') },
+      { value: 'ShiftAssignmentDeleted', label: this.i18n.t('audit_logs.actions.shift_assignment_deleted') },
+      { value: 'ShiftAssignmentActivated', label: this.i18n.t('audit_logs.actions.shift_assignment_activated') },
+      { value: 'ShiftAssignmentDeactivated', label: this.i18n.t('audit_logs.actions.shift_assignment_deactivated') },
 
       // Vacation Management
-      { value: 'VacationTypeCreated', label: 'Vacation Type Created' },
-      { value: 'VacationTypeUpdated', label: 'Vacation Type Updated' },
-      { value: 'VacationTypeDeleted', label: 'Vacation Type Deleted' },
-      { value: 'VacationRequestCreated', label: 'Vacation Request Created' },
-      { value: 'VacationRequestUpdated', label: 'Vacation Request Updated' },
-      { value: 'VacationRequestApproved', label: 'Vacation Request Approved' },
-      { value: 'VacationRequestRejected', label: 'Vacation Request Rejected' },
-      { value: 'VacationRequestCancelled', label: 'Vacation Request Cancelled' },
+      { value: 'VacationTypeCreated', label: this.i18n.t('audit_logs.actions.vacation_type_created') },
+      { value: 'VacationTypeUpdated', label: this.i18n.t('audit_logs.actions.vacation_type_updated') },
+      { value: 'VacationTypeDeleted', label: this.i18n.t('audit_logs.actions.vacation_type_deleted') },
+      { value: 'VacationRequestCreated', label: this.i18n.t('audit_logs.actions.vacation_request_created') },
+      { value: 'VacationRequestUpdated', label: this.i18n.t('audit_logs.actions.vacation_request_updated') },
+      { value: 'VacationRequestApproved', label: this.i18n.t('audit_logs.actions.vacation_request_approved') },
+      { value: 'VacationRequestRejected', label: this.i18n.t('audit_logs.actions.vacation_request_rejected') },
+      { value: 'VacationRequestCancelled', label: this.i18n.t('audit_logs.actions.vacation_request_cancelled') },
 
       // System Actions
-      { value: 'SystemStartup', label: 'System Startup' },
-      { value: 'SystemShutdown', label: 'System Shutdown' },
-      { value: 'DatabaseMigration', label: 'Database Migration' },
+      { value: 'SystemStartup', label: this.i18n.t('audit_logs.actions.system_startup') },
+      { value: 'SystemShutdown', label: this.i18n.t('audit_logs.actions.system_shutdown') },
+      { value: 'DatabaseMigration', label: this.i18n.t('audit_logs.actions.database_migration') },
 
       // Generic CRUD Operations
-      { value: 'Created', label: 'Created' },
-      { value: 'Updated', label: 'Updated' },
-      { value: 'Deleted', label: 'Deleted' },
-      { value: 'Viewed', label: 'Viewed' }
+      { value: 'Created', label: this.i18n.t('audit_logs.actions.created') },
+      { value: 'Updated', label: this.i18n.t('audit_logs.actions.updated') },
+      { value: 'Deleted', label: this.i18n.t('audit_logs.actions.deleted') },
+      { value: 'Viewed', label: this.i18n.t('audit_logs.actions.viewed') }
     ];
   }
 }

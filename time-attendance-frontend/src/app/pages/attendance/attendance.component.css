@@ -1,19 +1,19 @@
 .attendance-dashboard {
   padding: 1.5rem;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  background: linear-gradient(135deg, var(--app-gray-100) 0%, var(--app-gray-200) 100%);
   min-height: 100vh;
 }
 
 .page-title {
   font-size: 2.25rem;
   font-weight: 700;
-  color: #2c3e50;
+  color: var(--app-gray-800);
   margin-bottom: 0.5rem;
   letter-spacing: -0.025em;
 }
 
 .text-muted {
-  color: #6c757d !important;
+  color: var(--app-gray-600) !important;
   font-size: 1rem;
 }
 
@@ -48,7 +48,7 @@
 .spinner-border {
   width: 3rem;
   height: 3rem;
-  color: #0d6efd;
+  color: var(--bs-primary);
 }
 
 .alert {
@@ -88,7 +88,7 @@
 
 /* Chart Cards */
 .card {
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--app-gray-200);
   border-radius: 0.75rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease-in-out;
@@ -102,8 +102,8 @@
 }
 
 .card-header {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border-bottom: 1px solid #e9ecef;
+  background: linear-gradient(135deg, var(--app-gray-100) 0%, var(--app-gray-200) 100%);
+  border-bottom: 1px solid var(--app-gray-200);
   padding: 1.25rem 1.5rem;
   border-radius: 0.75rem 0.75rem 0 0;
 }
@@ -112,7 +112,7 @@
   font-weight: 600;
   font-size: 1.1rem;
   margin: 0;
-  color: #495057;
+  color: var(--app-gray-700);
 }
 
 .card-body {
@@ -129,41 +129,41 @@
 }
 
 .badge.bg-primary {
-  background-color: #0d6efd !important;
+  background-color: var(--bs-primary) !important;
 }
 
 .badge.bg-info {
-  background-color: #0dcaf0 !important;
+  background-color: var(--app-info) !important;
   color: #000;
 }
 
 .badge.bg-warning {
-  background-color: #fd7e14 !important;
+  background-color: var(--app-warning) !important;
   color: white;
 }
 
 .badge.bg-success {
-  background-color: #198754 !important;
+  background-color: var(--app-success) !important;
 }
 
 .badge.bg-danger {
-  background-color: #dc3545 !important;
+  background-color: var(--app-danger) !important;
 }
 
 .badge.bg-secondary {
-  background-color: #6c757d !important;
+  background-color: var(--app-gray-600) !important;
 }
 
 /* Incomplete Records Section */
 .border.rounded {
-  border: 1px solid #e9ecef !important;
+  border: 1px solid var(--app-gray-200) !important;
   border-radius: 0.5rem !important;
   transition: all 0.2s ease-in-out;
 }
 
 .border.rounded:hover {
-  border-color: #0d6efd !important;
-  background-color: #f8f9fa;
+  border-color: var(--bs-primary) !important;
+  background-color: var(--app-gray-100);
 }
 
 .fw-semibold {
@@ -195,33 +195,33 @@
 }
 
 .btn.btn-outline-primary.text-start:hover {
-  background-color: rgba(13, 110, 253, 0.1);
-  border-color: #0d6efd;
-  color: #0d6efd;
+  background-color: rgba(var(--app-primary-rgb), 0.1);
+  border-color: var(--bs-primary);
+  color: var(--bs-primary);
 }
 
 .btn.btn-outline-success.text-start:hover {
-  background-color: rgba(25, 135, 84, 0.1);
-  border-color: #198754;
-  color: #198754;
+  background-color: rgba(var(--app-success-rgb), 0.1);
+  border-color: var(--app-success);
+  color: var(--app-success);
 }
 
 .btn.btn-outline-info.text-start:hover {
-  background-color: rgba(13, 202, 240, 0.1);
-  border-color: #0dcaf0;
-  color: #0dcaf0;
+  background-color: rgba(var(--app-info-rgb), 0.1);
+  border-color: var(--app-info);
+  color: var(--app-info);
 }
 
 .btn.btn-outline-warning.text-start:hover {
-  background-color: rgba(255, 193, 7, 0.1);
-  border-color: #ffc107;
-  color: #ffc107;
+  background-color: rgba(var(--app-warning-rgb), 0.1);
+  border-color: var(--app-warning);
+  color: var(--app-warning);
 }
 
 .btn.btn-outline-secondary.text-start:hover {
-  background-color: rgba(108, 117, 125, 0.1);
-  border-color: #6c757d;
-  color: #6c757d;
+  background-color: rgba(var(--app-gray-secondary-rgb), 0.1);
+  border-color: var(--app-gray-600);
+  color: var(--app-gray-600);
 }
 
 /* Performance Metrics Cards */
@@ -230,19 +230,19 @@
 }
 
 .border-primary {
-  border-color: #0d6efd !important;
+  border-color: var(--bs-primary) !important;
 }
 
 .border-info {
-  border-color: #0dcaf0 !important;
+  border-color: var(--app-info) !important;
 }
 
 .border-warning {
-  border-color: #fd7e14 !important;
+  border-color: var(--app-warning) !important;
 }
 
 .border-success {
-  border-color: #198754 !important;
+  border-color: var(--app-success) !important;
 }
 
 .icon-circle {
@@ -261,35 +261,35 @@
 }
 
 .bg-primary.bg-opacity-10 {
-  background-color: rgba(13, 110, 253, 0.1) !important;
+  background-color: rgba(var(--app-primary-rgb), 0.1) !important;
 }
 
 .bg-info.bg-opacity-10 {
-  background-color: rgba(13, 202, 240, 0.1) !important;
+  background-color: rgba(var(--app-info-rgb), 0.1) !important;
 }
 
 .bg-warning.bg-opacity-10 {
-  background-color: rgba(253, 126, 20, 0.1) !important;
+  background-color: rgba(var(--app-warning-rgb), 0.1) !important;
 }
 
 .bg-success.bg-opacity-10 {
-  background-color: rgba(25, 135, 84, 0.1) !important;
+  background-color: rgba(var(--app-success-rgb), 0.1) !important;
 }
 
 .text-primary {
-  color: #0d6efd !important;
+  color: var(--bs-primary) !important;
 }
 
 .text-info {
-  color: #0dcaf0 !important;
+  color: var(--app-info) !important;
 }
 
 .text-warning {
-  color: #fd7e14 !important;
+  color: var(--app-warning) !important;
 }
 
 .text-success {
-  color: #198754 !important;
+  color: var(--app-success) !important;
 }
 
 /* Performance Cards Animation */
@@ -315,7 +315,7 @@
 
 /* Progress Bar */
 .progress {
-  background-color: #e9ecef;
+  background-color: var(--app-gray-200);
   border-radius: 0.375rem;
   overflow: hidden;
   height: 6px;
@@ -326,21 +326,21 @@
 }
 
 .progress-bar.bg-success {
-  background: linear-gradient(90deg, #198754 0%, #20c997 100%);
+  background: linear-gradient(90deg, var(--app-success) 0%, #20c997 100%);
 }
 
 /* Live Updates Badge */
 .badge.bg-light {
-  background-color: #f8f9fa !important;
-  color: #495057 !important;
+  background-color: var(--app-gray-100) !important;
+  color: var(--app-gray-700) !important;
   font-size: 0.9rem;
   padding: 0.75rem 1.5rem;
   border-radius: 2rem;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--app-gray-200);
 }
 
 .fa-circle.text-success {
-  color: #198754 !important;
+  color: var(--app-success) !important;
   animation: pulse 2s infinite;
 }
 
@@ -363,7 +363,7 @@
 
 /* Empty State Styling */
 .text-center.py-4 .fa-check-circle {
-  color: #198754;
+  color: var(--app-success);
   margin-bottom: 1rem;
 }
 
@@ -488,7 +488,7 @@
 /* Focus Management */
 .btn:focus,
 .card:focus-within {
-  outline: 2px solid #0d6efd;
+  outline: 2px solid var(--bs-primary);
   outline-offset: 2px;
 }
 

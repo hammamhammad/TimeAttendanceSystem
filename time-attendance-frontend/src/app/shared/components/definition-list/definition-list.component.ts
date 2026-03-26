@@ -1,5 +1,6 @@
-import { Component, Input, TemplateRef } from '@angular/core';
+import { Component, Input, TemplateRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { I18nService } from '../../../core/i18n/i18n.service';
 
 export interface DefinitionItem {
   label: string;
@@ -23,6 +24,7 @@ export interface DefinitionItem {
   styleUrls: ['./definition-list.component.css']
 })
 export class DefinitionListComponent {
+  private readonly i18n = inject(I18nService);
   @Input() items: DefinitionItem[] = [];
   @Input() layout: 'single' | 'two-column' = 'single';
   @Input() striped = false;
@@ -64,7 +66,8 @@ export class DefinitionListComponent {
   formatDate(dateString: string | Date): string {
     if (!dateString) return '-';
     try {
-      return new Date(dateString).toLocaleDateString();
+      const locale = this.i18n.getDateLocale();
+      return new Date(dateString).toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric' });
     } catch {
       return dateString.toString();
     }
@@ -73,7 +76,8 @@ export class DefinitionListComponent {
   formatTime(timeString: string | Date): string {
     if (!timeString) return '-';
     try {
-      return new Date(timeString).toLocaleTimeString();
+      const locale = this.i18n.getDateLocale();
+      return new Date(timeString).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', hour12: true });
     } catch {
       return timeString.toString();
     }
@@ -82,7 +86,8 @@ export class DefinitionListComponent {
   formatDateTime(dateTimeString: string | Date): string {
     if (!dateTimeString) return '-';
     try {
-      return new Date(dateTimeString).toLocaleString();
+      const locale = this.i18n.getDateLocale();
+      return new Date(dateTimeString).toLocaleString(locale, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
     } catch {
       return dateTimeString.toString();
     }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:nfc_manager/nfc_manager.dart' hide NfcTag;
+import 'package:nfc_manager/nfc_manager.dart' as nfc show NfcTag;
 
 import '../../../core/theme/app_theme.dart';
 import '../../../shared/models/nfc_tag_model.dart';
@@ -552,7 +554,7 @@ class _ScanRegisterSheetState extends ConsumerState<_ScanRegisterSheet> {
               const SizedBox(height: 16),
               
               // Branch selection
-              AppDropdownField<String>(
+              AppDropdown<String>(
                 label: 'Branch',
                 hint: 'Select branch',
                 value: _selectedBranchId,
@@ -598,17 +600,75 @@ class _ScanRegisterSheetState extends ConsumerState<_ScanRegisterSheet> {
   }
   
   Future<void> _scanTag() async {
+    final isAvailable = await NfcManager.instance.isAvailable();
+    if (!isAvailable) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('NFC is not available on this device')),
+        );
+      }
+      return;
+    }
+
     setState(() => _isScanning = true);
-    
-    // TODO: Implement actual NFC scanning with nfc_manager package
-    // For now, simulate a scan
-    await Future.delayed(const Duration(seconds: 2));
-    
-    setState(() {
-      _isScanning = false;
-      // Simulated UID - replace with actual NFC read
-      _scannedUid = 'NFC-${DateTime.now().millisecondsSinceEpoch.toRadixString(16).toUpperCase()}';
-    });
+
+    try {
+      await NfcManager.instance.startSession(
+        onDiscovered: (nfc.NfcTag tag) async {
+          // Extract tag UID from available technology
+          final nfca = tag.data['nfca'];
+          final nfcb = tag.data['nfcb'];
+          final nfcf = tag.data['nfcf'];
+          final nfcv = tag.data['nfcv'];
+
+          List<int>? identifier;
+          if (nfca != null) {
+            identifier = List<int>.from(nfca['identifier']);
+          } else if (nfcb != null) {
+            identifier = List<int>.from(nfcb['identifier']);
+          } else if (nfcf != null) {
+            identifier = List<int>.from(nfcf['identifier']);
+          } else if (nfcv != null) {
+            identifier = List<int>.from(nfcv['identifier']);
+          }
+
+          await NfcManager.instance.stopSession();
+
+          if (identifier != null && mounted) {
+            setState(() {
+              _isScanning = false;
+              _scannedUid = identifier!
+                  .map((b) => b.toRadixString(16).padLeft(2, '0'))
+                  .join(':')
+                  .toUpperCase();
+            });
+          } else if (mounted) {
+            setState(() {
+              _isScanning = false;
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Could not read tag UID')),
+            );
+          }
+        },
+        onError: (error) async {
+          await NfcManager.instance.stopSession();
+          if (mounted) {
+            setState(() => _isScanning = false);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('NFC error: ${error.message}')),
+            );
+          }
+        },
+      );
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isScanning = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('NFC error: $e')),
+        );
+      }
+    }
   }
   
   Future<void> _register() async {
@@ -789,19 +849,96 @@ class _ProvisionSheetState extends ConsumerState<_ProvisionSheet> {
   
   Future<void> _writeToTag() async {
     if (_writeData == null) return;
-    
+
+    final isAvailable = await NfcManager.instance.isAvailable();
+    if (!isAvailable) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('NFC is not available on this device')),
+        );
+      }
+      return;
+    }
+
     setState(() => _isWriting = true);
-    
-    // TODO: Implement actual NFC writing with nfc_manager package
-    // For now, simulate the write
-    await Future.delayed(const Duration(seconds: 2));
-    
-    // Confirm write protection on backend
-    await ref.read(nfcTagAdminProvider.notifier).confirmWriteProtection(widget.tag.id);
-    
-    setState(() {
-      _isWriting = false;
-      _writeComplete = true;
-    });
+
+    try {
+      await NfcManager.instance.startSession(
+        onDiscovered: (nfc.NfcTag tag) async {
+          try {
+            final ndef = Ndef.from(tag);
+            if (ndef == null || !ndef.isWritable) {
+              await NfcManager.instance.stopSession(errorMessage: 'Tag is not NDEF writable');
+              if (mounted) {
+                setState(() => _isWriting = false);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Tag is not writable')),
+                );
+              }
+              return;
+            }
+
+            // Create NDEF message with signed payload as text record
+            final payload = _writeData!.verificationCode;
+            final message = NdefMessage([
+              NdefRecord.createText(payload),
+            ]);
+
+            // Check message fits on tag
+            if (message.byteLength > ndef.maxSize) {
+              await NfcManager.instance.stopSession(errorMessage: 'Payload too large for tag');
+              if (mounted) {
+                setState(() => _isWriting = false);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Payload too large for this tag')),
+                );
+              }
+              return;
+            }
+
+            // Write the NDEF message
+            await ndef.write(message);
+
+            await NfcManager.instance.stopSession(alertMessage: 'Tag written successfully');
+
+            // Confirm write protection on backend
+            if (mounted) {
+              await ref.read(nfcTagAdminProvider.notifier).confirmWriteProtection(
+                widget.tag.id,
+              );
+
+              setState(() {
+                _isWriting = false;
+                _writeComplete = true;
+              });
+            }
+          } catch (e) {
+            await NfcManager.instance.stopSession(errorMessage: 'Write failed: $e');
+            if (mounted) {
+              setState(() => _isWriting = false);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Write failed: $e')),
+              );
+            }
+          }
+        },
+        onError: (error) async {
+          await NfcManager.instance.stopSession();
+          if (mounted) {
+            setState(() => _isWriting = false);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('NFC error: ${error.message}')),
+            );
+          }
+        },
+      );
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isWriting = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('NFC error: $e')),
+        );
+      }
+    }
   }
 }

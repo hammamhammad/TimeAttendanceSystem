@@ -1,48 +1,39 @@
 # Native Splash Screen Configuration
-# Run: flutter pub run flutter_native_splash:create
+# Run: dart run flutter_native_splash:create
 
 flutter_native_splash:
-  # Color of splash screen background
-  color: "#2196F3"
-  
-  # Image to display (centered)
-  image: assets/icons/splash_logo.png
-  
-  # Branding image at bottom (optional)
-  branding: assets/icons/splash_branding.png
-  branding_mode: bottom
-  
-  # Color mode variants for dark mode
-  color_dark: "#1565C0"
-  image_dark: assets/icons/splash_logo_dark.png
-  branding_dark: assets/icons/splash_branding_dark.png
-  
+  # White background with ClockN logo centered
+  color: "#FFFFFF"
+  image: assets/images/logo.png
+
+  # Dark mode variant
+  color_dark: "#1A1A2E"
+  image_dark: assets/images/logo.png
+
   # Android 12+ splash screen configuration
   android_12:
-    color: "#2196F3"
+    color: "#FFFFFF"
     icon_background_color: "#FFFFFF"
-    image: assets/icons/splash_android12.png
-    branding: assets/icons/splash_branding.png
-    
+    image: assets/images/logo.png
+
     # Dark mode for Android 12+
-    color_dark: "#1565C0"
-    icon_background_color_dark: "#121212"
-    image_dark: assets/icons/splash_android12_dark.png
-    branding_dark: assets/icons/splash_branding_dark.png
-  
+    color_dark: "#1A1A2E"
+    icon_background_color_dark: "#1A1A2E"
+    image_dark: assets/images/logo.png
+
   # Platform-specific settings
   android: true
   ios: true
   web: true
-  
+
   # Web-specific configuration
   web_image_mode: center
-  
+
   # Fullscreen mode
   fullscreen: true
-  
+
   # iOS content mode
   ios_content_mode: center
-  
+
   # Android gravity
   android_gravity: center

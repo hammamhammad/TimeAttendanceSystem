@@ -407,7 +407,8 @@ export class ShiftsComponent implements OnInit {
 
   formatDate(dateString: string): string {
     const date = new Date(dateString);
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const locale = this.i18n.getDateLocale();
+    return date.toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric' }) + ' ' + date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', hour12: true });
   }
 
   // CRUD Operations

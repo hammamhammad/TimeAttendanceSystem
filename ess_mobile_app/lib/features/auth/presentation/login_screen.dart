@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:dio/dio.dart';
 import 'package:go_router/go_router.dart';
 import 'package:local_auth/local_auth.dart';
@@ -106,18 +107,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         }
       }
     } on DioException catch (e) {
+      final statusCode = e.response?.statusCode;
+      final responseData = e.response?.data;
+      final requestUrl = e.requestOptions.uri.toString();
+
       setState(() {
-        if (e.response?.statusCode == 401) {
+        if (statusCode == 401) {
           _errorMessage = AppLocalizations.of(context).invalidCredentials;
-        } else if (e.response?.data != null && e.response?.data['error'] != null) {
-          // Show actual backend error message
-          _errorMessage = e.response!.data['error'].toString();
+        } else if (responseData is Map && responseData['error'] != null) {
+          _errorMessage = responseData['error'].toString();
+        } else if (e.type == DioExceptionType.connectionError ||
+                   e.type == DioExceptionType.connectionTimeout) {
+          _errorMessage = 'Cannot connect to server: $requestUrl';
         } else {
-          _errorMessage = e.message ?? 'Login failed';
+          _errorMessage = 'Login failed (HTTP $statusCode): ${e.message}';
         }
       });
-      // Debug: print the request and response details
-      print('Login error: ${e.response?.statusCode} - ${e.response?.data}');
+      print('Login error: URL=$requestUrl, Status=$statusCode, Body=$responseData');
     } catch (e) {
       setState(() {
         _errorMessage = 'An unexpected error occurred: $e';
@@ -203,7 +209,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 40),
-              
+
+              // Logo
+              Center(
+                child: SvgPicture.asset(
+                  'assets/images/logo.svg',
+                  width: 100,
+                  height: 100,
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
               // Welcome text
               Text(
                 l10n.login,

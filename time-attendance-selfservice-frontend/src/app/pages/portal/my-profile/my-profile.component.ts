@@ -7,6 +7,7 @@ import { PortalService } from '../services/portal.service';
 import { ConfirmationService } from '../../../core/confirmation/confirmation.service';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
+import { StatusBadgeComponent, StatusVariant } from '../../../shared/components/status-badge/status-badge.component';
 import { ChangePasswordModalComponent } from './change-password-modal.component';
 
 /**
@@ -22,6 +23,7 @@ import { ChangePasswordModalComponent } from './change-password-modal.component'
     ReactiveFormsModule,
     PageHeaderComponent,
     LoadingSpinnerComponent,
+    StatusBadgeComponent,
     ChangePasswordModalComponent
   ],
   templateUrl: './my-profile.component.html',
@@ -42,6 +44,12 @@ export class MyProfileComponent implements OnInit, OnDestroy {
   // Current user
   currentUser = computed(() => this.authService.currentUser());
 
+  // Status badge for active/inactive display
+  statusBadge = computed(() => ({
+    label: this.profile()?.isActive ? this.i18n.t('common.active') : this.i18n.t('common.inactive'),
+    variant: (this.profile()?.isActive ? 'success' : 'danger') as StatusVariant
+  }));
+
   // Edit mode
   isEditMode = signal<boolean>(false);
 
@@ -58,32 +66,32 @@ export class MyProfileComponent implements OnInit, OnDestroy {
 
     return [
       {
-        section: 'Personal Information',
+        section: this.i18n.t('portal.profile.personal_information'),
         fields: [
-          { label: 'Username', value: prof.userName || '-', icon: 'bi-person' },
-          { label: 'Email', value: prof.email || '-', icon: 'bi-envelope' },
-          { label: 'Phone', value: prof.phoneNumber || '-', icon: 'bi-telephone' },
-          { label: 'Display Name', value: prof.displayName || '-', icon: 'bi-person-badge' }
+          { label: this.i18n.t('portal.profile.username'), value: prof.userName || '-', icon: 'bi-person' },
+          { label: this.i18n.t('portal.profile.email'), value: prof.email || '-', icon: 'bi-envelope' },
+          { label: this.i18n.t('portal.profile.phone'), value: prof.phoneNumber || '-', icon: 'bi-telephone' },
+          { label: this.i18n.t('portal.profile.display_name'), value: prof.displayName || '-', icon: 'bi-person-badge' }
         ]
       },
       {
-        section: 'Employee Information',
+        section: this.i18n.t('portal.profile.employee_information'),
         fields: [
-          { label: 'Employee Code', value: prof.employeeInfo?.employeeCode || '-', icon: 'bi-person-vcard' },
-          { label: 'Full Name', value: prof.employeeInfo?.fullName || '-', icon: 'bi-person-circle' },
-          { label: 'Department', value: prof.employeeInfo?.department || '-', icon: 'bi-building' },
-          { label: 'Branch', value: prof.employeeInfo?.branch || '-', icon: 'bi-geo-alt' },
-          { label: 'Position', value: prof.employeeInfo?.position || '-', icon: 'bi-briefcase' },
-          { label: 'Hire Date', value: prof.employeeInfo?.hireDate ? this.formatDate(prof.employeeInfo.hireDate) : '-', icon: 'bi-calendar' }
+          { label: this.i18n.t('portal.profile.employee_code'), value: prof.employeeInfo?.employeeCode || '-', icon: 'bi-person-vcard' },
+          { label: this.i18n.t('portal.profile.full_name'), value: prof.employeeInfo?.fullName || '-', icon: 'bi-person-circle' },
+          { label: this.i18n.t('portal.profile.department'), value: prof.employeeInfo?.department || '-', icon: 'bi-building' },
+          { label: this.i18n.t('portal.profile.branch'), value: prof.employeeInfo?.branch || '-', icon: 'bi-geo-alt' },
+          { label: this.i18n.t('portal.profile.position'), value: prof.employeeInfo?.position || '-', icon: 'bi-briefcase' },
+          { label: this.i18n.t('portal.profile.hire_date'), value: prof.employeeInfo?.hireDate ? this.formatDate(prof.employeeInfo.hireDate) : '-', icon: 'bi-calendar' }
         ]
       },
       {
-        section: 'Account Information',
+        section: this.i18n.t('portal.profile.account_information'),
         fields: [
-          { label: 'Status', value: prof.isActive ? 'Active' : 'Inactive', icon: 'bi-circle-fill', badgeClass: prof.isActive ? 'badge bg-success' : 'badge bg-danger' },
-          { label: 'Roles', value: prof.roles?.join(', ') || '-', icon: 'bi-shield' },
-          { label: 'Created', value: this.formatDate(prof.createdAtUtc), icon: 'bi-clock' },
-          { label: 'Last Login', value: prof.lastLoginAtUtc ? this.formatDate(prof.lastLoginAtUtc) : 'Never', icon: 'bi-box-arrow-in-right' }
+          { label: this.i18n.t('portal.profile.status'), value: prof.isActive ? this.i18n.t('common.active') : this.i18n.t('common.inactive'), icon: 'bi-circle-fill', isStatus: true },
+          { label: this.i18n.t('portal.profile.roles'), value: prof.roles?.join(', ') || '-', icon: 'bi-shield' },
+          { label: this.i18n.t('portal.profile.created'), value: this.formatDate(prof.createdAtUtc), icon: 'bi-clock' },
+          { label: this.i18n.t('portal.profile.last_login'), value: prof.lastLoginAtUtc ? this.formatDate(prof.lastLoginAtUtc) : this.i18n.t('portal.profile.never'), icon: 'bi-box-arrow-in-right' }
         ]
       }
     ];
@@ -187,16 +195,17 @@ export class MyProfileComponent implements OnInit, OnDestroy {
 
   formatDate(date: Date | string): string {
     const d = typeof date === 'string' ? new Date(date) : date;
-    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    const locale = this.i18n.locale() === 'ar' ? 'ar-u-nu-latn' : 'en-US';
+    return d.toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' });
   }
 
   getFieldError(fieldName: string): string {
     const control = this.editForm.get(fieldName);
     if (control?.hasError('required')) {
-      return 'This field is required';
+      return this.i18n.t('portal.profile.field_required');
     }
     if (control?.hasError('email')) {
-      return 'Invalid email format';
+      return this.i18n.t('portal.profile.invalid_email');
     }
     return '';
   }

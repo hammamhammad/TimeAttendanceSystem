@@ -8,13 +8,14 @@ import { Branch } from '../../../shared/models/branch.model';
 import { Department } from '../../../shared/models/department.model';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { SearchableSelectComponent, SearchableSelectOption } from '../../../shared/components/searchable-select/searchable-select.component';
+import { FormSectionComponent } from '../../../shared/components/form-section/form-section.component';
 
 @Component({
   selector: 'app-edit-employee',
   standalone: true,
-  imports: [RouterModule, ReactiveFormsModule, SearchableSelectComponent],
+  imports: [RouterModule, ReactiveFormsModule, SearchableSelectComponent, FormSectionComponent],
   template: `
-    <div class="container-fluid">
+    <div class="container-fluid app-modern-form">
       <!-- Header -->
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
@@ -31,8 +32,8 @@ import { SearchableSelectComponent, SearchableSelectOption } from '../../../shar
             </ol>
           </nav>
         </div>
-        <button 
-          type="button" 
+        <button
+          type="button"
           class="btn btn-outline-secondary"
           (click)="onCancel()"
           [disabled]="saving()">
@@ -48,327 +49,353 @@ import { SearchableSelectComponent, SearchableSelectOption } from '../../../shar
           </div>
         </div>
       } @else if (employee()) {
-        <!-- Main Form Card -->
-        <div class="card">
-          <div class="card-header">
-            <h5 class="card-title mb-0">
-              <i class="fa-solid fa-user me-2"></i>
-              {{ i18n.t('employees.employee_information') }}
-            </h5>
-          </div>
-          <div class="card-body">
-            <form [formGroup]="employeeForm" (ngSubmit)="onSubmit()">
-              @if (error()) {
-                <div class="alert alert-danger" role="alert">
-                  <i class="fa-solid fa-exclamation-triangle me-2"></i>
-                  {{ error() }}
+        <form [formGroup]="employeeForm" (ngSubmit)="onSubmit()">
+          @if (error()) {
+            <div class="alert alert-danger" role="alert">
+              <i class="fa-solid fa-exclamation-triangle me-2"></i>
+              {{ error() }}
+            </div>
+          }
+
+          <!-- Required Information Section -->
+          <app-form-section [title]="i18n.t('employees.required_information')" variant="modern">
+            <div class="row g-3">
+              <!-- Employee Number (Read-only for edit) -->
+              <div class="col-md-6">
+                <div class="app-modern-field">
+                  <label class="app-modern-label">{{ i18n.t('employees.employee_number') }}</label>
+                  <input
+                    type="text"
+                    class="form-control-plaintext"
+                    [value]="employee()?.employeeNumber"
+                    readonly>
                 </div>
+                <div class="form-text">{{ i18n.t('employees.employee_number_readonly') }}</div>
+              </div>
+
+              <!-- Branch (Read-only for edit) -->
+              <div class="col-md-6">
+                <div class="app-modern-field">
+                  <label class="app-modern-label">{{ i18n.t('employees.branch') }}</label>
+                  <input
+                    type="text"
+                    class="form-control-plaintext"
+                    [value]="employee()?.branchName"
+                    readonly>
+                </div>
+                <div class="form-text">{{ i18n.t('employees.branch_readonly') }}</div>
+              </div>
+
+              <!-- First Name -->
+              <div class="col-md-6">
+                <div class="form-floating">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="firstName"
+                    formControlName="firstName"
+                    [class.is-invalid]="isFieldInvalid('firstName')"
+                    placeholder="{{ i18n.t('employees.first_name') }}">
+                  <label for="firstName">
+                    {{ i18n.t('employees.first_name') }}
+                    <span class="text-danger">*</span>
+                  </label>
+                </div>
+                @if (isFieldInvalid('firstName')) {
+                  <div class="invalid-feedback d-block">{{ getFieldError('firstName') }}</div>
+                }
+              </div>
+
+              <!-- Last Name -->
+              <div class="col-md-6">
+                <div class="form-floating">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="lastName"
+                    formControlName="lastName"
+                    [class.is-invalid]="isFieldInvalid('lastName')"
+                    placeholder="{{ i18n.t('employees.last_name') }}">
+                  <label for="lastName">
+                    {{ i18n.t('employees.last_name') }}
+                    <span class="text-danger">*</span>
+                  </label>
+                </div>
+                @if (isFieldInvalid('lastName')) {
+                  <div class="invalid-feedback d-block">{{ getFieldError('lastName') }}</div>
+                }
+              </div>
+
+              <!-- Job Title -->
+              <div class="col-md-6">
+                <div class="form-floating">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="jobTitle"
+                    formControlName="jobTitle"
+                    [class.is-invalid]="isFieldInvalid('jobTitle')"
+                    placeholder="{{ i18n.t('employees.job_title') }}">
+                  <label for="jobTitle">
+                    {{ i18n.t('employees.job_title') }}
+                    <span class="text-danger">*</span>
+                  </label>
+                </div>
+                @if (isFieldInvalid('jobTitle')) {
+                  <div class="invalid-feedback d-block">{{ getFieldError('jobTitle') }}</div>
+                }
+              </div>
+
+              <!-- Employment Status -->
+              <div class="col-md-6">
+                <div class="form-floating">
+                  <select
+                    class="form-select"
+                    id="employmentStatus"
+                    formControlName="employmentStatus"
+                    [class.is-invalid]="isFieldInvalid('employmentStatus')">
+                    <option value="">{{ i18n.t('common.select') }}</option>
+                    <option value="1">{{ i18n.t('employees.employment_status.active') }}</option>
+                    <option value="2">{{ i18n.t('employees.employment_status.fulltime') }}</option>
+                    <option value="3">{{ i18n.t('employees.employment_status.parttime') }}</option>
+                    <option value="4">{{ i18n.t('employees.employment_status.contract') }}</option>
+                    <option value="5">{{ i18n.t('employees.employment_status.intern') }}</option>
+                    <option value="6">{{ i18n.t('employees.employment_status.consultant') }}</option>
+                    <option value="7">{{ i18n.t('employees.employment_status.terminated') }}</option>
+                    <option value="8">{{ i18n.t('employees.employment_status.inactive') }}</option>
+                  </select>
+                  <label for="employmentStatus">
+                    {{ i18n.t('employees.employment_status.title') }}
+                    <span class="text-danger">*</span>
+                  </label>
+                </div>
+                @if (isFieldInvalid('employmentStatus')) {
+                  <div class="invalid-feedback d-block">{{ getFieldError('employmentStatus') }}</div>
+                }
+              </div>
+
+              <!-- Work Location -->
+              <div class="col-md-6">
+                <div class="form-floating">
+                  <select
+                    class="form-select"
+                    id="workLocationType"
+                    formControlName="workLocationType"
+                    [class.is-invalid]="isFieldInvalid('workLocationType')">
+                    <option value="">{{ i18n.t('common.select') }}</option>
+                    <option value="1">{{ i18n.t('employees.work_location.onsite') }}</option>
+                    <option value="2">{{ i18n.t('employees.work_location.remote') }}</option>
+                    <option value="3">{{ i18n.t('employees.work_location.hybrid') }}</option>
+                  </select>
+                  <label for="workLocationType">
+                    {{ i18n.t('employees.work_location.title') }}
+                    <span class="text-danger">*</span>
+                  </label>
+                </div>
+                @if (isFieldInvalid('workLocationType')) {
+                  <div class="invalid-feedback d-block">{{ getFieldError('workLocationType') }}</div>
+                }
+              </div>
+            </div>
+          </app-form-section>
+
+          <!-- Additional Information Section -->
+          <app-form-section [title]="i18n.t('employees.additional_information')" variant="modern">
+            <div class="row g-3">
+              <!-- Arabic Names -->
+              <div class="col-md-6">
+                <div class="form-floating">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="firstNameAr"
+                    formControlName="firstNameAr"
+                    [class.is-invalid]="isFieldInvalid('firstNameAr')"
+                    placeholder="{{ i18n.t('employees.first_name_ar') }}">
+                  <label for="firstNameAr">{{ i18n.t('employees.first_name_ar') }}</label>
+                </div>
+                @if (isFieldInvalid('firstNameAr')) {
+                  <div class="invalid-feedback d-block">{{ getFieldError('firstNameAr') }}</div>
+                }
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-floating">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="lastNameAr"
+                    formControlName="lastNameAr"
+                    [class.is-invalid]="isFieldInvalid('lastNameAr')"
+                    placeholder="{{ i18n.t('employees.last_name_ar') }}">
+                  <label for="lastNameAr">{{ i18n.t('employees.last_name_ar') }}</label>
+                </div>
+                @if (isFieldInvalid('lastNameAr')) {
+                  <div class="invalid-feedback d-block">{{ getFieldError('lastNameAr') }}</div>
+                }
+              </div>
+
+              <!-- Job Title Arabic -->
+              <div class="col-md-6">
+                <div class="form-floating">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="jobTitleAr"
+                    formControlName="jobTitleAr"
+                    [class.is-invalid]="isFieldInvalid('jobTitleAr')"
+                    placeholder="{{ i18n.t('employees.job_title_ar') }}">
+                  <label for="jobTitleAr">{{ i18n.t('employees.job_title_ar') }}</label>
+                </div>
+                @if (isFieldInvalid('jobTitleAr')) {
+                  <div class="invalid-feedback d-block">{{ getFieldError('jobTitleAr') }}</div>
+                }
+              </div>
+
+              <!-- Email -->
+              <div class="col-md-6">
+                <div class="form-floating">
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="email"
+                    formControlName="email"
+                    [class.is-invalid]="isFieldInvalid('email')"
+                    placeholder="{{ i18n.t('employees.email') }}">
+                  <label for="email">{{ i18n.t('employees.email') }}</label>
+                </div>
+                @if (isFieldInvalid('email')) {
+                  <div class="invalid-feedback d-block">{{ getFieldError('email') }}</div>
+                }
+              </div>
+
+              <!-- Phone -->
+              <div class="col-md-6">
+                <div class="form-floating">
+                  <input
+                    type="tel"
+                    class="form-control"
+                    id="phone"
+                    formControlName="phone"
+                    [class.is-invalid]="isFieldInvalid('phone')"
+                    placeholder="{{ i18n.t('employees.phone') }}">
+                  <label for="phone">{{ i18n.t('employees.phone') }}</label>
+                </div>
+                @if (isFieldInvalid('phone')) {
+                  <div class="invalid-feedback d-block">{{ getFieldError('phone') }}</div>
+                }
+              </div>
+
+              <!-- National ID -->
+              <div class="col-md-6">
+                <div class="form-floating">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="nationalId"
+                    formControlName="nationalId"
+                    [class.is-invalid]="isFieldInvalid('nationalId')"
+                    placeholder="{{ i18n.t('employees.national_id') }}">
+                  <label for="nationalId">{{ i18n.t('employees.national_id') }}</label>
+                </div>
+                @if (isFieldInvalid('nationalId')) {
+                  <div class="invalid-feedback d-block">{{ getFieldError('nationalId') }}</div>
+                }
+              </div>
+
+              <!-- Date of Birth -->
+              <div class="col-md-6">
+                <div class="form-floating">
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="dateOfBirth"
+                    formControlName="dateOfBirth"
+                    [class.is-invalid]="isFieldInvalid('dateOfBirth')"
+                    placeholder="{{ i18n.t('employees.date_of_birth') }}">
+                  <label for="dateOfBirth">{{ i18n.t('employees.date_of_birth') }}</label>
+                </div>
+                @if (isFieldInvalid('dateOfBirth')) {
+                  <div class="invalid-feedback d-block">{{ getFieldError('dateOfBirth') }}</div>
+                }
+              </div>
+
+              <!-- Gender -->
+              <div class="col-md-6">
+                <div class="form-floating">
+                  <select
+                    class="form-select"
+                    id="gender"
+                    formControlName="gender"
+                    [class.is-invalid]="isFieldInvalid('gender')">
+                    <option value="">{{ i18n.t('common.select') }}</option>
+                    <option value="1">{{ i18n.t('employees.gender.male') }}</option>
+                    <option value="2">{{ i18n.t('employees.gender.female') }}</option>
+                  </select>
+                  <label for="gender">{{ i18n.t('employees.gender.title') }}</label>
+                </div>
+                @if (isFieldInvalid('gender')) {
+                  <div class="invalid-feedback d-block">{{ getFieldError('gender') }}</div>
+                }
+              </div>
+
+              <!-- Department -->
+              <div class="col-md-6">
+                <div class="app-modern-field">
+                  <label class="app-modern-label">{{ i18n.t('employees.department') }}</label>
+                  <app-searchable-select
+                    [options]="departmentSelectOptions"
+                    formControlName="departmentId"
+                    [placeholder]="i18n.t('common.select_department')"
+                    [searchable]="true"
+                    [clearable]="false"
+                    [class.is-invalid]="isFieldInvalid('departmentId')"
+                  ></app-searchable-select>
+                </div>
+                @if (isFieldInvalid('departmentId')) {
+                  <div class="invalid-feedback d-block">{{ getFieldError('departmentId') }}</div>
+                }
+              </div>
+
+              <!-- Manager -->
+              <div class="col-md-6">
+                <div class="app-modern-field">
+                  <label class="app-modern-label">{{ i18n.t('employees.manager') }}</label>
+                  <app-searchable-select
+                    [options]="managerSelectOptions"
+                    formControlName="managerEmployeeId"
+                    [placeholder]="i18n.t('common.select_manager')"
+                    [searchable]="true"
+                    [clearable]="false"
+                    [class.is-invalid]="isFieldInvalid('managerEmployeeId')"
+                  ></app-searchable-select>
+                </div>
+                @if (isFieldInvalid('managerEmployeeId')) {
+                  <div class="invalid-feedback d-block">{{ getFieldError('managerEmployeeId') }}</div>
+                }
+              </div>
+            </div>
+          </app-form-section>
+
+          <!-- Form Actions -->
+          <div class="app-form-actions">
+            <button type="button" class="btn btn-outline-secondary" (click)="onCancel()" [disabled]="saving()">
+              <i class="fa-solid fa-times me-2"></i>
+              {{ i18n.t('common.cancel') }}
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="employeeForm.invalid || saving()">
+              @if (saving()) {
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              } @else {
+                <i class="fa-solid fa-save me-2"></i>
               }
-
-              <!-- Required Information Section -->
-              <div class="mb-4">
-                <h6 class="text-primary mb-3">
-                  <i class="fa-solid fa-asterisk me-2"></i>
-                  {{ i18n.t('employees.required_information') }}
-                </h6>
-                <div class="row g-3">
-                  <!-- Employee Number (Read-only for edit) -->
-                  <div class="col-md-6">
-                    <label class="form-label">{{ i18n.t('employees.employee_number') }}</label>
-                    <input 
-                      type="text" 
-                      class="form-control-plaintext" 
-                      [value]="employee()?.employeeNumber"
-                      readonly>
-                    <div class="form-text">{{ i18n.t('employees.employee_number_readonly') }}</div>
-                  </div>
-
-                  <!-- Branch (Read-only for edit) -->
-                  <div class="col-md-6">
-                    <label class="form-label">{{ i18n.t('employees.branch') }}</label>
-                    <input 
-                      type="text" 
-                      class="form-control-plaintext" 
-                      [value]="employee()?.branchName"
-                      readonly>
-                    <div class="form-text">{{ i18n.t('employees.branch_readonly') }}</div>
-                  </div>
-
-                  <!-- First Name -->
-                  <div class="col-md-6">
-                    <label class="form-label">
-                      {{ i18n.t('employees.first_name') }}
-                      <span class="text-danger">*</span>
-                    </label>
-                    <input 
-                      type="text" 
-                      class="form-control" 
-                      formControlName="firstName"
-                      [class.is-invalid]="isFieldInvalid('firstName')"
-                      [placeholder]="i18n.t('employees.first_name_placeholder')">
-                    @if (isFieldInvalid('firstName')) {
-                      <div class="invalid-feedback">{{ getFieldError('firstName') }}</div>
-                    }
-                  </div>
-
-                  <!-- Last Name -->
-                  <div class="col-md-6">
-                    <label class="form-label">
-                      {{ i18n.t('employees.last_name') }}
-                      <span class="text-danger">*</span>
-                    </label>
-                    <input 
-                      type="text" 
-                      class="form-control" 
-                      formControlName="lastName"
-                      [class.is-invalid]="isFieldInvalid('lastName')"
-                      [placeholder]="i18n.t('employees.last_name_placeholder')">
-                    @if (isFieldInvalid('lastName')) {
-                      <div class="invalid-feedback">{{ getFieldError('lastName') }}</div>
-                    }
-                  </div>
-
-                  <!-- Job Title -->
-                  <div class="col-md-6">
-                    <label class="form-label">
-                      {{ i18n.t('employees.job_title') }}
-                      <span class="text-danger">*</span>
-                    </label>
-                    <input 
-                      type="text" 
-                      class="form-control" 
-                      formControlName="jobTitle"
-                      [class.is-invalid]="isFieldInvalid('jobTitle')"
-                      [placeholder]="i18n.t('employees.job_title_placeholder')">
-                    @if (isFieldInvalid('jobTitle')) {
-                      <div class="invalid-feedback">{{ getFieldError('jobTitle') }}</div>
-                    }
-                  </div>
-
-                  <!-- Employment Status -->
-                  <div class="col-md-6">
-                    <label class="form-label">
-                      {{ i18n.t('employees.employment_status.title') }}
-                      <span class="text-danger">*</span>
-                    </label>
-                    <select 
-                      class="form-select" 
-                      formControlName="employmentStatus"
-                      [class.is-invalid]="isFieldInvalid('employmentStatus')">
-                      <option value="">{{ i18n.t('common.select') }}</option>
-                      <option value="1">{{ i18n.t('employees.employment_status.active') }}</option>
-                      <option value="2">{{ i18n.t('employees.employment_status.fulltime') }}</option>
-                      <option value="3">{{ i18n.t('employees.employment_status.parttime') }}</option>
-                      <option value="4">{{ i18n.t('employees.employment_status.contract') }}</option>
-                      <option value="5">{{ i18n.t('employees.employment_status.intern') }}</option>
-                      <option value="6">{{ i18n.t('employees.employment_status.consultant') }}</option>
-                      <option value="7">{{ i18n.t('employees.employment_status.terminated') }}</option>
-                      <option value="8">{{ i18n.t('employees.employment_status.inactive') }}</option>
-                    </select>
-                    @if (isFieldInvalid('employmentStatus')) {
-                      <div class="invalid-feedback">{{ getFieldError('employmentStatus') }}</div>
-                    }
-                  </div>
-
-                  <!-- Work Location -->
-                  <div class="col-md-6">
-                    <label class="form-label">
-                      {{ i18n.t('employees.work_location.title') }}
-                      <span class="text-danger">*</span>
-                    </label>
-                    <select 
-                      class="form-select" 
-                      formControlName="workLocationType"
-                      [class.is-invalid]="isFieldInvalid('workLocationType')">
-                      <option value="">{{ i18n.t('common.select') }}</option>
-                      <option value="1">{{ i18n.t('employees.work_location.onsite') }}</option>
-                      <option value="2">{{ i18n.t('employees.work_location.remote') }}</option>
-                      <option value="3">{{ i18n.t('employees.work_location.hybrid') }}</option>
-                    </select>
-                    @if (isFieldInvalid('workLocationType')) {
-                      <div class="invalid-feedback">{{ getFieldError('workLocationType') }}</div>
-                    }
-                  </div>
-                </div>
-              </div>
-
-              <hr>
-
-              <!-- Optional Information Section -->
-              <div class="mb-4">
-                <h6 class="text-secondary mb-3">
-                  <i class="fa-solid fa-info-circle me-2"></i>
-                  {{ i18n.t('employees.additional_information') }}
-                </h6>
-                <div class="row g-3">
-                  <!-- Arabic Names -->
-                  <div class="col-md-6">
-                    <label class="form-label">{{ i18n.t('employees.first_name_ar') }}</label>
-                    <input 
-                      type="text" 
-                      class="form-control" 
-                      formControlName="firstNameAr"
-                      [class.is-invalid]="isFieldInvalid('firstNameAr')"
-                      [placeholder]="i18n.t('employees.first_name_ar_placeholder')">
-                    @if (isFieldInvalid('firstNameAr')) {
-                      <div class="invalid-feedback">{{ getFieldError('firstNameAr') }}</div>
-                    }
-                  </div>
-
-                  <div class="col-md-6">
-                    <label class="form-label">{{ i18n.t('employees.last_name_ar') }}</label>
-                    <input 
-                      type="text" 
-                      class="form-control" 
-                      formControlName="lastNameAr"
-                      [class.is-invalid]="isFieldInvalid('lastNameAr')"
-                      [placeholder]="i18n.t('employees.last_name_ar_placeholder')">
-                    @if (isFieldInvalid('lastNameAr')) {
-                      <div class="invalid-feedback">{{ getFieldError('lastNameAr') }}</div>
-                    }
-                  </div>
-
-                  <!-- Job Title Arabic -->
-                  <div class="col-md-6">
-                    <label class="form-label">{{ i18n.t('employees.job_title_ar') }}</label>
-                    <input 
-                      type="text" 
-                      class="form-control" 
-                      formControlName="jobTitleAr"
-                      [class.is-invalid]="isFieldInvalid('jobTitleAr')"
-                      [placeholder]="i18n.t('employees.job_title_ar_placeholder')">
-                    @if (isFieldInvalid('jobTitleAr')) {
-                      <div class="invalid-feedback">{{ getFieldError('jobTitleAr') }}</div>
-                    }
-                  </div>
-
-                  <!-- Email -->
-                  <div class="col-md-6">
-                    <label class="form-label">{{ i18n.t('employees.email') }}</label>
-                    <input 
-                      type="email" 
-                      class="form-control" 
-                      formControlName="email"
-                      [class.is-invalid]="isFieldInvalid('email')"
-                      [placeholder]="i18n.t('employees.email_placeholder')">
-                    @if (isFieldInvalid('email')) {
-                      <div class="invalid-feedback">{{ getFieldError('email') }}</div>
-                    }
-                  </div>
-
-                  <!-- Phone -->
-                  <div class="col-md-6">
-                    <label class="form-label">{{ i18n.t('employees.phone') }}</label>
-                    <input 
-                      type="tel" 
-                      class="form-control" 
-                      formControlName="phone"
-                      [class.is-invalid]="isFieldInvalid('phone')"
-                      [placeholder]="i18n.t('employees.phone_placeholder')">
-                    @if (isFieldInvalid('phone')) {
-                      <div class="invalid-feedback">{{ getFieldError('phone') }}</div>
-                    }
-                  </div>
-
-                  <!-- National ID -->
-                  <div class="col-md-6">
-                    <label class="form-label">{{ i18n.t('employees.national_id') }}</label>
-                    <input 
-                      type="text" 
-                      class="form-control" 
-                      formControlName="nationalId"
-                      [class.is-invalid]="isFieldInvalid('nationalId')"
-                      [placeholder]="i18n.t('employees.national_id_placeholder')">
-                    @if (isFieldInvalid('nationalId')) {
-                      <div class="invalid-feedback">{{ getFieldError('nationalId') }}</div>
-                    }
-                  </div>
-
-                  <!-- Date of Birth -->
-                  <div class="col-md-6">
-                    <label class="form-label">{{ i18n.t('employees.date_of_birth') }}</label>
-                    <input 
-                      type="date" 
-                      class="form-control" 
-                      formControlName="dateOfBirth"
-                      [class.is-invalid]="isFieldInvalid('dateOfBirth')">
-                    @if (isFieldInvalid('dateOfBirth')) {
-                      <div class="invalid-feedback">{{ getFieldError('dateOfBirth') }}</div>
-                    }
-                  </div>
-
-                  <!-- Gender -->
-                  <div class="col-md-6">
-                    <label class="form-label">{{ i18n.t('employees.gender.title') }}</label>
-                    <select 
-                      class="form-select" 
-                      formControlName="gender"
-                      [class.is-invalid]="isFieldInvalid('gender')">
-                      <option value="">{{ i18n.t('common.select') }}</option>
-                      <option value="1">{{ i18n.t('employees.gender.male') }}</option>
-                      <option value="2">{{ i18n.t('employees.gender.female') }}</option>
-                    </select>
-                    @if (isFieldInvalid('gender')) {
-                      <div class="invalid-feedback">{{ getFieldError('gender') }}</div>
-                    }
-                  </div>
-
-                  <!-- Department -->
-                  <div class="col-md-6">
-                    <label class="form-label">{{ i18n.t('employees.department') }}</label>
-                    <app-searchable-select
-                      [options]="departmentSelectOptions"
-                      formControlName="departmentId"
-                      [placeholder]="i18n.t('common.select_department')"
-                      [searchable]="true"
-                      [clearable]="false"
-                      [class.is-invalid]="isFieldInvalid('departmentId')"
-                    ></app-searchable-select>
-                    @if (isFieldInvalid('departmentId')) {
-                      <div class="invalid-feedback">{{ getFieldError('departmentId') }}</div>
-                    }
-                  </div>
-
-                  <!-- Manager -->
-                  <div class="col-md-6">
-                    <label class="form-label">{{ i18n.t('employees.manager') }}</label>
-                    <app-searchable-select
-                      [options]="managerSelectOptions"
-                      formControlName="managerEmployeeId"
-                      [placeholder]="i18n.t('common.select_manager')"
-                      [searchable]="true"
-                      [clearable]="false"
-                      [class.is-invalid]="isFieldInvalid('managerEmployeeId')"
-                    ></app-searchable-select>
-                    @if (isFieldInvalid('managerEmployeeId')) {
-                      <div class="invalid-feedback">{{ getFieldError('managerEmployeeId') }}</div>
-                    }
-                  </div>
-                </div>
-              </div>
-
-              <!-- Form Actions -->
-              <div class="d-flex justify-content-end gap-2 mt-4">
-                <button type="button" class="btn btn-outline-secondary" (click)="onCancel()" [disabled]="saving()">
-                  <i class="fa-solid fa-times me-2"></i>
-                  {{ i18n.t('common.cancel') }}
-                </button>
-                <button 
-                  type="submit" 
-                  class="btn btn-primary" 
-                  [disabled]="employeeForm.invalid || saving()"
-                >
-                  @if (saving()) {
-                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                  } @else {
-                    <i class="fa-solid fa-save me-2"></i>
-                  }
-                  {{ saving() ? i18n.t('common.saving') : i18n.t('employees.update_employee') }}
-                </button>
-              </div>
-            </form>
+              {{ saving() ? i18n.t('common.saving') : i18n.t('employees.update_employee') }}
+            </button>
           </div>
-        </div>
+        </form>
       } @else {
         <div class="alert alert-danger">
           <i class="fa-solid fa-exclamation-triangle me-2"></i>

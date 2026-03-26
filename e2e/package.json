@@ -1,0 +1,20 @@
+{
+  "name": "time-attendance-e2e",
+  "version": "1.0.0",
+  "description": "Playwright E2E tests for Time Attendance System",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:admin": "npx playwright test --project=admin",
+    "test:portal": "npx playwright test --project=portal",
+    "test:headed": "npx playwright test --headed",
+    "test:ui": "npx playwright test --ui",
+    "test:debug": "npx playwright test --debug",
+    "report": "npx playwright show-report",
+    "install-browsers": "npx playwright install --with-deps chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.50.0",
+    "@types/node": "^25.2.3",
+    "typescript": "^5.3.0"
+  }
+}

@@ -258,7 +258,7 @@ export class CreatePublicHolidayComponent implements OnInit {
       const date = new Date(2024, i - 1, 1);
       months.push({
         value: i,
-        label: date.toLocaleDateString(this.i18n.getCurrentLocale(), { month: 'long' })
+        label: date.toLocaleDateString(this.i18n.getDateLocale(), { month: 'long' })
       });
     }
     return months;
@@ -288,7 +288,7 @@ export class CreatePublicHolidayComponent implements OnInit {
       const date = new Date(2024, 0, 7 + i); // Start from Sunday
       daysOfWeek.push({
         value: i,
-        label: date.toLocaleDateString(this.i18n.getCurrentLocale(), { weekday: 'long' })
+        label: date.toLocaleDateString(this.i18n.getDateLocale(), { weekday: 'long' })
       });
     }
     return daysOfWeek;

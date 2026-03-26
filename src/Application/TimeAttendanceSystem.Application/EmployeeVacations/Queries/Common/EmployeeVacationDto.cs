@@ -39,6 +39,7 @@ public record EmployeeVacationDto(
     string EmployeeName,
     long VacationTypeId,
     string VacationTypeName,
+    string? VacationTypeNameAr,
     DateTime StartDate,
     DateTime EndDate,
     int TotalDays,

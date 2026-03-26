@@ -3,13 +3,13 @@ class AppConfig {
   AppConfig._();
 
   /// Development mode - set to true for local API testing
-  static const bool isDevelopment = true;
+  static const bool isDevelopment = false;
 
   /// Local API URL for Android emulator (10.0.2.2 = host localhost)
   static const String localApiUrl = 'http://10.0.2.2:5099';
 
-  /// Default API base URL (before tenant discovery)
-  static const String apiBaseUrl = 'https://api.example.com';
+  /// Production API base URL
+  static const String apiBaseUrl = 'https://api.clockn.net';
 
   /// Default API timeout in seconds
   static const int apiTimeoutSeconds = 30;

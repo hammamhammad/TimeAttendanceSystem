@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #9D99EA 0%, #747A90 100%);
   padding: 1rem;
 }
 
@@ -20,8 +20,9 @@
   margin-bottom: 2rem;
 }
 
-.login-header .fa-clock {
-  color: var(--bs-primary);
+.login-logo {
+  max-width: 200px;
+  height: auto;
 }
 
 .login-header h1 {
@@ -37,6 +38,13 @@
   padding: 0.75rem 1rem;
   font-weight: 600;
   border-radius: 0.5rem;
+  background-color: #9D99EA;
+  border-color: #9D99EA;
+}
+
+.btn-primary:hover {
+  background-color: #7B76D2;
+  border-color: #7B76D2;
 }
 
 .form-check-input:checked {
@@ -50,12 +58,12 @@
 }
 
 /* RTL Support */
-:root[dir="rtl"] .me-1 {
+:host-context([dir="rtl"]) .me-1 {
   margin-left: 0.25rem !important;
   margin-right: 0 !important;
 }
 
-:root[dir="rtl"] .me-2 {
+:host-context([dir="rtl"]) .me-2 {
   margin-left: 0.5rem !important;
   margin-right: 0 !important;
 }
@@ -65,11 +73,11 @@
   .login-container {
     padding: 0.5rem;
   }
-  
+
   .login-card {
     padding: 1.5rem;
   }
-  
+
   .login-header .fa-clock {
     font-size: 2rem !important;
   }

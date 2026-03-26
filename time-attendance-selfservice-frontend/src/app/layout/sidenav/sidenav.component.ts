@@ -17,6 +17,7 @@ import { I18nService } from '../../core/i18n/i18n.service';
 })
 export class SidenavComponent {
   @Input() collapsed = signal(false);
+  @Input() show = signal(false);
 
   private menuService = inject(MenuService);
   private router = inject(Router);

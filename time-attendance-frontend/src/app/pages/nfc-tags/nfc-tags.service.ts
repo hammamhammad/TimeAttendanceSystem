@@ -68,4 +68,16 @@ export class NfcTagsService {
   deleteNfcTag(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
+
+  disableTag(id: number): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.baseUrl}/${id}/disable`, {});
+  }
+
+  enableTag(id: number): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.baseUrl}/${id}/enable`, {});
+  }
+
+  reportLost(id: number): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.baseUrl}/${id}/report-lost`, {});
+  }
 }

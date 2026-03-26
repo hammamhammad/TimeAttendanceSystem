@@ -18,7 +18,7 @@ export interface BranchDto {
       [filterFields]="filterFields()"
       [showAddButton]="showAddButton"
       [addButtonText]="addButtonText"
-      [searchPlaceholder]="'Search vacation types...'"
+      [searchPlaceholder]="i18n.t('vacation_types.search_placeholder')"
       [refreshing]="refreshing"
       (search)="onSearch($event)"
       (filterChange)="onFilterChange($event)"
@@ -28,7 +28,7 @@ export interface BranchDto {
   `
 })
 export class VacationTypeFiltersComponent implements OnInit {
-  private i18n = inject(I18nService);
+  readonly i18n = inject(I18nService);
 
   @Input() showAddButton = true;
   @Input() addButtonText = 'Add Vacation Type';
@@ -68,13 +68,13 @@ export class VacationTypeFiltersComponent implements OnInit {
     this.filterFields.set([
       {
         key: 'branchId',
-        label: 'Branch',
+        label: this.i18n.t('common.branch'),
         type: 'select',
         options: branchOptions
       },
       {
         key: 'isActive',
-        label: 'Status',
+        label: this.i18n.t('common.status'),
         type: 'select',
         options: statusOptions
       }

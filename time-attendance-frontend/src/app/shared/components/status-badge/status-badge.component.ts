@@ -1,4 +1,5 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
+import { I18nService } from '../../../core/i18n/i18n.service';
 
 
 export type StatusVariant = 'active' | 'inactive' | 'pending' | 'approved' | 'rejected' | 'cancelled' | 'processing' | 'success' | 'danger' | 'warning' | 'info' | 'primary' | 'secondary' | 'light' | 'dark';
@@ -10,21 +11,30 @@ export interface StatusConfig {
   pulse?: boolean;
 }
 
+interface StatusStyleConfig {
+  i18nKey: string;
+  variant: StatusVariant;
+  icon?: string;
+  pulse?: boolean;
+}
+
 @Component({
   selector: 'app-status-badge',
   standalone: true,
   imports: [],
   template: `
     <span [class]="getBadgeClasses()"
-          [attr.title]="title || label">
-      @if (showIcon && icon) {
-        <i [class]="icon + ' me-1'" [class.app-pulse]="pulse"></i>
+          [attr.title]="title || resolvedLabel">
+      @if (showIcon && resolvedIcon) {
+        <i [class]="resolvedIcon + ' me-1'" [class.app-pulse]="resolvedPulse"></i>
       }
-      {{ label }}
+      {{ resolvedLabel }}
     </span>
   `
 })
 export class StatusBadgeComponent {
+  private i18n = inject(I18nService);
+
   @Input() status?: string;
   @Input() label?: string;
   @Input() variant?: StatusVariant;
@@ -35,38 +45,49 @@ export class StatusBadgeComponent {
   @Input() title?: string;
   @Input() customConfig?: { [key: string]: StatusConfig };
 
-  private defaultStatusConfig: { [key: string]: StatusConfig } = {
-    'active': { label: 'Active', variant: 'success', icon: 'fas fa-check-circle' },
-    'inactive': { label: 'Inactive', variant: 'danger', icon: 'fas fa-times-circle' },
-    'pending': { label: 'Pending', variant: 'warning', icon: 'fas fa-hourglass-half' },
-    'approved': { label: 'Approved', variant: 'success', icon: 'fas fa-check-circle' },
-    'rejected': { label: 'Rejected', variant: 'danger', icon: 'fas fa-times-circle' },
-    'cancelled': { label: 'Cancelled', variant: 'secondary', icon: 'fas fa-ban' },
-    'processing': { label: 'Processing', variant: 'info', icon: 'fas fa-spinner', pulse: true },
-    'draft': { label: 'Draft', variant: 'light', icon: 'fas fa-edit' },
-    'published': { label: 'Published', variant: 'primary', icon: 'fas fa-eye' },
-    'archived': { label: 'Archived', variant: 'secondary', icon: 'fas fa-archive' },
-    'online': { label: 'Online', variant: 'success', icon: 'fas fa-circle' },
-    'offline': { label: 'Offline', variant: 'danger', icon: 'fas fa-circle' },
-    'present': { label: 'Present', variant: 'success', icon: 'fas fa-user-check' },
-    'absent': { label: 'Absent', variant: 'danger', icon: 'fas fa-user-times' },
-    'late': { label: 'Late', variant: 'warning', icon: 'fas fa-clock' },
-    'early': { label: 'Early', variant: 'info', icon: 'fas fa-clock' },
-    'overtime': { label: 'Overtime', variant: 'primary', icon: 'fas fa-business-time' },
-    'full_time': { label: 'Full Time', variant: 'primary', icon: 'fas fa-user-tie' },
-    'part_time': { label: 'Part Time', variant: 'info', icon: 'fas fa-user-clock' },
-    'contract': { label: 'Contract', variant: 'warning', icon: 'fas fa-file-contract' },
-    'intern': { label: 'Intern', variant: 'light', icon: 'fas fa-graduation-cap' },
-    'male': { label: 'Male', variant: 'info', icon: 'fas fa-mars' },
-    'female': { label: 'Female', variant: 'info', icon: 'fas fa-venus' },
-    'office': { label: 'Office', variant: 'primary', icon: 'fas fa-building' },
-    'remote': { label: 'Remote', variant: 'success', icon: 'fas fa-home' },
-    'hybrid': { label: 'Hybrid', variant: 'info', icon: 'fas fa-laptop-house' }
+  private static readonly statusStyleMap: { [key: string]: StatusStyleConfig } = {
+    'active': { i18nKey: 'common.statuses.active', variant: 'success', icon: 'fas fa-check-circle' },
+    'inactive': { i18nKey: 'common.statuses.inactive', variant: 'danger', icon: 'fas fa-times-circle' },
+    'pending': { i18nKey: 'common.statuses.pending', variant: 'warning', icon: 'fas fa-hourglass-half' },
+    'approved': { i18nKey: 'common.statuses.approved', variant: 'success', icon: 'fas fa-check-circle' },
+    'rejected': { i18nKey: 'common.statuses.rejected', variant: 'danger', icon: 'fas fa-times-circle' },
+    'cancelled': { i18nKey: 'common.statuses.cancelled', variant: 'secondary', icon: 'fas fa-ban' },
+    'processing': { i18nKey: 'common.statuses.processing', variant: 'info', icon: 'fas fa-spinner', pulse: true },
+    'draft': { i18nKey: 'common.statuses.draft', variant: 'light', icon: 'fas fa-edit' },
+    'published': { i18nKey: 'common.statuses.published', variant: 'primary', icon: 'fas fa-eye' },
+    'archived': { i18nKey: 'common.statuses.archived', variant: 'secondary', icon: 'fas fa-archive' },
+    'online': { i18nKey: 'common.statuses.online', variant: 'success', icon: 'fas fa-circle' },
+    'offline': { i18nKey: 'common.statuses.offline', variant: 'danger', icon: 'fas fa-circle' },
+    'present': { i18nKey: 'common.statuses.present', variant: 'success', icon: 'fas fa-user-check' },
+    'absent': { i18nKey: 'common.statuses.absent', variant: 'danger', icon: 'fas fa-user-times' },
+    'late': { i18nKey: 'common.statuses.late', variant: 'warning', icon: 'fas fa-clock' },
+    'early': { i18nKey: 'common.statuses.early', variant: 'info', icon: 'fas fa-clock' },
+    'overtime': { i18nKey: 'common.statuses.overtime', variant: 'primary', icon: 'fas fa-business-time' },
+    'full_time': { i18nKey: 'common.statuses.full_time', variant: 'primary', icon: 'fas fa-user-tie' },
+    'part_time': { i18nKey: 'common.statuses.part_time', variant: 'info', icon: 'fas fa-user-clock' },
+    'contract': { i18nKey: 'common.statuses.contract', variant: 'warning', icon: 'fas fa-file-contract' },
+    'intern': { i18nKey: 'common.statuses.intern', variant: 'light', icon: 'fas fa-graduation-cap' },
+    'male': { i18nKey: 'common.statuses.male', variant: 'info', icon: 'fas fa-mars' },
+    'female': { i18nKey: 'common.statuses.female', variant: 'info', icon: 'fas fa-venus' },
+    'office': { i18nKey: 'common.statuses.office', variant: 'primary', icon: 'fas fa-building' },
+    'remote': { i18nKey: 'common.statuses.remote', variant: 'success', icon: 'fas fa-home' },
+    'hybrid': { i18nKey: 'common.statuses.hybrid', variant: 'info', icon: 'fas fa-laptop-house' }
   };
+
+  private getDefaultStatusConfig(key: string): StatusConfig | undefined {
+    const style = StatusBadgeComponent.statusStyleMap[key];
+    if (!style) return undefined;
+    return {
+      label: this.i18n.t(style.i18nKey),
+      variant: style.variant,
+      icon: style.icon,
+      pulse: style.pulse
+    };
+  }
 
   get effectiveConfig(): StatusConfig | null {
     if (this.status) {
-      const config = this.customConfig?.[this.status] || this.defaultStatusConfig[this.status.toLowerCase()];
+      const config = this.customConfig?.[this.status] || this.getDefaultStatusConfig(this.status.toLowerCase());
       if (config) {
         return {
           ...config,
@@ -89,11 +110,13 @@ export class StatusBadgeComponent {
   }
 
   get resolvedLabel(): string {
-    return this.effectiveConfig?.label || this.label || this.status || '';
+    // Explicit label input takes priority over config default
+    return this.label || this.effectiveConfig?.label || this.status || '';
   }
 
   get resolvedVariant(): StatusVariant {
-    return this.effectiveConfig?.variant || this.variant || 'secondary';
+    // Explicit variant input takes priority over config default
+    return this.variant || this.effectiveConfig?.variant || 'secondary';
   }
 
   get resolvedIcon(): string | undefined {

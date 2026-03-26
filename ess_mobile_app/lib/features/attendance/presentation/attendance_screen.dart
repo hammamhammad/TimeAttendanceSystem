@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:location/location.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:dio/dio.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/theme/app_theme.dart';
@@ -21,29 +23,66 @@ class AttendanceScreen extends ConsumerStatefulWidget {
 class _AttendanceScreenState extends ConsumerState<AttendanceScreen> {
   AttendanceStep _currentStep = AttendanceStep.initial;
   TransactionType _transactionType = TransactionType.checkIn;
-  
+
   // GPS Status
   bool _isGpsVerified = false;
   double? _latitude;
   double? _longitude;
   double? _accuracy;
   String? _gpsError;
-  
+
   // NFC Status
   bool _isNfcVerified = false;
   String? _nfcTagUid;
+  String? _nfcPayload;
   String? _nfcError;
   bool _isNfcAvailable = false;
-  
+
   // Processing
   bool _isProcessing = false;
   String? _resultMessage;
   bool _isSuccess = false;
 
+  // User context (from login response)
+  int? _employeeId;
+  int? _branchId;
+  String _deviceModel = 'Unknown';
+  String _deviceId = 'mobile_app';
+
   @override
   void initState() {
     super.initState();
     _checkNfcAvailability();
+    _loadUserContext();
+  }
+
+  Future<void> _loadUserContext() async {
+    final userData = await SecureStorageService.instance.getUserData();
+    if (userData != null) {
+      _employeeId = userData['employeeId'] as int?;
+      final branchIds = userData['branchIds'] as List<dynamic>?;
+      if (branchIds != null && branchIds.isNotEmpty) {
+        _branchId = (branchIds.first as num).toInt();
+      }
+    }
+
+    // Get device info
+    try {
+      final deviceInfo = DeviceInfoPlugin();
+      if (Platform.isAndroid) {
+        final info = await deviceInfo.androidInfo;
+        _deviceModel = '${info.manufacturer} ${info.model}';
+        _deviceId = info.id;
+      } else if (Platform.isIOS) {
+        final info = await deviceInfo.iosInfo;
+        _deviceModel = info.utsname.machine;
+        _deviceId = info.identifierForVendor ?? 'ios_device';
+      }
+    } catch (_) {
+      // Keep defaults
+    }
+
+    setState(() {});
   }
 
   Future<void> _checkNfcAvailability() async {
@@ -68,17 +107,17 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen> {
             // Transaction type selector
             if (_currentStep == AttendanceStep.initial)
               _buildTransactionTypeSelector(theme, l10n),
-            
+
             const SizedBox(height: 24),
-            
+
             // Verification steps
             _buildVerificationSteps(theme, l10n),
-            
+
             const SizedBox(height: 32),
-            
+
             // Action button
             _buildActionButton(theme, l10n),
-            
+
             // Result message
             if (_resultMessage != null) ...[
               const SizedBox(height: 24),
@@ -167,12 +206,12 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen> {
               style: theme.textTheme.titleMedium,
             ),
             const SizedBox(height: 24),
-            
+
             // Step 1: GPS Verification
             _VerificationStep(
               stepNumber: 1,
               title: 'GPS Location',
-              description: _isGpsVerified 
+              description: _isGpsVerified
                   ? 'Location verified ($_accuracy m accuracy)'
                   : (_gpsError ?? l10n.verifyingLocation),
               icon: Icons.location_on,
@@ -180,14 +219,14 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen> {
               isError: _gpsError != null,
               isActive: _currentStep == AttendanceStep.gpsVerification,
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Step 2: NFC Verification
             _VerificationStep(
               stepNumber: 2,
               title: 'NFC Tag',
-              description: _isNfcVerified 
+              description: _isNfcVerified
                   ? l10n.nfcTagScanned
                   : (_nfcError ?? l10n.scanNfcTag),
               icon: Icons.nfc,
@@ -195,14 +234,14 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen> {
               isError: _nfcError != null,
               isActive: _currentStep == AttendanceStep.nfcVerification,
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Step 3: Complete
             _VerificationStep(
               stepNumber: 3,
               title: 'Complete',
-              description: _isSuccess 
+              description: _isSuccess
                   ? 'Transaction recorded'
                   : 'Submit attendance',
               icon: Icons.check_circle,
@@ -219,7 +258,7 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen> {
     String buttonText;
     VoidCallback? onPressed;
     Color buttonColor;
-    
+
     switch (_currentStep) {
       case AttendanceStep.initial:
         buttonText = 'Start Verification';
@@ -247,7 +286,7 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen> {
         buttonColor = _isSuccess ? AppColors.success : AppColors.error;
         break;
     }
-    
+
     return SizedBox(
       height: 56,
       child: ElevatedButton(
@@ -302,6 +341,16 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen> {
 
   // GPS Verification
   Future<void> _startGpsVerification() async {
+    if (_branchId == null || _employeeId == null) {
+      setState(() {
+        _gpsError = 'Employee profile not linked. Contact your administrator.';
+        _currentStep = AttendanceStep.complete;
+        _isSuccess = false;
+        _resultMessage = _gpsError;
+      });
+      return;
+    }
+
     setState(() {
       _currentStep = AttendanceStep.gpsVerification;
       _gpsError = null;
@@ -353,6 +402,7 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen> {
       final response = await dio.post(
         '${tenantConfig?.apiBaseUrl}/api/v1/mobile/attendance/check-location',
         data: {
+          'branchId': _branchId,
           'latitude': _latitude,
           'longitude': _longitude,
         },
@@ -370,8 +420,31 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen> {
         // Start NFC verification
         _startNfcVerification();
       } else {
-        throw Exception(AppLocalizations.of(context).outsideGeofence);
+        final distance = response.data['distanceMeters'];
+        final radius = response.data['geofenceRadiusMeters'];
+        final outsideMsg = mounted ? AppLocalizations.of(context).outsideGeofence : 'Outside geofence';
+        throw Exception(
+          '$outsideMsg'
+          '${distance != null ? ' (${(distance as num).toInt()}m away, allowed: ${radius}m)' : ''}',
+        );
       }
+    } on DioException catch (e) {
+      String errorMsg;
+      if (e.response?.data is Map && e.response!.data['error'] != null) {
+        errorMsg = e.response!.data['error'].toString();
+      } else if (e.type == DioExceptionType.connectionError ||
+                 e.type == DioExceptionType.connectionTimeout) {
+        errorMsg = 'Cannot connect to server';
+      } else {
+        errorMsg = 'Location check failed (HTTP ${e.response?.statusCode})';
+      }
+      setState(() {
+        _gpsError = errorMsg;
+        _isProcessing = false;
+        _currentStep = AttendanceStep.complete;
+        _isSuccess = false;
+        _resultMessage = _gpsError;
+      });
     } catch (e) {
       setState(() {
         _gpsError = e.toString().replaceAll('Exception: ', '');
@@ -408,7 +481,7 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen> {
           final nfcb = tag.data['nfcb'];
           final nfcf = tag.data['nfcf'];
           final nfcv = tag.data['nfcv'];
-          
+
           List<int>? identifier;
           if (nfca != null) {
             identifier = List<int>.from(nfca['identifier']);
@@ -419,16 +492,38 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen> {
           } else if (nfcv != null) {
             identifier = List<int>.from(nfcv['identifier']);
           }
-          
+
           if (identifier != null) {
             _nfcTagUid = identifier.map((b) => b.toRadixString(16).padLeft(2, '0')).join(':').toUpperCase();
-            
+
+            // Read NDEF payload if available (encrypted tag binding)
+            final ndef = Ndef.from(tag);
+            if (ndef != null && ndef.cachedMessage != null) {
+              final records = ndef.cachedMessage!.records;
+              if (records.isNotEmpty) {
+                // Decode text record payload (skip language code header)
+                final record = records.first;
+                if (record.typeNameFormat == NdefTypeNameFormat.nfcWellknown) {
+                  final payload = record.payload;
+                  if (payload.isNotEmpty) {
+                    // Text record: first byte is status byte (language code length)
+                    final langCodeLength = payload.first & 0x3F;
+                    if (payload.length > 1 + langCodeLength) {
+                      _nfcPayload = String.fromCharCodes(
+                        payload.sublist(1 + langCodeLength),
+                      );
+                    }
+                  }
+                }
+              }
+            }
+
             await NfcManager.instance.stopSession();
-            
+
             setState(() {
               _isNfcVerified = true;
             });
-            
+
             // Submit transaction
             _submitTransaction();
           }
@@ -453,6 +548,20 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen> {
     }
   }
 
+  /// Maps Flutter enum index (0-based) to backend enum (1-based).
+  int _getBackendTransactionType() {
+    switch (_transactionType) {
+      case TransactionType.checkIn:
+        return 1;
+      case TransactionType.checkOut:
+        return 2;
+      case TransactionType.breakStart:
+        return 3;
+      case TransactionType.breakEnd:
+        return 4;
+    }
+  }
+
   // Submit Transaction
   Future<void> _submitTransaction() async {
     setState(() {
@@ -463,16 +572,22 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen> {
     try {
       final tenantConfig = await SecureStorageService.instance.getTenantConfig();
       final accessToken = await SecureStorageService.instance.getAccessToken();
-      
+
       final dio = Dio();
       final response = await dio.post(
         '${tenantConfig?.apiBaseUrl}/api/v1/mobile/attendance/transaction',
         data: {
-          'transactionType': _transactionType.index,
+          'employeeId': _employeeId,
+          'branchId': _branchId,
+          'transactionType': _getBackendTransactionType(),
           'latitude': _latitude,
           'longitude': _longitude,
           'nfcTagUid': _nfcTagUid,
-          'deviceId': 'mobile_app', // TODO: Get actual device ID
+          'nfcPayload': _nfcPayload,
+          'deviceId': _deviceId,
+          'deviceModel': _deviceModel,
+          'platform': Platform.isAndroid ? 'Android' : 'iOS',
+          'appVersion': '1.0.0',
         },
         options: Options(
           headers: {'Authorization': 'Bearer $accessToken'},
@@ -480,16 +595,27 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen> {
       );
 
       if (response.statusCode == 200) {
+        final success = response.data['success'] as bool? ?? true;
+        final message = response.data['message'] as String?;
         final l10n = AppLocalizations.of(context);
         setState(() {
-          _isSuccess = true;
-          _resultMessage = _transactionType == TransactionType.checkIn
-              ? l10n.checkInSuccess
-              : l10n.checkOutSuccess;
+          _isSuccess = success;
+          _resultMessage = message ??
+              (_transactionType == TransactionType.checkIn
+                  ? l10n.checkInSuccess
+                  : l10n.checkOutSuccess);
         });
       } else {
         throw Exception('Transaction failed');
       }
+    } on DioException catch (e) {
+      final errorMsg = e.response?.data is Map
+          ? (e.response!.data['error'] ?? e.response!.data['message'] ?? 'Transaction failed')
+          : 'Transaction failed (HTTP ${e.response?.statusCode})';
+      setState(() {
+        _isSuccess = false;
+        _resultMessage = errorMsg.toString();
+      });
     } catch (e) {
       setState(() {
         _isSuccess = false;

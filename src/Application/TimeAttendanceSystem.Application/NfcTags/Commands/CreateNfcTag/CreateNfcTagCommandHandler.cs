@@ -49,6 +49,7 @@ public class CreateNfcTagCommandHandler : BaseHandler<CreateNfcTagCommand, Resul
             Description = request.Description?.Trim(),
             IsActive = true,
             IsWriteProtected = false,
+            Status = NfcTagStatus.Registered,
             CreatedAtUtc = DateTime.UtcNow,
             CreatedBy = CurrentUser.Username ?? "System"
         };

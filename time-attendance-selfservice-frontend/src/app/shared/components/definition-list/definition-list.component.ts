@@ -1,5 +1,5 @@
 import { Component, Input, TemplateRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 
 export interface DefinitionItem {
   label: string;
@@ -18,7 +18,7 @@ export interface DefinitionItem {
 @Component({
   selector: 'app-definition-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [NgTemplateOutlet],
   templateUrl: './definition-list.component.html',
   styleUrls: ['./definition-list.component.css']
 })

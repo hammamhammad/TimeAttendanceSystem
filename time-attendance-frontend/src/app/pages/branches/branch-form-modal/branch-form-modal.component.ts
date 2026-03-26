@@ -19,18 +19,20 @@ import { ModalWrapperComponent } from '../../../shared/components/modal-wrapper/
       [loading]="submitting()"
       (close)="onClose()">
     
-      <form [formGroup]="branchForm" (ngSubmit)="onSubmit()">
+      <form [formGroup]="branchForm" (ngSubmit)="onSubmit()" class="app-modern-form">
         <!-- Branch Code -->
         <div class="mb-3">
-          <label for="code" class="form-label">Branch Code *</label>
-          <input type="text"
-            id="code"
-            class="form-control"
-            formControlName="code"
-            [class.is-invalid]="branchForm.get('code')?.invalid && branchForm.get('code')?.touched"
-            placeholder="Enter branch code">
+          <div class="form-floating">
+            <input type="text"
+              id="code"
+              class="form-control"
+              formControlName="code"
+              [class.is-invalid]="branchForm.get('code')?.invalid && branchForm.get('code')?.touched"
+              placeholder="Branch Code">
+            <label for="code">Branch Code *</label>
+          </div>
           @if (branchForm.get('code')?.invalid && branchForm.get('code')?.touched) {
-            <div class="invalid-feedback">
+            <div class="invalid-feedback d-block">
               @if (branchForm.get('code')?.errors?.['required']) {
                 <div>Branch code is required.</div>
               }
@@ -43,18 +45,20 @@ import { ModalWrapperComponent } from '../../../shared/components/modal-wrapper/
             </div>
           }
         </div>
-    
+
         <!-- Branch Name -->
         <div class="mb-3">
-          <label for="name" class="form-label">Branch Name *</label>
-          <input type="text"
-            id="name"
-            class="form-control"
-            formControlName="name"
-            [class.is-invalid]="branchForm.get('name')?.invalid && branchForm.get('name')?.touched"
-            placeholder="Enter branch name">
+          <div class="form-floating">
+            <input type="text"
+              id="name"
+              class="form-control"
+              formControlName="name"
+              [class.is-invalid]="branchForm.get('name')?.invalid && branchForm.get('name')?.touched"
+              placeholder="Branch Name">
+            <label for="name">Branch Name *</label>
+          </div>
           @if (branchForm.get('name')?.invalid && branchForm.get('name')?.touched) {
-            <div class="invalid-feedback">
+            <div class="invalid-feedback d-block">
               @if (branchForm.get('name')?.errors?.['required']) {
                 <div>Branch name is required.</div>
               }
@@ -67,18 +71,20 @@ import { ModalWrapperComponent } from '../../../shared/components/modal-wrapper/
             </div>
           }
         </div>
-    
+
         <!-- Timezone -->
         <div class="mb-3">
-          <label for="timeZone" class="form-label">Timezone *</label>
-          <app-searchable-select
-            [options]="timezoneOptions"
-            [value]="branchForm.get('timeZone')?.value || ''"
-            (selectionChange)="onTimezoneChange($event)"
-            [placeholder]="'Select timezone'"
-            [searchable]="true"
-            [clearable]="false">
-          </app-searchable-select>
+          <div class="app-modern-field">
+            <label class="app-modern-label">Timezone *</label>
+            <app-searchable-select
+              [options]="timezoneOptions"
+              [value]="branchForm.get('timeZone')?.value || ''"
+              (selectionChange)="onTimezoneChange($event)"
+              [placeholder]="'Select timezone'"
+              [searchable]="true"
+              [clearable]="false">
+            </app-searchable-select>
+          </div>
           @if (branchForm.get('timeZone')?.invalid && branchForm.get('timeZone')?.touched) {
             <div class="invalid-feedback d-block">
               Timezone is required.
@@ -111,16 +117,18 @@ import { ModalWrapperComponent } from '../../../shared/components/modal-wrapper/
           <div class="card-body">
             <div class="row">
               <div class="col-md-6 mb-3">
-                <label for="latitude" class="form-label">{{ i18n.t('branches.latitude') }}</label>
-                <input type="number"
-                  id="latitude"
-                  class="form-control"
-                  formControlName="latitude"
-                  [class.is-invalid]="branchForm.get('latitude')?.invalid && branchForm.get('latitude')?.touched"
-                  placeholder="{{ i18n.t('branches.latitude_placeholder') }}"
-                  step="0.000001">
+                <div class="form-floating">
+                  <input type="number"
+                    id="latitude"
+                    class="form-control"
+                    formControlName="latitude"
+                    [class.is-invalid]="branchForm.get('latitude')?.invalid && branchForm.get('latitude')?.touched"
+                    placeholder="{{ i18n.t('branches.latitude') }}"
+                    step="0.000001">
+                  <label for="latitude">{{ i18n.t('branches.latitude') }}</label>
+                </div>
                 @if (branchForm.get('latitude')?.invalid && branchForm.get('latitude')?.touched) {
-                  <div class="invalid-feedback">
+                  <div class="invalid-feedback d-block">
                     @if (branchForm.get('latitude')?.errors?.['min']) {
                       <div>{{ i18n.t('branches.latitude_min_error') }}</div>
                     }
@@ -131,16 +139,18 @@ import { ModalWrapperComponent } from '../../../shared/components/modal-wrapper/
                 }
               </div>
               <div class="col-md-6 mb-3">
-                <label for="longitude" class="form-label">{{ i18n.t('branches.longitude') }}</label>
-                <input type="number"
-                  id="longitude"
-                  class="form-control"
-                  formControlName="longitude"
-                  [class.is-invalid]="branchForm.get('longitude')?.invalid && branchForm.get('longitude')?.touched"
-                  placeholder="{{ i18n.t('branches.longitude_placeholder') }}"
-                  step="0.000001">
+                <div class="form-floating">
+                  <input type="number"
+                    id="longitude"
+                    class="form-control"
+                    formControlName="longitude"
+                    [class.is-invalid]="branchForm.get('longitude')?.invalid && branchForm.get('longitude')?.touched"
+                    placeholder="{{ i18n.t('branches.longitude') }}"
+                    step="0.000001">
+                  <label for="longitude">{{ i18n.t('branches.longitude') }}</label>
+                </div>
                 @if (branchForm.get('longitude')?.invalid && branchForm.get('longitude')?.touched) {
-                  <div class="invalid-feedback">
+                  <div class="invalid-feedback d-block">
                     @if (branchForm.get('longitude')?.errors?.['min']) {
                       <div>{{ i18n.t('branches.longitude_min_error') }}</div>
                     }
@@ -152,17 +162,16 @@ import { ModalWrapperComponent } from '../../../shared/components/modal-wrapper/
               </div>
             </div>
             <div class="mb-0">
-              <label for="geofenceRadiusMeters" class="form-label">{{ i18n.t('branches.geofence_radius') }}</label>
-              <div class="input-group">
+              <div class="form-floating">
                 <input type="number"
                   id="geofenceRadiusMeters"
                   class="form-control"
                   formControlName="geofenceRadiusMeters"
                   [class.is-invalid]="branchForm.get('geofenceRadiusMeters')?.invalid && branchForm.get('geofenceRadiusMeters')?.touched"
-                  placeholder="{{ i18n.t('branches.geofence_radius_placeholder') }}"
+                  placeholder="{{ i18n.t('branches.geofence_radius') }}"
                   min="10"
                   max="5000">
-                <span class="input-group-text">{{ i18n.t('common.meters') }}</span>
+                <label for="geofenceRadiusMeters">{{ i18n.t('branches.geofence_radius') }} ({{ i18n.t('common.meters') }})</label>
               </div>
               @if (branchForm.get('geofenceRadiusMeters')?.invalid && branchForm.get('geofenceRadiusMeters')?.touched) {
                 <div class="invalid-feedback d-block">
@@ -174,7 +183,7 @@ import { ModalWrapperComponent } from '../../../shared/components/modal-wrapper/
                   }
                 </div>
               }
-              <div class="form-text">{{ i18n.t('branches.geofence_hint') }}</div>
+              <div class="form-text mt-2">{{ i18n.t('branches.geofence_hint') }}</div>
             </div>
           </div>
         </div>

@@ -1,4 +1,4 @@
-<div class="container-fluid py-4">
+<div class="container-fluid py-4 app-modern-form">
   <!-- Page Header with Back Button -->
   <div class="d-flex align-items-center mb-4">
     <button
@@ -30,79 +30,98 @@
         <div class="card-body">
           <div class="row">
             <div class="col-md-6 mb-3">
-              <label class="form-label">
-                {{ t('workflows.name') }}
-                <span class="text-danger">*</span>
-              </label>
-              <input
-                type="text"
-                class="form-control"
-                formControlName="name"
-                [class.is-invalid]="isFieldInvalid('name')"
-                [placeholder]="t('workflows.name_placeholder')">
+              <div class="form-floating">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="name"
+                  formControlName="name"
+                  [class.is-invalid]="isFieldInvalid('name')"
+                  placeholder="{{ t('workflows.name') }}">
+                <label for="name">
+                  {{ t('workflows.name') }}
+                  <span class="text-danger">*</span>
+                </label>
+              </div>
               @if (isFieldInvalid('name')) {
-                <div class="invalid-feedback">{{ t('workflows.name_required') }}</div>
+                <div class="invalid-feedback d-block">{{ t('workflows.name_required') }}</div>
               }
             </div>
 
             <div class="col-md-6 mb-3">
-              <label class="form-label">{{ t('workflows.name_ar') }}</label>
-              <input
-                type="text"
-                class="form-control"
-                formControlName="nameAr"
-                dir="rtl"
-                [placeholder]="t('workflows.name_ar_placeholder')">
+              <div class="form-floating">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="nameAr"
+                  formControlName="nameAr"
+                  dir="rtl"
+                  placeholder="{{ t('workflows.name_ar') }}">
+                <label for="nameAr">{{ t('workflows.name_ar') }}</label>
+              </div>
             </div>
 
             <div class="col-md-6 mb-3">
-              <label class="form-label">
-                {{ t('workflows.entity_type') }}
-                <span class="text-danger">*</span>
-              </label>
-              <select
-                class="form-select"
-                formControlName="entityType"
-                [class.is-invalid]="isFieldInvalid('entityType')">
-                @for (type of entityTypes; track type.value) {
-                  <option [value]="type.value">{{ type.label }}</option>
-                }
-              </select>
+              <div class="form-floating">
+                <select
+                  class="form-select"
+                  id="entityType"
+                  formControlName="entityType"
+                  [class.is-invalid]="isFieldInvalid('entityType')">
+                  @for (type of entityTypes(); track type.value) {
+                    <option [value]="type.value">{{ type.label }}</option>
+                  }
+                </select>
+                <label for="entityType">
+                  {{ t('workflows.entity_type') }}
+                  <span class="text-danger">*</span>
+                </label>
+              </div>
             </div>
 
             <div class="col-md-6 mb-3">
-              <label class="form-label">{{ t('workflows.branch') }}</label>
-              <app-searchable-select
-                [options]="branchSelectOptions()"
-                [value]="form.get('branchId')?.value?.toString() || ''"
-                (selectionChange)="onBranchSelectionChange($event)"
-                [placeholder]="t('workflows.branch_placeholder')"
-                [searchable]="true"
-                [clearable]="true"
-                [disabled]="isViewMode()">
-              </app-searchable-select>
-              <small class="text-muted">{{ t('workflows.branch_hint') }}</small>
+              <div class="app-modern-field">
+                <label class="app-modern-label">{{ t('workflows.branch') }}</label>
+                <app-searchable-select
+                  [options]="branchSelectOptions()"
+                  [value]="form.get('branchId')?.value?.toString() || ''"
+                  (selectionChange)="onBranchSelectionChange($event)"
+                  [placeholder]="t('workflows.branch_placeholder')"
+                  [searchable]="true"
+                  [clearable]="true"
+                  [disabled]="isViewMode()">
+                </app-searchable-select>
+                <small class="text-muted">{{ t('workflows.branch_hint') }}</small>
+              </div>
             </div>
 
             <div class="col-12 mb-3">
-              <label class="form-label">{{ t('workflows.description') }}</label>
-              <textarea
-                class="form-control"
-                formControlName="description"
-                rows="2"
-                [placeholder]="t('workflows.description_placeholder')">
-              </textarea>
+              <div class="form-floating">
+                <textarea
+                  class="form-control"
+                  id="description"
+                  formControlName="description"
+                  rows="2"
+                  placeholder="{{ t('workflows.description') }}"
+                  style="height: 80px">
+                </textarea>
+                <label for="description">{{ t('workflows.description') }}</label>
+              </div>
             </div>
 
             <div class="col-12 mb-3">
-              <label class="form-label">{{ t('workflows.description_ar') }}</label>
-              <textarea
-                class="form-control"
-                formControlName="descriptionAr"
-                rows="2"
-                dir="rtl"
-                [placeholder]="t('workflows.description_ar_placeholder')">
-              </textarea>
+              <div class="form-floating">
+                <textarea
+                  class="form-control"
+                  id="descriptionAr"
+                  formControlName="descriptionAr"
+                  rows="2"
+                  dir="rtl"
+                  placeholder="{{ t('workflows.description_ar') }}"
+                  style="height: 80px">
+                </textarea>
+                <label for="descriptionAr">{{ t('workflows.description_ar') }}</label>
+              </div>
             </div>
 
             <div class="col-12">
@@ -183,81 +202,109 @@
                   <div class="card-body">
                     <div class="row">
                       <div class="col-md-6 mb-3">
-                        <label class="form-label">
-                          {{ t('workflows.step_name') }}
-                          <span class="text-danger">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          class="form-control"
-                          formControlName="name"
-                          [class.is-invalid]="isStepFieldInvalid(i, 'name')"
-                          [placeholder]="t('workflows.step_name_placeholder')">
+                        <div class="form-floating">
+                          <input
+                            type="text"
+                            class="form-control"
+                            [id]="'stepName_' + i"
+                            formControlName="name"
+                            [class.is-invalid]="isStepFieldInvalid(i, 'name')"
+                            placeholder="{{ t('workflows.step_name') }}">
+                          <label [for]="'stepName_' + i">
+                            {{ t('workflows.step_name') }}
+                            <span class="text-danger">*</span>
+                          </label>
+                        </div>
                       </div>
 
                       <div class="col-md-6 mb-3">
-                        <label class="form-label">{{ t('workflows.step_name_ar') }}</label>
-                        <input
-                          type="text"
-                          class="form-control"
-                          formControlName="nameAr"
-                          dir="rtl"
-                          [placeholder]="t('workflows.step_name_ar_placeholder')">
+                        <div class="form-floating">
+                          <input
+                            type="text"
+                            class="form-control"
+                            [id]="'stepNameAr_' + i"
+                            formControlName="nameAr"
+                            dir="rtl"
+                            placeholder="{{ t('workflows.step_name_ar') }}">
+                          <label [for]="'stepNameAr_' + i">{{ t('workflows.step_name_ar') }}</label>
+                        </div>
                       </div>
 
                       <div class="col-md-6 mb-3">
-                        <label class="form-label">
-                          {{ t('workflows.step_type') }}
-                          <span class="text-danger">*</span>
-                        </label>
-                        <select class="form-select" formControlName="stepType">
-                          @for (type of stepTypes; track type.value) {
-                            <option [value]="type.value">{{ type.label }}</option>
-                          }
-                        </select>
+                        <div class="form-floating">
+                          <select
+                            class="form-select"
+                            [id]="'stepType_' + i"
+                            formControlName="stepType">
+                            @for (type of stepTypes(); track type.value) {
+                              <option [value]="type.value">{{ type.label }}</option>
+                            }
+                          </select>
+                          <label [for]="'stepType_' + i">
+                            {{ t('workflows.step_type') }}
+                            <span class="text-danger">*</span>
+                          </label>
+                        </div>
                       </div>
 
                       <div class="col-md-6 mb-3">
-                        <label class="form-label">
-                          {{ t('workflows.approver_type') }}
-                          <span class="text-danger">*</span>
-                        </label>
-                        <select class="form-select" formControlName="approverType">
-                          @for (type of approverTypes; track type.value) {
-                            <option [value]="type.value">{{ type.label }}</option>
-                          }
-                        </select>
+                        <div class="form-floating">
+                          <select
+                            class="form-select"
+                            [id]="'approverType_' + i"
+                            formControlName="approverType">
+                            @for (type of approverTypes(); track type.value) {
+                              <option [value]="type.value">{{ type.label }}</option>
+                            }
+                          </select>
+                          <label [for]="'approverType_' + i">
+                            {{ t('workflows.approver_type') }}
+                            <span class="text-danger">*</span>
+                          </label>
+                        </div>
                       </div>
 
                       <div class="col-md-6 mb-3">
-                        <label class="form-label">{{ t('workflows.timeout_hours') }}</label>
-                        <input
-                          type="number"
-                          class="form-control"
-                          formControlName="timeoutHours"
-                          min="0"
-                          [placeholder]="t('workflows.timeout_hours_placeholder')">
+                        <div class="form-floating">
+                          <input
+                            type="number"
+                            class="form-control"
+                            [id]="'timeoutHours_' + i"
+                            formControlName="timeoutHours"
+                            min="0"
+                            placeholder="{{ t('workflows.timeout_hours') }}">
+                          <label [for]="'timeoutHours_' + i">{{ t('workflows.timeout_hours') }}</label>
+                        </div>
                         <small class="text-muted">{{ t('workflows.timeout_hours_hint') }}</small>
                       </div>
 
                       <div class="col-md-6 mb-3">
-                        <label class="form-label">{{ t('workflows.timeout_action') }}</label>
-                        <select class="form-select" formControlName="timeoutAction">
-                          @for (action of timeoutActions; track action.value) {
-                            <option [value]="action.value">{{ action.label }}</option>
-                          }
-                        </select>
+                        <div class="form-floating">
+                          <select
+                            class="form-select"
+                            [id]="'timeoutAction_' + i"
+                            formControlName="timeoutAction">
+                            @for (action of timeoutActions(); track action.value) {
+                              <option [value]="action.value">{{ action.label }}</option>
+                            }
+                          </select>
+                          <label [for]="'timeoutAction_' + i">{{ t('workflows.timeout_action') }}</label>
+                        </div>
                         <small class="text-muted">{{ t('workflows.timeout_action_hint') }}</small>
                       </div>
 
                       <div class="col-md-6 mb-3">
-                        <label class="form-label">{{ t('workflows.approver_instructions') }}</label>
-                        <textarea
-                          class="form-control"
-                          formControlName="approverInstructions"
-                          rows="2"
-                          [placeholder]="t('workflows.approver_instructions_placeholder')">
-                        </textarea>
+                        <div class="form-floating">
+                          <textarea
+                            class="form-control"
+                            [id]="'approverInstructions_' + i"
+                            formControlName="approverInstructions"
+                            rows="2"
+                            placeholder="{{ t('workflows.approver_instructions') }}"
+                            style="height: 80px">
+                          </textarea>
+                          <label [for]="'approverInstructions_' + i">{{ t('workflows.approver_instructions') }}</label>
+                        </div>
                       </div>
 
                       <div class="col-12">
@@ -311,7 +358,7 @@
 
       <!-- Form Actions -->
       @if (!isViewMode()) {
-        <div class="d-flex justify-content-end gap-2">
+        <div class="app-form-actions">
           <button
             type="button"
             class="btn btn-secondary"
@@ -330,7 +377,7 @@
           </button>
         </div>
       } @else {
-        <div class="d-flex justify-content-end">
+        <div class="app-form-actions">
           <button
             type="button"
             class="btn btn-secondary"

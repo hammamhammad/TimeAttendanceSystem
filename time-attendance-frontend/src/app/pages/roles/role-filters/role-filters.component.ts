@@ -13,7 +13,7 @@ import { SearchableSelectOption } from '../../../shared/components/searchable-se
       [filterFields]="filterFields()"
       [showAddButton]="showAddButton"
       [addButtonText]="addButtonText"
-      [searchPlaceholder]="'Search roles...'"
+      [searchPlaceholder]="i18n.t('roles.search_placeholder')"
       [refreshing]="refreshing"
       (search)="onSearch($event)"
       (filterChange)="onFilterChange($event)"
@@ -23,7 +23,7 @@ import { SearchableSelectOption } from '../../../shared/components/searchable-se
   `
 })
 export class RoleFiltersComponent implements OnInit {
-  private i18n = inject(I18nService);
+  readonly i18n = inject(I18nService);
 
   @Input() showAddButton = true;
   @Input() addButtonText = 'Create Role';
@@ -50,7 +50,7 @@ export class RoleFiltersComponent implements OnInit {
     this.filterFields.set([
       {
         key: 'isActive',
-        label: 'Status',
+        label: this.i18n.t('common.status'),
         type: 'select',
         options: statusOptions
       }

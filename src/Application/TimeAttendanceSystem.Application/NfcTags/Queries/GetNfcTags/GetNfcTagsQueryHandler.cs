@@ -46,6 +46,9 @@ public class GetNfcTagsQueryHandler : BaseHandler<GetNfcTagsQuery, Result<PagedR
                 t.IsWriteProtected,
                 t.LockedAt,
                 t.IsActive,
+                t.Status,
+                t.LastScannedAt,
+                t.ScanCount,
                 t.CreatedAtUtc
             ))
             .ToListAsync(cancellationToken);

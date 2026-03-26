@@ -87,7 +87,7 @@ public class ActivityDto
     public string Type { get; set; } = string.Empty;
 
     /// <summary>
-    /// Activity description
+    /// Activity description (English fallback)
     /// </summary>
     public string Description { get; set; } = string.Empty;
 
@@ -105,6 +105,26 @@ public class ActivityDto
     /// Bootstrap variant (success, info, warning, danger)
     /// </summary>
     public string Variant { get; set; } = "info";
+
+    /// <summary>
+    /// Start date for date-range activities (Vacation, RemoteWork)
+    /// </summary>
+    public DateTime? StartDate { get; set; }
+
+    /// <summary>
+    /// End date for date-range activities (Vacation, RemoteWork)
+    /// </summary>
+    public DateTime? EndDate { get; set; }
+
+    /// <summary>
+    /// Working hours (for Attendance activities)
+    /// </summary>
+    public decimal? WorkingHours { get; set; }
+
+    /// <summary>
+    /// Status label (e.g., Approved, Pending, Rejected)
+    /// </summary>
+    public string? StatusLabel { get; set; }
 }
 
 /// <summary>

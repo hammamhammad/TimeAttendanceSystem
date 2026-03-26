@@ -1,12 +1,12 @@
 .employee-attendance-detail {
   padding: 1.5rem;
   min-height: calc(100vh - 120px);
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  background: linear-gradient(135deg, var(--app-gray-100) 0%, var(--app-gray-200) 100%);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .page-title {
-  color: #2c3e50;
+  color: var(--app-gray-800);
   font-weight: 600;
   margin-bottom: 0.5rem;
 }
@@ -27,7 +27,7 @@
 }
 
 .employee-info-card .card-header {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  background: linear-gradient(135deg, #ffffff 0%, var(--app-gray-100) 100%);
   border-bottom: 1px solid #f1f3f4;
   border-radius: 16px 16px 0 0;
   padding: 1.5rem 1.75rem;
@@ -55,7 +55,7 @@
 
 .info-label {
   font-weight: 600;
-  color: #6c757d;
+  color: var(--app-gray-600);
   font-size: 0.875rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -65,7 +65,7 @@
 
 .info-value {
   font-size: 1rem;
-  color: #495057;
+  color: var(--app-gray-700);
   font-weight: 500;
 }
 
@@ -136,20 +136,20 @@
 
 .table-hover tbody tr:hover {
   background: linear-gradient(90deg, #f8f9ff 0%, #ffffff 100%);
-  border-left-color: #0d6efd;
+  border-left-color: var(--bs-primary);
   transform: translateX(2px);
-  box-shadow: 0 2px 8px rgba(13, 110, 253, 0.1);
+  box-shadow: 0 2px 8px rgba(var(--app-primary-rgb), 0.1);
 }
 
 .table thead th {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  background: linear-gradient(135deg, var(--app-gray-100) 0%, var(--app-gray-200) 100%);
   border-top: none;
-  border-bottom: 2px solid #dee2e6;
+  border-bottom: 2px solid var(--app-gray-300);
   font-weight: 700;
   text-transform: uppercase;
   font-size: 0.8rem;
   letter-spacing: 0.8px;
-  color: #495057;
+  color: var(--app-gray-700);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -159,7 +159,7 @@
 .form-control,
 .form-select {
   border-radius: 12px;
-  border: 2px solid #e9ecef;
+  border: 2px solid var(--app-gray-200);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 0.75rem 1rem;
   font-size: 0.9rem;
@@ -169,14 +169,14 @@
 
 .form-control:focus,
 .form-select:focus {
-  border-color: #0d6efd;
-  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15), 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0.25rem rgba(var(--app-primary-rgb), 0.15), 0 4px 12px rgba(0, 0, 0, 0.08);
   transform: translateY(-1px);
 }
 
 .form-label {
   font-weight: 600;
-  color: #495057;
+  color: var(--app-gray-700);
   margin-bottom: 0.75rem;
   font-size: 0.875rem;
 }
@@ -239,7 +239,7 @@
 }
 
 .card-header {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  background: linear-gradient(135deg, #ffffff 0%, var(--app-gray-100) 100%);
   border-bottom: 1px solid #f1f3f4;
   border-radius: 16px 16px 0 0;
   padding: 1.5rem 1.75rem;
@@ -274,67 +274,67 @@
 
 /* Enhanced gradient effects for different status colors */
 .border-success {
-  border-color: #198754 !important;
-  background: linear-gradient(135deg, rgba(25, 135, 84, 0.05) 0%, rgba(255,255,255,1) 100%);
+  border-color: var(--app-success) !important;
+  background: linear-gradient(135deg, rgba(var(--app-success-rgb), 0.05) 0%, rgba(255,255,255,1) 100%);
 }
 
 .border-danger {
-  border-color: #dc3545 !important;
-  background: linear-gradient(135deg, rgba(220, 53, 69, 0.05) 0%, rgba(255,255,255,1) 100%);
+  border-color: var(--app-danger) !important;
+  background: linear-gradient(135deg, rgba(var(--app-danger-rgb), 0.05) 0%, rgba(255,255,255,1) 100%);
 }
 
 .border-warning {
-  border-color: #fd7e14 !important;
-  background: linear-gradient(135deg, rgba(253, 126, 20, 0.05) 0%, rgba(255,255,255,1) 100%);
+  border-color: var(--app-warning) !important;
+  background: linear-gradient(135deg, rgba(var(--app-warning-rgb), 0.05) 0%, rgba(255,255,255,1) 100%);
 }
 
 .border-info {
-  border-color: #0dcaf0 !important;
-  background: linear-gradient(135deg, rgba(13, 202, 240, 0.05) 0%, rgba(255,255,255,1) 100%);
+  border-color: var(--app-info) !important;
+  background: linear-gradient(135deg, rgba(var(--app-info-rgb), 0.05) 0%, rgba(255,255,255,1) 100%);
 }
 
 .border-primary {
-  border-color: #0d6efd !important;
-  background: linear-gradient(135deg, rgba(13, 110, 253, 0.05) 0%, rgba(255,255,255,1) 100%);
+  border-color: var(--bs-primary) !important;
+  background: linear-gradient(135deg, rgba(var(--app-primary-rgb), 0.05) 0%, rgba(255,255,255,1) 100%);
 }
 
 .border-secondary {
-  border-color: #6c757d !important;
-  background: linear-gradient(135deg, rgba(108, 117, 125, 0.05) 0%, rgba(255,255,255,1) 100%);
+  border-color: var(--app-gray-600) !important;
+  background: linear-gradient(135deg, rgba(var(--app-gray-secondary-rgb), 0.05) 0%, rgba(255,255,255,1) 100%);
 }
 
 /* Status Badge Colors */
 .badge.bg-success {
-  background-color: #198754 !important;
+  background-color: var(--app-success) !important;
 }
 
 .badge.bg-danger {
-  background-color: #dc3545 !important;
+  background-color: var(--app-danger) !important;
 }
 
 .badge.bg-warning {
-  background-color: #fd7e14 !important;
+  background-color: var(--app-warning) !important;
   color: white;
 }
 
 .badge.bg-info {
-  background-color: #0dcaf0 !important;
+  background-color: var(--app-info) !important;
   color: #000;
 }
 
 .badge.bg-secondary {
-  background-color: #6c757d !important;
+  background-color: var(--app-gray-600) !important;
 }
 
 .badge.bg-primary {
-  background-color: #0d6efd !important;
+  background-color: var(--bs-primary) !important;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
   .employee-attendance-detail {
     padding: 1rem;
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    background: linear-gradient(135deg, var(--app-gray-100) 0%, #ffffff 100%);
   }
 
   .page-title {

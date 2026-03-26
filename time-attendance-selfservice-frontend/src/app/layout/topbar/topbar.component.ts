@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, signal, computed } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter, map } from 'rxjs';
@@ -35,15 +35,23 @@ export class TopbarComponent {
     return user.fullName || user.username;
   });
 
-  pageTitle = signal('');
+  private pageTitleKey = signal('');
   showUserMenu = signal(false);
+
+  // Reactive page title: re-translates when locale changes
+  pageTitle = computed(() => {
+    const key = this.pageTitleKey();
+    // Access locale signal to re-compute on language change
+    this.i18n.locale();
+    return key ? this.t(key) : this.t('portal.employee_dashboard');
+  });
 
   constructor(
     private authService: AuthService,
     public i18n: I18nService,
     private router: Router
   ) {
-    // Listen to route changes to update page title
+    // Listen to route changes to update page title key
     this.router.events
       .pipe(
         filter(event => event instanceof NavigationEnd),
@@ -56,7 +64,7 @@ export class TopbarComponent {
         })
       )
       .subscribe(title => {
-        this.pageTitle.set(this.t(title) || 'Dashboard');
+        this.pageTitleKey.set(title);
       });
   }
 

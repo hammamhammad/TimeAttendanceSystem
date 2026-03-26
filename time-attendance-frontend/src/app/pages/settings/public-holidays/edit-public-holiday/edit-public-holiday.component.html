@@ -1,4 +1,4 @@
-<div class="app-form-page">
+<div class="app-form-page app-modern-form">
   <app-form-header
     mode="edit"
     [title]="i18n.t('public_holidays.edit_holiday')"
@@ -25,22 +25,24 @@
         <!-- Main Form Content -->
         <div class="app-main-content">
           <!-- Basic Information Section -->
-          <app-form-section [title]="i18n.t('public_holidays.basic_information')">
+          <app-form-section [title]="i18n.t('public_holidays.basic_information')" variant="modern">
             <div class="row">
               <!-- Holiday Name -->
               <div class="col-md-6 mb-3">
-                <label for="name" class="form-label">
-                  {{ i18n.t('fields.name') }} <span class="text-danger">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  formControlName="name"
-                  class="form-control"
-                  [class.is-invalid]="isFieldInvalid('name')"
-                  [placeholder]="i18n.t('public_holidays.placeholders.enter_name')">
+                <div class="form-floating">
+                  <input
+                    type="text"
+                    id="name"
+                    formControlName="name"
+                    class="form-control"
+
+                    [class.is-invalid]="isFieldInvalid('name')">
+                  <label for="name">
+                    {{ i18n.t('fields.name') }} <span class="text-danger">*</span>
+                  </label>
+                </div>
                 @if (hasError('name')) {
-                  <div class="invalid-feedback">
+                  <div class="invalid-feedback d-block">
                     {{ getErrorMessage('name') }}
                   </div>
                 }
@@ -48,18 +50,20 @@
 
               <!-- Holiday Name (Arabic) -->
               <div class="col-md-6 mb-3">
-                <label for="nameAr" class="form-label">
-                  {{ i18n.t('fields.nameAr') }}
-                </label>
-                <input
-                  type="text"
-                  id="nameAr"
-                  formControlName="nameAr"
-                  class="form-control"
-                  [class.is-invalid]="isFieldInvalid('nameAr')"
-                  [placeholder]="i18n.t('public_holidays.placeholders.enter_name_ar')">
+                <div class="form-floating">
+                  <input
+                    type="text"
+                    id="nameAr"
+                    formControlName="nameAr"
+                    class="form-control"
+
+                    [class.is-invalid]="isFieldInvalid('nameAr')">
+                  <label for="nameAr">
+                    {{ i18n.t('fields.nameAr') }}
+                  </label>
+                </div>
                 @if (hasError('nameAr')) {
-                  <div class="invalid-feedback">
+                  <div class="invalid-feedback d-block">
                     {{ getErrorMessage('nameAr') }}
                   </div>
                 }
@@ -67,16 +71,18 @@
 
               <!-- Holiday Type -->
               <div class="col-md-6 mb-3">
-                <label for="holidayType" class="form-label">
-                  {{ i18n.t('fields.holidayType') }} <span class="text-danger">*</span>
-                </label>
-                <app-searchable-select
-                  id="holidayType"
-                  formControlName="holidayType"
-                  [options]="holidayTypeOptions"
-                  [placeholder]="i18n.t('public_holidays.placeholders.select_type')"
-                  [isInvalid]="isFieldInvalid('holidayType')">
-                </app-searchable-select>
+                <div class="app-modern-field">
+                  <label class="app-modern-label">
+                    {{ i18n.t('fields.holidayType') }} <span class="text-danger">*</span>
+                  </label>
+                  <app-searchable-select
+                    id="holidayType"
+                    formControlName="holidayType"
+                    [options]="holidayTypeOptions"
+
+                    [isInvalid]="isFieldInvalid('holidayType')">
+                  </app-searchable-select>
+                </div>
                 @if (hasError('holidayType')) {
                   <div class="invalid-feedback d-block">
                     {{ getErrorMessage('holidayType') }}
@@ -86,20 +92,22 @@
 
               <!-- Priority -->
               <div class="col-md-6 mb-3">
-                <label for="priority" class="form-label">
-                  {{ i18n.t('fields.priority') }} <span class="text-danger">*</span>
-                </label>
-                <input
-                  type="number"
-                  id="priority"
-                  formControlName="priority"
-                  class="form-control"
-                  [class.is-invalid]="isFieldInvalid('priority')"
-                  min="1"
-                  max="100"
-                  [placeholder]="i18n.t('public_holidays.placeholders.enter_priority')">
+                <div class="form-floating">
+                  <input
+                    type="number"
+                    id="priority"
+                    formControlName="priority"
+                    class="form-control"
+
+                    [class.is-invalid]="isFieldInvalid('priority')"
+                    min="1"
+                    max="100">
+                  <label for="priority">
+                    {{ i18n.t('fields.priority') }} <span class="text-danger">*</span>
+                  </label>
+                </div>
                 @if (hasError('priority')) {
-                  <div class="invalid-feedback">
+                  <div class="invalid-feedback d-block">
                     {{ getErrorMessage('priority') }}
                   </div>
                 }
@@ -111,22 +119,25 @@
           </app-form-section>
 
           <!-- Date Configuration Section -->
-          <app-form-section [title]="i18n.t('public_holidays.date_configuration')">
+          <app-form-section [title]="i18n.t('public_holidays.date_configuration')" variant="modern">
             <div class="row">
               <!-- One Time Date -->
               @if (selectedHolidayType() === HolidayType.OneTime) {
                 <div class="col-md-6 mb-3">
-                  <label for="specificDate" class="form-label">
-                    {{ i18n.t('fields.specificDate') }} <span class="text-danger">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    id="specificDate"
-                    formControlName="specificDate"
-                    class="form-control"
-                    [class.is-invalid]="isFieldInvalid('specificDate')">
+                  <div class="form-floating">
+                    <input
+                      type="date"
+                      id="specificDate"
+                      formControlName="specificDate"
+                      class="form-control"
+
+                      [class.is-invalid]="isFieldInvalid('specificDate')">
+                    <label for="specificDate">
+                      {{ i18n.t('fields.specificDate') }} <span class="text-danger">*</span>
+                    </label>
+                  </div>
                   @if (hasError('specificDate')) {
-                    <div class="invalid-feedback">
+                    <div class="invalid-feedback d-block">
                       {{ getErrorMessage('specificDate') }}
                     </div>
                   }
@@ -136,21 +147,24 @@
               <!-- Annual/Monthly Date -->
               @if (selectedHolidayType() === HolidayType.Annual || selectedHolidayType() === HolidayType.Floating) {
                 <div class="col-md-6 mb-3">
-                  <label for="month" class="form-label">
-                    {{ i18n.t('fields.month') }} <span class="text-danger">*</span>
-                  </label>
-                  <select
-                    id="month"
-                    formControlName="month"
-                    class="form-select"
-                    [class.is-invalid]="isFieldInvalid('month')">
-                    <option value="">{{ i18n.t('public_holidays.placeholders.select_month') }}</option>
-                    @for (month of [1,2,3,4,5,6,7,8,9,10,11,12]; track month) {
-                      <option [value]="month">{{ i18n.t('months.month_' + month) }}</option>
-                    }
-                  </select>
+                  <div class="form-floating">
+                    <select
+                      id="month"
+                      formControlName="month"
+                      class="form-select"
+
+                      [class.is-invalid]="isFieldInvalid('month')">
+                      <option value="">{{ i18n.t('public_holidays.placeholders.select_month') }}</option>
+                      @for (month of [1,2,3,4,5,6,7,8,9,10,11,12]; track month) {
+                        <option [value]="month">{{ i18n.t('months.month_' + month) }}</option>
+                      }
+                    </select>
+                    <label for="month">
+                      {{ i18n.t('fields.month') }} <span class="text-danger">*</span>
+                    </label>
+                  </div>
                   @if (hasError('month')) {
-                    <div class="invalid-feedback">
+                    <div class="invalid-feedback d-block">
                       {{ getErrorMessage('month') }}
                     </div>
                   }
@@ -159,19 +173,22 @@
 
               @if (selectedHolidayType() === HolidayType.Annual || selectedHolidayType() === HolidayType.Monthly) {
                 <div class="col-md-6 mb-3">
-                  <label for="day" class="form-label">
-                    {{ i18n.t('fields.day') }} <span class="text-danger">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    id="day"
-                    formControlName="day"
-                    class="form-control"
-                    [class.is-invalid]="isFieldInvalid('day')"
-                    min="1"
-                    max="31">
+                  <div class="form-floating">
+                    <input
+                      type="number"
+                      id="day"
+                      formControlName="day"
+                      class="form-control"
+
+                      [class.is-invalid]="isFieldInvalid('day')"
+                      min="1"
+                      max="31">
+                    <label for="day">
+                      {{ i18n.t('fields.day') }} <span class="text-danger">*</span>
+                    </label>
+                  </div>
                   @if (hasError('day')) {
-                    <div class="invalid-feedback">
+                    <div class="invalid-feedback d-block">
                       {{ getErrorMessage('day') }}
                     </div>
                   }
@@ -181,48 +198,54 @@
               <!-- Floating Holiday Fields -->
               @if (selectedHolidayType() === HolidayType.Floating) {
                 <div class="col-md-6 mb-3">
-                  <label for="weekOfMonth" class="form-label">
-                    {{ i18n.t('fields.weekOfMonth') }} <span class="text-danger">*</span>
-                  </label>
-                  <select
-                    id="weekOfMonth"
-                    formControlName="weekOfMonth"
-                    class="form-select"
-                    [class.is-invalid]="isFieldInvalid('weekOfMonth')">
-                    <option value="">{{ i18n.t('public_holidays.placeholders.select_week') }}</option>
-                    <option value="1">{{ i18n.t('public_holidays.first_week') }}</option>
-                    <option value="2">{{ i18n.t('public_holidays.second_week') }}</option>
-                    <option value="3">{{ i18n.t('public_holidays.third_week') }}</option>
-                    <option value="4">{{ i18n.t('public_holidays.fourth_week') }}</option>
-                    <option value="5">{{ i18n.t('public_holidays.last_week') }}</option>
-                  </select>
+                  <div class="form-floating">
+                    <select
+                      id="weekOfMonth"
+                      formControlName="weekOfMonth"
+                      class="form-select"
+
+                      [class.is-invalid]="isFieldInvalid('weekOfMonth')">
+                      <option value="">{{ i18n.t('public_holidays.placeholders.select_week') }}</option>
+                      <option value="1">{{ i18n.t('public_holidays.first_week') }}</option>
+                      <option value="2">{{ i18n.t('public_holidays.second_week') }}</option>
+                      <option value="3">{{ i18n.t('public_holidays.third_week') }}</option>
+                      <option value="4">{{ i18n.t('public_holidays.fourth_week') }}</option>
+                      <option value="5">{{ i18n.t('public_holidays.last_week') }}</option>
+                    </select>
+                    <label for="weekOfMonth">
+                      {{ i18n.t('fields.weekOfMonth') }} <span class="text-danger">*</span>
+                    </label>
+                  </div>
                   @if (hasError('weekOfMonth')) {
-                    <div class="invalid-feedback">
+                    <div class="invalid-feedback d-block">
                       {{ getErrorMessage('weekOfMonth') }}
                     </div>
                   }
                 </div>
 
                 <div class="col-md-6 mb-3">
-                  <label for="dayOfWeek" class="form-label">
-                    {{ i18n.t('fields.dayOfWeek') }} <span class="text-danger">*</span>
-                  </label>
-                  <select
-                    id="dayOfWeek"
-                    formControlName="dayOfWeek"
-                    class="form-select"
-                    [class.is-invalid]="isFieldInvalid('dayOfWeek')">
-                    <option value="">{{ i18n.t('public_holidays.placeholders.select_day') }}</option>
-                    <option value="0">{{ i18n.t('days.sunday') }}</option>
-                    <option value="1">{{ i18n.t('days.monday') }}</option>
-                    <option value="2">{{ i18n.t('days.tuesday') }}</option>
-                    <option value="3">{{ i18n.t('days.wednesday') }}</option>
-                    <option value="4">{{ i18n.t('days.thursday') }}</option>
-                    <option value="5">{{ i18n.t('days.friday') }}</option>
-                    <option value="6">{{ i18n.t('days.saturday') }}</option>
-                  </select>
+                  <div class="form-floating">
+                    <select
+                      id="dayOfWeek"
+                      formControlName="dayOfWeek"
+                      class="form-select"
+
+                      [class.is-invalid]="isFieldInvalid('dayOfWeek')">
+                      <option value="">{{ i18n.t('public_holidays.placeholders.select_day') }}</option>
+                      <option value="0">{{ i18n.t('common.days.sunday') }}</option>
+                      <option value="1">{{ i18n.t('common.days.monday') }}</option>
+                      <option value="2">{{ i18n.t('common.days.tuesday') }}</option>
+                      <option value="3">{{ i18n.t('common.days.wednesday') }}</option>
+                      <option value="4">{{ i18n.t('common.days.thursday') }}</option>
+                      <option value="5">{{ i18n.t('common.days.friday') }}</option>
+                      <option value="6">{{ i18n.t('common.days.saturday') }}</option>
+                    </select>
+                    <label for="dayOfWeek">
+                      {{ i18n.t('fields.dayOfWeek') }} <span class="text-danger">*</span>
+                    </label>
+                  </div>
                   @if (hasError('dayOfWeek')) {
-                    <div class="invalid-feedback">
+                    <div class="invalid-feedback d-block">
                       {{ getErrorMessage('dayOfWeek') }}
                     </div>
                   }
@@ -232,7 +255,7 @@
           </app-form-section>
 
           <!-- Scope and Settings Section -->
-          <app-form-section [title]="i18n.t('public_holidays.scope_settings')">
+          <app-form-section [title]="i18n.t('public_holidays.scope_settings')" variant="modern">
             <div class="row">
               <!-- Status -->
               <div class="col-md-6 mb-3">
@@ -271,16 +294,18 @@
               <!-- Branch Selection (when not national) -->
               @if (!holidayForm.get('isNational')?.value) {
                 <div class="col-md-6 mb-3">
-                  <label for="branchId" class="form-label">
-                    {{ i18n.t('fields.branch') }}
-                  </label>
-                  <app-searchable-select
-                    id="branchId"
-                    formControlName="branchId"
-                    [options]="branchOptions"
-                    [placeholder]="i18n.t('public_holidays.placeholders.select_branch')"
-                    [isInvalid]="isFieldInvalid('branchId')">
-                  </app-searchable-select>
+                  <div class="app-modern-field">
+                    <label class="app-modern-label">
+                      {{ i18n.t('fields.branch') }}
+                    </label>
+                    <app-searchable-select
+                      id="branchId"
+                      formControlName="branchId"
+                      [options]="branchOptions"
+
+                      [isInvalid]="isFieldInvalid('branchId')">
+                    </app-searchable-select>
+                  </div>
                   @if (hasError('branchId')) {
                     <div class="invalid-feedback d-block">
                       {{ getErrorMessage('branchId') }}
@@ -291,16 +316,18 @@
 
               <!-- Description -->
               <div class="col-12 mb-3">
-                <label for="description" class="form-label">
-                  {{ i18n.t('fields.description') }}
-                </label>
-                <textarea
-                  id="description"
-                  formControlName="description"
-                  class="form-control"
-                  rows="3"
-                  [placeholder]="i18n.t('public_holidays.placeholders.enter_description')">
-                </textarea>
+                <div class="form-floating">
+                  <textarea
+                    id="description"
+                    formControlName="description"
+                    class="form-control"
+                    rows="3"
+>
+                  </textarea>
+                  <label for="description">
+                    {{ i18n.t('fields.description') }}
+                  </label>
+                </div>
               </div>
             </div>
           </app-form-section>
@@ -317,7 +344,7 @@
               </h6>
             </div>
             <div class="card-body">
-              <div class="d-grid gap-2">
+              <div class="app-form-actions-vertical">
                 <!-- Save Button -->
                 <button
                   type="submit"

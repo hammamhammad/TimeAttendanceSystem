@@ -8,104 +8,72 @@ part of 'leave_model.dart';
 
 _$LeaveRequestImpl _$$LeaveRequestImplFromJson(Map<String, dynamic> json) =>
     _$LeaveRequestImpl(
-      id: json['id'] as String,
-      type: $enumDecode(_$LeaveTypeEnumMap, json['type']),
+      id: (json['id'] as num).toInt(),
+      vacationTypeId: (json['vacationTypeId'] as num?)?.toInt(),
+      vacationTypeName: json['vacationTypeName'] as String?,
       startDate: DateTime.parse(json['startDate'] as String),
       endDate: DateTime.parse(json['endDate'] as String),
-      status: $enumDecode(_$LeaveStatusEnumMap, json['status']),
-      reason: json['reason'] as String?,
-      managerNotes: json['managerNotes'] as String?,
-      createdAt: json['createdAt'] == null
+      status: _parseLeaveStatus(json['workflowStatus']),
+      reason: json['notes'] as String?,
+      employeeId: (json['employeeId'] as num?)?.toInt(),
+      employeeName: json['employeeName'] as String?,
+      totalDays: (json['totalDays'] as num?)?.toInt(),
+      businessDays: (json['businessDays'] as num?)?.toInt(),
+      createdAtUtc: json['createdAtUtc'] == null
           ? null
-          : DateTime.parse(json['createdAt'] as String),
-      processedAt: json['processedAt'] == null
-          ? null
-          : DateTime.parse(json['processedAt'] as String),
-      processedByName: json['processedByName'] as String?,
+          : DateTime.parse(json['createdAtUtc'] as String),
+      createdBy: json['createdBy'] as String?,
+      currentApproverName: json['currentApproverName'] as String?,
+      workflowInstanceId: (json['workflowInstanceId'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$$LeaveRequestImplToJson(_$LeaveRequestImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'type': _$LeaveTypeEnumMap[instance.type]!,
+      'vacationTypeId': instance.vacationTypeId,
+      'vacationTypeName': instance.vacationTypeName,
       'startDate': instance.startDate.toIso8601String(),
       'endDate': instance.endDate.toIso8601String(),
-      'status': _$LeaveStatusEnumMap[instance.status]!,
-      'reason': instance.reason,
-      'managerNotes': instance.managerNotes,
-      'createdAt': instance.createdAt?.toIso8601String(),
-      'processedAt': instance.processedAt?.toIso8601String(),
-      'processedByName': instance.processedByName,
+      'workflowStatus': _leaveStatusToJson(instance.status),
+      'notes': instance.reason,
+      'employeeId': instance.employeeId,
+      'employeeName': instance.employeeName,
+      'totalDays': instance.totalDays,
+      'businessDays': instance.businessDays,
+      'createdAtUtc': instance.createdAtUtc?.toIso8601String(),
+      'createdBy': instance.createdBy,
+      'currentApproverName': instance.currentApproverName,
+      'workflowInstanceId': instance.workflowInstanceId,
     };
-
-const _$LeaveTypeEnumMap = {
-  LeaveType.annual: 0,
-  LeaveType.sick: 1,
-  LeaveType.unpaid: 2,
-  LeaveType.maternity: 3,
-  LeaveType.paternity: 4,
-  LeaveType.bereavement: 5,
-  LeaveType.emergency: 6,
-  LeaveType.other: 7,
-};
-
-const _$LeaveStatusEnumMap = {
-  LeaveStatus.pending: 0,
-  LeaveStatus.approved: 1,
-  LeaveStatus.rejected: 2,
-  LeaveStatus.cancelled: 3,
-};
 
 _$CreateLeaveRequestImpl _$$CreateLeaveRequestImplFromJson(
         Map<String, dynamic> json) =>
     _$CreateLeaveRequestImpl(
-      type: $enumDecode(_$LeaveTypeEnumMap, json['type']),
+      employeeId: (json['employeeId'] as num).toInt(),
+      vacationTypeId: (json['vacationTypeId'] as num).toInt(),
       startDate: DateTime.parse(json['startDate'] as String),
       endDate: DateTime.parse(json['endDate'] as String),
-      reason: json['reason'] as String?,
+      notes: json['notes'] as String?,
     );
 
 Map<String, dynamic> _$$CreateLeaveRequestImplToJson(
         _$CreateLeaveRequestImpl instance) =>
     <String, dynamic>{
-      'type': _$LeaveTypeEnumMap[instance.type]!,
+      'employeeId': instance.employeeId,
+      'vacationTypeId': instance.vacationTypeId,
       'startDate': instance.startDate.toIso8601String(),
       'endDate': instance.endDate.toIso8601String(),
-      'reason': instance.reason,
+      'notes': instance.notes,
     };
 
-_$LeaveBalanceImpl _$$LeaveBalanceImplFromJson(Map<String, dynamic> json) =>
-    _$LeaveBalanceImpl(
-      type: $enumDecode(_$LeaveTypeEnumMap, json['type']),
-      typeName: json['typeName'] as String,
-      totalDays: (json['totalDays'] as num).toDouble(),
-      usedDays: (json['usedDays'] as num).toDouble(),
-      remainingDays: (json['remainingDays'] as num).toDouble(),
-      pendingDays: (json['pendingDays'] as num).toDouble(),
+_$VacationTypeImpl _$$VacationTypeImplFromJson(Map<String, dynamic> json) =>
+    _$VacationTypeImpl(
+      id: (json['id'] as num).toInt(),
+      name: json['name'] as String,
     );
 
-Map<String, dynamic> _$$LeaveBalanceImplToJson(_$LeaveBalanceImpl instance) =>
+Map<String, dynamic> _$$VacationTypeImplToJson(_$VacationTypeImpl instance) =>
     <String, dynamic>{
-      'type': _$LeaveTypeEnumMap[instance.type]!,
-      'typeName': instance.typeName,
-      'totalDays': instance.totalDays,
-      'usedDays': instance.usedDays,
-      'remainingDays': instance.remainingDays,
-      'pendingDays': instance.pendingDays,
-    };
-
-_$LeaveSummaryImpl _$$LeaveSummaryImplFromJson(Map<String, dynamic> json) =>
-    _$LeaveSummaryImpl(
-      balances: (json['balances'] as List<dynamic>)
-          .map((e) => LeaveBalance.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      recentRequests: (json['recentRequests'] as List<dynamic>)
-          .map((e) => LeaveRequest.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
-
-Map<String, dynamic> _$$LeaveSummaryImplToJson(_$LeaveSummaryImpl instance) =>
-    <String, dynamic>{
-      'balances': instance.balances,
-      'recentRequests': instance.recentRequests,
+      'id': instance.id,
+      'name': instance.name,
     };

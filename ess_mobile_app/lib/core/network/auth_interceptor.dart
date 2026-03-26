@@ -2,12 +2,13 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../storage/secure_storage_service.dart';
+import '../../shared/providers/auth_provider.dart';
 
 /// Dio interceptor for handling JWT authentication.
 /// Automatically adds Authorization header and handles token refresh.
 class AuthInterceptor extends Interceptor {
   final Ref _ref;
-  
+
   AuthInterceptor(this._ref);
   
   @override
@@ -53,9 +54,8 @@ class AuthInterceptor extends Interceptor {
         }
       }
       
-      // Token refresh failed - clear tokens and redirect to login
-      await SecureStorageService.instance.clearTokens();
-      // TODO: Trigger logout/redirect to login
+      // Token refresh failed - logout to trigger GoRouter redirect to login
+      await _ref.read(authStateProvider.notifier).logout();
     }
     
     handler.next(err);

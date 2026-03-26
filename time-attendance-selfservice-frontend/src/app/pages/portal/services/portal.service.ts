@@ -1,7 +1,8 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, tap, catchError, throwError, map, of } from 'rxjs';
 import { NotificationService } from '../../../core/notifications/notification.service';
+import { I18nService } from '../../../core/i18n/i18n.service';
 import { environment } from '../../../../environments/environment';
 import {
   EmployeeDashboard,
@@ -43,43 +44,46 @@ export class PortalService {
     const totalOvertimeHours = dash.totalOvertimeHours ?? 0;
     const remainingVacationDays = dash.remainingVacationDays ?? 0;
 
+    const fromLastMonth = this.i18n.t('portal.stats_from_last_month');
+    const trendSubtitle = attendanceTrend >= 0
+      ? `+${attendanceTrend.toFixed(1)}% ${fromLastMonth}`
+      : `${attendanceTrend.toFixed(1)}% ${fromLastMonth}`;
+
     return [
       {
         id: 'attendance',
-        title: 'Attendance Rate',
+        title: this.i18n.t('portal.stats_attendance_rate'),
         value: `${attendanceRate.toFixed(1)}%`,
-        subtitle: attendanceTrend >= 0
-          ? `+${attendanceTrend.toFixed(1)}% from last month`
-          : `${attendanceTrend.toFixed(1)}% from last month`,
+        subtitle: trendSubtitle,
         icon: 'bi-calendar-check',
         iconColor: 'text-primary',
         trend: attendanceTrend,
-        trendLabel: 'vs last month',
+        trendLabel: fromLastMonth,
         route: '/my-attendance'
       },
       {
         id: 'working-hours',
-        title: 'Working Hours',
+        title: this.i18n.t('portal.working_hours'),
         value: totalWorkingHours.toFixed(1),
-        subtitle: 'This month',
+        subtitle: this.i18n.t('portal.this_month'),
         icon: 'bi-clock',
         iconColor: 'text-success',
         route: '/my-attendance'
       },
       {
         id: 'overtime',
-        title: 'Overtime Hours',
+        title: this.i18n.t('portal.overtime_hours'),
         value: totalOvertimeHours.toFixed(1),
-        subtitle: 'This month',
+        subtitle: this.i18n.t('portal.this_month'),
         icon: 'bi-hourglass-split',
         iconColor: 'text-warning',
         route: '/my-attendance'
       },
       {
         id: 'vacation',
-        title: 'Vacation Days',
+        title: this.i18n.t('portal.stats_vacation_days'),
         value: remainingVacationDays,
-        subtitle: 'Remaining this year',
+        subtitle: this.i18n.t('portal.stats_remaining_this_year'),
         icon: 'bi-sun',
         iconColor: 'text-info',
         route: '/vacation-requests'
@@ -92,8 +96,8 @@ export class PortalService {
     return [
       {
         id: 'request-vacation',
-        title: 'Request Vacation',
-        description: 'Submit a new vacation request',
+        title: this.i18n.t('portal.request_vacation'),
+        description: this.i18n.t('portal.quick_submit_vacation'),
         icon: 'bi-sun',
         route: '/vacation-requests/new',
         color: 'primary',
@@ -101,8 +105,8 @@ export class PortalService {
       },
       {
         id: 'request-excuse',
-        title: 'Request Excuse',
-        description: 'Submit an absence excuse',
+        title: this.i18n.t('portal.request_excuse'),
+        description: this.i18n.t('portal.quick_submit_excuse'),
         icon: 'bi-file-medical',
         route: '/excuse-requests/new',
         color: 'info',
@@ -110,8 +114,8 @@ export class PortalService {
       },
       {
         id: 'view-attendance',
-        title: 'My Attendance',
-        description: 'View attendance history',
+        title: this.i18n.t('portal.my_attendance'),
+        description: this.i18n.t('portal.quick_view_attendance'),
         icon: 'bi-calendar3',
         route: '/my-attendance',
         color: 'success',
@@ -119,8 +123,8 @@ export class PortalService {
       },
       {
         id: 'attendance-correction',
-        title: 'Attendance Correction',
-        description: 'Request correction for missed clock-in/out',
+        title: this.i18n.t('portal.quick_attendance_correction'),
+        description: this.i18n.t('portal.quick_correction_desc'),
         icon: 'bi-clock-history',
         route: '/attendance-corrections/new',
         color: 'warning',
@@ -128,6 +132,8 @@ export class PortalService {
       }
     ];
   });
+
+  private i18n = inject(I18nService);
 
   constructor(
     private http: HttpClient,
@@ -189,7 +195,9 @@ export class PortalService {
       ...dashboard,
       recentActivity: (dashboard.recentActivity || []).map(activity => ({
         ...activity,
-        timestamp: new Date(activity.timestamp)
+        timestamp: new Date(activity.timestamp),
+        startDate: activity.startDate ? new Date(activity.startDate) : undefined,
+        endDate: activity.endDate ? new Date(activity.endDate) : undefined
       }))
     };
   }
@@ -312,18 +320,18 @@ export class PortalService {
     ).pipe(
       map(response => {
         if (response && !response.isSuccess) {
-          throw new Error(response.error || 'Failed to update profile');
+          throw new Error(response.error || this.i18n.t('portal.profile_update_failed'));
         }
       }),
       tap(() => {
         this._myProfileLoading.set(false);
-        this.notificationService.success('Profile updated successfully');
+        this.notificationService.success(this.i18n.t('portal.profile_updated_success'));
         // Refresh profile
         this.loadMyProfile().subscribe();
       }),
       catchError(error => {
         this._myProfileLoading.set(false);
-        const errorMessage = error.error?.error || error.message || 'Failed to update profile';
+        const errorMessage = error.error?.error || error.message || this.i18n.t('portal.profile_update_failed');
         this.notificationService.error(errorMessage);
         return throwError(() => error);
       })
@@ -499,12 +507,12 @@ export class PortalService {
       { comments }
     ).pipe(
       tap(() => {
-        this.notificationService.success('Request approved successfully');
+        this.notificationService.success(this.i18n.t('portal.approval_success'));
         // Refresh pending approvals
         this.loadPendingApprovals().subscribe();
       }),
       catchError(error => {
-        const errorMessage = error.error?.error || error.message || 'Failed to approve request';
+        const errorMessage = error.error?.error || error.message || this.i18n.t('portal.approval_failed');
         this.notificationService.error(errorMessage);
         return throwError(() => error);
       })
@@ -520,12 +528,12 @@ export class PortalService {
       { comments }
     ).pipe(
       tap(() => {
-        this.notificationService.success('Request rejected successfully');
+        this.notificationService.success(this.i18n.t('portal.rejection_success'));
         // Refresh pending approvals
         this.loadPendingApprovals().subscribe();
       }),
       catchError(error => {
-        const errorMessage = error.error?.error || error.message || 'Failed to reject request';
+        const errorMessage = error.error?.error || error.message || this.i18n.t('portal.rejection_failed');
         this.notificationService.error(errorMessage);
         return throwError(() => error);
       })
@@ -541,12 +549,12 @@ export class PortalService {
       { delegateToUserId, comments }
     ).pipe(
       tap(() => {
-        this.notificationService.success('Request delegated successfully');
+        this.notificationService.success(this.i18n.t('portal.delegation_success'));
         // Refresh pending approvals
         this.loadPendingApprovals().subscribe();
       }),
       catchError(error => {
-        const errorMessage = error.error?.error || error.message || 'Failed to delegate request';
+        const errorMessage = error.error?.error || error.message || this.i18n.t('portal.delegation_error');
         this.notificationService.error(errorMessage);
         return throwError(() => error);
       })

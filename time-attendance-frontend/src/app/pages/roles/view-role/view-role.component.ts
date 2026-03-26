@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { RolesService } from '../roles.service';
@@ -7,13 +7,15 @@ import { I18nService } from '../../../core/i18n/i18n.service';
 import { PermissionService } from '../../../core/auth/permission.service';
 import { PermissionResources, PermissionActions } from '../../../shared/utils/permission.utils';
 import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
+import { DefinitionListComponent, DefinitionItem } from '../../../shared/components/definition-list/definition-list.component';
+import { StatusBadgeComponent, StatusVariant } from '../../../shared/components/status-badge/status-badge.component';
 
 @Component({
   selector: 'app-view-role',
   standalone: true,
-  imports: [CommonModule, RouterModule, HasPermissionDirective],
+  imports: [CommonModule, RouterModule, HasPermissionDirective, DefinitionListComponent, StatusBadgeComponent],
   template: `
-    <div class="container-fluid">
+    <div class="container-fluid app-modern-view">
       <!-- Header -->
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
@@ -40,8 +42,8 @@ import { HasPermissionDirective } from '../../../shared/directives/has-permissio
               {{ i18n.t('roles.edit') }}
             </button>
           }
-          <button 
-            type="button" 
+          <button
+            type="button"
             class="btn btn-outline-secondary"
             (click)="onBack()">
             <i class="fa-solid fa-arrow-left me-2"></i>
@@ -61,7 +63,7 @@ import { HasPermissionDirective } from '../../../shared/directives/has-permissio
         <div class="row">
           <!-- Main Information Card -->
           <div class="col-lg-8">
-            <div class="card">
+            <div class="card mb-4">
               <div class="card-header">
                 <h5 class="card-title mb-0">
                   <div class="d-flex align-items-center">
@@ -79,51 +81,28 @@ import { HasPermissionDirective } from '../../../shared/directives/has-permissio
                       </div>
                       <small class="text-muted">{{ role()?.permissions?.length || 0 }} {{ i18n.t('roles.permissions_assigned') }}</small>
                     </div>
+                    <div class="ms-auto">
+                      <app-status-badge
+                        [label]="role()?.isSystem ? i18n.t('roles.system') : i18n.t('roles.custom')"
+                        [variant]="role()?.isSystem ? 'warning' : 'success'">
+                      </app-status-badge>
+                    </div>
                   </div>
                 </h5>
               </div>
               <div class="card-body">
-                <div class="row">
-                  <!-- Basic Information -->
-                  <div class="col-md-6">
-                    <dl class="row">
-                      <dt class="col-sm-5">{{ i18n.t('roles.name') }}:</dt>
-                      <dd class="col-sm-7">{{ role()?.name }}</dd>
-                      
-                      <dt class="col-sm-5">{{ i18n.t('roles.type') }}:</dt>
-                      <dd class="col-sm-7">
-                        @if (role()?.isSystem) {
-                          <span class="badge bg-warning-subtle text-warning">{{ i18n.t('roles.system') }}</span>
-                        } @else {
-                          <span class="badge bg-success-subtle text-success">{{ i18n.t('roles.custom') }}</span>
-                        }
-                      </dd>
-                      
-                      <dt class="col-sm-5">{{ i18n.t('roles.user_count') }}:</dt>
-                      <dd class="col-sm-7">
-                        <span class="badge bg-primary-subtle text-primary">{{ role()?.userCount || 0 }}</span>
-                      </dd>
-                    </dl>
-                  </div>
-
-                  <!-- Status Information -->
-                  <div class="col-md-6">
-                    <dl class="row">
-                      <dt class="col-sm-5">{{ i18n.t('roles.created_at') }}:</dt>
-                      <dd class="col-sm-7">{{ formatDate(role()!.createdAtUtc) }}</dd>
-                      
-                      <dt class="col-sm-5">{{ i18n.t('roles.permissions') }}:</dt>
-                      <dd class="col-sm-7">{{ role()?.permissions?.length || 0 }}</dd>
-                    </dl>
-                  </div>
-                </div>
+                <app-definition-list
+                  [items]="roleInfoItems()"
+                  [labelWidth]="'4'"
+                  [valueWidth]="'8'">
+                </app-definition-list>
               </div>
             </div>
           </div>
 
           <!-- Actions Card -->
           <div class="col-lg-4">
-            <div class="card">
+            <div class="card mb-3">
               <div class="card-header">
                 <h6 class="card-title mb-0">{{ i18n.t('common.actions') }}</h6>
               </div>
@@ -172,9 +151,10 @@ import { HasPermissionDirective } from '../../../shared/directives/has-permissio
                         <div class="flex-grow-1">
                           <div class="d-flex align-items-center mb-1">
                             <small class="fw-medium me-2">{{ getPermissionResource(permission.key) }}</small>
-                            <span class="badge" [ngClass]="getActionBadgeClass(permission.key)">
-                              {{ getPermissionAction(permission.key) }}
-                            </span>
+                            <app-status-badge
+                              [label]="getPermissionAction(permission.key)"
+                              [variant]="getActionBadgeVariant(permission.key)">
+                            </app-status-badge>
                           </div>
                           <p class="text-muted small mb-0">
                             {{ getPermissionDescription(permission) }}
@@ -218,6 +198,18 @@ export class ViewRoleComponent implements OnInit {
   role = signal<Role | null>(null);
   loading = signal(true);
   error = signal('');
+
+  roleInfoItems = computed<DefinitionItem[]>(() => {
+    const r = this.role();
+    if (!r) return [];
+    return [
+      { label: this.i18n.t('roles.name'), value: r.name },
+      { label: this.i18n.t('roles.type'), value: r.isSystem ? this.i18n.t('roles.system') : this.i18n.t('roles.custom'), type: 'badge' as const, badgeVariant: r.isSystem ? 'warning' as const : 'success' as const },
+      { label: this.i18n.t('roles.user_count'), value: r.userCount || 0 },
+      { label: this.i18n.t('roles.created_at'), value: this.formatDate(r.createdAtUtc) },
+      { label: this.i18n.t('roles.permissions'), value: r.permissions?.length || 0 }
+    ];
+  });
 
   ngOnInit(): void {
     const roleId = this.route.snapshot.paramMap.get('id');
@@ -285,7 +277,8 @@ export class ViewRoleComponent implements OnInit {
   }
 
   formatDate(dateString: string): string {
-    return new Date(dateString).toLocaleDateString();
+    const locale = this.i18n.getDateLocale();
+    return new Date(dateString).toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric' });
   }
 
   getPermissionIcon(key: string): string {
@@ -306,12 +299,12 @@ export class ViewRoleComponent implements OnInit {
     return parts[1] || 'unknown';
   }
 
-  getActionBadgeClass(key: string): string {
-    if (key.includes('read')) return 'bg-info-subtle text-info';
-    if (key.includes('create')) return 'bg-success-subtle text-success';
-    if (key.includes('update')) return 'bg-warning-subtle text-warning';
-    if (key.includes('delete')) return 'bg-danger-subtle text-danger';
-    return 'bg-secondary-subtle text-secondary';
+  getActionBadgeVariant(key: string): StatusVariant {
+    if (key.includes('read')) return 'info';
+    if (key.includes('create')) return 'success';
+    if (key.includes('update')) return 'warning';
+    if (key.includes('delete')) return 'danger';
+    return 'secondary';
   }
 
   getPermissionDescription(permission: any): string {

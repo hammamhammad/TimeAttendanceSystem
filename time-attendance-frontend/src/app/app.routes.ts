@@ -407,7 +407,7 @@ export const routes: Routes = [
         path: 'reports/attendance',
         loadComponent: () => import('./pages/reports/attendance-report').then(m => m.AttendanceReportComponent),
         data: {
-          title: 'reports.attendance',
+          title: 'reports.attendance.title',
           permission: 'attendance.read'
         },
         canMatch: [authGuard]

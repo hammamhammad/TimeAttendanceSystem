@@ -33,6 +33,17 @@ body {
 :root[dir="rtl"] {
   /* Bootstrap margin utilities fix for RTL */
   --bs-gutter-x: -1.5rem;
+  --sidebar-width: 260px;
+}
+
+/* RTL icon flip - arrows should point left in RTL */
+:root[dir="rtl"] .rtl-flip {
+  transform: scaleX(-1);
+}
+
+/* RTL font for Arabic */
+:root[dir="rtl"] body {
+  font-family: "Segoe UI", Tahoma, "Noto Sans Arabic", "Noto Kufi Arabic", Arial, sans-serif;
 }
 
 :root[dir="rtl"] .me-1 { 
@@ -218,6 +229,107 @@ body {
     left: 0 !important;
     right: 0 !important;
   }
+}
+
+/* RTL Overrides for Modern Form / Floating Labels */
+:root[dir="rtl"] .app-modern-form .form-floating > label {
+  transform-origin: right top;
+  right: 0;
+  left: auto;
+}
+
+:root[dir="rtl"] .app-modern-form .form-floating > .form-control:focus ~ label,
+:root[dir="rtl"] .app-modern-form .form-floating > .form-control:not(:placeholder-shown) ~ label,
+:root[dir="rtl"] .app-modern-form .form-floating > .form-select ~ label {
+  transform: scale(var(--app-float-label-scale)) translateY(var(--app-float-label-translate-y));
+}
+
+:root[dir="rtl"] .app-modern-form .form-floating > .form-control,
+:root[dir="rtl"] .app-modern-form .form-floating > .form-select {
+  text-align: right;
+}
+
+/* Global RTL fix for form-check (checkboxes/radios) */
+:root[dir="rtl"] .form-check {
+  padding-left: 0;
+  padding-right: 1.5em;
+}
+
+:root[dir="rtl"] .form-check .form-check-input {
+  float: right;
+  margin-left: 0;
+  margin-right: -1.5em;
+}
+
+:root[dir="rtl"] .app-modern-form .form-floating::after {
+  left: auto;
+  right: 50%;
+}
+
+:root[dir="rtl"] .app-modern-form .form-floating:focus-within::after {
+  right: 0;
+  left: auto;
+}
+
+:root[dir="rtl"] .app-modern-form .app-form-section,
+:root[dir="rtl"] .app-modern-form .app-form-section-modern {
+  border-left: none;
+  border-right: 4px solid var(--app-primary);
+}
+
+:root[dir="rtl"] .app-modern-form .app-modern-label {
+  text-align: right;
+}
+
+:root[dir="rtl"] .app-modern-form .app-modern-field .searchable-select .form-control {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+:root[dir="rtl"] .app-modern-form .alert {
+  border-left: none;
+  border-right: 4px solid;
+}
+
+:root[dir="rtl"] .app-modern-form .alert-info {
+  border-right-color: var(--app-info);
+}
+
+:root[dir="rtl"] .app-modern-form .alert-warning {
+  border-right-color: var(--app-warning);
+}
+
+/* RTL Overrides for Modern View Pages */
+:root[dir="rtl"] .app-modern-view > .card,
+:root[dir="rtl"] .app-modern-view .row > [class*="col"] > .card,
+:root[dir="rtl"] .app-modern-view .col > .card {
+  border-left: none;
+  border-right: var(--app-view-accent-width) solid var(--app-view-accent);
+}
+
+:root[dir="rtl"] .app-modern-view .app-view-stat {
+  border-left: none;
+  border-right: var(--app-view-accent-width) solid var(--app-view-accent);
+}
+
+:root[dir="rtl"] .app-modern-view .app-view-timeline {
+  padding-left: 0;
+  padding-right: var(--app-spacing-xl);
+}
+
+:root[dir="rtl"] .app-modern-view .app-view-timeline::before {
+  left: auto;
+  right: 0.75rem;
+}
+
+:root[dir="rtl"] .app-modern-view .app-view-timeline-item::before {
+  left: auto;
+  right: calc(-1 * var(--app-spacing-xl) + 0.5rem);
+}
+
+:root[dir="rtl"] .app-modern-view .alert {
+  border-left: none;
+  border-right: 4px solid;
 }
 
 /* Utility classes */

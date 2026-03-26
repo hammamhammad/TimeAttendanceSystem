@@ -1,8 +1,9 @@
-import { Component, Input, Output, EventEmitter, signal, TemplateRef, ContentChild } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, TemplateRef, ContentChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LoadingSpinnerComponent } from '../loading-spinner/loading-spinner.component';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
+import { I18nService } from '../../../core/i18n/i18n.service';
 
 export interface TableColumn {
   key: string;
@@ -173,7 +174,7 @@ export interface SortEvent {
     
                 <!-- Actions column -->
                 @if (actions.length > 0) {
-                  <th class="actions-column">Actions</th>
+                  <th class="actions-column">{{ i18n.t('common.actions') }}</th>
                 }
               </tr>
             </thead>
@@ -262,7 +263,7 @@ export interface SortEvent {
             <div class="row align-items-center">
               <div class="col-md-6">
                 <div class="d-flex align-items-center">
-                  <label class="form-label me-2 mb-0">Page Size:</label>
+                  <label class="form-label me-2 mb-0">{{ i18n.t('common.page_size') }}:</label>
                   <select
                     class="form-select form-select-sm"
                     style="width: auto;"
@@ -274,9 +275,9 @@ export interface SortEvent {
                     }
                   </select>
                   <span class="text-muted ms-3">
-                    Showing
+                    {{ i18n.t('common.showing') }}
                     {{ getDisplayStart() }}-{{ getDisplayEnd() }}
-                    of
+                    {{ i18n.t('common.of') }}
                     {{ getTotalItemsValue() }}
                   </span>
                 </div>
@@ -285,7 +286,7 @@ export interface SortEvent {
                 <ul class="pagination pagination-sm justify-content-end mb-0">
                   <li class="page-item" [class.disabled]="getCurrentPage() === 1">
                     <button class="page-link" (click)="onPageChange(getCurrentPage() - 1)" [disabled]="getCurrentPage() === 1">
-                      <i class="fas fa-chevron-left"></i>
+                      <i class="fas fa-chevron-left rtl-flip"></i>
                     </button>
                   </li>
                   @for (page of getPageNumbers(); track page) {
@@ -308,7 +309,7 @@ export interface SortEvent {
                   }
                   <li class="page-item" [class.disabled]="getCurrentPage() === getTotalPagesValue()">
                     <button class="page-link" (click)="onPageChange(getCurrentPage() + 1)" [disabled]="getCurrentPage() === getTotalPagesValue()">
-                      <i class="fas fa-chevron-right"></i>
+                      <i class="fas fa-chevron-right rtl-flip"></i>
                     </button>
                   </li>
                 </ul>
@@ -759,6 +760,7 @@ export interface SortEvent {
   `]
 })
 export class DataTableComponent {
+  i18n = inject(I18nService);
   @Input() data: any[] = [];
   @Input() columns: TableColumn[] = [];
   @Input() actions: TableAction[] = [];

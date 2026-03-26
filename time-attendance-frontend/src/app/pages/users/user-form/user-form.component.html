@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div class="container-fluid app-modern-form">
   <!-- Header -->
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
@@ -15,8 +15,8 @@
         </ol>
       </nav>
     </div>
-    <button 
-      type="button" 
+    <button
+      type="button"
       class="btn btn-outline-secondary"
       (click)="closeModal()"
       [disabled]="loading()">
@@ -26,7 +26,7 @@
   </div>
 
   <!-- Main Form Card -->
-  <app-form-section [title]="t('users.user_information')">
+  <app-form-section [title]="t('users.user_information')" variant="modern">
     <div class="card-body">
       <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
             @if (error()) {
@@ -40,88 +40,102 @@
               <!-- Employee Selection (only for create and not for SystemAdmin) -->
               @if (!isEditMode() && !isSystemAdmin()) {
                 <div class="col-md-12">
-                  <label class="form-label">{{ t('users.employee') }} <span class="text-danger">*</span></label>
-                  <app-searchable-select
-                    [options]="employeeOptions()"
-                    [value]="userForm.get('employeeId')?.value"
-                    [placeholder]="t('common.select')"
-                    (selectionChange)="onEmployeeSelected($event); userForm.get('employeeId')?.setValue($event)"
-                  ></app-searchable-select>
-                  @if (isFieldInvalid('employeeId')) {
-                    <div class="text-danger small mt-1">
-                      <i class="fa-solid fa-exclamation-triangle me-1"></i>
-                      {{ getFieldError('employeeId') }}
-                    </div>
-                  }
-                  <small class="form-text text-muted">
-                    <i class="fa-solid fa-info-circle me-1"></i>
-                    {{ t('users.employee_help') }}
-                  </small>
+                  <div class="app-modern-field">
+                    <label class="app-modern-label">{{ t('users.employee') }} <span class="text-danger">*</span></label>
+                    <app-searchable-select
+                      [options]="employeeOptions()"
+                      [value]="userForm.get('employeeId')?.value"
+                      [placeholder]="t('common.select')"
+                      (selectionChange)="onEmployeeSelected($event); userForm.get('employeeId')?.setValue($event)"
+                    ></app-searchable-select>
+                    @if (isFieldInvalid('employeeId')) {
+                      <div class="text-danger small mt-1">
+                        <i class="fa-solid fa-exclamation-triangle me-1"></i>
+                        {{ getFieldError('employeeId') }}
+                      </div>
+                    }
+                    <small class="form-text text-muted">
+                      <i class="fa-solid fa-info-circle me-1"></i>
+                      {{ t('users.employee_help') }}
+                    </small>
+                  </div>
                 </div>
               }
 
               <!-- Username (only for create) - Auto-filled from employee -->
               @if (!isEditMode()) {
                 <div class="col-md-6">
-                  <label class="form-label">{{ t('users.username') }} <span class="text-danger">*</span></label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    formControlName="username"
-                    [placeholder]="t('users.username')"
-                    [class.is-invalid]="isFieldInvalid('username')"
-                    readonly
-                  />
+                  <div class="form-floating">
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="username"
+                      formControlName="username"
+                      placeholder="{{ t('users.username') }}"
+                      [class.is-invalid]="isFieldInvalid('username')"
+                      readonly
+                    />
+                    <label for="username">{{ t('users.username') }} <span class="text-danger">*</span></label>
+                  </div>
                   @if (isFieldInvalid('username')) {
-                    <div class="invalid-feedback">{{ getFieldError('username') }}</div>
+                    <div class="invalid-feedback d-block">{{ getFieldError('username') }}</div>
                   }
                 </div>
               }
 
               <!-- Email - Auto-filled from employee in create mode -->
               <div class="col-md-6">
-                <label class="form-label">{{ t('users.email') }} <span class="text-danger">*</span></label>
-                <input
-                  type="email"
-                  class="form-control"
-                  formControlName="email"
-                  [placeholder]="t('users.email')"
-                  [class.is-invalid]="isFieldInvalid('email')"
-                  [readonly]="!isEditMode()"
-                />
+                <div class="form-floating">
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="email"
+                    formControlName="email"
+                    placeholder="{{ t('users.email') }}"
+                    [class.is-invalid]="isFieldInvalid('email')"
+                    [readonly]="!isEditMode()"
+                  />
+                  <label for="email">{{ t('users.email') }} <span class="text-danger">*</span></label>
+                </div>
                 @if (isFieldInvalid('email')) {
-                  <div class="invalid-feedback">{{ getFieldError('email') }}</div>
+                  <div class="invalid-feedback d-block">{{ getFieldError('email') }}</div>
                 }
               </div>
 
               <!-- Phone -->
               <div class="col-md-6">
-                <label class="form-label">{{ t('users.phone') }}</label>
-                <input
-                  type="tel"
-                  class="form-control"
-                  formControlName="phone"
-                  [placeholder]="t('users.phone')"
-                  [class.is-invalid]="isFieldInvalid('phone')"
-                />
+                <div class="form-floating">
+                  <input
+                    type="tel"
+                    class="form-control"
+                    id="phone"
+                    formControlName="phone"
+                    placeholder="{{ t('users.phone') }}"
+                    [class.is-invalid]="isFieldInvalid('phone')"
+                  />
+                  <label for="phone">{{ t('users.phone') }}</label>
+                </div>
                 @if (isFieldInvalid('phone')) {
-                  <div class="invalid-feedback">{{ getFieldError('phone') }}</div>
+                  <div class="invalid-feedback d-block">{{ getFieldError('phone') }}</div>
                 }
               </div>
 
               <!-- Preferred Language -->
               <div class="col-md-6">
-                <label class="form-label">{{ t('users.language') }} <span class="text-danger">*</span></label>
-                <select
-                  class="form-select"
-                  formControlName="preferredLanguage"
-                  [class.is-invalid]="isFieldInvalid('preferredLanguage')"
-                >
-                  <option value="en">{{ t('common.language_english') }}</option>
-                  <option value="ar">{{ t('common.language_arabic') }}</option>
-                </select>
+                <div class="form-floating">
+                  <select
+                    class="form-select"
+                    id="preferredLanguage"
+                    formControlName="preferredLanguage"
+                    [class.is-invalid]="isFieldInvalid('preferredLanguage')"
+                  >
+                    <option value="en">{{ t('common.language_english') }}</option>
+                    <option value="ar">{{ t('common.language_arabic') }}</option>
+                  </select>
+                  <label for="preferredLanguage">{{ t('users.language') }} <span class="text-danger">*</span></label>
+                </div>
                 @if (isFieldInvalid('preferredLanguage')) {
-                  <div class="invalid-feedback">{{ getFieldError('preferredLanguage') }}</div>
+                  <div class="invalid-feedback d-block">{{ getFieldError('preferredLanguage') }}</div>
                 }
               </div>
 
@@ -129,16 +143,19 @@
               @if (!isEditMode()) {
                 <!-- Password -->
                 <div class="col-md-6">
-                  <label class="form-label">{{ t('users.password') }} <span class="text-danger">*</span></label>
-                  <input
-                    type="password"
-                    class="form-control"
-                    formControlName="password"
-                    [placeholder]="t('users.password')"
-                    [class.is-invalid]="isFieldInvalid('password')"
-                  />
+                  <div class="form-floating">
+                    <input
+                      type="password"
+                      class="form-control"
+                      id="password"
+                      formControlName="password"
+                      placeholder="{{ t('users.password') }}"
+                      [class.is-invalid]="isFieldInvalid('password')"
+                    />
+                    <label for="password">{{ t('users.password') }} <span class="text-danger">*</span></label>
+                  </div>
                   @if (isFieldInvalid('password')) {
-                    <div class="invalid-feedback">{{ getFieldError('password') }}</div>
+                    <div class="invalid-feedback d-block">{{ getFieldError('password') }}</div>
                   }
                   <small class="form-text text-muted">
                     {{ t('auth.password_requirements') }}
@@ -147,16 +164,19 @@
 
                 <!-- Confirm Password -->
                 <div class="col-md-6">
-                  <label class="form-label">{{ t('users.confirm_password') }} <span class="text-danger">*</span></label>
-                  <input
-                    type="password"
-                    class="form-control"
-                    formControlName="confirmPassword"
-                    [placeholder]="t('users.confirm_password')"
-                    [class.is-invalid]="isFieldInvalid('confirmPassword')"
-                  />
+                  <div class="form-floating">
+                    <input
+                      type="password"
+                      class="form-control"
+                      id="confirmPassword"
+                      formControlName="confirmPassword"
+                      placeholder="{{ t('users.confirm_password') }}"
+                      [class.is-invalid]="isFieldInvalid('confirmPassword')"
+                    />
+                    <label for="confirmPassword">{{ t('users.confirm_password') }} <span class="text-danger">*</span></label>
+                  </div>
                   @if (isFieldInvalid('confirmPassword')) {
-                    <div class="invalid-feedback">{{ getFieldError('confirmPassword') }}</div>
+                    <div class="invalid-feedback d-block">{{ getFieldError('confirmPassword') }}</div>
                   }
                 </div>
               }
@@ -202,7 +222,7 @@
             </div>
 
             <!-- Permissions Section -->
-              <app-form-section [title]="t('users.permissions')">
+              <app-form-section [title]="t('users.permissions')" variant="modern">
                 <!-- Roles -->
                 <div class="mb-3">
                   <label class="form-label">{{ t('users.roles') }} <span class="text-danger">*</span></label>
@@ -211,7 +231,7 @@
                       <div class="row g-3">
                         @for (role of availableRoles(); track role.id) {
                           <div class="col-md-6 col-lg-4">
-                            <div class="form-check p-2 border rounded bg-white">
+                            <div class="form-check border rounded bg-white">
                               <input
                                 class="form-check-input"
                                 type="checkbox"
@@ -250,7 +270,7 @@
                       <div class="row g-3">
                         @for (branch of availableBranches(); track branch.id) {
                           <div class="col-md-6 col-lg-4">
-                            <div class="form-check p-2 border rounded bg-white">
+                            <div class="form-check border rounded bg-white">
                               <input
                                 class="form-check-input"
                                 type="checkbox"
@@ -281,14 +301,14 @@
               </app-form-section>
 
         <!-- Form Actions -->
-        <div class="d-flex justify-content-end gap-2 mt-4">
+        <div class="app-form-actions">
           <button type="button" class="btn btn-outline-secondary" (click)="closeModal()" [disabled]="loading()">
             <i class="fa-solid fa-times me-2"></i>
             {{ t('common.cancel') }}
           </button>
-          <button 
-            type="submit" 
-            class="btn btn-primary" 
+          <button
+            type="submit"
+            class="btn btn-primary"
             [disabled]="userForm.invalid || loading()"
           >
             @if (loading()) {

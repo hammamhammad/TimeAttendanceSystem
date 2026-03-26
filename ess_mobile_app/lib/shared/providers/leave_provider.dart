@@ -10,61 +10,155 @@ class LeaveRepository {
 
   LeaveRepository(this._dio);
 
-  /// Get leave balance summary.
-  Future<List<LeaveBalance>> getBalances() async {
+  /// Get vacation types for the dropdown.
+  /// Uses /api/v1/vacation-types/dropdown which returns [{id, name}].
+  Future<List<VacationType>> getVacationTypes() async {
     try {
-      final response = await _dio.get('/api/v1/leave/balance');
-      final List<dynamic> data = response.data;
-      return data.map((e) => LeaveBalance.fromJson(e)).toList();
+      final response = await _dio.get('/api/v1/vacation-types/dropdown');
+      final data = response.data;
+
+      List<dynamic> items;
+      if (data is List) {
+        items = data;
+      } else if (data is Map<String, dynamic>) {
+        // Handle Result wrapper
+        if (data.containsKey('isSuccess') && data['isSuccess'] == true) {
+          final value = data['value'];
+          items = value is List ? value : [];
+        } else {
+          items = data['items'] ?? [];
+        }
+      } else {
+        items = [];
+      }
+
+      return items
+          .whereType<Map<String, dynamic>>()
+          .map((e) => VacationType(
+                id: (e['id'] as num).toInt(),
+                name: e['name']?.toString() ?? '',
+              ))
+          .toList();
     } on DioException catch (e) {
-      throw Exception(e.response?.data?['message'] ?? 'Failed to get balances');
+      throw Exception(
+          e.response?.data?['message'] ?? 'Failed to get vacation types');
     }
   }
 
   /// Get leave requests with optional filter.
   Future<List<LeaveRequest>> getRequests({LeaveStatus? status}) async {
     try {
-      final queryParams = <String, dynamic>{};
-      if (status != null) {
-        queryParams['status'] = status.index;
-      }
-      
+      final queryParams = <String, dynamic>{
+        'page': 1,
+        'pageSize': 50,
+      };
+
       final response = await _dio.get(
-        '/api/v1/leave/requests',
+        '/api/v1/portal/my-vacations',
         queryParameters: queryParams,
       );
-      
-      final List<dynamic> data = response.data;
-      return data.map((e) => LeaveRequest.fromJson(e)).toList();
+
+      final data = response.data;
+      List<dynamic> items;
+
+      if (data is Map<String, dynamic>) {
+        // Handle Result wrapper
+        if (data.containsKey('isSuccess') && data['isSuccess'] == true) {
+          final value = data['value'];
+          if (value is Map<String, dynamic>) {
+            items = value['items'] ?? value['data'] ?? [];
+          } else if (value is List) {
+            items = value;
+          } else {
+            items = [];
+          }
+        } else {
+          items = data['items'] ?? data['data'] ?? [];
+        }
+      } else if (data is List) {
+        items = data;
+      } else {
+        items = [];
+      }
+
+      final requests = <LeaveRequest>[];
+      for (final item in items) {
+        if (item is Map<String, dynamic>) {
+          try {
+            requests.add(LeaveRequest.fromJson(item));
+          } catch (_) {
+            // Skip items that fail to parse
+          }
+        }
+      }
+
+      // Filter by status client-side if needed
+      if (status != null) {
+        return requests.where((r) => r.status == status).toList();
+      }
+
+      return requests;
     } on DioException catch (e) {
-      throw Exception(e.response?.data?['message'] ?? 'Failed to get requests');
+      throw Exception(
+          e.response?.data?['message'] ?? 'Failed to get requests');
     }
   }
 
   /// Create a new leave request.
-  Future<LeaveRequest> createRequest(CreateLeaveRequest request) async {
+  Future<void> createRequest(CreateLeaveRequest request) async {
     try {
-      final response = await _dio.post(
-        '/api/v1/leave/requests',
+      await _dio.post(
+        '/api/v1/employee-vacations',
         data: {
-          'leaveType': request.type.index,
+          'employeeId': request.employeeId,
+          'vacationTypeId': request.vacationTypeId,
           'startDate': request.startDate.toIso8601String(),
           'endDate': request.endDate.toIso8601String(),
-          'reason': request.reason,
+          'notes': request.notes,
         },
       );
-      return LeaveRequest.fromJson(response.data);
     } on DioException catch (e) {
-      throw Exception(e.response?.data?['message'] ?? 'Failed to create request');
+      throw Exception(e.response?.data?['message'] ??
+          e.response?.data?['error'] ??
+          'Failed to create request');
+    }
+  }
+
+  /// Update a pending leave request.
+  Future<void> updateRequest({
+    required int requestId,
+    required int employeeId,
+    required int vacationTypeId,
+    required DateTime startDate,
+    required DateTime endDate,
+    String? notes,
+  }) async {
+    try {
+      await _dio.put(
+        '/api/v1/employee-vacations/$requestId',
+        data: {
+          'id': requestId,
+          'employeeId': employeeId,
+          'vacationTypeId': vacationTypeId,
+          'startDate': startDate.toIso8601String(),
+          'endDate': endDate.toIso8601String(),
+          'notes': notes,
+        },
+      );
+    } on DioException catch (e) {
+      throw Exception(e.response?.data?['message'] ??
+          e.response?.data?['error'] ??
+          'Failed to update request');
     }
   }
 
   /// Cancel a pending leave request.
-  Future<void> cancelRequest(String requestId) async {
+  Future<void> cancelRequest(int requestId) async {
     try {
-      await _dio.delete('/api/v1/leave/requests/$requestId');
+      await _dio.delete('/api/v1/employee-vacations/$requestId');
     } on DioException catch (e) {
-      throw Exception(e.response?.data?['message'] ?? 'Failed to cancel request');
+      throw Exception(
+          e.response?.data?['message'] ?? 'Failed to cancel request');
     }
   }
 }
@@ -79,29 +173,29 @@ final leaveRepositoryProvider = Provider<LeaveRepository>((ref) {
 class LeaveState {
   final bool isLoading;
   final String? error;
-  final List<LeaveBalance> balances;
+  final List<VacationType> vacationTypes;
   final List<LeaveRequest> requests;
   final LeaveStatus? filterStatus;
-  
+
   const LeaveState({
     this.isLoading = false,
     this.error,
-    this.balances = const [],
+    this.vacationTypes = const [],
     this.requests = const [],
     this.filterStatus,
   });
-  
+
   LeaveState copyWith({
     bool? isLoading,
     String? error,
-    List<LeaveBalance>? balances,
+    List<VacationType>? vacationTypes,
     List<LeaveRequest>? requests,
     LeaveStatus? filterStatus,
   }) {
     return LeaveState(
       isLoading: isLoading ?? this.isLoading,
       error: error,
-      balances: balances ?? this.balances,
+      vacationTypes: vacationTypes ?? this.vacationTypes,
       requests: requests ?? this.requests,
       filterStatus: filterStatus ?? this.filterStatus,
     );
@@ -109,10 +203,10 @@ class LeaveState {
 
   List<LeaveRequest> get pendingRequests =>
       requests.where((r) => r.status == LeaveStatus.pending).toList();
-  
+
   List<LeaveRequest> get approvedRequests =>
       requests.where((r) => r.status == LeaveStatus.approved).toList();
-  
+
   List<LeaveRequest> get rejectedRequests =>
       requests.where((r) => r.status == LeaveStatus.rejected).toList();
 }
@@ -120,21 +214,23 @@ class LeaveState {
 /// Leave notifier for managing leave state.
 class LeaveNotifier extends StateNotifier<LeaveState> {
   final LeaveRepository _repository;
-  
+
   LeaveNotifier(this._repository) : super(const LeaveState());
-  
+
   /// Load all leave data.
   Future<void> loadData() async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
-      final balances = await _repository.getBalances();
-      final requests = await _repository.getRequests();
-      
+      final results = await Future.wait([
+        _repository.getVacationTypes(),
+        _repository.getRequests(),
+      ]);
+
       state = state.copyWith(
         isLoading: false,
-        balances: balances,
-        requests: requests,
+        vacationTypes: results[0] as List<VacationType>,
+        requests: results[1] as List<LeaveRequest>,
       );
     } catch (e) {
       state = state.copyWith(
@@ -143,42 +239,49 @@ class LeaveNotifier extends StateNotifier<LeaveState> {
       );
     }
   }
-  
+
+  /// Load data alias for balance screen.
+  Future<void> loadBalances() async => loadData();
+
   /// Refresh only requests.
   Future<void> refreshRequests() async {
     try {
-      final requests = await _repository.getRequests(status: state.filterStatus);
+      final requests =
+          await _repository.getRequests(status: state.filterStatus);
       state = state.copyWith(requests: requests);
     } catch (e) {
       state = state.copyWith(error: e.toString());
     }
   }
-  
+
   /// Create new leave request.
   Future<bool> createRequest({
-    required LeaveType type,
+    required int employeeId,
+    required int vacationTypeId,
     required DateTime startDate,
     required DateTime endDate,
-    String? reason,
+    String? notes,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
       final request = CreateLeaveRequest(
-        type: type,
+        employeeId: employeeId,
+        vacationTypeId: vacationTypeId,
         startDate: startDate,
         endDate: endDate,
-        reason: reason,
+        notes: notes,
       );
-      
-      final created = await _repository.createRequest(request);
-      
-      // Add to list
+
+      await _repository.createRequest(request);
+
+      // Reload requests to get the fresh list from server
+      final requests = await _repository.getRequests();
       state = state.copyWith(
         isLoading: false,
-        requests: [created, ...state.requests],
+        requests: requests,
       );
-      
+
       return true;
     } catch (e) {
       state = state.copyWith(
@@ -188,32 +291,48 @@ class LeaveNotifier extends StateNotifier<LeaveState> {
       return false;
     }
   }
-  
+
+  /// Update a pending request.
+  Future<bool> updateRequest({
+    required int requestId,
+    required int employeeId,
+    required int vacationTypeId,
+    required DateTime startDate,
+    required DateTime endDate,
+    String? notes,
+  }) async {
+    try {
+      await _repository.updateRequest(
+        requestId: requestId,
+        employeeId: employeeId,
+        vacationTypeId: vacationTypeId,
+        startDate: startDate,
+        endDate: endDate,
+        notes: notes,
+      );
+
+      // Reload data to get fresh state
+      await loadData();
+      return true;
+    } catch (e) {
+      state = state.copyWith(error: e.toString());
+      return false;
+    }
+  }
+
   /// Cancel a pending request.
-  Future<bool> cancelRequest(String requestId) async {
+  Future<bool> cancelRequest(int requestId) async {
     state = state.copyWith(isLoading: true, error: null);
-    
+
     try {
       await _repository.cancelRequest(requestId);
-      
-      // Update list
+
+      // Remove from list
       state = state.copyWith(
         isLoading: false,
-        requests: state.requests.map((r) {
-          if (r.id == requestId) {
-            return LeaveRequest(
-              id: r.id,
-              type: r.type,
-              startDate: r.startDate,
-              endDate: r.endDate,
-              status: LeaveStatus.cancelled,
-              reason: r.reason,
-            );
-          }
-          return r;
-        }).toList(),
+        requests: state.requests.where((r) => r.id != requestId).toList(),
       );
-      
+
       return true;
     } catch (e) {
       state = state.copyWith(
@@ -223,7 +342,7 @@ class LeaveNotifier extends StateNotifier<LeaveState> {
       return false;
     }
   }
-  
+
   /// Filter by status.
   void setFilter(LeaveStatus? status) {
     state = state.copyWith(filterStatus: status);
@@ -232,7 +351,8 @@ class LeaveNotifier extends StateNotifier<LeaveState> {
 }
 
 /// Provider for LeaveNotifier.
-final leaveNotifierProvider = StateNotifierProvider<LeaveNotifier, LeaveState>((ref) {
+final leaveNotifierProvider =
+    StateNotifierProvider<LeaveNotifier, LeaveState>((ref) {
   final repository = ref.watch(leaveRepositoryProvider);
   return LeaveNotifier(repository);
 });

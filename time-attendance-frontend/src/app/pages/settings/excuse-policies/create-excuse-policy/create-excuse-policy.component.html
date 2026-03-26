@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div class="container-fluid app-modern-form">
   <app-form-header
     mode="create"
     [title]="t('excuse_policies.create_policy')"
@@ -10,15 +10,17 @@
     <div class="row">
       <!-- Scope Configuration -->
       <div class="col-md-12 mb-4">
-        <app-form-section [title]="t('excuse_policies.scope_configuration')">
+        <app-form-section [title]="t('excuse_policies.scope_configuration')" variant="modern">
             <div class="mb-3">
-              <label for="branchId" class="form-label">{{ t('excuse_policies.branch') }}</label>
-              <select id="branchId" class="form-select" [(ngModel)]="policyForm.branchId" name="branchId">
-                <option [ngValue]="null">{{ t('excuse_policies.organization_wide') }}</option>
-                @for (branch of branches(); track branch.id) {
-                  <option [ngValue]="branch.id">{{ branch.name }}</option>
-                }
-              </select>
+              <div class="form-floating">
+                <select id="branchId" class="form-select" [(ngModel)]="policyForm.branchId" name="branchId">
+                  <option [ngValue]="null">{{ t('excuse_policies.organization_wide') }}</option>
+                  @for (branch of branches(); track branch.id) {
+                    <option [ngValue]="branch.id">{{ branch.name }}</option>
+                  }
+                </select>
+                <label for="branchId">{{ t('excuse_policies.branch') }}</label>
+              </div>
               <div class="form-text">{{ t('excuse_policies.branch_help') }}</div>
             </div>
         </app-form-section>
@@ -26,36 +28,42 @@
 
       <!-- Monthly Limits -->
       <div class="col-md-6 mb-4">
-        <app-form-section [title]="t('excuse_policies.monthly_limits')">
+        <app-form-section [title]="t('excuse_policies.monthly_limits')" variant="modern">
             <div class="mb-3">
-              <label for="maxExcusesMonth" class="form-label">{{ t('excuse_policies.max_personal_excuses_per_month') }}</label>
-              <input
-                type="number"
-                id="maxExcusesMonth"
-                class="form-control"
-                [(ngModel)]="policyForm.maxPersonalExcusesPerMonth"
-                name="maxExcusesMonth"
-                min="1"
-                max="100"
-                required>
+              <div class="form-floating">
+                <input
+                  type="number"
+                  id="maxExcusesMonth"
+                  class="form-control"
+                  [(ngModel)]="policyForm.maxPersonalExcusesPerMonth"
+                  name="maxExcusesMonth"
+                  min="1"
+                  max="100"
+                  placeholder="{{ t('excuse_policies.max_personal_excuses_per_month') }}"
+                  required>
+                <label for="maxExcusesMonth">{{ t('excuse_policies.max_personal_excuses_per_month') }}</label>
+              </div>
               @if (validationErrors()['maxPersonalExcusesPerMonth']) {
-                <div class="text-danger small mt-1">{{ validationErrors()['maxPersonalExcusesPerMonth'] }}</div>
+                <div class="invalid-feedback d-block">{{ validationErrors()['maxPersonalExcusesPerMonth'] }}</div>
               }
               <div class="form-text">{{ t('excuse_policies.max_excuses_month_help') }}</div>
             </div>
             <div class="mb-3">
-              <label for="maxHoursMonth" class="form-label">{{ t('excuse_policies.max_personal_excuse_hours_per_month') }}</label>
-              <input
-                type="number"
-                id="maxHoursMonth"
-                class="form-control"
-                [(ngModel)]="policyForm.maxPersonalExcuseHoursPerMonth"
-                name="maxHoursMonth"
-                min="0.5"
-                step="0.5"
-                required>
+              <div class="form-floating">
+                <input
+                  type="number"
+                  id="maxHoursMonth"
+                  class="form-control"
+                  [(ngModel)]="policyForm.maxPersonalExcuseHoursPerMonth"
+                  name="maxHoursMonth"
+                  min="0.5"
+                  step="0.5"
+                  placeholder="{{ t('excuse_policies.max_personal_excuse_hours_per_month') }}"
+                  required>
+                <label for="maxHoursMonth">{{ t('excuse_policies.max_personal_excuse_hours_per_month') }}</label>
+              </div>
               @if (validationErrors()['maxPersonalExcuseHoursPerMonth']) {
-                <div class="text-danger small mt-1">{{ validationErrors()['maxPersonalExcuseHoursPerMonth'] }}</div>
+                <div class="invalid-feedback d-block">{{ validationErrors()['maxPersonalExcuseHoursPerMonth'] }}</div>
               }
               <div class="form-text">{{ t('excuse_policies.max_hours_month_help') }}</div>
             </div>
@@ -64,52 +72,61 @@
 
       <!-- Time Limits -->
       <div class="col-md-6 mb-4">
-        <app-form-section [title]="t('excuse_policies.time_limits')">
+        <app-form-section [title]="t('excuse_policies.time_limits')" variant="modern">
             <div class="mb-3">
-              <label for="maxHoursDay" class="form-label">{{ t('excuse_policies.max_personal_excuse_hours_per_day') }}</label>
-              <input
-                type="number"
-                id="maxHoursDay"
-                class="form-control"
-                [(ngModel)]="policyForm.maxPersonalExcuseHoursPerDay"
-                name="maxHoursDay"
-                min="0.5"
-                step="0.5"
-                required>
+              <div class="form-floating">
+                <input
+                  type="number"
+                  id="maxHoursDay"
+                  class="form-control"
+                  [(ngModel)]="policyForm.maxPersonalExcuseHoursPerDay"
+                  name="maxHoursDay"
+                  min="0.5"
+                  step="0.5"
+                  placeholder="{{ t('excuse_policies.max_personal_excuse_hours_per_day') }}"
+                  required>
+                <label for="maxHoursDay">{{ t('excuse_policies.max_personal_excuse_hours_per_day') }}</label>
+              </div>
               @if (validationErrors()['maxPersonalExcuseHoursPerDay']) {
-                <div class="text-danger small mt-1">{{ validationErrors()['maxPersonalExcuseHoursPerDay'] }}</div>
+                <div class="invalid-feedback d-block">{{ validationErrors()['maxPersonalExcuseHoursPerDay'] }}</div>
               }
               <div class="form-text">{{ t('excuse_policies.max_hours_day_help') }}</div>
             </div>
             <div class="mb-3">
-              <label for="maxHoursPerExcuse" class="form-label">{{ t('excuse_policies.max_hours_per_excuse') }}</label>
-              <input
-                type="number"
-                id="maxHoursPerExcuse"
-                class="form-control"
-                [(ngModel)]="policyForm.maxHoursPerExcuse"
-                name="maxHoursPerExcuse"
-                min="0.5"
-                step="0.5"
-                required>
+              <div class="form-floating">
+                <input
+                  type="number"
+                  id="maxHoursPerExcuse"
+                  class="form-control"
+                  [(ngModel)]="policyForm.maxHoursPerExcuse"
+                  name="maxHoursPerExcuse"
+                  min="0.5"
+                  step="0.5"
+                  placeholder="{{ t('excuse_policies.max_hours_per_excuse') }}"
+                  required>
+                <label for="maxHoursPerExcuse">{{ t('excuse_policies.max_hours_per_excuse') }}</label>
+              </div>
               @if (validationErrors()['maxHoursPerExcuse']) {
-                <div class="text-danger small mt-1">{{ validationErrors()['maxHoursPerExcuse'] }}</div>
+                <div class="invalid-feedback d-block">{{ validationErrors()['maxHoursPerExcuse'] }}</div>
               }
               <div class="form-text">{{ t('excuse_policies.max_hours_per_excuse_help') }}</div>
             </div>
             <div class="mb-3">
-              <label for="minimumDuration" class="form-label">{{ t('excuse_policies.minimum_duration') }}</label>
-              <input
-                type="number"
-                id="minimumDuration"
-                class="form-control"
-                [(ngModel)]="policyForm.minimumExcuseDuration"
-                name="minimumDuration"
-                min="0.5"
-                step="0.5"
-                required>
+              <div class="form-floating">
+                <input
+                  type="number"
+                  id="minimumDuration"
+                  class="form-control"
+                  [(ngModel)]="policyForm.minimumExcuseDuration"
+                  name="minimumDuration"
+                  min="0.5"
+                  step="0.5"
+                  placeholder="{{ t('excuse_policies.minimum_duration') }}"
+                  required>
+                <label for="minimumDuration">{{ t('excuse_policies.minimum_duration') }}</label>
+              </div>
               @if (validationErrors()['minimumExcuseDuration']) {
-                <div class="text-danger small mt-1">{{ validationErrors()['minimumExcuseDuration'] }}</div>
+                <div class="invalid-feedback d-block">{{ validationErrors()['minimumExcuseDuration'] }}</div>
               }
               <div class="form-text">{{ t('excuse_policies.minimum_duration_help') }}</div>
             </div>
@@ -118,7 +135,7 @@
 
       <!-- Policy Options -->
       <div class="col-md-12 mb-4">
-        <app-form-section [title]="t('excuse_policies.policy_options')">
+        <app-form-section [title]="t('excuse_policies.policy_options')" variant="modern">
             <div class="row">
               <div class="col-md-6 mb-3">
                 <div class="form-check form-switch">
@@ -163,15 +180,18 @@
                 <div class="form-text">{{ t('excuse_policies.allow_self_service_help') }}</div>
               </div>
               <div class="col-md-6 mb-3">
-                <label for="maxRetroactiveDays" class="form-label">{{ t('excuse_policies.max_retroactive_days') }}</label>
-                <input
-                  type="number"
-                  id="maxRetroactiveDays"
-                  class="form-control"
-                  [(ngModel)]="policyForm.maxRetroactiveDays"
-                  name="maxRetroactiveDays"
-                  min="0"
-                  required>
+                <div class="form-floating">
+                  <input
+                    type="number"
+                    id="maxRetroactiveDays"
+                    class="form-control"
+                    [(ngModel)]="policyForm.maxRetroactiveDays"
+                    name="maxRetroactiveDays"
+                    min="0"
+                    placeholder="{{ t('excuse_policies.max_retroactive_days') }}"
+                    required>
+                  <label for="maxRetroactiveDays">{{ t('excuse_policies.max_retroactive_days') }}</label>
+                </div>
                 <div class="form-text">{{ t('excuse_policies.max_retroactive_days_help') }}</div>
               </div>
             </div>
@@ -180,7 +200,7 @@
 
       <!-- Form Actions -->
       <div class="col-12">
-        <div class="d-flex justify-content-end gap-2">
+        <div class="app-form-actions">
           <button type="button" class="btn btn-outline-secondary" (click)="onCancel()" [disabled]="submitting()">
             {{ t('common.cancel') }}
           </button>

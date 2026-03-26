@@ -21,7 +21,7 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
     LoadingSpinnerComponent
   ],
   template: `
-    <div class="container-fluid">
+    <div class="container-fluid app-modern-view">
       <app-page-header
         [title]="i18n.t('nfc_tags.view_tag')"
         [showBackButton]="true"
@@ -62,6 +62,24 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
                     <button class="btn btn-outline-warning" (click)="lockTag()">
                       <i class="fa-solid fa-lock me-2"></i>
                       {{ i18n.t('nfc_tags.lock') }}
+                    </button>
+                  }
+                  @if (tag()!.status === 2) {
+                    <button class="btn btn-outline-warning" (click)="disableTag()">
+                      <i class="fa-solid fa-ban me-2"></i>
+                      {{ i18n.t('nfc_tags.disable') }}
+                    </button>
+                  }
+                  @if (tag()!.status === 3) {
+                    <button class="btn btn-outline-success" (click)="enableTag()">
+                      <i class="fa-solid fa-check-circle me-2"></i>
+                      {{ i18n.t('nfc_tags.enable') }}
+                    </button>
+                  }
+                  @if (tag()!.status !== 4) {
+                    <button class="btn btn-outline-danger" (click)="reportLost()">
+                      <i class="fa-solid fa-exclamation-triangle me-2"></i>
+                      {{ i18n.t('nfc_tags.report_lost') }}
                     </button>
                   }
                   <button class="btn btn-outline-danger" (click)="deleteTag()">
@@ -129,10 +147,24 @@ export class ViewNfcTagComponent implements OnInit {
   loading = signal(true);
   error = signal('');
 
+  // Helper to map numeric status to display label and variant
+  private getStatusInfo(status: number): { label: string; variant: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark' } {
+    switch (status) {
+      case 0: return { label: this.i18n.t('nfc_tags.status_unregistered'), variant: 'secondary' };
+      case 1: return { label: this.i18n.t('nfc_tags.status_registered'), variant: 'info' };
+      case 2: return { label: this.i18n.t('nfc_tags.status_active'), variant: 'success' };
+      case 3: return { label: this.i18n.t('nfc_tags.status_disabled'), variant: 'warning' };
+      case 4: return { label: this.i18n.t('nfc_tags.status_lost'), variant: 'danger' };
+      default: return { label: this.i18n.t('nfc_tags.status_unknown'), variant: 'secondary' };
+    }
+  }
+
   // Computed fields for detail card
   tagFields = computed<DetailField[]>(() => {
     const t = this.tag();
     if (!t) return [];
+
+    const statusInfo = this.getStatusInfo(t.status);
 
     return [
       { label: this.i18n.t('nfc_tags.tag_uid'), value: t.tagUid, copyable: true },
@@ -140,9 +172,9 @@ export class ViewNfcTagComponent implements OnInit {
       { label: this.i18n.t('common.description'), value: t.description || '-' },
       {
         label: this.i18n.t('common.status'),
-        value: t.isActive ? this.i18n.t('common.active') : this.i18n.t('common.inactive'),
+        value: statusInfo.label,
         type: 'badge',
-        badgeVariant: t.isActive ? 'success' : 'secondary'
+        badgeVariant: statusInfo.variant
       },
       {
         label: this.i18n.t('nfc_tags.write_protected'),
@@ -150,6 +182,8 @@ export class ViewNfcTagComponent implements OnInit {
         type: 'badge',
         badgeVariant: t.isWriteProtected ? 'warning' : 'info'
       },
+      { label: this.i18n.t('nfc_tags.last_scanned_at'), value: t.lastScannedAt || '-', type: t.lastScannedAt ? 'date' : undefined },
+      { label: this.i18n.t('nfc_tags.scan_count'), value: t.scanCount?.toString() || '0' },
       { label: this.i18n.t('common.created_at'), value: t.createdAtUtc, type: 'date' }
     ];
   });
@@ -159,7 +193,7 @@ export class ViewNfcTagComponent implements OnInit {
     if (tagId) {
       this.loadTag(parseInt(tagId));
     } else {
-      this.error.set('Invalid tag ID');
+      this.error.set(this.i18n.t('nfc_tags.invalid_tag_id'));
       this.loading.set(false);
     }
   }
@@ -217,6 +251,60 @@ export class ViewNfcTagComponent implements OnInit {
           this.router.navigate(['/nfc-tags']);
         },
         error: () => this.notificationService.error(this.i18n.t('nfc_tags.delete_error'))
+      });
+    }
+  }
+
+  async disableTag(): Promise<void> {
+    const result = await this.confirmationService.confirm({
+      title: this.i18n.t('nfc_tags.disable'),
+      message: this.i18n.t('nfc_tags.disable_confirmation_message'),
+      confirmText: this.i18n.t('nfc_tags.disable'),
+      cancelText: this.i18n.t('common.cancel'),
+      confirmButtonClass: 'btn-warning',
+      icon: 'fa-ban',
+      iconClass: 'text-warning'
+    });
+
+    if (result.confirmed) {
+      this.nfcTagsService.disableTag(this.tag()!.id).subscribe({
+        next: () => {
+          this.notificationService.success(this.i18n.t('nfc_tags.disable_success'));
+          this.loadTag(this.tag()!.id);
+        },
+        error: (err) => this.notificationService.error(err.error?.error || this.i18n.t('nfc_tags.disable_error'))
+      });
+    }
+  }
+
+  enableTag(): void {
+    this.nfcTagsService.enableTag(this.tag()!.id).subscribe({
+      next: () => {
+        this.notificationService.success(this.i18n.t('nfc_tags.enable_success'));
+        this.loadTag(this.tag()!.id);
+      },
+      error: (err) => this.notificationService.error(err.error?.error || this.i18n.t('nfc_tags.enable_error'))
+    });
+  }
+
+  async reportLost(): Promise<void> {
+    const result = await this.confirmationService.confirm({
+      title: this.i18n.t('nfc_tags.report_lost'),
+      message: this.i18n.t('nfc_tags.report_lost_confirmation_message'),
+      confirmText: this.i18n.t('nfc_tags.report_lost'),
+      cancelText: this.i18n.t('common.cancel'),
+      confirmButtonClass: 'btn-danger',
+      icon: 'fa-exclamation-triangle',
+      iconClass: 'text-danger'
+    });
+
+    if (result.confirmed) {
+      this.nfcTagsService.reportLost(this.tag()!.id).subscribe({
+        next: () => {
+          this.notificationService.success(this.i18n.t('nfc_tags.report_lost_success'));
+          this.loadTag(this.tag()!.id);
+        },
+        error: (err) => this.notificationService.error(err.error?.error || this.i18n.t('nfc_tags.report_lost_error'))
       });
     }
   }

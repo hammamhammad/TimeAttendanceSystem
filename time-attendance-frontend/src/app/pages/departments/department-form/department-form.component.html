@@ -1,23 +1,26 @@
+<div class="container-fluid app-modern-form">
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
-  <app-form-section [title]="i18n.t('common.basicInformation')">
+  <app-form-section [title]="i18n.t('common.basicInformation')" variant="modern">
     <div class="row g-3">
     <!-- Branch (only for create mode) -->
     @if (!isEditMode) {
       <div class="col-md-6">
-        <label class="form-label required">{{ i18n.t('branch.title') }}</label>
-        <app-searchable-select
-          [options]="branchSelectOptions"
-          [value]="form.get('branchId')?.value?.toString() || ''"
-          (selectionChange)="onBranchSelectionChange($event)"
-          [placeholder]="i18n.t('branch.select')"
-          [searchable]="true"
-          [clearable]="false"
-          [disabled]="loadingBranches()"
-          [loading]="loadingBranches()"
-          [class.is-invalid]="isFieldInvalid('branchId')"
-        ></app-searchable-select>
+        <div class="app-modern-field">
+          <label class="app-modern-label">{{ i18n.t('branch.title') }} <span class="text-danger">*</span></label>
+          <app-searchable-select
+            [options]="branchSelectOptions"
+            [value]="form.get('branchId')?.value?.toString() || ''"
+            (selectionChange)="onBranchSelectionChange($event)"
+            [placeholder]="i18n.t('branch.select')"
+            [searchable]="true"
+            [clearable]="false"
+            [disabled]="loadingBranches()"
+            [loading]="loadingBranches()"
+            [class.is-invalid]="isFieldInvalid('branchId')"
+          ></app-searchable-select>
+        </div>
         @if (isFieldInvalid('branchId')) {
-          <div class="invalid-feedback">
+          <div class="invalid-feedback d-block">
             {{ getFieldError('branchId') }}
           </div>
         }
@@ -26,16 +29,19 @@
 
     <!-- Name -->
     <div class="col-md-6">
-      <label class="form-label required">{{ i18n.t('department.name') }}</label>
-      <input
-        type="text"
-        class="form-control"
-        formControlName="name"
-        [class.is-invalid]="isFieldInvalid('name')"
-        [placeholder]="i18n.t('department.namePlaceholder')"
-      />
+      <div class="form-floating">
+        <input
+          type="text"
+          class="form-control"
+          id="name"
+          formControlName="name"
+          [class.is-invalid]="isFieldInvalid('name')"
+          placeholder="{{ i18n.t('department.name') }}"
+        />
+        <label for="name">{{ i18n.t('department.name') }} <span class="text-danger">*</span></label>
+      </div>
       @if (isFieldInvalid('name')) {
-        <div class="invalid-feedback">
+        <div class="invalid-feedback d-block">
           {{ getFieldError('name') }}
         </div>
       }
@@ -43,17 +49,20 @@
 
     <!-- Arabic Name -->
     <div class="col-md-6">
-      <label class="form-label">{{ i18n.t('department.nameAr') }}</label>
-      <input
-        type="text"
-        class="form-control"
-        formControlName="nameAr"
-        [class.is-invalid]="isFieldInvalid('nameAr')"
-        [placeholder]="i18n.t('department.nameArPlaceholder')"
-        dir="rtl"
-      />
+      <div class="form-floating">
+        <input
+          type="text"
+          class="form-control"
+          id="nameAr"
+          formControlName="nameAr"
+          [class.is-invalid]="isFieldInvalid('nameAr')"
+          placeholder="{{ i18n.t('department.nameAr') }}"
+          dir="rtl"
+        />
+        <label for="nameAr">{{ i18n.t('department.nameAr') }}</label>
+      </div>
       @if (isFieldInvalid('nameAr')) {
-        <div class="invalid-feedback">
+        <div class="invalid-feedback d-block">
           {{ getFieldError('nameAr') }}
         </div>
       }
@@ -61,17 +70,20 @@
 
     <!-- Code -->
     <div class="col-md-6">
-      <label class="form-label required">{{ i18n.t('department.code') }}</label>
-      <input
-        type="text"
-        class="form-control"
-        formControlName="code"
-        [class.is-invalid]="isFieldInvalid('code')"
-        [placeholder]="i18n.t('department.codePlaceholder')"
-        style="text-transform: uppercase;"
-      />
+      <div class="form-floating">
+        <input
+          type="text"
+          class="form-control"
+          id="code"
+          formControlName="code"
+          [class.is-invalid]="isFieldInvalid('code')"
+          placeholder="{{ i18n.t('department.code') }}"
+          style="text-transform: uppercase;"
+        />
+        <label for="code">{{ i18n.t('department.code') }} <span class="text-danger">*</span></label>
+      </div>
       @if (isFieldInvalid('code')) {
-        <div class="invalid-feedback">
+        <div class="invalid-feedback d-block">
           {{ getFieldError('code') }}
         </div>
       }
@@ -79,20 +91,22 @@
 
     <!-- Parent Department -->
     <div class="col-md-6">
-      <label class="form-label">{{ i18n.t('department.parentDepartment') }}</label>
-      <app-searchable-select
-        [options]="departmentSelectOptions"
-        [value]="form.get('parentDepartmentId')?.value?.toString() || ''"
-        (selectionChange)="onParentDepartmentSelectionChange($event)"
-        [placeholder]="i18n.t('department.selectParent')"
-        [searchable]="true"
-        [clearable]="true"
-        [disabled]="loading()"
-        [loading]="loading()"
-        [class.is-invalid]="isFieldInvalid('parentDepartmentId')"
-      ></app-searchable-select>
+      <div class="app-modern-field">
+        <label class="app-modern-label">{{ i18n.t('department.parentDepartment') }}</label>
+        <app-searchable-select
+          [options]="departmentSelectOptions"
+          [value]="form.get('parentDepartmentId')?.value?.toString() || ''"
+          (selectionChange)="onParentDepartmentSelectionChange($event)"
+          [placeholder]="i18n.t('department.selectParent')"
+          [searchable]="true"
+          [clearable]="true"
+          [disabled]="loading()"
+          [loading]="loading()"
+          [class.is-invalid]="isFieldInvalid('parentDepartmentId')"
+        ></app-searchable-select>
+      </div>
       @if (isFieldInvalid('parentDepartmentId')) {
-        <div class="invalid-feedback">
+        <div class="invalid-feedback d-block">
           {{ getFieldError('parentDepartmentId') }}
         </div>
       }
@@ -103,16 +117,20 @@
 
     <!-- Description -->
     <div class="col-md-6">
-      <label class="form-label">{{ i18n.t('common.description') }}</label>
-      <textarea
-        class="form-control"
-        formControlName="description"
-        [class.is-invalid]="isFieldInvalid('description')"
-        [placeholder]="i18n.t('department.descriptionPlaceholder')"
-        rows="3"
-      ></textarea>
+      <div class="form-floating">
+        <textarea
+          class="form-control"
+          id="description"
+          formControlName="description"
+          [class.is-invalid]="isFieldInvalid('description')"
+          placeholder="{{ i18n.t('common.description') }}"
+          rows="3"
+          style="height: 100px;"
+        ></textarea>
+        <label for="description">{{ i18n.t('common.description') }}</label>
+      </div>
       @if (isFieldInvalid('description')) {
-        <div class="invalid-feedback">
+        <div class="invalid-feedback d-block">
           {{ getFieldError('description') }}
         </div>
       }
@@ -120,17 +138,21 @@
 
     <!-- Arabic Description -->
     <div class="col-md-6">
-      <label class="form-label">{{ i18n.t('department.descriptionAr') }}</label>
-      <textarea
-        class="form-control"
-        formControlName="descriptionAr"
-        [class.is-invalid]="isFieldInvalid('descriptionAr')"
-        [placeholder]="i18n.t('department.descriptionArPlaceholder')"
-        rows="3"
-        dir="rtl"
-      ></textarea>
+      <div class="form-floating">
+        <textarea
+          class="form-control"
+          id="descriptionAr"
+          formControlName="descriptionAr"
+          [class.is-invalid]="isFieldInvalid('descriptionAr')"
+          placeholder="{{ i18n.t('department.descriptionAr') }}"
+          rows="3"
+          dir="rtl"
+          style="height: 100px;"
+        ></textarea>
+        <label for="descriptionAr">{{ i18n.t('department.descriptionAr') }}</label>
+      </div>
       @if (isFieldInvalid('descriptionAr')) {
-        <div class="invalid-feedback">
+        <div class="invalid-feedback d-block">
           {{ getFieldError('descriptionAr') }}
         </div>
       }
@@ -139,23 +161,24 @@
   </app-form-section>
 
   <!-- Additional Information -->
-  <app-form-section [title]="i18n.t('department.additionalInformation')">
+  <app-form-section [title]="i18n.t('department.additionalInformation')" variant="modern">
     <div class="row g-3">
     <!-- Manager -->
     <div class="col-md-6">
-      <label class="form-label">{{ i18n.t('department.manager') }}</label>
-      <div class="position-relative">
+      <div class="form-floating">
         <input
           type="text"
           class="form-control"
+          id="manager"
           [value]="managerSearchTerm() || getSelectedManagerName()"
           [class.is-invalid]="isFieldInvalid('managerEmployeeId')"
-          [placeholder]="i18n.t('department.selectManager')"
+          placeholder="{{ i18n.t('department.manager') }}"
           (input)="onManagerSearch($event)"
           (focus)="onManagerFocus()"
           (blur)="onManagerBlur()"
           [disabled]="loadingManagers()"
         />
+        <label for="manager">{{ i18n.t('department.manager') }}</label>
 
         <!-- Loading indicator -->
         @if (loadingManagers()) {
@@ -208,9 +231,8 @@
           </div>
         }
       </div>
-
       @if (isFieldInvalid('managerEmployeeId')) {
-        <div class="invalid-feedback">
+        <div class="invalid-feedback d-block">
           {{ getFieldError('managerEmployeeId') }}
         </div>
       }
@@ -221,16 +243,19 @@
 
     <!-- Cost Center -->
     <div class="col-md-6">
-      <label class="form-label">{{ i18n.t('department.costCenter') }}</label>
-      <input
-        type="text"
-        class="form-control"
-        formControlName="costCenter"
-        [class.is-invalid]="isFieldInvalid('costCenter')"
-        [placeholder]="i18n.t('department.costCenterPlaceholder')"
-      />
+      <div class="form-floating">
+        <input
+          type="text"
+          class="form-control"
+          id="costCenter"
+          formControlName="costCenter"
+          [class.is-invalid]="isFieldInvalid('costCenter')"
+          placeholder="{{ i18n.t('department.costCenter') }}"
+        />
+        <label for="costCenter">{{ i18n.t('department.costCenter') }}</label>
+      </div>
       @if (isFieldInvalid('costCenter')) {
-        <div class="invalid-feedback">
+        <div class="invalid-feedback d-block">
           {{ getFieldError('costCenter') }}
         </div>
       }
@@ -238,16 +263,19 @@
 
     <!-- Location -->
     <div class="col-md-6">
-      <label class="form-label">{{ i18n.t('department.location') }}</label>
-      <input
-        type="text"
-        class="form-control"
-        formControlName="location"
-        [class.is-invalid]="isFieldInvalid('location')"
-        [placeholder]="i18n.t('department.locationPlaceholder')"
-      />
+      <div class="form-floating">
+        <input
+          type="text"
+          class="form-control"
+          id="location"
+          formControlName="location"
+          [class.is-invalid]="isFieldInvalid('location')"
+          placeholder="{{ i18n.t('department.location') }}"
+        />
+        <label for="location">{{ i18n.t('department.location') }}</label>
+      </div>
       @if (isFieldInvalid('location')) {
-        <div class="invalid-feedback">
+        <div class="invalid-feedback d-block">
           {{ getFieldError('location') }}
         </div>
       }
@@ -255,16 +283,19 @@
 
     <!-- Phone -->
     <div class="col-md-6">
-      <label class="form-label">{{ i18n.t('common.phone') }}</label>
-      <input
-        type="tel"
-        class="form-control"
-        formControlName="phone"
-        [class.is-invalid]="isFieldInvalid('phone')"
-        [placeholder]="i18n.t('common.phonePlaceholder')"
-      />
+      <div class="form-floating">
+        <input
+          type="tel"
+          class="form-control"
+          id="phone"
+          formControlName="phone"
+          [class.is-invalid]="isFieldInvalid('phone')"
+          placeholder="{{ i18n.t('common.phone') }}"
+        />
+        <label for="phone">{{ i18n.t('common.phone') }}</label>
+      </div>
       @if (isFieldInvalid('phone')) {
-        <div class="invalid-feedback">
+        <div class="invalid-feedback d-block">
           {{ getFieldError('phone') }}
         </div>
       }
@@ -272,16 +303,19 @@
 
     <!-- Email -->
     <div class="col-md-6">
-      <label class="form-label">{{ i18n.t('common.email') }}</label>
-      <input
-        type="email"
-        class="form-control"
-        formControlName="email"
-        [class.is-invalid]="isFieldInvalid('email')"
-        [placeholder]="i18n.t('common.emailPlaceholder')"
-      />
+      <div class="form-floating">
+        <input
+          type="email"
+          class="form-control"
+          id="email"
+          formControlName="email"
+          [class.is-invalid]="isFieldInvalid('email')"
+          placeholder="{{ i18n.t('common.email') }}"
+        />
+        <label for="email">{{ i18n.t('common.email') }}</label>
+      </div>
       @if (isFieldInvalid('email')) {
-        <div class="invalid-feedback">
+        <div class="invalid-feedback d-block">
           {{ getFieldError('email') }}
         </div>
       }
@@ -289,16 +323,20 @@
 
     <!-- Sort Order -->
     <div class="col-md-6">
-      <label class="form-label">{{ i18n.t('common.sortOrder') }}</label>
-      <input
-        type="number"
-        class="form-control"
-        formControlName="sortOrder"
-        [class.is-invalid]="isFieldInvalid('sortOrder')"
-        min="0"
-      />
+      <div class="form-floating">
+        <input
+          type="number"
+          class="form-control"
+          id="sortOrder"
+          formControlName="sortOrder"
+          [class.is-invalid]="isFieldInvalid('sortOrder')"
+          placeholder="{{ i18n.t('common.sortOrder') }}"
+          min="0"
+        />
+        <label for="sortOrder">{{ i18n.t('common.sortOrder') }}</label>
+      </div>
       @if (isFieldInvalid('sortOrder')) {
-        <div class="invalid-feedback">
+        <div class="invalid-feedback d-block">
           {{ getFieldError('sortOrder') }}
         </div>
       }
@@ -310,7 +348,7 @@
   </app-form-section>
 
   <!-- Status -->
-  <app-form-section [title]="i18n.t('common.status')">
+  <app-form-section [title]="i18n.t('common.status')" variant="modern">
     <div class="row g-3">
     <!-- Active Status -->
     <div class="col-12">
@@ -333,7 +371,7 @@
   </app-form-section>
 
   <!-- Form Actions -->
-  <div class="form-actions">
+  <div class="app-form-actions">
     <div class="d-flex justify-content-between">
       <div>
         <button
@@ -373,6 +411,7 @@
     </div>
   </div>
 </form>
+</div>
 
 <!-- Loading Overlay -->
 @if (loading()) {

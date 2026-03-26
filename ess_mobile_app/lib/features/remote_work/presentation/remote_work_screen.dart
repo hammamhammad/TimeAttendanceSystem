@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/l10n/app_localizations.dart';
 import '../../../shared/models/remote_work_model.dart';
 import '../../../shared/providers/remote_work_provider.dart';
+import '../../../shared/providers/dashboard_provider.dart';
 import '../../../shared/widgets/widgets.dart';
 
 /// Remote work request screen.
@@ -43,6 +45,10 @@ class _RemoteWorkScreenState extends ConsumerState<RemoteWorkScreen>
     
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.pop(),
+        ),
         title: const Text('Remote Work'),
         bottom: TabBar(
           controller: _tabController,
@@ -97,7 +103,7 @@ class _RemoteWorkScreenState extends ConsumerState<RemoteWorkScreen>
         icon: Icons.home_work_outlined,
       );
     }
-    
+
     return RefreshIndicator(
       onRefresh: () => ref.read(remoteWorkProvider.notifier).loadAll(),
       child: ListView.builder(
@@ -109,6 +115,7 @@ class _RemoteWorkScreenState extends ConsumerState<RemoteWorkScreen>
             request: request,
             showCancel: showCancel,
             onCancel: () => _cancelRequest(request.id),
+            onEdit: () => _showEditSheet(context, request),
           );
         },
       ),
@@ -117,7 +124,7 @@ class _RemoteWorkScreenState extends ConsumerState<RemoteWorkScreen>
   
   void _showCreateSheet(BuildContext context) {
     final state = ref.read(remoteWorkProvider);
-    
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -125,6 +132,23 @@ class _RemoteWorkScreenState extends ConsumerState<RemoteWorkScreen>
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) => _CreateRemoteWorkSheet(
+        policy: state.policy,
+        remainingDays: state.remainingDays,
+      ),
+    );
+  }
+
+  void _showEditSheet(BuildContext context, RemoteWorkRequest request) {
+    final state = ref.read(remoteWorkProvider);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => _EditRemoteWorkSheet(
+        request: request,
         policy: state.policy,
         remainingDays: state.remainingDays,
       ),
@@ -239,11 +263,13 @@ class _RemoteWorkCard extends StatelessWidget {
   final RemoteWorkRequest request;
   final bool showCancel;
   final VoidCallback? onCancel;
-  
+  final VoidCallback? onEdit;
+
   const _RemoteWorkCard({
     required this.request,
     this.showCancel = false,
     this.onCancel,
+    this.onEdit,
   });
 
   @override
@@ -368,16 +394,32 @@ class _RemoteWorkCard extends StatelessWidget {
             
             if (showCancel) ...[
               const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: onCancel,
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.error,
-                    side: BorderSide(color: AppColors.error),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: onEdit,
+                      icon: const Icon(Icons.edit, size: 18),
+                      label: const Text('Edit'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.primary,
+                        side: BorderSide(color: AppColors.primary),
+                      ),
+                    ),
                   ),
-                  child: const Text('Cancel Request'),
-                ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: onCancel,
+                      icon: const Icon(Icons.close, size: 18),
+                      label: const Text('Cancel'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.error,
+                        side: BorderSide(color: AppColors.error),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ],
@@ -385,7 +427,7 @@ class _RemoteWorkCard extends StatelessWidget {
       ),
     );
   }
-  
+
   Color _getStatusColor(RemoteWorkStatus status) {
     switch (status) {
       case RemoteWorkStatus.pending:
@@ -624,14 +666,22 @@ class _CreateRemoteWorkSheetState extends ConsumerState<_CreateRemoteWorkSheet> 
       return;
     }
     
+    final dashboardState = ref.read(dashboardNotifierProvider);
+    final employeeId = dashboardState.data?.employeeId;
+    if (employeeId == null || employeeId == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Employee data not loaded. Please try again.')),
+      );
+      return;
+    }
+
     setState(() => _isSubmitting = true);
-    
+
     final success = await ref.read(remoteWorkProvider.notifier).createRequest(
+      employeeId: employeeId,
       startDate: _startDate,
       endDate: _endDate,
       reason: _reasonController.text,
-      workLocation: _locationController.text.isEmpty ? null : _locationController.text,
-      contactPhone: _phoneController.text.isEmpty ? null : _phoneController.text,
     );
     
     setState(() => _isSubmitting = false);
@@ -641,6 +691,231 @@ class _CreateRemoteWorkSheetState extends ConsumerState<_CreateRemoteWorkSheet> 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Remote work request submitted'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
+  }
+}
+
+/// Edit remote work request sheet.
+class _EditRemoteWorkSheet extends ConsumerStatefulWidget {
+  final RemoteWorkRequest request;
+  final RemoteWorkPolicy? policy;
+  final int remainingDays;
+
+  const _EditRemoteWorkSheet({
+    required this.request,
+    this.policy,
+    required this.remainingDays,
+  });
+
+  @override
+  ConsumerState<_EditRemoteWorkSheet> createState() => _EditRemoteWorkSheetState();
+}
+
+class _EditRemoteWorkSheetState extends ConsumerState<_EditRemoteWorkSheet> {
+  late DateTime _startDate;
+  late DateTime _endDate;
+  final _reasonController = TextEditingController();
+  final _locationController = TextEditingController();
+  final _phoneController = TextEditingController();
+  bool _isSubmitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Pre-populate with existing request data
+    _startDate = widget.request.startDate;
+    _endDate = widget.request.endDate;
+    _reasonController.text = widget.request.reason;
+    _locationController.text = widget.request.workLocation ?? '';
+    _phoneController.text = widget.request.contactPhone ?? '';
+  }
+
+  @override
+  void dispose() {
+    _reasonController.dispose();
+    _locationController.dispose();
+    _phoneController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final days = _endDate.difference(_startDate).inDays + 1;
+
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 24,
+        right: 24,
+        top: 24,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  l10n.editRemoteWork,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.close),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+
+            // Remaining days info
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.info.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline, color: AppColors.info, size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    'You have ${widget.remainingDays} remote days remaining this month',
+                    style: TextStyle(color: AppColors.info),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Date range
+            Row(
+              children: [
+                Expanded(
+                  child: AppDateField(
+                    label: 'Start Date',
+                    value: _startDate,
+                    firstDate: DateTime.now(),
+                    lastDate: DateTime.now().add(const Duration(days: 90)),
+                    onChanged: (date) => setState(() {
+                      _startDate = date;
+                      if (_endDate.isBefore(_startDate)) {
+                        _endDate = _startDate;
+                      }
+                    }),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: AppDateField(
+                    label: 'End Date',
+                    value: _endDate,
+                    firstDate: _startDate,
+                    lastDate: DateTime.now().add(const Duration(days: 90)),
+                    onChanged: (date) => setState(() => _endDate = date),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '$days day${days > 1 ? 's' : ''} of remote work',
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+            ),
+            const SizedBox(height: 16),
+
+            // Reason
+            AppTextField(
+              controller: _reasonController,
+              label: 'Reason',
+              hint: 'Why do you need to work remotely?',
+              maxLines: 2,
+            ),
+            const SizedBox(height: 16),
+
+            // Work location
+            AppTextField(
+              controller: _locationController,
+              label: 'Work Location (Optional)',
+              hint: 'e.g., Home, Coffee Shop, Co-working Space',
+              prefixIcon: Icons.location_on_outlined,
+            ),
+            const SizedBox(height: 16),
+
+            // Contact phone
+            AppTextField(
+              controller: _phoneController,
+              label: 'Contact Phone (Optional)',
+              hint: 'Alternative contact number',
+              prefixIcon: Icons.phone_outlined,
+              keyboardType: TextInputType.phone,
+            ),
+            const SizedBox(height: 24),
+
+            // Update button
+            AppButton(
+              label: l10n.updateRequest,
+              width: double.infinity,
+              isLoading: _isSubmitting,
+              onPressed: _submit,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _submit() async {
+    if (_reasonController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a reason')),
+      );
+      return;
+    }
+
+    final days = _endDate.difference(_startDate).inDays + 1;
+    if (days > widget.remainingDays) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('You only have ${widget.remainingDays} days remaining'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+
+    final dashboardState = ref.read(dashboardNotifierProvider);
+    final employeeId = dashboardState.data?.employeeId;
+    if (employeeId == null || employeeId == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Employee data not loaded. Please try again.')),
+      );
+      return;
+    }
+
+    setState(() => _isSubmitting = true);
+
+    final success = await ref.read(remoteWorkProvider.notifier).updateRequest(
+      requestId: widget.request.id,
+      employeeId: employeeId,
+      startDate: _startDate,
+      endDate: _endDate,
+      reason: _reasonController.text,
+    );
+
+    setState(() => _isSubmitting = false);
+
+    if (success && mounted) {
+      Navigator.pop(context);
+      final l10n = AppLocalizations.of(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.requestUpdated),
           backgroundColor: Colors.green,
         ),
       );

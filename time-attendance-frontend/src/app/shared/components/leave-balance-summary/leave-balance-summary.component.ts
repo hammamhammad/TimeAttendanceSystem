@@ -149,7 +149,8 @@ export class LeaveBalanceSummaryComponent implements OnInit {
   formatLastAccrualDate(dateString: string | null): string {
     if (!dateString) return this.i18n.t('common.notAvailable');
     const date = new Date(dateString);
-    return date.toLocaleDateString();
+    const locale = this.i18n.getDateLocale();
+    return date.toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric' });
   }
 
   /**

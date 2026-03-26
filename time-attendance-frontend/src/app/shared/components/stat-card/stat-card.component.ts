@@ -1,4 +1,5 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
+import { I18nService } from '../../../core/i18n/i18n.service';
 
 
 export interface StatChange {
@@ -68,8 +69,8 @@ export interface StatChange {
       @if (clickable) {
         <div class="card-footer bg-transparent border-0 pt-0">
           <div class="d-flex align-items-center text-muted">
-            <small>{{ clickableText || 'View details' }}</small>
-            <i class="fas fa-arrow-right ms-auto"></i>
+            <small>{{ clickableText || i18n.t('common.view_details') }}</small>
+            <i class="fas fa-arrow-right ms-auto rtl-flip"></i>
           </div>
         </div>
       }
@@ -77,6 +78,7 @@ export interface StatChange {
   `
 })
 export class StatCardComponent {
+  i18n = inject(I18nService);
   @Input() label!: string;
   @Input() value!: number | string;
   @Input() prefix?: string;

@@ -9,6 +9,11 @@ using TimeAttendanceSystem.Application.NfcTags.Queries.GetNfcTags;
 using TimeAttendanceSystem.Application.NfcTags.Queries.GetNfcTagById;
 using TimeAttendanceSystem.Application.NfcTags.Queries.GetNfcTagsByBranch;
 using TimeAttendanceSystem.Application.NfcTags.Queries.ValidateNfcTag;
+using TimeAttendanceSystem.Application.NfcTags.Queries.GetNfcWriteData;
+using TimeAttendanceSystem.Application.NfcTags.Commands.ConfirmWriteProtection;
+using TimeAttendanceSystem.Application.NfcTags.Commands.DisableNfcTag;
+using TimeAttendanceSystem.Application.NfcTags.Commands.EnableNfcTag;
+using TimeAttendanceSystem.Application.NfcTags.Commands.ReportLostNfcTag;
 
 namespace TimeAttendanceSystem.Api.Controllers;
 
@@ -188,6 +193,98 @@ public class NfcTagsController : ControllerBase
 
         return NoContent();
     }
+
+    /// <summary>
+    /// Gets the signed payload data for writing to a physical NFC tag.
+    /// Used during the provisioning process.
+    /// </summary>
+    [HttpGet("{id}/write-data")]
+    [Authorize(Policy = "BranchManagement")]
+    public async Task<IActionResult> GetNfcWriteData(long id)
+    {
+        var query = new GetNfcWriteDataQuery(id);
+        var result = await _mediator.Send(query);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(new { error = result.Error });
+        }
+
+        return Ok(result.Value);
+    }
+
+    /// <summary>
+    /// Confirms that the NFC tag has been written and optionally write-protected.
+    /// Activates the tag for use in attendance verification.
+    /// </summary>
+    [HttpPost("{id}/confirm-write-protection")]
+    [Authorize(Policy = "BranchManagement")]
+    public async Task<IActionResult> ConfirmWriteProtection(long id, [FromBody] ConfirmWriteProtectionRequest request)
+    {
+        var command = new ConfirmWriteProtectionCommand(id, request.EncryptedPayload);
+        var result = await _mediator.Send(command);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(new { error = result.Error });
+        }
+
+        return Ok(new { message = "NFC tag activated and write-protection confirmed" });
+    }
+
+    /// <summary>
+    /// Temporarily disables an NFC tag. Can be re-enabled later.
+    /// </summary>
+    [HttpPost("{id}/disable")]
+    [Authorize(Policy = "BranchManagement")]
+    public async Task<IActionResult> DisableNfcTag(long id)
+    {
+        var command = new DisableNfcTagCommand(id);
+        var result = await _mediator.Send(command);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(new { error = result.Error });
+        }
+
+        return Ok(new { message = "NFC tag has been disabled" });
+    }
+
+    /// <summary>
+    /// Re-enables a previously disabled NFC tag.
+    /// </summary>
+    [HttpPost("{id}/enable")]
+    [Authorize(Policy = "BranchManagement")]
+    public async Task<IActionResult> EnableNfcTag(long id)
+    {
+        var command = new EnableNfcTagCommand(id);
+        var result = await _mediator.Send(command);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(new { error = result.Error });
+        }
+
+        return Ok(new { message = "NFC tag has been re-enabled" });
+    }
+
+    /// <summary>
+    /// Reports an NFC tag as lost or stolen. This is a permanent action.
+    /// </summary>
+    [HttpPost("{id}/report-lost")]
+    [Authorize(Policy = "BranchManagement")]
+    public async Task<IActionResult> ReportLostNfcTag(long id)
+    {
+        var command = new ReportLostNfcTagCommand(id);
+        var result = await _mediator.Send(command);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(new { error = result.Error });
+        }
+
+        return Ok(new { message = "NFC tag has been reported as lost" });
+    }
 }
 
 public record CreateNfcTagRequest(
@@ -200,4 +297,8 @@ public record UpdateNfcTagRequest(
     long BranchId,
     string? Description,
     bool IsActive
+);
+
+public record ConfirmWriteProtectionRequest(
+    string? EncryptedPayload
 );

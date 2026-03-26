@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:dio/dio.dart';
 import 'package:go_router/go_router.dart';
 
@@ -9,7 +10,7 @@ import '../../../core/network/api_client.dart';
 import '../../../shared/providers/auth_provider.dart';
 
 /// Tenant discovery screen - first screen the user sees.
-/// User enters their company subdomain to discover the API endpoint.
+/// Connects to the ClockN API and navigates to login.
 class TenantDiscoveryScreen extends ConsumerStatefulWidget {
   const TenantDiscoveryScreen({super.key});
 
@@ -18,8 +19,6 @@ class TenantDiscoveryScreen extends ConsumerStatefulWidget {
 }
 
 class _TenantDiscoveryScreenState extends ConsumerState<TenantDiscoveryScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _domainController = TextEditingController();
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -40,52 +39,48 @@ class _TenantDiscoveryScreenState extends ConsumerState<TenantDiscoveryScreen> {
     });
   }
 
-  @override
-  void dispose() {
-    _domainController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _discoverTenant() async {
-    if (!_formKey.currentState!.validate()) return;
-
+  Future<void> _connectToServer() async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
     try {
-      final domain = _domainController.text.trim();
+      // Verify the API is reachable
+      final dio = Dio(BaseOptions(
+        connectTimeout: const Duration(seconds: 10),
+        receiveTimeout: const Duration(seconds: 10),
+      ));
 
-      // Call tenant discovery API
-      final dio = Dio();
-      final response = await dio.get(
-        'https://api.timeattendance.com/api/v1/tenants/discover',
-        queryParameters: {'domain': domain},
+      try {
+        await dio.get('${AppConfig.apiBaseUrl}/api/v1/auth/login');
+      } on DioException catch (e) {
+        // 405 Method Not Allowed is expected (GET on a POST endpoint) - API is reachable
+        if (e.response?.statusCode != 405) {
+          rethrow;
+        }
+      }
+
+      // API is reachable - create tenant config
+      final tenantConfig = TenantConfig(
+        tenantId: 1,
+        subdomain: 'clockn',
+        name: 'ClockN',
+        nameAr: 'كلوك إن',
+        logoUrl: null,
+        apiBaseUrl: AppConfig.apiBaseUrl,
       );
 
-      if (response.statusCode == 200 && response.data != null) {
-        final tenantConfig = TenantConfig.fromJson(response.data);
+      // Save tenant configuration
+      await ref.read(authStateProvider.notifier).setTenant(tenantConfig);
 
-        // Save tenant configuration
-        await ref.read(authStateProvider.notifier).setTenant(tenantConfig);
-
-        // Navigate to login
-        if (mounted) {
-          context.go('/login');
-        }
-      } else {
-        setState(() {
-          _errorMessage = AppLocalizations.of(context).companyNotFound;
-        });
+      // Navigate to login
+      if (mounted) {
+        context.go('/login');
       }
-    } on DioException catch (e) {
+    } on DioException {
       setState(() {
-        if (e.response?.statusCode == 404) {
-          _errorMessage = AppLocalizations.of(context).companyNotFound;
-        } else {
-          _errorMessage = e.message ?? 'Connection failed';
-        }
+        _errorMessage = 'Cannot connect to server. Check your internet connection.';
       });
     } catch (e) {
       setState(() {
@@ -147,132 +142,120 @@ class _TenantDiscoveryScreenState extends ConsumerState<TenantDiscoveryScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 60),
-              
-              // Logo/Icon
-              Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.access_time_filled,
-                  size: 50,
-                  color: theme.colorScheme.primary,
+
+              // Logo
+              Center(
+                child: SvgPicture.asset(
+                  'assets/images/logo.svg',
+                  width: 120,
+                  height: 120,
                 ),
               ),
-              
+
               const SizedBox(height: 32),
-              
+
               // Title
               Text(
                 l10n.appName,
                 style: theme.textTheme.headlineMedium,
                 textAlign: TextAlign.center,
               ),
-              
+
               const SizedBox(height: 8),
-              
+
               Text(
-                l10n.enterCompanyUrl,
+                'Employee Self Service',
                 style: theme.textTheme.bodyLarge?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
                 textAlign: TextAlign.center,
               ),
-              
-              const SizedBox(height: 48),
-              
-              // Form
-              Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+
+              const SizedBox(height: 16),
+
+              // Server info
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerLow,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Domain input
-                    TextFormField(
-                      controller: _domainController,
-                      keyboardType: TextInputType.url,
-                      textInputAction: TextInputAction.done,
-                      autocorrect: false,
-                      decoration: InputDecoration(
-                        hintText: l10n.companyUrlHint,
-                        prefixIcon: const Icon(Icons.language),
-                        suffixText: '.timeattendance.com',
-                      ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return l10n.invalidCompanyUrl;
-                        }
-                        // Basic subdomain validation
-                        if (!RegExp(r'^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$|^[a-zA-Z0-9]$')
-                            .hasMatch(value.trim())) {
-                          return l10n.invalidCompanyUrl;
-                        }
-                        return null;
-                      },
-                      onFieldSubmitted: (_) => _discoverTenant(),
+                    Icon(
+                      Icons.cloud_done_outlined,
+                      color: theme.colorScheme.primary,
+                      size: 20,
                     ),
-                    
-                    // Error message
-                    if (_errorMessage != null) ...[
-                      const SizedBox(height: 16),
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.error.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.error_outline,
-                              color: theme.colorScheme.error,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                _errorMessage!,
-                                style: TextStyle(
-                                  color: theme.colorScheme.error,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                    
-                    const SizedBox(height: 24),
-                    
-                    // Continue button
-                    SizedBox(
-                      height: 56,
-                      child: ElevatedButton(
-                        onPressed: _isLoading ? null : _discoverTenant,
-                        child: _isLoading
-                            ? const SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : Text(l10n.continueText),
+                    const SizedBox(width: 8),
+                    Text(
+                      'api.clockn.net',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
                 ),
               ),
-              
+
+              const SizedBox(height: 48),
+
+              // Error message
+              if (_errorMessage != null) ...[
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.error.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.error_outline,
+                        color: theme.colorScheme.error,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          _errorMessage!,
+                          style: TextStyle(
+                            color: theme.colorScheme.error,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+              ],
+
+              // Connect button
+              SizedBox(
+                height: 56,
+                child: ElevatedButton.icon(
+                  onPressed: _isLoading ? null : _connectToServer,
+                  icon: _isLoading
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Icon(Icons.login),
+                  label: Text(_isLoading ? 'Connecting...' : l10n.continueText),
+                ),
+              ),
+
               const SizedBox(height: 48),
 
               // Help text
               Text(
-                'Contact your administrator if you don\'t know your company URL.',
+                'Contact your administrator if you have trouble connecting.',
                 style: theme.textTheme.bodySmall,
                 textAlign: TextAlign.center,
               ),

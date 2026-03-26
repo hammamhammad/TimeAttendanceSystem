@@ -202,7 +202,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             icon: Icons.calendar_month,
             label: l10n.requestLeave,
             color: AppColors.warning,
-            onTap: () => context.go('/leave'),
+            onTap: () => context.push('/leave'),
           ),
         ),
       ],
@@ -326,7 +326,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
                 const Spacer(),
                 TextButton(
-                  onPressed: () => context.go('/leave'),
+                  onPressed: () => context.push('/leave'),
                   child: const Text('View All'),
                 ),
               ],

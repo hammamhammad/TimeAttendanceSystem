@@ -161,5 +161,9 @@ public enum VerificationFailureReason
     /// <summary>Branch does not have GPS coordinates or NFC tags configured</summary>
     BranchNotConfigured = 5,
     /// <summary>Device could not determine GPS location</summary>
-    GpsUnavailable = 6
+    GpsUnavailable = 6,
+    /// <summary>NFC tag payload is missing or malformed</summary>
+    NfcPayloadInvalid = 7,
+    /// <summary>NFC tag HMAC signature verification failed (possible tampering)</summary>
+    NfcPayloadTampering = 8
 }

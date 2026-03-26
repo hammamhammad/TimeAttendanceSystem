@@ -28,7 +28,7 @@ class StatsCard extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: AppColors.border.withOpacity(0.5)),
+        side: BorderSide(color: AppColors.outline.withOpacity(0.5)),
       ),
       child: InkWell(
         onTap: onTap,
@@ -112,7 +112,7 @@ class ProgressCard extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: AppColors.border.withOpacity(0.5)),
+        side: BorderSide(color: AppColors.outline.withOpacity(0.5)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -180,7 +180,7 @@ class ActionTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: AppColors.border.withOpacity(0.5)),
+        side: BorderSide(color: AppColors.outline.withOpacity(0.5)),
       ),
       child: ListTile(
         onTap: onTap,

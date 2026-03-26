@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -8,6 +9,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import '../models/notification_model.dart';
 import '../providers/notification_provider.dart';
 import '../../core/network/api_client.dart';
+import '../../app/router.dart';
 
 /// Service for handling push notifications.
 class PushNotificationService {
@@ -114,22 +116,23 @@ class PushNotificationService {
     final notification = message.notification;
     
     if (notification != null) {
-      // Show local notification
+      // Show local notification with JSON payload for navigation
       _showLocalNotification(
         title: notification.title ?? 'Notification',
         body: notification.body ?? '',
-        payload: message.data.toString(),
+        payload: json.encode(message.data),
       );
       
       // Add to notification list
       final appNotification = AppNotification(
-        id: message.messageId ?? DateTime.now().toIso8601String(),
-        title: notification.title ?? 'Notification',
-        message: notification.body ?? '',
+        id: DateTime.now().millisecondsSinceEpoch,
+        titleEn: notification.title ?? 'Notification',
+        messageEn: notification.body ?? '',
         type: _parseNotificationType(message.data['type']),
-        createdAt: DateTime.now(),
+        createdAtUtc: DateTime.now().toUtc(),
         isRead: false,
-        data: message.data,
+        entityType: message.data['entityType'],
+        actionUrl: message.data['actionUrl'],
       );
       
       _ref?.read(notificationNotifierProvider.notifier).addNotification(appNotification);
@@ -138,19 +141,56 @@ class PushNotificationService {
   
   /// Handle message opened (background/terminated).
   void _handleMessageOpenedApp(RemoteMessage message) {
-    // Navigate based on message data
-    final action = message.data['action'];
-    final targetId = message.data['targetId'];
-    
-    // TODO: Implement navigation based on action
-    print('Message opened: action=$action, targetId=$targetId');
+    final entityType = message.data['entityType'] as String?;
+    final route = _resolveRoute(entityType);
+    _navigateTo(route);
   }
-  
+
   /// Handle local notification tap.
   void _onNotificationTap(NotificationResponse response) {
+    // Try to parse entity type from payload
+    String? entityType;
     final payload = response.payload;
-    print('Notification tapped: $payload');
-    // TODO: Navigate based on payload
+    if (payload != null) {
+      try {
+        final data = json.decode(payload) as Map<String, dynamic>;
+        entityType = data['entityType'] as String?;
+      } catch (_) {
+        // payload may not be valid JSON — fall through to default route
+      }
+    }
+    final route = _resolveRoute(entityType);
+    _navigateTo(route);
+  }
+
+  /// Map entity type to a GoRouter path.
+  String _resolveRoute(String? entityType) {
+    switch (entityType?.toLowerCase()) {
+      case 'vacation':
+      case 'employeevacation':
+        return '/leave';
+      case 'excuse':
+      case 'employeeexcuse':
+        return '/excuses';
+      case 'remotework':
+      case 'remoteworkrequest':
+        return '/remote-work';
+      case 'attendancecorrection':
+        return '/attendance-corrections';
+      default:
+        return '/notifications';
+    }
+  }
+
+  /// Navigate using the GoRouter instance from Riverpod.
+  void _navigateTo(String route) {
+    try {
+      final router = _ref?.read(routerProvider);
+      router?.go(route);
+    } catch (e) {
+      // Router may not be available yet (e.g., during app startup)
+      print('Navigation failed: $e');
+    }
   }
   
   /// Show local notification.
@@ -185,15 +225,23 @@ class PushNotificationService {
   
   NotificationType _parseNotificationType(String? type) {
     switch (type) {
-      case 'leave_approved':
-        return NotificationType.leaveApproved;
-      case 'leave_rejected':
-        return NotificationType.leaveRejected;
-      case 'attendance_reminder':
-        return NotificationType.attendanceReminder;
-      case 'announcement':
-        return NotificationType.announcement;
-      case 'alert':
+      case 'RequestApproved':
+        return NotificationType.requestApproved;
+      case 'RequestRejected':
+        return NotificationType.requestRejected;
+      case 'RequestSubmitted':
+        return NotificationType.requestSubmitted;
+      case 'ApprovalPending':
+        return NotificationType.approvalPending;
+      case 'ApprovalReminder':
+        return NotificationType.approvalReminder;
+      case 'RequestDelegated':
+        return NotificationType.requestDelegated;
+      case 'RequestEscalated':
+        return NotificationType.requestEscalated;
+      case 'DelegationReceived':
+        return NotificationType.delegationReceived;
+      case 'Alert':
         return NotificationType.alert;
       default:
         return NotificationType.info;

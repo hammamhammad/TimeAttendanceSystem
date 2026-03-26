@@ -52,21 +52,19 @@ const _$RemoteWorkStatusEnumMap = {
 _$CreateRemoteWorkRequestImpl _$$CreateRemoteWorkRequestImplFromJson(
         Map<String, dynamic> json) =>
     _$CreateRemoteWorkRequestImpl(
+      employeeId: (json['employeeId'] as num).toInt(),
       startDate: DateTime.parse(json['startDate'] as String),
       endDate: DateTime.parse(json['endDate'] as String),
       reason: json['reason'] as String,
-      workLocation: json['workLocation'] as String?,
-      contactPhone: json['contactPhone'] as String?,
     );
 
 Map<String, dynamic> _$$CreateRemoteWorkRequestImplToJson(
         _$CreateRemoteWorkRequestImpl instance) =>
     <String, dynamic>{
+      'employeeId': instance.employeeId,
       'startDate': instance.startDate.toIso8601String(),
       'endDate': instance.endDate.toIso8601String(),
       'reason': instance.reason,
-      'workLocation': instance.workLocation,
-      'contactPhone': instance.contactPhone,
     };
 
 _$RemoteWorkPolicyImpl _$$RemoteWorkPolicyImplFromJson(

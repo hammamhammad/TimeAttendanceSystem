@@ -138,62 +138,79 @@ public class GetEmployeeDashboardQueryHandler : IRequestHandler<GetEmployeeDashb
                 Description = $"Attended on {a.AttendanceDate:MMM dd, yyyy} - {a.WorkingHours:F1}h worked",
                 Timestamp = a.CreatedAtUtc,
                 Icon = GetAttendanceIcon(a.Status),
-                Variant = GetAttendanceVariant(a.Status)
+                Variant = GetAttendanceVariant(a.Status),
+                StartDate = a.AttendanceDate,
+                WorkingHours = a.WorkingHours,
+                StatusLabel = a.Status.ToString()
             });
 
         recentActivity.AddRange(recentAttendanceActivities);
 
         // Add recent vacation requests (last 3)
-        var recentVacations = await _context.EmployeeVacations
+        var recentVacationsRaw = await _context.EmployeeVacations
             .Where(v => v.EmployeeId == employee.Id && !v.IsDeleted)
             .OrderByDescending(v => v.CreatedAtUtc)
             .Take(3)
-            .Select(v => new ActivityDto
-            {
-                EntityId = v.Id,
-                Type = "Vacation",
-                Description = $"Vacation request from {v.StartDate:MMM dd} to {v.EndDate:MMM dd} - {(v.IsApproved ? "Approved" : "Pending")}",
-                Timestamp = v.CreatedAtUtc,
-                Icon = "fa-umbrella-beach",
-                Variant = v.IsApproved ? "success" : "warning"
-            })
+            .Select(v => new { v.Id, v.StartDate, v.EndDate, v.IsApproved, v.CreatedAtUtc })
             .ToListAsync(cancellationToken);
+
+        var recentVacations = recentVacationsRaw.Select(v => new ActivityDto
+        {
+            EntityId = v.Id,
+            Type = "Vacation",
+            Description = $"Vacation request from {v.StartDate:MMM dd} to {v.EndDate:MMM dd} - {(v.IsApproved ? "Approved" : "Pending")}",
+            Timestamp = v.CreatedAtUtc,
+            Icon = "fa-umbrella-beach",
+            Variant = v.IsApproved ? "success" : "warning",
+            StartDate = v.StartDate,
+            EndDate = v.EndDate,
+            StatusLabel = v.IsApproved ? "Approved" : "Pending"
+        });
 
         recentActivity.AddRange(recentVacations);
 
         // Add recent excuse requests (last 3)
-        var recentExcuses = await _context.EmployeeExcuses
+        var recentExcusesRaw = await _context.EmployeeExcuses
             .Where(e => e.EmployeeId == employee.Id && !e.IsDeleted)
             .OrderByDescending(e => e.CreatedAtUtc)
             .Take(3)
-            .Select(e => new ActivityDto
-            {
-                EntityId = e.Id,
-                Type = "Excuse",
-                Description = $"Excuse request for {e.ExcuseDate:MMM dd} - {e.ApprovalStatus}",
-                Timestamp = e.CreatedAtUtc,
-                Icon = "fa-comment-medical",
-                Variant = GetExcuseStatusVariant(e.ApprovalStatus)
-            })
+            .Select(e => new { e.Id, e.ExcuseDate, e.ApprovalStatus, e.CreatedAtUtc })
             .ToListAsync(cancellationToken);
+
+        var recentExcuses = recentExcusesRaw.Select(e => new ActivityDto
+        {
+            EntityId = e.Id,
+            Type = "Excuse",
+            Description = $"Excuse request for {e.ExcuseDate:MMM dd} - {e.ApprovalStatus}",
+            Timestamp = e.CreatedAtUtc,
+            Icon = "fa-comment-medical",
+            Variant = GetExcuseStatusVariant(e.ApprovalStatus),
+            StartDate = e.ExcuseDate,
+            StatusLabel = e.ApprovalStatus.ToString()
+        });
 
         recentActivity.AddRange(recentExcuses);
 
         // Add recent remote work requests (last 3)
-        var recentRemoteWork = await _context.RemoteWorkRequests
+        var recentRemoteWorkRaw = await _context.RemoteWorkRequests
             .Where(r => r.EmployeeId == employee.Id && !r.IsDeleted)
             .OrderByDescending(r => r.CreatedAtUtc)
             .Take(3)
-            .Select(r => new ActivityDto
-            {
-                EntityId = r.Id,
-                Type = "RemoteWork",
-                Description = $"Remote work from {r.StartDate:MMM dd} to {r.EndDate:MMM dd} - {r.Status}",
-                Timestamp = r.CreatedAtUtc,
-                Icon = "fa-laptop",
-                Variant = GetRemoteWorkStatusVariant(r.Status)
-            })
+            .Select(r => new { r.Id, r.StartDate, r.EndDate, r.Status, r.CreatedAtUtc })
             .ToListAsync(cancellationToken);
+
+        var recentRemoteWork = recentRemoteWorkRaw.Select(r => new ActivityDto
+        {
+            EntityId = r.Id,
+            Type = "RemoteWork",
+            Description = $"Remote work from {r.StartDate:MMM dd} to {r.EndDate:MMM dd} - {r.Status}",
+            Timestamp = r.CreatedAtUtc,
+            Icon = "fa-laptop",
+            Variant = GetRemoteWorkStatusVariant(r.Status),
+            StartDate = r.StartDate.ToDateTime(TimeOnly.MinValue),
+            EndDate = r.EndDate.ToDateTime(TimeOnly.MinValue),
+            StatusLabel = r.Status.ToString()
+        });
 
         recentActivity.AddRange(recentRemoteWork);
 

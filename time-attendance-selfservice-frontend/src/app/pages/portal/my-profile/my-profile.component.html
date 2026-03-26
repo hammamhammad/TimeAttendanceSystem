@@ -79,17 +79,10 @@
               <span>{{ profile()!.employeeInfo?.branch || 'N/A' }}</span>
             </div>
             <div class="stat-item">
-              @if (profile()!.isActive) {
-                <span class="badge bg-success">
-                  <i class="bi bi-circle-fill me-1"></i>
-                  {{ i18n.t('common.active') }}
-                </span>
-              } @else {
-                <span class="badge bg-danger">
-                  <i class="bi bi-circle-fill me-1"></i>
-                  {{ i18n.t('common.inactive') }}
-                </span>
-              }
+              <app-status-badge
+                [status]="statusBadge().label"
+                [variant]="statusBadge().variant">
+              </app-status-badge>
             </div>
           </div>
         </div>
@@ -115,8 +108,11 @@
                       </div>
                       <div class="info-content">
                         <label class="info-label">{{ field.label }}</label>
-                        @if (field.badgeClass) {
-                          <span [class]="field.badgeClass">{{ field.value }}</span>
+                        @if (field.isStatus) {
+                          <app-status-badge
+                            [status]="statusBadge().label"
+                            [variant]="statusBadge().variant">
+                          </app-status-badge>
                         } @else {
                           <div class="info-value">{{ field.value }}</div>
                         }

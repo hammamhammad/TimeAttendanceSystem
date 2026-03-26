@@ -72,6 +72,32 @@ public class NfcTag : BaseEntity
     public bool IsActive { get; set; } = true;
 
     /// <summary>
+    /// Gets or sets the lifecycle status of the NFC tag.
+    /// </summary>
+    public NfcTagStatus Status { get; set; } = NfcTagStatus.Registered;
+
+    /// <summary>
+    /// Gets or sets the HMAC-signed encrypted payload written to the tag during provisioning.
+    /// Format: {tagId}|{branchId}|{tagUid}|{timestamp}|{hmacSignature}
+    /// </summary>
+    public string? EncryptedPayload { get; set; }
+
+    /// <summary>
+    /// Gets or sets the SHA256 hash of the encrypted payload for integrity verification.
+    /// </summary>
+    public string? VerificationHash { get; set; }
+
+    /// <summary>
+    /// Gets or sets the timestamp of the last successful scan of this tag.
+    /// </summary>
+    public DateTime? LastScannedAt { get; set; }
+
+    /// <summary>
+    /// Gets or sets the total number of successful scans for this tag.
+    /// </summary>
+    public int ScanCount { get; set; }
+
+    /// <summary>
     /// Navigation property to the branch this tag is registered to.
     /// </summary>
     public virtual Branch Branch { get; set; } = null!;

@@ -14,6 +14,7 @@ import { PermissionService } from '../../core/auth/permission.service';
 })
 export class SidenavComponent {
   @Input() collapsed = signal(false);
+  @Input() show = signal(false);
 
   private menuService = inject(MenuService);
   private router = inject(Router);
@@ -24,6 +25,10 @@ export class SidenavComponent {
 
   // Track which submenus are open - updated for debugging
   private openSubmenus = signal<Set<string>>(new Set());
+
+  isRtl(): boolean {
+    return this.i18n.isRtl();
+  }
 
   t(key: string): string {
     return this.i18n.t(key);

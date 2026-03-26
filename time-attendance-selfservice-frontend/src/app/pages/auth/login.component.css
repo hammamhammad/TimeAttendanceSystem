@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #9D99EA 0%, #747A90 100%);
   padding: 1rem;
 }
 
@@ -20,8 +20,9 @@
   margin-bottom: 2rem;
 }
 
-.login-header .fa-clock {
-  color: var(--bs-primary);
+.login-logo {
+  max-width: 200px;
+  height: auto;
 }
 
 .login-header h1 {
@@ -50,12 +51,12 @@
 }
 
 /* RTL Support */
-:root[dir="rtl"] .me-1 {
+:host-context([dir="rtl"]) .me-1 {
   margin-left: 0.25rem !important;
   margin-right: 0 !important;
 }
 
-:root[dir="rtl"] .me-2 {
+:host-context([dir="rtl"]) .me-2 {
   margin-left: 0.5rem !important;
   margin-right: 0 !important;
 }
@@ -70,7 +71,7 @@
     padding: 1.5rem;
   }
   
-  .login-header .fa-clock {
-    font-size: 2rem !important;
+  .login-logo {
+    max-width: 150px;
   }
 }

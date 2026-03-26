@@ -20,16 +20,23 @@ export class TopbarComponent {
   currentUser = computed(() => this.authService.currentUser());
   currentLocale = computed(() => this.i18n.locale());
   isRtl = computed(() => this.i18n.isRtl());
-  
-  pageTitle = signal('');
+
+  private pageTitleKey = signal('nav.dashboard');
   showUserMenu = signal(false);
+
+  // Reactive page title - re-translates when locale changes
+  pageTitle = computed(() => {
+    // Reading locale() makes this recompute on language switch
+    this.i18n.locale();
+    return this.t(this.pageTitleKey()) || this.t('nav.dashboard');
+  });
 
   constructor(
     private authService: AuthService,
     public i18n: I18nService,
     private router: Router
   ) {
-    // Listen to route changes to update page title
+    // Listen to route changes to update page title key
     this.router.events
       .pipe(
         filter(event => event instanceof NavigationEnd),
@@ -38,11 +45,11 @@ export class TopbarComponent {
           while (route.firstChild) {
             route = route.firstChild;
           }
-          return route.snapshot.data?.['title'] || '';
+          return route.snapshot.data?.['title'] || 'nav.dashboard';
         })
       )
-      .subscribe(title => {
-        this.pageTitle.set(this.t(title) || 'Dashboard');
+      .subscribe(titleKey => {
+        this.pageTitleKey.set(titleKey);
       });
   }
 

@@ -1,7 +1,7 @@
 /* Edit Overtime Configuration Component Styles */
 
 .card {
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--app-gray-200);
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
   transition: box-shadow 0.15s ease-in-out;
 }
@@ -11,19 +11,19 @@
 }
 
 .card-header {
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #e9ecef;
+  background-color: var(--app-gray-100);
+  border-bottom: 1px solid var(--app-gray-200);
   padding: 1rem 1.25rem;
 }
 
 .card-header h5 {
-  color: #495057;
+  color: var(--app-gray-700);
   font-weight: 600;
 }
 
 .form-label {
   font-weight: 500;
-  color: #495057;
+  color: var(--app-gray-700);
   margin-bottom: 0.5rem;
 }
 
@@ -33,12 +33,12 @@
 
 .form-text {
   font-size: 0.875rem;
-  color: #6c757d;
+  color: var(--app-gray-600);
   margin-top: 0.25rem;
 }
 
 .input-group-text {
-  background-color: #f8f9fa;
+  background-color: var(--app-gray-100);
   border-color: #ced4da;
   font-weight: 500;
 }
@@ -56,12 +56,12 @@
 
 .alert-warning {
   background-color: #fff3cd;
-  border-left: 4px solid #ffc107;
+  border-left: 4px solid var(--app-warning);
 }
 
 .alert-danger {
   background-color: #f8d7da;
-  border-left: 4px solid #dc3545;
+  border-left: 4px solid var(--app-danger);
 }
 
 .badge {
@@ -71,23 +71,23 @@
 }
 
 .text-danger {
-  color: #dc3545 !important;
+  color: var(--app-danger) !important;
 }
 
 .text-muted {
-  color: #6c757d !important;
+  color: var(--app-gray-600) !important;
 }
 
 .text-primary {
-  color: #0d6efd !important;
+  color: var(--bs-primary) !important;
 }
 
 .text-success {
-  color: #198754 !important;
+  color: var(--app-success) !important;
 }
 
 .text-warning {
-  color: #ffc107 !important;
+  color: var(--app-warning) !important;
 }
 
 /* Loading state */
@@ -102,7 +102,7 @@
 
 /* Form validation styles */
 .form-control.is-invalid {
-  border-color: #dc3545;
+  border-color: var(--app-danger);
   padding-right: calc(1.5em + 0.75rem);
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='m5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
   background-repeat: no-repeat;
@@ -111,15 +111,15 @@
 }
 
 .form-control.is-invalid:focus {
-  border-color: #dc3545;
-  box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+  border-color: var(--app-danger);
+  box-shadow: 0 0 0 0.25rem rgba(var(--app-danger-rgb), 0.25);
 }
 
 .invalid-feedback {
   width: 100%;
   margin-top: 0.25rem;
   font-size: 0.875rem;
-  color: #dc3545;
+  color: var(--app-danger);
 }
 
 /* Responsive design */
@@ -151,7 +151,7 @@
 
 /* Configuration info styling */
 .configuration-info {
-  background-color: #f8f9fa;
+  background-color: var(--app-gray-100);
   border-radius: 0.5rem;
   padding: 1rem;
   margin-bottom: 1rem;
@@ -168,11 +168,11 @@
 
 /* Status badge */
 .badge.bg-success {
-  background-color: #198754 !important;
+  background-color: var(--app-success) !important;
 }
 
 .badge.bg-secondary {
-  background-color: #6c757d !important;
+  background-color: var(--app-gray-600) !important;
 }
 
 /* Icon styling */
@@ -201,13 +201,13 @@
 .form-check-input:focus {
   border-color: #86b7fe;
   outline: 0;
-  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+  box-shadow: 0 0 0 0.25rem rgba(var(--app-primary-rgb), 0.25);
 }
 
 /* Disabled states */
 .form-control:disabled,
 .form-control[readonly] {
-  background-color: #e9ecef;
+  background-color: var(--app-gray-200);
   opacity: 1;
 }
 

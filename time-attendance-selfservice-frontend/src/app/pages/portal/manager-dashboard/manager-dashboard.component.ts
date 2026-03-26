@@ -294,7 +294,8 @@ export class ManagerDashboardComponent implements OnInit, OnDestroy {
     } else if (compareDate.getTime() === compareYesterday.getTime()) {
       return this.i18n.t('common.yesterday');
     } else {
-      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const locale = this.i18n.locale() === 'ar' ? 'ar-u-nu-latn' : 'en-US';
+      return date.toLocaleDateString(locale, { month: 'short', day: 'numeric' });
     }
   }
 

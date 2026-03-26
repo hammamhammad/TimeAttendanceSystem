@@ -164,7 +164,7 @@
                 <td>{{ formatDate(record.date) }}</td>
                 <td>
                   <span [class]="getStatusBadgeClass(record.status)">
-                    {{ record.status }}
+                    {{ getStatusLabel(record.status) }}
                   </span>
                 </td>
                 <td>{{ formatTime(record.checkInTime) }}</td>

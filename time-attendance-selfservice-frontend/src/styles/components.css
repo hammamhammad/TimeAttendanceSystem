@@ -963,3 +963,613 @@
     gap: var(--app-spacing-sm);
   }
 }
+
+/* ============================================================
+   MODERN FORM STYLES - Material Design Floating Labels
+   All styles scoped under .app-modern-form for opt-in usage
+   ============================================================ */
+
+/* --- Form Section Card --- */
+.app-modern-form .app-form-section,
+.app-modern-form .app-form-section-modern {
+  background: #fff;
+  border-radius: var(--app-float-section-radius, var(--app-border-radius-lg));
+  padding: var(--app-float-section-padding);
+  margin-bottom: var(--app-spacing-xl);
+  box-shadow: var(--app-shadow-sm);
+  border-left: 4px solid var(--app-primary);
+  transition: box-shadow var(--app-transition-normal) var(--app-transition-ease);
+}
+
+.app-modern-form .app-form-section:hover,
+.app-modern-form .app-form-section-modern:hover {
+  box-shadow: var(--app-shadow-md);
+}
+
+/* Section header inside modern form */
+.app-modern-form .app-form-section-header {
+  border-left: none;
+  padding-left: 0;
+  margin-bottom: var(--app-spacing-lg);
+  padding-bottom: var(--app-spacing-sm);
+  border-bottom: 1px solid var(--app-gray-200);
+}
+
+.app-modern-form .app-form-section-header h3,
+.app-modern-form .app-form-section-header .app-section-primary {
+  font-size: var(--app-font-size-lg);
+  font-weight: var(--app-font-weight-semibold);
+  color: var(--app-gray-800);
+  letter-spacing: 0.01em;
+}
+
+/* --- Floating Label Inputs (Bottom Border Only) --- */
+.app-modern-form .form-floating {
+  position: relative;
+  margin-bottom: 0;
+}
+
+/* Animated underline pseudo-element */
+.app-modern-form .form-floating::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: var(--app-float-border-width);
+  background-color: var(--app-primary);
+  transition: width var(--app-float-underline-speed) ease, left var(--app-float-underline-speed) ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.app-modern-form .form-floating:focus-within::after {
+  width: 100%;
+  left: 0;
+}
+
+/* Input base - bottom border only */
+.app-modern-form .form-floating > .form-control {
+  border: none;
+  border-bottom: var(--app-float-border-width) solid var(--app-gray-400);
+  border-radius: 0;
+  background-color: transparent;
+  padding: var(--app-float-input-padding-top) 0 var(--app-float-input-padding-bottom) 0;
+  height: var(--app-float-input-height);
+  font-size: var(--app-font-size-md);
+  line-height: 1.25;
+  transition: border-color var(--app-float-transition-speed) ease,
+              background-color var(--app-float-transition-speed) ease;
+}
+
+/* Input focus state */
+.app-modern-form .form-floating > .form-control:focus {
+  border-bottom-color: var(--app-primary);
+  box-shadow: none;
+  background-color: var(--app-float-focus-bg);
+  outline: none;
+}
+
+/* Label base */
+.app-modern-form .form-floating > label {
+  padding: 1rem 0;
+  color: var(--app-gray-600);
+  transform-origin: 0 0;
+  transition: opacity var(--app-float-transition-speed) ease-in-out,
+              transform var(--app-float-transition-speed) ease-in-out,
+              color var(--app-float-transition-speed) ease-in-out;
+  border: none;
+  font-weight: var(--app-font-weight-normal);
+}
+
+/* Label floated state */
+.app-modern-form .form-floating > .form-control:focus ~ label,
+.app-modern-form .form-floating > .form-control:not(:placeholder-shown) ~ label {
+  transform: scale(var(--app-float-label-scale)) translateY(var(--app-float-label-translate-y));
+  color: var(--app-primary);
+  opacity: 1;
+  font-weight: var(--app-font-weight-medium);
+}
+
+/* --- Select Elements --- */
+.app-modern-form .form-floating > .form-select {
+  border: none;
+  border-bottom: var(--app-float-border-width) solid var(--app-gray-400);
+  border-radius: 0;
+  background-color: transparent;
+  padding-top: var(--app-float-input-padding-top);
+  padding-bottom: var(--app-float-input-padding-bottom);
+  padding-left: 0;
+  height: var(--app-float-input-height);
+  font-size: var(--app-font-size-md);
+  transition: border-color var(--app-float-transition-speed) ease,
+              background-color var(--app-float-transition-speed) ease;
+}
+
+.app-modern-form .form-floating > .form-select:focus {
+  border-bottom-color: var(--app-primary);
+  box-shadow: none;
+  background-color: var(--app-float-focus-bg);
+  outline: none;
+}
+
+/* Select label always floated */
+.app-modern-form .form-floating > .form-select ~ label {
+  transform: scale(var(--app-float-label-scale)) translateY(var(--app-float-label-translate-y));
+  color: var(--app-gray-600);
+  opacity: 1;
+}
+
+.app-modern-form .form-floating > .form-select:focus ~ label {
+  color: var(--app-primary);
+  font-weight: var(--app-font-weight-medium);
+}
+
+/* --- Textarea --- */
+.app-modern-form .form-floating > textarea.form-control {
+  height: auto;
+  min-height: var(--app-float-input-height);
+}
+
+/* --- Validation States --- */
+.app-modern-form .form-floating > .form-control.is-invalid,
+.app-modern-form .form-floating > .form-select.is-invalid {
+  border-bottom-color: var(--app-danger);
+  background-image: none;
+}
+
+.app-modern-form .form-floating > .form-control.is-invalid ~ label,
+.app-modern-form .form-floating > .form-select.is-invalid ~ label {
+  color: var(--app-danger);
+}
+
+/* Error underline color */
+.app-modern-form .form-floating:has(.is-invalid)::after {
+  background-color: var(--app-danger);
+}
+
+.app-modern-form .form-floating:has(.is-invalid):focus-within::after {
+  background-color: var(--app-danger);
+}
+
+/* Error message styling */
+.app-modern-form .invalid-feedback {
+  font-size: var(--app-font-size-xs);
+  padding-top: 0.25rem;
+  padding-left: 0;
+}
+
+/* Help text in modern form */
+.app-modern-form .form-text {
+  font-size: var(--app-font-size-xs);
+  color: var(--app-gray-600);
+  margin-top: 0.25rem;
+  padding-left: 0;
+}
+
+/* --- Non-Floating Field (for SearchableSelect, multi-select, etc.) --- */
+.app-modern-form .app-modern-field {
+  position: relative;
+  margin-bottom: 0;
+}
+
+.app-modern-form .app-modern-label {
+  display: block;
+  font-size: var(--app-font-size-xs);
+  font-weight: var(--app-font-weight-medium);
+  color: var(--app-gray-600);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+  transition: color var(--app-float-transition-speed) ease;
+}
+
+.app-modern-form .app-modern-field:focus-within .app-modern-label {
+  color: var(--app-primary);
+}
+
+/* Style the SearchableSelect input to match material inputs */
+.app-modern-form .app-modern-field .searchable-select .form-control {
+  border: none;
+  border-bottom: var(--app-float-border-width) solid var(--app-gray-400);
+  border-radius: 0;
+  padding-left: 0;
+  transition: border-color var(--app-float-transition-speed) ease;
+}
+
+.app-modern-form .app-modern-field .searchable-select .form-control:focus {
+  border-bottom-color: var(--app-primary);
+  box-shadow: none;
+  background-color: var(--app-float-focus-bg);
+}
+
+.app-modern-form .app-modern-field .searchable-select .input-group-text {
+  border: none;
+  border-bottom: var(--app-float-border-width) solid var(--app-gray-400);
+  border-radius: 0;
+  background-color: transparent;
+}
+
+.app-modern-form .app-modern-field .searchable-select .input-group:focus-within .input-group-text {
+  border-bottom-color: var(--app-primary);
+}
+
+/* --- Checkbox / Switch Enhancement --- */
+.app-modern-form .form-check {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.app-modern-form .form-check-input {
+  width: 1.15em;
+  height: 1.15em;
+  border: var(--app-float-border-width) solid var(--app-gray-400);
+  transition: all var(--app-float-transition-speed) ease;
+}
+
+.app-modern-form .form-check-input:checked {
+  background-color: var(--app-primary);
+  border-color: var(--app-primary);
+}
+
+.app-modern-form .form-check-input:focus {
+  box-shadow: 0 0 0 0.15rem rgba(var(--app-primary-rgb), 0.25);
+  border-color: var(--app-primary);
+}
+
+.app-modern-form .form-check-label {
+  font-weight: var(--app-font-weight-medium);
+  color: var(--app-gray-700);
+}
+
+/* --- Form Action Buttons --- */
+.app-modern-form .app-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--app-spacing-md);
+  padding-top: var(--app-spacing-lg);
+  border-top: 1px solid var(--app-gray-200);
+  margin-top: var(--app-spacing-md);
+}
+
+.app-modern-form .app-form-actions .btn-primary {
+  padding: 0.625rem 2rem;
+  font-weight: var(--app-font-weight-semibold);
+  border-radius: var(--app-border-radius-md);
+  background: var(--app-gradient-primary);
+  border: none;
+  letter-spacing: 0.02em;
+  transition: all var(--app-transition-normal) var(--app-transition-ease);
+}
+
+.app-modern-form .app-form-actions .btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--app-shadow-md);
+}
+
+.app-modern-form .app-form-actions .btn-outline-secondary {
+  padding: 0.625rem 1.5rem;
+  border-radius: var(--app-border-radius-md);
+  font-weight: var(--app-font-weight-medium);
+}
+
+/* --- Alert inside modern form --- */
+.app-modern-form .alert {
+  border-radius: var(--app-border-radius-md);
+  border-left: 4px solid;
+}
+
+.app-modern-form .alert-info {
+  border-left-color: var(--app-info);
+}
+
+.app-modern-form .alert-warning {
+  border-left-color: var(--app-warning);
+}
+
+/* --- Row/Grid spacing adjustments --- */
+.app-modern-form .row.g-3 > [class*="col-"] {
+  margin-bottom: var(--app-spacing-sm);
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .app-modern-form .app-form-section,
+  .app-modern-form .app-form-section-modern {
+    padding: var(--app-spacing-lg);
+    border-left-width: 3px;
+  }
+
+  .app-modern-form .form-floating > .form-control,
+  .app-modern-form .form-floating > .form-select {
+    font-size: 1rem; /* Prevent iOS zoom */
+  }
+
+  .app-modern-form .app-form-actions {
+    flex-direction: column;
+    gap: var(--app-spacing-sm);
+  }
+
+  .app-modern-form .app-form-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ============================================================
+   MODERN VIEW STYLES - Enhanced View/Detail Pages
+   All styles scoped under .app-modern-view for opt-in usage
+   ============================================================ */
+
+/* --- Card Enhancements --- */
+.app-modern-view > .card,
+.app-modern-view .row > [class*="col"] > .card,
+.app-modern-view .col > .card {
+  border: none;
+  border-radius: var(--app-view-card-radius);
+  box-shadow: var(--app-view-card-shadow);
+  border-left: var(--app-view-accent-width) solid var(--app-view-accent);
+  transition: box-shadow var(--app-view-transition), transform var(--app-view-transition);
+  overflow: hidden;
+}
+
+.app-modern-view > .card:hover,
+.app-modern-view .row > [class*="col"] > .card:hover,
+.app-modern-view .col > .card:hover {
+  box-shadow: var(--app-view-card-shadow-hover);
+}
+
+/* --- Card Header Enhancements --- */
+.app-modern-view .card > .card-header {
+  background: linear-gradient(135deg, rgba(var(--app-primary-rgb), 0.06) 0%, rgba(var(--app-primary-rgb), 0.02) 100%);
+  border-bottom: 1px solid var(--app-view-divider);
+  padding: var(--app-spacing-md) var(--app-spacing-lg);
+}
+
+.app-modern-view .card > .card-header .card-title,
+.app-modern-view .card > .card-header h5,
+.app-modern-view .card > .card-header h6 {
+  font-weight: var(--app-font-weight-semibold);
+  color: var(--app-gray-800);
+  letter-spacing: 0.01em;
+}
+
+.app-modern-view .card > .card-header .card-title i,
+.app-modern-view .card > .card-header h5 i,
+.app-modern-view .card > .card-header h6 i {
+  color: var(--app-view-accent);
+}
+
+/* --- Card Body Padding --- */
+.app-modern-view .card > .card-body {
+  padding: var(--app-spacing-lg);
+}
+
+/* --- Definition List Enhancements --- */
+.app-modern-view app-definition-list .row {
+  --bs-gutter-y: 0;
+}
+
+.app-modern-view app-definition-list .row > [class*="col"] {
+  padding-top: var(--app-spacing-sm);
+  padding-bottom: var(--app-spacing-sm);
+  border-bottom: 1px solid var(--app-view-divider);
+  transition: background-color var(--app-view-transition);
+}
+
+.app-modern-view app-definition-list .row > [class*="col"]:hover {
+  background-color: rgba(var(--app-primary-rgb), 0.02);
+}
+
+/* Stripe effect on every other row pair */
+.app-modern-view app-definition-list .row:nth-child(even) > [class*="col"] {
+  background-color: var(--app-view-stripe-bg);
+}
+
+.app-modern-view app-definition-list .row:nth-child(even) > [class*="col"]:hover {
+  background-color: rgba(var(--app-primary-rgb), 0.04);
+}
+
+/* Remove border from last row */
+.app-modern-view app-definition-list .row:last-child > [class*="col"] {
+  border-bottom: none;
+}
+
+/* Label styling */
+.app-modern-view app-definition-list dt,
+.app-modern-view app-definition-list .text-muted {
+  font-weight: var(--app-font-weight-medium);
+  font-size: var(--app-font-size-sm);
+  color: var(--app-gray-600);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* Value styling */
+.app-modern-view app-definition-list dd {
+  font-size: var(--app-font-size-sm);
+  color: var(--app-gray-800);
+  font-weight: var(--app-font-weight-medium);
+}
+
+/* --- Status Header Area (optional utility) --- */
+.app-modern-view .app-view-status-header {
+  background: var(--app-view-header-bg);
+  color: white;
+  padding: var(--app-spacing-lg) var(--app-spacing-xl);
+  border-radius: var(--app-view-card-radius);
+  margin-bottom: var(--app-spacing-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--app-spacing-md);
+}
+
+.app-modern-view .app-view-status-header h4,
+.app-modern-view .app-view-status-header h5 {
+  color: white;
+  margin-bottom: 0;
+  font-weight: var(--app-font-weight-semibold);
+}
+
+.app-modern-view .app-view-status-header .text-muted {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* --- Stat Mini-Cards --- */
+.app-modern-view .app-view-stat {
+  background: white;
+  border-radius: var(--app-view-card-radius);
+  padding: var(--app-spacing-md) var(--app-spacing-lg);
+  box-shadow: var(--app-view-card-shadow);
+  border-left: var(--app-view-accent-width) solid var(--app-view-accent);
+  text-align: center;
+  transition: transform var(--app-view-transition), box-shadow var(--app-view-transition);
+}
+
+.app-modern-view .app-view-stat:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--app-view-card-shadow-hover);
+}
+
+.app-modern-view .app-view-stat .stat-value {
+  font-size: var(--app-font-size-2xl);
+  font-weight: var(--app-font-weight-bold);
+  color: var(--app-gray-800);
+  line-height: 1.2;
+}
+
+.app-modern-view .app-view-stat .stat-label {
+  font-size: var(--app-font-size-xs);
+  color: var(--app-gray-600);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: var(--app-spacing-xs);
+}
+
+/* --- Timeline / Approval History --- */
+.app-modern-view .app-view-timeline {
+  position: relative;
+  padding-left: var(--app-spacing-xl);
+}
+
+.app-modern-view .app-view-timeline::before {
+  content: '';
+  position: absolute;
+  left: 0.75rem;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--app-view-divider);
+}
+
+.app-modern-view .app-view-timeline-item {
+  position: relative;
+  padding-bottom: var(--app-spacing-lg);
+}
+
+.app-modern-view .app-view-timeline-item::before {
+  content: '';
+  position: absolute;
+  left: calc(-1 * var(--app-spacing-xl) + 0.5rem);
+  top: 0.35rem;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--app-view-accent);
+  border: 2px solid white;
+  box-shadow: 0 0 0 2px var(--app-view-accent);
+}
+
+.app-modern-view .app-view-timeline-item .timeline-date {
+  font-size: var(--app-font-size-xs);
+  color: var(--app-gray-600);
+  margin-bottom: var(--app-spacing-xs);
+}
+
+.app-modern-view .app-view-timeline-item .timeline-content {
+  background: var(--app-gray-100);
+  border-radius: var(--app-border-radius-md);
+  padding: var(--app-spacing-sm) var(--app-spacing-md);
+}
+
+/* --- Table inside Modern View --- */
+.app-modern-view .table {
+  margin-bottom: 0;
+}
+
+.app-modern-view .table thead th {
+  background-color: rgba(var(--app-primary-rgb), 0.04);
+  border-bottom: 2px solid var(--app-view-divider);
+  font-size: var(--app-font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--app-gray-700);
+  font-weight: var(--app-font-weight-semibold);
+}
+
+.app-modern-view .table tbody tr {
+  transition: background-color var(--app-view-transition);
+}
+
+.app-modern-view .table tbody tr:hover {
+  background-color: rgba(var(--app-primary-rgb), 0.03);
+}
+
+/* --- Nav Tabs Enhancement --- */
+.app-modern-view .nav-tabs {
+  border-bottom: 2px solid var(--app-view-divider);
+}
+
+.app-modern-view .nav-tabs .nav-link {
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--app-gray-600);
+  font-weight: var(--app-font-weight-medium);
+  padding: var(--app-spacing-sm) var(--app-spacing-md);
+  transition: color var(--app-view-transition), border-color var(--app-view-transition);
+  margin-bottom: -2px;
+}
+
+.app-modern-view .nav-tabs .nav-link:hover {
+  color: var(--app-view-accent);
+  border-bottom-color: rgba(var(--app-primary-rgb), 0.3);
+}
+
+.app-modern-view .nav-tabs .nav-link.active {
+  color: var(--app-view-accent);
+  border-bottom-color: var(--app-view-accent);
+  font-weight: var(--app-font-weight-semibold);
+  background: transparent;
+}
+
+/* --- Alert inside Modern View --- */
+.app-modern-view .alert {
+  border-radius: var(--app-border-radius-md);
+  border-left: 4px solid;
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .app-modern-view > .card,
+  .app-modern-view .row > [class*="col"] > .card,
+  .app-modern-view .col > .card {
+    border-radius: var(--app-border-radius-md);
+    border-left-width: 2px;
+  }
+
+  .app-modern-view .card > .card-body {
+    padding: var(--app-spacing-md);
+  }
+
+  .app-modern-view .app-view-status-header {
+    padding: var(--app-spacing-md);
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .app-modern-view .app-view-timeline {
+    padding-left: var(--app-spacing-lg);
+  }
+}

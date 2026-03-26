@@ -16,7 +16,7 @@
             [value]="selectedEntityType() || ''"
             (change)="onEntityTypeChange($event)">
             <option value="">{{ t('common.all') }}</option>
-            @for (type of entityTypes; track type.value) {
+            @for (type of entityTypes(); track type.value) {
               <option [value]="type.value">{{ type.label }}</option>
             }
           </select>

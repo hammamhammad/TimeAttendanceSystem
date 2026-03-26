@@ -36,15 +36,14 @@ class RemoteWorkRequest with _$RemoteWorkRequest {
       _$RemoteWorkRequestFromJson(json);
 }
 
-/// Create remote work request payload.
+/// Create remote work request payload matching backend CreateRemoteWorkRequestCommand.
 @freezed
 class CreateRemoteWorkRequest with _$CreateRemoteWorkRequest {
   const factory CreateRemoteWorkRequest({
+    required int employeeId,
     required DateTime startDate,
     required DateTime endDate,
     required String reason,
-    String? workLocation,
-    String? contactPhone,
   }) = _CreateRemoteWorkRequest;
 
   factory CreateRemoteWorkRequest.fromJson(Map<String, dynamic> json) =>

@@ -241,6 +241,70 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Gets localized activity description built from structured data
+   */
+  getLocalizedDescription(activity: Activity): string {
+    // Fall back to original description if structured data is not available
+    if (!activity.startDate && activity.type !== 'Attendance') {
+      return activity.description;
+    }
+
+    const locale = this.i18n.locale() === 'ar' ? 'ar-u-nu-latn' : 'en-US';
+    const dateOpts: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' };
+    const shortDateOpts: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
+
+    const statusLabel = activity.statusLabel
+      ? this.getLocalizedStatus(activity.statusLabel)
+      : this.getActivityVariantLabel(activity.variant, activity.type);
+
+    switch (activity.type) {
+      case 'Attendance': {
+        if (!activity.startDate) return activity.description;
+        const date = new Date(activity.startDate).toLocaleDateString(locale, dateOpts);
+        const hours = activity.workingHours?.toFixed(1) ?? '0.0';
+        return this.i18n.t('portal.activity_attended', { date, hours });
+      }
+      case 'Vacation': {
+        const start = new Date(activity.startDate!).toLocaleDateString(locale, shortDateOpts);
+        const end = activity.endDate
+          ? new Date(activity.endDate).toLocaleDateString(locale, shortDateOpts)
+          : start;
+        return this.i18n.t('portal.activity_vacation', { start, end, status: statusLabel });
+      }
+      case 'Excuse': {
+        const date = new Date(activity.startDate!).toLocaleDateString(locale, shortDateOpts);
+        return this.i18n.t('portal.activity_excuse', { date, status: statusLabel });
+      }
+      case 'RemoteWork': {
+        const start = new Date(activity.startDate!).toLocaleDateString(locale, shortDateOpts);
+        const end = activity.endDate
+          ? new Date(activity.endDate).toLocaleDateString(locale, shortDateOpts)
+          : start;
+        return this.i18n.t('portal.activity_remote_work', { start, end, status: statusLabel });
+      }
+      default:
+        return activity.description;
+    }
+  }
+
+  /**
+   * Gets localized status label from English status string
+   */
+  private getLocalizedStatus(status: string): string {
+    const statusMap: Record<string, string> = {
+      'Approved': this.i18n.t('common.approved'),
+      'Pending': this.i18n.t('common.pending'),
+      'Rejected': this.i18n.t('common.rejected'),
+      'Cancelled': this.i18n.t('common.cancelled'),
+      'Present': this.i18n.t('attendance.status.present'),
+      'Absent': this.i18n.t('attendance.status.absent'),
+      'Late': this.i18n.t('attendance.status.late'),
+      'OnLeave': this.i18n.t('attendance.status.on_leave')
+    };
+    return statusMap[status] || status;
+  }
+
+  /**
    * Gets localized variant label (status) based on activity type and variant
    */
   getActivityVariantLabel(variant: string, activityType?: string): string {
@@ -290,7 +354,8 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
     } else if (compareDate.getTime() === compareYesterday.getTime()) {
       return this.i18n.t('common.yesterday');
     } else {
-      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      const locale = this.i18n.locale() === 'ar' ? 'ar-u-nu-latn' : 'en-US';
+      return date.toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric' });
     }
   }
 

@@ -118,7 +118,7 @@ export class EditAttendanceComponent implements OnInit {
         this.recordId = parseInt(id, 10);
         this.loadAttendanceRecord(this.recordId);
       } else {
-        this.error.set('Invalid attendance record ID');
+        this.error.set(this.i18n.t('attendance.edit.validation.invalid_record_id'));
         this.loading.set(false);
       }
     });
@@ -313,19 +313,19 @@ export class EditAttendanceComponent implements OnInit {
   onSave(): void {
     if (this.editForm.invalid) {
       this.markFormGroupTouched(this.editForm);
-      this.notificationService.error('Please fix validation errors before saving');
+      this.notificationService.error(this.i18n.t('attendance.edit.form_errors'));
       return;
     }
 
     if (!this.recordId) {
-      this.notificationService.error('Invalid record ID');
+      this.notificationService.error(this.i18n.t('attendance.edit.validation.invalid_record_id'));
       return;
     }
 
     // Validate that manual overrides require override notes
     const formValue = this.editForm.value;
     if (this.hasManualOverrides(formValue) && !formValue.overrideNotes?.trim()) {
-      this.notificationService.error('Override notes are required when making manual adjustments');
+      this.notificationService.error(this.i18n.t('attendance.edit.validation.override_notes_required'));
       return;
     }
 
@@ -338,7 +338,7 @@ export class EditAttendanceComponent implements OnInit {
         const checkIn = new Date(checkInDateTime);
         const checkOut = new Date(checkOutDateTime);
         if (checkOut <= checkIn) {
-          this.notificationService.error('Check-out time must be after check-in time');
+          this.notificationService.error(this.i18n.t('attendance.edit.validation.check_out_after_check_in'));
           return;
         }
       }
@@ -346,7 +346,7 @@ export class EditAttendanceComponent implements OnInit {
 
     // Validate break hours
     if (formValue.breakHours && formValue.breakHours < 0) {
-      this.notificationService.error('Break hours cannot be negative');
+      this.notificationService.error(this.i18n.t('attendance.edit.validation.break_hours_negative'));
       return;
     }
 
@@ -366,7 +366,7 @@ export class EditAttendanceComponent implements OnInit {
       next: (updatedRecord) => {
         this.attendanceRecord.set(updatedRecord);
         this.saving.set(false);
-        this.notificationService.success('Attendance record updated successfully');
+        this.notificationService.success(this.i18n.t('attendance.edit.record_updated'));
         this.navigateBackToDailyAttendance();
       },
       error: (error) => {
@@ -416,7 +416,7 @@ export class EditAttendanceComponent implements OnInit {
     const record = this.attendanceRecord();
     if (record) {
       this.populateForm(record);
-      this.notificationService.info('Form reset to original values');
+      this.notificationService.info(this.i18n.t('attendance.edit.form_reset'));
     }
   }
 
@@ -491,10 +491,10 @@ export class EditAttendanceComponent implements OnInit {
    */
   private getErrorMessage(error: any): string {
     if (error?.status === 403) {
-      return 'You do not have permission to edit attendance records';
+      return this.i18n.t('attendance.edit.unauthorized');
     }
     if (error?.status === 404) {
-      return 'Attendance record not found';
+      return this.i18n.t('attendance.edit.record_not_found');
     }
     if (error?.error && typeof error.error === 'string') {
       return error.error;
@@ -502,7 +502,7 @@ export class EditAttendanceComponent implements OnInit {
     if (error?.message) {
       return error.message;
     }
-    return 'An error occurred while processing your request';
+    return this.i18n.t('common.errors.generic');
   }
 
   /**
@@ -525,19 +525,19 @@ export class EditAttendanceComponent implements OnInit {
     }
 
     if (control.errors['required']) {
-      return `${controlName} is required`;
+      return this.i18n.t('attendance.edit.validation.required', { field: controlName });
     }
     if (control.errors['min']) {
-      return `${controlName} must be greater than or equal to ${control.errors['min'].min}`;
+      return this.i18n.t('attendance.edit.validation.min', { field: controlName, min: control.errors['min'].min });
     }
     if (control.errors['max']) {
-      return `${controlName} must be less than or equal to ${control.errors['max'].max}`;
+      return this.i18n.t('attendance.edit.validation.max', { field: controlName, max: control.errors['max'].max });
     }
     if (control.errors['maxlength']) {
-      return `${controlName} cannot exceed ${control.errors['maxlength'].requiredLength} characters`;
+      return this.i18n.t('attendance.edit.validation.maxlength', { field: controlName, max: control.errors['maxlength'].requiredLength });
     }
 
-    return 'Invalid value';
+    return this.i18n.t('attendance.edit.validation.invalid');
   }
 
   /**

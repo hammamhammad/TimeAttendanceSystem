@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map, tap, catchError, throwError } from 'rxjs';
 import {
@@ -13,6 +13,7 @@ import {
   PagedResult
 } from '../../../shared/models/leave-balance.model';
 import { NotificationService } from '../../../core/notifications/notification.service';
+import { I18nService } from '../../../core/i18n/i18n.service';
 import { environment } from '../../../../environments/environment';
 
 /**
@@ -41,6 +42,8 @@ export class LeaveBalanceService {
   readonly transactions = this._transactions.asReadonly();
   readonly transactionsPagedResult = this._transactionsPagedResult.asReadonly();
 
+  private i18n = inject(I18nService);
+
   constructor(
     private http: HttpClient,
     private notificationService: NotificationService
@@ -67,9 +70,9 @@ export class LeaveBalanceService {
           this._loading.set(false);
         }),
         catchError(error => {
-          this._error.set(error.error?.message || 'Failed to load leave balance');
+          this._error.set(error.error?.message || this.i18n.t('leaveBalance.errors.load_balance_failed'));
           this._loading.set(false);
-          this.notificationService.error('Failed to load leave balance');
+          this.notificationService.error(this.i18n.t('leaveBalance.errors.load_balance_failed'));
           return throwError(() => error);
         })
       );
@@ -92,9 +95,9 @@ export class LeaveBalanceService {
           this._loading.set(false);
         }),
         catchError(error => {
-          this._error.set(error.error?.message || 'Failed to load balance summary');
+          this._error.set(error.error?.message || this.i18n.t('leaveBalance.errors.load_summary_failed'));
           this._loading.set(false);
-          this.notificationService.error('Failed to load balance summary');
+          this.notificationService.error(this.i18n.t('leaveBalance.errors.load_summary_failed'));
           return throwError(() => error);
         })
       );
@@ -141,9 +144,9 @@ export class LeaveBalanceService {
           this._loading.set(false);
         }),
         catchError(error => {
-          this._error.set(error.error?.message || 'Failed to load transaction history');
+          this._error.set(error.error?.message || this.i18n.t('leaveBalance.errors.load_history_failed'));
           this._loading.set(false);
-          this.notificationService.error('Failed to load transaction history');
+          this.notificationService.error(this.i18n.t('leaveBalance.errors.load_history_failed'));
           return throwError(() => error);
         })
       );
@@ -161,11 +164,11 @@ export class LeaveBalanceService {
     return this.http.post<number>(`${this.apiUrl}/entitlements`, request).pipe(
       tap(entitlementId => {
         this._loading.set(false);
-        this.notificationService.success('Leave entitlement set successfully');
+        this.notificationService.success(this.i18n.t('leaveBalance.success.entitlement_set'));
       }),
       catchError(error => {
         this._loading.set(false);
-        const errorMessage = error.error?.message || 'Failed to set leave entitlement';
+        const errorMessage = error.error?.message || this.i18n.t('leaveBalance.errors.set_entitlement_failed');
         this._error.set(errorMessage);
         this.notificationService.error(errorMessage);
         return throwError(() => error);
@@ -186,12 +189,12 @@ export class LeaveBalanceService {
       tap(employeesProcessed => {
         this._loading.set(false);
         this.notificationService.success(
-          `Monthly accrual processed successfully for ${employeesProcessed} employee(s)`
+          this.i18n.t('leaveBalance.success.accrual_processed', { count: employeesProcessed })
         );
       }),
       catchError(error => {
         this._loading.set(false);
-        const errorMessage = error.error?.message || 'Failed to process monthly accrual';
+        const errorMessage = error.error?.message || this.i18n.t('leaveBalance.errors.process_accrual_failed');
         this._error.set(errorMessage);
         this.notificationService.error(errorMessage);
         return throwError(() => error);
@@ -211,7 +214,7 @@ export class LeaveBalanceService {
     return this.http.post<boolean>(`${this.apiUrl}/adjustments`, request).pipe(
       tap(() => {
         this._loading.set(false);
-        this.notificationService.success('Leave balance adjusted successfully');
+        this.notificationService.success(this.i18n.t('leaveBalance.success.balance_adjusted'));
         // Refresh balance summary if available
         const summary = this._balanceSummary();
         if (summary && summary.employeeId === request.employeeId) {
@@ -220,7 +223,7 @@ export class LeaveBalanceService {
       }),
       catchError(error => {
         this._loading.set(false);
-        const errorMessage = error.error?.message || 'Failed to adjust leave balance';
+        const errorMessage = error.error?.message || this.i18n.t('leaveBalance.errors.adjust_balance_failed');
         this._error.set(errorMessage);
         this.notificationService.error(errorMessage);
         return throwError(() => error);

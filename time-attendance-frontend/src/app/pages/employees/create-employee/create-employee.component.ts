@@ -1,7 +1,7 @@
 import { Component, signal, inject, OnInit } from '@angular/core';
 
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { SearchableSelectComponent, SearchableSelectOption } from '../../../shared/components/searchable-select/searchable-select.component';
 import { FormHeaderComponent } from '../../../shared/components/form-header/form-header.component';
@@ -21,7 +21,7 @@ import {
 @Component({
   selector: 'app-create-employee',
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule, RouterLink, SearchableSelectComponent, FormHeaderComponent, FormSectionComponent, LoadingSpinnerComponent],
+  imports: [FormsModule, ReactiveFormsModule, SearchableSelectComponent, FormHeaderComponent, FormSectionComponent, LoadingSpinnerComponent],
   templateUrl: './create-employee.component.html',
   styleUrls: ['./create-employee.component.css']
 })

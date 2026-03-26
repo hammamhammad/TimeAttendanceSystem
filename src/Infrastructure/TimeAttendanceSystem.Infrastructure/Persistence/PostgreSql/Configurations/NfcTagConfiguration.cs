@@ -49,6 +49,28 @@ public class NfcTagConfiguration : IEntityTypeConfiguration<NfcTag>
             .HasDefaultValue(true)
             .HasComment("Whether tag is active for verification");
 
+        builder.Property(t => t.Status)
+            .IsRequired()
+            .HasDefaultValue(NfcTagStatus.Registered)
+            .HasComment("Lifecycle status: Unregistered(0), Registered(1), Active(2), Disabled(3), Lost(4)");
+
+        builder.Property(t => t.EncryptedPayload)
+            .HasMaxLength(500)
+            .HasComment("HMAC-signed payload written to the physical tag during provisioning");
+
+        builder.Property(t => t.VerificationHash)
+            .HasMaxLength(100)
+            .HasComment("SHA256 hash of the encrypted payload for integrity verification");
+
+        builder.Property(t => t.LastScannedAt)
+            .HasColumnType("timestamp with time zone")
+            .HasComment("Timestamp of the last successful scan");
+
+        builder.Property(t => t.ScanCount)
+            .IsRequired()
+            .HasDefaultValue(0)
+            .HasComment("Total number of successful scans");
+
         // Relationships
         builder.HasOne(t => t.Branch)
             .WithMany()
@@ -69,6 +91,10 @@ public class NfcTagConfiguration : IEntityTypeConfiguration<NfcTag>
         builder.HasIndex(t => new { t.BranchId, t.IsActive })
             .HasDatabaseName("IX_NfcTags_BranchId_IsActive")
             .HasFilter("\"IsDeleted\" = false AND \"IsActive\" = true");
+
+        builder.HasIndex(t => t.Status)
+            .HasDatabaseName("IX_NfcTags_Status")
+            .HasFilter("\"IsDeleted\" = false");
 
         // Query filter for soft delete
         builder.HasQueryFilter(t => !t.IsDeleted);

@@ -5,94 +5,83 @@ part 'leave_model.g.dart';
 
 /// Leave request status.
 enum LeaveStatus {
-  @JsonValue(0)
   pending,
-  @JsonValue(1)
   approved,
-  @JsonValue(2)
   rejected,
-  @JsonValue(3)
   cancelled,
 }
 
-/// Leave type.
-enum LeaveType {
-  @JsonValue(0)
-  annual,
-  @JsonValue(1)
-  sick,
-  @JsonValue(2)
-  unpaid,
-  @JsonValue(3)
-  maternity,
-  @JsonValue(4)
-  paternity,
-  @JsonValue(5)
-  bereavement,
-  @JsonValue(6)
-  emergency,
-  @JsonValue(7)
-  other,
+/// Parse workflow status string from backend to LeaveStatus enum.
+LeaveStatus _parseLeaveStatus(dynamic value) {
+  if (value == null) return LeaveStatus.pending;
+  final str = value.toString().toLowerCase();
+  switch (str) {
+    case 'approved':
+      return LeaveStatus.approved;
+    case 'rejected':
+      return LeaveStatus.rejected;
+    case 'cancelled':
+    case 'canceled':
+      return LeaveStatus.cancelled;
+    default:
+      return LeaveStatus.pending;
+  }
 }
 
-/// Leave request model.
+String _leaveStatusToJson(LeaveStatus status) {
+  return status.name[0].toUpperCase() + status.name.substring(1);
+}
+
+/// Leave request model matching backend EmployeeVacationDto.
 @freezed
 class LeaveRequest with _$LeaveRequest {
   const factory LeaveRequest({
-    required String id,
-    required LeaveType type,
+    required int id,
+    int? vacationTypeId,
+    String? vacationTypeName,
     required DateTime startDate,
     required DateTime endDate,
+    @JsonKey(name: 'workflowStatus', fromJson: _parseLeaveStatus, toJson: _leaveStatusToJson)
     required LeaveStatus status,
+    @JsonKey(name: 'notes')
     String? reason,
-    String? managerNotes,
-    DateTime? createdAt,
-    DateTime? processedAt,
-    String? processedByName,
+    int? employeeId,
+    String? employeeName,
+    int? totalDays,
+    int? businessDays,
+    DateTime? createdAtUtc,
+    String? createdBy,
+    String? currentApproverName,
+    int? workflowInstanceId,
   }) = _LeaveRequest;
 
   factory LeaveRequest.fromJson(Map<String, dynamic> json) =>
       _$LeaveRequestFromJson(json);
 }
 
-/// Create leave request payload.
+/// Create leave request payload matching backend CreateEmployeeVacationCommand.
 @freezed
 class CreateLeaveRequest with _$CreateLeaveRequest {
   const factory CreateLeaveRequest({
-    required LeaveType type,
+    required int employeeId,
+    required int vacationTypeId,
     required DateTime startDate,
     required DateTime endDate,
-    String? reason,
+    String? notes,
   }) = _CreateLeaveRequest;
 
   factory CreateLeaveRequest.fromJson(Map<String, dynamic> json) =>
       _$CreateLeaveRequestFromJson(json);
 }
 
-/// Leave balance model.
+/// Vacation type for dropdown selection.
 @freezed
-class LeaveBalance with _$LeaveBalance {
-  const factory LeaveBalance({
-    required LeaveType type,
-    required String typeName,
-    required double totalDays,
-    required double usedDays,
-    required double remainingDays,
-    required double pendingDays,
-  }) = _LeaveBalance;
+class VacationType with _$VacationType {
+  const factory VacationType({
+    required int id,
+    required String name,
+  }) = _VacationType;
 
-  factory LeaveBalance.fromJson(Map<String, dynamic> json) =>
-      _$LeaveBalanceFromJson(json);
-}
-
-/// Leave summary response.
-@freezed
-class LeaveSummary with _$LeaveSummary {
-  const factory LeaveSummary({
-    required List<LeaveBalance> balances,
-    required List<LeaveRequest> recentRequests,
-  }) = _LeaveSummary;
-
-  factory LeaveSummary.fromJson(Map<String, dynamic> json) =>
-      _$LeaveSummaryFromJson(json);
+  factory VacationType.fromJson(Map<String, dynamic> json) =>
+      _$VacationTypeFromJson(json);
 }

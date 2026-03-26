@@ -53,7 +53,7 @@ export class AttendanceCorrectionsListComponent implements OnInit, OnDestroy {
 
   initColumns(): void {
     this.columns = [
-      { key: 'id', label: 'ID', sortable: true, width: '80px' },
+      { key: 'id', label: this.i18n.t('portal.columns.id'), sortable: true, width: '80px' },
       { key: 'correctionDate', label: this.i18n.t('portal.correction_date'), sortable: true },
       { key: 'correctionTime', label: this.i18n.t('portal.correction_time'), sortable: false },
       { key: 'correctionType', label: this.i18n.t('portal.correction_type'), sortable: true },
@@ -70,13 +70,13 @@ export class AttendanceCorrectionsListComponent implements OnInit, OnDestroy {
     this.tableActions = [
       {
         key: 'view',
-        label: 'View',
+        label: this.i18n.t('portal.actions.view'),
         icon: 'bi-eye',
         color: 'primary'
       },
       {
         key: 'edit',
-        label: 'Edit',
+        label: this.i18n.t('portal.actions.edit'),
         icon: 'bi-pencil',
         color: 'warning',
         // Only allow edit for pending requests that haven't been finalized
@@ -84,7 +84,7 @@ export class AttendanceCorrectionsListComponent implements OnInit, OnDestroy {
       },
       {
         key: 'cancel',
-        label: 'Cancel',
+        label: this.i18n.t('portal.actions.cancel'),
         icon: 'bi-x-circle',
         color: 'danger',
         // Only allow cancel for pending requests
@@ -179,7 +179,7 @@ export class AttendanceCorrectionsListComponent implements OnInit, OnDestroy {
       correctionTime: this.formatTime(correction.correctionTime),
       correctionType: this.getCorrectionTypeLabel(correction.correctionType),
       reason: this.truncateReason(correction.reason),
-      createdAtUtc: this.formatDate(correction.createdAtUtc),
+      createdAtUtc: this.formatDateTime(correction.createdAtUtc),
       status: this.getStatusBadgeHtml(correction)
     }));
   });
@@ -311,15 +311,16 @@ export class AttendanceCorrectionsListComponent implements OnInit, OnDestroy {
   /**
    * Get correction type label
    */
-  private getCorrectionTypeLabel(type: AttendanceCorrectionType): string {
-    switch (type) {
-      case AttendanceCorrectionType.CheckIn:
-        return this.i18n.t('portal.check_in');
-      case AttendanceCorrectionType.CheckOut:
-        return this.i18n.t('portal.check_out');
-      default:
-        return String(type);
+  private getCorrectionTypeLabel(type: AttendanceCorrectionType | string): string {
+    // Handle both numeric enum values and string values from backend
+    const typeStr = String(type);
+    if (type === AttendanceCorrectionType.CheckIn || typeStr === 'CheckIn' || typeStr === '1') {
+      return this.i18n.t('portal.check_in');
     }
+    if (type === AttendanceCorrectionType.CheckOut || typeStr === 'CheckOut' || typeStr === '2') {
+      return this.i18n.t('portal.check_out');
+    }
+    return typeStr;
   }
 
   /**
@@ -364,6 +365,14 @@ export class AttendanceCorrectionsListComponent implements OnInit, OnDestroy {
   formatDate(date: Date | string): string {
     if (!date) return '';
     const d = typeof date === 'string' ? new Date(date) : date;
-    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    const locale = this.i18n.locale() === 'ar' ? 'ar-u-nu-latn' : 'en-US';
+    return d.toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric' });
+  }
+
+  formatDateTime(date: Date | string): string {
+    if (!date) return '';
+    const d = typeof date === 'string' ? new Date(date) : date;
+    const locale = this.i18n.locale() === 'ar' ? 'ar-u-nu-latn' : 'en-US';
+    return d.toLocaleString(locale, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
   }
 }

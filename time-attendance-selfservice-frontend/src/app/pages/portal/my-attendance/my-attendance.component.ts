@@ -107,6 +107,20 @@ export class MyAttendanceComponent implements OnInit, OnDestroy {
     this.loadAttendance();
   }
 
+  getStatusLabel(status: string): string {
+    const statusMap: Record<string, string> = {
+      'Present': this.i18n.t('attendance.status.present'),
+      'Absent': this.i18n.t('attendance.status.absent'),
+      'Late': this.i18n.t('attendance.status.late'),
+      'EarlyLeave': this.i18n.t('attendance.status.early_leave'),
+      'Holiday': this.i18n.t('attendance.status.holiday'),
+      'Weekend': this.i18n.t('attendance.status.day_off'),
+      'OnLeave': this.i18n.t('attendance.status.on_leave'),
+      'RemoteWork': this.i18n.t('attendance.status.remote_work')
+    };
+    return statusMap[status] || status;
+  }
+
   getStatusBadgeClass(status: string): string {
     const statusMap: Record<string, string> = {
       'Present': 'badge bg-success',
@@ -123,7 +137,8 @@ export class MyAttendanceComponent implements OnInit, OnDestroy {
 
   formatDate(date: Date | string): string {
     const d = typeof date === 'string' ? new Date(date) : date;
-    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    const locale = this.i18n.locale() === 'ar' ? 'ar-u-nu-latn' : 'en-US';
+    return d.toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric' });
   }
 
   formatTime(time: Date | string | null): string {

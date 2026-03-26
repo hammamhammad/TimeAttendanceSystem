@@ -86,29 +86,24 @@ public class DeleteVacationTypeCommandHandler : IRequestHandler<DeleteVacationTy
             return Result.Failure<bool>("Vacation type not found or has been deleted");
         }
 
-        // Stage 3: Domain-Level Deletion Validation (simplified)
-        var canDelete = true; // Simplified: allow deletion for now
+        // Stage 3: Database-Level Referential Integrity Checks
+        // Check for pending (unapproved) vacation requests first - more specific error message
+        var hasPendingRequests = await _context.EmployeeVacations
+            .AnyAsync(ev => ev.VacationTypeId == request.Id && !ev.IsApproved, cancellationToken);
 
-        // Stage 4: Database-Level Referential Integrity Checks
-        // TODO: Add checks for vacation records when vacation records module is implemented
-        // var hasVacationRecords = await _context.VacationRecords
-        //     .AnyAsync(vr => vr.VacationTypeId == request.Id && !vr.IsDeleted, cancellationToken);
-        //
-        // if (hasVacationRecords)
-        // {
-        //     return Result.Failure<bool>("Cannot delete vacation type because it has associated vacation records");
-        // }
+        if (hasPendingRequests)
+        {
+            return Result.Failure<bool>("Cannot delete vacation type because it has pending vacation requests");
+        }
 
-        // TODO: Add checks for pending vacation requests when vacation requests module is implemented
-        // var hasPendingRequests = await _context.VacationRequests
-        //     .AnyAsync(vr => vr.VacationTypeId == request.Id &&
-        //                    vr.Status == VacationRequestStatus.Pending &&
-        //                    !vr.IsDeleted, cancellationToken);
-        //
-        // if (hasPendingRequests)
-        // {
-        //     return Result.Failure<bool>("Cannot delete vacation type because it has pending vacation requests");
-        // }
+        // Check for any existing vacation records using this type
+        var hasVacationRecords = await _context.EmployeeVacations
+            .AnyAsync(ev => ev.VacationTypeId == request.Id, cancellationToken);
+
+        if (hasVacationRecords)
+        {
+            return Result.Failure<bool>("Cannot delete vacation type because it has associated vacation records");
+        }
 
         // Stage 5: Soft Delete Execution
         try

@@ -87,20 +87,24 @@ export class SendNotificationComponent implements OnInit {
     });
 
     // Target type options
-    targetTypes = [
-        { value: BroadcastTargetType.All, label: 'All Employees', icon: 'fa-globe' },
-        { value: BroadcastTargetType.Branch, label: 'By Branch', icon: 'fa-building' },
-        { value: BroadcastTargetType.Department, label: 'By Department', icon: 'fa-sitemap' },
-        { value: BroadcastTargetType.Role, label: 'By Role', icon: 'fa-user-tag' },
-        { value: BroadcastTargetType.Individual, label: 'Individual', icon: 'fa-user' }
-    ];
+    get targetTypes() {
+        return [
+            { value: BroadcastTargetType.All, label: this.t('notifications.target_all_employees'), icon: 'fa-globe' },
+            { value: BroadcastTargetType.Branch, label: this.t('notifications.target_by_branch'), icon: 'fa-building' },
+            { value: BroadcastTargetType.Department, label: this.t('notifications.target_by_department'), icon: 'fa-sitemap' },
+            { value: BroadcastTargetType.Role, label: this.t('notifications.target_by_role'), icon: 'fa-user-tag' },
+            { value: BroadcastTargetType.Individual, label: this.t('notifications.target_individual'), icon: 'fa-user' }
+        ];
+    }
 
     // Priority options
-    priorities = [
-        { value: 'low', label: 'Low', icon: 'fa-arrow-down', color: 'text-muted' },
-        { value: 'normal', label: 'Normal', icon: 'fa-minus', color: 'text-primary' },
-        { value: 'high', label: 'High', icon: 'fa-arrow-up', color: 'text-danger' }
-    ];
+    get priorities() {
+        return [
+            { value: 'low', label: this.t('notifications.priority_low'), icon: 'fa-arrow-down', color: 'text-muted' },
+            { value: 'normal', label: this.t('notifications.priority_normal'), icon: 'fa-minus', color: 'text-primary' },
+            { value: 'high', label: this.t('notifications.priority_high'), icon: 'fa-arrow-up', color: 'text-danger' }
+        ];
+    }
 
     ngOnInit(): void {
         this.initForm();

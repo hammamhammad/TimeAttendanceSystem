@@ -85,14 +85,14 @@ export class ViewShiftComponent implements OnInit {
 
     const fields: DetailField[] = [];
 
-    if (shift.requiredHours !== undefined) {
+    if (shift.requiredHours != null) {
       fields.push({
         label: this.i18n.t('shifts.required_hours'),
         value: `${shift.requiredHours} ${this.i18n.t('fields.hoursUnit')}`
       });
     }
 
-    if (shift.requiredWeeklyHours !== undefined) {
+    if (shift.requiredWeeklyHours != null) {
       fields.push({
         label: this.i18n.t('shifts.required_weekly_hours'),
         value: `${shift.requiredWeeklyHours} ${this.i18n.t('fields.hoursUnit')}`
@@ -114,13 +114,13 @@ export class ViewShiftComponent implements OnInit {
     if (!shift) return [];
 
     const workingDays = [];
-    if (shift.isSunday) workingDays.push(this.i18n.t('days.sunday'));
-    if (shift.isMonday) workingDays.push(this.i18n.t('days.monday'));
-    if (shift.isTuesday) workingDays.push(this.i18n.t('days.tuesday'));
-    if (shift.isWednesday) workingDays.push(this.i18n.t('days.wednesday'));
-    if (shift.isThursday) workingDays.push(this.i18n.t('days.thursday'));
-    if (shift.isFriday) workingDays.push(this.i18n.t('days.friday'));
-    if (shift.isSaturday) workingDays.push(this.i18n.t('days.saturday'));
+    if (shift.isSunday) workingDays.push(this.i18n.t('common.days.sunday'));
+    if (shift.isMonday) workingDays.push(this.i18n.t('common.days.monday'));
+    if (shift.isTuesday) workingDays.push(this.i18n.t('common.days.tuesday'));
+    if (shift.isWednesday) workingDays.push(this.i18n.t('common.days.wednesday'));
+    if (shift.isThursday) workingDays.push(this.i18n.t('common.days.thursday'));
+    if (shift.isFriday) workingDays.push(this.i18n.t('common.days.friday'));
+    if (shift.isSaturday) workingDays.push(this.i18n.t('common.days.saturday'));
 
     return [
       {
@@ -160,13 +160,13 @@ export class ViewShiftComponent implements OnInit {
     ];
 
     if (shift.allowFlexibleHours) {
-      if (shift.flexMinutesBefore !== undefined) {
+      if (shift.flexMinutesBefore != null) {
         fields.push({
           label: this.i18n.t('shifts.flex_minutes_before'),
           value: `${shift.flexMinutesBefore} ${this.i18n.t('fields.minutesUnit')}`
         });
       }
-      if (shift.flexMinutesAfter !== undefined) {
+      if (shift.flexMinutesAfter != null) {
         fields.push({
           label: this.i18n.t('shifts.flex_minutes_after'),
           value: `${shift.flexMinutesAfter} ${this.i18n.t('fields.minutesUnit')}`
@@ -174,7 +174,7 @@ export class ViewShiftComponent implements OnInit {
       }
     }
 
-    if (shift.gracePeriodMinutes !== undefined) {
+    if (shift.gracePeriodMinutes != null) {
       fields.push({
         label: this.i18n.t('shifts.grace_period'),
         value: `${shift.gracePeriodMinutes} ${this.i18n.t('fields.minutesUnit')}`
@@ -441,24 +441,8 @@ export class ViewShiftComponent implements OnInit {
     };
   });
 
-  // Header actions computed property
+  // Header actions computed property (Edit/Back are auto-added by FormHeaderComponent)
   headerActions = computed<FormHeaderAction[]>(() => {
-    const shift = this.shift();
-    if (!shift) return [];
-
-    const actions: FormHeaderAction[] = [];
-
-    // Edit action
-    if (this.canEdit()) {
-      actions.push({
-        label: this.i18n.t('common.edit'),
-        icon: 'fas fa-edit',
-        route: `/shifts/edit/${shift.id}`,
-        type: 'primary',
-        action: () => {}
-      });
-    }
-
-    return actions;
+    return [];
   });
 }

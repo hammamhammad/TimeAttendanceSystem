@@ -17,8 +17,8 @@ import { PermissionResources, PermissionActions } from '../../../shared/utils/pe
       [showAddButton]="showAddButton"
       [addButtonText]="addButtonText"
       [showBulkButton]="showBulkButton()"
-      [bulkButtonText]="'Bulk Assign'"
-      [searchPlaceholder]="'Search by employee name...'"
+      [bulkButtonText]="i18n.t('employee_vacations.bulk_assign')"
+      [searchPlaceholder]="i18n.t('employee_vacations.search_employee_name')"
       [refreshing]="refreshing"
       (search)="onSearch($event)"
       (filterChange)="onFilterChange($event)"
@@ -30,11 +30,11 @@ import { PermissionResources, PermissionActions } from '../../../shared/utils/pe
 })
 export class EmployeeVacationFiltersComponent implements OnInit {
   private employeeVacationsService = inject(EmployeeVacationsService);
-  private i18n = inject(I18nService);
+  i18n = inject(I18nService);
   private permissionService = inject(PermissionService);
 
   @Input() showAddButton = true;
-  @Input() addButtonText = 'Create Vacation';
+  @Input() addButtonText = '';
   @Input() refreshing = false;
 
   @Output() searchChange = new EventEmitter<string>();
@@ -53,6 +53,9 @@ export class EmployeeVacationFiltersComponent implements OnInit {
   });
 
   ngOnInit() {
+    if (!this.addButtonText) {
+      this.addButtonText = this.i18n.t('employee_vacations.create_vacation');
+    }
     this.loadEmployees();
     this.loadVacationTypes();
     this.setupFilterFields();
@@ -118,25 +121,25 @@ export class EmployeeVacationFiltersComponent implements OnInit {
     this.filterFields.set([
       {
         key: 'employeeId',
-        label: 'Employee',
+        label: this.i18n.t('employee_vacations.employee'),
         type: 'select',
         options: employeeOptions
       },
       {
         key: 'vacationTypeId',
-        label: 'Vacation Type',
+        label: this.i18n.t('employee_vacations.vacation_type'),
         type: 'select',
         options: vacationTypeOptions
       },
       {
         key: 'isApproved',
-        label: 'Status',
+        label: this.i18n.t('common.status'),
         type: 'select',
         options: statusOptions
       },
       {
         key: 'isCurrentlyActive',
-        label: 'Currently Active',
+        label: this.i18n.t('employee_vacations.currently_active'),
         type: 'select',
         options: activeStatusOptions
       }

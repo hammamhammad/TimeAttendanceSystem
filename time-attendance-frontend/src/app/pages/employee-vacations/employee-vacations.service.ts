@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map, tap, catchError, throwError } from 'rxjs';
 import {
@@ -13,6 +13,7 @@ import {
 import { BulkVacationRequest, BulkVacationResult } from './bulk-vacation-modal/bulk-vacation-modal.component';
 import { PagedResult } from '../../shared/models/vacation-type.model';
 import { NotificationService } from '../../core/notifications/notification.service';
+import { I18nService } from '../../core/i18n/i18n.service';
 import { environment } from '../../../environments/environment';
 
 /**
@@ -51,6 +52,8 @@ export class EmployeeVacationsService {
     const result = this._pagedResult();
     return result ? result.page > 1 : false;
   });
+
+  private i18n = inject(I18nService);
 
   constructor(
     private http: HttpClient,
@@ -92,9 +95,9 @@ export class EmployeeVacationsService {
         this._loading.set(false);
       }),
       catchError(error => {
-        this._error.set(error.error?.message || 'Failed to load vacations');
+        this._error.set(error.error?.message || this.i18n.t('employeeVacation.errors.load_failed'));
         this._loading.set(false);
-        this.notificationService.error('Failed to load employee vacations');
+        this.notificationService.error(this.i18n.t('employeeVacation.errors.load_failed'));
         return throwError(() => error);
       })
     );
@@ -107,7 +110,7 @@ export class EmployeeVacationsService {
     return this.http.get<EmployeeVacation>(`${this.apiUrl}/${id}`).pipe(
       map(vacation => this.transformDates(vacation)),
       catchError(error => {
-        this.notificationService.error('Failed to load vacation details');
+        this.notificationService.error(this.i18n.t('employeeVacation.errors.load_details_failed'));
         return throwError(() => error);
       })
     );
@@ -122,13 +125,13 @@ export class EmployeeVacationsService {
     return this.http.post<number>(this.apiUrl, request).pipe(
       tap(vacationId => {
         this._loading.set(false);
-        this.notificationService.success('Vacation created successfully');
+        this.notificationService.success(this.i18n.t('employeeVacation.success.created'));
         // Refresh the vacation list
         this.refreshVacations();
       }),
       catchError(error => {
         this._loading.set(false);
-        const errorMessage = error.error?.message || 'Failed to create vacation';
+        const errorMessage = error.error?.message || this.i18n.t('employeeVacation.errors.create_failed');
         this._error.set(errorMessage);
         this.notificationService.error(errorMessage);
         return throwError(() => error);
@@ -145,13 +148,13 @@ export class EmployeeVacationsService {
     return this.http.put<void>(`${this.apiUrl}/${id}`, request).pipe(
       tap(() => {
         this._loading.set(false);
-        this.notificationService.success('Vacation updated successfully');
+        this.notificationService.success(this.i18n.t('employeeVacation.success.updated'));
         // Refresh the vacation list
         this.refreshVacations();
       }),
       catchError(error => {
         this._loading.set(false);
-        const errorMessage = error.error?.message || 'Failed to update vacation';
+        const errorMessage = error.error?.message || this.i18n.t('employeeVacation.errors.update_failed');
         this._error.set(errorMessage);
         this.notificationService.error(errorMessage);
         return throwError(() => error);
@@ -168,7 +171,7 @@ export class EmployeeVacationsService {
     return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
       tap(() => {
         this._loading.set(false);
-        this.notificationService.success('Vacation deleted successfully');
+        this.notificationService.success(this.i18n.t('employeeVacation.success.deleted'));
         // Remove from local state
         const currentVacations = this._vacations();
         this._vacations.set(currentVacations.filter(v => v.id !== id));
@@ -183,7 +186,7 @@ export class EmployeeVacationsService {
       }),
       catchError(error => {
         this._loading.set(false);
-        const errorMessage = error.error?.message || 'Failed to delete vacation';
+        const errorMessage = error.error?.message || this.i18n.t('employeeVacation.errors.delete_failed');
         this._error.set(errorMessage);
         this.notificationService.error(errorMessage);
         return throwError(() => error);
@@ -197,7 +200,7 @@ export class EmployeeVacationsService {
   toggleVacationStatus(id: number): Observable<void> {
     return this.http.patch<void>(`${this.apiUrl}/${id}/toggle-status`, {}).pipe(
       tap(() => {
-        this.notificationService.success('Vacation status updated successfully');
+        this.notificationService.success(this.i18n.t('employeeVacation.success.status_updated'));
         // Update local state
         const currentVacations = this._vacations();
         const updatedVacations = currentVacations.map(v =>
@@ -206,7 +209,7 @@ export class EmployeeVacationsService {
         this._vacations.set(updatedVacations);
       }),
       catchError(error => {
-        const errorMessage = error.error?.message || 'Failed to update vacation status';
+        const errorMessage = error.error?.message || this.i18n.t('employeeVacation.errors.status_toggle_failed');
         this.notificationService.error(errorMessage);
         return throwError(() => error);
       })
@@ -234,7 +237,7 @@ export class EmployeeVacationsService {
         endDate: new Date(item.endDate)
       }))),
       catchError(error => {
-        this.notificationService.error('Failed to load vacation calendar');
+        this.notificationService.error(this.i18n.t('employeeVacation.errors.load_calendar_failed'));
         return throwError(() => error);
       })
     );
@@ -262,8 +265,8 @@ export class EmployeeVacationsService {
           hasConflict: conflictingVacations.length > 0,
           conflictingVacations,
           message: conflictingVacations.length > 0
-            ? `Found ${conflictingVacations.length} overlapping vacation(s)`
-            : 'No conflicts found'
+            ? this.i18n.t('employeeVacation.conflict.found', { count: conflictingVacations.length })
+            : this.i18n.t('employeeVacation.conflict.none')
         };
       })
     );
@@ -376,7 +379,7 @@ export class EmployeeVacationsService {
   getEmployees(): Observable<Array<{id: number, name: string}>> {
     return this.http.get<Array<{id: number, name: string}>>(`${environment.apiUrl}/api/v1/employees/dropdown`).pipe(
       catchError(error => {
-        this.notificationService.error('Failed to load employees');
+        this.notificationService.error(this.i18n.t('employeeVacation.errors.load_employees_failed'));
         return throwError(() => error);
       })
     );
@@ -388,7 +391,7 @@ export class EmployeeVacationsService {
   getVacationTypes(): Observable<Array<{id: number, name: string}>> {
     return this.http.get<Array<{id: number, name: string}>>(`${environment.apiUrl}/api/v1/vacation-types/dropdown`).pipe(
       catchError(error => {
-        this.notificationService.error('Failed to load vacation types');
+        this.notificationService.error(this.i18n.t('employeeVacation.errors.load_vacation_types_failed'));
         return throwError(() => error);
       })
     );
@@ -400,7 +403,7 @@ export class EmployeeVacationsService {
   getBranches(): Observable<Array<{id: number, name: string}>> {
     return this.http.get<Array<{id: number, name: string}>>(`${environment.apiUrl}/api/v1/branches/dropdown`).pipe(
       catchError(error => {
-        this.notificationService.error('Failed to load branches');
+        this.notificationService.error(this.i18n.t('employeeVacation.errors.load_branches_failed'));
         return throwError(() => error);
       })
     );
@@ -412,7 +415,7 @@ export class EmployeeVacationsService {
   getDepartments(): Observable<Array<{id: number, name: string}>> {
     return this.http.get<Array<{id: number, name: string}>>(`${environment.apiUrl}/api/v1/departments/dropdown`).pipe(
       catchError(error => {
-        this.notificationService.error('Failed to load departments');
+        this.notificationService.error(this.i18n.t('employeeVacation.errors.load_departments_failed'));
         return throwError(() => error);
       })
     );
@@ -435,7 +438,7 @@ export class EmployeeVacationsService {
     return this.http.get<{ count: number }>(`${environment.apiUrl}/api/v1/employees/count-preview`, { params }).pipe(
       map(response => response.count),
       catchError(error => {
-        this.notificationService.error('Failed to load employee count preview');
+        this.notificationService.error(this.i18n.t('employeeVacation.errors.load_preview_failed'));
         return throwError(() => error);
       })
     );
@@ -456,7 +459,7 @@ export class EmployeeVacationsService {
       }),
       catchError(error => {
         this._loading.set(false);
-        const errorMessage = error.error?.message || 'Failed to create bulk vacations';
+        const errorMessage = error.error?.message || this.i18n.t('employeeVacation.errors.bulk_create_failed');
         this.notificationService.error(errorMessage);
         return throwError(() => error);
       })

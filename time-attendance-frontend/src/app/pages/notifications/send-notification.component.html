@@ -206,8 +206,8 @@
           <div class="notification-preview">
             <div class="preview-header">
               <i class="fa-solid fa-bell"></i>
-              <span class="preview-app">Time Attendance</span>
-              <span class="preview-time">now</span>
+              <span class="preview-app">{{ t('notifications.preview_app_name') }}</span>
+              <span class="preview-time">{{ t('notifications.preview_time_now') }}</span>
             </div>
             <div class="preview-content">
               <h6 class="preview-title">{{ notificationForm.get('title')?.value || t('notifications.title_placeholder') }}</h6>
@@ -242,10 +242,10 @@
             <div class="summary-item">
               <span class="summary-label">{{ t('notifications.channels') }}</span>
               <span class="summary-value">
-                <i class="fa-solid fa-inbox me-1"></i>In-App
+                <i class="fa-solid fa-inbox me-1"></i>{{ t('notifications.channel_in_app') }}
                 @if (notificationForm.get('sendPush')?.value) {
                   <span class="ms-2">
-                    <i class="fa-solid fa-mobile-alt me-1"></i>Push
+                    <i class="fa-solid fa-mobile-alt me-1"></i>{{ t('notifications.channel_push') }}
                   </span>
                 }
               </span>

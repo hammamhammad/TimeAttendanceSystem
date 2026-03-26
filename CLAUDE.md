@@ -30,7 +30,7 @@ The Time Attendance System is a comprehensive enterprise-grade workforce managem
 - Login attempt tracking and lockout
 
 #### 2. Organization Structure
-- **Branches**: Multi-branch organization support with branch-scoped data
+- **Branches**: Multi-branch organization support with branch-scoped data, GPS geofencing (latitude, longitude, radius)
 - **Departments**: Hierarchical department structure (parent-child relationships)
 - **Employees**: Complete employee lifecycle management
 - **Users**: User accounts with role and branch assignments
@@ -45,6 +45,8 @@ The Time Attendance System is a comprehensive enterprise-grade workforce managem
 - **Approval Workflow**: Multi-step attendance approval process
 - **Finalization**: Lock attendance records after approval
 - **Device Integration**: Support for biometric fingerprint devices
+- **Mobile GPS+NFC Verification**: Dual-verification attendance via geofencing and NFC tag scanning
+- **Attendance Verification Audit**: Full audit trail of all mobile verification attempts (GPS data, NFC data, device info, failure reasons)
 
 #### 4. Shift Management
 - **Shift Types**: Regular, Flexible, Split, Rotating, Night shifts
@@ -109,7 +111,17 @@ The Time Attendance System is a comprehensive enterprise-grade workforce managem
 - **Approvals**: Approve/reject team member requests (for managers)
 - **Team View**: View team members and their hierarchy
 
-#### 10. Fingerprint/Biometric Management
+#### 10. NFC Tag Management & Security
+- **NFC Tags**: Physical NFC tags registered to branches for attendance verification
+- **Tag Lifecycle**: Status tracking (Unregistered, Registered, Active, Disabled, Lost)
+- **HMAC-SHA256 Signing**: Encrypted payload written during provisioning for tamper detection
+- **Payload Format**: `{tagId}|{branchId}|{tagUid}|{timestamp}|{hmacSignature}`
+- **Verification Hash**: SHA256 integrity hash for each tag
+- **Scan Tracking**: Last scan timestamp and scan count per tag
+- **Write Protection**: User audit trail for tag provisioning
+- **Configuration-Driven**: `NfcEncryption:RequirePayload` toggle in appsettings
+
+#### 11. Fingerprint/Biometric Management
 - **Fingerprint Requests**: Employee self-service requests for fingerprint management
 - **Request Types**: Enrollment, Update, Repair, Replacement
 - **Technician Assignment**: Assign technicians to handle requests
@@ -117,7 +129,7 @@ The Time Attendance System is a comprehensive enterprise-grade workforce managem
 - **Preferred Date/Time**: Schedule fingerprint appointments
 - **Technician Notes**: Track technician feedback and resolution
 
-#### 11. Overtime Management
+#### 12. Overtime Management
 - **Overtime Configuration**: Per-branch overtime rules
 - **Regular Overtime**: Standard overtime rate and thresholds
 - **Premium Overtime**: Enhanced overtime for weekends/holidays
@@ -125,14 +137,14 @@ The Time Attendance System is a comprehensive enterprise-grade workforce managem
 - **Automatic Calculation**: Overtime calculated during attendance processing
 - **Approval Requirements**: Optional approval workflow for overtime
 
-#### 12. Public Holidays
+#### 13. Public Holidays
 - **Holiday Management**: Create and manage public holidays
 - **Recurring Holidays**: Support for annual recurring holidays
 - **Branch-Specific**: Different holidays per branch
 - **Attendance Impact**: Automatic marking of attendance on holidays
 - **Bilingual Names**: Holiday names in English and Arabic
 
-#### 13. Dashboards & Analytics
+#### 14. Dashboards & Analytics
 - **Admin Dashboard**: Organization stats, HR stats, attendance stats, leave stats, system health
 - **Employee Dashboard**: Personal attendance, leave balance, recent activity, upcoming vacations
 - **Manager Dashboard**: Team size, pending approvals, team attendance overview
@@ -140,7 +152,7 @@ The Time Attendance System is a comprehensive enterprise-grade workforce managem
 - **Weekly Trends**: Attendance trends over time
 - **Incomplete Records**: Track and highlight incomplete attendance
 
-#### 14. Reporting & Audit
+#### 15. Reporting & Audit
 - **Attendance Reports**: Summary and detailed reports with date range, branch, department filtering
 - **Leave Reports**: Leave summary and breakdown by type
 - **Export to CSV**: Download reports for external analysis
@@ -149,23 +161,25 @@ The Time Attendance System is a comprehensive enterprise-grade workforce managem
 - **Session Reports**: Active sessions and login history
 - **User Activity Tracking**: Track who did what and when
 
-#### 15. System Administration
+#### 16. System Administration
 - **Database Seeding**: Initialize system with sample data
 - **Background Jobs** (using Coravel):
   - Daily attendance generation
-  - Leave accrual calculations
-  - Session cleanup
-  - Report generation
-- **Permission Management**: Manage system permissions
+  - End-of-day attendance finalization
+  - Monthly leave accrual calculations
+  - Workflow timeout processing (hourly)
+- **Permission Management**: Manage system permissions (52 authorization policies)
 - **System Configuration**: Configure system-wide settings
+- **Global Exception Handler**: Centralized error handling middleware with standardized JSON error responses and traceId for debugging
 
-#### 16. Multi-Language Support
-- **Bilingual UI**: Full support for English and Arabic
+#### 17. Multi-Language Support
+- **Bilingual UI**: Full support for English and Arabic (100% translation coverage)
 - **Entity Names**: All entities support bilingual names
-- **RTL Support**: Right-to-left layout for Arabic
-- **Translation Service**: Centralized i18n service
+- **RTL Support**: Full right-to-left layout for Arabic including sidebar, topbar, forms, tables, and all components
+- **Translation Service**: Centralized i18n service with ~2,700+ translation keys per language
+- **Translation Sync**: EN and AR translation files are fully synchronized with zero missing keys
 
-#### 17. Real-Time Notifications (NEW)
+#### 18. Real-Time Notifications
 - **SignalR Hub**: Real-time notification delivery via WebSocket
 - **Notification Types**:
   - RequestSubmitted: Sent when a request is created
@@ -220,9 +234,12 @@ The Time Attendance System is a comprehensive enterprise-grade workforce managem
 - Always run the admin frontend on **http://localhost:4200**
 - Always run the self-service portal on **http://localhost:4201**
 - Both frontends are separate applications that share the same backend API
-- Always use the new Angular template syntax `@if` / `@for` instead of legacy structural directives (`*ngIf`, `*ngFor`)
-- Follow Angular 17+ standalone component patterns
+- **Angular 20**: Always use the modern template syntax `@if` / `@for` / `@switch` instead of legacy structural directives (`*ngIf`, `*ngFor`, `*ngSwitch`). The entire codebase has been migrated - zero legacy directives remain.
+- Follow Angular 20 standalone component patterns
 - Use Angular Signals for reactive state management
+- **All user-facing text must use `i18n.t('key')`** - never hardcode English strings in templates
+- **Component CSS RTL**: Use `:host-context([dir="rtl"])` instead of `:root[dir="rtl"]` for RTL styles in component CSS files (Angular view encapsulation requires this)
+- **CSS Variables**: Use `var(--app-*)` CSS variables from `styles/variables.css` instead of hardcoded hex colors
 
 ---
 
@@ -326,16 +343,60 @@ When creating form pages, **always use**:
 - Use interfaces for complex objects
 
 ### Template Standards
-- Use `@if` and `@for` syntax (Angular 17+)
+- Use `@if`, `@for`, and `@switch` syntax (Angular 20) - **never** use `*ngIf`, `*ngFor`, `*ngSwitch`
 - Use signal accessors with `()`
 - Maintain consistent indentation
-- Use i18n service for all user-facing text: `i18n.t('key')`
+- Use i18n service for all user-facing text: `i18n.t('key')` - never hardcode strings
+- Never use `|| 'Fallback Text'` pattern with i18n - use `i18n.t('key')` for fallbacks too
 
 ### Styling Standards
 - Use Bootstrap 5 utility classes
 - Follow established spacing patterns
 - Maintain responsive design (mobile-first)
 - Use CSS files for component-specific styles
+- **Use CSS variables** from `styles/variables.css` instead of hardcoded hex colors (e.g., `var(--app-success)` not `#198754`)
+- **RTL in component CSS**: Always use `:host-context([dir="rtl"])` selector, never `:root[dir="rtl"]` (Angular encapsulation blocks `:root` selectors)
+- **RTL padding fix**: `<ul>` elements need explicit `padding-right: 0` in RTL (browser default `padding-inline-start` shifts to right)
+- Common CSS variable mappings:
+
+| Hex | CSS Variable |
+|-----|-------------|
+| `#f8f9fa` | `var(--app-gray-100)` |
+| `#e9ecef` | `var(--app-gray-200)` |
+| `#dee2e6` | `var(--app-gray-300)` |
+| `#6c757d` | `var(--app-gray-600)` |
+| `#0d6efd` | `var(--bs-primary)` |
+| `#198754` | `var(--app-success)` |
+| `#dc3545` | `var(--app-danger)` |
+| `#ffc107` | `var(--app-warning)` |
+| `#0dcaf0` | `var(--app-info)` |
+
+### Modern Form Design System (Material Design Floating Labels)
+
+All create/edit forms **must** use the `.app-modern-form` CSS class system. This applies to both the admin frontend and self-service frontend.
+
+**CSS Architecture**:
+- Design tokens: `styles/variables.css` (under `--app-float-*` prefix)
+- Form styles: `styles/components.css` (scoped under `.app-modern-form`)
+- RTL overrides: `styles.css` (under `:root[dir="rtl"] .app-modern-form`)
+
+**How to Apply**:
+1. Add `app-modern-form` class to the outermost container `<div>`
+2. Use `<app-form-section variant="modern">` for section cards
+3. Convert fields by type:
+
+| Field Type | Pattern |
+|---|---|
+| Text/date/password/number input | Wrap in `<div class="form-floating">`, input BEFORE label, add `id` + `placeholder` |
+| Native `<select>` | Wrap in `<div class="form-floating">` with `form-select` class |
+| SearchableSelectComponent | Wrap in `<div class="app-modern-field">` with `<label class="app-modern-label">` |
+| Multi-select / complex controls | `app-modern-field` + `app-modern-label` |
+| Checkboxes / toggles | Keep as-is (enhanced by global CSS) |
+
+4. Move `.invalid-feedback` outside `form-floating`, add `d-block` class
+5. Use `<div class="app-form-actions">` for submit/cancel buttons
+
+**Reference**: See create-employee form for the prototype implementation.
 
 ---
 
@@ -808,6 +869,213 @@ npm run build
 
 ---
 
+## Mobile Application (Flutter)
+
+### Overview
+The Time Attendance System includes a **Flutter mobile application** for employee self-service on iOS and Android devices. This native mobile app provides GPS+NFC verified attendance with biometric authentication.
+
+**Application Location**: `ess_mobile_app/`
+**Platforms**: iOS, Android, Windows, Web
+
+### Key Capabilities
+
+| Feature | Description |
+|---------|-------------|
+| **GPS + NFC Verification** | Dual-verification attendance using geofencing and NFC tags |
+| **Biometric Authentication** | Fingerprint/Face ID login via device biometrics |
+| **Push Notifications** | Firebase Cloud Messaging for real-time alerts |
+| **Multi-Tenant Support** | Organization discovery via subdomain/URL |
+| **Offline Support** | Graceful handling of network failures |
+| **Bilingual UI** | English and Arabic with RTL support |
+
+### Feature Modules
+
+The app has 11 feature modules located in `lib/features/`:
+
+| Module | Description |
+|--------|-------------|
+| `auth/` | Login, biometric authentication |
+| `tenant_discovery/` | Company URL entry, organization discovery |
+| `home/` | Dashboard with quick actions |
+| `attendance/` | GPS+NFC check-in/check-out with dual verification |
+| `leave/` | Leave request management (list, create, detail) |
+| `excuse/` | Excuse request management (list, create, detail) |
+| `remote_work/` | Remote work requests (list, create, detail) |
+| `notifications/` | Push & in-app notifications |
+| `profile/` | User profile management |
+| `schedule/` | Work schedule viewing |
+| `admin/` | Admin dashboard, NFC tag management, notification broadcasts, branch management |
+
+### Navigation Structure
+
+The app uses a **ShellRoute** with bottom navigation:
+
+| Nav Item | Screen | Description |
+|----------|--------|-------------|
+| Home | HomeScreen | Dashboard with quick actions |
+| Attendance | AttendanceScreen | GPS+NFC check-in/check-out |
+| Requests | (Hub) | Consolidates Leave, Excuses, Remote Work requests |
+| Notifications | NotificationsScreen | Push & in-app notifications |
+| Profile | ProfileScreen | User profile and settings |
+
+**Role-Based Access:**
+- **All Employees**: Home, Attendance, Requests (Leave, Excuses, Remote Work), Notifications, Profile, Schedule
+- **Managers**: Additional access to Manager Dashboard, Team Members, Pending Approvals
+- **Admins**: Additional access to Admin Dashboard, NFC Tag Management, Notification Broadcasts, Branch Management
+
+### Project Structure
+
+```
+ess_mobile_app/
+├── lib/
+│   ├── main.dart                 # App entry point
+│   ├── app/
+│   │   ├── app.dart              # MaterialApp configuration
+│   │   └── router.dart           # GoRouter with ShellRoute navigation
+│   ├── core/
+│   │   ├── config/               # App configuration constants
+│   │   ├── network/              # Dio client, Retrofit API service, auth interceptor
+│   │   ├── storage/              # Secure storage service
+│   │   ├── theme/                # App theme & colors (app_theme.dart)
+│   │   └── l10n/                 # Localization (app_localizations.dart)
+│   ├── features/                 # Feature modules (11 total)
+│   └── shared/
+│       ├── models/               # Shared data models (Freezed + JSON serializable)
+│       ├── providers/            # Global Riverpod providers (13 providers)
+│       ├── services/             # Push notification service
+│       └── widgets/              # Reusable widgets (stats_card, etc.)
+├── assets/                       # Images, icons, translations
+├── android/                      # Android-specific configuration
+├── ios/                          # iOS-specific configuration
+└── pubspec.yaml                  # Dependencies
+```
+
+### Riverpod Providers
+
+| Provider | Purpose |
+|----------|---------|
+| `attendance_history_provider` | Attendance record history |
+| `schedule_provider` | Work schedule data |
+| `excuse_provider` | Excuse request management |
+| `leave_provider` | Leave request management |
+| `remote_work_provider` | Remote work request management |
+| `notification_provider` | In-app notification management |
+| `admin_dashboard_provider` | Admin statistics and data |
+| `branch_admin_provider` | Branch management for admins |
+| `broadcast_provider` | Notification broadcast for admins |
+| `nfc_tag_admin_provider` | NFC tag management for admins |
+
+### Architecture
+
+The app follows **Clean Architecture** with **Riverpod** for state management:
+
+- **Presentation Layer**: UI widgets, screens, controllers
+- **Domain Layer**: Business logic, use cases
+- **Data Layer**: API clients (Retrofit), repositories, data sources
+
+**Key Dependencies**:
+- `flutter_riverpod` - State management
+- `go_router` - Navigation
+- `dio` + `retrofit` - HTTP client
+- `flutter_secure_storage` - Secure token storage
+- `location` - GPS tracking
+- `nfc_manager` - NFC tag reading
+- `local_auth` - Biometric authentication
+- `firebase_messaging` - Push notifications
+
+### Mobile-Specific API Endpoints
+
+| Feature | Endpoint |
+|---------|----------|
+| Tenant Discovery | `GET /api/v1/tenants/discover` |
+| Login | `POST /api/v1/auth/login` |
+| Check-In/Out | `POST /api/v1/mobile/attendance/transaction` |
+| Location Check | `POST /api/v1/mobile/attendance/check-location` |
+| Push Token | `POST /api/v1/push-tokens/register` |
+| Notifications | `GET /api/v1/notifications` |
+
+### Development Commands
+
+```bash
+# Navigate to mobile app directory
+cd ess_mobile_app
+
+# Install dependencies
+flutter pub get
+
+# Generate code (Riverpod, Freezed, Retrofit)
+flutter pub run build_runner build --delete-conflicting-outputs
+
+# Run on connected device/emulator
+flutter run
+
+# Build debug APK
+flutter build apk --debug
+
+# Build release APK
+flutter build apk --release
+
+# Build iOS (requires Mac)
+flutter build ios
+```
+
+### Android Permissions
+
+The AndroidManifest.xml includes comprehensive permissions for:
+- **NFC**: `android.permission.NFC` - NFC tag reading for attendance
+- **GPS/Location**: `ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION`, `ACCESS_BACKGROUND_LOCATION` - Geofence verification
+- **Biometric**: `USE_BIOMETRIC`, `USE_FINGERPRINT` - Biometric authentication
+- **Camera**: `android.permission.CAMERA` - Document scanning
+- **Vibration**: `android.permission.VIBRATE` - Haptic feedback
+- **Internet**: `android.permission.INTERNET` - API communication
+
+**App Label**: `ClockN ESS` (configured in AndroidManifest.xml)
+
+### Theme Customization
+
+Colors and theme are defined in `lib/core/theme/app_theme.dart`:
+
+```dart
+class AppColors {
+  static const Color primary = Color(0xFFA8A4CE);      // ClockN Lavender Purple
+  static const Color secondary = Color(0xFF5C6670);   // ClockN Blue-Gray
+  static const Color accent = Color(0xFFE5DD7A);      // ClockN Soft Gold
+  // ... additional colors
+}
+```
+
+### Firebase Setup
+
+For push notifications, configure Firebase:
+
+1. Add `google-services.json` to `android/app/`
+2. Add `GoogleService-Info.plist` to `ios/Runner/`
+3. Configure Firebase project with your app's package name
+
+### Best Practices for Mobile Development
+
+1. **Always Test on Real Devices**
+   - GPS and NFC require real hardware
+   - Test biometric auth on physical devices
+   - Verify push notifications work end-to-end
+
+2. **Handle Permissions Gracefully**
+   - Request location permission before check-in
+   - Handle permission denial with clear messaging
+   - Provide settings deep-link for re-enabling
+
+3. **Optimize for Battery**
+   - Use location only when needed
+   - Batch API requests when possible
+   - Avoid background location tracking
+
+4. **Security Considerations**
+   - Store tokens in secure storage (not SharedPreferences)
+   - Use biometric auth for sensitive operations
+   - Clear credentials on logout
+
+---
+
 ## Admin Frontend Application
 
 ### Overview
@@ -985,7 +1253,7 @@ time-attendance-frontend/
 
 ## Backend API Architecture
 
-### Controllers (29 total)
+### Controllers (35 total)
 
 #### Core Management
 - **AuthController** - Authentication (login, logout, 2FA, password management)
@@ -998,6 +1266,7 @@ time-attendance-frontend/
 
 #### Time & Attendance
 - **AttendanceController** - Attendance records management
+- **AttendanceCorrectionRequestsController** - Attendance correction requests
 - **ShiftsController** - Shift configuration
 - **ShiftAssignmentsController** - Shift assignments
 
@@ -1013,8 +1282,16 @@ time-attendance-frontend/
 - **RemoteWorkPoliciesController** - Remote work policy configuration
 
 #### Self-Service Portal
-- **PortalController** - Employee self-service dashboard and features
+- **PortalController** - Employee self-service dashboard and features (largest controller, 2300+ lines)
 - **NotificationsController** - In-app notification management
+- **NotificationBroadcastsController** - Admin broadcast notifications
+
+#### Mobile
+- **MobileAttendanceController** - GPS+NFC mobile check-in/check-out
+- **MobileScheduleController** - Mobile schedule viewing
+- **PushTokensController** - Firebase push notification token management
+- **NfcTagsController** - NFC tag management for attendance verification
+- **TenantsController** - Multi-tenant discovery for mobile app
 
 #### Workflows & Approvals
 - **ApprovalsController** - Approval actions
@@ -1049,7 +1326,7 @@ time-attendance-frontend/
 - PasswordHistory, LoginAttempt, TwoFactorBackupCode
 
 #### Time & Attendance
-- AttendanceRecord, AttendanceTransaction, WorkingDay
+- AttendanceRecord, AttendanceTransaction, WorkingDay, AttendanceVerificationLog
 
 #### Leave Management
 - VacationType, EmployeeVacation, LeaveBalance
@@ -1064,8 +1341,8 @@ time-attendance-frontend/
 #### Remote Work
 - RemoteWorkPolicy, RemoteWorkRequest
 
-#### Biometric
-- FingerprintRequest
+#### Biometric & NFC
+- FingerprintRequest, NfcTag (with EncryptedPayload, VerificationHash, Status, ScanCount)
 
 #### Configuration
 - PublicHoliday, OvertimeConfiguration
@@ -1089,12 +1366,19 @@ time-attendance-frontend/
 - LeaveAccrualService
 - InAppNotificationService
 - ChangeTrackingService
+- NfcTagEncryptionService (HMAC-SHA256 payload signing/verification)
 
 ### Background Jobs (Coravel)
-- Daily attendance generation
-- Leave accrual calculations
-- Session cleanup
-- Report generation
+- `DailyAttendanceGenerationJob` - Daily at 2:00 AM
+- `EndOfDayAttendanceFinalizationJob` - Daily at 11:59 PM
+- `MonthlyLeaveAccrualJob` - Monthly on 1st at 1:00 AM UTC
+- `WorkflowTimeoutProcessingJob` - Hourly
+
+### Middleware Pipeline
+- CORS → Global Exception Handler → Rate Limiting → Localization → Authentication → Authorization → Routing → SignalR Hub
+- **Global Exception Handler**: `src/Api/TimeAttendanceSystem.Api/Middleware/GlobalExceptionHandlerMiddleware.cs`
+  - Maps `ValidationException` → 400, `UnauthorizedAccessException` → 401, `NotFoundException` → 404, others → 500
+  - Returns JSON: `{ statusCode, message, traceId, detail?, stackTrace? }` (detail/stackTrace only in Development)
 
 ---
 
@@ -1110,6 +1394,26 @@ When working with attendance:
 - Apply grace periods before marking as late
 - Calculate both regular and premium overtime
 - Track manual overrides separately from automated calculations
+
+### Mobile Attendance Verification Features
+When working with mobile GPS+NFC attendance:
+- **Dual Verification**: GPS geofence check AND NFC tag validation required
+- **Geofence Calculation**: Uses Haversine formula to calculate distance from branch coordinates
+- **NFC Tag Validation**: Verify tag UID is registered and active for the branch
+- **HMAC Payload Verification**: Validate HMAC-SHA256 signed payload if `RequirePayload` is enabled
+- **Audit Every Attempt**: Log all verification attempts (success and failure) to `AttendanceVerificationLogs`
+- **Failure Reason Classification**: Use specific enum values:
+  - `GpsOutsideGeofence` - Employee too far from branch
+  - `NfcTagMismatch` - Scanned tag not registered to branch
+  - `NfcTagNotRegistered` - Tag UID not in system
+  - `NfcTagInactive` - Tag exists but deactivated
+  - `BranchNotConfigured` - GPS/NFC not configured for branch
+  - `GpsUnavailable` - Device location unavailable
+  - `NfcPayloadInvalid` - Missing/malformed NFC payload
+  - `NfcPayloadTampering` - HMAC signature verification failed
+- **Device Tracking**: Capture device ID, model, platform, and app version
+- **Timezone Awareness**: Convert UTC to branch local time for transaction timestamps
+- **Configuration**: NFC encryption settings in `appsettings.json` under `NfcEncryption` section
 
 ### Leave Management Features
 When working with leave/vacation features:
@@ -1272,6 +1576,19 @@ public class EmployeeDto
 - Use role-based and permission-based authorization
 - Implement branch-scoped data access
 
+### NFC Tag Security
+- HMAC-SHA256 signed payloads for tamper detection on NFC tags
+- Configuration in `appsettings.json`:
+  ```json
+  "NfcEncryption": {
+    "SecretKey": "your-hmac-secret-key",
+    "RequirePayload": false
+  }
+  ```
+- `RequirePayload: false` allows graceful degradation (NFC UID-only verification)
+- `RequirePayload: true` enforces full payload signature verification
+- Payload verification service registered in DI via `DependencyInjection.cs`
+
 ### Data Security
 - Hash passwords using strong algorithms
 - Store password history to prevent reuse
@@ -1285,9 +1602,10 @@ public class EmployeeDto
 - Validate all inputs
 - Implement rate limiting
 - Use HTTPS in production
-- Set proper CORS policies
+- Set proper CORS policies (configured for localhost:4200, 4201, 4202)
 - Implement request/response logging
-- Handle errors without exposing sensitive info
+- **Global Exception Handler**: `GlobalExceptionHandlerMiddleware` catches all unhandled exceptions and returns standardized JSON responses with `statusCode`, `message`, and `traceId`. In Development mode, includes `detail` and `stackTrace`. Registered in `Program.cs` before `UseRouting`.
+- Handle errors without exposing sensitive info (no stack traces in production)
 
 ---
 
@@ -1303,11 +1621,11 @@ public class EmployeeDto
 - Optimize database indexes
 
 ### Frontend Performance
-- Use lazy loading for routes
+- Use lazy loading for routes (all routes use lazy loading)
 - Implement virtual scrolling for long lists
 - Use OnPush change detection strategy
 - Unsubscribe from observables
-- Use trackBy functions in *ngFor loops
+- Use `track` expression in `@for` loops (e.g., `@for (item of items; track item.id)`)
 - Optimize bundle size
 - Use Angular signals for reactive state
 
@@ -1353,6 +1671,9 @@ public class EmployeeDto
 - [ ] Test permission restrictions
 - [ ] Test data filtering and pagination
 - [ ] Test real-time notifications
+- [ ] Test mobile GPS+NFC attendance on real device
+- [ ] Test NFC tag scanning and HMAC verification
+- [ ] Test geofence boundary (inside and outside radius)
 
 ---
 
@@ -1366,6 +1687,12 @@ public class EmployeeDto
 - Use Coravel for background jobs
 - **See "Running the Complete System" section for detailed startup instructions**
 
+### Production Environment
+- **Backend API + DB**: Ubuntu 24.04 LTS at `https://api.clockn.net`
+- **Admin Frontend**: Cloudflare Pages at `https://www.clockn.net`
+- **Self-Service Portal**: Cloudflare Pages at `https://portal.clockn.net`
+- **Mobile App**: Flutter (iOS/Android) connecting to `https://api.clockn.net`
+
 ### Production Considerations
 - Use environment-specific configurations
 - Configure HTTPS and SSL certificates
@@ -1373,7 +1700,7 @@ public class EmployeeDto
 - Configure logging and monitoring
 - Set up error tracking
 - Use production-optimized builds
-- Configure CDN for static assets
+- Configure CDN for static assets (Cloudflare Pages for frontends)
 - Set up database migrations pipeline
 - Configure branch-specific settings
 - Review and set CORS policies
@@ -1420,6 +1747,13 @@ When adding a new feature:
 - **Translation errors**: Ensure translation keys exist in both languages
 - **SignalR not connecting**: Check WebSocket support, verify authentication token
 
+#### Mobile App Issues
+- **NFC not working**: Verify NFC permission in AndroidManifest, test on real device (emulators don't support NFC)
+- **GPS verification failing**: Check branch has `Latitude`, `Longitude`, and `GeofenceRadiusMeters` configured
+- **HMAC payload error**: Check `NfcEncryption:SecretKey` in appsettings matches the key used during tag provisioning
+- **Tenant discovery fails**: Ensure `/api/v1/tenants/discover` endpoint is accessible and CORS allows mobile origin
+- **Push notifications**: Verify Firebase `google-services.json` (Android) / `GoogleService-Info.plist` (iOS) are configured
+
 #### Common Mistakes to Avoid
 - Forgetting to validate leave balances before approval
 - Not recalculating attendance after shift changes
@@ -1431,6 +1765,9 @@ When adding a new feature:
 - Missing pagination on large datasets
 - Not testing with different user roles
 - Not sending notifications for workflow events
+- Not logging failed verification attempts to `AttendanceVerificationLogs`
+- Not configuring branch GPS coordinates before enabling mobile attendance
+- Forgetting timezone conversion for mobile transaction timestamps
 
 ---
 
@@ -1633,6 +1970,25 @@ npm start
 npm run build
 ```
 
+#### Mobile App (Flutter)
+```bash
+# Navigate to mobile app
+cd ess_mobile_app
+
+# Install dependencies
+flutter pub get
+
+# Generate code (Riverpod, Freezed, Retrofit)
+flutter pub run build_runner build --delete-conflicting-outputs
+
+# Run on device/emulator
+flutter run
+
+# Build APK
+flutter build apk --debug
+flutter build apk --release
+```
+
 ### Running the Complete System
 
 To run and test the entire Time Attendance System, you need to start all three applications:
@@ -1704,6 +2060,7 @@ npm start
 | **Backend API** | http://localhost:5099 | 5099 | RESTful API, SignalR Hub, Authentication, Business Logic |
 | **Admin Portal** | http://localhost:4200 | 4200 | Full system management for HR/Admins |
 | **Self-Service Portal** | http://localhost:4201 | 4201 | Employee self-service and manager approvals |
+| **Mobile App** | Device/Emulator | N/A | Flutter app for GPS+NFC attendance (see `ess_mobile_app/`) |
 
 #### Default Login Credentials
 
@@ -1721,7 +2078,7 @@ npm start
 - **Total**: 50 employees across 5 branches and 20 departments
 
 #### Quick Testing Checklist
-Once all three applications are running:
+Once all applications are running:
 - [ ] Backend: Visit http://localhost:5099/swagger to see API documentation
 - [ ] Admin Portal: Log in at http://localhost:4200 with systemadmin credentials
 - [ ] Self-Service Portal: Log in at http://localhost:4201 with employee credentials (e.g., `salma.khaldi` / `Emp@123!`)
@@ -1731,6 +2088,7 @@ Once all three applications are running:
 - [ ] Test manager features: Log in as department manager (e.g., `sara.fahad`) and approve requests
 - [ ] Test hierarchy: Verify managers can see their team members and pending approvals
 - [ ] Test notifications: Verify real-time notifications appear after request submission/approval
+- [ ] Mobile App: Test tenant discovery, login, GPS+NFC check-in on real device
 
 #### Troubleshooting Startup Issues
 - **Backend won't start**: Check PostgreSQL connection, review appsettings.json
@@ -1752,11 +2110,15 @@ Once all three applications are running:
 - Repositories: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/Repositories/`
 - DTOs: `src/Application/TimeAttendanceSystem.Application/` (within feature folders)
 - Background Jobs: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/BackgroundJobs/`
+- Middleware: `src/Api/TimeAttendanceSystem.Api/Middleware/` (GlobalExceptionHandlerMiddleware)
 
 #### Frontend (Admin)
 - Pages: `time-attendance-frontend/src/app/pages/`
-- Shared Components: `time-attendance-frontend/src/app/shared/components/`
+- Shared Components: `time-attendance-frontend/src/app/shared/components/` (29 components)
 - Core Services: `time-attendance-frontend/src/app/core/services/`
+- i18n Translations: `time-attendance-frontend/src/app/core/i18n/translations/` (en.json, ar.json)
+- CSS Design System: `time-attendance-frontend/src/styles/` (variables.css, components.css, utilities.css, patterns.css)
+- Layout Components: `time-attendance-frontend/src/app/layout/` (sidenav, topbar, layout)
 - Models: `time-attendance-frontend/src/app/shared/models/`
 - Guards: `time-attendance-frontend/src/app/core/guards/`
 
@@ -1764,7 +2126,18 @@ Once all three applications are running:
 - Portal Pages: `time-attendance-selfservice-frontend/src/app/pages/portal/`
 - Portal Service: `time-attendance-selfservice-frontend/src/app/pages/portal/services/portal.service.ts`
 - Portal Models: `time-attendance-selfservice-frontend/src/app/pages/portal/models/`
-- Shared: `time-attendance-selfservice-frontend/src/app/shared/`
+- i18n Translations: `time-attendance-selfservice-frontend/src/app/core/i18n/translations/` (en.json, ar.json)
+- Shared Components: `time-attendance-selfservice-frontend/src/app/shared/components/` (27 components)
+
+#### Mobile App (Flutter)
+- Router: `ess_mobile_app/lib/app/router.dart`
+- API Service: `ess_mobile_app/lib/core/network/api_service.dart` (Retrofit)
+- Auth Interceptor: `ess_mobile_app/lib/core/network/auth_interceptor.dart`
+- Theme: `ess_mobile_app/lib/core/theme/app_theme.dart`
+- Feature Screens: `ess_mobile_app/lib/features/*/presentation/`
+- Shared Models: `ess_mobile_app/lib/shared/models/` (Freezed models)
+- Riverpod Providers: `ess_mobile_app/lib/shared/providers/`
+- Push Notifications: `ess_mobile_app/lib/shared/services/push_notification_service.dart`
 
 ---
 
@@ -1797,5 +2170,5 @@ Once all three applications are running:
 
 ---
 
-**Last Updated**: January 10, 2026
-**Version**: 4.0 - Added Real-Time Notifications, Updated Self-Service Portal, Complete API Documentation
+**Last Updated**: March 26, 2026
+**Version**: 6.0 - Mobile GPS+NFC dual-verification attendance, NFC tag security (HMAC-SHA256 payload signing), AttendanceVerificationLog audit system, expanded Flutter mobile app (excuse/remote work/schedule/admin/manager features), ShellRoute navigation, Riverpod providers (13 total), Android NFC/GPS/Biometric permissions, production deployment (api.clockn.net / www.clockn.net / portal.clockn.net via Cloudflare Pages), NfcEncryption configuration section

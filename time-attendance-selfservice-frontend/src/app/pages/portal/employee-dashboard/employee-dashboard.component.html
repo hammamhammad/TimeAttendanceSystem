@@ -154,7 +154,7 @@
                               <i class="bi bi-box-arrow-up-right ms-1 small text-muted"></i>
                             }
                           </h6>
-                          <p class="activity-description mb-1 text-muted">{{ activity.description }}</p>
+                          <p class="activity-description mb-1 text-muted">{{ getLocalizedDescription(activity) }}</p>
                         </div>
                         <span [class]="getActivityBadgeClass(activity)" class="ms-2">
                           {{ getActivityVariantLabel(activity.variant, activity.type) }}

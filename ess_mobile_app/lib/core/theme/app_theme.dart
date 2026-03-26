@@ -4,15 +4,20 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
   
-  // Primary colors
-  static const Color primary = Color(0xFF2563EB);
-  static const Color primaryLight = Color(0xFF3B82F6);
-  static const Color primaryDark = Color(0xFF1D4ED8);
-  
-  // Secondary colors
-  static const Color secondary = Color(0xFF7C3AED);
-  static const Color secondaryLight = Color(0xFF8B5CF6);
-  static const Color secondaryDark = Color(0xFF6D28D9);
+  // Primary colors - ClockN Brand
+  static const Color primary = Color(0xFF9D99EA);       // ClockN Purple
+  static const Color primaryLight = Color(0xFFB5B2EF);
+  static const Color primaryDark = Color(0xFF7B76D2);
+
+  // Secondary colors - ClockN Brand
+  static const Color secondary = Color(0xFF747A90);     // ClockN Blue-Gray
+  static const Color secondaryLight = Color(0xFF8E94A8);
+  static const Color secondaryDark = Color(0xFF5A5F72);
+
+  // Accent color - ClockN Brand
+  static const Color accent = Color(0xFFE1DD8B);        // ClockN Soft Gold
+  static const Color accentLight = Color(0xFFEAE7A5);
+  static const Color accentDark = Color(0xFFD4CF6D);
   
   // Success colors
   static const Color success = Color(0xFF10B981);
@@ -42,6 +47,11 @@ class AppColors {
   static const Color textTertiary = Color(0xFF94A3B8);
   static const Color textOnPrimary = Color(0xFFFFFFFF);
   
+  // Semantic aliases
+  static const Color info = Color(0xFF3B82F6);         // Blue for informational
+  static const Color divider = Color(0xFFE2E8F0);      // Same as outlineVariant
+  static const Color border = Color(0xFFCBD5E1);       // Same as outline
+
   // Dark theme colors
   static const Color backgroundDark = Color(0xFF0F172A);
   static const Color surfaceDark = Color(0xFF1E293B);
@@ -89,7 +99,7 @@ class AppTheme {
       ),
       
       // Cards
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: AppColors.surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
@@ -253,7 +263,7 @@ class AppTheme {
         centerTitle: true,
       ),
       
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: AppColors.surfaceDark,
         elevation: 0,
         shape: RoundedRectangleBorder(

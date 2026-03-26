@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using TimeAttendanceSystem.Application.Abstractions;
 using TimeAttendanceSystem.Application.Common;
 using TimeAttendanceSystem.Application.Workflows.Services;
@@ -19,17 +20,20 @@ public class CreateEmployeeVacationCommandHandler : IRequestHandler<CreateEmploy
     private readonly IWorkflowEngine _workflowEngine;
     private readonly ICurrentUser _currentUser;
     private readonly ILeaveAccrualService _leaveAccrualService;
+    private readonly ILogger<CreateEmployeeVacationCommandHandler> _logger;
 
     public CreateEmployeeVacationCommandHandler(
         IApplicationDbContext context,
         IWorkflowEngine workflowEngine,
         ICurrentUser currentUser,
-        ILeaveAccrualService leaveAccrualService)
+        ILeaveAccrualService leaveAccrualService,
+        ILogger<CreateEmployeeVacationCommandHandler> logger)
     {
         _context = context;
         _workflowEngine = workflowEngine;
         _currentUser = currentUser;
         _leaveAccrualService = leaveAccrualService;
+        _logger = logger;
     }
 
     /// <summary>
@@ -292,11 +296,12 @@ public class CreateEmployeeVacationCommandHandler : IRequestHandler<CreateEmploy
             // Save attendance record changes
             await _context.SaveChangesAsync(cancellationToken);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             // Log error but don't fail the vacation creation
             // Attendance integration is secondary to vacation creation
-            // TODO: Add proper logging here
+            _logger.LogError(ex, "Failed to update attendance records for vacation {VacationId}, employee {EmployeeId} ({StartDate} - {EndDate})",
+                vacation.Id, vacation.EmployeeId, vacation.StartDate, vacation.EndDate);
         }
     }
 }

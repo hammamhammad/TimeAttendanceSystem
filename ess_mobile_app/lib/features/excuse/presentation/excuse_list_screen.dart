@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/l10n/app_localizations.dart';
 import '../../../shared/models/excuse_model.dart';
 import '../../../shared/providers/excuse_provider.dart';
+import '../../../shared/providers/dashboard_provider.dart';
 import '../../../shared/widgets/widgets.dart';
 
 /// Screen for managing excuse requests.
@@ -44,6 +46,10 @@ class _ExcuseListScreenState extends ConsumerState<ExcuseListScreen>
     
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.pop(),
+        ),
         title: const Text('Excuses'),
         bottom: TabBar(
           controller: _tabController,
@@ -84,7 +90,7 @@ class _ExcuseListScreenState extends ConsumerState<ExcuseListScreen>
         icon: Icons.assignment_outlined,
       );
     }
-    
+
     return RefreshIndicator(
       onRefresh: () => ref.read(excuseNotifierProvider.notifier).loadExcuses(),
       child: ListView.builder(
@@ -96,6 +102,7 @@ class _ExcuseListScreenState extends ConsumerState<ExcuseListScreen>
             excuse: excuse,
             showCancel: showCancel,
             onCancel: () => _cancelExcuse(excuse.id),
+            onEdit: () => _showEditExcuseSheet(context, excuse),
           );
         },
       ),
@@ -110,6 +117,17 @@ class _ExcuseListScreenState extends ConsumerState<ExcuseListScreen>
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) => const _CreateExcuseSheet(),
+    );
+  }
+
+  void _showEditExcuseSheet(BuildContext context, ExcuseRequest excuse) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => _EditExcuseSheet(excuse: excuse),
     );
   }
   
@@ -143,11 +161,13 @@ class _ExcuseCard extends StatelessWidget {
   final ExcuseRequest excuse;
   final bool showCancel;
   final VoidCallback? onCancel;
-  
+  final VoidCallback? onEdit;
+
   const _ExcuseCard({
     required this.excuse,
     this.showCancel = false,
     this.onCancel,
+    this.onEdit,
   });
 
   @override
@@ -247,16 +267,32 @@ class _ExcuseCard extends StatelessWidget {
             ],
             if (showCancel) ...[
               const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: onCancel,
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.error,
-                    side: BorderSide(color: AppColors.error),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: onEdit,
+                      icon: const Icon(Icons.edit, size: 18),
+                      label: const Text('Edit'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.primary,
+                        side: BorderSide(color: AppColors.primary),
+                      ),
+                    ),
                   ),
-                  child: const Text('Cancel Request'),
-                ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: onCancel,
+                      icon: const Icon(Icons.close, size: 18),
+                      label: const Text('Cancel'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.error,
+                        side: BorderSide(color: AppColors.error),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ],
@@ -264,30 +300,22 @@ class _ExcuseCard extends StatelessWidget {
       ),
     );
   }
-  
+
   Color _getTypeColor(ExcuseType type) {
     switch (type) {
-      case ExcuseType.lateArrival:
+      case ExcuseType.personalExcuse:
         return AppColors.warning;
-      case ExcuseType.earlyDeparture:
+      case ExcuseType.officialDuty:
         return AppColors.info;
-      case ExcuseType.missedPunch:
-        return AppColors.error;
-      case ExcuseType.other:
-        return AppColors.textSecondary;
     }
   }
-  
+
   String _getTypeName(ExcuseType type) {
     switch (type) {
-      case ExcuseType.lateArrival:
-        return 'Late Arrival';
-      case ExcuseType.earlyDeparture:
-        return 'Early Departure';
-      case ExcuseType.missedPunch:
-        return 'Missed Punch';
-      case ExcuseType.other:
-        return 'Other';
+      case ExcuseType.personalExcuse:
+        return 'Personal Excuse';
+      case ExcuseType.officialDuty:
+        return 'Official Duty';
     }
   }
   
@@ -323,15 +351,21 @@ class _CreateExcuseSheet extends ConsumerStatefulWidget {
 }
 
 class _CreateExcuseSheetState extends ConsumerState<_CreateExcuseSheet> {
-  ExcuseType _selectedType = ExcuseType.lateArrival;
+  ExcuseType _selectedType = ExcuseType.personalExcuse;
   DateTime _selectedDate = DateTime.now();
+  TimeOfDay _startTime = const TimeOfDay(hour: 9, minute: 0);
+  TimeOfDay _endTime = const TimeOfDay(hour: 10, minute: 0);
   final _reasonController = TextEditingController();
   bool _isSubmitting = false;
-  
+
   @override
   void dispose() {
     _reasonController.dispose();
     super.dispose();
+  }
+
+  String _formatTime(TimeOfDay time) {
+    return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
   }
 
   @override
@@ -343,85 +377,127 @@ class _CreateExcuseSheetState extends ConsumerState<_CreateExcuseSheet> {
         top: 24,
         bottom: MediaQuery.of(context).viewInsets.bottom + 24,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Request Excuse',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              IconButton(
-                onPressed: () => Navigator.pop(context),
-                icon: const Icon(Icons.close),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          
-          // Type dropdown
-          AppDropdown<ExcuseType>(
-            label: 'Excuse Type',
-            value: _selectedType,
-            items: ExcuseType.values.map((type) {
-              return DropdownMenuItem(
-                value: type,
-                child: Text(_getTypeName(type)),
-              );
-            }).toList(),
-            onChanged: (value) {
-              if (value != null) setState(() => _selectedType = value);
-            },
-          ),
-          const SizedBox(height: 16),
-          
-          // Date picker
-          AppDateField(
-            label: 'Date',
-            value: _selectedDate,
-            firstDate: DateTime.now().subtract(const Duration(days: 30)),
-            lastDate: DateTime.now(),
-            onChanged: (date) => setState(() => _selectedDate = date),
-          ),
-          const SizedBox(height: 16),
-          
-          // Reason
-          AppTextField(
-            controller: _reasonController,
-            label: 'Reason',
-            hint: 'Explain your reason...',
-            maxLines: 3,
-          ),
-          const SizedBox(height: 24),
-          
-          // Submit button
-          AppButton(
-            label: 'Submit Request',
-            width: double.infinity,
-            isLoading: _isSubmitting,
-            onPressed: _submit,
-          ),
-        ],
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Request Excuse',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.close),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+
+            // Type dropdown
+            AppDropdown<ExcuseType>(
+              label: 'Excuse Type',
+              value: _selectedType,
+              items: ExcuseType.values.map((type) {
+                return DropdownMenuItem(
+                  value: type,
+                  child: Text(_getTypeName(type)),
+                );
+              }).toList(),
+              onChanged: (value) {
+                if (value != null) setState(() => _selectedType = value);
+              },
+            ),
+            const SizedBox(height: 16),
+
+            // Date picker
+            AppDateField(
+              label: 'Date',
+              value: _selectedDate,
+              firstDate: DateTime.now().subtract(const Duration(days: 30)),
+              lastDate: DateTime.now(),
+              onChanged: (date) => setState(() => _selectedDate = date),
+            ),
+            const SizedBox(height: 16),
+
+            // Start time
+            Row(
+              children: [
+                Expanded(
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.access_time),
+                    title: Text('Start: ${_formatTime(_startTime)}'),
+                    tileColor: AppColors.surfaceVariant,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    onTap: () async {
+                      final time = await showTimePicker(
+                        context: context,
+                        initialTime: _startTime,
+                      );
+                      if (time != null) setState(() => _startTime = time);
+                    },
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.access_time),
+                    title: Text('End: ${_formatTime(_endTime)}'),
+                    tileColor: AppColors.surfaceVariant,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    onTap: () async {
+                      final time = await showTimePicker(
+                        context: context,
+                        initialTime: _endTime,
+                      );
+                      if (time != null) setState(() => _endTime = time);
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // Reason
+            AppTextField(
+              controller: _reasonController,
+              label: 'Reason',
+              hint: 'Explain your reason...',
+              maxLines: 3,
+            ),
+            const SizedBox(height: 24),
+
+            // Submit button
+            AppButton(
+              label: 'Submit Request',
+              width: double.infinity,
+              isLoading: _isSubmitting,
+              onPressed: _submit,
+            ),
+          ],
+        ),
       ),
     );
   }
-  
+
   String _getTypeName(ExcuseType type) {
     switch (type) {
-      case ExcuseType.lateArrival:
-        return 'Late Arrival';
-      case ExcuseType.earlyDeparture:
-        return 'Early Departure';
-      case ExcuseType.missedPunch:
-        return 'Missed Punch';
-      case ExcuseType.other:
-        return 'Other';
+      case ExcuseType.personalExcuse:
+        return 'Personal Excuse';
+      case ExcuseType.officialDuty:
+        return 'Official Duty';
     }
   }
-  
+
   Future<void> _submit() async {
     if (_reasonController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -429,22 +505,259 @@ class _CreateExcuseSheetState extends ConsumerState<_CreateExcuseSheet> {
       );
       return;
     }
-    
+
+    final dashboardState = ref.read(dashboardNotifierProvider);
+    final employeeId = dashboardState.data?.employeeId;
+    if (employeeId == null || employeeId == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Employee data not loaded. Please try again.')),
+      );
+      return;
+    }
+
     setState(() => _isSubmitting = true);
-    
+
     final success = await ref.read(excuseNotifierProvider.notifier).createExcuse(
+      employeeId: employeeId,
       type: _selectedType,
       excuseDate: _selectedDate,
       reason: _reasonController.text,
+      startTime: _formatTime(_startTime),
+      endTime: _formatTime(_endTime),
     );
-    
+
     setState(() => _isSubmitting = false);
-    
+
     if (success && mounted) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Excuse request submitted'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
+  }
+}
+
+/// Edit excuse bottom sheet.
+class _EditExcuseSheet extends ConsumerStatefulWidget {
+  final ExcuseRequest excuse;
+
+  const _EditExcuseSheet({required this.excuse});
+
+  @override
+  ConsumerState<_EditExcuseSheet> createState() => _EditExcuseSheetState();
+}
+
+class _EditExcuseSheetState extends ConsumerState<_EditExcuseSheet> {
+  late ExcuseType _selectedType;
+  late DateTime _selectedDate;
+  late TimeOfDay _startTime;
+  late TimeOfDay _endTime;
+  final _reasonController = TextEditingController();
+  bool _isSubmitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Pre-populate with existing excuse data
+    _selectedType = widget.excuse.type;
+    _selectedDate = widget.excuse.excuseDate;
+    _reasonController.text = widget.excuse.reason;
+
+    // Parse times from requestedTime/actualTime or use defaults
+    if (widget.excuse.requestedTime != null) {
+      _startTime = TimeOfDay.fromDateTime(widget.excuse.requestedTime!);
+    } else {
+      _startTime = const TimeOfDay(hour: 9, minute: 0);
+    }
+    if (widget.excuse.actualTime != null) {
+      _endTime = TimeOfDay.fromDateTime(widget.excuse.actualTime!);
+    } else {
+      _endTime = const TimeOfDay(hour: 10, minute: 0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _reasonController.dispose();
+    super.dispose();
+  }
+
+  String _formatTime(TimeOfDay time) {
+    return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 24,
+        right: 24,
+        top: 24,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  l10n.editExcuse,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.close),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+
+            // Type dropdown
+            AppDropdown<ExcuseType>(
+              label: 'Excuse Type',
+              value: _selectedType,
+              items: ExcuseType.values.map((type) {
+                return DropdownMenuItem(
+                  value: type,
+                  child: Text(_getTypeName(type)),
+                );
+              }).toList(),
+              onChanged: (value) {
+                if (value != null) setState(() => _selectedType = value);
+              },
+            ),
+            const SizedBox(height: 16),
+
+            // Date picker
+            AppDateField(
+              label: 'Date',
+              value: _selectedDate,
+              firstDate: DateTime.now().subtract(const Duration(days: 30)),
+              lastDate: DateTime.now(),
+              onChanged: (date) => setState(() => _selectedDate = date),
+            ),
+            const SizedBox(height: 16),
+
+            // Start time / End time
+            Row(
+              children: [
+                Expanded(
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.access_time),
+                    title: Text('Start: ${_formatTime(_startTime)}'),
+                    tileColor: AppColors.surfaceVariant,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    onTap: () async {
+                      final time = await showTimePicker(
+                        context: context,
+                        initialTime: _startTime,
+                      );
+                      if (time != null) setState(() => _startTime = time);
+                    },
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.access_time),
+                    title: Text('End: ${_formatTime(_endTime)}'),
+                    tileColor: AppColors.surfaceVariant,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    onTap: () async {
+                      final time = await showTimePicker(
+                        context: context,
+                        initialTime: _endTime,
+                      );
+                      if (time != null) setState(() => _endTime = time);
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // Reason
+            AppTextField(
+              controller: _reasonController,
+              label: 'Reason',
+              hint: 'Explain your reason...',
+              maxLines: 3,
+            ),
+            const SizedBox(height: 24),
+
+            // Update button
+            AppButton(
+              label: l10n.updateRequest,
+              width: double.infinity,
+              isLoading: _isSubmitting,
+              onPressed: _submit,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _getTypeName(ExcuseType type) {
+    switch (type) {
+      case ExcuseType.personalExcuse:
+        return 'Personal Excuse';
+      case ExcuseType.officialDuty:
+        return 'Official Duty';
+    }
+  }
+
+  Future<void> _submit() async {
+    if (_reasonController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a reason')),
+      );
+      return;
+    }
+
+    final dashboardState = ref.read(dashboardNotifierProvider);
+    final employeeId = dashboardState.data?.employeeId;
+    if (employeeId == null || employeeId == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Employee data not loaded. Please try again.')),
+      );
+      return;
+    }
+
+    setState(() => _isSubmitting = true);
+
+    final success = await ref.read(excuseNotifierProvider.notifier).updateExcuse(
+      requestId: widget.excuse.id,
+      employeeId: employeeId,
+      type: _selectedType,
+      excuseDate: _selectedDate,
+      reason: _reasonController.text,
+      startTime: _formatTime(_startTime),
+      endTime: _formatTime(_endTime),
+    );
+
+    setState(() => _isSubmitting = false);
+
+    if (success && mounted) {
+      Navigator.pop(context);
+      final l10n = AppLocalizations.of(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.requestUpdated),
           backgroundColor: Colors.green,
         ),
       );

@@ -260,7 +260,8 @@ export class ViewPublicHolidayComponent implements OnInit {
   private formatDate(date: string | Date): string {
     if (!date) return '';
     const dateObj = typeof date === 'string' ? new Date(date) : date;
-    return new Intl.DateTimeFormat('en-US', {
+    const locale = this.i18n.getDateLocale();
+    return new Intl.DateTimeFormat(locale, {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
@@ -270,7 +271,8 @@ export class ViewPublicHolidayComponent implements OnInit {
   private formatDateTime(dateTime: string | Date): string {
     if (!dateTime) return '';
     const dateObj = typeof dateTime === 'string' ? new Date(dateTime) : dateTime;
-    return new Intl.DateTimeFormat('en-US', {
+    const locale = this.i18n.getDateLocale();
+    return new Intl.DateTimeFormat(locale, {
       year: 'numeric',
       month: 'short',
       day: 'numeric',

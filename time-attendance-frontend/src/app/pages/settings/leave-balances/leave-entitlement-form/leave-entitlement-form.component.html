@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div class="container-fluid app-modern-form">
   <!-- Form Header -->
   <app-form-header
     [title]="getPageTitle()"
@@ -25,19 +25,22 @@
             <div class="col-md-6">
               <app-form-section
                 [title]="i18n.t('leaveBalance.basicInformation')"
-                [description]="i18n.t('leaveBalance.basicInformationDescription')">
+                [description]="i18n.t('leaveBalance.basicInformationDescription')"
+                variant="modern">
                 <!-- Employee Selection -->
                 <div class="mb-3">
-                  <label for="employeeId" class="form-label">
-                    {{ i18n.t('employees.employee') }}
-                    <span class="text-danger">*</span>
-                  </label>
-                  <app-searchable-select
-                    formControlName="employeeId"
-                    [options]="employees()"
-                    [placeholder]="i18n.t('leaveBalance.selectEmployee')"
-                    [disabled]="isEditMode()">
-                  </app-searchable-select>
+                  <div class="app-modern-field">
+                    <label class="app-modern-label">
+                      {{ i18n.t('employees.employee') }}
+                      <span class="text-danger">*</span>
+                    </label>
+                    <app-searchable-select
+                      formControlName="employeeId"
+                      [options]="employees()"
+                      [placeholder]="i18n.t('leaveBalance.selectEmployee')"
+                      [disabled]="isEditMode()">
+                    </app-searchable-select>
+                  </div>
                   @if (entitlementForm.get('employeeId')?.invalid && entitlementForm.get('employeeId')?.touched) {
                     <div class="text-danger small mt-1">
                       {{ i18n.t('errors.fieldRequired') }}
@@ -47,16 +50,18 @@
 
                 <!-- Vacation Type Selection -->
                 <div class="mb-3">
-                  <label for="vacationTypeId" class="form-label">
-                    {{ i18n.t('vacationTypes.vacationType') }}
-                    <span class="text-danger">*</span>
-                  </label>
-                  <app-searchable-select
-                    formControlName="vacationTypeId"
-                    [options]="vacationTypes()"
-                    [placeholder]="i18n.t('leaveBalance.selectVacationType')"
-                    [disabled]="isEditMode()">
-                  </app-searchable-select>
+                  <div class="app-modern-field">
+                    <label class="app-modern-label">
+                      {{ i18n.t('vacationTypes.vacationType') }}
+                      <span class="text-danger">*</span>
+                    </label>
+                    <app-searchable-select
+                      formControlName="vacationTypeId"
+                      [options]="vacationTypes()"
+                      [placeholder]="i18n.t('leaveBalance.selectVacationType')"
+                      [disabled]="isEditMode()">
+                    </app-searchable-select>
+                  </div>
                   @if (entitlementForm.get('vacationTypeId')?.invalid && entitlementForm.get('vacationTypeId')?.touched) {
                     <div class="text-danger small mt-1">
                       {{ i18n.t('errors.fieldRequired') }}
@@ -66,22 +71,24 @@
 
                 <!-- Year -->
                 <div class="mb-3">
-                  <label for="year" class="form-label">
-                    {{ i18n.t('leaveBalance.year') }}
-                    <span class="text-danger">*</span>
-                  </label>
-                  <select
-                    id="year"
-                    class="form-select"
-                    formControlName="year"
-                    [class.is-invalid]="entitlementForm.get('year')?.invalid && entitlementForm.get('year')?.touched"
-                    [attr.disabled]="isEditMode() ? true : null">
-                    @for (year of availableYears(); track year) {
-                      <option [value]="year">{{ year }}</option>
-                    }
-                  </select>
+                  <div class="form-floating">
+                    <select
+                      id="year"
+                      class="form-select"
+                      formControlName="year"
+                      [class.is-invalid]="entitlementForm.get('year')?.invalid && entitlementForm.get('year')?.touched"
+                      [attr.disabled]="isEditMode() ? true : null">
+                      @for (year of availableYears(); track year) {
+                        <option [value]="year">{{ year }}</option>
+                      }
+                    </select>
+                    <label for="year">
+                      {{ i18n.t('leaveBalance.year') }}
+                      <span class="text-danger">*</span>
+                    </label>
+                  </div>
                   @if (entitlementForm.get('year')?.invalid && entitlementForm.get('year')?.touched) {
-                    <div class="invalid-feedback">
+                    <div class="invalid-feedback d-block">
                       {{ i18n.t('errors.invalidYear') }}
                     </div>
                   }
@@ -89,22 +96,24 @@
 
                 <!-- Annual Days -->
                 <div class="mb-3">
-                  <label for="annualDays" class="form-label">
-                    {{ i18n.t('leaveBalance.annualDays') }}
-                    <span class="text-danger">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    id="annualDays"
-                    class="form-control"
-                    formControlName="annualDays"
-                    [class.is-invalid]="entitlementForm.get('annualDays')?.invalid && entitlementForm.get('annualDays')?.touched"
-                    min="0"
-                    max="365"
-                    step="0.5"
-                    placeholder="30">
+                  <div class="form-floating">
+                    <input
+                      type="number"
+                      id="annualDays"
+                      class="form-control"
+                      formControlName="annualDays"
+                      placeholder="{{ i18n.t('leaveBalance.annualDays') }}"
+                      [class.is-invalid]="entitlementForm.get('annualDays')?.invalid && entitlementForm.get('annualDays')?.touched"
+                      min="0"
+                      max="365"
+                      step="0.5">
+                    <label for="annualDays">
+                      {{ i18n.t('leaveBalance.annualDays') }}
+                      <span class="text-danger">*</span>
+                    </label>
+                  </div>
                   @if (entitlementForm.get('annualDays')?.invalid && entitlementForm.get('annualDays')?.touched) {
-                    <div class="invalid-feedback">
+                    <div class="invalid-feedback d-block">
                       {{ i18n.t('errors.invalidDays') }}
                     </div>
                   }
@@ -117,25 +126,26 @@
             <div class="col-md-6">
               <app-form-section
                 [title]="i18n.t('leaveBalance.carryOverConfiguration')"
-                [description]="i18n.t('leaveBalance.carryOverConfigurationDescription')">
+                [description]="i18n.t('leaveBalance.carryOverConfigurationDescription')"
+                variant="modern">
                 <!-- Carry Over Days -->
                 <div class="mb-3">
-                  <label for="carryOverDays" class="form-label">
-                    {{ i18n.t('leaveBalance.carryOverDays') }}
-                  </label>
-                  <input
-                    type="number"
-                    id="carryOverDays"
-                    class="form-control"
-                    formControlName="carryOverDays"
-                    [class.is-invalid]="entitlementForm.get('carryOverDays')?.invalid && entitlementForm.get('carryOverDays')?.touched"
-                    min="0"
-                    max="365"
-                    step="0.5"
-                    placeholder="0"
-                    (blur)="validateMaxCarryOver()">
+                  <div class="form-floating">
+                    <input
+                      type="number"
+                      id="carryOverDays"
+                      class="form-control"
+                      formControlName="carryOverDays"
+                      placeholder="{{ i18n.t('leaveBalance.carryOverDays') }}"
+                      [class.is-invalid]="entitlementForm.get('carryOverDays')?.invalid && entitlementForm.get('carryOverDays')?.touched"
+                      min="0"
+                      max="365"
+                      step="0.5"
+                      (blur)="validateMaxCarryOver()">
+                    <label for="carryOverDays">{{ i18n.t('leaveBalance.carryOverDays') }}</label>
+                  </div>
                   @if (entitlementForm.get('carryOverDays')?.invalid && entitlementForm.get('carryOverDays')?.touched) {
-                    <div class="invalid-feedback">
+                    <div class="invalid-feedback d-block">
                       {{ i18n.t('errors.invalidDays') }}
                     </div>
                   }
@@ -144,21 +154,21 @@
 
                 <!-- Max Carry Over Days -->
                 <div class="mb-3">
-                  <label for="maxCarryOverDays" class="form-label">
-                    {{ i18n.t('leaveBalance.maxCarryOverDays') }}
-                  </label>
-                  <input
-                    type="number"
-                    id="maxCarryOverDays"
-                    class="form-control"
-                    formControlName="maxCarryOverDays"
-                    [class.is-invalid]="entitlementForm.get('maxCarryOverDays')?.invalid && entitlementForm.get('maxCarryOverDays')?.touched"
-                    min="0"
-                    max="365"
-                    step="0.5"
-                    [placeholder]="i18n.t('common.unlimited')">
+                  <div class="form-floating">
+                    <input
+                      type="number"
+                      id="maxCarryOverDays"
+                      class="form-control"
+                      formControlName="maxCarryOverDays"
+                      [placeholder]="i18n.t('common.unlimited')"
+                      [class.is-invalid]="entitlementForm.get('maxCarryOverDays')?.invalid && entitlementForm.get('maxCarryOverDays')?.touched"
+                      min="0"
+                      max="365"
+                      step="0.5">
+                    <label for="maxCarryOverDays">{{ i18n.t('leaveBalance.maxCarryOverDays') }}</label>
+                  </div>
                   @if (entitlementForm.get('maxCarryOverDays')?.invalid && entitlementForm.get('maxCarryOverDays')?.touched) {
-                    <div class="invalid-feedback">
+                    <div class="invalid-feedback d-block">
                       {{ i18n.t('errors.invalidDays') }}
                     </div>
                   }
@@ -186,33 +196,36 @@
           <!-- Effective Dates Section -->
           <app-form-section
             [title]="i18n.t('leaveBalance.effectiveDates')"
-            [description]="i18n.t('leaveBalance.effectiveDatesDescription')">
+            [description]="i18n.t('leaveBalance.effectiveDatesDescription')"
+            variant="modern">
             <div class="row">
               <div class="col-md-6">
                 <!-- Effective Start Date -->
                 <div class="mb-3">
-                  <label for="effectiveStartDate" class="form-label">
-                    {{ i18n.t('leaveBalance.effectiveStartDate') }}
-                  </label>
-                  <input
-                    type="date"
-                    id="effectiveStartDate"
-                    class="form-control"
-                    formControlName="effectiveStartDate">
+                  <div class="form-floating">
+                    <input
+                      type="date"
+                      id="effectiveStartDate"
+                      class="form-control"
+                      formControlName="effectiveStartDate"
+                      placeholder="{{ i18n.t('leaveBalance.effectiveStartDate') }}">
+                    <label for="effectiveStartDate">{{ i18n.t('leaveBalance.effectiveStartDate') }}</label>
+                  </div>
                   <div class="form-text">{{ i18n.t('leaveBalance.effectiveStartDateHelp') }}</div>
                 </div>
               </div>
               <div class="col-md-6">
                 <!-- Effective End Date -->
                 <div class="mb-3">
-                  <label for="effectiveEndDate" class="form-label">
-                    {{ i18n.t('leaveBalance.effectiveEndDate') }}
-                  </label>
-                  <input
-                    type="date"
-                    id="effectiveEndDate"
-                    class="form-control"
-                    formControlName="effectiveEndDate">
+                  <div class="form-floating">
+                    <input
+                      type="date"
+                      id="effectiveEndDate"
+                      class="form-control"
+                      formControlName="effectiveEndDate"
+                      placeholder="{{ i18n.t('leaveBalance.effectiveEndDate') }}">
+                    <label for="effectiveEndDate">{{ i18n.t('leaveBalance.effectiveEndDate') }}</label>
+                  </div>
                   <div class="form-text">{{ i18n.t('leaveBalance.effectiveEndDateHelp') }}</div>
                 </div>
               </div>
@@ -222,21 +235,23 @@
           <!-- Notes Section -->
           <app-form-section
             [title]="i18n.t('common.notes')"
-            [description]="i18n.t('leaveBalance.notesDescription')">
+            [description]="i18n.t('leaveBalance.notesDescription')"
+            variant="modern">
             <div class="mb-3">
-              <label for="notes" class="form-label">
-                {{ i18n.t('common.notes') }}
-              </label>
-              <textarea
-                id="notes"
-                class="form-control"
-                formControlName="notes"
-                rows="4"
-                maxlength="500"
-                [class.is-invalid]="entitlementForm.get('notes')?.invalid && entitlementForm.get('notes')?.touched"
-                [placeholder]="i18n.t('leaveBalance.notesPlaceholder')"></textarea>
+              <div class="form-floating">
+                <textarea
+                  id="notes"
+                  class="form-control"
+                  formControlName="notes"
+                  rows="4"
+                  maxlength="500"
+                  [class.is-invalid]="entitlementForm.get('notes')?.invalid && entitlementForm.get('notes')?.touched"
+                  [placeholder]="i18n.t('leaveBalance.notesPlaceholder')"
+                  style="height: 120px;"></textarea>
+                <label for="notes">{{ i18n.t('common.notes') }}</label>
+              </div>
               @if (entitlementForm.get('notes')?.invalid && entitlementForm.get('notes')?.touched) {
-                <div class="invalid-feedback">
+                <div class="invalid-feedback d-block">
                   {{ i18n.t('errors.notesTooLong') }}
                 </div>
               }
@@ -247,7 +262,7 @@
           </app-form-section>
 
           <!-- Form Actions -->
-          <div class="d-flex justify-content-end gap-2 mt-4">
+          <div class="app-form-actions">
             <button
               type="button"
               class="btn btn-outline-secondary"

@@ -64,25 +64,25 @@ export class WorkflowFormComponent implements OnInit {
   form!: FormGroup;
 
   // Dropdown options
-  entityTypes = this.workflowsService.getEntityTypes();
-  stepTypes: { value: WorkflowStepType; label: string }[] = [
-    { value: 'Approval', label: 'Approval' },
-    { value: 'Notification', label: 'Notification' },
-    { value: 'Validation', label: 'Validation' },
-    { value: 'Condition', label: 'Condition' }
-  ];
-  approverTypes: { value: ApproverType; label: string }[] = [
-    { value: 'DirectManager', label: 'Direct Manager' },
-    { value: 'DepartmentHead', label: 'Department Head' },
-    { value: 'Role', label: 'Specific Role' },
-    { value: 'SpecificUser', label: 'Specific User' }
-  ];
-  timeoutActions: { value: TimeoutAction; label: string }[] = [
-    { value: 'Expire', label: 'Expire' },
-    { value: 'Escalate', label: 'Escalate' },
-    { value: 'AutoApprove', label: 'Auto Approve' },
-    { value: 'AutoReject', label: 'Auto Reject' }
-  ];
+  entityTypes = computed(() => this.workflowsService.getEntityTypes());
+  stepTypes = computed<{ value: WorkflowStepType; label: string }[]>(() => [
+    { value: 'Approval', label: this.i18n.t('workflows.step_type_approval') },
+    { value: 'Notification', label: this.i18n.t('workflows.step_type_notification') },
+    { value: 'Validation', label: this.i18n.t('workflows.step_type_validation') },
+    { value: 'Condition', label: this.i18n.t('workflows.step_type_condition') }
+  ]);
+  approverTypes = computed<{ value: ApproverType; label: string }[]>(() => [
+    { value: 'DirectManager', label: this.i18n.t('workflows.approver_type_direct_manager') },
+    { value: 'DepartmentHead', label: this.i18n.t('workflows.approver_type_department_head') },
+    { value: 'Role', label: this.i18n.t('workflows.approver_type_role') },
+    { value: 'SpecificUser', label: this.i18n.t('workflows.approver_type_specific_user') }
+  ]);
+  timeoutActions = computed<{ value: TimeoutAction; label: string }[]>(() => [
+    { value: 'Expire', label: this.i18n.t('workflows.timeout_action_expire') },
+    { value: 'Escalate', label: this.i18n.t('workflows.timeout_action_escalate') },
+    { value: 'AutoApprove', label: this.i18n.t('workflows.timeout_action_auto_approve') },
+    { value: 'AutoReject', label: this.i18n.t('workflows.timeout_action_auto_reject') }
+  ]);
 
   // Page title
   pageTitle = computed(() => {

@@ -14,7 +14,7 @@ import { SearchableSelectOption } from '../../../shared/components/searchable-se
       [filterFields]="filterFields()"
       [showAddButton]="showAddButton"
       [addButtonText]="addButtonText"
-      [searchPlaceholder]="'Search branches...'"
+      [searchPlaceholder]="i18n.t('branches.search_branches')"
       (search)="onSearch($event)"
       (filterChange)="onFilterChange($event)"
       (add)="onAdd()">
@@ -22,10 +22,10 @@ import { SearchableSelectOption } from '../../../shared/components/searchable-se
   `
 })
 export class BranchFiltersComponent {
-  private i18n = inject(I18nService);
+  i18n = inject(I18nService);
 
   @Input() showAddButton = true;
-  @Input() addButtonText = 'Add Branch';
+  @Input() addButtonText = '';
 
   @Output() searchChange = new EventEmitter<string>();
   @Output() filtersChange = new EventEmitter<any>();
@@ -34,6 +34,9 @@ export class BranchFiltersComponent {
   filterFields = signal<FilterField[]>([]);
 
   ngOnInit() {
+    if (!this.addButtonText) {
+      this.addButtonText = this.i18n.t('branches.add_branch');
+    }
     this.setupFilterFields();
   }
 
@@ -47,7 +50,7 @@ export class BranchFiltersComponent {
     this.filterFields.set([
       {
         key: 'isActive',
-        label: 'Status',
+        label: this.i18n.t('common.status'),
         type: 'select',
         options: statusOptions
       }

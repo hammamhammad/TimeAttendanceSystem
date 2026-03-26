@@ -9,36 +9,51 @@ part of 'notification_model.dart';
 _$AppNotificationImpl _$$AppNotificationImplFromJson(
         Map<String, dynamic> json) =>
     _$AppNotificationImpl(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      message: json['message'] as String,
-      type: $enumDecode(_$NotificationTypeEnumMap, json['type']),
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      id: (json['id'] as num).toInt(),
+      titleEn: json['titleEn'] as String,
+      titleAr: json['titleAr'] as String?,
+      messageEn: json['messageEn'] as String,
+      messageAr: json['messageAr'] as String?,
+      type: $enumDecodeNullable(_$NotificationTypeEnumMap, json['type']) ??
+          NotificationType.info,
       isRead: json['isRead'] as bool,
+      readAt: json['readAt'] == null
+          ? null
+          : DateTime.parse(json['readAt'] as String),
+      entityType: json['entityType'] as String?,
+      entityId: (json['entityId'] as num?)?.toInt(),
       actionUrl: json['actionUrl'] as String?,
-      data: json['data'] as Map<String, dynamic>?,
+      createdAtUtc: DateTime.parse(json['createdAtUtc'] as String),
     );
 
 Map<String, dynamic> _$$AppNotificationImplToJson(
         _$AppNotificationImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'title': instance.title,
-      'message': instance.message,
+      'titleEn': instance.titleEn,
+      'titleAr': instance.titleAr,
+      'messageEn': instance.messageEn,
+      'messageAr': instance.messageAr,
       'type': _$NotificationTypeEnumMap[instance.type]!,
-      'createdAt': instance.createdAt.toIso8601String(),
       'isRead': instance.isRead,
+      'readAt': instance.readAt?.toIso8601String(),
+      'entityType': instance.entityType,
+      'entityId': instance.entityId,
       'actionUrl': instance.actionUrl,
-      'data': instance.data,
+      'createdAtUtc': instance.createdAtUtc.toIso8601String(),
     };
 
 const _$NotificationTypeEnumMap = {
-  NotificationType.info: 0,
-  NotificationType.leaveApproved: 1,
-  NotificationType.leaveRejected: 2,
-  NotificationType.attendanceReminder: 3,
-  NotificationType.announcement: 4,
-  NotificationType.alert: 5,
+  NotificationType.requestSubmitted: 0,
+  NotificationType.requestApproved: 1,
+  NotificationType.requestRejected: 2,
+  NotificationType.requestDelegated: 3,
+  NotificationType.requestEscalated: 4,
+  NotificationType.approvalPending: 5,
+  NotificationType.delegationReceived: 6,
+  NotificationType.approvalReminder: 7,
+  NotificationType.info: 8,
+  NotificationType.alert: 9,
 };
 
 _$PushTokenRequestImpl _$$PushTokenRequestImplFromJson(

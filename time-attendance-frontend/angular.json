@@ -22,7 +22,13 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              }
+              },
+              {
+                "glob": "**/*",
+                "input": "src/assets",
+                "output": "assets"
+              },
+              "src/_redirects"
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
@@ -41,7 +47,7 @@
                 {
                   "type": "anyComponentStyle",
                   "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumError": "10kB"
                 }
               ],
               "outputHashing": "all",

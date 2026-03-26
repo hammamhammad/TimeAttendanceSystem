@@ -1,5 +1,4 @@
 import { Component, Input, Output, EventEmitter, signal, OnChanges, SimpleChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SearchableSelectComponent, SearchableSelectOption } from '../searchable-select/searchable-select.component';
 
@@ -16,62 +15,67 @@ export interface FilterField {
 @Component({
   selector: 'app-search-filter',
   standalone: true,
-  imports: [CommonModule, FormsModule, SearchableSelectComponent],
+  imports: [FormsModule, SearchableSelectComponent],
   template: `
     <div class="search-filter">
       <div class="row g-3">
         <!-- Search input -->
-        <div class="col-md-4" *ngIf="showSearch">
-          <div class="input-group">
-            <span class="input-group-text">
-              <i class="fas fa-search"></i>
-            </span>
-            <input type="text"
-                   class="form-control"
-                   [placeholder]="searchPlaceholder"
-                   [(ngModel)]="searchTerm"
-                   (ngModelChange)="onSearchChange()"
-                   (keyup.enter)="onSearch()">
+        @if (showSearch) {
+          <div class="col-md-4">
+            <div class="input-group">
+              <span class="input-group-text">
+                <i class="fas fa-search"></i>
+              </span>
+              <input type="text"
+                     class="form-control"
+                     [placeholder]="searchPlaceholder"
+                     [(ngModel)]="searchTerm"
+                     (ngModelChange)="onSearchChange()"
+                     (keyup.enter)="onSearch()">
+            </div>
           </div>
-        </div>
+        }
 
         <!-- Filter fields -->
-        <div class="col-md-2" *ngFor="let field of filterFields">
-          <ng-container [ngSwitch]="field.type">
-            <!-- Text input -->
-            <input *ngSwitchCase="'text'"
-                   type="text"
-                   class="form-control"
-                   [placeholder]="field.placeholder || field.label"
-                   [(ngModel)]="filterValues[field.key]"
-                   (ngModelChange)="onFilterChange()">
-
-            <!-- Select dropdown -->
-            <app-searchable-select *ngSwitchCase="'select'"
-              [options]="field.options || []"
-              [placeholder]="field.placeholder || field.label"
-              [value]="filterValues[field.key] || ''"
-              (selectionChange)="onFilterFieldChange(field.key, $event)">
-            </app-searchable-select>
-
-            <!-- Date input -->
-            <input *ngSwitchCase="'date'"
-                   type="date"
-                   class="form-control"
-                   [(ngModel)]="filterValues[field.key]"
-                   (ngModelChange)="onFilterChange()">
-
-            <!-- Boolean select -->
-            <select *ngSwitchCase="'boolean'"
-                    class="form-select"
-                    [(ngModel)]="filterValues[field.key]"
-                    (ngModelChange)="onFilterChange()">
-              <option value="">{{ field.placeholder || 'All' }}</option>
-              <option value="true">Yes</option>
-              <option value="false">No</option>
-            </select>
-          </ng-container>
-        </div>
+        @for (field of filterFields; track field.key) {
+          <div class="col-md-2">
+            @switch (field.type) {
+              @case ('text') {
+                <input
+                  type="text"
+                  class="form-control"
+                  [placeholder]="field.placeholder || field.label"
+                  [(ngModel)]="filterValues[field.key]"
+                  (ngModelChange)="onFilterChange()">
+              }
+              @case ('select') {
+                <app-searchable-select
+                  [options]="field.options || []"
+                  [placeholder]="field.placeholder || field.label"
+                  [value]="filterValues[field.key] || ''"
+                  (selectionChange)="onFilterFieldChange(field.key, $event)">
+                </app-searchable-select>
+              }
+              @case ('date') {
+                <input
+                  type="date"
+                  class="form-control"
+                  [(ngModel)]="filterValues[field.key]"
+                  (ngModelChange)="onFilterChange()">
+              }
+              @case ('boolean') {
+                <select
+                  class="form-select"
+                  [(ngModel)]="filterValues[field.key]"
+                  (ngModelChange)="onFilterChange()">
+                  <option value="">{{ field.placeholder || 'All' }}</option>
+                  <option value="true">Yes</option>
+                  <option value="false">No</option>
+                </select>
+              }
+            }
+          </div>
+        }
 
         <!-- Action buttons -->
         <div class="col-md-auto">
@@ -89,56 +93,64 @@ export interface FilterField {
               <i class="fas fa-times me-1"></i>
               Clear
             </button>
-            <button type="button"
-                    *ngIf="showRefreshButton"
-                    class="btn btn-outline-info"
-                    [disabled]="refreshing"
-                    (click)="onRefresh()">
-              <i class="fas"
-                 [class.fa-sync-alt]="!refreshing"
-                 [class.fa-spinner]="refreshing"
-                 [class.fa-spin]="refreshing"
-                 [class.me-1]="true"></i>
-              Refresh
-            </button>
+            @if (showRefreshButton) {
+              <button type="button"
+                      class="btn btn-outline-info"
+                      [disabled]="refreshing"
+                      (click)="onRefresh()">
+                <i class="fas"
+                   [class.fa-sync-alt]="!refreshing"
+                   [class.fa-spinner]="refreshing"
+                   [class.fa-spin]="refreshing"
+                   [class.me-1]="true"></i>
+                Refresh
+              </button>
+            }
           </div>
         </div>
 
         <!-- Additional action buttons -->
         <div class="col-md-auto ms-auto">
           <div class="btn-group">
-            <button type="button"
-                    *ngIf="showBulkButton"
-                    class="btn btn-outline-primary"
-                    (click)="onBulkAction()">
-              <i class="fas fa-users me-1"></i>
-              {{ bulkButtonText }}
-            </button>
-            <button type="button"
-                    *ngIf="showAddButton"
-                    class="btn btn-success"
-                    (click)="onAdd()">
-              <i class="fas fa-plus me-1"></i>
-              {{ addButtonText }}
-            </button>
+            @if (showBulkButton) {
+              <button type="button"
+                      class="btn btn-outline-primary"
+                      (click)="onBulkAction()">
+                <i class="fas fa-users me-1"></i>
+                {{ bulkButtonText }}
+              </button>
+            }
+            @if (showAddButton) {
+              <button type="button"
+                      class="btn btn-success"
+                      (click)="onAdd()">
+                <i class="fas fa-plus me-1"></i>
+                {{ addButtonText }}
+              </button>
+            }
           </div>
         </div>
       </div>
 
       <!-- Active filters display -->
-      <div class="active-filters mt-3" *ngIf="hasActiveFilters()">
-        <small class="text-muted me-2">Active filters:</small>
-        <span class="badge bg-primary me-1" *ngIf="searchTerm">
-          Search: {{ searchTerm }}
-          <button type="button" class="btn-close btn-close-white ms-1" (click)="clearSearchTerm()"></button>
-        </span>
-        <span class="badge bg-primary me-1"
-              *ngFor="let filter of getActiveFilterLabels()"
-              [title]="filter.label + ': ' + filter.value">
-          {{ filter.label }}: {{ filter.displayValue }}
-          <button type="button" class="btn-close btn-close-white ms-1" (click)="clearFilter(filter.key)"></button>
-        </span>
-      </div>
+      @if (hasActiveFilters()) {
+        <div class="active-filters mt-3">
+          <small class="text-muted me-2">Active filters:</small>
+          @if (searchTerm) {
+            <span class="badge bg-primary me-1">
+              Search: {{ searchTerm }}
+              <button type="button" class="btn-close btn-close-white ms-1" (click)="clearSearchTerm()"></button>
+            </span>
+          }
+          @for (filter of getActiveFilterLabels(); track filter.key) {
+            <span class="badge bg-primary me-1"
+                  [title]="filter.label + ': ' + filter.value">
+              {{ filter.label }}: {{ filter.displayValue }}
+              <button type="button" class="btn-close btn-close-white ms-1" (click)="clearFilter(filter.key)"></button>
+            </span>
+          }
+        </div>
+      }
     </div>
   `,
   styles: [`

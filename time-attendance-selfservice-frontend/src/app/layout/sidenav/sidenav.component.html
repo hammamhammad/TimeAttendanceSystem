@@ -1,12 +1,15 @@
 <nav class="sidenav"
      [class.collapsed]="collapsed()"
+     [class.show]="show()"
      [attr.aria-expanded]="!collapsed()">
 
   <div class="sidenav-header p-3">
     @if (!collapsed()) {
-      <h5 class="text-truncate mb-0">Self Service Portal</h5>
+      <div class="d-flex align-items-center">
+        <img src="assets/images/logo.svg" alt="ClockN" class="sidenav-logo me-2">
+      </div>
     } @else {
-      <i class="bi bi-person-badge fa-lg"></i>
+      <img src="assets/images/logo.svg" alt="ClockN" class="sidenav-logo-collapsed">
     }
   </div>
 
@@ -27,7 +30,7 @@
              [routerLink]="item.path"
              routerLinkActive="active"
              [title]="collapsed() ? t(item.titleKey) : ''">
-            <i class="{{ item.icon }} me-2"></i>
+            <i class="{{ item.icon }} nav-icon"></i>
             @if (!collapsed()) {
               <span class="text-truncate">{{ t(item.titleKey) }}</span>
             }

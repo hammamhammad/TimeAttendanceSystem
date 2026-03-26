@@ -207,7 +207,7 @@ export class PendingApprovalsComponent implements OnInit {
 
   formatDate(dateString: string): string {
     const date = new Date(dateString);
-    return date.toLocaleDateString(this.i18n.getCurrentLocale(), {
+    return date.toLocaleDateString(this.i18n.getDateLocale(), {
       year: 'numeric',
       month: 'short',
       day: 'numeric',

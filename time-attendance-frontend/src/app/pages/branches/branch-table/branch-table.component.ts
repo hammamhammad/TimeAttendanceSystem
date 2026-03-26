@@ -21,7 +21,7 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
       [totalPages]="totalPages"
       [totalItems]="totalItems"
       [pageSize]="pageSize"
-      [emptyMessage]="'No branches found'"
+      [emptyMessage]="i18n.t('branches.no_branches_found')"
       (actionClick)="onActionClick($event)"
       (pageChange)="onPageChange($event)"
       (pageSizeChange)="onPageSizeChange($event)"
@@ -56,7 +56,7 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
             <span>
               <app-status-badge
                 [status]="branch.isActive ? 'active' : 'inactive'"
-                [label]="branch.isActive ? 'Active' : 'Inactive'"
+                [label]="branch.isActive ? i18n.t('common.active') : i18n.t('common.inactive')"
                 [showIcon]="true">
               </app-status-badge>
             </span>
@@ -104,7 +104,7 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
   `]
 })
 export class BranchTableComponent {
-  private i18n = inject(I18nService);
+  i18n = inject(I18nService);
   private permissionService = inject(PermissionService);
 
   @Input() branches: Branch[] = [];
@@ -122,14 +122,18 @@ export class BranchTableComponent {
   @Output() selectionChange = new EventEmitter<Branch[]>();
   @Output() sortChange = new EventEmitter<{column: string, direction: 'asc' | 'desc'}>();
 
-  columns: TableColumn[] = [
-    { key: 'branch', label: 'Branch', width: '250px', sortable: true },
-    { key: 'timezone', label: 'Timezone', width: '200px', sortable: true },
-    { key: 'employeeCount', label: 'Employees', width: '100px', align: 'center', sortable: true },
-    { key: 'status', label: 'Status', width: '100px', align: 'center', sortable: true },
-    { key: 'created', label: 'Created', width: '120px', sortable: true },
-    { key: 'updated', label: 'Updated', width: '120px', sortable: true }
-  ];
+  columns: TableColumn[] = [];
+
+  ngOnInit() {
+    this.columns = [
+      { key: 'branch', label: this.i18n.t('common.branch'), width: '250px', sortable: true },
+      { key: 'timezone', label: this.i18n.t('branches.timezone'), width: '200px', sortable: true },
+      { key: 'employeeCount', label: this.i18n.t('branches.employees'), width: '100px', align: 'center', sortable: true },
+      { key: 'status', label: this.i18n.t('common.status'), width: '100px', align: 'center', sortable: true },
+      { key: 'created', label: this.i18n.t('common.created'), width: '120px', sortable: true },
+      { key: 'updated', label: this.i18n.t('common.updated'), width: '120px', sortable: true }
+    ];
+  }
 
   get actions(): TableAction[] {
     const actions: TableAction[] = [];
@@ -137,7 +141,7 @@ export class BranchTableComponent {
     if (this.permissionService.has(`${PermissionResources.BRANCH}.${PermissionActions.READ}`)) {
       actions.push({
         key: 'view',
-        label: 'View',
+        label: this.i18n.t('common.view'),
         icon: 'fa-eye',
         color: 'info'
       });
@@ -146,7 +150,7 @@ export class BranchTableComponent {
     if (this.permissionService.has(`${PermissionResources.BRANCH}.${PermissionActions.UPDATE}`)) {
       actions.push({
         key: 'edit',
-        label: 'Edit',
+        label: this.i18n.t('common.edit'),
         icon: 'fa-edit',
         color: 'primary'
       });
@@ -155,7 +159,7 @@ export class BranchTableComponent {
     if (this.permissionService.has(`${PermissionResources.BRANCH}.${PermissionActions.DELETE}`)) {
       actions.push({
         key: 'delete',
-        label: 'Delete',
+        label: this.i18n.t('common.delete'),
         icon: 'fa-trash',
         color: 'danger'
       });
@@ -200,7 +204,8 @@ export class BranchTableComponent {
     // Simple timezone display - in a real app, you'd use a timezone library
     const date = new Date();
     try {
-      return date.toLocaleTimeString('en-US', {
+      const locale = this.i18n.getDateLocale();
+      return date.toLocaleTimeString(locale, {
         timeZone: timeZone,
         timeZoneName: 'short',
         hour12: false
@@ -218,7 +223,7 @@ export class BranchTableComponent {
     if (isNaN(date.getTime())) {
       return '-';
     }
-    return date.toLocaleDateString(this.i18n.getCurrentLocale(), {
+    return date.toLocaleDateString(this.i18n.getDateLocale(), {
       year: 'numeric',
       month: 'short',
       day: 'numeric'

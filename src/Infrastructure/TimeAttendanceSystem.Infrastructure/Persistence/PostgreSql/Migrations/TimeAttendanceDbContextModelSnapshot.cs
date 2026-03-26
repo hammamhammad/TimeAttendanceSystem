@@ -872,6 +872,11 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasColumnType("character varying(200)")
                         .HasComment("Descriptive name for tag location (e.g., Main Entrance)");
 
+                    b.Property<string>("EncryptedPayload")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasComment("HMAC-signed payload written to the physical tag during provisioning");
+
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
@@ -889,6 +894,10 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasColumnType("boolean")
                         .HasDefaultValue(false)
                         .HasComment("Whether tag has been permanently write-protected");
+
+                    b.Property<DateTime?>("LastScannedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("Timestamp of the last successful scan");
 
                     b.Property<DateTime?>("LockedAt")
                         .HasColumnType("timestamp with time zone")
@@ -915,16 +924,37 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasDefaultValue(new byte[] { 1 })
                         .HasComment("Concurrency control timestamp");
 
+                    b.Property<int>("ScanCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasComment("Total number of successful scans");
+
+                    b.Property<int>("Status")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1)
+                        .HasComment("Lifecycle status: Unregistered(0), Registered(1), Active(2), Disabled(3), Lost(4)");
+
                     b.Property<string>("TagUid")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
                         .HasComment("Unique hardware identifier of the NFC tag");
 
+                    b.Property<string>("VerificationHash")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("SHA256 hash of the encrypted payload for integrity verification");
+
                     b.HasKey("Id");
 
                     b.HasIndex("BranchId")
                         .HasDatabaseName("IX_NfcTags_BranchId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_NfcTags_Status")
                         .HasFilter("\"IsDeleted\" = false");
 
                     b.HasIndex("TagUid")

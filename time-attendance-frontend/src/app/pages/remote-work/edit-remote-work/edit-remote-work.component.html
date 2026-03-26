@@ -1,4 +1,4 @@
-<div class="edit-remote-work-page">
+<div class="edit-remote-work-page app-modern-form">
   <!-- Form Header -->
   <app-form-header
     mode="edit"
@@ -17,14 +17,14 @@
   @if (!loading()) {
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <!-- Remote Work Details -->
-      <app-form-section [title]="i18n.t('remoteWork.request.details')">
+      <app-form-section [title]="i18n.t('remoteWork.request.details')" variant="modern">
         <!-- Employee Selection (Disabled) -->
-        <div class="row mb-3">
-          <label class="col-sm-3 col-form-label">
-            {{ i18n.t('remoteWork.request.employee') }}
-            <span class="text-danger">*</span>
-          </label>
-          <div class="col-sm-9">
+        <div class="mb-3">
+          <div class="app-modern-field">
+            <label class="app-modern-label">
+              {{ i18n.t('remoteWork.request.employee') }}
+              <span class="text-danger">*</span>
+            </label>
             <app-searchable-select
               [options]="employeeOptions()"
               [value]="form.get('employeeId')?.value"
@@ -40,66 +40,66 @@
         </div>
 
         <!-- Start Date -->
-        <div class="row mb-3">
-          <label for="startDate" class="col-sm-3 col-form-label">
-            {{ i18n.t('remoteWork.request.startDate') }}
-            <span class="text-danger">*</span>
-          </label>
-          <div class="col-sm-9">
+        <div class="mb-3">
+          <div class="form-floating">
             <input
               type="date"
               id="startDate"
               class="form-control"
               formControlName="startDate"
+              placeholder="{{ i18n.t('remoteWork.request.startDate') }}"
               [class.is-invalid]="form.get('startDate')?.invalid && form.get('startDate')?.touched">
-            @if (form.get('startDate')?.invalid && form.get('startDate')?.touched) {
-              <div class="invalid-feedback">
-                {{ i18n.t('remoteWork.request.errors.start_date_required') }}
-              </div>
-            }
+            <label for="startDate">
+              {{ i18n.t('remoteWork.request.startDate') }}
+              <span class="text-danger">*</span>
+            </label>
           </div>
+          @if (form.get('startDate')?.invalid && form.get('startDate')?.touched) {
+            <div class="invalid-feedback d-block">
+              {{ i18n.t('remoteWork.request.errors.start_date_required') }}
+            </div>
+          }
         </div>
 
         <!-- End Date -->
-        <div class="row mb-3">
-          <label for="endDate" class="col-sm-3 col-form-label">
-            {{ i18n.t('remoteWork.request.endDate') }}
-            <span class="text-danger">*</span>
-          </label>
-          <div class="col-sm-9">
+        <div class="mb-3">
+          <div class="form-floating">
             <input
               type="date"
               id="endDate"
               class="form-control"
               formControlName="endDate"
+              placeholder="{{ i18n.t('remoteWork.request.endDate') }}"
               [class.is-invalid]="form.get('endDate')?.invalid && form.get('endDate')?.touched">
-            @if (form.get('endDate')?.invalid && form.get('endDate')?.touched) {
-              <div class="invalid-feedback">
-                {{ i18n.t('remoteWork.request.errors.end_date_required') }}
-              </div>
-            }
+            <label for="endDate">
+              {{ i18n.t('remoteWork.request.endDate') }}
+              <span class="text-danger">*</span>
+            </label>
           </div>
+          @if (form.get('endDate')?.invalid && form.get('endDate')?.touched) {
+            <div class="invalid-feedback d-block">
+              {{ i18n.t('remoteWork.request.errors.end_date_required') }}
+            </div>
+          }
         </div>
 
         <!-- Reason -->
-        <div class="row mb-3">
-          <label for="reason" class="col-sm-3 col-form-label">
-            {{ i18n.t('remoteWork.request.reason') }}
-          </label>
-          <div class="col-sm-9">
+        <div class="mb-3">
+          <div class="form-floating">
             <textarea
               id="reason"
               class="form-control"
               formControlName="reason"
               rows="3"
-              [placeholder]="i18n.t('remoteWork.request.reason_placeholder')">
-            </textarea>
+              [placeholder]="i18n.t('remoteWork.request.reason_placeholder')"
+              style="height: 100px;"></textarea>
+            <label for="reason">{{ i18n.t('remoteWork.request.reason') }}</label>
           </div>
         </div>
       </app-form-section>
 
       <!-- Form Actions -->
-      <div class="d-flex justify-content-end gap-2 mt-4">
+      <div class="app-form-actions">
         <button
           type="button"
           class="btn btn-secondary"

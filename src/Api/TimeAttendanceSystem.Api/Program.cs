@@ -13,6 +13,9 @@ using TimeAttendanceSystem.Infrastructure.Persistence;
 using TimeAttendanceSystem.Shared.Localization;
 using System.Globalization;
 
+// Enable legacy timestamp behavior so Npgsql accepts DateTime with Kind=Unspecified for timestamptz columns
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure CORS from appsettings
@@ -200,6 +203,9 @@ if (app.Environment.IsDevelopment())
 
 // Use CORS middleware
 app.UseCors(corsSettings.PolicyName);
+
+// Global exception handler - catches all unhandled exceptions and returns standardized JSON errors
+app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 app.UseRouting();
 app.UseMiddleware<RateLimitingMiddleware>(app.Services.GetRequiredService<RateLimitOptions>());

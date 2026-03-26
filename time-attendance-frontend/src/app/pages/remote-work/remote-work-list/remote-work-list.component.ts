@@ -147,25 +147,33 @@ export class RemoteWorkListComponent implements OnInit {
   /**
    * Get status text for display
    */
-  getStatusText(status: RemoteWorkRequestStatus): string {
-    const statusMap: Record<RemoteWorkRequestStatus, string> = {
+  getStatusText(status: RemoteWorkRequestStatus | string): string {
+    const statusMap: Record<string, string> = {
       [RemoteWorkRequestStatus.Pending]: this.i18n.t('remoteWork.status.pending'),
       [RemoteWorkRequestStatus.Approved]: this.i18n.t('remoteWork.status.approved'),
       [RemoteWorkRequestStatus.Rejected]: this.i18n.t('remoteWork.status.rejected'),
-      [RemoteWorkRequestStatus.Cancelled]: this.i18n.t('remoteWork.status.cancelled')
+      [RemoteWorkRequestStatus.Cancelled]: this.i18n.t('remoteWork.status.cancelled'),
+      'Pending': this.i18n.t('remoteWork.status.pending'),
+      'Approved': this.i18n.t('remoteWork.status.approved'),
+      'Rejected': this.i18n.t('remoteWork.status.rejected'),
+      'Cancelled': this.i18n.t('remoteWork.status.cancelled')
     };
-    return statusMap[status] || '';
+    return statusMap[status] || this.i18n.t('common.unknown');
   }
 
   /**
    * Get status badge variant
    */
-  getStatusVariant(status: RemoteWorkRequestStatus): string {
-    const statusMap: Record<RemoteWorkRequestStatus, string> = {
+  getStatusVariant(status: RemoteWorkRequestStatus | string): string {
+    const statusMap: Record<string, string> = {
       [RemoteWorkRequestStatus.Pending]: 'warning',
       [RemoteWorkRequestStatus.Approved]: 'success',
       [RemoteWorkRequestStatus.Rejected]: 'danger',
-      [RemoteWorkRequestStatus.Cancelled]: 'secondary'
+      [RemoteWorkRequestStatus.Cancelled]: 'secondary',
+      'Pending': 'warning',
+      'Approved': 'success',
+      'Rejected': 'danger',
+      'Cancelled': 'secondary'
     };
     return statusMap[status] || 'secondary';
   }
@@ -176,6 +184,7 @@ export class RemoteWorkListComponent implements OnInit {
   formatDate(date: Date): string {
     if (!date) return '';
     const d = new Date(date);
-    return d.toLocaleDateString();
+    const locale = this.i18n.getDateLocale();
+    return d.toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric' });
   }
 }

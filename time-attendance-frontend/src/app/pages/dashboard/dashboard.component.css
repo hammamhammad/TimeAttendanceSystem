@@ -476,29 +476,29 @@
 
 /* RTL Support */
 
-:root[dir="rtl"] .section-title {
+:host-context([dir="rtl"]) .section-title {
   padding-right: 1rem;
   padding-left: 0;
   border-right: 4px solid var(--bs-primary);
   border-left: none;
 }
 
-:root[dir="rtl"] .me-1 {
+:host-context([dir="rtl"]) .me-1 {
   margin-left: 0.25rem !important;
   margin-right: 0 !important;
 }
 
-:root[dir="rtl"] .me-2 {
+:host-context([dir="rtl"]) .me-2 {
   margin-left: 0.5rem !important;
   margin-right: 0 !important;
 }
 
-:root[dir="rtl"] .ms-2 {
+:host-context([dir="rtl"]) .ms-2 {
   margin-right: 0.5rem !important;
   margin-left: 0 !important;
 }
 
-:root[dir="rtl"] .auto-refresh-settings {
+:host-context([dir="rtl"]) .auto-refresh-settings {
   right: auto;
   left: 2rem;
 }

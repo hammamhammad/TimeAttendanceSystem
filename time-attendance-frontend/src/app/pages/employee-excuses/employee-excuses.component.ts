@@ -58,21 +58,33 @@ export class EmployeeExcusesComponent implements OnInit {
   searchTerm = signal<string | undefined>(undefined);
 
   // Service signals
-  employeeExcuses = this.employeeExcusesService.employeeExcuses;
+  private rawExcuses = this.employeeExcusesService.employeeExcuses;
   pagedResult = this.employeeExcusesService.pagedResult;
   statistics = this.employeeExcusesService.statistics;
   error = this.employeeExcusesService.error;
+
+  // Transform data: format status and dates for display
+  employeeExcuses = computed(() => {
+    const excuses = this.rawExcuses();
+    if (!excuses) return [];
+    return excuses.map(e => ({
+      ...e,
+      _statusDisplay: this.formatStatus(e.status),
+      _excuseDateDisplay: e.excuseDate ? new Date(e.excuseDate).toLocaleDateString(this.i18n.getDateLocale(), { year: 'numeric', month: 'short', day: 'numeric' }) : '--',
+      _submissionDateDisplay: e.submissionDate ? new Date(e.submissionDate).toLocaleString(this.i18n.getDateLocale(), { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }) : '--'
+    }));
+  });
 
   // Table configuration
   tableColumns: TableColumn[] = [
     { key: 'employeeName', label: this.i18n.t('employee_excuses.employee'), sortable: true, width: '15%' },
     { key: 'employeeNumber', label: this.i18n.t('employee_excuses.employee_number'), sortable: true, width: '10%' },
     { key: 'departmentName', label: this.i18n.t('employee_excuses.department'), sortable: true, width: '12%' },
-    { key: 'excuseDate', label: this.i18n.t('employee_excuses.excuse_date'), sortable: true, width: '10%' },
+    { key: '_excuseDateDisplay', label: this.i18n.t('employee_excuses.excuse_date'), sortable: true, width: '10%' },
     { key: 'durationHours', label: this.i18n.t('employee_excuses.duration'), sortable: false, width: '8%' },
     { key: 'reason', label: this.i18n.t('employee_excuses.reason'), sortable: false, width: '15%' },
-    { key: 'status', label: this.i18n.t('employee_excuses.status'), sortable: true, width: '10%' },
-    { key: 'submissionDate', label: this.i18n.t('employee_excuses.submitted_date'), sortable: true, width: '10%' }
+    { key: '_statusDisplay', label: this.i18n.t('employee_excuses.status'), sortable: true, width: '10%' },
+    { key: '_submissionDateDisplay', label: this.i18n.t('employee_excuses.submitted_date'), sortable: true, width: '10%' }
   ];
 
   // Table actions

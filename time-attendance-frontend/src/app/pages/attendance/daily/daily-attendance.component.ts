@@ -762,7 +762,8 @@ export class DailyAttendanceComponent implements OnInit, OnDestroy {
       if (timeToFormat.includes(':')) {
         const date = new Date(`1970-01-01T${timeToFormat}`);
         if (!isNaN(date.getTime())) {
-          return date.toLocaleTimeString('en-US', {
+          const locale = this.i18n.getDateLocale();
+          return date.toLocaleTimeString(locale, {
             hour: '2-digit',
             minute: '2-digit',
             hour12: false

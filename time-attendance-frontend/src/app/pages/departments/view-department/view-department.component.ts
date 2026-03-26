@@ -1,17 +1,19 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, inject, computed } from '@angular/core';
 
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { DepartmentsService } from '../departments.service';
 import { Department } from '../../../shared/models/department.model';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
+import { DefinitionListComponent, DefinitionItem } from '../../../shared/components/definition-list/definition-list.component';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 
 @Component({
   selector: 'app-view-department',
   standalone: true,
-  imports: [RouterModule, LoadingSpinnerComponent],
+  imports: [RouterModule, LoadingSpinnerComponent, DefinitionListComponent, StatusBadgeComponent],
   template: `
-    <div class="container-fluid">
+    <div class="container-fluid app-modern-view">
       <!-- Header -->
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
@@ -29,15 +31,15 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
           </nav>
         </div>
         <div class="btn-group">
-          <button 
-            type="button" 
+          <button
+            type="button"
             class="btn btn-primary"
             (click)="onEdit()">
             <i class="fa-solid fa-edit me-2"></i>
             {{ i18n.t('departments.edit') }}
           </button>
-          <button 
-            type="button" 
+          <button
+            type="button"
             class="btn btn-outline-secondary"
             (click)="onBack()">
             <i class="fa-solid fa-arrow-left me-2"></i>
@@ -58,7 +60,7 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
         <div class="row">
           <!-- Main Information Card -->
           <div class="col-lg-8">
-            <div class="card">
+            <div class="card mb-4">
               <div class="card-header">
                 <h5 class="card-title mb-0">
                   <div class="d-flex align-items-center">
@@ -71,51 +73,20 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
                       <div class="fw-medium">{{ department()?.name }}</div>
                       <small class="text-muted">{{ department()?.code }}</small>
                     </div>
+                    <div class="ms-auto">
+                      <app-status-badge
+                        [status]="department()?.isActive ? 'active' : 'inactive'">
+                      </app-status-badge>
+                    </div>
                   </div>
                 </h5>
               </div>
               <div class="card-body">
-                <div class="row">
-                  <!-- Basic Information -->
-                  <div class="col-md-6">
-                    <dl class="row">
-                      <dt class="col-sm-5">{{ i18n.t('departments.name') }}:</dt>
-                      <dd class="col-sm-7">{{ department()?.name }}</dd>
-                      
-                      <dt class="col-sm-5">{{ i18n.t('departments.name_ar') }}:</dt>
-                      <dd class="col-sm-7">{{ department()?.nameAr || '-' }}</dd>
-                      
-                      <dt class="col-sm-5">{{ i18n.t('departments.code') }}:</dt>
-                      <dd class="col-sm-7">{{ department()?.code }}</dd>
-                      
-                      <dt class="col-sm-5">{{ i18n.t('departments.parent') }}:</dt>
-                      <dd class="col-sm-7">{{ department()?.parentDepartmentName || i18n.t('departments.root_department') }}</dd>
-                    </dl>
-                  </div>
-
-                  <!-- Additional Information -->
-                  <div class="col-md-6">
-                    <dl class="row">
-                      <dt class="col-sm-5">{{ i18n.t('departments.manager') }}:</dt>
-                      <dd class="col-sm-7">{{ department()?.managerName || '-' }}</dd>
-                      
-                      <dt class="col-sm-5">{{ i18n.t('departments.cost_center') }}:</dt>
-                      <dd class="col-sm-7">{{ department()?.costCenter || '-' }}</dd>
-                      
-                      <dt class="col-sm-5">{{ i18n.t('departments.location') }}:</dt>
-                      <dd class="col-sm-7">{{ department()?.location || '-' }}</dd>
-                      
-                      <dt class="col-sm-5">{{ i18n.t('common.status') }}:</dt>
-                      <dd class="col-sm-7">
-                        @if (department()?.isActive) {
-                          <span class="badge bg-success">{{ i18n.t('common.active') }}</span>
-                        } @else {
-                          <span class="badge bg-light text-dark border">{{ i18n.t('common.inactive') }}</span>
-                        }
-                      </dd>
-                    </dl>
-                  </div>
-                </div>
+                <app-definition-list
+                  [items]="departmentInfoItems()"
+                  [labelWidth]="'4'"
+                  [valueWidth]="'8'">
+                </app-definition-list>
 
                 @if (department()?.description) {
                   <div class="mt-3">
@@ -157,28 +128,28 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
 
           <!-- Actions and Statistics Card -->
           <div class="col-lg-4">
-            <div class="card">
+            <div class="card mb-3">
               <div class="card-header">
                 <h6 class="card-title mb-0">{{ i18n.t('common.actions') }}</h6>
               </div>
               <div class="card-body">
                 <div class="d-grid gap-2">
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     class="btn btn-outline-primary"
                     (click)="onEdit()">
                     <i class="fa-solid fa-edit me-2"></i>
                     {{ i18n.t('departments.edit') }}
                   </button>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     class="btn btn-outline-info"
                     (click)="onViewEmployees()">
                     <i class="fa-solid fa-users me-2"></i>
                     {{ i18n.t('departments.view_employees') }}
                   </button>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     class="btn btn-outline-success"
                     (click)="onCreateSubDepartment()">
                     <i class="fa-solid fa-plus me-2"></i>
@@ -189,7 +160,7 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
             </div>
 
             <!-- Statistics Card -->
-            <div class="card mt-3">
+            <div class="card mb-3">
               <div class="card-header">
                 <h6 class="card-title mb-0">{{ i18n.t('departments.statistics') }}</h6>
               </div>
@@ -211,7 +182,7 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
 
             <!-- Hierarchy Card -->
             @if (departmentHierarchy().length > 0) {
-              <div class="card mt-3">
+              <div class="card mb-3">
                 <div class="card-header">
                   <h6 class="card-title mb-0">{{ i18n.t('departments.hierarchy') }}</h6>
                 </div>
@@ -298,6 +269,20 @@ export class ViewDepartmentComponent implements OnInit {
   departmentHierarchy = signal<{id: string, name: string, level: number}[]>([]);
   loading = signal(true);
   error = signal('');
+
+  departmentInfoItems = computed<DefinitionItem[]>(() => {
+    const dept = this.department();
+    if (!dept) return [];
+    return [
+      { label: this.i18n.t('departments.name'), value: dept.name },
+      { label: this.i18n.t('departments.name_ar'), value: dept.nameAr || '-' },
+      { label: this.i18n.t('departments.code'), value: dept.code },
+      { label: this.i18n.t('departments.parent'), value: dept.parentDepartmentName || this.i18n.t('departments.root_department') },
+      { label: this.i18n.t('departments.manager'), value: dept.managerName || '-' },
+      { label: this.i18n.t('departments.cost_center'), value: (dept as any).costCenter || '-' },
+      { label: this.i18n.t('departments.location'), value: (dept as any).location || '-' }
+    ];
+  });
 
   ngOnInit(): void {
     const departmentId = this.route.snapshot.paramMap.get('id');

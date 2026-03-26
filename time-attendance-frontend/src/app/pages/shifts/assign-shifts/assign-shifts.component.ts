@@ -3,6 +3,7 @@ import { Component, OnInit, signal, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { I18nService } from '../../../core/i18n/i18n.service';
+import { NotificationService } from '../../../core/notifications/notification.service';
 import { SearchableSelectComponent, SearchableSelectOption } from '../../../shared/components/searchable-select/searchable-select.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { UnifiedFilterComponent } from '../../../shared/components/unified-filter/unified-filter.component';
@@ -48,6 +49,7 @@ export class AssignShiftsComponent implements OnInit {
   private departmentsService = inject(DepartmentsService);
   private router = inject(Router);
   public i18n = inject(I18nService);
+  private notificationService = inject(NotificationService);
   public permissionService = inject(PermissionService);
 
   // Permission constants for use in template
@@ -404,13 +406,14 @@ export class AssignShiftsComponent implements OnInit {
     if (this.isCreateFormValid()) {
       this.shiftAssignmentService.createShiftAssignment(this.createForm()).subscribe({
         next: (result) => {
-          console.log('Assignment created successfully:', result);
+          this.notificationService.success(this.i18n.t('shifts.assignments.success.created'));
           this.closeCreateModal();
           this.loadAssignments();
         },
         error: (error) => {
           console.error('Error creating assignment:', error);
-          // Handle error display
+          const message = error?.error?.error || error?.error?.message || this.i18n.t('shifts.assignments.errors.create_failed');
+          this.notificationService.error(message);
         }
       });
     }

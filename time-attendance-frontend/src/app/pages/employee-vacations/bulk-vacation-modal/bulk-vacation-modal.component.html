@@ -7,7 +7,7 @@
   (close)="closeModal()">
 
   <div class="modal-body">
-    <form [formGroup]="bulkVacationForm" (ngSubmit)="onSubmit()">
+    <form [formGroup]="bulkVacationForm" (ngSubmit)="onSubmit()" class="app-modern-form">
 
             <!-- Assignment Type Selection -->
             <div class="row mb-3">
@@ -46,19 +46,22 @@
               <!-- Branch Selection -->
               @if (bulkVacationForm.get('assignmentType')?.value === BulkAssignmentType.Branch) {
                 <div class="col-12">
-                  <label class="form-label">{{ i18n.t('employee_vacations.select_branch') }} *</label>
-                  <select
-                    class="form-select"
-                    formControlName="branchId"
-                    [class.is-invalid]="hasError('branchId')"
-                    (change)="onTargetChange()">
-                    <option value="">{{ i18n.t('employee_vacations.select_branch_placeholder') }}</option>
-                    @for (branch of branches(); track branch.id) {
-                      <option [value]="branch.id">{{ branch.name }}</option>
-                    }
-                  </select>
+                  <div class="form-floating">
+                    <select
+                      id="branchId"
+                      class="form-select"
+                      formControlName="branchId"
+                      [class.is-invalid]="hasError('branchId')"
+                      (change)="onTargetChange()">
+                      <option value="">{{ i18n.t('employee_vacations.select_branch_placeholder') }}</option>
+                      @for (branch of branches(); track branch.id) {
+                        <option [value]="branch.id">{{ branch.name }}</option>
+                      }
+                    </select>
+                    <label for="branchId">{{ i18n.t('employee_vacations.select_branch') }} *</label>
+                  </div>
                   @if (hasError('branchId')) {
-                    <div class="invalid-feedback">
+                    <div class="invalid-feedback d-block">
                       {{ getErrorMessage('branchId') }}
                     </div>
                   }
@@ -68,19 +71,22 @@
               <!-- Department Selection -->
               @if (bulkVacationForm.get('assignmentType')?.value === BulkAssignmentType.Department) {
                 <div class="col-12">
-                  <label class="form-label">{{ i18n.t('employee_vacations.select_department') }} *</label>
-                  <select
-                    class="form-select"
-                    formControlName="departmentId"
-                    [class.is-invalid]="hasError('departmentId')"
-                    (change)="onTargetChange()">
-                    <option value="">{{ i18n.t('employee_vacations.select_department_placeholder') }}</option>
-                    @for (department of departments(); track department.id) {
-                      <option [value]="department.id">{{ department.name }}</option>
-                    }
-                  </select>
+                  <div class="form-floating">
+                    <select
+                      id="departmentId"
+                      class="form-select"
+                      formControlName="departmentId"
+                      [class.is-invalid]="hasError('departmentId')"
+                      (change)="onTargetChange()">
+                      <option value="">{{ i18n.t('employee_vacations.select_department_placeholder') }}</option>
+                      @for (department of departments(); track department.id) {
+                        <option [value]="department.id">{{ department.name }}</option>
+                      }
+                    </select>
+                    <label for="departmentId">{{ i18n.t('employee_vacations.select_department') }} *</label>
+                  </div>
                   @if (hasError('departmentId')) {
-                    <div class="invalid-feedback">
+                    <div class="invalid-feedback d-block">
                       {{ getErrorMessage('departmentId') }}
                     </div>
                   }
@@ -108,18 +114,21 @@
             <!-- Vacation Details -->
             <div class="row mb-3">
               <div class="col-md-6">
-                <label class="form-label">{{ i18n.t('employee_vacations.vacation_type') }} *</label>
-                <select
-                  class="form-select"
-                  formControlName="vacationTypeId"
-                  [class.is-invalid]="hasError('vacationTypeId')">
-                  <option value="">{{ i18n.t('employee_vacations.select_vacation_type') }}</option>
-                  @for (vacationType of vacationTypes(); track vacationType.id) {
-                    <option [value]="vacationType.id">{{ vacationType.name }}</option>
-                  }
-                </select>
+                <div class="form-floating">
+                  <select
+                    id="vacationTypeId"
+                    class="form-select"
+                    formControlName="vacationTypeId"
+                    [class.is-invalid]="hasError('vacationTypeId')">
+                    <option value="">{{ i18n.t('employee_vacations.select_vacation_type') }}</option>
+                    @for (vacationType of vacationTypes(); track vacationType.id) {
+                      <option [value]="vacationType.id">{{ vacationType.name }}</option>
+                    }
+                  </select>
+                  <label for="vacationTypeId">{{ i18n.t('employee_vacations.vacation_type') }} *</label>
+                </div>
                 @if (hasError('vacationTypeId')) {
-                  <div class="invalid-feedback">
+                  <div class="invalid-feedback d-block">
                     {{ getErrorMessage('vacationTypeId') }}
                   </div>
                 }
@@ -143,28 +152,36 @@
             <!-- Date Range -->
             <div class="row mb-3">
               <div class="col-md-6">
-                <label class="form-label">{{ i18n.t('employee_vacations.start_date') }} *</label>
-                <input
-                  type="date"
-                  class="form-control"
-                  formControlName="startDate"
-                  [class.is-invalid]="hasError('startDate')">
+                <div class="form-floating">
+                  <input
+                    type="date"
+                    id="startDate"
+                    class="form-control"
+                    formControlName="startDate"
+                    [class.is-invalid]="hasError('startDate')"
+                    placeholder="{{ i18n.t('employee_vacations.start_date') }}">
+                  <label for="startDate">{{ i18n.t('employee_vacations.start_date') }} *</label>
+                </div>
                 @if (hasError('startDate')) {
-                  <div class="invalid-feedback">
+                  <div class="invalid-feedback d-block">
                     {{ getErrorMessage('startDate') }}
                   </div>
                 }
               </div>
 
               <div class="col-md-6">
-                <label class="form-label">{{ i18n.t('employee_vacations.end_date') }} *</label>
-                <input
-                  type="date"
-                  class="form-control"
-                  formControlName="endDate"
-                  [class.is-invalid]="hasError('endDate')">
+                <div class="form-floating">
+                  <input
+                    type="date"
+                    id="endDate"
+                    class="form-control"
+                    formControlName="endDate"
+                    [class.is-invalid]="hasError('endDate')"
+                    placeholder="{{ i18n.t('employee_vacations.end_date') }}">
+                  <label for="endDate">{{ i18n.t('employee_vacations.end_date') }} *</label>
+                </div>
                 @if (hasError('endDate')) {
-                  <div class="invalid-feedback">
+                  <div class="invalid-feedback d-block">
                     {{ getErrorMessage('endDate') }}
                   </div>
                 }
@@ -174,13 +191,17 @@
             <!-- Notes -->
             <div class="row mb-3">
               <div class="col-12">
-                <label class="form-label">{{ i18n.t('employee_vacations.notes') }}</label>
-                <textarea
-                  class="form-control"
-                  rows="3"
-                  formControlName="notes"
-                  [placeholder]="i18n.t('employee_vacations.notes_placeholder')">
-                </textarea>
+                <div class="form-floating">
+                  <textarea
+                    id="notes"
+                    class="form-control"
+                    rows="3"
+                    formControlName="notes"
+                    placeholder="{{ i18n.t('employee_vacations.notes') }}"
+                    style="height: 100px">
+                  </textarea>
+                  <label for="notes">{{ i18n.t('employee_vacations.notes') }}</label>
+                </div>
               </div>
             </div>
 

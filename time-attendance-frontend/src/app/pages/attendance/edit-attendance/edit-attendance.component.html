@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div class="container-fluid app-modern-form">
   <app-form-header
     mode="edit"
     [title]="i18n.t('attendance.edit.title')"
@@ -60,25 +60,26 @@
       <div class="row">
         <!-- Editable Time Fields -->
         <div class="col-lg-6">
-          <app-form-section [title]="i18n.t('attendance.edit.basic_info')">
+          <app-form-section [title]="i18n.t('attendance.edit.basic_info')" variant="modern">
             <div class="card-body">
               <!-- Check-in Time -->
               <div class="mb-3">
-                <label for="actualCheckInTime" class="form-label">
-                  {{ i18n.t('attendance.fields.check_in_time') }}
-                </label>
-                <input
-                  type="time"
-                  id="actualCheckInTime"
-                  class="form-control"
-                  formControlName="actualCheckInTime"
-                  [class.is-invalid]="hasControlError('actualCheckInTime')">
+                <div class="form-floating">
+                  <input
+                    type="time"
+                    id="actualCheckInTime"
+                    class="form-control"
+                    formControlName="actualCheckInTime"
+                    placeholder="{{ i18n.t('attendance.fields.check_in_time') }}"
+                    [class.is-invalid]="hasControlError('actualCheckInTime')">
+                  <label for="actualCheckInTime">{{ i18n.t('attendance.fields.check_in_time') }}</label>
+                </div>
                 <div class="form-text">
                   {{ i18n.t('attendance.edit.original') }}:
                   {{ attendanceRecord()?.actualCheckInTime ? (attendanceRecord()?.actualCheckInTime | date: 'HH:mm') : '--:--' }}
                 </div>
                 @if (hasControlError('actualCheckInTime')) {
-                  <div class="invalid-feedback">
+                  <div class="invalid-feedback d-block">
                     {{ getControlErrorMessage('actualCheckInTime') }}
                   </div>
                 }
@@ -86,21 +87,22 @@
 
               <!-- Check-out Time -->
               <div class="mb-3">
-                <label for="actualCheckOutTime" class="form-label">
-                  {{ i18n.t('attendance.fields.check_out_time') }}
-                </label>
-                <input
-                  type="time"
-                  id="actualCheckOutTime"
-                  class="form-control"
-                  formControlName="actualCheckOutTime"
-                  [class.is-invalid]="hasControlError('actualCheckOutTime')">
+                <div class="form-floating">
+                  <input
+                    type="time"
+                    id="actualCheckOutTime"
+                    class="form-control"
+                    formControlName="actualCheckOutTime"
+                    placeholder="{{ i18n.t('attendance.fields.check_out_time') }}"
+                    [class.is-invalid]="hasControlError('actualCheckOutTime')">
+                  <label for="actualCheckOutTime">{{ i18n.t('attendance.fields.check_out_time') }}</label>
+                </div>
                 <div class="form-text">
                   {{ i18n.t('attendance.edit.original') }}:
                   {{ attendanceRecord()?.actualCheckOutTime ? (attendanceRecord()?.actualCheckOutTime | date: 'HH:mm') : '--:--' }}
                 </div>
                 @if (hasControlError('actualCheckOutTime')) {
-                  <div class="invalid-feedback">
+                  <div class="invalid-feedback d-block">
                     {{ getControlErrorMessage('actualCheckOutTime') }}
                   </div>
                 }
@@ -109,21 +111,22 @@
               <!-- Break Hours - Only show if shift has break -->
               @if (shiftHasBreak()) {
                 <div class="mb-3">
-                  <label for="breakHours" class="form-label">
-                    {{ i18n.t('attendance.fields.break_hours') }}
-                  </label>
-                  <input
-                    type="number"
-                    id="breakHours"
-                    class="form-control"
-                    formControlName="breakHours"
-                    step="0.1"
-                    [class.is-invalid]="hasControlError('breakHours')">
+                  <div class="form-floating">
+                    <input
+                      type="number"
+                      id="breakHours"
+                      class="form-control"
+                      formControlName="breakHours"
+                      step="0.1"
+                      placeholder="{{ i18n.t('attendance.fields.break_hours') }}"
+                      [class.is-invalid]="hasControlError('breakHours')">
+                    <label for="breakHours">{{ i18n.t('attendance.fields.break_hours') }}</label>
+                  </div>
                   <div class="form-text">
                     {{ i18n.t('attendance.edit.original') }}: {{ attendanceRecord()?.breakHours || 0 }} {{ i18n.t('common.hours') }}
                   </div>
                   @if (hasControlError('breakHours')) {
-                    <div class="invalid-feedback">
+                    <div class="invalid-feedback d-block">
                       {{ getControlErrorMessage('breakHours') }}
                     </div>
                   }
@@ -135,11 +138,11 @@
 
         <!-- Calculated Fields (Read-only) -->
         <div class="col-lg-6">
-          <app-form-section [title]="i18n.t('attendance.edit.hours_calculations')">
+          <app-form-section [title]="i18n.t('attendance.edit.hours_calculations')" variant="modern">
             <div class="card-header">
               <small class="text-muted">{{ i18n.t('attendance.edit.calculated_automatically') }}</small>
               <br>
-              <small class="text-info">Uses backend business logic including flexible hours</small>
+              <small class="text-info">{{ i18n.t('attendance.edit.calculated_info') }}</small>
             </div>
             <div class="card-body">
               <!-- Calculated Working Hours -->
@@ -202,7 +205,7 @@
       <!-- Notes and Approval Section -->
       <div class="row">
         <div class="col-12">
-          <app-form-section [title]="i18n.t('attendance.edit.notes')">
+          <app-form-section [title]="i18n.t('attendance.edit.notes')" variant="modern">
             <div class="card-body">
               <div class="row">
                 <!-- Approval -->
@@ -227,19 +230,20 @@
                 <!-- General Notes -->
                 <div class="col-md-6">
                   <div class="mb-3">
-                    <label for="notes" class="form-label">
-                      {{ i18n.t('attendance.fields.notes') }}
-                    </label>
-                    <textarea
-                      id="notes"
-                      class="form-control"
-                      formControlName="notes"
-                      rows="3"
-                      [class.is-invalid]="hasControlError('notes')"
-                      [placeholder]="i18n.t('attendance.edit.notes_help')">
-                    </textarea>
+                    <div class="form-floating">
+                      <textarea
+                        id="notes"
+                        class="form-control"
+                        formControlName="notes"
+                        rows="3"
+                        placeholder="{{ i18n.t('attendance.fields.notes') }}"
+                        style="height: 100px"
+                        [class.is-invalid]="hasControlError('notes')">
+                      </textarea>
+                      <label for="notes">{{ i18n.t('attendance.fields.notes') }}</label>
+                    </div>
                     @if (hasControlError('notes')) {
-                      <div class="invalid-feedback">
+                      <div class="invalid-feedback d-block">
                         {{ getControlErrorMessage('notes') }}
                       </div>
                     }
@@ -249,20 +253,23 @@
                 <!-- Override Notes (Required) -->
                 <div class="col-md-6">
                   <div class="mb-3">
-                    <label for="overrideNotes" class="form-label">
-                      {{ i18n.t('attendance.edit.override_notes') }}
-                      <span class="text-danger">*</span>
-                    </label>
-                    <textarea
-                      id="overrideNotes"
-                      class="form-control"
-                      formControlName="overrideNotes"
-                      rows="3"
-                      [class.is-invalid]="hasControlError('overrideNotes')"
-                      [placeholder]="i18n.t('attendance.edit.override_notes_help')">
-                    </textarea>
+                    <div class="form-floating">
+                      <textarea
+                        id="overrideNotes"
+                        class="form-control"
+                        formControlName="overrideNotes"
+                        rows="3"
+                        placeholder="{{ i18n.t('attendance.edit.override_notes') }}"
+                        style="height: 100px"
+                        [class.is-invalid]="hasControlError('overrideNotes')">
+                      </textarea>
+                      <label for="overrideNotes">
+                        {{ i18n.t('attendance.edit.override_notes') }}
+                        <span class="text-danger">*</span>
+                      </label>
+                    </div>
                     @if (hasControlError('overrideNotes')) {
-                      <div class="invalid-feedback">
+                      <div class="invalid-feedback d-block">
                         {{ getControlErrorMessage('overrideNotes') }}
                       </div>
                     }
@@ -278,34 +285,26 @@
       </div>
 
       <!-- Action Buttons -->
-      <div class="row">
-        <div class="col-12">
-          <div class="card">
-            <div class="card-body">
-              <div class="d-flex justify-content-between">
-                <button type="button" class="btn btn-outline-secondary" (click)="onCancel()">
-                  <i class="fas fa-times me-2"></i>
-                  {{ i18n.t('attendance.edit.discard_changes') }}
-                </button>
-                <button
-                  type="submit"
-                  class="btn btn-primary"
-                  [disabled]="saving() || editForm.invalid"
-                  [class.loading]="saving()">
-                  @if (!saving()) {
-                    <i class="fas fa-save me-2"></i>
-                  }
-                  @if (saving()) {
-                    <div class="spinner-border spinner-border-sm me-2" role="status">
-                      <span class="visually-hidden">{{ i18n.t('attendance.edit.saving') }}</span>
-                    </div>
-                  }
-                  {{ saving() ? i18n.t('attendance.edit.saving') : i18n.t('attendance.edit.save_changes') }}
-                </button>
-              </div>
+      <div class="app-form-actions">
+        <button type="button" class="btn btn-outline-secondary" (click)="onCancel()">
+          <i class="fas fa-times me-2"></i>
+          {{ i18n.t('attendance.edit.discard_changes') }}
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="saving() || editForm.invalid"
+          [class.loading]="saving()">
+          @if (!saving()) {
+            <i class="fas fa-save me-2"></i>
+          }
+          @if (saving()) {
+            <div class="spinner-border spinner-border-sm me-2" role="status">
+              <span class="visually-hidden">{{ i18n.t('attendance.edit.saving') }}</span>
             </div>
-          </div>
-        </div>
+          }
+          {{ saving() ? i18n.t('attendance.edit.saving') : i18n.t('attendance.edit.save_changes') }}
+        </button>
       </div>
     </form>
   }

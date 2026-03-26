@@ -1,4 +1,4 @@
-<div class="container-fluid px-4">
+<div class="container-fluid px-4 app-modern-form">
   <div class="row">
     <div class="col-12">
       <!-- Header -->
@@ -16,41 +16,46 @@
           <form (ngSubmit)="onSubmit()" #formRef="ngForm">
 
             <!-- Basic Information Section -->
-            <app-form-section [title]="t('common.basicInformation')">
+            <app-form-section [title]="t('common.basicInformation')" variant="modern">
               <div class="row mb-4">
                 <!-- Shift Name -->
                 <div class="col-md-6 mb-3">
-                  <label for="name" class="form-label">
-                    {{ t('shifts.name') }} <span class="text-danger">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="name"
-                    [(ngModel)]="shiftForm.name"
-                    name="name"
-                    required
-                    maxlength="200"
-                    placeholder="{{ t('shifts.namePlaceholder') }}">
+                  <div class="form-floating">
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="name"
+                      [(ngModel)]="shiftForm.name"
+                      name="name"
+                      required
+                      maxlength="200"
+                      placeholder="{{ t('shifts.name') }}">
+                    <label for="name">
+                      {{ t('shifts.name') }} <span class="text-danger">*</span>
+                    </label>
+                  </div>
                 </div>
 
                 <!-- Description -->
                 <div class="col-12 mb-3">
-                  <label for="description" class="form-label">{{ t('shifts.description') }}</label>
-                  <textarea
-                    class="form-control"
-                    id="description"
-                    [(ngModel)]="shiftForm.description"
-                    name="description"
-                    rows="3"
-                    maxlength="1000"
-                    placeholder="{{ t('shifts.descriptionPlaceholder') }}"></textarea>
+                  <div class="form-floating">
+                    <textarea
+                      class="form-control"
+                      id="description"
+                      [(ngModel)]="shiftForm.description"
+                      name="description"
+                      rows="3"
+                      maxlength="1000"
+                      placeholder="{{ t('shifts.description') }}"
+                      style="height: 100px"></textarea>
+                    <label for="description">{{ t('shifts.description') }}</label>
+                  </div>
                 </div>
               </div>
             </app-form-section>
 
             <!-- Shift Type Section -->
-            <app-form-section [title]="t('shifts.type')">
+            <app-form-section [title]="t('shifts.type')" variant="modern">
               <div class="row mb-4">
                 <!-- Shift Type Selection -->
                 <div class="col-12 mb-3">
@@ -93,30 +98,32 @@
                 <!-- Required Hours (Hours-Only) -->
                 @if (shiftForm.shiftType === ShiftType.HoursOnly) {
                   <div class="col-md-6 mb-3">
-                    <label for="requiredHours" class="form-label">
-                      {{ t('shifts.requiredHours') }} <span class="text-danger">*</span>
-                    </label>
-                    <div class="input-group">
-                      <input
-                        type="number"
-                        class="form-control"
-                        id="requiredHours"
-                        [(ngModel)]="shiftForm.requiredHours"
-                        name="requiredHours"
-                        step="0.5"
-                        min="0.5"
-                        max="24"
-                        required>
-                      <span class="input-group-text">{{ t('shifts.hours') }}</span>
+                    <div class="app-modern-field">
+                      <label class="app-modern-label">
+                        {{ t('shifts.requiredHours') }} <span class="text-danger">*</span>
+                      </label>
+                      <div class="input-group">
+                        <input
+                          type="number"
+                          class="form-control"
+                          id="requiredHours"
+                          [(ngModel)]="shiftForm.requiredHours"
+                          name="requiredHours"
+                          step="0.5"
+                          min="0.5"
+                          max="24"
+                          required>
+                        <span class="input-group-text">{{ t('shifts.hours') }}</span>
+                      </div>
+                      <div class="form-text">{{ t('shifts.help.requiredHours') }}</div>
                     </div>
-                    <div class="form-text">{{ t('shifts.help.requiredHours') }}</div>
                   </div>
                 }
               </div>
             </app-form-section>
 
             <!-- Working Days Section -->
-            <app-form-section [title]="t('shifts.workingDays')">
+            <app-form-section [title]="t('shifts.workingDays')" variant="modern">
               <div class="row mb-4">
                 <div class="col-12 mb-3">
                   <div class="row">
@@ -226,7 +233,7 @@
 
             <!-- Work Periods Section (Time-Based Only) -->
             @if (shiftForm.shiftType === ShiftType.TimeBased) {
-              <app-form-section [title]="t('shifts.periods')">
+              <app-form-section [title]="t('shifts.periods')" variant="modern">
                 <div class="row mb-4">
                   <div class="col-12">
                     <div class="d-flex justify-content-end mb-3">
@@ -262,22 +269,30 @@
                         <div class="card-body">
                           <div class="row">
                             <div class="col-md-6">
-                              <label class="form-label">{{ t('shifts.startTime') }}</label>
-                              <input
-                                type="time"
-                                class="form-control"
-                                [(ngModel)]="period.startTime"
-                                [name]="'startTime_' + $index"
-                                required>
+                              <div class="form-floating">
+                                <input
+                                  type="time"
+                                  class="form-control"
+                                  [id]="'startTime_' + $index"
+                                  [(ngModel)]="period.startTime"
+                                  [name]="'startTime_' + $index"
+                                  placeholder="{{ t('shifts.startTime') }}"
+                                  required>
+                                <label [for]="'startTime_' + $index">{{ t('shifts.startTime') }}</label>
+                              </div>
                             </div>
                             <div class="col-md-6">
-                              <label class="form-label">{{ t('shifts.endTime') }}</label>
-                              <input
-                                type="time"
-                                class="form-control"
-                                [(ngModel)]="period.endTime"
-                                [name]="'endTime_' + $index"
-                                required>
+                              <div class="form-floating">
+                                <input
+                                  type="time"
+                                  class="form-control"
+                                  [id]="'endTime_' + $index"
+                                  [(ngModel)]="period.endTime"
+                                  [name]="'endTime_' + $index"
+                                  placeholder="{{ t('shifts.endTime') }}"
+                                  required>
+                                <label [for]="'endTime_' + $index">{{ t('shifts.endTime') }}</label>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -295,7 +310,7 @@
             }
 
             <!-- Core Hours Section -->
-            <app-form-section [title]="t('shifts.coreHours')">
+            <app-form-section [title]="t('shifts.coreHours')" variant="modern">
               <div class="row mb-4">
                 <!-- Enable Core Hours -->
                 <div class="col-12 mb-3">
@@ -317,57 +332,65 @@
                 <!-- Core Hours Times -->
                 @if (shiftForm.hasCoreHours) {
                   <div class="col-md-6 mb-3">
-                    <label for="coreStart" class="form-label">
-                      {{ t('shifts.coreStart') }} <span class="text-danger">*</span>
-                    </label>
-                    <input
-                      type="time"
-                      class="form-control"
-                      id="coreStart"
-                      [(ngModel)]="shiftForm.coreStart"
-                      name="coreStart"
-                      required>
+                    <div class="form-floating">
+                      <input
+                        type="time"
+                        class="form-control"
+                        id="coreStart"
+                        [(ngModel)]="shiftForm.coreStart"
+                        name="coreStart"
+                        placeholder="{{ t('shifts.coreStart') }}"
+                        required>
+                      <label for="coreStart">
+                        {{ t('shifts.coreStart') }} <span class="text-danger">*</span>
+                      </label>
+                    </div>
                   </div>
 
                   <div class="col-md-6 mb-3">
-                    <label for="coreEnd" class="form-label">
-                      {{ t('shifts.coreEnd') }} <span class="text-danger">*</span>
-                    </label>
-                    <input
-                      type="time"
-                      class="form-control"
-                      id="coreEnd"
-                      [(ngModel)]="shiftForm.coreEnd"
-                      name="coreEnd"
-                      required>
+                    <div class="form-floating">
+                      <input
+                        type="time"
+                        class="form-control"
+                        id="coreEnd"
+                        [(ngModel)]="shiftForm.coreEnd"
+                        name="coreEnd"
+                        placeholder="{{ t('shifts.coreEnd') }}"
+                        required>
+                      <label for="coreEnd">
+                        {{ t('shifts.coreEnd') }} <span class="text-danger">*</span>
+                      </label>
+                    </div>
                   </div>
                 }
               </div>
             </app-form-section>
 
             <!-- Advanced Options Section -->
-            <app-form-section [title]="t('shifts.advancedOptions')">
+            <app-form-section [title]="t('shifts.advancedOptions')" variant="modern">
               <div class="row mb-4">
                 <!-- Weekly Hours -->
                 <div class="col-md-6 mb-3">
-                  <label for="requiredWeeklyHours" class="form-label">{{ t('shifts.requiredWeeklyHours') }}</label>
-                  <div class="input-group">
-                    <input
-                      type="number"
-                      class="form-control"
-                      id="requiredWeeklyHours"
-                      [(ngModel)]="shiftForm.requiredWeeklyHours"
-                      name="requiredWeeklyHours"
-                      (ngModelChange)="onWeeklyHoursChange()"
-                      step="0.5"
-                      min="0"
-                      max="168">
-                    <span class="input-group-text">{{ t('shifts.hours') }}</span>
+                  <div class="app-modern-field">
+                    <label class="app-modern-label">{{ t('shifts.requiredWeeklyHours') }}</label>
+                    <div class="input-group">
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="requiredWeeklyHours"
+                        [(ngModel)]="shiftForm.requiredWeeklyHours"
+                        name="requiredWeeklyHours"
+                        (ngModelChange)="onWeeklyHoursChange()"
+                        step="0.5"
+                        min="0"
+                        max="168">
+                      <span class="input-group-text">{{ t('shifts.hours') }}</span>
+                    </div>
+                    <div class="form-text">{{ t('shifts.help.requiredWeeklyHours') }}</div>
+                    @if (shiftForm.requiredWeeklyHours && shiftForm.requiredWeeklyHours > 0) {
+                      <small class="text-info d-block">{{ t('shifts.help.weeklyHoursCoreRequired') }}</small>
+                    }
                   </div>
-                  <div class="form-text">{{ t('shifts.help.requiredWeeklyHours') }}</div>
-                  @if (shiftForm.requiredWeeklyHours && shiftForm.requiredWeeklyHours > 0) {
-                    <small class="text-info d-block">{{ t('shifts.help.weeklyHoursCoreRequired') }}</small>
-                  }
                 </div>
 
                 <!-- Check-in Required -->
@@ -405,24 +428,26 @@
                 <!-- Grace Period (Time-Based Only) -->
                 @if (shiftForm.shiftType === ShiftType.TimeBased) {
                   <div class="col-md-6 mb-3">
-                    <label for="gracePeriod" class="form-label">{{ t('shifts.gracePeriodMinutes') }}</label>
-                    <div class="input-group">
-                      <input
-                        type="number"
-                        class="form-control"
-                        id="gracePeriod"
-                        [(ngModel)]="shiftForm.gracePeriodMinutes"
-                        name="gracePeriodMinutes"
-                        (ngModelChange)="onGracePeriodChange()"
-                        [disabled]="shiftForm.allowFlexibleHours"
-                        min="0"
-                        max="120">
-                      <span class="input-group-text">{{ t('common.minutes') }}</span>
+                    <div class="app-modern-field">
+                      <label class="app-modern-label">{{ t('shifts.gracePeriodMinutes') }}</label>
+                      <div class="input-group">
+                        <input
+                          type="number"
+                          class="form-control"
+                          id="gracePeriod"
+                          [(ngModel)]="shiftForm.gracePeriodMinutes"
+                          name="gracePeriodMinutes"
+                          (ngModelChange)="onGracePeriodChange()"
+                          [disabled]="shiftForm.allowFlexibleHours"
+                          min="0"
+                          max="120">
+                        <span class="input-group-text">{{ t('common.minutes') }}</span>
+                      </div>
+                      <div class="form-text">{{ t('shifts.help.gracePeriod') }}</div>
+                      @if (shiftForm.allowFlexibleHours) {
+                        <small class="text-warning d-block">{{ t('shifts.help.gracePeriodDisabledFlexible') }}</small>
+                      }
                     </div>
-                    <div class="form-text">{{ t('shifts.help.gracePeriod') }}</div>
-                    @if (shiftForm.allowFlexibleHours) {
-                      <small class="text-warning d-block">{{ t('shifts.help.gracePeriodDisabledFlexible') }}</small>
-                    }
                   </div>
 
                   <!-- Flexible Hours -->
@@ -444,35 +469,39 @@
 
                   @if (shiftForm.allowFlexibleHours) {
                     <div class="col-md-6 mb-3">
-                      <label for="flexBefore" class="form-label">{{ t('shifts.flexMinutesBefore') }}</label>
-                      <div class="input-group">
-                        <input
-                          type="number"
-                          class="form-control"
-                          id="flexBefore"
-                          [(ngModel)]="shiftForm.flexMinutesBefore"
-                          name="flexMinutesBefore"
-                          min="1"
-                          max="480">
-                        <span class="input-group-text">{{ t('common.minutes') }}</span>
+                      <div class="app-modern-field">
+                        <label class="app-modern-label">{{ t('shifts.flexMinutesBefore') }}</label>
+                        <div class="input-group">
+                          <input
+                            type="number"
+                            class="form-control"
+                            id="flexBefore"
+                            [(ngModel)]="shiftForm.flexMinutesBefore"
+                            name="flexMinutesBefore"
+                            min="1"
+                            max="480">
+                          <span class="input-group-text">{{ t('common.minutes') }}</span>
+                        </div>
+                        <div class="form-text">{{ t('shifts.help.flexBefore') }}</div>
                       </div>
-                      <div class="form-text">{{ t('shifts.help.flexBefore') }}</div>
                     </div>
 
                     <div class="col-md-6 mb-3">
-                      <label for="flexAfter" class="form-label">{{ t('shifts.flexMinutesAfter') }}</label>
-                      <div class="input-group">
-                        <input
-                          type="number"
-                          class="form-control"
-                          id="flexAfter"
-                          [(ngModel)]="shiftForm.flexMinutesAfter"
-                          name="flexMinutesAfter"
-                          min="1"
-                          max="480">
-                        <span class="input-group-text">{{ t('common.minutes') }}</span>
+                      <div class="app-modern-field">
+                        <label class="app-modern-label">{{ t('shifts.flexMinutesAfter') }}</label>
+                        <div class="input-group">
+                          <input
+                            type="number"
+                            class="form-control"
+                            id="flexAfter"
+                            [(ngModel)]="shiftForm.flexMinutesAfter"
+                            name="flexMinutesAfter"
+                            min="1"
+                            max="480">
+                          <span class="input-group-text">{{ t('common.minutes') }}</span>
+                        </div>
+                        <div class="form-text">{{ t('shifts.help.flexAfter') }}</div>
                       </div>
-                      <div class="form-text">{{ t('shifts.help.flexAfter') }}</div>
                     </div>
                   }
                 }
@@ -501,8 +530,7 @@
             <!-- Form Actions -->
             <div class="row">
               <div class="col-12">
-                <hr class="mb-4">
-                <div class="d-flex justify-content-end gap-2">
+                <div class="app-form-actions">
                   <button
                     type="button"
                     class="btn btn-outline-secondary"

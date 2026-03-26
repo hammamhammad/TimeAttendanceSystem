@@ -13,7 +13,7 @@ import { SearchableSelectOption } from '../../../shared/components/searchable-se
       [filterFields]="filterFields()"
       [showAddButton]="showAddButton"
       [addButtonText]="addButtonText"
-      [searchPlaceholder]="'Search shifts...'"
+      [searchPlaceholder]="i18n.t('shifts.searchPlaceholder')"
       [refreshing]="refreshing"
       (search)="onSearch($event)"
       (filterChange)="onFilterChange($event)"
@@ -23,7 +23,7 @@ import { SearchableSelectOption } from '../../../shared/components/searchable-se
   `
 })
 export class ShiftFiltersComponent implements OnInit {
-  private i18n = inject(I18nService);
+  readonly i18n = inject(I18nService);
 
   @Input() showAddButton = true;
   @Input() addButtonText = 'Create Shift';
@@ -49,20 +49,20 @@ export class ShiftFiltersComponent implements OnInit {
 
     const typeOptions: SearchableSelectOption[] = [
       { value: '', label: this.i18n.t('common.all') },
-      { value: 'TimeBased', label: 'Time Based' },
-      { value: 'HoursOnly', label: 'Hours Only' }
+      { value: 'TimeBased', label: this.i18n.t('shifts.time_based') },
+      { value: 'HoursOnly', label: this.i18n.t('shifts.hours_only') }
     ];
 
     this.filterFields.set([
       {
         key: 'status',
-        label: 'Status',
+        label: this.i18n.t('common.status'),
         type: 'select',
         options: statusOptions
       },
       {
         key: 'shiftType',
-        label: 'Type',
+        label: this.i18n.t('common.type'),
         type: 'select',
         options: typeOptions
       }

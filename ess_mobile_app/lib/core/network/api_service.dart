@@ -18,7 +18,7 @@ abstract class ApiService {
   @POST('/api/v1/auth/login')
   Future<AuthResponse> login(@Body() Map<String, dynamic> body);
 
-  @POST('/api/v1/auth/refresh-token')
+  @POST('/api/v1/auth/refresh')
   Future<AuthResponse> refreshToken(@Body() Map<String, dynamic> body);
 
   @POST('/api/v1/mobile/attendance/check-location')

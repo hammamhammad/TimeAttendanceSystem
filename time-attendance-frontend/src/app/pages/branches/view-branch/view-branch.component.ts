@@ -22,7 +22,7 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
     LoadingSpinnerComponent
 ],
   template: `
-    <div class="app-view-page">
+    <div class="app-view-page app-modern-view">
       <!-- Standardized Page Header -->
       <app-page-header
         [title]="i18n.t('branches.view_details')"
@@ -230,7 +230,8 @@ export class ViewBranchComponent implements OnInit {
   }
 
   formatDate(dateString: string): string {
-    return new Date(dateString).toLocaleDateString();
+    const locale = this.i18n.getDateLocale();
+    return new Date(dateString).toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric' });
   }
 
   private getErrorMessage(error: any): string {

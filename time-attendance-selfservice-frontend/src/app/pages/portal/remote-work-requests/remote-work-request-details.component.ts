@@ -450,7 +450,7 @@ export class PortalRemoteWorkRequestDetailsComponent implements OnInit {
 
   formatDate(dateString: string): string {
     const date = new Date(dateString);
-    const locale = this.i18n.getCurrentLocale() === 'ar' ? 'ar-SA' : 'en-US';
+    const locale = this.i18n.getCurrentLocale() === 'ar' ? 'ar-u-nu-latn' : 'en-US';
     return date.toLocaleDateString(locale, {
       year: 'numeric',
       month: 'long',
@@ -460,7 +460,7 @@ export class PortalRemoteWorkRequestDetailsComponent implements OnInit {
 
   formatDateTime(dateString: string): string {
     const date = new Date(dateString);
-    const locale = this.i18n.getCurrentLocale() === 'ar' ? 'ar-SA' : 'en-US';
+    const locale = this.i18n.getCurrentLocale() === 'ar' ? 'ar-u-nu-latn' : 'en-US';
     return date.toLocaleDateString(locale, {
       year: 'numeric',
       month: 'long',

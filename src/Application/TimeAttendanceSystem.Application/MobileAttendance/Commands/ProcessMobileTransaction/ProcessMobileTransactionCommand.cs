@@ -13,6 +13,7 @@ public record ProcessMobileTransactionCommand(
     double DeviceLatitude,
     double DeviceLongitude,
     string? NfcTagUid,
+    string? NfcPayload,
     string DeviceId,
     string? DeviceModel,
     string DevicePlatform,

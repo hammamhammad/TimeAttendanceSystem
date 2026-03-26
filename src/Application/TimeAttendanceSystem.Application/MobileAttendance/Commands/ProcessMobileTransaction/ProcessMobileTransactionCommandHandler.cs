@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using TimeAttendanceSystem.Application.Abstractions;
 using TimeAttendanceSystem.Application.Common;
 using TimeAttendanceSystem.Domain.Attendance;
+using TimeAttendanceSystem.Domain.Branches;
 
 namespace TimeAttendanceSystem.Application.MobileAttendance.Commands.ProcessMobileTransaction;
 
@@ -11,9 +12,15 @@ namespace TimeAttendanceSystem.Application.MobileAttendance.Commands.ProcessMobi
 /// </summary>
 public class ProcessMobileTransactionCommandHandler : BaseHandler<ProcessMobileTransactionCommand, Result<MobileTransactionResult>>
 {
-    public ProcessMobileTransactionCommandHandler(IApplicationDbContext context, ICurrentUser currentUser) 
+    private readonly INfcTagEncryptionService _encryptionService;
+
+    public ProcessMobileTransactionCommandHandler(
+        IApplicationDbContext context,
+        ICurrentUser currentUser,
+        INfcTagEncryptionService encryptionService)
         : base(context, currentUser)
     {
+        _encryptionService = encryptionService;
     }
 
     public override async Task<Result<MobileTransactionResult>> Handle(ProcessMobileTransactionCommand request, CancellationToken cancellationToken)
@@ -94,16 +101,38 @@ public class ProcessMobileTransactionCommandHandler : BaseHandler<ProcessMobileT
             return CreateFailureResult("NFC tag does not belong to the selected branch");
         }
 
+        // ==== NFC PAYLOAD VERIFICATION (Encrypted Tag Binding) ====
+        if (nfcTag.EncryptedPayload != null || _encryptionService.RequirePayload)
+        {
+            // Tag has been provisioned with encrypted payload - verify it
+            if (string.IsNullOrWhiteSpace(request.NfcPayload))
+            {
+                await LogVerificationAttempt(request, attemptedAt, VerificationStatus.Failed,
+                    VerificationFailureReason.NfcPayloadInvalid, distanceFromBranch, cancellationToken);
+                return CreateFailureResult("NFC payload is required for this tag");
+            }
+
+            if (!_encryptionService.VerifyPayload(request.NfcPayload, nfcTag))
+            {
+                await LogVerificationAttempt(request, attemptedAt, VerificationStatus.Failed,
+                    VerificationFailureReason.NfcPayloadTampering, distanceFromBranch, cancellationToken);
+                return CreateFailureResult("NFC tag verification failed - possible tampering detected");
+            }
+        }
+
         // ==== VERIFICATION PASSED - CREATE TRANSACTION ====
         var transactionType = MapTransactionType(request.TransactionType);
-        
+
+        // Convert UTC time to branch local timezone
+        var localTime = ConvertToBranchLocalTime(attemptedAt, branch.TimeZone);
+
         var transaction = new AttendanceTransaction
         {
             EmployeeId = request.EmployeeId,
             TransactionType = transactionType,
             TransactionTimeUtc = attemptedAt,
-            TransactionTimeLocal = attemptedAt, // TODO: Convert to branch timezone
-            AttendanceDate = attemptedAt.Date,
+            TransactionTimeLocal = localTime,
+            AttendanceDate = localTime.Date,
             IsManual = false,
             DeviceId = request.DeviceId,
             Notes = $"Mobile check-in via GPS+NFC verification. Distance: {distanceFromBranch:F1}m",
@@ -113,6 +142,10 @@ public class ProcessMobileTransactionCommandHandler : BaseHandler<ProcessMobileT
         };
 
         Context.AttendanceTransactions.Add(transaction);
+
+        // Update NFC tag scan tracking
+        nfcTag.ScanCount++;
+        nfcTag.LastScannedAt = attemptedAt;
 
         // Log successful verification
         await LogVerificationAttempt(request, attemptedAt, VerificationStatus.Success,
@@ -164,6 +197,32 @@ public class ProcessMobileTransactionCommandHandler : BaseHandler<ProcessMobileT
         };
 
         Context.AttendanceVerificationLogs.Add(log);
+    }
+
+    /// <summary>
+    /// Converts a UTC time to the branch's local timezone.
+    /// Falls back to UTC if the branch timezone is not configured or invalid.
+    /// </summary>
+    private static DateTime ConvertToBranchLocalTime(DateTime utcTime, string? branchTimeZone)
+    {
+        if (string.IsNullOrWhiteSpace(branchTimeZone))
+            return utcTime;
+
+        try
+        {
+            var timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(branchTimeZone);
+            return TimeZoneInfo.ConvertTimeFromUtc(utcTime, timeZoneInfo);
+        }
+        catch (TimeZoneNotFoundException)
+        {
+            // Branch has an invalid timezone identifier - fall back to UTC
+            return utcTime;
+        }
+        catch (InvalidTimeZoneException)
+        {
+            // Timezone data is corrupted - fall back to UTC
+            return utcTime;
+        }
     }
 
     private static double CalculateDistance(double lat1, double lon1, double lat2, double lon2)

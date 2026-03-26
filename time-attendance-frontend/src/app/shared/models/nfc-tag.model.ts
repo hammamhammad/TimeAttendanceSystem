@@ -1,3 +1,5 @@
+export type NfcTagStatus = 'Unregistered' | 'Registered' | 'Active' | 'Disabled' | 'Lost';
+
 export interface NfcTag {
   id: number;
   tagUid: string;
@@ -9,6 +11,9 @@ export interface NfcTag {
   lockedByUserId?: number;
   lockedByUserName?: string;
   isActive: boolean;
+  status: number;
+  lastScannedAt?: string;
+  scanCount: number;
   createdAtUtc: string;
   modifiedAtUtc?: string;
 }

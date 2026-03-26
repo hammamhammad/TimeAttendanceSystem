@@ -394,11 +394,10 @@ CreateRemoteWorkRequest _$CreateRemoteWorkRequestFromJson(
 
 /// @nodoc
 mixin _$CreateRemoteWorkRequest {
+  int get employeeId => throw _privateConstructorUsedError;
   DateTime get startDate => throw _privateConstructorUsedError;
   DateTime get endDate => throw _privateConstructorUsedError;
   String get reason => throw _privateConstructorUsedError;
-  String? get workLocation => throw _privateConstructorUsedError;
-  String? get contactPhone => throw _privateConstructorUsedError;
 
   /// Serializes this CreateRemoteWorkRequest to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -417,11 +416,7 @@ abstract class $CreateRemoteWorkRequestCopyWith<$Res> {
       _$CreateRemoteWorkRequestCopyWithImpl<$Res, CreateRemoteWorkRequest>;
   @useResult
   $Res call(
-      {DateTime startDate,
-      DateTime endDate,
-      String reason,
-      String? workLocation,
-      String? contactPhone});
+      {int employeeId, DateTime startDate, DateTime endDate, String reason});
 }
 
 /// @nodoc
@@ -440,13 +435,16 @@ class _$CreateRemoteWorkRequestCopyWithImpl<$Res,
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? employeeId = null,
     Object? startDate = null,
     Object? endDate = null,
     Object? reason = null,
-    Object? workLocation = freezed,
-    Object? contactPhone = freezed,
   }) {
     return _then(_value.copyWith(
+      employeeId: null == employeeId
+          ? _value.employeeId
+          : employeeId // ignore: cast_nullable_to_non_nullable
+              as int,
       startDate: null == startDate
           ? _value.startDate
           : startDate // ignore: cast_nullable_to_non_nullable
@@ -459,14 +457,6 @@ class _$CreateRemoteWorkRequestCopyWithImpl<$Res,
           ? _value.reason
           : reason // ignore: cast_nullable_to_non_nullable
               as String,
-      workLocation: freezed == workLocation
-          ? _value.workLocation
-          : workLocation // ignore: cast_nullable_to_non_nullable
-              as String?,
-      contactPhone: freezed == contactPhone
-          ? _value.contactPhone
-          : contactPhone // ignore: cast_nullable_to_non_nullable
-              as String?,
     ) as $Val);
   }
 }
@@ -481,11 +471,7 @@ abstract class _$$CreateRemoteWorkRequestImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {DateTime startDate,
-      DateTime endDate,
-      String reason,
-      String? workLocation,
-      String? contactPhone});
+      {int employeeId, DateTime startDate, DateTime endDate, String reason});
 }
 
 /// @nodoc
@@ -503,13 +489,16 @@ class __$$CreateRemoteWorkRequestImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? employeeId = null,
     Object? startDate = null,
     Object? endDate = null,
     Object? reason = null,
-    Object? workLocation = freezed,
-    Object? contactPhone = freezed,
   }) {
     return _then(_$CreateRemoteWorkRequestImpl(
+      employeeId: null == employeeId
+          ? _value.employeeId
+          : employeeId // ignore: cast_nullable_to_non_nullable
+              as int,
       startDate: null == startDate
           ? _value.startDate
           : startDate // ignore: cast_nullable_to_non_nullable
@@ -522,14 +511,6 @@ class __$$CreateRemoteWorkRequestImplCopyWithImpl<$Res>
           ? _value.reason
           : reason // ignore: cast_nullable_to_non_nullable
               as String,
-      workLocation: freezed == workLocation
-          ? _value.workLocation
-          : workLocation // ignore: cast_nullable_to_non_nullable
-              as String?,
-      contactPhone: freezed == contactPhone
-          ? _value.contactPhone
-          : contactPhone // ignore: cast_nullable_to_non_nullable
-              as String?,
     ));
   }
 }
@@ -538,29 +519,26 @@ class __$$CreateRemoteWorkRequestImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$CreateRemoteWorkRequestImpl implements _CreateRemoteWorkRequest {
   const _$CreateRemoteWorkRequestImpl(
-      {required this.startDate,
+      {required this.employeeId,
+      required this.startDate,
       required this.endDate,
-      required this.reason,
-      this.workLocation,
-      this.contactPhone});
+      required this.reason});
 
   factory _$CreateRemoteWorkRequestImpl.fromJson(Map<String, dynamic> json) =>
       _$$CreateRemoteWorkRequestImplFromJson(json);
 
+  @override
+  final int employeeId;
   @override
   final DateTime startDate;
   @override
   final DateTime endDate;
   @override
   final String reason;
-  @override
-  final String? workLocation;
-  @override
-  final String? contactPhone;
 
   @override
   String toString() {
-    return 'CreateRemoteWorkRequest(startDate: $startDate, endDate: $endDate, reason: $reason, workLocation: $workLocation, contactPhone: $contactPhone)';
+    return 'CreateRemoteWorkRequest(employeeId: $employeeId, startDate: $startDate, endDate: $endDate, reason: $reason)';
   }
 
   @override
@@ -568,20 +546,18 @@ class _$CreateRemoteWorkRequestImpl implements _CreateRemoteWorkRequest {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$CreateRemoteWorkRequestImpl &&
+            (identical(other.employeeId, employeeId) ||
+                other.employeeId == employeeId) &&
             (identical(other.startDate, startDate) ||
                 other.startDate == startDate) &&
             (identical(other.endDate, endDate) || other.endDate == endDate) &&
-            (identical(other.reason, reason) || other.reason == reason) &&
-            (identical(other.workLocation, workLocation) ||
-                other.workLocation == workLocation) &&
-            (identical(other.contactPhone, contactPhone) ||
-                other.contactPhone == contactPhone));
+            (identical(other.reason, reason) || other.reason == reason));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, startDate, endDate, reason, workLocation, contactPhone);
+  int get hashCode =>
+      Object.hash(runtimeType, employeeId, startDate, endDate, reason);
 
   /// Create a copy of CreateRemoteWorkRequest
   /// with the given fields replaced by the non-null parameter values.
@@ -602,25 +578,22 @@ class _$CreateRemoteWorkRequestImpl implements _CreateRemoteWorkRequest {
 
 abstract class _CreateRemoteWorkRequest implements CreateRemoteWorkRequest {
   const factory _CreateRemoteWorkRequest(
-      {required final DateTime startDate,
+      {required final int employeeId,
+      required final DateTime startDate,
       required final DateTime endDate,
-      required final String reason,
-      final String? workLocation,
-      final String? contactPhone}) = _$CreateRemoteWorkRequestImpl;
+      required final String reason}) = _$CreateRemoteWorkRequestImpl;
 
   factory _CreateRemoteWorkRequest.fromJson(Map<String, dynamic> json) =
       _$CreateRemoteWorkRequestImpl.fromJson;
 
+  @override
+  int get employeeId;
   @override
   DateTime get startDate;
   @override
   DateTime get endDate;
   @override
   String get reason;
-  @override
-  String? get workLocation;
-  @override
-  String? get contactPhone;
 
   /// Create a copy of CreateRemoteWorkRequest
   /// with the given fields replaced by the non-null parameter values.

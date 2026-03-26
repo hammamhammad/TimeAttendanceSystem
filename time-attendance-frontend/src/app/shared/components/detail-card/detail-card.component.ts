@@ -1,5 +1,6 @@
-import { Component, Input, TemplateRef } from '@angular/core';
+import { Component, Input, TemplateRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { I18nService } from '../../../core/i18n/i18n.service';
 
 export interface DetailField {
   label: string;
@@ -269,6 +270,7 @@ export interface DetailField {
     `
 })
 export class DetailCardComponent {
+  private readonly i18n = inject(I18nService);
   @Input() title?: string;
   @Input() subtitle?: string;
   @Input() icon?: string;
@@ -287,7 +289,8 @@ export class DetailCardComponent {
   formatDate(dateString: string | Date): string {
     if (!dateString) return '-';
     try {
-      return new Date(dateString).toLocaleDateString();
+      const locale = this.i18n.getDateLocale();
+      return new Date(dateString).toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric' });
     } catch {
       return dateString.toString();
     }
@@ -296,7 +299,8 @@ export class DetailCardComponent {
   formatTime(timeString: string | Date): string {
     if (!timeString) return '-';
     try {
-      return new Date(timeString).toLocaleTimeString();
+      const locale = this.i18n.getDateLocale();
+      return new Date(timeString).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', hour12: true });
     } catch {
       return timeString.toString();
     }
@@ -305,7 +309,8 @@ export class DetailCardComponent {
   formatDateTime(dateTimeString: string | Date): string {
     if (!dateTimeString) return '-';
     try {
-      return new Date(dateTimeString).toLocaleString();
+      const locale = this.i18n.getDateLocale();
+      return new Date(dateTimeString).toLocaleString(locale, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
     } catch {
       return dateTimeString.toString();
     }

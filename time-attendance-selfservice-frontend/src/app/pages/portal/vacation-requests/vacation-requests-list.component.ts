@@ -49,7 +49,7 @@ export class VacationRequestsListComponent implements OnInit, OnDestroy {
 
   initColumns(): void {
     this.columns = [
-      { key: 'id', label: 'ID', sortable: true, width: '80px' },
+      { key: 'id', label: this.i18n.t('portal.columns.id'), sortable: true, width: '80px' },
       { key: 'vacationTypeName', label: this.i18n.t('portal.vacation_type'), sortable: true },
       { key: 'startDate', label: this.i18n.t('portal.start_date'), sortable: true },
       { key: 'endDate', label: this.i18n.t('portal.end_date'), sortable: true },
@@ -66,13 +66,13 @@ export class VacationRequestsListComponent implements OnInit, OnDestroy {
     this.tableActions = [
       {
         key: 'view',
-        label: 'View',
+        label: this.i18n.t('portal.actions.view'),
         icon: 'bi-eye',
         color: 'primary'
       },
       {
         key: 'edit',
-        label: 'Edit',
+        label: this.i18n.t('portal.actions.edit'),
         icon: 'bi-pencil',
         color: 'warning',
         // Only allow edit for pending workflow requests that haven't been finalized
@@ -80,7 +80,7 @@ export class VacationRequestsListComponent implements OnInit, OnDestroy {
       },
       {
         key: 'delete',
-        label: 'Delete',
+        label: this.i18n.t('portal.actions.delete'),
         icon: 'bi-trash',
         color: 'danger',
         // Only allow delete for pending workflow requests that haven't been finalized
@@ -165,11 +165,13 @@ export class VacationRequestsListComponent implements OnInit, OnDestroy {
     });
 
     // Map to display format
+    const isAr = this.i18n.locale() === 'ar';
     return sorted.map(vac => ({
       ...vac,
+      vacationTypeName: (isAr && vac.vacationTypeNameAr) ? vac.vacationTypeNameAr : vac.vacationTypeName,
       startDate: this.formatDate(vac.startDate),
       endDate: this.formatDate(vac.endDate),
-      createdAtUtc: this.formatDate(vac.createdAtUtc),
+      createdAtUtc: this.formatDateTime(vac.createdAtUtc),
       status: this.getStatusBadgeHtml(vac)
     }));
   });
@@ -312,6 +314,13 @@ export class VacationRequestsListComponent implements OnInit, OnDestroy {
 
   formatDate(date: Date | string): string {
     const d = typeof date === 'string' ? new Date(date) : date;
-    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    const locale = this.i18n.locale() === 'ar' ? 'ar-u-nu-latn' : 'en-US';
+    return d.toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric' });
+  }
+
+  formatDateTime(date: Date | string): string {
+    const d = typeof date === 'string' ? new Date(date) : date;
+    const locale = this.i18n.locale() === 'ar' ? 'ar-u-nu-latn' : 'en-US';
+    return d.toLocaleString(locale, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
   }
 }

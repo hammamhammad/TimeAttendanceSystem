@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using TimeAttendanceSystem.Application.Abstractions;
 using TimeAttendanceSystem.Application.Common;
 using TimeAttendanceSystem.Domain.Vacations;
@@ -16,10 +17,14 @@ namespace TimeAttendanceSystem.Application.EmployeeVacations.Commands.CreateBulk
 public class CreateBulkEmployeeVacationCommandHandler : IRequestHandler<CreateBulkEmployeeVacationCommand, Result<BulkVacationCreationResult>>
 {
     private readonly IApplicationDbContext _context;
+    private readonly ILogger<CreateBulkEmployeeVacationCommandHandler> _logger;
 
-    public CreateBulkEmployeeVacationCommandHandler(IApplicationDbContext context)
+    public CreateBulkEmployeeVacationCommandHandler(
+        IApplicationDbContext context,
+        ILogger<CreateBulkEmployeeVacationCommandHandler> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     /// <summary>
@@ -267,11 +272,11 @@ public class CreateBulkEmployeeVacationCommandHandler : IRequestHandler<CreateBu
             // Save attendance record changes
             await _context.SaveChangesAsync(cancellationToken);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             // Log error but don't fail the vacation creation
             // Attendance integration is secondary to vacation creation
-            // TODO: Add proper logging here
+            _logger.LogError(ex, "Failed to update attendance records for {Count} bulk vacation(s)", vacations.Count);
         }
     }
 }
