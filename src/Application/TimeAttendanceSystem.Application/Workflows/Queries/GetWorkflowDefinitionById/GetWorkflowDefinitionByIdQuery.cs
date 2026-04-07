@@ -1,8 +1,8 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Workflows.Enums;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Workflows.Enums;
 
-namespace TimeAttendanceSystem.Application.Workflows.Queries.GetWorkflowDefinitionById;
+namespace TecAxle.Hrms.Application.Workflows.Queries.GetWorkflowDefinitionById;
 
 /// <summary>
 /// Query to get a single workflow definition by ID.

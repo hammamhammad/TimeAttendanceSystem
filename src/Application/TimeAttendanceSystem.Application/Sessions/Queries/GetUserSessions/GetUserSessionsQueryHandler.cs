@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Sessions.Queries.GetUserSessions;
+namespace TecAxle.Hrms.Application.Sessions.Queries.GetUserSessions;
 
 public class GetUserSessionsQueryHandler : BaseHandler<GetUserSessionsQuery, Result<GetUserSessionsResponse>>
 {

@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace TimeAttendanceSystem.Application.Excuses.Commands.UpdateEmployeeExcuse;
+namespace TecAxle.Hrms.Application.Excuses.Commands.UpdateEmployeeExcuse;
 
 public class UpdateEmployeeExcuseCommandValidator : AbstractValidator<UpdateEmployeeExcuseCommand>
 {

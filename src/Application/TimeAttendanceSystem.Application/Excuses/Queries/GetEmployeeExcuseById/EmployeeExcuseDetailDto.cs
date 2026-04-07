@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.Excuses;
+using TecAxle.Hrms.Domain.Excuses;
 
-namespace TimeAttendanceSystem.Application.Excuses.Queries.GetEmployeeExcuseById;
+namespace TecAxle.Hrms.Application.Excuses.Queries.GetEmployeeExcuseById;
 
 public class EmployeeExcuseDetailDto
 {

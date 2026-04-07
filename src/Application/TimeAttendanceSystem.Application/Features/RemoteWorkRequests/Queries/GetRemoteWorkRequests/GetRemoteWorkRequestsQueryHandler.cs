@@ -1,8 +1,8 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
+using TecAxle.Hrms.Application.Abstractions;
 
-namespace TimeAttendanceSystem.Application.Features.RemoteWorkRequests.Queries.GetRemoteWorkRequests;
+namespace TecAxle.Hrms.Application.Features.RemoteWorkRequests.Queries.GetRemoteWorkRequests;
 
 /// <summary>
 /// Handler for getting remote work requests.

@@ -1,0 +1,79 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header [title]="i18n.t(isEditMode() ? 'candidates.edit' : 'candidates.create')" moduleName="candidates" moduleRoute="recruitment/candidates" />
+  @if (loadingData()) { <div class="text-center py-5"><app-loading-spinner [message]="i18n.t('common.loading')" [variant]="'primary'" [centered]="true" /></div> }
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate [class.d-none]="loadingData()">
+    <app-form-section [title]="i18n.t('candidates.personal_info')" [variant]="'modern'">
+      <div class="row g-3">
+        <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" id="firstName" formControlName="firstName" placeholder="x"><label for="firstName">{{ i18n.t('fields.first_name') }} <span class="text-danger">*</span></label></div></div>
+        <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" id="lastName" formControlName="lastName" placeholder="x"><label for="lastName">{{ i18n.t('fields.last_name') }} <span class="text-danger">*</span></label></div></div>
+        <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" id="firstNameAr" formControlName="firstNameAr" placeholder="x" dir="rtl"><label for="firstNameAr">{{ i18n.t('fields.first_name_ar') }}</label></div></div>
+        <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" id="lastNameAr" formControlName="lastNameAr" placeholder="x" dir="rtl"><label for="lastNameAr">{{ i18n.t('fields.last_name_ar') }}</label></div></div>
+        <div class="col-md-6"><div class="form-floating"><input type="email" class="form-control" id="email" formControlName="email" placeholder="x"><label for="email">{{ i18n.t('candidates.email') }}</label></div></div>
+        <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" id="phone" formControlName="phone" placeholder="x"><label for="phone">{{ i18n.t('candidates.phone') }}</label></div></div>
+        <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" id="nationalId" formControlName="nationalId" placeholder="x"><label for="nationalId">{{ i18n.t('fields.national_id') }}</label></div></div>
+        <div class="col-md-6"><div class="form-floating"><input type="date" class="form-control" id="dateOfBirth" formControlName="dateOfBirth" placeholder="x"><label for="dateOfBirth">{{ i18n.t('fields.date_of_birth') }}</label></div></div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <select class="form-select" id="gender" formControlName="gender">
+              <option value="">{{ i18n.t('common.select') }}</option>
+              @for (g of genderOptions; track g.value) {
+                <option [value]="g.value">{{ g.label }}</option>
+              }
+            </select>
+            <label for="gender">{{ i18n.t('fields.gender') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" id="nationality" formControlName="nationality" placeholder="x"><label for="nationality">{{ i18n.t('fields.nationality') }}</label></div></div>
+      </div>
+    </app-form-section>
+
+    <app-form-section [title]="i18n.t('candidates.professional_info')" [variant]="'modern'">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="form-floating">
+            <select class="form-select" id="source" formControlName="source">
+              @for (s of sourceOptions; track s.value) {
+                <option [value]="s.value">{{ s.label }}</option>
+              }
+            </select>
+            <label for="source">{{ i18n.t('candidates.source') }} <span class="text-danger">*</span></label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('candidates.referred_by') }}</label>
+            <app-searchable-select
+              [options]="employeeOptions()"
+              [placeholder]="i18n.t('common.select')"
+              [value]="form.get('referredByEmployeeId')?.value"
+              (selectionChange)="form.get('referredByEmployeeId')?.setValue($event)">
+            </app-searchable-select>
+          </div>
+        </div>
+        <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" id="currentCompany" formControlName="currentCompany" placeholder="x"><label for="currentCompany">{{ i18n.t('candidates.current_company') }}</label></div></div>
+        <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" id="currentJobTitle" formControlName="currentJobTitle" placeholder="x"><label for="currentJobTitle">{{ i18n.t('candidates.current_title') }}</label></div></div>
+        <div class="col-md-6"><div class="form-floating"><input type="number" class="form-control" id="yearsOfExperience" formControlName="yearsOfExperience" placeholder="x" min="0"><label for="yearsOfExperience">{{ i18n.t('candidates.experience') }}</label></div></div>
+        <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" id="linkedInUrl" formControlName="linkedInUrl" placeholder="x"><label for="linkedInUrl">{{ i18n.t('candidates.linkedin_url') }}</label></div></div>
+        <div class="col-12"><div class="form-floating"><textarea class="form-control" id="skills" formControlName="skills" placeholder="x" style="height: 80px"></textarea><label for="skills">{{ i18n.t('candidates.skills') }}</label></div></div>
+        <div class="col-12"><div class="form-floating"><textarea class="form-control" id="notes" formControlName="notes" placeholder="x" style="height: 80px"></textarea><label for="notes">{{ i18n.t('candidates.notes') }}</label></div></div>
+      </div>
+    </app-form-section>
+
+    <app-form-section [title]="i18n.t('files.upload_resume')" [variant]="'modern'">
+      <app-file-upload
+        [label]="i18n.t('files.upload_resume')"
+        [category]="'recruitment'"
+        [accept]="'.pdf,.doc,.docx'"
+        [entityType]="'Candidate'"
+        (fileUploaded)="onResumeUploaded($event)">
+      </app-file-upload>
+    </app-form-section>
+
+    <div class="app-form-actions">
+      <button type="button" class="btn btn-secondary" routerLink="/recruitment/candidates">{{ i18n.t('common.cancel') }}</button>
+      <button type="submit" class="btn btn-primary" [disabled]="form.invalid || submitting()">
+        @if (submitting()) { <span class="spinner-border spinner-border-sm me-1"></span> }{{ i18n.t('common.save') }}
+      </button>
+    </div>
+  </form>
+</div>

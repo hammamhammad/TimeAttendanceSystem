@@ -1,0 +1,204 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header
+    mode="create"
+    [title]="t('allowance_assignments.assign')"
+    moduleName="allowance_assignments"
+    moduleRoute="allowances">
+  </app-form-header>
+
+  <form #formRef="ngForm" (ngSubmit)="onSubmit()">
+    <div class="row">
+      <!-- Employee & Allowance Type -->
+      <div class="col-md-6 mb-4">
+        <app-form-section [title]="t('common.basic_info')" variant="modern">
+          <div class="mb-3">
+            <div class="form-floating">
+              <select id="employeeId" class="form-select" [(ngModel)]="form.employeeId" name="employeeId" required>
+                <option [ngValue]="null" disabled>{{ t('common.select') }}</option>
+                @for (emp of employees(); track emp.id) {
+                  <option [ngValue]="emp.id">{{ emp.name }} ({{ emp.employeeNumber }})</option>
+                }
+              </select>
+              <label for="employeeId">{{ t('common.employee') }}</label>
+            </div>
+            <small class="text-muted">{{ t('allowance_assignments.hints.employee') }}</small>
+            @if (validationErrors()['employeeId']) {
+              <div class="invalid-feedback d-block">{{ validationErrors()['employeeId'] }}</div>
+            }
+          </div>
+          <div class="mb-3">
+            <div class="form-floating">
+              <select id="allowanceTypeId" class="form-select" [(ngModel)]="form.allowanceTypeId" name="allowanceTypeId" required>
+                <option [ngValue]="null" disabled>{{ t('common.select') }}</option>
+                @for (at of allowanceTypes(); track at.id) {
+                  <option [ngValue]="at.id">{{ at.name }}</option>
+                }
+              </select>
+              <label for="allowanceTypeId">{{ t('allowance_policies.allowance_type') }}</label>
+            </div>
+            <small class="text-muted">{{ t('allowance_assignments.hints.allowance_type') }}</small>
+            @if (validationErrors()['allowanceTypeId']) {
+              <div class="invalid-feedback d-block">{{ validationErrors()['allowanceTypeId'] }}</div>
+            }
+          </div>
+          <div class="mb-3">
+            <div class="form-floating">
+              <textarea
+                id="reason"
+                class="form-control"
+                [(ngModel)]="form.reason"
+                name="reason"
+                placeholder="{{ t('common.reason') }}"
+                style="height: 80px"></textarea>
+              <label for="reason">{{ t('common.reason') }}</label>
+            </div>
+            <small class="text-muted">{{ t('allowance_assignments.hints.reason') }}</small>
+          </div>
+        </app-form-section>
+      </div>
+
+      <!-- Amount & Calculation -->
+      <div class="col-md-6 mb-4">
+        <app-form-section [title]="t('allowance_assignments.amount')" variant="modern">
+          <div class="mb-3">
+            <div class="form-floating">
+              <select id="calculationType" class="form-select" [(ngModel)]="form.calculationType" name="calculationType" required>
+                @for (ct of calculationTypes; track ct) {
+                  <option [value]="ct">{{ getCalcTypeLabel(ct) }}</option>
+                }
+              </select>
+              <label for="calculationType">{{ t('allowance_assignments.calculation_type') }}</label>
+            </div>
+            <small class="text-muted">{{ t('allowance_assignments.hints.calculation_type') }}</small>
+          </div>
+          @if (form.calculationType === 'Fixed') {
+            <div class="mb-3">
+              <div class="form-floating">
+                <input
+                  type="number"
+                  id="amount"
+                  class="form-control"
+                  [(ngModel)]="form.amount"
+                  name="amount"
+                  min="0"
+                  step="0.01"
+                  placeholder="{{ t('allowance_assignments.amount') }}"
+                  required>
+                <label for="amount">{{ t('allowance_assignments.amount') }}</label>
+              </div>
+              <small class="text-muted">{{ t('allowance_assignments.hints.amount') }}</small>
+              @if (validationErrors()['amount']) {
+                <div class="invalid-feedback d-block">{{ validationErrors()['amount'] }}</div>
+              }
+            </div>
+          } @else {
+            <div class="mb-3">
+              <div class="form-floating">
+                <input
+                  type="number"
+                  id="percentage"
+                  class="form-control"
+                  [(ngModel)]="form.percentage"
+                  name="percentage"
+                  min="0"
+                  max="100"
+                  step="0.01"
+                  placeholder="{{ t('allowance_assignments.percentage') }}"
+                  required>
+                <label for="percentage">{{ t('allowance_assignments.percentage') }}</label>
+              </div>
+              <small class="text-muted">{{ t('allowance_assignments.hints.percentage') }}</small>
+              @if (validationErrors()['percentage']) {
+                <div class="invalid-feedback d-block">{{ validationErrors()['percentage'] }}</div>
+              }
+            </div>
+          }
+          <div class="mb-3">
+            <div class="form-floating">
+              <select id="currency" class="form-select" [(ngModel)]="form.currency" name="currency" required>
+                @for (cur of currencies; track cur) {
+                  <option [value]="cur">{{ cur }}</option>
+                }
+              </select>
+              <label for="currency">{{ t('common.currency') }}</label>
+            </div>
+            <small class="text-muted">{{ t('allowance_assignments.hints.currency') }}</small>
+          </div>
+        </app-form-section>
+      </div>
+
+      <!-- Dates -->
+      <div class="col-md-6 mb-4">
+        <app-form-section [title]="t('common.dates')" variant="modern">
+          <div class="mb-3">
+            <div class="form-floating">
+              <input
+                type="date"
+                id="effectiveFromDate"
+                class="form-control"
+                [(ngModel)]="form.effectiveFromDate"
+                name="effectiveFromDate"
+                placeholder="{{ t('allowance_assignments.effective_from') }}"
+                required>
+              <label for="effectiveFromDate">{{ t('allowance_assignments.effective_from') }}</label>
+            </div>
+            <small class="text-muted">{{ t('allowance_assignments.hints.effective_from') }}</small>
+            @if (validationErrors()['effectiveFromDate']) {
+              <div class="invalid-feedback d-block">{{ validationErrors()['effectiveFromDate'] }}</div>
+            }
+          </div>
+          <div class="mb-3">
+            <div class="form-floating">
+              <input
+                type="date"
+                id="effectiveToDate"
+                class="form-control"
+                [(ngModel)]="form.effectiveToDate"
+                name="effectiveToDate"
+                placeholder="{{ t('allowance_assignments.effective_to') }}">
+              <label for="effectiveToDate">{{ t('allowance_assignments.effective_to') }}</label>
+            </div>
+            <small class="text-muted">{{ t('allowance_assignments.hints.effective_to') }}</small>
+            @if (validationErrors()['effectiveToDate']) {
+              <div class="invalid-feedback d-block">{{ validationErrors()['effectiveToDate'] }}</div>
+            }
+          </div>
+        </app-form-section>
+      </div>
+
+      <!-- Notes -->
+      <div class="col-md-6 mb-4">
+        <app-form-section [title]="t('common.notes')" variant="modern">
+          <div class="mb-3">
+            <div class="form-floating">
+              <textarea
+                id="notes"
+                class="form-control"
+                [(ngModel)]="form.notes"
+                name="notes"
+                placeholder="{{ t('common.notes') }}"
+                style="height: 120px"></textarea>
+              <label for="notes">{{ t('common.notes') }}</label>
+            </div>
+            <small class="text-muted">{{ t('allowance_assignments.hints.notes') }}</small>
+          </div>
+        </app-form-section>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="col-12">
+        <div class="app-form-actions">
+          <button type="button" class="btn btn-outline-secondary" (click)="onCancel()" [disabled]="submitting()">
+            {{ t('common.cancel') }}
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="submitting()">
+            @if (submitting()) {
+              <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            }
+            {{ t('common.save') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

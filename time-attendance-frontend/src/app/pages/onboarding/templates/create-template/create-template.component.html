@@ -1,0 +1,45 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header [title]="i18n.t(isEditMode() ? 'onboarding_templates.edit' : 'onboarding_templates.create')" moduleName="onboarding_templates" moduleRoute="onboarding/templates" />
+  @if (loadingData()) {
+    <div class="text-center py-5"><app-loading-spinner [message]="i18n.t('common.loading')" [variant]="'primary'" [centered]="true" /></div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <app-form-section [title]="i18n.t('common.basic_info')" [variant]="'modern'">
+        <div class="row g-3">
+          <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" id="name" formControlName="name" placeholder="x"><label for="name">{{ i18n.t('onboarding_templates.name') }} <span class="text-danger">*</span></label></div></div>
+          <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" id="nameAr" formControlName="nameAr" placeholder="x" dir="rtl"><label for="nameAr">{{ i18n.t('onboarding_templates.name_ar') }}</label></div></div>
+          <div class="col-12"><div class="form-floating"><textarea class="form-control" id="description" formControlName="description" placeholder="x" style="height: 80px"></textarea><label for="description">{{ i18n.t('onboarding_templates.description') }}</label></div></div>
+          <div class="col-md-6">
+            <div class="form-check mt-2"><input type="checkbox" class="form-check-input" id="isActive" formControlName="isActive"><label class="form-check-label" for="isActive">{{ i18n.t('common.active') }}</label></div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-check mt-2"><input type="checkbox" class="form-check-input" id="isDefault" formControlName="isDefault"><label class="form-check-label" for="isDefault">{{ i18n.t('onboarding_templates.is_default') }}</label></div>
+          </div>
+        </div>
+      </app-form-section>
+      <app-form-section [title]="i18n.t('onboarding_tasks.title')" [variant]="'modern'">
+        <div formArrayName="tasks">
+          @for (task of tasks.controls; track $index; let i = $index) {
+            <div class="border rounded p-3 mb-3" [formGroupName]="i">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0">{{ i18n.t('onboarding_tasks.task') }} {{ i + 1 }}</h6>
+                <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeTask(i)"><i class="fas fa-trash"></i></button>
+              </div>
+              <div class="row g-2">
+                <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" [id]="'taskName' + i" formControlName="taskName" placeholder="x"><label [for]="'taskName' + i">{{ i18n.t('onboarding_tasks.task_title') }} <span class="text-danger">*</span></label></div></div>
+                <div class="col-md-3"><div class="form-floating"><select class="form-select" [id]="'taskCategory' + i" formControlName="category"><option value="HR">HR</option><option value="IT">IT</option><option value="Training">Training</option><option value="Documentation">Documentation</option><option value="Equipment">Equipment</option><option value="Access">Access</option><option value="Introduction">Introduction</option><option value="Other">Other</option></select><label [for]="'taskCategory' + i">{{ i18n.t('onboarding_tasks.category') }}</label></div></div>
+                <div class="col-md-3"><div class="form-floating"><input type="number" class="form-control" [id]="'taskDue' + i" formControlName="dueDaysAfterJoining" placeholder="x" min="1"><label [for]="'taskDue' + i">{{ i18n.t('onboarding_tasks.due_days') }}</label></div></div>
+                <div class="col-md-3"><div class="form-check mt-2"><input type="checkbox" class="form-check-input" [id]="'taskRequired' + i" formControlName="isRequired"><label class="form-check-label" [for]="'taskRequired' + i">{{ i18n.t('onboarding_tasks.mandatory') }}</label></div></div>
+              </div>
+            </div>
+          }
+        </div>
+        <button type="button" class="btn btn-outline-primary btn-sm" (click)="addTask()"><i class="fas fa-plus me-1"></i>{{ i18n.t('onboarding_tasks.add_task') }}</button>
+      </app-form-section>
+      <div class="app-form-actions">
+        <button type="button" class="btn btn-secondary" routerLink="/onboarding/templates">{{ i18n.t('common.cancel') }}</button>
+        <button type="submit" class="btn btn-primary" [disabled]="form.invalid || submitting()">@if (submitting()) { <span class="spinner-border spinner-border-sm me-1"></span> }{{ i18n.t('common.save') }}</button>
+      </div>
+    </form>
+  }
+</div>

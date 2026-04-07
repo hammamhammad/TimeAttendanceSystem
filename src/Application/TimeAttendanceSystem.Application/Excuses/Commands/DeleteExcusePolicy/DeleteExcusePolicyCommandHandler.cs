@@ -1,9 +1,9 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Excuses.Commands.DeleteExcusePolicy;
+namespace TecAxle.Hrms.Application.Excuses.Commands.DeleteExcusePolicy;
 
 /// <summary>
 /// Command handler for deleting excuse policies (soft delete).

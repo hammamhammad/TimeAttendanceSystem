@@ -1,10 +1,10 @@
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Domain.Employees;
-using TimeAttendanceSystem.Domain.Users;
-using TimeAttendanceSystem.Domain.Workflows;
-using TimeAttendanceSystem.Domain.Excuses;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Employees;
+using TecAxle.Hrms.Domain.Users;
+using TecAxle.Hrms.Domain.Workflows;
+using TecAxle.Hrms.Domain.Excuses;
 
-namespace TimeAttendanceSystem.Domain.Attendance;
+namespace TecAxle.Hrms.Domain.Attendance;
 
 /// <summary>
 /// Domain entity representing an employee's attendance correction request.

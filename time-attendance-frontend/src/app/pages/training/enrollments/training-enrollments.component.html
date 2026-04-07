@@ -1,0 +1,26 @@
+<div class="app-list-page">
+  <app-page-header [title]="i18n.t('training_enrollments.title')" />
+  <app-unified-filter [searchPlaceholder]="i18n.t('training_enrollments.search')" [showRefreshButton]="true" [refreshing]="loading()"
+    [showAddButton]="true" [addButtonText]="i18n.t('training_enrollments.enroll')"
+    (add)="navigateToCreate()" (searchChange)="onSearchChange($event)" (refresh)="onRefreshData()" />
+
+  <app-data-table [data]="data()" [columns]="columns" [actions]="tableActions()" [currentPage]="currentPage()"
+    [totalPages]="totalPages()" [totalItems]="totalCount()" [pageSize]="pageSize()" [loading]="loading"
+    [emptyTitle]="i18n.t('training_enrollments.no_data')" [showPagination]="true"
+    (actionClick)="onActionClick($event)" (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)">
+    <ng-template #cellTemplate let-item let-column="column">
+      @if (column.key === 'status') {
+        <span class="badge" [class.bg-secondary]="item.status === 'Pending'" [class.bg-primary]="item.status === 'Approved'"
+          [class.bg-danger]="item.status === 'Rejected'" [class.bg-info]="item.status === 'Enrolled'"
+          [class.bg-success]="item.status === 'Completed'" [class.bg-warning]="item.status === 'Withdrawn'"
+          [class.bg-dark]="item.status === 'NoShow'">
+          {{ i18n.t('training_enrollments.status_' + item.status) }}
+        </span>
+      } @else if (column.key === 'enrollmentDate') {
+        {{ item.enrollmentDate | date }}
+      } @else {
+        {{ item[column.key] ?? '-' }}
+      }
+    </ng-template>
+  </app-data-table>
+</div>

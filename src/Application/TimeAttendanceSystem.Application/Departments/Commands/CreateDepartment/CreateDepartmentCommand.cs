@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Departments.Commands.CreateDepartment;
+namespace TecAxle.Hrms.Application.Departments.Commands.CreateDepartment;
 
 public record CreateDepartmentCommand(
     long BranchId,

@@ -6,8 +6,8 @@
 
 .tree-controls {
   padding: 1rem;
-  border-bottom: 1px solid #e9ecef;
-  background-color: #f8f9fa;
+  border-bottom: 1px solid var(--app-gray-200, #EAECF0);
+  background-color: var(--app-gray-50, #F9FAFB);
   border-radius: 8px 8px 0 0;
 }
 
@@ -17,17 +17,17 @@
 }
 
 .tree-node {
-  border-bottom: 1px solid #f8f9fa;
+  border-bottom: 1px solid var(--app-gray-50, #F9FAFB);
   transition: all 0.2s ease;
 }
 
 .tree-node:hover {
-  background-color: #f8f9fa;
+  background-color: var(--app-gray-50, #F9FAFB);
 }
 
 .tree-node.selected {
   background-color: #e3f2fd;
-  border-left: 4px solid #2196f3;
+  border-left: 4px solid var(--app-primary, #4F6BF6);
 }
 
 .tree-node.inactive {
@@ -44,15 +44,15 @@
   width: 24px;
   height: 24px;
   border: none !important;
-  color: #6c757d;
+  color: var(--app-gray-500, #667085);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .expand-btn:hover {
-  color: #495057;
-  background-color: #e9ecef;
+  color: var(--app-gray-700, #344054);
+  background-color: var(--app-gray-200, #EAECF0);
   border-radius: 4px;
 }
 
@@ -113,7 +113,7 @@
 /* RTL Support */
 [dir="rtl"] .tree-node.selected {
   border-left: none;
-  border-right: 4px solid #2196f3;
+  border-right: 4px solid var(--app-primary, #4F6BF6);
 }
 
 [dir="rtl"] .node-content {
@@ -178,7 +178,7 @@
 
 /* Loading state */
 .spinner-border {
-  color: #2196f3;
+  color: var(--app-primary, #4F6BF6);
 }
 
 /* Empty state */

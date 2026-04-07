@@ -1,8 +1,8 @@
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Application.Settings.Commands.ActivateOvertimeConfiguration;
+namespace TecAxle.Hrms.Application.Settings.Commands.ActivateOvertimeConfiguration;
 
 /// <summary>
 /// Command for activating an overtime configuration.

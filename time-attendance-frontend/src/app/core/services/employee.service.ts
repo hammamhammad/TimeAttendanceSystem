@@ -19,4 +19,8 @@ export class EmployeeService {
   getEmployee(id: number): Observable<EmployeeDto> {
     return this.http.get<EmployeeDto>(`${this.apiUrl}/${id}`);
   }
+
+  getDropdown(): Observable<{ id: number; name: string; employeeNumber: string }[]> {
+    return this.http.get<{ id: number; name: string; employeeNumber: string }[]>(`${this.apiUrl}/dropdown`);
+  }
 }

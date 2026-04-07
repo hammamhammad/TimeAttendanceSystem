@@ -1,7 +1,7 @@
 using FluentValidation;
-using TimeAttendanceSystem.Domain.Shifts;
+using TecAxle.Hrms.Domain.Shifts;
 
-namespace TimeAttendanceSystem.Application.Shifts.Commands.CreateShift;
+namespace TecAxle.Hrms.Application.Shifts.Commands.CreateShift;
 
 /// <summary>
 /// FluentValidation validator for CreateShiftCommand ensuring comprehensive shift data validation.

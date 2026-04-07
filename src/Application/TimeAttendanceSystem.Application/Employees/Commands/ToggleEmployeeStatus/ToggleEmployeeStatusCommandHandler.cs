@@ -1,10 +1,10 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Application.Employees.Commands.ToggleEmployeeStatus;
+namespace TecAxle.Hrms.Application.Employees.Commands.ToggleEmployeeStatus;
 
 /// <summary>
 /// Handler for toggling employee active/inactive status

@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Users;
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Users;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Application.Authorization.Commands.EnableTwoFactor;
+namespace TecAxle.Hrms.Application.Authorization.Commands.EnableTwoFactor;
 
 /// <summary>
 /// Command handler for enabling two-factor authentication (2FA) for user accounts with comprehensive security setup.

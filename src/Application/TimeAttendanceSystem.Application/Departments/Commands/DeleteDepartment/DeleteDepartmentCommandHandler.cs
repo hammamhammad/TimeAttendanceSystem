@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Departments.Commands.DeleteDepartment;
+namespace TecAxle.Hrms.Application.Departments.Commands.DeleteDepartment;
 
 public class DeleteDepartmentCommandHandler : BaseHandler<DeleteDepartmentCommand, Result>
 {

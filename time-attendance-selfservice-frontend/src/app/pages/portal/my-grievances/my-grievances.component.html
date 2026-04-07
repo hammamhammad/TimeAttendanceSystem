@@ -1,0 +1,114 @@
+<!-- Page Header -->
+<app-page-header [title]="i18n.t('portal.grievances.title')">
+  <div header-actions>
+    <button
+      class="btn btn-primary btn-sm me-2"
+      (click)="openNewGrievance()"
+      type="button">
+      <i class="bi bi-plus me-1"></i>{{ i18n.t('portal.grievances.file_grievance') }}
+    </button>
+    <button
+      class="btn btn-outline-primary btn-sm"
+      (click)="refresh()"
+      [disabled]="loading()"
+      type="button">
+      <i class="bi bi-arrow-clockwise" [class.spin]="loading()"></i>
+      {{ i18n.t('common.refresh') }}
+    </button>
+  </div>
+</app-page-header>
+
+<!-- Loading State (only when no data) -->
+@if (loading() && grievances().length === 0) {
+  <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+}
+
+<!-- Error State -->
+@if (error() && grievances().length === 0) {
+  <div class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle me-2"></i>{{ error() }}
+    <button class="btn btn-sm btn-outline-danger ms-3" (click)="refresh()" type="button">{{ i18n.t('common.retry') }}</button>
+  </div>
+}
+
+<!-- Empty State -->
+@if (!loading() && grievances().length === 0 && !error()) {
+  <app-empty-state
+    icon="bi bi-exclamation-triangle"
+    [title]="i18n.t('portal.grievances.no_grievances')">
+  </app-empty-state>
+}
+
+<!-- Data Table -->
+@if (grievances().length > 0) {
+  <div class="card">
+    <div class="card-body">
+      <app-data-table
+        [data]="tableData()"
+        [columns]="columns"
+        [actions]="tableActions()"
+        [loading]="loading()"
+        [paginated]="true"
+        [pageSize]="10"
+        (actionClick)="onAction($event)">
+      </app-data-table>
+    </div>
+  </div>
+
+  <!-- Info Card -->
+  <div class="card mt-3">
+    <div class="card-body">
+      <div class="d-flex align-items-start">
+        <i class="bi bi-info-circle text-info me-3 mt-1" style="font-size: 1.5rem;"></i>
+        <div>
+          <h6 class="mb-2">{{ i18n.t('portal.grievances.info_title') }}</h6>
+          <p class="text-muted mb-0 small">{{ i18n.t('portal.grievances.info_text') }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- File Grievance Modal -->
+@if (showModal()) {
+  <app-modal-wrapper [title]="i18n.t('portal.grievances.file_grievance')" [show]="showModal()" (close)="showModal.set(false)">
+    <div class="app-modern-form">
+      <div class="row g-3">
+        <div class="col-12">
+          <label class="form-label">{{ i18n.t('portal.grievances.type') }} *</label>
+          <select class="form-select" [ngModel]="selectedType()" (ngModelChange)="selectedType.set($event)">
+            <option [ngValue]="null">{{ i18n.t('portal.grievances.select_type') }}</option>
+            @for (t of grievanceTypes(); track t.value) {
+              <option [ngValue]="t.value">{{ t.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="col-12">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="subject" placeholder="Subject" [ngModel]="subject()" (ngModelChange)="subject.set($event)">
+            <label for="subject">{{ i18n.t('portal.grievances.subject') }} *</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-floating">
+            <textarea class="form-control" id="description" placeholder="Description" style="height: 100px" [ngModel]="description()" (ngModelChange)="description.set($event)"></textarea>
+            <label for="description">{{ i18n.t('portal.grievances.description') }} *</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="isConfidential" [ngModel]="isConfidential()" (ngModelChange)="isConfidential.set($event)">
+            <label class="form-check-label" for="isConfidential">
+              <i class="bi bi-lock me-1"></i>{{ i18n.t('portal.grievances.confidential') }}
+            </label>
+            <div class="form-text">{{ i18n.t('portal.grievances.confidential_hint') }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="app-form-actions mt-3">
+        <button class="btn btn-secondary" (click)="showModal.set(false)">{{ i18n.t('common.cancel') }}</button>
+        <button class="btn btn-primary" (click)="submitGrievance()" [disabled]="saving() || !selectedType() || !subject().trim() || !description().trim()">{{ i18n.t('common.submit') }}</button>
+      </div>
+    </div>
+  </app-modal-wrapper>
+}

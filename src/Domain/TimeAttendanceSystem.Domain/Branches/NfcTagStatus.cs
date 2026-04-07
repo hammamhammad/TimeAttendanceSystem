@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Domain.Branches;
+namespace TecAxle.Hrms.Domain.Branches;
 
 /// <summary>
 /// Represents the lifecycle status of an NFC tag.

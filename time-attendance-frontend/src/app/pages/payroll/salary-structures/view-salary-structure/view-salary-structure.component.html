@@ -1,0 +1,49 @@
+<div class="app-view-page app-modern-view">
+  <app-form-header
+    mode="view"
+    [title]="i18n.t('payroll.salary_structures.view_details')"
+    moduleName="payroll.salary_structures"
+    moduleRoute="payroll/salary-structures"
+    [entityId]="structure()?.id"
+    [loading]="loading()">
+  </app-form-header>
+
+  @if (loading()) {
+    <div class="text-center py-5">
+      <app-loading-spinner [message]="i18n.t('common.loading')" [variant]="'primary'" [centered]="true"></app-loading-spinner>
+    </div>
+  }
+
+  @if (structure() && !loading()) {
+    <app-section-card [title]="i18n.t('common.basic_info')" icon="fas fa-info-circle" headerClass="bg-light" class="mb-4">
+      <app-definition-list [items]="basicInfoItems()" [labelWidth]="'4'" [valueWidth]="'8'"></app-definition-list>
+    </app-section-card>
+
+    <app-section-card [title]="i18n.t('payroll.salary_structures.components')" icon="fas fa-layer-group" headerClass="bg-light" class="mb-4">
+      <app-data-table
+        [data]="structure()?.components || []"
+        [columns]="componentColumns"
+        [showPagination]="false"
+        [emptyTitle]="i18n.t('payroll.salary_structures.no_components')">
+        <ng-template #cellTemplate let-item let-column="column">
+          @if (column.key === 'isTaxable') {
+            <app-status-badge
+              [status]="item.isTaxable ? 'success' : 'secondary'"
+              [label]="item.isTaxable ? i18n.t('common.yes') : i18n.t('common.no')">
+            </app-status-badge>
+          } @else if (column.key === 'componentType') {
+            {{ getComponentTypeName(item.componentType) }}
+          } @else if (column.key === 'calculationType') {
+            {{ getCalcTypeName(item.calculationType) }}
+          } @else {
+            {{ item[column.key] }}
+          }
+        </ng-template>
+      </app-data-table>
+    </app-section-card>
+
+    <app-section-card [title]="i18n.t('history.title')" icon="fas fa-clock-rotate-left" headerClass="bg-light" class="mb-4">
+      <app-audit-history [entityName]="'SalaryStructure'" [entityId]="structure()?.id" />
+    </app-section-card>
+  }
+</div>

@@ -1,14 +1,14 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Application.Extensions;
-using TimeAttendanceSystem.Application.Workflows.Services;
-using TimeAttendanceSystem.Domain.Attendance;
-using TimeAttendanceSystem.Domain.Excuses;
-using TimeAttendanceSystem.Domain.Workflows.Enums;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Extensions;
+using TecAxle.Hrms.Application.Workflows.Services;
+using TecAxle.Hrms.Domain.Attendance;
+using TecAxle.Hrms.Domain.Excuses;
+using TecAxle.Hrms.Domain.Workflows.Enums;
 
-namespace TimeAttendanceSystem.Application.Workflows.Commands.ApproveStep;
+namespace TecAxle.Hrms.Application.Workflows.Commands.ApproveStep;
 
 /// <summary>
 /// Handler for ApproveStepCommand.

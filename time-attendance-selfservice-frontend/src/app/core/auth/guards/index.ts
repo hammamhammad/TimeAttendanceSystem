@@ -3,3 +3,4 @@
  */
 export { employeeGuard } from './employee.guard';
 export { managerGuard } from './manager.guard';
+export { moduleGuard } from './module.guard';

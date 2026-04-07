@@ -1,0 +1,99 @@
+<!-- Page Header -->
+<app-page-header [title]="i18n.t('portal.letters.title')">
+  <div header-actions>
+    <button
+      class="btn btn-primary btn-sm me-2"
+      (click)="openNewRequest()"
+      type="button">
+      <i class="bi bi-plus me-1"></i>{{ i18n.t('portal.letters.request_letter') }}
+    </button>
+    <button
+      class="btn btn-outline-primary btn-sm"
+      (click)="refresh()"
+      [disabled]="loading()"
+      type="button">
+      <i class="bi bi-arrow-clockwise" [class.spin]="loading()"></i>
+      {{ i18n.t('common.refresh') }}
+    </button>
+  </div>
+</app-page-header>
+
+<!-- Loading State (only when no data) -->
+@if (loading() && requests().length === 0) {
+  <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+}
+
+<!-- Error State -->
+@if (error() && requests().length === 0) {
+  <div class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle me-2"></i>{{ error() }}
+    <button class="btn btn-sm btn-outline-danger ms-3" (click)="refresh()" type="button">{{ i18n.t('common.retry') }}</button>
+  </div>
+}
+
+<!-- Empty State -->
+@if (!loading() && requests().length === 0 && !error()) {
+  <app-empty-state
+    icon="bi bi-envelope-paper"
+    [title]="i18n.t('portal.letters.no_requests')">
+  </app-empty-state>
+}
+
+<!-- Data Table -->
+@if (requests().length > 0) {
+  <div class="card">
+    <div class="card-body">
+      <app-data-table
+        [data]="tableData()"
+        [columns]="columns"
+        [actions]="tableActions()"
+        [loading]="loading()"
+        [paginated]="true"
+        [pageSize]="10"
+        (actionClick)="onAction($event)">
+      </app-data-table>
+    </div>
+  </div>
+
+  <!-- Info Card -->
+  <div class="card mt-3">
+    <div class="card-body">
+      <div class="d-flex align-items-start">
+        <i class="bi bi-info-circle text-info me-3 mt-1" style="font-size: 1.5rem;"></i>
+        <div>
+          <h6 class="mb-2">{{ i18n.t('portal.letters.info_title') }}</h6>
+          <p class="text-muted mb-0 small">{{ i18n.t('portal.letters.info_text') }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Request Letter Modal -->
+@if (showModal()) {
+  <app-modal-wrapper [title]="i18n.t('portal.letters.request_letter')" [show]="showModal()" (close)="showModal.set(false)">
+    <div class="app-modern-form">
+      <div class="row g-3">
+        <div class="col-12">
+          <label class="form-label">{{ i18n.t('portal.letters.template') }} *</label>
+          <select class="form-select" [ngModel]="selectedTemplateId()" (ngModelChange)="selectedTemplateId.set($event)">
+            <option [ngValue]="null">{{ i18n.t('portal.letters.select_template') }}</option>
+            @for (t of templates(); track t.id) {
+              <option [ngValue]="t.id">{{ t.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="col-12">
+          <div class="form-floating">
+            <textarea class="form-control" id="purpose" placeholder="Purpose" [ngModel]="purpose()" (ngModelChange)="purpose.set($event)"></textarea>
+            <label for="purpose">{{ i18n.t('portal.letters.purpose') }}</label>
+          </div>
+        </div>
+      </div>
+      <div class="app-form-actions mt-3">
+        <button class="btn btn-secondary" (click)="showModal.set(false)">{{ i18n.t('common.cancel') }}</button>
+        <button class="btn btn-primary" (click)="submitRequest()" [disabled]="saving() || !selectedTemplateId()">{{ i18n.t('common.submit') }}</button>
+      </div>
+    </div>
+  </app-modal-wrapper>
+}

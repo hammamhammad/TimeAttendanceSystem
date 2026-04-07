@@ -1,0 +1,60 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header [title]="i18n.t('loan_applications.create')" moduleName="loan_applications" moduleRoute="loans/applications" />
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <app-form-section [title]="i18n.t('common.basic_info')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('loan_applications.employee') }} <span class="text-danger">*</span></label>
+            <app-searchable-select [options]="employeeOptions" [placeholder]="i18n.t('common.select')" [value]="form.get('employeeId')?.value" (selectionChange)="form.get('employeeId')?.setValue($event)" />
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('loan_applications.loan_type') }} <span class="text-danger">*</span></label>
+            <app-searchable-select [options]="loanTypeOptions" [placeholder]="i18n.t('common.select')" [value]="form.get('loanTypeId')?.value" (selectionChange)="onLoanTypeChange($event)" />
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="number" class="form-control" id="requestedAmount" placeholder="0" formControlName="requestedAmount" min="1">
+            <label for="requestedAmount">{{ i18n.t('loan_applications.requested_amount') }} <span class="text-danger">*</span></label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="number" class="form-control" id="repaymentMonths" placeholder="12" formControlName="repaymentMonths" min="1">
+            <label for="repaymentMonths">{{ i18n.t('loan_applications.term_months') }} <span class="text-danger">*</span></label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="number" class="form-control" id="interestRate" placeholder="0" formControlName="interestRate" min="0" step="0.1">
+            <label for="interestRate">{{ i18n.t('loan_applications.interest_rate') }} (%)</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-floating">
+            <textarea class="form-control" id="purpose" placeholder="Purpose" formControlName="purpose" style="height:80px"></textarea>
+            <label for="purpose">{{ i18n.t('loan_applications.purpose') }}</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-floating">
+            <textarea class="form-control" id="notes" placeholder="Notes" formControlName="notes" style="height:60px"></textarea>
+            <label for="notes">{{ i18n.t('common.notes') }}</label>
+          </div>
+        </div>
+      </div>
+    </app-form-section>
+
+    <div class="app-form-actions">
+      <button type="button" class="btn btn-secondary" routerLink="/loans/applications">{{ i18n.t('common.cancel') }}</button>
+      <button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving()">
+        @if (saving()) { <span class="spinner-border spinner-border-sm me-1"></span> }
+        {{ i18n.t('common.save') }}
+      </button>
+    </div>
+  </form>
+</div>

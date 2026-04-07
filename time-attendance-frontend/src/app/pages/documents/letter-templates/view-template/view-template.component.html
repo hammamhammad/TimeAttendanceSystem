@@ -1,0 +1,63 @@
+<div class="container-fluid app-modern-view">
+  <app-form-header [title]="i18n.t('letter_templates.view')" moduleName="letter-templates" moduleRoute="documents/letter-templates" [loading]="loading()" />
+
+  @if (loading()) { <app-loading-spinner [message]="i18n.t('common.loading')" [centered]="true" /> }
+  @if (error()) { <div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>{{ error() }}</div> }
+  @if (template() && !loading()) {
+    <div class="row">
+      <div class="col-lg-8">
+        <div class="card mb-3">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">{{ template()?.name }}</h5>
+            <app-status-badge [status]="statusBadge().label" [variant]="statusBadge().variant" />
+          </div>
+          <div class="card-body">
+            <app-definition-list [items]="detailItems()" [labelWidth]="'4'" [valueWidth]="'8'" />
+          </div>
+        </div>
+
+        <!-- HTML Content Preview -->
+        @if (template()?.content || template()?.htmlContent) {
+          <div class="card mb-3">
+            <div class="card-header">
+              <h5 class="card-title mb-0"><i class="fas fa-code me-2"></i>{{ i18n.t('letter_templates.html_content') }}</h5>
+            </div>
+            <div class="card-body">
+              <div class="content-preview border rounded p-3" [innerHTML]="template()?.content ?? template()?.htmlContent"></div>
+            </div>
+          </div>
+        }
+
+        @if (template()?.contentAr) {
+          <div class="card mb-3">
+            <div class="card-header">
+              <h5 class="card-title mb-0"><i class="fas fa-code me-2"></i>{{ i18n.t('letter_templates.html_content') }} ({{ i18n.t('letter_templates.name_ar') }})</h5>
+            </div>
+            <div class="card-body">
+              <div class="content-preview border rounded p-3" dir="rtl" [innerHTML]="template()?.contentAr"></div>
+            </div>
+          </div>
+        }
+      </div>
+      <div class="col-lg-4">
+        <div class="card">
+          <div class="card-header"><h5 class="card-title mb-0">{{ i18n.t('common.actions') }}</h5></div>
+          <div class="card-body d-grid gap-2">
+            <button class="btn btn-primary" (click)="router.navigate(['/documents/letter-templates', template()?.id, 'edit'])">
+              <i class="fas fa-edit me-1"></i>{{ i18n.t('common.edit') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Audit History -->
+    <div class="row mt-3">
+      <div class="col-12">
+        <app-section-card [title]="i18n.t('history.title')" icon="fas fa-clock-rotate-left" headerClass="bg-light">
+          <app-audit-history [entityName]="'LetterTemplate'" [entityId]="template()?.id" />
+        </app-section-card>
+      </div>
+    </div>
+  }
+</div>

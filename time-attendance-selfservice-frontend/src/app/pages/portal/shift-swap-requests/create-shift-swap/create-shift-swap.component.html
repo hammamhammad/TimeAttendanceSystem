@@ -1,0 +1,48 @@
+<app-page-header [title]="i18n.t('portal.shift_swaps.create')">
+  <div header-actions>
+    <button class="btn btn-outline-secondary btn-sm" (click)="cancel()" type="button">
+      <i class="bi bi-arrow-left me-1"></i> {{ i18n.t('common.back') }}
+    </button>
+  </div>
+</app-page-header>
+
+@if (loading()) {
+  <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+}
+
+@if (!loading()) {
+  <div class="card">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">{{ i18n.t('portal.shift_swaps.swap_with') }} <span class="text-danger">*</span></label>
+          <app-searchable-select
+            [options]="employeeOptions"
+            [value]="swapWithEmployeeId"
+            [placeholder]="i18n.t('common.select_employee')"
+            (selectionChange)="swapWithEmployeeId = $event">
+          </app-searchable-select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">{{ i18n.t('portal.shift_swaps.original_date') }} <span class="text-danger">*</span></label>
+          <input type="date" class="form-control" [(ngModel)]="originalDate">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">{{ i18n.t('portal.shift_swaps.swap_date') }} <span class="text-danger">*</span></label>
+          <input type="date" class="form-control" [(ngModel)]="swapDate">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">{{ i18n.t('portal.shift_swaps.reason') }}</label>
+          <input type="text" class="form-control" [(ngModel)]="reason" [placeholder]="i18n.t('portal.shift_swaps.reason_placeholder')">
+        </div>
+      </div>
+      <div class="mt-4 d-flex gap-2">
+        <button class="btn btn-primary" (click)="submit()" [disabled]="saving() || !swapWithEmployeeId || !originalDate || !swapDate" type="button">
+          @if (saving()) { <span class="spinner-border spinner-border-sm me-1"></span> }
+          {{ i18n.t('common.submit') }}
+        </button>
+        <button class="btn btn-outline-secondary" (click)="cancel()" type="button">{{ i18n.t('common.cancel') }}</button>
+      </div>
+    </div>
+  </div>
+}

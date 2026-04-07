@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Branches;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Branches;
 
-namespace TimeAttendanceSystem.Application.NfcTags.Commands.CreateNfcTag;
+namespace TecAxle.Hrms.Application.NfcTags.Commands.CreateNfcTag;
 
 /// <summary>
 /// Handler for registering a new NFC tag.

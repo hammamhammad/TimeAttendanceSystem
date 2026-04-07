@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Departments.Commands.UpdateDepartment;
+namespace TecAxle.Hrms.Application.Departments.Commands.UpdateDepartment;
 
 public record UpdateDepartmentCommand(
     long Id,

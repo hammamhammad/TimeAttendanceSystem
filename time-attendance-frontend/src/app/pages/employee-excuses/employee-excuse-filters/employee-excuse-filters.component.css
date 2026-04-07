@@ -21,7 +21,7 @@
 
 .form-select:focus,
 .form-control:focus {
-  border-color: #80bdff;
+  border-color: var(--app-primary-300, #8BA3FF);
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }

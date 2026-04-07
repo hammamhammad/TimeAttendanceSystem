@@ -1,11 +1,11 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Excuses;
-using TimeAttendanceSystem.Domain.Workflows.Enums;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Excuses;
+using TecAxle.Hrms.Domain.Workflows.Enums;
 
-namespace TimeAttendanceSystem.Application.Excuses.Queries.GetEmployeeExcuses;
+namespace TecAxle.Hrms.Application.Excuses.Queries.GetEmployeeExcuses;
 
 /// <summary>
 /// Query handler for retrieving employee excuse requests with filtering and pagination.

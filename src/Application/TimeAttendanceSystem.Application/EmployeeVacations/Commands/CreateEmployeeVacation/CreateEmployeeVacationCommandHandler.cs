@@ -1,14 +1,14 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Application.Workflows.Services;
-using TimeAttendanceSystem.Domain.Vacations;
-using TimeAttendanceSystem.Domain.Attendance;
-using TimeAttendanceSystem.Domain.Workflows.Enums;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Workflows.Services;
+using TecAxle.Hrms.Domain.Vacations;
+using TecAxle.Hrms.Domain.Attendance;
+using TecAxle.Hrms.Domain.Workflows.Enums;
 
-namespace TimeAttendanceSystem.Application.EmployeeVacations.Commands.CreateEmployeeVacation;
+namespace TecAxle.Hrms.Application.EmployeeVacations.Commands.CreateEmployeeVacation;
 
 /// <summary>
 /// Command handler for creating employee vacation requests with workflow integration.
@@ -77,6 +77,25 @@ public class CreateEmployeeVacationCommandHandler : IRequestHandler<CreateEmploy
             return Result.Failure<long>("Vacation type not found or inactive");
         }
 
+        // Validate half-day leave request
+        if (request.IsHalfDay)
+        {
+            if (!vacationType.AllowHalfDay)
+            {
+                return Result.Failure<long>("This vacation type does not allow half-day leave requests");
+            }
+
+            if (request.HalfDayType == null)
+            {
+                return Result.Failure<long>("Half-day type (Morning or Afternoon) is required for half-day leave requests");
+            }
+
+            if (request.StartDate.Date != request.EndDate.Date)
+            {
+                return Result.Failure<long>("Half-day leave must be for a single day (start date must equal end date)");
+            }
+        }
+
         // Get current user name for audit trail
         var currentUserName = _currentUser.Username ?? "Unknown";
 
@@ -92,7 +111,9 @@ public class CreateEmployeeVacationCommandHandler : IRequestHandler<CreateEmploy
                 ? $"{request.Notes}\n[Submitted on behalf by user ID: {currentUserId}]"
                 : request.Notes,
             SubmittedByUserId = currentUserId,
-            CreatedBy = currentUserName
+            CreatedBy = currentUserName,
+            IsHalfDay = request.IsHalfDay,
+            HalfDayType = request.IsHalfDay ? request.HalfDayType : null
         };
 
         // Calculate total days
@@ -119,10 +140,12 @@ public class CreateEmployeeVacationCommandHandler : IRequestHandler<CreateEmploy
 
         // Check leave balance availability
         var vacationYear = request.StartDate.Year;
+        // For half-day leave, use 0.5 days for balance checking; otherwise use calculated total days
+        decimal effectiveDays = request.IsHalfDay ? 0.5m : vacation.TotalDays;
         var hasSufficientBalance = await _leaveAccrualService.CheckSufficientBalanceAsync(
             targetEmployeeId,
             request.VacationTypeId,
-            vacation.TotalDays,
+            effectiveDays,
             vacationYear,
             cancellationToken);
 
@@ -142,7 +165,7 @@ public class CreateEmployeeVacationCommandHandler : IRequestHandler<CreateEmploy
         var reserveResult = await _leaveAccrualService.ReserveLeaveBalanceAsync(
             targetEmployeeId,
             request.VacationTypeId,
-            vacation.TotalDays,
+            effectiveDays,
             vacation.Id,
             vacationYear,
             cancellationToken);
@@ -158,7 +181,7 @@ public class CreateEmployeeVacationCommandHandler : IRequestHandler<CreateEmploy
         // Start workflow for approval
         var contextData = new Dictionary<string, object>
         {
-            { "days", vacation.TotalDays },
+            { "days", effectiveDays },
             { "startDate", vacation.StartDate.ToString("yyyy-MM-dd") },
             { "endDate", vacation.EndDate.ToString("yyyy-MM-dd") },
             { "vacationTypeId", vacation.VacationTypeId }
@@ -178,7 +201,7 @@ public class CreateEmployeeVacationCommandHandler : IRequestHandler<CreateEmploy
             await _leaveAccrualService.ReleaseLeaveBalanceAsync(
                 targetEmployeeId,
                 request.VacationTypeId,
-                vacation.TotalDays,
+                effectiveDays,
                 vacation.Id,
                 vacationYear,
                 cancellationToken);

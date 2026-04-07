@@ -1,8 +1,8 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Application.Employees.Commands.UpdateEmployee;
+namespace TecAxle.Hrms.Application.Employees.Commands.UpdateEmployee;
 
 public record UpdateEmployeeCommand : IRequest<Result<Unit>>
 {

@@ -126,7 +126,7 @@
 
 .form-control:focus,
 .form-select:focus {
-  border-color: #80bdff;
+  border-color: var(--app-primary-300, #8BA3FF);
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
@@ -151,13 +151,13 @@
 }
 
 .btn-primary {
-  background-color: #007bff;
-  border-color: #007bff;
+  background-color: var(--app-primary, #4F6BF6);
+  border-color: var(--app-primary, #4F6BF6);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background-color: #0056b3;
-  border-color: #0056b3;
+  background-color: var(--app-primary-700, #2D3EB3);
+  border-color: var(--app-primary-700, #2D3EB3);
 }
 
 .btn-secondary {

@@ -1,0 +1,40 @@
+<div class="app-list-page">
+  <app-page-header [title]="i18n.t('payroll.salary_structures.title')" />
+
+  <app-unified-filter
+    [showAddButton]="true"
+    [addButtonText]="i18n.t('payroll.salary_structures.create')"
+    [showRefreshButton]="true"
+    [refreshing]="loading()"
+    (add)="create()"
+    (refresh)="loadData()">
+  </app-unified-filter>
+
+  <app-data-table
+    [data]="items()"
+    [columns]="tableColumns"
+    [actions]="tableActions"
+    [currentPage]="currentPage()"
+    [totalItems]="totalCount()"
+    [pageSize]="pageSize()"
+    [loading]="loading"
+    [emptyTitle]="i18n.t('payroll.salary_structures.no_records')"
+    [emptyMessage]="i18n.t('payroll.salary_structures.no_records_message')"
+    [showPagination]="true"
+    (actionClick)="onActionClick($event)"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+    <ng-template #cellTemplate let-item let-column="column">
+      @if (column.key === 'isActive') {
+        <app-status-badge
+          [status]="item.isActive ? 'active' : 'inactive'"
+          [label]="item.isActive ? i18n.t('common.active') : i18n.t('common.inactive')">
+        </app-status-badge>
+      } @else if (column.key === 'componentCount') {
+        <span class="badge bg-secondary">{{ item.componentCount }}</span>
+      } @else {
+        {{ item[column.key] }}
+      }
+    </ng-template>
+  </app-data-table>
+</div>

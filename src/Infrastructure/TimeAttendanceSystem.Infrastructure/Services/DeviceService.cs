@@ -2,10 +2,10 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Domain.Users;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Domain.Users;
 
-namespace TimeAttendanceSystem.Infrastructure.Services;
+namespace TecAxle.Hrms.Infrastructure.Services;
 
 public class DeviceService : IDeviceService
 {

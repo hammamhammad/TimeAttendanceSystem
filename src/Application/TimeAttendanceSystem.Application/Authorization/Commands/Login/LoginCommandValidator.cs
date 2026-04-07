@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace TimeAttendanceSystem.Application.Authorization.Commands.Login;
+namespace TecAxle.Hrms.Application.Authorization.Commands.Login;
 
 /// <summary>
 /// FluentValidation validator for LoginCommand ensuring secure and proper authentication request validation.

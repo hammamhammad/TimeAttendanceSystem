@@ -1,0 +1,1 @@
+var r=(e=>(e.Allowance="Allowance",e.Deduction="Deduction",e.Benefit="Benefit",e))(r||{}),n=(e=>(e.Fixed="Fixed",e.PercentageOfBasic="PercentageOfBasic",e.PercentageOfGross="PercentageOfGross",e))(n||{});export{r as a,n as b};

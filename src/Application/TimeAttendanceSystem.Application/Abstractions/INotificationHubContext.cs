@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Application.Abstractions;
+namespace TecAxle.Hrms.Application.Abstractions;
 
 /// <summary>
 /// Abstraction for SignalR notification hub context.

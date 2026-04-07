@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.VacationTypes.Queries.GetVacationTypes;
+namespace TecAxle.Hrms.Application.VacationTypes.Queries.GetVacationTypes;
 
 /// <summary>
 /// Query handler for retrieving paginated vacation type lists with advanced filtering and security enforcement.
@@ -163,7 +163,10 @@ public class GetVacationTypesQueryHandler : BaseHandler<GetVacationTypesQuery, R
                     vt.NameAr,
                     vt.IsActive,
                     vt.CreatedAtUtc,
-                    vt.ModifiedAtUtc
+                    vt.ModifiedAtUtc,
+                    vt.AllowHalfDay,
+                    vt.AllowEncashment,
+                    vt.EncashmentMaxDays
                 ))
                 .ToListAsync(cancellationToken);
 

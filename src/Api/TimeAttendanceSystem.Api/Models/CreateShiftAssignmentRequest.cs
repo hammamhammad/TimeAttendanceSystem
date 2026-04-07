@@ -1,7 +1,7 @@
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Domain.Common;
 using System.ComponentModel.DataAnnotations;
 
-namespace TimeAttendanceSystem.Api.Models;
+namespace TecAxle.Hrms.Api.Models;
 
 /// <summary>
 /// Request model for creating new shift assignments with comprehensive validation.

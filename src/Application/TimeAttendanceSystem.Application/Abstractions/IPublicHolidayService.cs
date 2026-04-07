@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.Settings;
+using TecAxle.Hrms.Domain.Settings;
 
-namespace TimeAttendanceSystem.Application.Abstractions;
+namespace TecAxle.Hrms.Application.Abstractions;
 
 /// <summary>
 /// Service interface for managing public holidays and providing business logic

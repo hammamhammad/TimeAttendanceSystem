@@ -1,0 +1,148 @@
+<!-- Page Header -->
+<app-page-header [title]="i18n.t('portal.surveys.take_survey')">
+  <div header-actions>
+    <button
+      class="btn btn-outline-secondary btn-sm"
+      [routerLink]="['/my-surveys']"
+      type="button">
+      <i class="bi bi-arrow-left me-1"></i>{{ i18n.t('common.back') }}
+    </button>
+  </div>
+</app-page-header>
+
+<!-- Loading -->
+@if (loading()) {
+  <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+}
+
+<!-- Error -->
+@if (error()) {
+  <div class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle me-2"></i>{{ error() }}
+  </div>
+}
+
+<!-- Survey Form -->
+@if (surveyForm() && !loading()) {
+  <!-- Survey Header -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h4 class="mb-2">{{ surveyTitle() }}</h4>
+      @if (surveyDescription()) {
+        <p class="text-muted mb-1">{{ surveyDescription() }}</p>
+      }
+      @if (surveyForm()!.isAnonymous) {
+        <div class="d-flex align-items-center text-success small mt-2">
+          <i class="bi bi-shield-check me-1"></i>{{ i18n.t('portal.surveys.anonymous_notice') }}
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Questions -->
+  @for (q of surveyForm()!.questions; track q.id; let i = $index) {
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="d-flex align-items-start mb-3">
+          <span class="badge bg-primary rounded-circle me-2" style="min-width: 28px; height: 28px; line-height: 20px;">{{ i + 1 }}</span>
+          <div>
+            <span class="fw-semibold">{{ getQuestionText(q) }}</span>
+            @if (q.isRequired) { <span class="text-danger ms-1">*</span> }
+          </div>
+        </div>
+
+        <!-- Rating (Stars) -->
+        @if (q.questionType === 'Rating') {
+          <div class="d-flex gap-1 align-items-center">
+            @for (star of getRatingStars(); track star) {
+              <button type="button" class="btn btn-link p-0 text-decoration-none fs-4"
+                (click)="setRating(i, star)" [attr.aria-label]="star + ' stars'">
+                <i class="bi" [class.bi-star-fill]="(answers()[i]?.ratingValue ?? 0) >= star" [class.bi-star]="(answers()[i]?.ratingValue ?? 0) < star"
+                   [class.text-warning]="(answers()[i]?.ratingValue ?? 0) >= star" [class.text-muted]="(answers()[i]?.ratingValue ?? 0) < star"></i>
+              </button>
+            }
+            @if (answers()[i]?.ratingValue) {
+              <span class="ms-2 text-muted small">{{ answers()[i].ratingValue }} / 5</span>
+            }
+          </div>
+        }
+
+        <!-- Multiple Choice (Radio) -->
+        @if (q.questionType === 'MultipleChoice') {
+          @for (opt of q.options ?? []; track $index; let oi = $index) {
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="radio" [name]="'q_' + q.id" [id]="'q_' + q.id + '_o_' + oi"
+                [value]="opt" [checked]="answers()[i]?.selectedOptions?.includes(opt)"
+                (change)="setRadio(i, opt)">
+              <label class="form-check-label" [for]="'q_' + q.id + '_o_' + oi">{{ getOptionText(q, oi) }}</label>
+            </div>
+          }
+        }
+
+        <!-- Multi Select (Checkboxes) -->
+        @if (q.questionType === 'MultiSelect') {
+          @for (opt of q.options ?? []; track $index; let oi = $index) {
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="checkbox" [id]="'q_' + q.id + '_o_' + oi"
+                [checked]="isChecked(i, opt)"
+                (change)="toggleCheckbox(i, opt)">
+              <label class="form-check-label" [for]="'q_' + q.id + '_o_' + oi">{{ getOptionText(q, oi) }}</label>
+            </div>
+          }
+        }
+
+        <!-- Open Text (Textarea) -->
+        @if (q.questionType === 'OpenText') {
+          <textarea class="form-control" rows="3" [placeholder]="i18n.t('portal.surveys.type_answer')"
+            [ngModel]="answers()[i]?.textValue" (ngModelChange)="setText(i, $event)"></textarea>
+        }
+
+        <!-- NPS (0-10 buttons) -->
+        @if (q.questionType === 'NPS') {
+          <div class="d-flex justify-content-between mb-2">
+            <small class="text-muted">{{ i18n.t('portal.surveys.not_likely') }}</small>
+            <small class="text-muted">{{ i18n.t('portal.surveys.very_likely') }}</small>
+          </div>
+          <div class="d-flex gap-1 flex-wrap">
+            @for (val of npsValues; track val) {
+              <button type="button" class="btn btn-sm" style="min-width: 38px;"
+                [class.btn-primary]="answers()[i]?.npsValue === val"
+                [class.btn-outline-secondary]="answers()[i]?.npsValue !== val"
+                (click)="setNps(i, val)">
+                {{ val }}
+              </button>
+            }
+          </div>
+        }
+
+        <!-- Yes/No Toggle -->
+        @if (q.questionType === 'YesNo') {
+          <div class="d-flex gap-2">
+            <button type="button" class="btn"
+              [class.btn-success]="answers()[i]?.yesNoValue === true"
+              [class.btn-outline-success]="answers()[i]?.yesNoValue !== true"
+              (click)="setYesNo(i, true)">
+              <i class="bi bi-check-lg me-1"></i>{{ i18n.t('common.yes') }}
+            </button>
+            <button type="button" class="btn"
+              [class.btn-danger]="answers()[i]?.yesNoValue === false"
+              [class.btn-outline-danger]="answers()[i]?.yesNoValue !== false"
+              (click)="setYesNo(i, false)">
+              <i class="bi bi-x-lg me-1"></i>{{ i18n.t('common.no') }}
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Submit Button -->
+  <div class="d-flex justify-content-end gap-2 mb-4">
+    <button class="btn btn-secondary" [routerLink]="['/my-surveys']">{{ i18n.t('common.cancel') }}</button>
+    <button class="btn btn-primary" (click)="onSubmit()" [disabled]="submitting()">
+      @if (submitting()) { <i class="bi bi-hourglass-split me-1"></i> }
+      @else { <i class="bi bi-send me-1"></i> }
+      {{ i18n.t('common.submit') }}
+    </button>
+  </div>
+}

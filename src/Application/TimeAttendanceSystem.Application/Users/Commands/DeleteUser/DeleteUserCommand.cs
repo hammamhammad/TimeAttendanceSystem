@@ -1,6 +1,6 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Users.Commands.DeleteUser;
+namespace TecAxle.Hrms.Application.Users.Commands.DeleteUser;
 
 public record DeleteUserCommand(long UserId) : IRequest<Result<Unit>>;

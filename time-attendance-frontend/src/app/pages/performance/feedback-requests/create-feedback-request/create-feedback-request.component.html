@@ -1,0 +1,64 @@
+<div class="app-modern-form">
+  <app-form-header
+    mode="create"
+    [title]="i18n.t('feedback_360.create')"
+    moduleName="feedback_360"
+    moduleRoute="performance/feedback-requests"
+    [loading]="false">
+  </app-form-header>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <app-form-section [title]="i18n.t('feedback_360.request')" icon="fas fa-comments" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('feedback_360.select_review') }} *</label>
+            <app-searchable-select
+              [options]="reviewOptions()"
+              [value]="form.get('performanceReviewId')?.value"
+              [placeholder]="i18n.t('feedback_360.select_review')"
+              (selectionChange)="form.get('performanceReviewId')?.setValue($event)">
+            </app-searchable-select>
+            @if (isInvalid('performanceReviewId')) {
+              <div class="invalid-feedback d-block">{{ i18n.t('common.required') }}</div>
+            }
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('feedback_360.select_employee') }} *</label>
+            <app-searchable-select
+              [options]="employeeOptions()"
+              [value]="form.get('requestedFromEmployeeId')?.value"
+              [placeholder]="i18n.t('feedback_360.select_employee')"
+              (selectionChange)="form.get('requestedFromEmployeeId')?.setValue($event)">
+            </app-searchable-select>
+            @if (isInvalid('requestedFromEmployeeId')) {
+              <div class="invalid-feedback d-block">{{ i18n.t('common.required') }}</div>
+            }
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="deadline" formControlName="deadline" placeholder="Deadline">
+            <label for="deadline">{{ i18n.t('feedback_360.deadline') }}</label>
+          </div>
+        </div>
+      </div>
+    </app-form-section>
+
+    <div class="app-form-actions">
+      <button type="submit" class="btn btn-primary" [disabled]="submitting()">
+        @if (submitting()) {
+          <span class="spinner-border spinner-border-sm me-2"></span>
+        }
+        <i class="fa-solid fa-save me-2"></i>{{ i18n.t('common.save') }}
+      </button>
+      <a [routerLink]="['/performance/feedback-requests']" class="btn btn-secondary">
+        {{ i18n.t('common.cancel') }}
+      </a>
+    </div>
+  </form>
+</div>

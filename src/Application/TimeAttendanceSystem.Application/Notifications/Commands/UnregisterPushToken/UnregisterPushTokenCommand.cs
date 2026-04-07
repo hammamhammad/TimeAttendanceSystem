@@ -1,7 +1,7 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Notifications.Commands.UnregisterPushToken;
+namespace TecAxle.Hrms.Application.Notifications.Commands.UnregisterPushToken;
 
 /// <summary>
 /// Command to unregister/deactivate a push notification token.

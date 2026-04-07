@@ -1,16 +1,16 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TimeAttendanceSystem.Application.Users.Commands.CreateUser;
-using TimeAttendanceSystem.Application.Users.Commands.UpdateUser;
-using TimeAttendanceSystem.Application.Users.Commands.DeleteUser;
-using TimeAttendanceSystem.Application.Users.Commands.AssignUserRole;
-using TimeAttendanceSystem.Application.Users.Commands.RemoveUserRole;
-using TimeAttendanceSystem.Application.Users.Commands.AssignUserBranchScope;
-using TimeAttendanceSystem.Application.Users.Queries.GetUsers;
-using TimeAttendanceSystem.Application.Users.Queries.GetUserById;
+using TecAxle.Hrms.Application.Users.Commands.CreateUser;
+using TecAxle.Hrms.Application.Users.Commands.UpdateUser;
+using TecAxle.Hrms.Application.Users.Commands.DeleteUser;
+using TecAxle.Hrms.Application.Users.Commands.AssignUserRole;
+using TecAxle.Hrms.Application.Users.Commands.RemoveUserRole;
+using TecAxle.Hrms.Application.Users.Commands.AssignUserBranchScope;
+using TecAxle.Hrms.Application.Users.Queries.GetUsers;
+using TecAxle.Hrms.Application.Users.Queries.GetUserById;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 /// <summary>
 /// API controller for user management operations in the Time Attendance System.

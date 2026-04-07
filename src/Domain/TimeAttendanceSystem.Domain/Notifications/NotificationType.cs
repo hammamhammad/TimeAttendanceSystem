@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Domain.Notifications;
+namespace TecAxle.Hrms.Domain.Notifications;
 
 /// <summary>
 /// Defines the types of in-app notifications that can be sent to users.

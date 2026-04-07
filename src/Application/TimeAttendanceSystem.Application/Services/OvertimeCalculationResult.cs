@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.Settings;
+using TecAxle.Hrms.Domain.Settings;
 
-namespace TimeAttendanceSystem.Application.Services;
+namespace TecAxle.Hrms.Application.Services;
 
 /// <summary>
 /// Result of overtime calculation containing detailed breakdown of overtime hours,

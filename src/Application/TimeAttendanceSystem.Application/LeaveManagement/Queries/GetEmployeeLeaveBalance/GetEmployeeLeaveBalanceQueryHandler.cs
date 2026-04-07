@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.LeaveManagement.Queries.GetEmployeeLeaveBalance;
+namespace TecAxle.Hrms.Application.LeaveManagement.Queries.GetEmployeeLeaveBalance;
 
 /// <summary>
 /// Query handler for retrieving employee leave balance.

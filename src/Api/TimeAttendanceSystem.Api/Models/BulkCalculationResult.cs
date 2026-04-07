@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Api.Models;
+namespace TecAxle.Hrms.Api.Models;
 
 /// <summary>
 /// Result model for bulk attendance calculation operations.

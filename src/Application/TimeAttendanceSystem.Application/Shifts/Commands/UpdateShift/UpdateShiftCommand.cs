@@ -1,13 +1,16 @@
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Shifts;
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Shifts;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.Shifts.Commands.UpdateShift;
+namespace TecAxle.Hrms.Application.Shifts.Commands.UpdateShift;
 
 /// <summary>
 /// Command for updating an existing shift with comprehensive shift management capabilities.
 /// Supports modification of all shift properties while maintaining business rule validation.
 /// </summary>
+[RequiresModule(SystemModule.TimeAttendance)]
 public record UpdateShiftCommand(
     long Id,
     string Name,

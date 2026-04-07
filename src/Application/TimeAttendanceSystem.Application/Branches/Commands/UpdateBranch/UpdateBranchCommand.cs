@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Branches.Commands.UpdateBranch;
+namespace TecAxle.Hrms.Application.Branches.Commands.UpdateBranch;
 
 public record UpdateBranchCommand(
     long Id,

@@ -1,0 +1,90 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header [title]="isEdit() ? i18n.t('surveys.edit_distribution') : i18n.t('surveys.create_distribution')" moduleName="surveys" moduleRoute="surveys/distributions" [loading]="saving()" />
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <app-form-section [title]="i18n.t('common.basic_information')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="title" placeholder="Title" formControlName="title">
+            <label for="title">{{ i18n.t('surveys.dist_title') }} *</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="titleAr" placeholder="Title AR" formControlName="titleAr">
+            <label for="titleAr">{{ i18n.t('surveys.dist_title_ar') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('surveys.template') }} *</label>
+            <app-searchable-select [options]="templateOptions()" [placeholder]="i18n.t('common.select')" [value]="form.get('templateId')?.value" (selectionChange)="form.get('templateId')?.setValue($event)" [disabled]="isEdit()" />
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-check form-switch mt-4">
+            <input class="form-check-input" type="checkbox" id="isAnonymous" formControlName="isAnonymous">
+            <label class="form-check-label" for="isAnonymous">{{ i18n.t('surveys.anonymous') }}</label>
+          </div>
+        </div>
+      </div>
+    </app-form-section>
+
+    <app-form-section [title]="i18n.t('surveys.schedule')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="startDate" placeholder="Date" formControlName="startDate">
+            <label for="startDate">{{ i18n.t('surveys.start_date') }} *</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="endDate" placeholder="Date" formControlName="endDate">
+            <label for="endDate">{{ i18n.t('surveys.end_date') }} *</label>
+          </div>
+        </div>
+      </div>
+    </app-form-section>
+
+    <app-form-section [title]="i18n.t('surveys.target_audience')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('surveys.target_audience') }} *</label>
+            <app-searchable-select [options]="targetAudienceOptions()" [placeholder]="i18n.t('common.select')" [value]="form.get('targetAudience')?.value" (selectionChange)="onTargetAudienceChange($event)" />
+          </div>
+        </div>
+        @if (showTargetIds()) {
+          <div class="col-md-6">
+            <div class="app-modern-field">
+              <label class="app-modern-label">{{ i18n.t('surveys.target_ids') }}</label>
+              <app-searchable-select [options]="targetIdOptions()" [placeholder]="i18n.t('common.select')" [value]="null" (selectionChange)="onTargetIdChange($event)" />
+            </div>
+          </div>
+          @if (selectedTargetIds().length > 0) {
+            <div class="col-12">
+              <div class="d-flex flex-wrap gap-2">
+                @for (id of selectedTargetIds(); track id) {
+                  <span class="badge bg-primary d-flex align-items-center gap-1">
+                    {{ getTargetLabel(id) }}
+                    <button type="button" class="btn-close btn-close-white ms-1" style="font-size: 0.6rem" (click)="removeTargetId(id)"></button>
+                  </span>
+                }
+              </div>
+            </div>
+          }
+        }
+      </div>
+    </app-form-section>
+
+    <div class="app-form-actions">
+      <button type="button" class="btn btn-secondary" (click)="router.navigate(['/surveys/distributions'])">{{ i18n.t('common.cancel') }}</button>
+      <button type="submit" class="btn btn-primary" [disabled]="saving()">
+        @if (saving()) { <i class="fas fa-spinner fa-spin me-1"></i> }
+        {{ i18n.t('common.save') }}
+      </button>
+    </div>
+  </form>
+</div>

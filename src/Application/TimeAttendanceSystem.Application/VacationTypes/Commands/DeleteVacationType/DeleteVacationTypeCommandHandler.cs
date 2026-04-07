@@ -1,9 +1,9 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Abstractions;
 
-namespace TimeAttendanceSystem.Application.VacationTypes.Commands.DeleteVacationType;
+namespace TecAxle.Hrms.Application.VacationTypes.Commands.DeleteVacationType;
 
 /// <summary>
 /// Command handler for soft-deleting vacation types in the Time Attendance System.

@@ -1,11 +1,11 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using FluentValidation;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Domain.VacationTypes;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Domain.VacationTypes;
 
-namespace TimeAttendanceSystem.Application.VacationTypes.Commands.CreateVacationType;
+namespace TecAxle.Hrms.Application.VacationTypes.Commands.CreateVacationType;
 
 /// <summary>
 /// Command handler for creating new vacation types in the Time Attendance System.
@@ -104,7 +104,10 @@ public class CreateVacationTypeCommandHandler : IRequestHandler<CreateVacationTy
             BranchId = request.BranchId,
             Name = request.Name.Trim(),
             NameAr = request.NameAr?.Trim(),
-            IsActive = true // New vacation types are active by default
+            IsActive = true, // New vacation types are active by default
+            AllowHalfDay = request.AllowHalfDay,
+            AllowEncashment = request.AllowEncashment,
+            EncashmentMaxDays = request.AllowEncashment ? request.EncashmentMaxDays : null
         };
 
         // Stage 5: Database Persistence with Transaction Support

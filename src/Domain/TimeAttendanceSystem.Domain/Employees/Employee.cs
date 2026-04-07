@@ -1,8 +1,9 @@
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Domain.Branches;
-using TimeAttendanceSystem.Domain.Users;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Branches;
+using TecAxle.Hrms.Domain.Payroll;
+using TecAxle.Hrms.Domain.Users;
 
-namespace TimeAttendanceSystem.Domain.Employees;
+namespace TecAxle.Hrms.Domain.Employees;
 
 /// <summary>
 /// Domain entity representing an employee within the organizational time attendance system.
@@ -119,6 +120,27 @@ public class Employee : BaseEntity
     public WorkLocationType WorkLocationType { get; set; }
     public string? PhotoUrl { get; set; }
 
+    // Personal info enhancements (Phase 1)
+    public string? MiddleName { get; set; }
+    public string? MiddleNameAr { get; set; }
+    public MaritalStatus? MaritalStatus { get; set; }
+    public string? Nationality { get; set; }
+    public string? NationalityAr { get; set; }
+    public string? Religion { get; set; }
+    public string? PassportNumber { get; set; }
+    public DateTime? PassportExpiryDate { get; set; }
+    public int? NumberOfDependents { get; set; }
+
+    // Employment enhancements (Phase 1)
+    public long? JobGradeId { get; set; }
+    public string? CostCenter { get; set; }
+    public ContractType? CurrentContractType { get; set; }
+    public DateTime? ProbationEndDate { get; set; }
+    public ProbationStatus ProbationStatus { get; set; } = ProbationStatus.NotApplicable;
+    public int? NoticePeriodDays { get; set; }
+    public DateTime? TerminationDate { get; set; }
+    public DateTime? LastWorkingDate { get; set; }
+
     /// <summary>
     /// Gets or sets a value indicating whether this employee is active in the system.
     /// Active employees can access the system and are visible in normal operations.
@@ -133,6 +155,32 @@ public class Employee : BaseEntity
     public Employee? Manager { get; set; }
     public ICollection<Employee> DirectReports { get; set; } = new List<Employee>();
     public EmployeeUserLink? EmployeeUserLink { get; set; }
+
+    // Phase 1: Employee Lifecycle navigation properties
+    public JobGrade? JobGrade { get; set; }
+    public ICollection<EmployeeContract> Contracts { get; set; } = new List<EmployeeContract>();
+    public ICollection<EmployeeTransfer> Transfers { get; set; } = new List<EmployeeTransfer>();
+    public ICollection<EmployeePromotion> Promotions { get; set; } = new List<EmployeePromotion>();
+    public ICollection<SalaryAdjustment> SalaryAdjustments { get; set; } = new List<SalaryAdjustment>();
+    public ICollection<EmployeeProfileChange> ProfileChanges { get; set; } = new List<EmployeeProfileChange>();
+    public ICollection<EmployeeBankDetail> BankDetails { get; set; } = new List<EmployeeBankDetail>();
+    public ICollection<EmployeeDependent> Dependents { get; set; } = new List<EmployeeDependent>();
+    public ICollection<EmergencyContact> EmergencyContacts { get; set; } = new List<EmergencyContact>();
+    public ICollection<EmployeeAddress> Addresses { get; set; } = new List<EmployeeAddress>();
+    public ICollection<EmployeeEducation> EducationHistory { get; set; } = new List<EmployeeEducation>();
+    public ICollection<EmployeeWorkExperience> WorkExperienceHistory { get; set; } = new List<EmployeeWorkExperience>();
+    public ICollection<EmployeeVisa> Visas { get; set; } = new List<EmployeeVisa>();
+    public ICollection<EmployeeSalary> Salaries { get; set; } = new List<EmployeeSalary>();
+    public ICollection<EmployeeInsurance> Insurances { get; set; } = new List<EmployeeInsurance>();
+
+    // Phase 4: Training
+    public ICollection<Training.TrainingEnrollment> TrainingEnrollments { get; set; } = new List<Training.TrainingEnrollment>();
+    public ICollection<Training.EmployeeCertification> Certifications { get; set; } = new List<Training.EmployeeCertification>();
+
+    // Phase 4: Employee Relations
+    public ICollection<EmployeeRelations.DisciplinaryAction> DisciplinaryActions { get; set; } = new List<EmployeeRelations.DisciplinaryAction>();
+    public ICollection<EmployeeRelations.CounselingRecord> CounselingRecords { get; set; } = new List<EmployeeRelations.CounselingRecord>();
+    public ICollection<EmployeeRelations.Grievance> Grievances { get; set; } = new List<EmployeeRelations.Grievance>();
 
     public string FullName => $"{FirstName} {LastName}";
     public string? FullNameAr => !string.IsNullOrEmpty(FirstNameAr) && !string.IsNullOrEmpty(LastNameAr) 

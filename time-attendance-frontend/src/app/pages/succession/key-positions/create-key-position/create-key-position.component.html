@@ -1,0 +1,83 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header [title]="i18n.t(isEditMode() ? 'succession.key_positions.edit' : 'succession.key_positions.create')" moduleName="key_positions" moduleRoute="succession/key-positions" />
+  @if (loadingData()) {
+    <div class="text-center py-5"><app-loading-spinner [message]="i18n.t('common.loading')" [variant]="'primary'" [centered]="true" /></div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <app-form-section [title]="i18n.t('common.basic_info')" [variant]="'modern'">
+        <div class="row g-3">
+          <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" id="jobTitle" formControlName="jobTitle" placeholder="x"><label for="jobTitle">{{ i18n.t('succession.key_positions.job_title') }} <span class="text-danger">*</span></label></div></div>
+          <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" id="jobTitleAr" formControlName="jobTitleAr" placeholder="x" dir="rtl"><label for="jobTitleAr">{{ i18n.t('succession.key_positions.job_title_ar') }}</label></div></div>
+          <div class="col-md-6">
+            <div class="app-modern-field">
+              <label class="app-modern-label">{{ i18n.t('fields.branch') }} <span class="text-danger">*</span></label>
+              <app-searchable-select [options]="branchOptions()" [formControl]="$any(form.get('branchId'))" [placeholder]="i18n.t('common.select')" />
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="app-modern-field">
+              <label class="app-modern-label">{{ i18n.t('fields.department') }}</label>
+              <app-searchable-select [options]="departmentOptions()" [formControl]="$any(form.get('departmentId'))" [placeholder]="i18n.t('common.select')" />
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="app-modern-field">
+              <label class="app-modern-label">{{ i18n.t('succession.key_positions.job_grade') }}</label>
+              <app-searchable-select [options]="jobGradeOptions()" [formControl]="$any(form.get('jobGradeId'))" [placeholder]="i18n.t('common.select')" />
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="app-modern-field">
+              <label class="app-modern-label">{{ i18n.t('succession.key_positions.current_holder') }}</label>
+              <app-searchable-select [options]="employeeOptions()" [formControl]="$any(form.get('currentHolderId'))" [placeholder]="i18n.t('common.select')" />
+            </div>
+          </div>
+        </div>
+      </app-form-section>
+
+      <app-form-section [title]="i18n.t('succession.key_positions.risk_assessment')" [variant]="'modern'">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="form-floating">
+              <select class="form-select" id="criticalityLevel" formControlName="criticalityLevel">
+                <option value="Low">{{ i18n.t('succession.enums.Low') }}</option>
+                <option value="Medium">{{ i18n.t('succession.enums.Medium') }}</option>
+                <option value="High">{{ i18n.t('succession.enums.High') }}</option>
+                <option value="Critical">{{ i18n.t('succession.enums.Critical') }}</option>
+              </select>
+              <label for="criticalityLevel">{{ i18n.t('succession.key_positions.criticality') }} <span class="text-danger">*</span></label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-floating">
+              <select class="form-select" id="vacancyRisk" formControlName="vacancyRisk">
+                <option value="Low">{{ i18n.t('succession.enums.Low') }}</option>
+                <option value="Medium">{{ i18n.t('succession.enums.Medium') }}</option>
+                <option value="High">{{ i18n.t('succession.enums.High') }}</option>
+                <option value="Imminent">{{ i18n.t('succession.enums.Imminent') }}</option>
+              </select>
+              <label for="vacancyRisk">{{ i18n.t('succession.key_positions.vacancy_risk') }} <span class="text-danger">*</span></label>
+            </div>
+          </div>
+          <div class="col-md-6"><div class="form-floating"><input type="number" class="form-control" id="minExperienceYears" formControlName="minExperienceYears" placeholder="x"><label for="minExperienceYears">{{ i18n.t('succession.key_positions.min_experience_years') }}</label></div></div>
+          @if (isEditMode()) {
+            <div class="col-md-6">
+              <div class="form-check form-switch mt-3">
+                <input class="form-check-input" type="checkbox" id="isActive" formControlName="isActive">
+                <label class="form-check-label" for="isActive">{{ i18n.t('common.active') }}</label>
+              </div>
+            </div>
+          }
+          <div class="col-12"><div class="form-floating"><textarea class="form-control" id="impactOfVacancy" formControlName="impactOfVacancy" placeholder="x" style="height:80px"></textarea><label for="impactOfVacancy">{{ i18n.t('succession.key_positions.impact_of_vacancy') }}</label></div></div>
+          <div class="col-12"><div class="form-floating"><textarea class="form-control" id="requiredCompetencies" formControlName="requiredCompetencies" placeholder="x" style="height:80px"></textarea><label for="requiredCompetencies">{{ i18n.t('succession.key_positions.required_competencies') }}</label></div></div>
+          <div class="col-12"><div class="form-floating"><textarea class="form-control" id="notes" formControlName="notes" placeholder="x" style="height:80px"></textarea><label for="notes">{{ i18n.t('fields.notes') }}</label></div></div>
+        </div>
+      </app-form-section>
+
+      <div class="app-form-actions">
+        <button type="button" class="btn btn-secondary" routerLink="/succession/key-positions">{{ i18n.t('common.cancel') }}</button>
+        <button type="submit" class="btn btn-primary" [disabled]="form.invalid || submitting()">@if (submitting()) { <span class="spinner-border spinner-border-sm me-1"></span> }{{ i18n.t('common.save') }}</button>
+      </div>
+    </form>
+  }
+</div>

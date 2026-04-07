@@ -1,7 +1,7 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Authorization.Commands.Login;
+namespace TecAxle.Hrms.Application.Authorization.Commands.Login;
 
 public record LoginCommand(
     string Username,

@@ -1,0 +1,77 @@
+<div class="container-fluid app-modern-view">
+  <app-form-header [title]="i18n.t('surveys.view_template')" moduleName="surveys" moduleRoute="surveys/templates" [loading]="loading()" />
+
+  @if (loading()) { <app-loading-spinner [message]="i18n.t('common.loading')" [centered]="true" /> }
+  @if (error()) { <div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>{{ error() }}</div> }
+  @if (template() && !loading()) {
+    <div class="row">
+      <div class="col-lg-8">
+        <!-- Details Card -->
+        <div class="card mb-3">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">{{ template()?.name }}</h5>
+            <div class="d-flex gap-2">
+              <app-status-badge [status]="typeBadge().label" [variant]="typeBadge().variant" />
+              <app-status-badge [status]="statusBadge().label" [variant]="statusBadge().variant" />
+            </div>
+          </div>
+          <div class="card-body">
+            <app-definition-list [items]="detailItems()" [labelWidth]="'4'" [valueWidth]="'8'" />
+          </div>
+        </div>
+
+        <!-- Questions Preview -->
+        <app-section-card [title]="i18n.t('surveys.questions')" icon="fas fa-clipboard-question" headerClass="bg-light">
+          @if (template()?.questions?.length) {
+            @for (q of template()!.questions; track q.id; let i = $index) {
+              <div class="d-flex mb-3 p-3 border rounded">
+                <div class="me-3 text-center" style="min-width: 40px;">
+                  <span class="badge bg-primary rounded-circle" style="width:28px;height:28px;line-height:20px;">{{ i + 1 }}</span>
+                  <div class="mt-1"><i [class]="getQuestionTypeIcon(q.questionType)" class="text-muted small"></i></div>
+                </div>
+                <div class="flex-grow-1">
+                  <div class="fw-semibold">{{ q.questionText }} @if (q.isRequired) { <span class="text-danger">*</span> }</div>
+                  @if (q.questionTextAr) { <div class="text-muted small" dir="rtl">{{ q.questionTextAr }}</div> }
+                  <span class="badge bg-light text-dark mt-1">{{ i18n.t('surveys.question_type_' + q.questionType) }}</span>
+                  @if (q.options?.length) {
+                    <div class="mt-2">
+                      @for (opt of q.options; track $index) {
+                        <div class="ms-3 small text-muted"><i class="fas fa-circle fa-xs me-1"></i>{{ opt }}</div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          } @else {
+            <div class="text-muted text-center py-3">{{ i18n.t('surveys.no_questions_yet') }}</div>
+          }
+        </app-section-card>
+      </div>
+
+      <div class="col-lg-4">
+        <!-- Actions Card -->
+        <div class="card mb-3">
+          <div class="card-header"><h5 class="card-title mb-0">{{ i18n.t('common.actions') }}</h5></div>
+          <div class="card-body d-grid gap-2">
+            <button class="btn btn-primary" (click)="editTemplate()">
+              <i class="fas fa-edit me-1"></i>{{ i18n.t('common.edit') }}
+            </button>
+            <button class="btn btn-secondary" (click)="duplicateTemplate()">
+              <i class="fas fa-copy me-1"></i>{{ i18n.t('surveys.duplicate') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Audit History -->
+    <div class="row mt-3">
+      <div class="col-12">
+        <app-section-card [title]="i18n.t('history.title')" icon="fas fa-clock-rotate-left" headerClass="bg-light">
+          <app-audit-history [entityName]="'SurveyTemplate'" [entityId]="template()?.id" />
+        </app-section-card>
+      </div>
+    </div>
+  }
+</div>

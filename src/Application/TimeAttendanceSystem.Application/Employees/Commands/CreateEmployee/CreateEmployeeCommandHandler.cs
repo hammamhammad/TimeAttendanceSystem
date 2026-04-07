@@ -1,13 +1,13 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Employees;
-using TimeAttendanceSystem.Domain.Shifts;
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Domain.Users;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Employees;
+using TecAxle.Hrms.Domain.Shifts;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Users;
 using System.Security.Cryptography;
 
-namespace TimeAttendanceSystem.Application.Employees.Commands.CreateEmployee;
+namespace TecAxle.Hrms.Application.Employees.Commands.CreateEmployee;
 
 /// <summary>
 /// Command handler for creating new employee records with comprehensive validation.

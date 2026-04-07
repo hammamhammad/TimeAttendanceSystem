@@ -324,8 +324,10 @@ export interface SortEvent {
     /* Main Container */
     .unified-data-table {
       background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--app-gray-200, #EAECF0);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: var(--app-shadow-sm, 0 1px 3px rgba(16, 24, 40, 0.1));
     }
 
     /* Table Container */
@@ -340,10 +342,13 @@ export interface SortEvent {
     }
 
     .table thead th {
-      border-bottom: 2px solid #dee2e6;
-      background-color: #f8f9fa;
+      border-bottom: 1px solid var(--app-gray-200, #EAECF0);
+      background-color: var(--app-gray-50, #F9FAFB);
       font-weight: 600;
-      color: #495057;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--app-gray-600, #475467);
       position: sticky;
       top: 0;
       z-index: 10;
@@ -355,17 +360,17 @@ export interface SortEvent {
     }
 
     .table tbody tr:hover {
-      background-color: #f8f9fa;
+      background-color: var(--app-primary-50, #EEF2FF);
       cursor: pointer;
     }
 
     .table tbody tr.selected-row {
-      background-color: #e3f2fd;
-      border-left: 4px solid #2196f3;
+      background-color: var(--app-primary-50, #EEF2FF);
+      border-left: 4px solid var(--app-primary, #4F6BF6);
     }
 
     .table tbody tr.inactive-row {
-      background-color: #fff3cd;
+      background-color: var(--app-warning-50, #FFFBEB);
     }
 
     .table tbody tr.inactive-row:hover {
@@ -383,6 +388,16 @@ export interface SortEvent {
       text-align: center;
     }
 
+    /* Action buttons as separate items with gap */
+    .actions-column .btn-group {
+      display: flex;
+      gap: 4px;
+    }
+
+    .actions-column .btn-group .btn {
+      border-radius: 6px !important;
+    }
+
     /* Sortable Headers */
     .sortable {
       cursor: pointer;
@@ -391,8 +406,8 @@ export interface SortEvent {
     }
 
     .sortable:hover {
-      color: #2196f3;
-      background-color: #f0f7ff;
+      color: var(--app-primary, #4F6BF6);
+      background-color: var(--app-primary-50, #EEF2FF);
     }
 
     .sortable .fas {
@@ -406,58 +421,82 @@ export interface SortEvent {
       transform: scale(1.1);
     }
 
-    /* Button Styles */
+    /* Action Button Styles - ERP clean bordered icon buttons */
     .btn-group .btn {
-      border: none;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      transition: all 0.2s ease;
+      background: white;
+      border: 1px solid var(--app-gray-300, #D0D5DD);
+      color: var(--app-gray-500, #667085);
+      box-shadow: none;
+      transition: all 0.15s ease;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
     }
 
     .btn-group .btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      background-color: var(--app-gray-50, #F9FAFB);
+      border-color: var(--app-gray-300, #D0D5DD);
+      color: var(--app-gray-700, #344054);
+      transform: none;
+      box-shadow: none;
     }
 
+    .btn-group .btn i {
+      font-size: 12px;
+    }
+
+    /* Specific action color hints on hover */
     .btn-outline-primary:hover {
-      background-color: #2196f3;
-      border-color: #2196f3;
-    }
-
-    .btn-outline-danger:hover {
-      background-color: #dc3545;
-      border-color: #dc3545;
-    }
-
-    .btn-outline-secondary:hover {
-      background-color: #6c757d;
-      border-color: #6c757d;
+      color: var(--app-primary, #4F6BF6);
+      border-color: var(--app-primary-200, #B3C2FF);
+      background-color: var(--app-primary-50, #EEF2FF);
     }
 
     .btn-outline-info:hover {
-      background-color: #17a2b8;
-      border-color: #17a2b8;
+      color: var(--app-info, #3B82F6);
+      border-color: var(--app-info-100, #DBEAFE);
+      background-color: var(--app-info-50, #EFF6FF);
+    }
+
+    .btn-outline-danger:hover {
+      color: var(--app-danger, #EF4444);
+      border-color: var(--app-danger-100, #FEE2E2);
+      background-color: var(--app-danger-50, #FEF2F2);
     }
 
     .btn-outline-warning:hover {
-      background-color: #ffc107;
-      border-color: #ffc107;
-      color: #212529;
+      color: var(--app-warning-600, #D97706);
+      border-color: var(--app-warning-100, #FEF3C7);
+      background-color: var(--app-warning-50, #FFFBEB);
+    }
+
+    .btn-outline-success:hover {
+      color: var(--app-success, #22C55E);
+      border-color: var(--app-success-100, #DCFCE7);
+      background-color: var(--app-success-50, #F0FDF4);
+    }
+
+    .btn-outline-secondary:hover {
+      color: var(--app-gray-700, #344054);
+      border-color: var(--app-gray-300, #D0D5DD);
+      background-color: var(--app-gray-50, #F9FAFB);
     }
 
     /* Form Controls */
     .form-check-input {
       cursor: pointer;
       transition: all 0.2s ease;
+      accent-color: var(--app-primary, #4F6BF6);
     }
 
     .form-check-input:checked {
-      background-color: #2196f3;
-      border-color: #2196f3;
+      background-color: var(--app-primary, #4F6BF6);
+      border-color: var(--app-primary, #4F6BF6);
     }
 
     .form-check-input:indeterminate {
-      background-color: #ffc107;
-      border-color: #ffc107;
+      background-color: var(--app-warning, #F59E0B);
+      border-color: var(--app-warning, #F59E0B);
     }
 
     .form-select {
@@ -466,8 +505,8 @@ export interface SortEvent {
     }
 
     .form-select:focus {
-      border-color: #2196f3;
-      box-shadow: 0 0 0 0.2rem rgba(33, 150, 243, 0.25);
+      border-color: var(--app-primary, #4F6BF6);
+      box-shadow: 0 0 0 0.2rem rgba(79, 107, 246, 0.25);
     }
 
     /* Pagination */
@@ -476,33 +515,33 @@ export interface SortEvent {
     }
 
     .page-link {
-      color: #6c757d;
-      border: 1px solid #dee2e6;
+      color: var(--app-gray-500, #667085);
+      border: 1px solid var(--app-gray-200, #EAECF0);
       transition: all 0.2s ease;
     }
 
     .page-link:hover {
-      color: #2196f3;
-      background-color: #f8f9fa;
-      border-color: #dee2e6;
+      color: var(--app-primary, #4F6BF6);
+      background-color: var(--app-gray-50, #F9FAFB);
+      border-color: var(--app-gray-200, #EAECF0);
     }
 
     .page-item.active .page-link {
-      background-color: #2196f3;
-      border-color: #2196f3;
+      background-color: var(--app-primary, #4F6BF6);
+      border-color: var(--app-primary, #4F6BF6);
       color: white;
     }
 
     .page-item.disabled .page-link {
       color: #adb5bd;
       background-color: #fff;
-      border-color: #dee2e6;
+      border-color: var(--app-gray-200, #EAECF0);
       cursor: not-allowed;
     }
 
     /* Loading State */
     .spinner-border {
-      color: #2196f3;
+      color: var(--app-primary, #4F6BF6);
       width: 3rem;
       height: 3rem;
     }
@@ -515,12 +554,12 @@ export interface SortEvent {
 
     /* Focus States */
     .table tbody tr:focus-within {
-      outline: 2px solid #2196f3;
+      outline: 2px solid var(--app-primary, #4F6BF6);
       outline-offset: -2px;
     }
 
     .btn:focus {
-      box-shadow: 0 0 0 0.2rem rgba(33, 150, 243, 0.25);
+      box-shadow: 0 0 0 0.2rem rgba(79, 107, 246, 0.25);
     }
 
     /* Enhanced Table Layout */
@@ -544,7 +583,7 @@ export interface SortEvent {
     /* RTL Support */
     [dir="rtl"] .table tbody tr.selected-row {
       border-left: none;
-      border-right: 4px solid #2196f3;
+      border-right: 4px solid var(--app-primary, #4F6BF6);
     }
 
     /* Mobile Cards */
@@ -554,7 +593,7 @@ export interface SortEvent {
 
     .mobile-card {
       background: white;
-      border: 1px solid #dee2e6;
+      border: 1px solid var(--app-gray-200, #EAECF0);
       border-radius: 8px;
       margin-bottom: 1rem;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -568,13 +607,13 @@ export interface SortEvent {
     }
 
     .mobile-card.selected-row {
-      border-color: #2196f3;
-      background-color: #f3f9ff;
+      border-color: var(--app-primary, #4F6BF6);
+      background-color: var(--app-primary-50, #EEF2FF);
     }
 
     .mobile-card-selection {
       padding: 0.75rem 1rem 0;
-      border-bottom: 1px solid #f8f9fa;
+      border-bottom: 1px solid var(--app-gray-50, #F9FAFB);
     }
 
     .mobile-card-content {
@@ -587,7 +626,7 @@ export interface SortEvent {
       align-items: start;
       margin-bottom: 0.5rem;
       padding: 0.25rem 0;
-      border-bottom: 1px solid #f8f9fa;
+      border-bottom: 1px solid var(--app-gray-50, #F9FAFB);
     }
 
     .default-card-layout .mobile-field:last-child {
@@ -597,7 +636,7 @@ export interface SortEvent {
 
     .mobile-label {
       font-weight: 600;
-      color: #495057;
+      color: var(--app-gray-700, #344054);
       flex: 0 0 40%;
       font-size: 0.875rem;
     }
@@ -611,8 +650,8 @@ export interface SortEvent {
 
     .mobile-card-actions {
       padding: 0.75rem 1rem;
-      background-color: #f8f9fa;
-      border-top: 1px solid #dee2e6;
+      background-color: var(--app-gray-50, #F9FAFB);
+      border-top: 1px solid var(--app-gray-200, #EAECF0);
     }
 
     .mobile-card-actions .btn-group {
@@ -630,7 +669,7 @@ export interface SortEvent {
     .mobile-empty-state {
       text-align: center;
       padding: 3rem 1rem;
-      color: #6c757d;
+      color: var(--app-gray-500, #667085);
     }
 
     .mobile-empty-state i {

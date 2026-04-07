@@ -1,0 +1,5 @@
+<div class="key-positions-page">
+  <app-page-header [title]="i18n.t('succession.key_positions.title')" />
+  <app-unified-filter moduleName="key_positions" [showAddButton]="true" [addButtonText]="i18n.t('succession.key_positions.create')" [showRefreshButton]="true" [refreshing]="loading()" (searchChange)="onSearchChange($event)" (add)="navigateToCreate()" (refresh)="onRefreshData()" />
+  <app-data-table [data]="displayData()" [columns]="tableColumns" [actions]="tableActions()" [loading]="loading" [totalItems]="totalCount()" [currentPage]="currentPage()" [pageSize]="pageSize()" [pageSizeOptions]="[10, 25, 50]" [emptyTitle]="i18n.t('succession.key_positions.no_records_title')" [emptyMessage]="i18n.t('succession.key_positions.no_records')" (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)" (actionClick)="onTableAction($event)" />
+</div>

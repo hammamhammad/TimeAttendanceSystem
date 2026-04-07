@@ -1,14 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Extensions;
-using TimeAttendanceSystem.Domain.Attendance;
-using TimeAttendanceSystem.Domain.Employees;
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Domain.Shifts;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Extensions;
+using TecAxle.Hrms.Domain.Attendance;
+using TecAxle.Hrms.Domain.Employees;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Shifts;
 
-namespace TimeAttendanceSystem.Application.Services;
+namespace TecAxle.Hrms.Application.Services;
 
 /// <summary>
 /// Service implementation for daily attendance generation operations.

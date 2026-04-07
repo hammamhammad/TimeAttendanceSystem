@@ -17,6 +17,8 @@ export class EmptyStateComponent {
   @Input() showClearFilters = false;
   @Input() clearFiltersText = 'Clear Filters';
   @Input() size: 'sm' | 'md' | 'lg' = 'md';
+  @Input() variant: 'default' | 'module-disabled' | 'feature-locked' = 'default';
+  @Input() moduleName?: string;
 
   @Output() action = new EventEmitter<void>();
   @Output() clearFilters = new EventEmitter<void>();

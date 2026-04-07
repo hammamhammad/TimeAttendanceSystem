@@ -1,0 +1,260 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header
+    [mode]="isEditMode() ? 'edit' : 'create'"
+    [title]="isEditMode() ? t('allowance_policies.edit') : t('allowance_policies.create')"
+    [entityId]="editId() ?? undefined"
+    moduleName="allowance_policies"
+    moduleRoute="settings/allowance-policies">
+  </app-form-header>
+
+  <form #formRef="ngForm" (ngSubmit)="onSubmit()">
+    <div class="row">
+      <!-- Basic Information -->
+      <div class="col-md-6 mb-4">
+        <app-form-section [title]="t('common.basic_info')" variant="modern">
+          <div class="mb-3">
+            <div class="form-floating">
+              <select id="allowanceTypeId" class="form-select" [(ngModel)]="form.allowanceTypeId" name="allowanceTypeId" required>
+                <option [ngValue]="null" disabled>{{ t('common.select') }}</option>
+                @for (at of allowanceTypes(); track at.id) {
+                  <option [ngValue]="at.id">{{ at.name }} ({{ at.code }})</option>
+                }
+              </select>
+              <label for="allowanceTypeId">{{ t('allowance_policies.allowance_type') }}</label>
+            </div>
+            <small class="text-muted">{{ t('allowance_policies.hints.allowance_type') }}</small>
+            @if (validationErrors()['allowanceTypeId']) {
+              <div class="invalid-feedback d-block">{{ validationErrors()['allowanceTypeId'] }}</div>
+            }
+          </div>
+          <div class="mb-3">
+            <div class="form-floating">
+              <input
+                type="text"
+                id="name"
+                class="form-control"
+                [(ngModel)]="form.name"
+                name="name"
+                placeholder="{{ t('common.name') }}"
+                required>
+              <label for="name">{{ t('common.name') }}</label>
+            </div>
+            <small class="text-muted">{{ t('allowance_policies.hints.name') }}</small>
+            @if (validationErrors()['name']) {
+              <div class="invalid-feedback d-block">{{ validationErrors()['name'] }}</div>
+            }
+          </div>
+          <div class="mb-3">
+            <div class="form-floating">
+              <input
+                type="text"
+                id="nameAr"
+                class="form-control"
+                [(ngModel)]="form.nameAr"
+                name="nameAr"
+                placeholder="{{ t('common.name_ar') }}">
+              <label for="nameAr">{{ t('common.name_ar') }}</label>
+            </div>
+            <small class="text-muted">{{ t('allowance_policies.hints.name_ar') }}</small>
+          </div>
+          <div class="mb-3">
+            <div class="form-floating">
+              <textarea
+                id="description"
+                class="form-control"
+                [(ngModel)]="form.description"
+                name="description"
+                placeholder="{{ t('common.description') }}"
+                style="height: 80px"></textarea>
+              <label for="description">{{ t('common.description') }}</label>
+            </div>
+            <small class="text-muted">{{ t('allowance_policies.hints.description') }}</small>
+          </div>
+        </app-form-section>
+      </div>
+
+      <!-- Scope & Rules -->
+      <div class="col-md-6 mb-4">
+        <app-form-section [title]="t('common.configuration')" variant="modern">
+          <div class="mb-3">
+            <div class="form-floating">
+              <select id="branchId" class="form-select" [(ngModel)]="form.branchId" name="branchId">
+                <option [ngValue]="null">{{ t('common.all_branches') }}</option>
+                @for (branch of branches(); track branch.id) {
+                  <option [ngValue]="branch.id">{{ branch.name }}</option>
+                }
+              </select>
+              <label for="branchId">{{ t('common.branch') }}</label>
+            </div>
+            <small class="text-muted">{{ t('allowance_policies.hints.branch') }}</small>
+          </div>
+          <div class="mb-3">
+            <div class="form-floating">
+              <input
+                type="date"
+                id="effectiveDate"
+                class="form-control"
+                [(ngModel)]="form.effectiveDate"
+                name="effectiveDate"
+                placeholder="{{ t('common.effective_date') }}"
+                required>
+              <label for="effectiveDate">{{ t('common.effective_date') }}</label>
+            </div>
+            <small class="text-muted">{{ t('allowance_policies.hints.effective_date') }}</small>
+            @if (validationErrors()['effectiveDate']) {
+              <div class="invalid-feedback d-block">{{ validationErrors()['effectiveDate'] }}</div>
+            }
+          </div>
+          <div class="mb-3">
+            <div class="form-floating">
+              <textarea
+                id="eligibilityRules"
+                class="form-control"
+                [(ngModel)]="form.eligibilityRules"
+                name="eligibilityRules"
+                placeholder="{{ t('allowance_policies.eligibility_rules') }}"
+                style="height: 80px"></textarea>
+              <label for="eligibilityRules">{{ t('allowance_policies.eligibility_rules') }}</label>
+            </div>
+            <small class="text-muted">{{ t('allowance_policies.hints.eligibility_rules') }}</small>
+          </div>
+        </app-form-section>
+      </div>
+
+      <!-- Limits -->
+      <div class="col-md-6 mb-4">
+        <app-form-section [title]="t('allowance_policies.limits')" variant="modern">
+          <div class="mb-3">
+            <div class="form-floating">
+              <input
+                type="number"
+                id="minAmount"
+                class="form-control"
+                [(ngModel)]="form.minAmount"
+                name="minAmount"
+                min="0"
+                step="0.01"
+                placeholder="{{ t('allowance_policies.min_amount') }}">
+              <label for="minAmount">{{ t('allowance_policies.min_amount') }}</label>
+            </div>
+            <small class="text-muted">{{ t('allowance_policies.hints.min_amount') }}</small>
+          </div>
+          <div class="mb-3">
+            <div class="form-floating">
+              <input
+                type="number"
+                id="maxAmount"
+                class="form-control"
+                [(ngModel)]="form.maxAmount"
+                name="maxAmount"
+                min="0"
+                step="0.01"
+                placeholder="{{ t('allowance_policies.max_amount') }}">
+              <label for="maxAmount">{{ t('allowance_policies.max_amount') }}</label>
+            </div>
+            <small class="text-muted">{{ t('allowance_policies.hints.max_amount') }}</small>
+            @if (validationErrors()['maxAmount']) {
+              <div class="invalid-feedback d-block">{{ validationErrors()['maxAmount'] }}</div>
+            }
+          </div>
+          <div class="mb-3">
+            <div class="form-floating">
+              <input
+                type="number"
+                id="maxPercentageOfBasic"
+                class="form-control"
+                [(ngModel)]="form.maxPercentageOfBasic"
+                name="maxPercentageOfBasic"
+                min="0"
+                max="100"
+                step="0.01"
+                placeholder="{{ t('allowance_policies.max_percentage') }}">
+              <label for="maxPercentageOfBasic">{{ t('allowance_policies.max_percentage') }}</label>
+            </div>
+            <small class="text-muted">{{ t('allowance_policies.hints.max_percentage') }}</small>
+          </div>
+        </app-form-section>
+      </div>
+
+      <!-- Options -->
+      <div class="col-md-6 mb-4">
+        <app-form-section [title]="t('common.options')" variant="modern">
+          <div class="mb-3">
+            <div class="form-check form-switch">
+              <input
+                type="checkbox"
+                class="form-check-input"
+                id="requiresApproval"
+                [(ngModel)]="form.requiresApproval"
+                name="requiresApproval">
+              <label class="form-check-label" for="requiresApproval">
+                {{ t('allowance_policies.requires_approval') }}
+              </label>
+            </div>
+            <small class="text-muted">{{ t('allowance_policies.hints.requires_approval') }}</small>
+          </div>
+          <div class="mb-3">
+            <div class="form-check form-switch">
+              <input
+                type="checkbox"
+                class="form-check-input"
+                id="isTemporaryAllowed"
+                [(ngModel)]="form.isTemporaryAllowed"
+                name="isTemporaryAllowed">
+              <label class="form-check-label" for="isTemporaryAllowed">
+                {{ t('allowance_policies.temporary_allowed') }}
+              </label>
+            </div>
+            <small class="text-muted">{{ t('allowance_policies.hints.temporary_allowed') }}</small>
+          </div>
+          @if (form.isTemporaryAllowed) {
+            <div class="mb-3">
+              <div class="form-floating">
+                <input
+                  type="number"
+                  id="maxDurationMonths"
+                  class="form-control"
+                  [(ngModel)]="form.maxDurationMonths"
+                  name="maxDurationMonths"
+                  min="1"
+                  placeholder="{{ t('allowance_policies.max_duration') }}">
+                <label for="maxDurationMonths">{{ t('allowance_policies.max_duration') }}</label>
+              </div>
+              <small class="text-muted">{{ t('allowance_policies.hints.max_duration') }}</small>
+            </div>
+          }
+          @if (isEditMode()) {
+            <div class="mb-3">
+              <div class="form-check form-switch">
+                <input
+                  type="checkbox"
+                  class="form-check-input"
+                  id="isActive"
+                  [(ngModel)]="form.isActive"
+                  name="isActive">
+                <label class="form-check-label" for="isActive">
+                  {{ t('common.active') }}
+                </label>
+              </div>
+            </div>
+          }
+        </app-form-section>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="col-12">
+        <div class="app-form-actions">
+          <button type="button" class="btn btn-outline-secondary" (click)="onCancel()" [disabled]="submitting()">
+            {{ t('common.cancel') }}
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="submitting()">
+            @if (submitting()) {
+              <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            }
+            {{ t('common.save') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

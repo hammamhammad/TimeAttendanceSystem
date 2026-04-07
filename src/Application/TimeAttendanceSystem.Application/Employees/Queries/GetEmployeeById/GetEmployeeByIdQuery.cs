@@ -1,6 +1,6 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Employees.Queries.GetEmployeeById;
+namespace TecAxle.Hrms.Application.Employees.Queries.GetEmployeeById;
 
 public record GetEmployeeByIdQuery(long EmployeeId) : IRequest<Result<EmployeeDetailDto>>;

@@ -1,9 +1,9 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Workflows.Queries.GetWorkflowDefinitions;
+namespace TecAxle.Hrms.Application.Workflows.Queries.GetWorkflowDefinitions;
 
 /// <summary>
 /// Handler for GetWorkflowDefinitionsQuery.

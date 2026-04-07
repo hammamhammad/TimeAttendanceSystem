@@ -1,13 +1,16 @@
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Shifts;
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Shifts;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.Shifts.Commands.CreateShift;
+namespace TecAxle.Hrms.Application.Shifts.Commands.CreateShift;
 
 /// <summary>
 /// Command for creating a new shift with comprehensive shift management capabilities.
 /// Supports time-based, hours-only, flexible, and multi-period shifts with validation.
 /// </summary>
+[RequiresModule(SystemModule.TimeAttendance)]
 public record CreateShiftCommand(
     string Name,
     string? Description,

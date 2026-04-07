@@ -1,0 +1,64 @@
+<div class="app-modern-form">
+  <app-form-header
+    mode="create"
+    [title]="isEditMode() ? i18n.t('offboarding.terminations.edit') : i18n.t('offboarding.terminations.create')"
+    moduleName="offboarding.terminations"
+    moduleRoute="offboarding/terminations">
+  </app-form-header>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <app-form-section [title]="i18n.t('common.basic_info')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('common.employee') }} <span class="text-danger">*</span></label>
+            <app-searchable-select [options]="employeeOptions" [placeholder]="i18n.t('common.select_employee')" [value]="form.get('employeeId')?.value" (selectionChange)="form.get('employeeId')?.setValue($event)" />
+          </div>
+          <small class="text-muted">{{ i18n.t('offboarding.terminations.hints.employee') }}</small>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <select class="form-select" id="terminationType" formControlName="terminationType">
+              @for (tt of terminationTypes; track tt) {
+                <option [value]="tt">{{ i18n.t('offboarding.termination_types.' + tt) }}</option>
+              }
+            </select>
+            <label for="terminationType">{{ i18n.t('offboarding.terminations.type') }}</label>
+          </div>
+          <small class="text-muted">{{ i18n.t('offboarding.terminations.hints.termination_type') }}</small>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="terminationDate" formControlName="terminationDate" placeholder="Termination Date">
+            <label for="terminationDate">{{ i18n.t('offboarding.terminations.termination_date') }}</label>
+          </div>
+          <small class="text-muted">{{ i18n.t('offboarding.terminations.hints.termination_date') }}</small>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="lastWorkingDate" formControlName="lastWorkingDate" placeholder="Last Working Date">
+            <label for="lastWorkingDate">{{ i18n.t('offboarding.terminations.last_working_date') }}</label>
+          </div>
+          <small class="text-muted">{{ i18n.t('offboarding.terminations.hints.last_working_date') }}</small>
+        </div>
+        <div class="col-md-12">
+          <div class="form-floating">
+            <textarea class="form-control" id="reason" formControlName="reason" placeholder="Reason" style="height: 100px"></textarea>
+            <label for="reason">{{ i18n.t('common.reason') }}</label>
+          </div>
+          <small class="text-muted">{{ i18n.t('offboarding.terminations.hints.reason') }}</small>
+        </div>
+      </div>
+    </app-form-section>
+
+    <div class="app-form-actions">
+      <button type="button" class="btn btn-secondary" routerLink="/offboarding/terminations">{{ i18n.t('common.cancel') }}</button>
+      <button type="submit" class="btn btn-primary" [disabled]="form.invalid || submitting()">
+        @if (submitting()) {
+          <span class="spinner-border spinner-border-sm me-2"></span>
+        }
+        {{ i18n.t('common.save') }}
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Domain.Excuses;
+namespace TecAxle.Hrms.Domain.Excuses;
 
 /// <summary>
 /// Enumeration defining the types of excuses available in the system.

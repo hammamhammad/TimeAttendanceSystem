@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Extensions;
-using TimeAttendanceSystem.Domain.Attendance;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Extensions;
+using TecAxle.Hrms.Domain.Attendance;
 
-namespace TimeAttendanceSystem.Infrastructure.Persistence.Repositories;
+namespace TecAxle.Hrms.Infrastructure.Persistence.Repositories;
 
 /// <summary>
 /// Repository implementation for attendance transaction data access operations.

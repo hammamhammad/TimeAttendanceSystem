@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Domain.Notifications;
-using TimeAttendanceSystem.Domain.Workflows;
-using TimeAttendanceSystem.Domain.Workflows.Enums;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Domain.Notifications;
+using TecAxle.Hrms.Domain.Workflows;
+using TecAxle.Hrms.Domain.Workflows.Enums;
 
-namespace TimeAttendanceSystem.Application.Workflows.Services;
+namespace TecAxle.Hrms.Application.Workflows.Services;
 
 /// <summary>
 /// Implementation of the workflow engine for managing approval workflows.

@@ -1,12 +1,12 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Attendance;
-using TimeAttendanceSystem.Domain.Employees;
-using TimeAttendanceSystem.Domain.Excuses;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Attendance;
+using TecAxle.Hrms.Domain.Employees;
+using TecAxle.Hrms.Domain.Excuses;
 
-namespace TimeAttendanceSystem.Application.Features.Portal.Team.Queries;
+namespace TecAxle.Hrms.Application.Features.Portal.Team.Queries;
 
 /// <summary>
 /// Query to get team members for a manager (with recursive hierarchy support)

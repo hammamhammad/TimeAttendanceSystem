@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Domain.LeaveManagement;
+namespace TecAxle.Hrms.Domain.LeaveManagement;
 
 /// <summary>
 /// Represents a single transaction affecting leave balance.

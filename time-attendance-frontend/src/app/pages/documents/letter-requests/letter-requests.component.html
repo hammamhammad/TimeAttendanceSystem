@@ -1,0 +1,24 @@
+<div class="app-list-page">
+  <app-page-header [title]="i18n.t('letter_requests.title')" />
+  <app-unified-filter [searchPlaceholder]="i18n.t('letter_requests.search')" [showRefreshButton]="true" [refreshing]="loading()"
+    [showAddButton]="true" [addButtonText]="i18n.t('letter_requests.create')"
+    (searchChange)="onSearchChange($event)" (refresh)="onRefreshData()" (add)="navigateToCreate()" />
+
+  <app-data-table [data]="data()" [columns]="columns" [actions]="tableActions()" [currentPage]="currentPage()"
+    [totalPages]="totalPages()" [totalItems]="totalCount()" [pageSize]="pageSize()" [loading]="loading"
+    [emptyTitle]="i18n.t('letter_requests.no_data')" [showPagination]="true"
+    (actionClick)="onActionClick($event)" (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)">
+    <ng-template #cellTemplate let-item let-column="column">
+      @if (column.key === 'status') {
+        <span class="badge" [class.bg-warning]="item.status === 'Pending'" [class.bg-success]="item.status === 'Approved' || item.status === 'Generated'"
+          [class.bg-danger]="item.status === 'Rejected'" [class.bg-info]="item.status === 'Delivered'">
+          {{ i18n.t('letter_requests.status_' + item.status) }}
+        </span>
+      } @else if (column.key === 'requestedAtUtc') {
+        {{ formatDate(item.requestedAtUtc) }}
+      } @else {
+        {{ item[column.key] ?? '-' }}
+      }
+    </ng-template>
+  </app-data-table>
+</div>

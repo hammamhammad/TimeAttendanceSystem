@@ -1,10 +1,12 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TimeAttendanceSystem.Application.AuditLogs.Queries.GetAuditLogs;
-using TimeAttendanceSystem.Domain.Common;
+using Microsoft.EntityFrameworkCore;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.AuditLogs.Queries.GetAuditLogs;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/audit-logs")]
@@ -12,10 +14,12 @@ namespace TimeAttendanceSystem.Api.Controllers;
 public class AuditLogsController : ControllerBase
 {
     private readonly ISender _mediator;
+    private readonly IApplicationDbContext _context;
 
-    public AuditLogsController(ISender mediator)
+    public AuditLogsController(ISender mediator, IApplicationDbContext context)
     {
         _mediator = mediator;
+        _context = context;
     }
     /// <summary>
     /// Gets audit logs with filtering and pagination
@@ -24,6 +28,7 @@ public class AuditLogsController : ControllerBase
     /// <param name="endDate">Filter by end date</param>
     /// <param name="actions">Filter by audit actions (comma-separated)</param>
     /// <param name="entityName">Filter by entity name</param>
+    /// <param name="entityId">Filter by entity ID</param>
     /// <param name="actorUserId">Filter by actor user ID</param>
     /// <param name="searchTerm">Search term for entity ID, IP address, or user agent</param>
     /// <param name="pageNumber">Page number (default: 1)</param>
@@ -40,6 +45,7 @@ public class AuditLogsController : ControllerBase
         [FromQuery] DateTime? endDate,
         [FromQuery] string? actions,
         [FromQuery] string? entityName,
+        [FromQuery] string? entityId,
         [FromQuery] long? actorUserId,
         [FromQuery] string? searchTerm,
         [FromQuery] int pageNumber = 1,
@@ -71,6 +77,7 @@ public class AuditLogsController : ControllerBase
             EndDate = endDate,
             Actions = actionList,
             EntityName = entityName,
+            EntityId = entityId,
             ActorUserId = actorUserId,
             SearchTerm = searchTerm,
             PageNumber = pageNumber,
@@ -84,5 +91,23 @@ public class AuditLogsController : ControllerBase
         return result.IsSuccess
             ? Ok(result.Value)
             : BadRequest(result.Error);
+    }
+
+    /// <summary>
+    /// Gets the field-level changes for a specific audit log entry
+    /// </summary>
+    /// <param name="id">The audit log ID</param>
+    /// <returns>List of field-level changes with old and new values</returns>
+    [HttpGet("{id}/changes")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetChanges(long id)
+    {
+        var changes = await _context.AuditChanges
+            .Where(c => c.AuditLogId == id && !c.IsDeleted)
+            .Select(c => new { c.Id, c.FieldName, c.OldValue, c.NewValue })
+            .ToListAsync();
+        return Ok(changes);
     }
 }

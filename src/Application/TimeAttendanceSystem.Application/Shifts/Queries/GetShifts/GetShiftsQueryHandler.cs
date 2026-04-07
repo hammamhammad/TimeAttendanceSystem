@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Shifts.Queries.GetShifts;
+namespace TecAxle.Hrms.Application.Shifts.Queries.GetShifts;
 
 /// <summary>
 /// Query handler for retrieving shifts with comprehensive filtering and pagination support.

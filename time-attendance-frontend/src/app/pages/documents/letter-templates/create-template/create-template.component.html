@@ -1,0 +1,58 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header [title]="isEdit() ? i18n.t('letter_templates.edit') : i18n.t('letter_templates.create')" moduleName="letter-templates" moduleRoute="documents/letter-templates" [loading]="saving()" />
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <app-form-section [title]="i18n.t('letter_templates.basic_info')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="name" placeholder="Name" formControlName="name">
+            <label for="name">{{ i18n.t('letter_templates.name') }} *</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="nameAr" placeholder="Name AR" formControlName="nameAr">
+            <label for="nameAr">{{ i18n.t('letter_templates.name_ar') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="category" placeholder="Category" formControlName="category">
+            <label for="category">{{ i18n.t('letter_templates.category') }} *</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-check form-switch mt-3">
+            <input class="form-check-input" type="checkbox" id="isActive" formControlName="isActive">
+            <label class="form-check-label" for="isActive">{{ i18n.t('common.active') }}</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-floating">
+            <textarea class="form-control" id="description" placeholder="Description" formControlName="description" style="height:60px"></textarea>
+            <label for="description">{{ i18n.t('common.description') }}</label>
+          </div>
+        </div>
+      </div>
+    </app-form-section>
+
+    <app-form-section [title]="i18n.t('letter_templates.html_content')" variant="modern">
+      <div class="row g-3">
+        <div class="col-12">
+          <label class="form-label">{{ i18n.t('letter_templates.html_content') }} *</label>
+          <textarea class="form-control font-monospace" formControlName="htmlContent" rows="15" placeholder="<html>...</html>"></textarea>
+          <small class="text-muted">{{ i18n.t('letter_templates.placeholders_hint') }}</small>
+        </div>
+      </div>
+    </app-form-section>
+
+    <div class="app-form-actions">
+      <button type="button" class="btn btn-secondary" routerLink="/documents/letter-templates">{{ i18n.t('common.cancel') }}</button>
+      <button type="submit" class="btn btn-primary" [disabled]="saving()">
+        @if (saving()) { <i class="fas fa-spinner fa-spin me-1"></i> }
+        {{ i18n.t('common.save') }}
+      </button>
+    </div>
+  </form>
+</div>

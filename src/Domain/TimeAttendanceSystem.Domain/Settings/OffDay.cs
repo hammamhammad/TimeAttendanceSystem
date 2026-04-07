@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Domain.Settings;
+namespace TecAxle.Hrms.Domain.Settings;
 
 /// <summary>
 /// Domain entity representing designated off days (rest days) that affect overtime calculations.

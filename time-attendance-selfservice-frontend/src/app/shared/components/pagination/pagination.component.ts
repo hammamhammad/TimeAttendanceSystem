@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter, signal, computed } from '@angular/core';
 
+
 @Component({
   selector: 'app-pagination',
   standalone: true,
@@ -14,29 +15,25 @@ import { Component, Input, Output, EventEmitter, signal, computed } from '@angul
               <i class="fas fa-angle-double-left"></i>
             </button>
           </li>
-
           <!-- Previous page -->
           <li class="page-item" [class.disabled]="currentPage() === 1">
             <button class="page-link" (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() === 1">
               <i class="fas fa-angle-left"></i>
             </button>
           </li>
-
           <!-- Page numbers -->
           @for (page of visiblePages(); track page) {
             <li class="page-item"
-                [class.active]="page === currentPage()">
+              [class.active]="page === currentPage()">
               <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
             </li>
           }
-
           <!-- Next page -->
           <li class="page-item" [class.disabled]="currentPage() === totalPages()">
             <button class="page-link" (click)="goToPage(currentPage() + 1)" [disabled]="currentPage() === totalPages()">
               <i class="fas fa-angle-right"></i>
             </button>
           </li>
-
           <!-- Last page -->
           <li class="page-item" [class.disabled]="currentPage() === totalPages()">
             <button class="page-link" (click)="goToPage(totalPages())" [disabled]="currentPage() === totalPages()">
@@ -46,7 +43,7 @@ import { Component, Input, Output, EventEmitter, signal, computed } from '@angul
         </ul>
       </nav>
     }
-
+    
     <!-- Page info -->
     @if (showInfo) {
       <div class="d-flex justify-content-between align-items-center mt-3">
@@ -58,27 +55,42 @@ import { Component, Input, Output, EventEmitter, signal, computed } from '@angul
         </small>
       </div>
     }
-  `,
+    `,
   styles: [`
     .page-link {
-      border: 1px solid #dee2e6;
-      color: #6c757d;
+      border: 1px solid var(--app-gray-300, #D0D5DD);
+      color: var(--app-gray-600, #475467);
+      font-size: 13px;
+      min-width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--app-border-radius-sm, 6px);
+      transition: all 0.1s ease;
     }
 
     .page-link:hover {
-      background-color: #e9ecef;
-      border-color: #dee2e6;
+      background-color: var(--app-gray-50, #F9FAFB);
+      border-color: var(--app-gray-300, #D0D5DD);
+      color: var(--app-gray-700, #344054);
     }
 
     .page-item.active .page-link {
-      background-color: #007bff;
-      border-color: #007bff;
+      background-color: var(--app-primary, #4F6BF6);
+      border-color: var(--app-primary, #4F6BF6);
+      color: #fff;
     }
 
     .page-item.disabled .page-link {
-      color: #6c757d;
+      color: var(--app-gray-400, #98A2B3);
       background-color: #fff;
-      border-color: #dee2e6;
+      border-color: var(--app-gray-200, #EAECF0);
+      cursor: not-allowed;
+    }
+
+    .pagination {
+      gap: 4px;
     }
   `]
 })

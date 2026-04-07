@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Domain.Users;
+namespace TecAxle.Hrms.Domain.Users;
 
 /// <summary>
 /// Represents a user account in the Time Attendance System.

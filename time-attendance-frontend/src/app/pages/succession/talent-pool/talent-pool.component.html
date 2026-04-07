@@ -1,0 +1,46 @@
+<div class="talent-pool-page">
+  <app-page-header [title]="i18n.t('succession.talent_pool.title')" />
+
+  @if (riskSummary()) {
+    <div class="row g-3 mb-4">
+      <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body text-center">
+            <div class="fs-2 fw-bold text-primary">{{ riskSummary()!.totalKeyPositions }}</div>
+            <div class="text-muted small">{{ i18n.t('succession.talent_pool.total_key_positions') }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body text-center">
+            <div class="fs-2 fw-bold text-danger">{{ riskSummary()!.criticalPositions }}</div>
+            <div class="text-muted small">{{ i18n.t('succession.talent_pool.critical_positions') }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body text-center">
+            <div class="fs-2 fw-bold text-warning">{{ riskSummary()!.highRiskCount }}</div>
+            <div class="text-muted small">{{ i18n.t('succession.talent_pool.high_risk') }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body text-center">
+            <div class="fs-2 fw-bold text-success">{{ totalCount() }}</div>
+            <div class="text-muted small">{{ i18n.t('succession.talent_pool.high_potential_count') }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="text-center py-5"><app-loading-spinner [message]="i18n.t('common.loading')" [variant]="'primary'" [centered]="true" /></div>
+  } @else {
+    <app-data-table [data]="displayData()" [columns]="tableColumns" [actions]="tableActions()" [loading]="loading" [totalItems]="totalCount()" [currentPage]="1" [pageSize]="50" [emptyTitle]="i18n.t('succession.talent_pool.no_records_title')" [emptyMessage]="i18n.t('succession.talent_pool.no_records')" (actionClick)="onTableAction($event)" />
+  }
+</div>

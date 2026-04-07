@@ -1,7 +1,7 @@
 using FluentValidation;
-using TimeAttendanceSystem.Domain.Shifts;
+using TecAxle.Hrms.Domain.Shifts;
 
-namespace TimeAttendanceSystem.Application.Shifts.Commands.UpdateShift;
+namespace TecAxle.Hrms.Application.Shifts.Commands.UpdateShift;
 
 /// <summary>
 /// FluentValidation validator for UpdateShiftCommand ensuring comprehensive shift data validation.

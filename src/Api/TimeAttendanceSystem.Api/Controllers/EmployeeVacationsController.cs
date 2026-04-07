@@ -1,15 +1,15 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TimeAttendanceSystem.Application.EmployeeVacations.Commands.CreateEmployeeVacation;
-using TimeAttendanceSystem.Application.EmployeeVacations.Commands.CreateBulkEmployeeVacation;
-using TimeAttendanceSystem.Application.EmployeeVacations.Commands.UpdateEmployeeVacation;
-using TimeAttendanceSystem.Application.EmployeeVacations.Commands.ToggleEmployeeVacationStatus;
-using TimeAttendanceSystem.Application.EmployeeVacations.Queries.GetEmployeeVacations;
-using TimeAttendanceSystem.Application.EmployeeVacations.Queries.Common;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.EmployeeVacations.Commands.CreateEmployeeVacation;
+using TecAxle.Hrms.Application.EmployeeVacations.Commands.CreateBulkEmployeeVacation;
+using TecAxle.Hrms.Application.EmployeeVacations.Commands.UpdateEmployeeVacation;
+using TecAxle.Hrms.Application.EmployeeVacations.Commands.ToggleEmployeeVacationStatus;
+using TecAxle.Hrms.Application.EmployeeVacations.Queries.GetEmployeeVacations;
+using TecAxle.Hrms.Application.EmployeeVacations.Queries.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 /// <summary>
 /// API controller for managing employee vacation records.
@@ -128,7 +128,9 @@ public class EmployeeVacationsController : ControllerBase
             request.StartDate,
             request.EndDate,
             request.IsApproved,
-            request.Notes
+            request.Notes,
+            IsHalfDay: request.IsHalfDay,
+            HalfDayType: request.HalfDayType
         );
 
         var result = await _mediator.Send(command);
@@ -163,7 +165,9 @@ public class EmployeeVacationsController : ControllerBase
             request.StartDate,
             request.EndDate,
             request.IsApproved,
-            request.Notes
+            request.Notes,
+            IsHalfDay: request.IsHalfDay,
+            HalfDayType: request.HalfDayType
         );
 
         var result = await _mediator.Send(command);
@@ -310,7 +314,9 @@ public record CreateEmployeeVacationRequest(
     DateTime StartDate,
     DateTime EndDate,
     bool IsApproved = true,
-    string? Notes = null
+    string? Notes = null,
+    bool IsHalfDay = false,
+    TecAxle.Hrms.Domain.Common.HalfDayType? HalfDayType = null
 );
 
 /// <summary>
@@ -321,7 +327,9 @@ public record UpdateEmployeeVacationRequest(
     DateTime StartDate,
     DateTime EndDate,
     bool IsApproved,
-    string? Notes = null
+    string? Notes = null,
+    bool IsHalfDay = false,
+    TecAxle.Hrms.Domain.Common.HalfDayType? HalfDayType = null
 );
 
 /// <summary>

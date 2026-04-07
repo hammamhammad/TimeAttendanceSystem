@@ -1,0 +1,70 @@
+<div class="tenant-config-page">
+  <div class="page-header mb-4">
+    <h2 class="mb-1">{{ t('tenant_configuration.title') }}</h2>
+    <p class="text-muted mb-0">{{ t('tenant_configuration.subtitle') }}</p>
+  </div>
+
+  <div class="config-layout">
+    <!-- Sidebar Navigation -->
+    <nav class="config-sidebar">
+      @for (item of navItems; track item.route) {
+        @if (item.route === 'divider') {
+          <hr class="sidebar-divider" />
+        } @else {
+          <a [routerLink]="item.route"
+             routerLinkActive="active"
+             class="sidebar-item">
+            <i [class]="item.icon + ' sidebar-icon'"></i>
+            <span>{{ t(item.labelKey) }}</span>
+          </a>
+        }
+      }
+
+      <!-- Links to existing policy pages (only shown if user has access) -->
+      @if (isAdmin || hasPermission('vacationType.read') || hasPermission('settings.excusePolicy.read') || hasPermission('workflow.read') || hasPermission('publicHoliday.read')) {
+        <hr class="sidebar-divider" />
+        <span class="sidebar-section-label">{{ t('tenant_configuration.policy_management') }}</span>
+        @if (hasPermission('vacationType.read')) {
+          <a routerLink="/vacation-types" class="sidebar-item sidebar-item-external">
+            <i class="fa-solid fa-calendar-check sidebar-icon"></i>
+            <span>{{ t('vacation_types.title') }}</span>
+            <i class="fa-solid fa-arrow-up-right-from-square ms-auto sidebar-external-icon"></i>
+          </a>
+        }
+        @if (hasPermission('settings.excusePolicy.read')) {
+          <a routerLink="/settings/excuse-policies" class="sidebar-item sidebar-item-external">
+            <i class="fa-solid fa-user-clock sidebar-icon"></i>
+            <span>{{ t('excuse_policies.title') }}</span>
+            <i class="fa-solid fa-arrow-up-right-from-square ms-auto sidebar-external-icon"></i>
+          </a>
+        }
+        @if (hasPermission('settings.overtime.read')) {
+          <a routerLink="/settings/overtime" class="sidebar-item sidebar-item-external">
+            <i class="fa-solid fa-clock sidebar-icon"></i>
+            <span>{{ t('settings.overtime.title') }}</span>
+            <i class="fa-solid fa-arrow-up-right-from-square ms-auto sidebar-external-icon"></i>
+          </a>
+        }
+        @if (hasPermission('workflow.read')) {
+          <a routerLink="/settings/workflows" class="sidebar-item sidebar-item-external">
+            <i class="fa-solid fa-project-diagram sidebar-icon"></i>
+            <span>{{ t('workflows.title') }}</span>
+            <i class="fa-solid fa-arrow-up-right-from-square ms-auto sidebar-external-icon"></i>
+          </a>
+        }
+        @if (hasPermission('publicHoliday.read')) {
+          <a routerLink="/settings/public-holidays" class="sidebar-item sidebar-item-external">
+            <i class="fa-solid fa-calendar-day sidebar-icon"></i>
+            <span>{{ t('settings.holidays.title') }}</span>
+            <i class="fa-solid fa-arrow-up-right-from-square ms-auto sidebar-external-icon"></i>
+          </a>
+        }
+      }
+    </nav>
+
+    <!-- Content Area -->
+    <div class="config-content">
+      <router-outlet />
+    </div>
+  </div>
+</div>

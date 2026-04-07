@@ -1,7 +1,7 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Roles.Commands.DeleteRole;
+namespace TecAxle.Hrms.Application.Roles.Commands.DeleteRole;
 
 public record DeleteRoleCommand : IRequest<Result>
 {

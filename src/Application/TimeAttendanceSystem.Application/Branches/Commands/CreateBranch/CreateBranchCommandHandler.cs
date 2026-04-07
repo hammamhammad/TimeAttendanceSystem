@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Branches;
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Domain.Shifts;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Branches;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Shifts;
 
-namespace TimeAttendanceSystem.Application.Branches.Commands.CreateBranch;
+namespace TecAxle.Hrms.Application.Branches.Commands.CreateBranch;
 
 public class CreateBranchCommandHandler : BaseHandler<CreateBranchCommand, Result<long>>
 {

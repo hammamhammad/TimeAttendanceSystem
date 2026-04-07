@@ -1,0 +1,111 @@
+<div class="container-fluid app-modern-view">
+  <app-form-header mode="view" [title]="i18n.t('succession.plans.view')" moduleName="succession_plans" moduleRoute="succession/plans" [entityId]="item()?.id" [loading]="loading()" [actions]="headerActions()" />
+  @if (loading()) { <div class="text-center py-5"><app-loading-spinner [message]="i18n.t('common.loading')" [variant]="'primary'" [centered]="true" /></div> }
+  @if (error()) { <div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>{{ error() }}</div> }
+  @if (item() && !loading()) {
+    <div class="row g-4">
+      <div class="col-12">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <span class="fw-medium">{{ i18n.t('fields.status') }}:</span><app-status-badge [status]="statusBadge().label" [variant]="statusBadge().variant" />
+        </div>
+      </div>
+      <div class="col-lg-6"><app-section-card [title]="i18n.t('common.basic_info')"><app-definition-list [items]="infoItems()" [labelWidth]="'5'" [valueWidth]="'7'" /></app-section-card></div>
+
+      <!-- Candidates Section -->
+      <div class="col-12">
+        <app-section-card [title]="i18n.t('succession.plans.candidates')" icon="fas fa-users">
+          <div class="d-flex justify-content-end mb-3">
+            <button class="btn btn-outline-primary btn-sm" (click)="toggleAddCandidate()">
+              <i class="fas fa-plus me-1"></i>{{ i18n.t('succession.plans.add_candidate') }}
+            </button>
+          </div>
+
+          @if (showAddCandidate()) {
+            <div class="card mb-3 border-primary">
+              <div class="card-body">
+                <form [formGroup]="candidateForm" (ngSubmit)="addCandidate()" novalidate>
+                  <div class="row g-3">
+                    <div class="col-md-4">
+                      <div class="app-modern-field">
+                        <label class="app-modern-label">{{ i18n.t('succession.talent_profiles.employee') }} <span class="text-danger">*</span></label>
+                        <app-searchable-select [options]="employeeOptions()" [formControl]="$any(candidateForm.get('employeeId'))" [placeholder]="i18n.t('common.select')" />
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">{{ i18n.t('succession.talent_profiles.readiness') }}</label>
+                      <select class="form-select form-select-sm" formControlName="readinessLevel">
+                        <option value="NotReady">{{ i18n.t('succession.enums.NotReady') }}</option>
+                        <option value="DevelopmentNeeded">{{ i18n.t('succession.enums.DevelopmentNeeded') }}</option>
+                        <option value="ReadyWithDevelopment">{{ i18n.t('succession.enums.ReadyWithDevelopment') }}</option>
+                        <option value="ReadyNow">{{ i18n.t('succession.enums.ReadyNow') }}</option>
+                      </select>
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">{{ i18n.t('succession.plans.readiness_timeline') }}</label>
+                      <select class="form-select form-select-sm" formControlName="readinessTimeline">
+                        <option value="Immediate">{{ i18n.t('succession.enums.Immediate') }}</option>
+                        <option value="SixMonths">{{ i18n.t('succession.enums.SixMonths') }}</option>
+                        <option value="OneYear">{{ i18n.t('succession.enums.OneYear') }}</option>
+                        <option value="TwoYears">{{ i18n.t('succession.enums.TwoYears') }}</option>
+                        <option value="ThreePlusYears">{{ i18n.t('succession.enums.ThreePlusYears') }}</option>
+                      </select>
+                    </div>
+                    <div class="col-md-2">
+                      <label class="form-label">{{ i18n.t('succession.plans.priority') }}</label>
+                      <input type="number" class="form-control form-control-sm" formControlName="priority" min="1">
+                    </div>
+                    <div class="col-md-5">
+                      <label class="form-label">{{ i18n.t('succession.plans.development_plan') }}</label>
+                      <textarea class="form-control form-control-sm" formControlName="developmentPlan" rows="2"></textarea>
+                    </div>
+                    <div class="col-md-5">
+                      <label class="form-label">{{ i18n.t('succession.plans.gap_analysis') }}</label>
+                      <textarea class="form-control form-control-sm" formControlName="gapAnalysis" rows="2"></textarea>
+                    </div>
+                    <div class="col-12 d-flex gap-2 justify-content-end">
+                      <button type="button" class="btn btn-secondary btn-sm" (click)="toggleAddCandidate()">{{ i18n.t('common.cancel') }}</button>
+                      <button type="submit" class="btn btn-primary btn-sm" [disabled]="candidateForm.invalid || addingCandidate()">
+                        @if (addingCandidate()) { <span class="spinner-border spinner-border-sm me-1"></span> }{{ i18n.t('common.save') }}
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          }
+
+          @if (item()!.candidates && item()!.candidates!.length > 0) {
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead><tr>
+                  <th>#</th>
+                  <th>{{ i18n.t('succession.talent_profiles.employee') }}</th>
+                  <th>{{ i18n.t('succession.talent_profiles.readiness') }}</th>
+                  <th>{{ i18n.t('succession.plans.readiness_timeline') }}</th>
+                  <th>{{ i18n.t('fields.status') }}</th>
+                  <th>{{ i18n.t('common.actions') }}</th>
+                </tr></thead>
+                <tbody>
+                  @for (candidate of item()!.candidates; track candidate.id) {
+                    <tr>
+                      <td>{{ candidate.priority }}</td>
+                      <td>{{ candidate.employeeName }}<br><small class="text-muted">{{ candidate.employeeNumber }}</small></td>
+                      <td><span class="badge bg-info">{{ i18n.t('succession.enums.' + candidate.readinessLevel) }}</span></td>
+                      <td>{{ i18n.t('succession.enums.' + candidate.readinessTimeline) }}</td>
+                      <td><span class="badge bg-success">{{ i18n.t('succession.enums.' + candidate.status) }}</span></td>
+                      <td><button class="btn btn-outline-danger btn-sm" (click)="removeCandidate(candidate.id)"><i class="fas fa-times"></i></button></td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          } @else {
+            <p class="text-muted text-center py-3">{{ i18n.t('succession.plans.no_candidates') }}</p>
+          }
+        </app-section-card>
+      </div>
+
+      <div class="col-12"><app-section-card [title]="i18n.t('history.title')" icon="fas fa-clock-rotate-left" headerClass="bg-light"><app-audit-history [entityName]="'SuccessionPlan'" [entityId]="item()?.id" /></app-section-card></div>
+    </div>
+  }
+</div>

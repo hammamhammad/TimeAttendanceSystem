@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.LeaveManagement;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.LeaveManagement;
 
-namespace TimeAttendanceSystem.Application.Services;
+namespace TecAxle.Hrms.Application.Services;
 
 /// <summary>
 /// Service for leave accrual calculations and balance management.

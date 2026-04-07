@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Domain.Workflows.Enums;
+namespace TecAxle.Hrms.Domain.Workflows.Enums;
 
 /// <summary>
 /// Defines the status of a workflow instance throughout its lifecycle.
@@ -40,5 +40,14 @@ public enum WorkflowStatus
     /// Workflow has expired due to timeout without action.
     /// May trigger escalation or automatic rejection.
     /// </summary>
-    Expired = 6
+    Expired = 6,
+
+    /// <summary>
+    /// Workflow has been frozen due to module deactivation.
+    /// The module required by this workflow's entity type has been disabled.
+    /// Frozen workflows cannot be approved/rejected/escalated.
+    /// If the module is re-enabled, frozen workflows resume from their previous state.
+    /// After 90 days frozen, workflows are automatically cancelled.
+    /// </summary>
+    Frozen = 7
 }

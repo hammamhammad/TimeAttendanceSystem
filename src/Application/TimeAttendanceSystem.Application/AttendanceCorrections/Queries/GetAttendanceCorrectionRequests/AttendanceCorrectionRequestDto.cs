@@ -1,7 +1,7 @@
-using TimeAttendanceSystem.Domain.Attendance;
-using TimeAttendanceSystem.Domain.Excuses;
+using TecAxle.Hrms.Domain.Attendance;
+using TecAxle.Hrms.Domain.Excuses;
 
-namespace TimeAttendanceSystem.Application.AttendanceCorrections.Queries.GetAttendanceCorrectionRequests;
+namespace TecAxle.Hrms.Application.AttendanceCorrections.Queries.GetAttendanceCorrectionRequests;
 
 /// <summary>
 /// Data Transfer Object representing a single approval step in workflow history.

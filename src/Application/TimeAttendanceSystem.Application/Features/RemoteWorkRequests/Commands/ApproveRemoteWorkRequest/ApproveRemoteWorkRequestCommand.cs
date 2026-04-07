@@ -1,8 +1,10 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.RemoteWork;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.RemoteWork;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.Features.RemoteWorkRequests.Commands.ApproveRemoteWorkRequest;
+namespace TecAxle.Hrms.Application.Features.RemoteWorkRequests.Commands.ApproveRemoteWorkRequest;
 
 /// <summary>
 /// CQRS command for approving or rejecting remote work requests.
@@ -26,6 +28,7 @@ namespace TimeAttendanceSystem.Application.Features.RemoteWorkRequests.Commands.
 /// - Rejection reason is mandatory for rejections
 /// - Audit trail maintained for compliance
 /// </remarks>
+[RequiresModule(SystemModule.RemoteWork)]
 public record ApproveRemoteWorkRequestCommand(
     long RequestId,
     long ApproverId,

@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Infrastructure.Persistence;
+using TecAxle.Hrms.Infrastructure.Persistence;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]

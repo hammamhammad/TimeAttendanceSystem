@@ -1,10 +1,10 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TimeAttendanceSystem.Application.Notifications.Commands.RegisterPushToken;
-using TimeAttendanceSystem.Application.Notifications.Commands.UnregisterPushToken;
+using TecAxle.Hrms.Application.Notifications.Commands.RegisterPushToken;
+using TecAxle.Hrms.Application.Notifications.Commands.UnregisterPushToken;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 /// <summary>
 /// Controller for managing push notification tokens (FCM).

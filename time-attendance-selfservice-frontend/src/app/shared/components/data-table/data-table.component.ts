@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, signal, TemplateRef, ContentChild, inject } from '@angular/core';
-import { NgTemplateOutlet } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LoadingSpinnerComponent } from '../loading-spinner/loading-spinner.component';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
@@ -33,18 +33,18 @@ export interface SortEvent {
 @Component({
   selector: 'app-data-table',
   standalone: true,
-  imports: [NgTemplateOutlet, FormsModule, LoadingSpinnerComponent, EmptyStateComponent],
+  imports: [CommonModule, FormsModule, LoadingSpinnerComponent, EmptyStateComponent],
   template: `
     <div class="unified-data-table">
       <!-- Loading State -->
       @if (isLoading()) {
         <app-loading-spinner></app-loading-spinner>
       }
-
+    
       <!-- Mobile Card View -->
       @if (!isLoading() && (responsiveMode === 'cards' || responsiveMode === 'auto')) {
         <div class="mobile-cards d-block d-md-none">
-          @for (item of getDisplayedData(); track item.id || $index) {
+          @for (item of getDisplayedData(); track trackByFn($index, item)) {
             <div class="mobile-card">
               <!-- Selection -->
               @if (allowSelection) {
@@ -55,11 +55,10 @@ export interface SortEvent {
                       type="checkbox"
                       [checked]="isSelected(item)"
                       (change)="toggleSelection(item, $event)"
-                    />
+                      />
                   </div>
                 </div>
               }
-
               <!-- Card Content -->
               <div class="mobile-card-content">
                 <!-- Custom template if provided -->
@@ -69,7 +68,6 @@ export interface SortEvent {
                     [ngTemplateOutletContext]="{ $implicit: item, actions: getAvailableActions(item) }">
                   </ng-container>
                 }
-
                 <!-- Default card layout -->
                 @if (!cardTemplate) {
                   <div class="default-card-layout">
@@ -77,10 +75,8 @@ export interface SortEvent {
                       <div class="mobile-field">
                         <span class="mobile-label">{{ column.mobileLabel || column.label }}:</span>
                         <span class="mobile-value">
-                          @if (cellTemplate) {
-                            <ng-container [ngTemplateOutlet]="cellTemplate" [ngTemplateOutletContext]="{ $implicit: item, column: column }">
-                            </ng-container>
-                          }
+                          <ng-container *ngTemplateOutlet="cellTemplate; context: { $implicit: item, column: column }">
+                          </ng-container>
                           @if (!cellTemplate && !column.renderHtml) {
                             <span>{{ getNestedValue(item, column.key) }}</span>
                           }
@@ -93,7 +89,6 @@ export interface SortEvent {
                   </div>
                 }
               </div>
-
               <!-- Actions -->
               @if (actions.length > 0) {
                 <div class="mobile-card-actions">
@@ -105,7 +100,7 @@ export interface SortEvent {
                         [title]="action.label"
                         (click)="onAction(action.key, item)">
                         @if (action.icon) {
-                          <i [class]="getIconClass(action.icon)"></i>
+                          <i [class]="'fas ' + action.icon"></i>
                         }
                         @if (!action.icon) {
                           <span>{{ action.label }}</span>
@@ -117,18 +112,17 @@ export interface SortEvent {
               }
             </div>
           }
-
           <!-- Empty state for mobile -->
           @if (data.length === 0) {
             <app-empty-state
-              [icon]="'bi-inbox'"
+              [icon]="'fa-inbox'"
               [title]="emptyTitle || 'No Data'"
               [message]="emptyMessage || 'No data available'">
             </app-empty-state>
           }
         </div>
       }
-
+    
       <!-- Desktop Table View -->
       <div class="table-container" [class.d-none]="isMobileView() && (responsiveMode === 'cards' || responsiveMode === 'auto')" [class.d-md-block]="responsiveMode === 'cards' || responsiveMode === 'auto'">
         <div class="table-responsive" [class.overflow-auto]="responsiveMode === 'horizontal-scroll'">
@@ -145,11 +139,11 @@ export interface SortEvent {
                         [checked]="allSelected()"
                         [indeterminate]="someSelected()"
                         (change)="toggleSelectAll($event)"
-                      />
+                        />
                     </div>
                   </th>
                 }
-
+    
                 <!-- Data columns -->
                 @for (column of getVisibleColumns(); track column.key) {
                   <th
@@ -161,33 +155,34 @@ export interface SortEvent {
                     [class.d-md-table-cell]="column.hideOnMobile"
                     (click)="onSort(column)">
                     <div class="d-flex align-items-center"
-                         [class.justify-content-center]="column.align === 'center'"
-                         [class.justify-content-end]="column.align === 'right'">
+                      [class.justify-content-center]="column.align === 'center'"
+                      [class.justify-content-end]="column.align === 'right'">
                       <span>{{ column.label }}</span>
                       @if (column.sortable && getSortColumn() === column.key) {
-                        <i class="ms-2 bi"
-                           [class.bi-caret-up-fill]="getSortDirection() === 'asc'"
-                           [class.bi-caret-down-fill]="getSortDirection() === 'desc'"></i>
+                        <i
+                          class="ms-2 fas"
+                          [class.fa-sort-up]="getSortDirection() === 'asc'"
+                        [class.fa-sort-down]="getSortDirection() === 'desc'"></i>
                       }
                       @if (column.sortable && getSortColumn() !== column.key) {
-                        <i class="ms-2 bi bi-arrow-down-up text-muted"></i>
+                        <i
+                        class="ms-2 fas fa-sort text-muted"></i>
                       }
                     </div>
                   </th>
                 }
-
+    
                 <!-- Actions column -->
                 @if (actions.length > 0) {
-                  <th class="actions-column">{{ actionsLabel || i18n.t('app.actions') }}</th>
+                  <th class="actions-column">{{ i18n.t('common.actions') }}</th>
                 }
               </tr>
             </thead>
             <tbody>
-              @for (item of getDisplayedData(); track item.id || $index) {
+              @for (item of getDisplayedData(); track trackByFn($index, item)) {
                 <tr
                   [class.selected-row]="isSelected(item)"
                   [class.inactive-row]="!isActiveItem(item)">
-
                   <!-- Selection cell -->
                   @if (allowSelection) {
                     <td class="selection-column">
@@ -197,11 +192,10 @@ export interface SortEvent {
                           type="checkbox"
                           [checked]="isSelected(item)"
                           (change)="toggleSelection(item, $event); $event.stopPropagation()"
-                        />
+                          />
                       </div>
                     </td>
                   }
-
                   <!-- Data cells -->
                   @for (column of getVisibleColumns(); track column.key) {
                     <td
@@ -209,19 +203,20 @@ export interface SortEvent {
                       [class.text-end]="column.align === 'right'"
                       [class.d-none]="column.hideOnMobile && isMobileView()"
                       [class.d-md-table-cell]="column.hideOnMobile">
-                      @if (cellTemplate) {
-                        <ng-container [ngTemplateOutlet]="cellTemplate" [ngTemplateOutletContext]="{ $implicit: item, column: column }">
-                        </ng-container>
-                      }
-                      @if (!cellTemplate && !column.renderHtml) {
-                        <span>{{ getNestedValue(item, column.key) }}</span>
-                      }
-                      @if (!cellTemplate && column.renderHtml) {
-                        <span [innerHTML]="getNestedValue(item, column.key)"></span>
+                      @switch (column.key) {
+                        @default {
+                          <ng-container *ngTemplateOutlet="cellTemplate; context: { $implicit: item, column: column }">
+                          </ng-container>
+                          @if (!cellTemplate && !column.renderHtml) {
+                            <span>{{ getNestedValue(item, column.key) }}</span>
+                          }
+                          @if (!cellTemplate && column.renderHtml) {
+                            <span [innerHTML]="getNestedValue(item, column.key)"></span>
+                          }
+                        }
                       }
                     </td>
                   }
-
                   <!-- Actions cell -->
                   @if (actions.length > 0) {
                     <td class="actions-column">
@@ -233,7 +228,7 @@ export interface SortEvent {
                             [title]="action.label"
                             (click)="onAction(action.key, item); $event.stopPropagation()">
                             @if (action.icon) {
-                              <i [class]="getIconClass(action.icon)"></i>
+                              <i [class]="'fas ' + action.icon"></i>
                             }
                             @if (!action.icon) {
                               <span>{{ action.label }}</span>
@@ -245,13 +240,13 @@ export interface SortEvent {
                   }
                 </tr>
               }
-
+    
               <!-- Empty state -->
               @if (data.length === 0) {
                 <tr>
                   <td [attr.colspan]="getTotalColumns()" class="p-0">
                     <app-empty-state
-                      [icon]="'bi-inbox'"
+                      [icon]="'fa-inbox'"
                       [title]="emptyTitle || 'No Data'"
                       [message]="emptyMessage || 'No data available'">
                     </app-empty-state>
@@ -261,28 +256,28 @@ export interface SortEvent {
             </tbody>
           </table>
         </div>
-
+    
         <!-- Enhanced Pagination -->
         @if (showPagination && getTotalPagesValue() > 1) {
           <nav class="mt-3">
             <div class="row align-items-center">
               <div class="col-md-6">
                 <div class="d-flex align-items-center">
-                  <label class="form-label me-2 mb-0">Page Size:</label>
+                  <label class="form-label me-2 mb-0">{{ i18n.t('common.page_size') }}:</label>
                   <select
                     class="form-select form-select-sm"
                     style="width: auto;"
                     [value]="getPageSizeValue()"
                     (change)="onPageSizeChange(+$any($event.target).value)"
-                  >
+                    >
                     @for (size of pageSizeOptions; track size) {
                       <option [value]="size">{{ size }}</option>
                     }
                   </select>
                   <span class="text-muted ms-3">
-                    Showing
+                    {{ i18n.t('common.showing') }}
                     {{ getDisplayStart() }}-{{ getDisplayEnd() }}
-                    of
+                    {{ i18n.t('common.of') }}
                     {{ getTotalItemsValue() }}
                   </span>
                 </div>
@@ -291,11 +286,10 @@ export interface SortEvent {
                 <ul class="pagination pagination-sm justify-content-end mb-0">
                   <li class="page-item" [class.disabled]="getCurrentPage() === 1">
                     <button class="page-link" (click)="onPageChange(getCurrentPage() - 1)" [disabled]="getCurrentPage() === 1">
-                      <i class="bi bi-chevron-left"></i>
+                      <i class="fas fa-chevron-left rtl-flip"></i>
                     </button>
                   </li>
-
-                  @for (page of getPageNumbers(); track $index) {
+                  @for (page of getPageNumbers(); track page) {
                     <li
                       class="page-item"
                       [class.active]="page === getCurrentPage()"
@@ -304,7 +298,7 @@ export interface SortEvent {
                         <button
                           class="page-link"
                           (click)="onPageChange(page)"
-                        >
+                          >
                           {{ page }}
                         </button>
                       }
@@ -313,10 +307,9 @@ export interface SortEvent {
                       }
                     </li>
                   }
-
                   <li class="page-item" [class.disabled]="getCurrentPage() === getTotalPagesValue()">
                     <button class="page-link" (click)="onPageChange(getCurrentPage() + 1)" [disabled]="getCurrentPage() === getTotalPagesValue()">
-                      <i class="bi bi-chevron-right"></i>
+                      <i class="fas fa-chevron-right rtl-flip"></i>
                     </button>
                   </li>
                 </ul>
@@ -326,13 +319,15 @@ export interface SortEvent {
         }
       </div>
     </div>
-  `,
+    `,
   styles: [`
     /* Main Container */
     .unified-data-table {
       background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--app-gray-200, #EAECF0);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: var(--app-shadow-sm, 0 1px 3px rgba(16, 24, 40, 0.1));
     }
 
     /* Table Container */
@@ -347,10 +342,13 @@ export interface SortEvent {
     }
 
     .table thead th {
-      border-bottom: 2px solid #dee2e6;
-      background-color: #f8f9fa;
+      border-bottom: 1px solid var(--app-gray-200, #EAECF0);
+      background-color: var(--app-gray-50, #F9FAFB);
       font-weight: 600;
-      color: #495057;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--app-gray-600, #475467);
       position: sticky;
       top: 0;
       z-index: 10;
@@ -362,17 +360,17 @@ export interface SortEvent {
     }
 
     .table tbody tr:hover {
-      background-color: #f8f9fa;
+      background-color: var(--app-primary-50, #EEF2FF);
       cursor: pointer;
     }
 
     .table tbody tr.selected-row {
-      background-color: #e3f2fd;
-      border-left: 4px solid #2196f3;
+      background-color: var(--app-primary-50, #EEF2FF);
+      border-left: 4px solid var(--app-primary, #4F6BF6);
     }
 
     .table tbody tr.inactive-row {
-      background-color: #fff3cd;
+      background-color: var(--app-warning-50, #FFFBEB);
     }
 
     .table tbody tr.inactive-row:hover {
@@ -390,6 +388,16 @@ export interface SortEvent {
       text-align: center;
     }
 
+    /* Action buttons as separate items with gap */
+    .actions-column .btn-group {
+      display: flex;
+      gap: 4px;
+    }
+
+    .actions-column .btn-group .btn {
+      border-radius: 6px !important;
+    }
+
     /* Sortable Headers */
     .sortable {
       cursor: pointer;
@@ -398,73 +406,97 @@ export interface SortEvent {
     }
 
     .sortable:hover {
-      color: #2196f3;
-      background-color: #f0f7ff;
+      color: var(--app-primary, #4F6BF6);
+      background-color: var(--app-primary-50, #EEF2FF);
     }
 
-    .sortable .bi {
+    .sortable .fas {
       font-size: 0.75rem;
       opacity: 0.6;
       transition: opacity 0.2s ease, transform 0.2s ease;
     }
 
-    .sortable:hover .bi {
+    .sortable:hover .fas {
       opacity: 1;
       transform: scale(1.1);
     }
 
-    /* Button Styles */
+    /* Action Button Styles - ERP clean bordered icon buttons */
     .btn-group .btn {
-      border: none;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      transition: all 0.2s ease;
+      background: white;
+      border: 1px solid var(--app-gray-300, #D0D5DD);
+      color: var(--app-gray-500, #667085);
+      box-shadow: none;
+      transition: all 0.15s ease;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
     }
 
     .btn-group .btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      background-color: var(--app-gray-50, #F9FAFB);
+      border-color: var(--app-gray-300, #D0D5DD);
+      color: var(--app-gray-700, #344054);
+      transform: none;
+      box-shadow: none;
     }
 
+    .btn-group .btn i {
+      font-size: 12px;
+    }
+
+    /* Specific action color hints on hover */
     .btn-outline-primary:hover {
-      background-color: #2196f3;
-      border-color: #2196f3;
-    }
-
-    .btn-outline-danger:hover {
-      background-color: #dc3545;
-      border-color: #dc3545;
-    }
-
-    .btn-outline-secondary:hover {
-      background-color: #6c757d;
-      border-color: #6c757d;
+      color: var(--app-primary, #4F6BF6);
+      border-color: var(--app-primary-200, #B3C2FF);
+      background-color: var(--app-primary-50, #EEF2FF);
     }
 
     .btn-outline-info:hover {
-      background-color: #17a2b8;
-      border-color: #17a2b8;
+      color: var(--app-info, #3B82F6);
+      border-color: var(--app-info-100, #DBEAFE);
+      background-color: var(--app-info-50, #EFF6FF);
+    }
+
+    .btn-outline-danger:hover {
+      color: var(--app-danger, #EF4444);
+      border-color: var(--app-danger-100, #FEE2E2);
+      background-color: var(--app-danger-50, #FEF2F2);
     }
 
     .btn-outline-warning:hover {
-      background-color: #ffc107;
-      border-color: #ffc107;
-      color: #212529;
+      color: var(--app-warning-600, #D97706);
+      border-color: var(--app-warning-100, #FEF3C7);
+      background-color: var(--app-warning-50, #FFFBEB);
+    }
+
+    .btn-outline-success:hover {
+      color: var(--app-success, #22C55E);
+      border-color: var(--app-success-100, #DCFCE7);
+      background-color: var(--app-success-50, #F0FDF4);
+    }
+
+    .btn-outline-secondary:hover {
+      color: var(--app-gray-700, #344054);
+      border-color: var(--app-gray-300, #D0D5DD);
+      background-color: var(--app-gray-50, #F9FAFB);
     }
 
     /* Form Controls */
     .form-check-input {
       cursor: pointer;
       transition: all 0.2s ease;
+      accent-color: var(--app-primary, #4F6BF6);
     }
 
     .form-check-input:checked {
-      background-color: #2196f3;
-      border-color: #2196f3;
+      background-color: var(--app-primary, #4F6BF6);
+      border-color: var(--app-primary, #4F6BF6);
     }
 
     .form-check-input:indeterminate {
-      background-color: #ffc107;
-      border-color: #ffc107;
+      background-color: var(--app-warning, #F59E0B);
+      border-color: var(--app-warning, #F59E0B);
     }
 
     .form-select {
@@ -473,8 +505,8 @@ export interface SortEvent {
     }
 
     .form-select:focus {
-      border-color: #2196f3;
-      box-shadow: 0 0 0 0.2rem rgba(33, 150, 243, 0.25);
+      border-color: var(--app-primary, #4F6BF6);
+      box-shadow: 0 0 0 0.2rem rgba(79, 107, 246, 0.25);
     }
 
     /* Pagination */
@@ -483,33 +515,33 @@ export interface SortEvent {
     }
 
     .page-link {
-      color: #6c757d;
-      border: 1px solid #dee2e6;
+      color: var(--app-gray-500, #667085);
+      border: 1px solid var(--app-gray-200, #EAECF0);
       transition: all 0.2s ease;
     }
 
     .page-link:hover {
-      color: #2196f3;
-      background-color: #f8f9fa;
-      border-color: #dee2e6;
+      color: var(--app-primary, #4F6BF6);
+      background-color: var(--app-gray-50, #F9FAFB);
+      border-color: var(--app-gray-200, #EAECF0);
     }
 
     .page-item.active .page-link {
-      background-color: #2196f3;
-      border-color: #2196f3;
+      background-color: var(--app-primary, #4F6BF6);
+      border-color: var(--app-primary, #4F6BF6);
       color: white;
     }
 
     .page-item.disabled .page-link {
       color: #adb5bd;
       background-color: #fff;
-      border-color: #dee2e6;
+      border-color: var(--app-gray-200, #EAECF0);
       cursor: not-allowed;
     }
 
     /* Loading State */
     .spinner-border {
-      color: #2196f3;
+      color: var(--app-primary, #4F6BF6);
       width: 3rem;
       height: 3rem;
     }
@@ -522,12 +554,12 @@ export interface SortEvent {
 
     /* Focus States */
     .table tbody tr:focus-within {
-      outline: 2px solid #2196f3;
+      outline: 2px solid var(--app-primary, #4F6BF6);
       outline-offset: -2px;
     }
 
     .btn:focus {
-      box-shadow: 0 0 0 0.2rem rgba(33, 150, 243, 0.25);
+      box-shadow: 0 0 0 0.2rem rgba(79, 107, 246, 0.25);
     }
 
     /* Enhanced Table Layout */
@@ -551,7 +583,7 @@ export interface SortEvent {
     /* RTL Support */
     [dir="rtl"] .table tbody tr.selected-row {
       border-left: none;
-      border-right: 4px solid #2196f3;
+      border-right: 4px solid var(--app-primary, #4F6BF6);
     }
 
     /* Mobile Cards */
@@ -561,7 +593,7 @@ export interface SortEvent {
 
     .mobile-card {
       background: white;
-      border: 1px solid #dee2e6;
+      border: 1px solid var(--app-gray-200, #EAECF0);
       border-radius: 8px;
       margin-bottom: 1rem;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -575,13 +607,13 @@ export interface SortEvent {
     }
 
     .mobile-card.selected-row {
-      border-color: #2196f3;
-      background-color: #f3f9ff;
+      border-color: var(--app-primary, #4F6BF6);
+      background-color: var(--app-primary-50, #EEF2FF);
     }
 
     .mobile-card-selection {
       padding: 0.75rem 1rem 0;
-      border-bottom: 1px solid #f8f9fa;
+      border-bottom: 1px solid var(--app-gray-50, #F9FAFB);
     }
 
     .mobile-card-content {
@@ -594,7 +626,7 @@ export interface SortEvent {
       align-items: start;
       margin-bottom: 0.5rem;
       padding: 0.25rem 0;
-      border-bottom: 1px solid #f8f9fa;
+      border-bottom: 1px solid var(--app-gray-50, #F9FAFB);
     }
 
     .default-card-layout .mobile-field:last-child {
@@ -604,7 +636,7 @@ export interface SortEvent {
 
     .mobile-label {
       font-weight: 600;
-      color: #495057;
+      color: var(--app-gray-700, #344054);
       flex: 0 0 40%;
       font-size: 0.875rem;
     }
@@ -618,8 +650,8 @@ export interface SortEvent {
 
     .mobile-card-actions {
       padding: 0.75rem 1rem;
-      background-color: #f8f9fa;
-      border-top: 1px solid #dee2e6;
+      background-color: var(--app-gray-50, #F9FAFB);
+      border-top: 1px solid var(--app-gray-200, #EAECF0);
     }
 
     .mobile-card-actions .btn-group {
@@ -637,7 +669,7 @@ export interface SortEvent {
     .mobile-empty-state {
       text-align: center;
       padding: 3rem 1rem;
-      color: #6c757d;
+      color: var(--app-gray-500, #667085);
     }
 
     .mobile-empty-state i {
@@ -767,11 +799,10 @@ export interface SortEvent {
   `]
 })
 export class DataTableComponent {
-  readonly i18n = inject(I18nService);
+  i18n = inject(I18nService);
   @Input() data: any[] = [];
   @Input() columns: TableColumn[] = [];
   @Input() actions: TableAction[] = [];
-  @Input() actionsLabel = '';
   @Input() loading: any = false;
   @Input() allowSelection = false;
   @Input() showPagination = true;
@@ -1024,14 +1055,5 @@ export class DataTableComponent {
   isMobileView(): boolean {
     if (typeof window === 'undefined') return false;
     return window.innerWidth < 768;
-  }
-
-  getIconClass(icon: string): string {
-    // Support both Bootstrap Icons (bi-*) and FontAwesome (fa-*)
-    if (icon.startsWith('bi-')) {
-      return 'bi ' + icon;
-    }
-    // Default to FontAwesome
-    return 'fas ' + icon;
   }
 }

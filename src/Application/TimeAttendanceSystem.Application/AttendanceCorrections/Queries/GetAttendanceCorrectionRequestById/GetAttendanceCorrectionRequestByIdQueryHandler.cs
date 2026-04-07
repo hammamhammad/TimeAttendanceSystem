@@ -1,13 +1,13 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.AttendanceCorrections.Queries.GetAttendanceCorrectionRequests;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Attendance;
-using TimeAttendanceSystem.Domain.Excuses;
-using TimeAttendanceSystem.Domain.Workflows.Enums;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.AttendanceCorrections.Queries.GetAttendanceCorrectionRequests;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Attendance;
+using TecAxle.Hrms.Domain.Excuses;
+using TecAxle.Hrms.Domain.Workflows.Enums;
 
-namespace TimeAttendanceSystem.Application.AttendanceCorrections.Queries.GetAttendanceCorrectionRequestById;
+namespace TecAxle.Hrms.Application.AttendanceCorrections.Queries.GetAttendanceCorrectionRequestById;
 
 /// <summary>
 /// Query handler for retrieving a single attendance correction request by ID.

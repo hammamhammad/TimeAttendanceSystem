@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace TimeAttendanceSystem.Application.VacationTypes.Commands.UpdateVacationType;
+namespace TecAxle.Hrms.Application.VacationTypes.Commands.UpdateVacationType;
 
 /// <summary>
 /// FluentValidation validator for UpdateVacationTypeCommand providing essential input validation.

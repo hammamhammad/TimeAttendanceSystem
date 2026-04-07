@@ -1,7 +1,7 @@
-using TimeAttendanceSystem.Domain.Shifts;
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Domain.Shifts;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Application.Shifts.Queries.GetShifts;
+namespace TecAxle.Hrms.Application.Shifts.Queries.GetShifts;
 
 /// <summary>
 /// Data transfer object for shift information.

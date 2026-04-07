@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace TimeAttendanceSystem.Application.Excuses.Commands.DeleteExcusePolicy;
+namespace TecAxle.Hrms.Application.Excuses.Commands.DeleteExcusePolicy;
 
 /// <summary>
 /// Fluent Validation rules for DeleteExcusePolicyCommand.

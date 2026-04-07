@@ -1,0 +1,24 @@
+<div class="app-list-page">
+  <app-page-header [title]="i18n.t('company_policies.title')" />
+  <app-unified-filter [searchPlaceholder]="i18n.t('company_policies.search')" [showAddButton]="true"
+    [addButtonText]="i18n.t('company_policies.create')" [showRefreshButton]="true" [refreshing]="loading()"
+    (searchChange)="onSearchChange($event)" (add)="onAdd()" (refresh)="onRefreshData()" />
+
+  <app-data-table [data]="data()" [columns]="columns" [actions]="tableActions()" [currentPage]="currentPage()"
+    [totalPages]="totalPages()" [totalItems]="totalCount()" [pageSize]="pageSize()" [loading]="loading"
+    [emptyTitle]="i18n.t('company_policies.no_data')" [showPagination]="true"
+    (actionClick)="onActionClick($event)" (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)">
+    <ng-template #cellTemplate let-item let-column="column">
+      @if (column.key === 'status') {
+        <span class="badge" [class.bg-secondary]="item.status === 'Draft'" [class.bg-success]="item.status === 'Published'"
+          [class.bg-warning]="item.status === 'Archived'">
+          {{ i18n.t('company_policies.status_' + item.status) }}
+        </span>
+      } @else if (column.key === 'acknowledgmentCount') {
+        {{ item.acknowledgmentCount }} / {{ item.totalEmployees }}
+      } @else {
+        {{ item[column.key] ?? '-' }}
+      }
+    </ng-template>
+  </app-data-table>
+</div>

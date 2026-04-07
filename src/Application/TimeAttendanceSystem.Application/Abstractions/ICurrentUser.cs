@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Application.Abstractions;
+namespace TecAxle.Hrms.Application.Abstractions;
 
 /// <summary>
 /// Abstraction for accessing current user context within the Application layer.
@@ -37,6 +37,12 @@ namespace TimeAttendanceSystem.Application.Abstractions;
 /// </remarks>
 public interface ICurrentUser
 {
+    /// <summary>
+    /// Gets the tenant ID of the currently authenticated user.
+    /// Returns null for unauthenticated requests, system admins with cross-tenant access, or anonymous access.
+    /// </summary>
+    long? TenantId { get; }
+
     /// <summary>
     /// Gets the unique identifier of the currently authenticated user.
     /// Returns null for unauthenticated requests or anonymous access.

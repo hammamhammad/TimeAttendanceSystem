@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Application.Abstractions;
+namespace TecAxle.Hrms.Application.Abstractions;
 
 /// <summary>
 /// Email service abstraction for sending system-generated emails and notifications.

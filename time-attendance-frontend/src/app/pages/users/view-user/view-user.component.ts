@@ -12,11 +12,13 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 import { BadgeListComponent, BadgeItem } from '../../../shared/components/badge-list/badge-list.component';
 import { DefinitionListComponent, DefinitionItem } from '../../../shared/components/definition-list/definition-list.component';
+import { AuditHistoryComponent } from '../../../shared/components/audit-history/audit-history.component';
+import { SectionCardComponent } from '../../../shared/components/section-card/section-card.component';
 
 @Component({
   selector: 'app-view-user',
   standalone: true,
-  imports: [HasPermissionDirective, FormHeaderComponent, LoadingSpinnerComponent, StatusBadgeComponent, BadgeListComponent, DefinitionListComponent],
+  imports: [HasPermissionDirective, FormHeaderComponent, LoadingSpinnerComponent, StatusBadgeComponent, BadgeListComponent, DefinitionListComponent, AuditHistoryComponent, SectionCardComponent],
   templateUrl: './view-user.component.html',
   styleUrls: ['./view-user.component.css']
 })

@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Branches;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Branches;
 
-namespace TimeAttendanceSystem.Application.NfcTags.Queries.GetNfcWriteData;
+namespace TecAxle.Hrms.Application.NfcTags.Queries.GetNfcWriteData;
 
 /// <summary>
 /// Handler for generating NFC tag write data with HMAC-signed payload.

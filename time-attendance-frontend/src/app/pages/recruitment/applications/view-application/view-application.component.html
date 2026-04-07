@@ -1,0 +1,37 @@
+<div class="container-fluid app-modern-view">
+  <app-form-header mode="view" [title]="i18n.t('job_applications.view')" moduleName="job_applications" moduleRoute="recruitment/applications" [entityId]="item()?.id" [loading]="loading()" [actions]="headerActions()" />
+  @if (loading()) { <div class="text-center py-5"><app-loading-spinner [message]="i18n.t('common.loading')" [variant]="'primary'" [centered]="true" /></div> }
+  @if (error()) { <div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>{{ error() }}</div> }
+  @if (item() && !loading()) {
+    <div class="row g-4">
+      <div class="col-12"><div class="d-flex align-items-center gap-2 mb-3"><span class="fw-medium">{{ i18n.t('fields.status') }}:</span><app-status-badge [status]="statusBadge().label" [variant]="statusBadge().variant" /></div></div>
+      <div class="col-lg-6"><app-section-card [title]="i18n.t('common.basic_info')"><app-definition-list [items]="infoItems()" [labelWidth]="'5'" [valueWidth]="'7'" /></app-section-card></div>
+      @if (item()?.interviews?.length) {
+        <div class="col-lg-6">
+          <app-section-card [title]="i18n.t('interviews.title')">
+            @for (interview of item()!.interviews; track interview.id) {
+              <div class="border-bottom pb-2 mb-2">
+                <div class="fw-medium">{{ interview.interviewType }} - {{ interview.scheduledDate }}</div>
+                <div class="text-muted small">{{ interview.result }}</div>
+              </div>
+            }
+          </app-section-card>
+        </div>
+      }
+      @if (item()?.screeningNotes) { <div class="col-12"><app-section-card [title]="i18n.t('job_applications.screening_notes')"><p class="mb-0" style="white-space: pre-wrap;">{{ item()?.screeningNotes }}</p></app-section-card></div> }
+      <div class="col-lg-6">
+        <app-section-card [title]="i18n.t('files.upload_cover_letter')">
+          <app-file-upload
+            [label]="i18n.t('files.upload_cover_letter')"
+            [category]="'applications'"
+            [accept]="'.pdf,.doc,.docx'"
+            [entityType]="'JobApplication'"
+            [entityId]="item()?.id"
+            (fileUploaded)="onCoverLetterUploaded($event)">
+          </app-file-upload>
+        </app-section-card>
+      </div>
+      <div class="col-12"><app-section-card [title]="i18n.t('history.title')" icon="fas fa-clock-rotate-left" headerClass="bg-light"><app-audit-history [entityName]="'JobApplication'" [entityId]="item()?.id" /></app-section-card></div>
+    </div>
+  }
+</div>

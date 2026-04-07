@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TimeAttendanceSystem.Domain.RemoteWork;
+using TecAxle.Hrms.Domain.RemoteWork;
 
-namespace TimeAttendanceSystem.Infrastructure.Data.Configurations;
+namespace TecAxle.Hrms.Infrastructure.Data.Configurations;
 
 /// <summary>
 /// Entity Framework Core configuration for RemoteWorkRequest entity.

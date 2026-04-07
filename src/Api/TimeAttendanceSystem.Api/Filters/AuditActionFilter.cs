@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Text.Json;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Api.Filters;
+namespace TecAxle.Hrms.Api.Filters;
 
 /// <summary>
 /// ASP.NET Core action filter implementing comprehensive audit logging for API operations.

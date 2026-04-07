@@ -1,0 +1,44 @@
+<app-page-header [title]="i18n.t('portal.shift_swaps.title')">
+  <div header-actions>
+    <button class="btn btn-primary btn-sm me-2" (click)="navigateToCreate()" type="button">
+      <i class="bi bi-plus-circle me-1"></i> {{ i18n.t('portal.shift_swaps.create') }}
+    </button>
+    <button class="btn btn-outline-primary btn-sm" (click)="loadData()" [disabled]="loading()" type="button">
+      <i class="bi bi-arrow-clockwise" [class.spin]="loading()"></i> {{ i18n.t('common.refresh') }}
+    </button>
+  </div>
+</app-page-header>
+
+@if (loading() && items().length === 0) {
+  <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+}
+
+@if (error() && items().length === 0) {
+  <div class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle me-2"></i>{{ error() }}
+    <button class="btn btn-sm btn-outline-danger ms-3" (click)="loadData()" type="button">{{ i18n.t('common.retry') }}</button>
+  </div>
+}
+
+@if (!loading() && items().length === 0 && !error()) {
+  <app-empty-state
+    icon="bi bi-arrow-left-right"
+    [title]="i18n.t('portal.shift_swaps.no_records')">
+  </app-empty-state>
+}
+
+@if (items().length > 0) {
+  <div class="card">
+    <div class="card-body">
+      <app-data-table
+        [data]="tableData()"
+        [columns]="columns"
+        [actions]="tableActions()"
+        [loading]="loading()"
+        [paginated]="true"
+        [pageSize]="10"
+        (actionClick)="onAction($event)">
+      </app-data-table>
+    </div>
+  </div>
+}

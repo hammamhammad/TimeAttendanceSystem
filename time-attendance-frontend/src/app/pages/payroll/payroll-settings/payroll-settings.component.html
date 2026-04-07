@@ -1,0 +1,207 @@
+<div class="container-fluid">
+  <app-page-header [title]="i18n.t('payroll.settings.title')"></app-page-header>
+
+  <ul class="nav nav-tabs mb-4">
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="activeTab() === 'tax'" (click)="setTab('tax')" role="button">
+        <i class="fa-solid fa-percentage me-2"></i>{{ i18n.t('payroll.settings.tax_configurations') }}
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="activeTab() === 'social'" (click)="setTab('social')" role="button">
+        <i class="fa-solid fa-shield-halved me-2"></i>{{ i18n.t('payroll.settings.social_insurance') }}
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="activeTab() === 'insurance'" (click)="setTab('insurance')" role="button">
+        <i class="fa-solid fa-file-shield me-2"></i>{{ i18n.t('payroll.settings.insurance_providers') }}
+      </a>
+    </li>
+  </ul>
+
+  <!-- Tax Configurations Tab -->
+  @if (activeTab() === 'tax') {
+    <app-section-card [title]="i18n.t('payroll.settings.tax_configurations')" icon="fas fa-percentage">
+      <div class="d-flex justify-content-end mb-3">
+        <button class="btn btn-sm btn-primary" (click)="addTaxConfig()">
+          <i class="fa-solid fa-plus me-2"></i>{{ i18n.t('common.add') }}
+        </button>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>{{ i18n.t('common.name') }}</th>
+              <th>{{ i18n.t('payroll.settings.effective_date') }}</th>
+              <th>{{ i18n.t('common.branch') }}</th>
+              <th>{{ i18n.t('common.status') }}</th>
+              <th>{{ i18n.t('common.actions') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of taxConfigs(); track $index) {
+              <tr>
+                @if (item.editing) {
+                  <td><input type="text" class="form-control form-control-sm" [(ngModel)]="item.name" [placeholder]="i18n.t('common.name')"></td>
+                  <td><input type="date" class="form-control form-control-sm" [(ngModel)]="item.effectiveDate"></td>
+                  <td>--</td>
+                  <td>
+                    <div class="form-check">
+                      <input type="checkbox" class="form-check-input" [(ngModel)]="item.isActive">
+                    </div>
+                  </td>
+                  <td>
+                    <button class="btn btn-sm btn-success me-1" (click)="saveTaxConfig(item, $index)"><i class="fa-solid fa-check"></i></button>
+                    <button class="btn btn-sm btn-danger" (click)="removeTaxConfig($index)"><i class="fa-solid fa-trash"></i></button>
+                  </td>
+                } @else {
+                  <td>{{ item.name }}</td>
+                  <td>{{ item.effectiveDate ? (item.effectiveDate | date:'mediumDate') : '-' }}</td>
+                  <td>{{ item.branchName || '-' }}</td>
+                  <td><span class="badge" [class.bg-success]="item.isActive" [class.bg-secondary]="!item.isActive">{{ item.isActive ? i18n.t('common.active') : i18n.t('common.inactive') }}</span></td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-primary me-1" (click)="item.editing = true"><i class="fa-solid fa-edit"></i></button>
+                    <button class="btn btn-sm btn-outline-danger" (click)="removeTaxConfig($index)"><i class="fa-solid fa-trash"></i></button>
+                  </td>
+                }
+              </tr>
+            }
+            @if (taxConfigs().length === 0 && !loading()) {
+              <tr><td colspan="5" class="text-center text-muted py-4">{{ i18n.t('payroll.settings.no_tax_configs') }}</td></tr>
+            }
+            @if (loading()) {
+              <tr><td colspan="5" class="text-center py-4"><span class="spinner-border spinner-border-sm me-2"></span>{{ i18n.t('common.loading') }}</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </app-section-card>
+  }
+
+  <!-- Social Insurance Tab -->
+  @if (activeTab() === 'social') {
+    <app-section-card [title]="i18n.t('payroll.settings.social_insurance')" icon="fas fa-shield-halved">
+      <div class="d-flex justify-content-end mb-3">
+        <button class="btn btn-sm btn-primary" (click)="addSocialConfig()">
+          <i class="fa-solid fa-plus me-2"></i>{{ i18n.t('common.add') }}
+        </button>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>{{ i18n.t('common.name') }}</th>
+              <th>{{ i18n.t('payroll.settings.employee_rate') }} (%)</th>
+              <th>{{ i18n.t('payroll.settings.employer_rate') }} (%)</th>
+              <th>{{ i18n.t('payroll.settings.max_salary') }}</th>
+              <th>{{ i18n.t('payroll.settings.effective_date') }}</th>
+              <th>{{ i18n.t('common.status') }}</th>
+              <th>{{ i18n.t('common.actions') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of socialConfigs(); track $index) {
+              <tr>
+                @if (item.editing) {
+                  <td><input type="text" class="form-control form-control-sm" [(ngModel)]="item.name" [placeholder]="i18n.t('common.name')"></td>
+                  <td><input type="number" class="form-control form-control-sm" [(ngModel)]="item.employeeContributionRate"></td>
+                  <td><input type="number" class="form-control form-control-sm" [(ngModel)]="item.employerContributionRate"></td>
+                  <td><input type="number" class="form-control form-control-sm" [(ngModel)]="item.maxInsurableSalary"></td>
+                  <td><input type="date" class="form-control form-control-sm" [(ngModel)]="item.effectiveDate"></td>
+                  <td>
+                    <div class="form-check">
+                      <input type="checkbox" class="form-check-input" [(ngModel)]="item.isActive">
+                    </div>
+                  </td>
+                  <td>
+                    <button class="btn btn-sm btn-success me-1" (click)="saveSocialConfig(item, $index)"><i class="fa-solid fa-check"></i></button>
+                    <button class="btn btn-sm btn-danger" (click)="removeSocialConfig($index)"><i class="fa-solid fa-trash"></i></button>
+                  </td>
+                } @else {
+                  <td>{{ item.name }}</td>
+                  <td>{{ item.employeeContributionRate }}%</td>
+                  <td>{{ item.employerContributionRate }}%</td>
+                  <td>{{ item.maxInsurableSalary ? item.maxInsurableSalary.toLocaleString() : '-' }}</td>
+                  <td>{{ item.effectiveDate ? (item.effectiveDate | date:'mediumDate') : '-' }}</td>
+                  <td><span class="badge" [class.bg-success]="item.isActive" [class.bg-secondary]="!item.isActive">{{ item.isActive ? i18n.t('common.active') : i18n.t('common.inactive') }}</span></td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-primary me-1" (click)="item.editing = true"><i class="fa-solid fa-edit"></i></button>
+                    <button class="btn btn-sm btn-outline-danger" (click)="removeSocialConfig($index)"><i class="fa-solid fa-trash"></i></button>
+                  </td>
+                }
+              </tr>
+            }
+            @if (socialConfigs().length === 0 && !loading()) {
+              <tr><td colspan="7" class="text-center text-muted py-4">{{ i18n.t('payroll.settings.no_social_configs') }}</td></tr>
+            }
+            @if (loading()) {
+              <tr><td colspan="7" class="text-center py-4"><span class="spinner-border spinner-border-sm me-2"></span>{{ i18n.t('common.loading') }}</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </app-section-card>
+  }
+
+  <!-- Insurance Providers Tab -->
+  @if (activeTab() === 'insurance') {
+    <app-section-card [title]="i18n.t('payroll.settings.insurance_providers')" icon="fas fa-file-shield">
+      <div class="d-flex justify-content-end mb-3">
+        <button class="btn btn-sm btn-primary" (click)="addInsuranceProvider()">
+          <i class="fa-solid fa-plus me-2"></i>{{ i18n.t('common.add') }}
+        </button>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>{{ i18n.t('common.name') }}</th>
+              <th>{{ i18n.t('payroll.settings.policy_number') }}</th>
+              <th>{{ i18n.t('payroll.settings.contact_person') }}</th>
+              <th>{{ i18n.t('common.email') }}</th>
+              <th>{{ i18n.t('common.status') }}</th>
+              <th>{{ i18n.t('common.actions') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of insuranceProviders(); track $index) {
+              <tr>
+                @if (item.editing) {
+                  <td><input type="text" class="form-control form-control-sm" [(ngModel)]="item.name" [placeholder]="i18n.t('common.name')"></td>
+                  <td><input type="text" class="form-control form-control-sm" [(ngModel)]="item.policyNumber"></td>
+                  <td><input type="text" class="form-control form-control-sm" [(ngModel)]="item.contactPerson"></td>
+                  <td><input type="email" class="form-control form-control-sm" [(ngModel)]="item.email"></td>
+                  <td>
+                    <div class="form-check">
+                      <input type="checkbox" class="form-check-input" [(ngModel)]="item.isActive">
+                    </div>
+                  </td>
+                  <td>
+                    <button class="btn btn-sm btn-success me-1" (click)="saveInsuranceProvider(item, $index)"><i class="fa-solid fa-check"></i></button>
+                    <button class="btn btn-sm btn-danger" (click)="removeInsuranceProvider($index)"><i class="fa-solid fa-trash"></i></button>
+                  </td>
+                } @else {
+                  <td>{{ item.name }}</td>
+                  <td>{{ item.policyNumber || '-' }}</td>
+                  <td>{{ item.contactPerson || '-' }}</td>
+                  <td>{{ item.email || '-' }}</td>
+                  <td><span class="badge" [class.bg-success]="item.isActive" [class.bg-secondary]="!item.isActive">{{ item.isActive ? i18n.t('common.active') : i18n.t('common.inactive') }}</span></td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-primary me-1" (click)="item.editing = true"><i class="fa-solid fa-edit"></i></button>
+                    <button class="btn btn-sm btn-outline-danger" (click)="removeInsuranceProvider($index)"><i class="fa-solid fa-trash"></i></button>
+                  </td>
+                }
+              </tr>
+            }
+            @if (insuranceProviders().length === 0 && !loading()) {
+              <tr><td colspan="6" class="text-center text-muted py-4">{{ i18n.t('payroll.settings.no_insurance_providers') }}</td></tr>
+            }
+            @if (loading()) {
+              <tr><td colspan="6" class="text-center py-4"><span class="spinner-border spinner-border-sm me-2"></span>{{ i18n.t('common.loading') }}</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </app-section-card>
+  }
+</div>

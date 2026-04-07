@@ -1,7 +1,9 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.LeaveManagement.Queries.GetLeaveTransactionHistory;
+namespace TecAxle.Hrms.Application.LeaveManagement.Queries.GetLeaveTransactionHistory;
 
 /// <summary>
 /// CQRS query for retrieving leave transaction history for an employee.
@@ -12,6 +14,7 @@ namespace TimeAttendanceSystem.Application.LeaveManagement.Queries.GetLeaveTrans
 /// <param name="Year">Calendar year for transactions (optional - null returns all years)</param>
 /// <param name="PageNumber">Page number for pagination (default 1)</param>
 /// <param name="PageSize">Page size for pagination (default 50)</param>
+[RequiresModule(SystemModule.LeaveManagement, AllowReadWhenDisabled = true)]
 public record GetLeaveTransactionHistoryQuery(
     long EmployeeId,
     long? VacationTypeId = null,

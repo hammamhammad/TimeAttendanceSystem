@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace TimeAttendanceSystem.Application.AttendanceCorrections.Commands.UpdateAttendanceCorrectionRequest;
+namespace TecAxle.Hrms.Application.AttendanceCorrections.Commands.UpdateAttendanceCorrectionRequest;
 
 /// <summary>
 /// Fluent Validation rules for UpdateAttendanceCorrectionRequestCommand.

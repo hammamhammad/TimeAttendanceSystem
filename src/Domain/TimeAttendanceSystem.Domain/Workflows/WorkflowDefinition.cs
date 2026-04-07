@@ -1,8 +1,8 @@
-using TimeAttendanceSystem.Domain.Branches;
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Domain.Workflows.Enums;
+using TecAxle.Hrms.Domain.Branches;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Workflows.Enums;
 
-namespace TimeAttendanceSystem.Domain.Workflows;
+namespace TecAxle.Hrms.Domain.Workflows;
 
 /// <summary>
 /// Domain entity representing a workflow definition that configures the approval process.

@@ -1,7 +1,9 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.Attendance.Queries.GetLeaveExcuseDetails;
+namespace TecAxle.Hrms.Application.Attendance.Queries.GetLeaveExcuseDetails;
 
 /// <summary>
 /// CQRS query for retrieving leave, excuse, and remote work details for a specific employee and date.
@@ -29,6 +31,7 @@ namespace TimeAttendanceSystem.Application.Attendance.Queries.GetLeaveExcuseDeta
 /// - Minimal data transfer with projection
 /// - Single query per data type for efficiency
 /// </remarks>
+[RequiresModule(SystemModule.TimeAttendance, AllowReadWhenDisabled = true)]
 public record GetLeaveExcuseDetailsQuery(
     long EmployeeId,
     DateTime Date

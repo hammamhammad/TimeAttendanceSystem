@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
 
-namespace TimeAttendanceSystem.Api.Hubs;
+namespace TecAxle.Hrms.Api.Hubs;
 
 /// <summary>
 /// SignalR hub for real-time notification delivery.

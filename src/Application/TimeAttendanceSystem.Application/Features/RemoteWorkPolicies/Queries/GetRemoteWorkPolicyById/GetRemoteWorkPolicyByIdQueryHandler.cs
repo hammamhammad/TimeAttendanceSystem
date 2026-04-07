@@ -1,8 +1,8 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
+using TecAxle.Hrms.Application.Abstractions;
 
-namespace TimeAttendanceSystem.Application.Features.RemoteWorkPolicies.Queries.GetRemoteWorkPolicyById;
+namespace TecAxle.Hrms.Application.Features.RemoteWorkPolicies.Queries.GetRemoteWorkPolicyById;
 
 /// <summary>
 /// Handler for getting a remote work policy by ID.

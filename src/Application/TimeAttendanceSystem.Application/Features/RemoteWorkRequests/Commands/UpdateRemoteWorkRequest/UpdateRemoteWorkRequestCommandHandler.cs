@@ -1,11 +1,11 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.RemoteWork;
-using TimeAttendanceSystem.Shared.Common.Exceptions;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.RemoteWork;
+using TecAxle.Hrms.Shared.Common.Exceptions;
 
-namespace TimeAttendanceSystem.Application.Features.RemoteWorkRequests.Commands.UpdateRemoteWorkRequest;
+namespace TecAxle.Hrms.Application.Features.RemoteWorkRequests.Commands.UpdateRemoteWorkRequest;
 
 /// <summary>
 /// Handler for updating remote work requests.

@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.NfcTags.Commands.DeleteNfcTag;
+namespace TecAxle.Hrms.Application.NfcTags.Commands.DeleteNfcTag;
 
 /// <summary>
 /// Handler for soft-deleting an NFC tag.

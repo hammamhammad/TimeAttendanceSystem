@@ -1,0 +1,39 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header [title]="isEdit() ? i18n.t('expense_policies.edit') : i18n.t('expense_policies.create')" moduleName="expense-policies" moduleRoute="expenses/policies" [loading]="saving()" />
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <app-form-section [title]="i18n.t('expense_policies.basic_info')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="form-floating"><input type="text" class="form-control" id="name" placeholder="Name" formControlName="name"><label for="name">{{ i18n.t('expense_policies.name') }} *</label></div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating"><input type="text" class="form-control" id="nameAr" placeholder="Name AR" formControlName="nameAr"><label for="nameAr">{{ i18n.t('expense_policies.name_ar') }}</label></div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating"><input type="number" class="form-control" id="maxClaimAmount" placeholder="0" formControlName="maxClaimAmount"><label for="maxClaimAmount">{{ i18n.t('expense_policies.max_claim_amount') }} *</label></div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating"><input type="number" class="form-control" id="maxMonthlyAmount" placeholder="0" formControlName="maxMonthlyAmount"><label for="maxMonthlyAmount">{{ i18n.t('expense_policies.max_monthly_amount') }} *</label></div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating"><input type="number" class="form-control" id="receiptRequiredAbove" placeholder="0" formControlName="receiptRequiredAbove"><label for="receiptRequiredAbove">{{ i18n.t('expense_policies.receipt_required_above') }}</label></div>
+        </div>
+        <div class="col-12 d-flex gap-3">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="requiresApproval" formControlName="requiresApproval">
+            <label class="form-check-label" for="requiresApproval">{{ i18n.t('expense_policies.requires_approval') }}</label>
+          </div>
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="isActive" formControlName="isActive">
+            <label class="form-check-label" for="isActive">{{ i18n.t('common.active') }}</label>
+          </div>
+        </div>
+      </div>
+    </app-form-section>
+    <div class="app-form-actions">
+      <button type="button" class="btn btn-secondary" routerLink="/expenses/policies">{{ i18n.t('common.cancel') }}</button>
+      <button type="submit" class="btn btn-primary" [disabled]="saving()">{{ i18n.t('common.save') }}</button>
+    </div>
+  </form>
+</div>

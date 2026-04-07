@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Application.Settings.Queries.GetOvertimeConfigurations;
+namespace TecAxle.Hrms.Application.Settings.Queries.GetOvertimeConfigurations;
 
 /// <summary>
 /// Query for retrieving paginated overtime configurations with optional filtering.

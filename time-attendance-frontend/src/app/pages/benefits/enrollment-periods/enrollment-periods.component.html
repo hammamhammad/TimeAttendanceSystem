@@ -1,0 +1,31 @@
+<div class="container-fluid">
+  <app-page-header [title]="t('benefits.periods.title')" />
+
+  <app-unified-filter
+    [searchPlaceholder]="t('benefits.periods.search_placeholder')"
+    [showAddButton]="permissionService.has(PERMISSIONS.CREATE)"
+    [addButtonText]="t('benefits.periods.create')"
+    [showRefreshButton]="true"
+    [refreshButtonText]="t('common.refresh')"
+    [refreshing]="loading()"
+    (searchChange)="onSearchChange($event)"
+    (add)="navigateToCreate()"
+    (refresh)="onRefreshData()">
+  </app-unified-filter>
+
+  <app-data-table
+    [columns]="tableColumns()"
+    [data]="tableData() || []"
+    [actions]="tableActions()"
+    [currentPage]="currentPage()"
+    [pageSize]="pageSize()"
+    [totalItems]="totalCount()"
+    [totalPages]="totalPages()"
+    [loading]="loading"
+    [emptyTitle]="t('benefits.periods.no_records_title')"
+    [emptyMessage]="t('benefits.periods.no_records')"
+    (actionClick)="onActionClick($event)"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+  </app-data-table>
+</div>

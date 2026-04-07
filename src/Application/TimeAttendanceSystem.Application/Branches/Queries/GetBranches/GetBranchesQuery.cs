@@ -1,7 +1,7 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Branches.Queries.GetBranches;
+namespace TecAxle.Hrms.Application.Branches.Queries.GetBranches;
 
 public record GetBranchesQuery(
     int Page = 1,

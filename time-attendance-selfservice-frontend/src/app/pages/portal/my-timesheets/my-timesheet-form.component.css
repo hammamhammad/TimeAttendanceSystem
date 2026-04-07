@@ -1,0 +1,32 @@
+.sticky-col {
+  position: sticky;
+  left: 0;
+  background-color: var(--bs-table-bg, #fff);
+  z-index: 1;
+  min-width: 140px;
+}
+
+thead .sticky-col {
+  background-color: var(--bs-table-bg, #f8f9fa);
+  z-index: 2;
+}
+
+tfoot .sticky-col {
+  background-color: var(--bs-table-bg, #f8f9fa);
+  z-index: 2;
+}
+
+:host-context([dir="rtl"]) .sticky-col {
+  left: auto;
+  right: 0;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}

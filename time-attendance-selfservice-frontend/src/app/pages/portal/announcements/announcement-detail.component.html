@@ -1,0 +1,170 @@
+<!-- Loading State -->
+@if (loading()) {
+  <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+}
+
+<!-- Error State -->
+@if (error() && !loading()) {
+  <div class="alert alert-danger">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    {{ error() }}
+    <button class="btn btn-sm btn-outline-danger ms-3" (click)="onBack()" type="button">
+      {{ i18n.t('common.back') }}
+    </button>
+  </div>
+}
+
+<!-- Detail View -->
+@if (announcement() && !loading() && !error()) {
+  <div class="announcement-detail app-modern-view">
+    <!-- Page Header -->
+    <app-page-header [title]="i18n.t('portal.announcements.detail')">
+      <div header-actions>
+        @if (canAcknowledge()) {
+          <button
+            class="btn btn-success btn-sm me-2"
+            (click)="acknowledge()"
+            [disabled]="acknowledging()"
+            type="button">
+            @if (acknowledging()) {
+              <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+            } @else {
+              <i class="bi bi-check-circle me-1"></i>
+            }
+            {{ i18n.t('portal.announcements.acknowledge') }}
+          </button>
+        }
+        <button
+          class="btn btn-outline-secondary btn-sm"
+          (click)="onBack()"
+          type="button">
+          <i class="bi bi-arrow-left me-1"></i>
+          {{ i18n.t('common.back') }}
+        </button>
+      </div>
+    </app-page-header>
+
+    <!-- Status badges -->
+    <div class="d-flex flex-wrap gap-2 mb-3">
+      @if (announcement()!.isPinned) {
+        <span class="badge bg-info-subtle text-info">
+          <i class="bi bi-pin-angle me-1"></i>{{ i18n.t('portal.announcements.pinned') }}
+        </span>
+      }
+      <span [class]="getPriorityBadgeClass(announcement()!.priority)">
+        {{ getPriorityLabel(announcement()!.priority) }}
+      </span>
+      @if (announcement()!.category) {
+        <span class="badge bg-light text-dark border">{{ announcement()!.category }}</span>
+      }
+      @if (isAcknowledged()) {
+        <span class="badge bg-success">
+          <i class="bi bi-check-circle me-1"></i>{{ i18n.t('portal.announcements.acknowledged') }}
+        </span>
+      } @else if (announcement()!.requiresAcknowledgment) {
+        <span class="badge bg-warning text-dark">
+          <i class="bi bi-clock me-1"></i>{{ i18n.t('portal.announcements.pending_ack') }}
+        </span>
+      }
+    </div>
+
+    <!-- Title -->
+    <h3 class="announcement-title mb-3">{{ getLocalizedTitle(announcement()!) }}</h3>
+
+    <!-- Metadata Card -->
+    <app-detail-card [title]="i18n.t('portal.announcements.details')">
+      <app-definition-list
+        [items]="detailItems()"
+        [labelWidth]="'4'"
+        [valueWidth]="'8'">
+      </app-definition-list>
+    </app-detail-card>
+
+    <!-- Content Card -->
+    <div class="card mt-3">
+      <div class="card-header bg-white">
+        <h5 class="card-title mb-0">
+          <i class="bi bi-text-paragraph me-2 text-primary"></i>
+          {{ i18n.t('portal.announcements.content') }}
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="announcement-content" [innerHTML]="getLocalizedContent(announcement()!)"></div>
+      </div>
+    </div>
+
+    <!-- Attachments Card -->
+    @if (announcement()!.attachments && announcement()!.attachments!.length > 0) {
+      <div class="card mt-3">
+        <div class="card-header bg-white">
+          <h5 class="card-title mb-0">
+            <i class="bi bi-paperclip me-2 text-primary"></i>
+            {{ i18n.t('portal.announcements.attachments') }}
+            <span class="badge bg-primary ms-2">{{ announcement()!.attachments!.length }}</span>
+          </h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="list-group list-group-flush">
+            @for (attachment of announcement()!.attachments!; track attachment.id) {
+              <button
+                type="button"
+                class="list-group-item list-group-item-action d-flex align-items-center"
+                (click)="downloadAttachment(attachment)">
+                <i class="bi bi-file-earmark me-3 text-muted" style="font-size: 1.25rem;"></i>
+                <div class="flex-grow-1">
+                  <div class="fw-semibold">{{ attachment.fileName }}</div>
+                  @if (attachment.fileSize) {
+                    <small class="text-muted">{{ (attachment.fileSize / 1024).toFixed(1) }} KB</small>
+                  }
+                </div>
+                <i class="bi bi-download text-primary"></i>
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Acknowledgment Alert -->
+    @if (canAcknowledge()) {
+      <div class="alert alert-warning mt-3 d-flex align-items-center">
+        <i class="bi bi-exclamation-triangle me-2 fs-5"></i>
+        <div class="flex-grow-1">
+          {{ i18n.t('portal.announcements.ack_required_msg') }}
+        </div>
+        <button
+          class="btn btn-success btn-sm ms-3"
+          (click)="acknowledge()"
+          [disabled]="acknowledging()"
+          type="button">
+          @if (acknowledging()) {
+            <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+          } @else {
+            <i class="bi bi-check-circle me-1"></i>
+          }
+          {{ i18n.t('portal.announcements.acknowledge') }}
+        </button>
+      </div>
+    }
+
+    @if (isAcknowledged()) {
+      <div class="alert alert-success mt-3 d-flex align-items-center">
+        <i class="bi bi-check-circle me-2 fs-5"></i>
+        <div>{{ i18n.t('portal.announcements.already_acknowledged') }}</div>
+      </div>
+    }
+
+    <!-- Info Card -->
+    <div class="card mt-3">
+      <div class="card-body">
+        <div class="d-flex align-items-start">
+          <i class="bi bi-info-circle text-info me-3 mt-1" style="font-size: 1.5rem;"></i>
+          <div>
+            <h6 class="mb-2">{{ i18n.t('portal.announcements.info_title') }}</h6>
+            <p class="text-muted mb-0 small">{{ i18n.t('portal.announcements.info_text') }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}

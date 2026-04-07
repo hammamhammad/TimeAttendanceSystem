@@ -1,10 +1,12 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Application.PublicHolidays.Queries.GetPublicHolidays;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.PublicHolidays.Queries.GetPublicHolidays;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.PublicHolidays.Queries.GetPublicHolidayById;
+namespace TecAxle.Hrms.Application.PublicHolidays.Queries.GetPublicHolidayById;
 
 /// <summary>
 /// Query for retrieving a specific public holiday by its unique identifier.
@@ -43,6 +45,7 @@ namespace TimeAttendanceSystem.Application.PublicHolidays.Queries.GetPublicHolid
 /// - Multi-tenant data isolation maintained
 /// - Permission validation for sensitive fields
 /// </remarks>
+[RequiresModule(SystemModule.TimeAttendance, AllowReadWhenDisabled = true)]
 public record GetPublicHolidayByIdQuery(
     long Id,
     bool IncludeConflicts = false,

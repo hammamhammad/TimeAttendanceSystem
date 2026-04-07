@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Application.Employees.Queries.GetEmployeeById;
+namespace TecAxle.Hrms.Application.Employees.Queries.GetEmployeeById;
 
 public class EmployeeDetailDto
 {

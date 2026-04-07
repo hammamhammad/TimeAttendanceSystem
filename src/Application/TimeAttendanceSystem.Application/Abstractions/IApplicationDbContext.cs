@@ -1,21 +1,42 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Domain.Branches;
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Domain.Employees;
-using TimeAttendanceSystem.Domain.Users;
-using TimeAttendanceSystem.Domain.Shifts;
-using TimeAttendanceSystem.Domain.Attendance;
-using TimeAttendanceSystem.Domain.Settings;
-using TimeAttendanceSystem.Domain.VacationTypes;
-using TimeAttendanceSystem.Domain.Vacations;
-using TimeAttendanceSystem.Domain.Excuses;
-using TimeAttendanceSystem.Domain.RemoteWork;
-using TimeAttendanceSystem.Domain.Workflows;
-using TimeAttendanceSystem.Domain.LeaveManagement;
-using TimeAttendanceSystem.Domain.Notifications;
-using TimeAttendanceSystem.Domain.Tenants;
+using TecAxle.Hrms.Domain.Branches;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Employees;
+using TecAxle.Hrms.Domain.Users;
+using TecAxle.Hrms.Domain.Shifts;
+using TecAxle.Hrms.Domain.Attendance;
+using TecAxle.Hrms.Domain.Settings;
+using TecAxle.Hrms.Domain.VacationTypes;
+using TecAxle.Hrms.Domain.Vacations;
+using TecAxle.Hrms.Domain.Excuses;
+using TecAxle.Hrms.Domain.RemoteWork;
+using TecAxle.Hrms.Domain.Workflows;
+using TecAxle.Hrms.Domain.LeaveManagement;
+using TecAxle.Hrms.Domain.Notifications;
+using TecAxle.Hrms.Domain.Tenants;
+using TecAxle.Hrms.Domain.Subscriptions;
+using TecAxle.Hrms.Domain.Payroll;
+using TecAxle.Hrms.Domain.Offboarding;
+using TecAxle.Hrms.Domain.Recruitment;
+using TecAxle.Hrms.Domain.Onboarding;
+using TecAxle.Hrms.Domain.Performance;
+using TecAxle.Hrms.Domain.Documents;
+using TecAxle.Hrms.Domain.Expenses;
+using TecAxle.Hrms.Domain.Loans;
+using TecAxle.Hrms.Domain.Announcements;
+using TecAxle.Hrms.Domain.Training;
+using TecAxle.Hrms.Domain.EmployeeRelations;
+using TecAxle.Hrms.Domain.Assets;
+using TecAxle.Hrms.Domain.Surveys;
+using TecAxle.Hrms.Domain.Analytics;
+using TecAxle.Hrms.Domain.Timesheets;
+using TecAxle.Hrms.Domain.Succession;
+using TecAxle.Hrms.Domain.Benefits;
+using TecAxle.Hrms.Domain.Reports;
+using TecAxle.Hrms.Domain.Configuration;
+using TecAxle.Hrms.Domain.Departments;
 
-namespace TimeAttendanceSystem.Application.Abstractions;
+namespace TecAxle.Hrms.Application.Abstractions;
 
 /// <summary>
 /// Database context abstraction for the Time Attendance System Application layer.
@@ -689,6 +710,206 @@ public interface IApplicationDbContext
     /// </summary>
     /// <value>DbSet for querying and managing Tenant entities</value>
     DbSet<Tenant> Tenants { get; }
+
+    // Subscription & Entitlements
+    DbSet<SubscriptionPlan> SubscriptionPlans { get; }
+    DbSet<PlanModuleEntitlement> PlanModuleEntitlements { get; }
+    DbSet<PlanFeatureFlag> PlanFeatureFlags { get; }
+    DbSet<PlanLimit> PlanLimits { get; }
+    DbSet<TenantSubscription> TenantSubscriptions { get; }
+    DbSet<TenantModuleAddOn> TenantModuleAddOns { get; }
+    DbSet<TenantFeatureOverride> TenantFeatureOverrides { get; }
+    DbSet<EntitlementChangeLog> EntitlementChangeLogs { get; }
+
+    // Phase 1: Employee Lifecycle
+    DbSet<EmployeeContract> EmployeeContracts { get; }
+    DbSet<EmployeeTransfer> EmployeeTransfers { get; }
+    DbSet<EmployeePromotion> EmployeePromotions { get; }
+    DbSet<SalaryAdjustment> SalaryAdjustments { get; }
+    DbSet<EmployeeProfileChange> EmployeeProfileChanges { get; }
+    DbSet<EmployeeBankDetail> EmployeeBankDetails { get; }
+    DbSet<EmployeeDependent> EmployeeDependents { get; }
+    DbSet<EmergencyContact> EmergencyContacts { get; }
+    DbSet<EmployeeAddress> EmployeeAddresses { get; }
+    DbSet<EmployeeEducation> EmployeeEducations { get; }
+    DbSet<EmployeeWorkExperience> EmployeeWorkExperiences { get; }
+    DbSet<EmployeeVisa> EmployeeVisas { get; }
+    DbSet<JobGrade> JobGrades { get; }
+
+    // Phase 1: Payroll
+    DbSet<SalaryStructure> SalaryStructures { get; }
+    DbSet<SalaryComponent> SalaryComponents { get; }
+    DbSet<EmployeeSalary> EmployeeSalaries { get; }
+    DbSet<EmployeeSalaryComponent> EmployeeSalaryComponents { get; }
+    DbSet<PayrollPeriod> PayrollPeriods { get; }
+    DbSet<PayrollRecord> PayrollRecords { get; }
+    DbSet<PayrollRecordDetail> PayrollRecordDetails { get; }
+    DbSet<PayrollAdjustment> PayrollAdjustments { get; }
+    DbSet<TaxConfiguration> TaxConfigurations { get; }
+    DbSet<TaxBracket> TaxBrackets { get; }
+    DbSet<SocialInsuranceConfig> SocialInsuranceConfigs { get; }
+    DbSet<BankTransferFile> BankTransferFiles { get; }
+    DbSet<InsuranceProvider> InsuranceProviders { get; }
+    DbSet<EmployeeInsurance> EmployeeInsurances { get; }
+
+    // Allowance Management
+    DbSet<AllowanceType> AllowanceTypes { get; }
+    DbSet<AllowancePolicy> AllowancePolicies { get; }
+    DbSet<AllowanceAssignment> AllowanceAssignments { get; }
+    DbSet<AllowanceRequest> AllowanceRequests { get; }
+    DbSet<AllowanceChangeLog> AllowanceChangeLogs { get; }
+
+    // Phase 1: Offboarding
+    DbSet<ResignationRequest> ResignationRequests { get; }
+    DbSet<TerminationRecord> TerminationRecords { get; }
+    DbSet<ClearanceChecklist> ClearanceChecklists { get; }
+    DbSet<ClearanceItem> ClearanceItems { get; }
+    DbSet<EndOfServiceBenefit> EndOfServiceBenefits { get; }
+    DbSet<FinalSettlement> FinalSettlements { get; }
+    DbSet<ExitInterview> ExitInterviews { get; }
+
+    // Phase 2: Recruitment
+    DbSet<JobRequisition> JobRequisitions { get; }
+    DbSet<JobPosting> JobPostings { get; }
+    DbSet<Candidate> Candidates { get; }
+    DbSet<JobApplication> JobApplications { get; }
+    DbSet<InterviewSchedule> InterviewSchedules { get; }
+    DbSet<InterviewFeedback> InterviewFeedbacks { get; }
+    DbSet<OfferLetter> OfferLetters { get; }
+
+    // Phase 2: Onboarding
+    DbSet<OnboardingTemplate> OnboardingTemplates { get; }
+    DbSet<OnboardingTemplateTask> OnboardingTemplateTasks { get; }
+    DbSet<OnboardingProcess> OnboardingProcesses { get; }
+    DbSet<OnboardingTask> OnboardingTasks { get; }
+    DbSet<OnboardingDocument> OnboardingDocuments { get; }
+
+    // Phase 2: Performance
+    DbSet<PerformanceReviewCycle> PerformanceReviewCycles { get; }
+    DbSet<PerformanceReview> PerformanceReviews { get; }
+    DbSet<GoalDefinition> GoalDefinitions { get; }
+    DbSet<CompetencyFramework> CompetencyFrameworks { get; }
+    DbSet<Competency> Competencies { get; }
+    DbSet<CompetencyAssessment> CompetencyAssessments { get; }
+    DbSet<PerformanceImprovementPlan> PerformanceImprovementPlans { get; }
+    DbSet<FeedbackRequest360> FeedbackRequests360 { get; }
+    DbSet<Feedback360Response> Feedback360Responses { get; }
+
+    // File Management
+    DbSet<FileAttachment> FileAttachments { get; }
+
+    // Phase 3: Documents & Letters
+    DbSet<DocumentCategory> DocumentCategories { get; }
+    DbSet<EmployeeDocument> EmployeeDocuments { get; }
+    DbSet<CompanyPolicy> CompanyPolicies { get; }
+    DbSet<PolicyAcknowledgment> PolicyAcknowledgments { get; }
+    DbSet<LetterTemplate> LetterTemplates { get; }
+    DbSet<LetterRequest> LetterRequests { get; }
+
+    // Phase 3: Expenses
+    DbSet<ExpenseCategory> ExpenseCategories { get; }
+    DbSet<ExpensePolicy> ExpensePolicies { get; }
+    DbSet<ExpenseClaim> ExpenseClaims { get; }
+    DbSet<ExpenseClaimItem> ExpenseClaimItems { get; }
+    DbSet<ExpenseReimbursement> ExpenseReimbursements { get; }
+
+    // Phase 3: Loans
+    DbSet<LoanType> LoanTypes { get; }
+    DbSet<LoanPolicy> LoanPolicies { get; }
+    DbSet<LoanApplication> LoanApplications { get; }
+    DbSet<LoanRepayment> LoanRepayments { get; }
+    DbSet<SalaryAdvance> SalaryAdvances { get; }
+
+    // Phase 4: Announcements
+    DbSet<AnnouncementCategory> AnnouncementCategories { get; }
+    DbSet<Announcement> Announcements { get; }
+    DbSet<AnnouncementAcknowledgment> AnnouncementAcknowledgments { get; }
+    DbSet<AnnouncementAttachment> AnnouncementAttachments { get; }
+
+    // Phase 4: Training & Development
+    DbSet<TrainingCategory> TrainingCategories { get; }
+    DbSet<TrainingCourse> TrainingCourses { get; }
+    DbSet<TrainingProgram> TrainingPrograms { get; }
+    DbSet<TrainingProgramCourse> TrainingProgramCourses { get; }
+    DbSet<TrainingSession> TrainingSessions { get; }
+    DbSet<TrainingEnrollment> TrainingEnrollments { get; }
+    DbSet<TrainingAttendance> TrainingAttendanceRecords { get; }
+    DbSet<TrainingEvaluation> TrainingEvaluations { get; }
+    DbSet<EmployeeCertification> EmployeeCertifications { get; }
+    DbSet<TrainingBudget> TrainingBudgets { get; }
+
+    // Phase 4: Employee Relations
+    DbSet<Grievance> Grievances { get; }
+    DbSet<GrievanceNote> GrievanceNotes { get; }
+    DbSet<GrievanceAttachment> GrievanceAttachments { get; }
+    DbSet<DisciplinaryAction> DisciplinaryActions { get; }
+    DbSet<DisciplinaryAttachment> DisciplinaryAttachments { get; }
+    DbSet<Investigation> Investigations { get; }
+    DbSet<InvestigationNote> InvestigationNotes { get; }
+    DbSet<InvestigationAttachment> InvestigationAttachments { get; }
+    DbSet<CounselingRecord> CounselingRecords { get; }
+
+    // Phase 5: Asset Management
+    DbSet<AssetCategory> AssetCategories { get; }
+    DbSet<Asset> Assets { get; }
+    DbSet<AssetAssignment> AssetAssignments { get; }
+    DbSet<AssetMaintenanceRecord> AssetMaintenanceRecords { get; }
+
+    // Phase 5: Employee Engagement & Surveys
+    DbSet<SurveyTemplate> SurveyTemplates { get; }
+    DbSet<SurveyQuestion> SurveyQuestions { get; }
+    DbSet<SurveyDistribution> SurveyDistributions { get; }
+    DbSet<SurveyParticipant> SurveyParticipants { get; }
+    DbSet<SurveyResponse> SurveyResponses { get; }
+
+    // Phase 5: Advanced Analytics
+    DbSet<AnalyticsSnapshot> AnalyticsSnapshots { get; }
+    DbSet<SavedDashboard> SavedDashboards { get; }
+
+    // Phase 6: Timesheet Management
+    DbSet<Project> Projects { get; }
+    DbSet<ProjectTask> ProjectTasks { get; }
+    DbSet<TimesheetPeriod> TimesheetPeriods { get; }
+    DbSet<Timesheet> Timesheets { get; }
+    DbSet<TimesheetEntry> TimesheetEntries { get; }
+
+    // Phase 6: Succession Planning & Talent Management
+    DbSet<KeyPosition> KeyPositions { get; }
+    DbSet<TalentProfile> TalentProfiles { get; }
+    DbSet<TalentSkill> TalentSkills { get; }
+    DbSet<SuccessionPlan> SuccessionPlans { get; }
+    DbSet<SuccessionCandidate> SuccessionCandidates { get; }
+    DbSet<CareerPath> CareerPaths { get; }
+    DbSet<CareerPathStep> CareerPathSteps { get; }
+
+    // Phase 6: Benefits Administration
+    DbSet<BenefitPlan> BenefitPlans { get; }
+    DbSet<BenefitPlanOption> BenefitPlanOptions { get; }
+    DbSet<BenefitEligibilityRule> BenefitEligibilityRules { get; }
+    DbSet<OpenEnrollmentPeriod> OpenEnrollmentPeriods { get; }
+    DbSet<BenefitEnrollment> BenefitEnrollments { get; }
+    DbSet<BenefitDependent> BenefitDependents { get; }
+    DbSet<BenefitClaim> BenefitClaims { get; }
+
+    // Phase 7: Enhancements
+    DbSet<ShiftSwapRequest> ShiftSwapRequests { get; }
+    DbSet<OnCallSchedule> OnCallSchedules { get; }
+    DbSet<CompensatoryOff> CompensatoryOffs { get; }
+    DbSet<LeaveEncashment> LeaveEncashments { get; }
+    DbSet<CustomReportDefinition> CustomReportDefinitions { get; }
+    DbSet<ScheduledReport> ScheduledReports { get; }
+
+    // Settings & Configuration
+    DbSet<OvertimeConfiguration> OvertimeConfigurations { get; }
+    DbSet<OffDay> OffDays { get; }
+
+    // Tenant Configuration & Policy Framework
+    DbSet<TenantSettings> TenantSettings { get; }
+    DbSet<BranchSettingsOverride> BranchSettingsOverrides { get; }
+    DbSet<DepartmentSettingsOverride> DepartmentSettingsOverrides { get; }
+    DbSet<PolicyTemplate> PolicyTemplates { get; }
+    DbSet<PolicyTemplateItem> PolicyTemplateItems { get; }
+    DbSet<SetupStep> SetupSteps { get; }
 
     /// <summary>
     /// Asynchronously saves all pending changes to the database.

@@ -1,0 +1,224 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header
+    [mode]="getFormMode()"
+    [title]="isEditMode() ? i18n.t('assets.edit') : i18n.t('assets.create')"
+    moduleName="assets"
+    moduleRoute="assets"
+    [entityId]="assetId()"
+    [loading]="loading()">
+  </app-form-header>
+
+  @if (loading()) {
+    <div class="text-center py-5">
+      <app-loading-spinner [message]="i18n.t('common.loading')" [variant]="'primary'" [centered]="true"></app-loading-spinner>
+    </div>
+  }
+
+  @if (!loading()) {
+    <div class="row">
+      <div class="col-lg-8">
+        <form [formGroup]="assetForm" (ngSubmit)="onSubmit()" novalidate>
+          <!-- Basic Information -->
+          <app-form-section [title]="i18n.t('common.basic_information')" [variant]="'modern'">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <div class="form-floating">
+                  <input type="text" class="form-control" id="assetTag" formControlName="assetTag"
+                    placeholder="Asset Tag" [class.is-invalid]="isFieldInvalid('assetTag')">
+                  <label for="assetTag">{{ i18n.t('assets.asset_tag') }} <span class="text-danger">*</span></label>
+                </div>
+                @if (hasError('assetTag')) {
+                  <div class="invalid-feedback d-block">{{ getErrorMessage('assetTag') }}</div>
+                }
+              </div>
+              <div class="col-md-6 mb-3">
+                <div class="form-floating">
+                  <input type="text" class="form-control" id="assetName" formControlName="name"
+                    placeholder="Name" [class.is-invalid]="isFieldInvalid('name')">
+                  <label for="assetName">{{ i18n.t('assets.name') }} <span class="text-danger">*</span></label>
+                </div>
+                @if (hasError('name')) {
+                  <div class="invalid-feedback d-block">{{ getErrorMessage('name') }}</div>
+                }
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <div class="form-floating">
+                  <input type="text" class="form-control" id="assetNameAr" formControlName="nameAr" placeholder="Name (Arabic)">
+                  <label for="assetNameAr">{{ i18n.t('assets.name_ar') }}</label>
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <div class="app-modern-field">
+                  <label class="app-modern-label">{{ i18n.t('assets.category') }} <span class="text-danger">*</span></label>
+                  <app-searchable-select
+                    [options]="categoryOptions"
+                    [placeholder]="i18n.t('assets.select_category')"
+                    [value]="assetForm.get('categoryId')?.value"
+                    [disabled]="saving()"
+                    (selectionChange)="assetForm.get('categoryId')?.setValue($event)">
+                  </app-searchable-select>
+                </div>
+                @if (hasError('categoryId')) {
+                  <div class="invalid-feedback d-block">{{ getErrorMessage('categoryId') }}</div>
+                }
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <div class="app-modern-field">
+                  <label class="app-modern-label">{{ i18n.t('assets.branch') }} <span class="text-danger">*</span></label>
+                  <app-searchable-select
+                    [options]="branchOptions"
+                    [placeholder]="i18n.t('common.select_branch')"
+                    [value]="assetForm.get('branchId')?.value"
+                    [disabled]="saving()"
+                    (selectionChange)="assetForm.get('branchId')?.setValue($event)">
+                  </app-searchable-select>
+                </div>
+                @if (hasError('branchId')) {
+                  <div class="invalid-feedback d-block">{{ getErrorMessage('branchId') }}</div>
+                }
+              </div>
+              <div class="col-md-6 mb-3">
+                <div class="form-floating">
+                  <input type="text" class="form-control" id="location" formControlName="location" placeholder="Location">
+                  <label for="location">{{ i18n.t('assets.location') }}</label>
+                </div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="form-floating">
+                <textarea class="form-control" id="description" formControlName="description"
+                  placeholder="Description" style="height: 80px"></textarea>
+                <label for="description">{{ i18n.t('common.description') }}</label>
+              </div>
+            </div>
+          </app-form-section>
+
+          <!-- Product Details -->
+          <app-form-section [title]="i18n.t('assets.product_details')" [variant]="'modern'">
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <div class="form-floating">
+                  <input type="text" class="form-control" id="serialNumber" formControlName="serialNumber" placeholder="Serial Number">
+                  <label for="serialNumber">{{ i18n.t('assets.serial_number') }}</label>
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <div class="form-floating">
+                  <input type="text" class="form-control" id="model" formControlName="model" placeholder="Model">
+                  <label for="model">{{ i18n.t('assets.model') }}</label>
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <div class="form-floating">
+                  <input type="text" class="form-control" id="manufacturer" formControlName="manufacturer" placeholder="Manufacturer">
+                  <label for="manufacturer">{{ i18n.t('assets.manufacturer') }}</label>
+                </div>
+              </div>
+            </div>
+          </app-form-section>
+
+          <!-- Financial & Status -->
+          <app-form-section [title]="i18n.t('assets.financial_status')" [variant]="'modern'">
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <div class="form-floating">
+                  <input type="date" class="form-control" id="purchaseDate" formControlName="purchaseDate" placeholder="Purchase Date">
+                  <label for="purchaseDate">{{ i18n.t('assets.purchase_date') }}</label>
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <div class="form-floating">
+                  <input type="number" class="form-control" id="purchasePrice" formControlName="purchasePrice" placeholder="Purchase Price" step="0.01">
+                  <label for="purchasePrice">{{ i18n.t('assets.purchase_price') }}</label>
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <div class="form-floating">
+                  <select class="form-select" id="currency" formControlName="currency">
+                    @for (c of currencyOptions; track c) {
+                      <option [value]="c">{{ c }}</option>
+                    }
+                  </select>
+                  <label for="currency">{{ i18n.t('assets.currency') }}</label>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <div class="form-floating">
+                  <input type="date" class="form-control" id="warrantyExpiryDate" formControlName="warrantyExpiryDate" placeholder="Warranty Expiry">
+                  <label for="warrantyExpiryDate">{{ i18n.t('assets.warranty_expiry') }}</label>
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <div class="form-floating">
+                  <select class="form-select" id="status" formControlName="status">
+                    @for (opt of statusOptions; track opt.value) {
+                      <option [value]="opt.value">{{ i18n.t(opt.label) }}</option>
+                    }
+                  </select>
+                  <label for="status">{{ i18n.t('common.status') }} <span class="text-danger">*</span></label>
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <div class="form-floating">
+                  <select class="form-select" id="condition" formControlName="condition">
+                    @for (opt of conditionOptions; track opt.value) {
+                      <option [value]="opt.value">{{ i18n.t(opt.label) }}</option>
+                    }
+                  </select>
+                  <label for="condition">{{ i18n.t('assets.condition') }} <span class="text-danger">*</span></label>
+                </div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="form-floating">
+                <textarea class="form-control" id="notes" formControlName="notes" placeholder="Notes" style="height: 80px"></textarea>
+                <label for="notes">{{ i18n.t('common.notes') }}</label>
+              </div>
+            </div>
+          </app-form-section>
+
+          <!-- Submit -->
+          <div class="app-form-actions">
+            <button type="button" class="btn btn-secondary" (click)="onCancel()" [disabled]="saving()">
+              {{ i18n.t('common.cancel') }}
+            </button>
+            <button type="button" class="btn btn-outline-secondary" (click)="onReset()" [disabled]="saving()">
+              {{ i18n.t('common.reset') }}
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="assetForm.invalid || saving()">
+              @if (saving()) {
+                <span class="spinner-border spinner-border-sm me-2"></span>
+              }
+              {{ isEditMode() ? i18n.t('assets.update') : i18n.t('assets.create') }}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <div class="card">
+          <div class="card-header">
+            <h6 class="card-title mb-0">
+              <i class="fas fa-info-circle me-2"></i>{{ i18n.t('assets.help_title') }}
+            </h6>
+          </div>
+          <div class="card-body">
+            <p class="small text-muted mb-2">{{ i18n.t('assets.help_text') }}</p>
+            <ul class="small text-muted mb-0">
+              <li>{{ i18n.t('assets.help_tag') }}</li>
+              <li>{{ i18n.t('assets.help_category') }}</li>
+              <li>{{ i18n.t('assets.help_branch') }}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

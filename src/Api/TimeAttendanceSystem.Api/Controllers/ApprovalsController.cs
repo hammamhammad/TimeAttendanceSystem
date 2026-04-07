@@ -1,18 +1,18 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TimeAttendanceSystem.Application.Workflows.Commands.ApproveStep;
-using TimeAttendanceSystem.Application.Workflows.Commands.CancelWorkflow;
-using TimeAttendanceSystem.Application.Workflows.Commands.CreateDelegation;
-using TimeAttendanceSystem.Application.Workflows.Commands.DelegateApproval;
-using TimeAttendanceSystem.Application.Workflows.Commands.DeleteDelegation;
-using TimeAttendanceSystem.Application.Workflows.Commands.RejectStep;
-using TimeAttendanceSystem.Application.Workflows.Queries.GetApprovalHistory;
-using TimeAttendanceSystem.Application.Workflows.Queries.GetPendingApprovals;
-using TimeAttendanceSystem.Domain.Workflows.Enums;
+using TecAxle.Hrms.Application.Workflows.Commands.ApproveStep;
+using TecAxle.Hrms.Application.Workflows.Commands.CancelWorkflow;
+using TecAxle.Hrms.Application.Workflows.Commands.CreateDelegation;
+using TecAxle.Hrms.Application.Workflows.Commands.DelegateApproval;
+using TecAxle.Hrms.Application.Workflows.Commands.DeleteDelegation;
+using TecAxle.Hrms.Application.Workflows.Commands.RejectStep;
+using TecAxle.Hrms.Application.Workflows.Queries.GetApprovalHistory;
+using TecAxle.Hrms.Application.Workflows.Queries.GetPendingApprovals;
+using TecAxle.Hrms.Domain.Workflows.Enums;
 using System.Security.Claims;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 /// <summary>
 /// Controller for managing approvals and approval actions.

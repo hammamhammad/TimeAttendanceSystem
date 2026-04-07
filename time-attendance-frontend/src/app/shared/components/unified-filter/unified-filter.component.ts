@@ -40,7 +40,7 @@ import { FILTER_CONFIGURATIONS } from '../../../core/configs/filter-configuratio
           <div class="d-flex justify-content-md-end justify-content-center gap-2 flex-wrap">
             @if (showRefreshButton) {
               <button
-                class="btn btn-outline-info"
+                class="btn btn-outline-secondary"
                 type="button"
                 [disabled]="refreshing"
                 (click)="onRefresh()">
@@ -48,9 +48,9 @@ import { FILTER_CONFIGURATIONS } from '../../../core/configs/filter-configuratio
                 {{ displayRefreshButtonText() }}
               </button>
             }
-            @if (showAddButton) {
+            @if (showAddButton && !readOnly) {
               <button
-                class="btn btn-success"
+                class="btn btn-primary"
                 type="button"
                 (click)="onAdd()">
                 <i class="fas fa-plus me-2"></i>
@@ -78,6 +78,8 @@ export class UnifiedFilterComponent implements OnInit {
   @Input() showRefreshButton: boolean = true;
   @Input() refreshButtonText?: string;
   @Input() refreshing: boolean = false;
+  /** When true, hides the Add button (module is disabled, read-only mode). */
+  @Input() readOnly: boolean = false;
 
   // Advanced mode inputs (for moduleName-based pages)
   @Input() moduleName?: string;

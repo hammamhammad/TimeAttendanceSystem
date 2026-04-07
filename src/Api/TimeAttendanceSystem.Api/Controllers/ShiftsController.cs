@@ -1,18 +1,18 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TimeAttendanceSystem.Application.Shifts.Queries.GetShifts;
-using TimeAttendanceSystem.Application.Shifts.Queries.GetShiftById;
-using TimeAttendanceSystem.Application.Shifts.Queries.GetDefaultShift;
-using TimeAttendanceSystem.Application.Shifts.Commands.CreateShift;
-using TimeAttendanceSystem.Application.Shifts.Commands.UpdateShift;
-using TimeAttendanceSystem.Application.Shifts.Commands.DeleteShift;
-using TimeAttendanceSystem.Application.Shifts.Commands.SetDefaultShift;
-using TimeAttendanceSystem.Domain.Shifts;
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Api.Models;
+using TecAxle.Hrms.Application.Shifts.Queries.GetShifts;
+using TecAxle.Hrms.Application.Shifts.Queries.GetShiftById;
+using TecAxle.Hrms.Application.Shifts.Queries.GetDefaultShift;
+using TecAxle.Hrms.Application.Shifts.Commands.CreateShift;
+using TecAxle.Hrms.Application.Shifts.Commands.UpdateShift;
+using TecAxle.Hrms.Application.Shifts.Commands.DeleteShift;
+using TecAxle.Hrms.Application.Shifts.Commands.SetDefaultShift;
+using TecAxle.Hrms.Domain.Shifts;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Api.Models;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/shifts")]

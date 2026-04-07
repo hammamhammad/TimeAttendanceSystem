@@ -1,0 +1,83 @@
+<div class="container-fluid app-modern-view">
+  <app-form-header [title]="i18n.t('timesheets.timesheets.view')" moduleName="timesheets" moduleRoute="timesheets/timesheets" [loading]="loading()" />
+
+  @if (loading()) { <app-loading-spinner [message]="i18n.t('common.loading')" [centered]="true" /> }
+  @if (error()) { <div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>{{ error() }}</div> }
+  @if (timesheet() && !loading()) {
+    <div class="row">
+      <div class="col-lg-8">
+        <div class="card mb-3">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">{{ timesheet()?.employeeName }} - {{ timesheet()?.periodName }}</h5>
+            <app-status-badge [status]="statusBadge().label" [variant]="statusBadge().variant" />
+          </div>
+          <div class="card-body">
+            <app-definition-list [items]="detailItems()" [labelWidth]="'4'" [valueWidth]="'8'" />
+          </div>
+        </div>
+
+        @if (rejectionItems().length > 0) {
+          <div class="card mb-3 border-danger">
+            <div class="card-header bg-danger bg-opacity-10">
+              <h5 class="card-title mb-0 text-danger"><i class="fas fa-times-circle me-2"></i>{{ i18n.t('timesheets.timesheets.rejection_info') }}</h5>
+            </div>
+            <div class="card-body">
+              <app-definition-list [items]="rejectionItems()" [labelWidth]="'4'" [valueWidth]="'8'" />
+            </div>
+          </div>
+        }
+      </div>
+      <div class="col-lg-4">
+        <div class="card">
+          <div class="card-header"><h5 class="card-title mb-0">{{ i18n.t('common.actions') }}</h5></div>
+          <div class="card-body d-grid gap-2">
+            @if (timesheet()?.status === 'Submitted') {
+              <button class="btn btn-success" (click)="approveTimesheet()" [disabled]="actionLoading()">
+                <i class="fas fa-check me-1"></i>{{ i18n.t('timesheets.timesheets.approve') }}
+              </button>
+              <button class="btn btn-danger" (click)="openRejectModal()" [disabled]="actionLoading()">
+                <i class="fas fa-times me-1"></i>{{ i18n.t('timesheets.timesheets.reject') }}
+              </button>
+            }
+            <button class="btn btn-outline-primary" (click)="router.navigate(['/timesheets/periods', timesheet()?.timesheetPeriodId, 'view'])">
+              <i class="fas fa-calendar me-1"></i>{{ i18n.t('timesheets.timesheets.view_period') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Entries Table -->
+    <app-section-card [title]="i18n.t('timesheets.entries.title')" icon="fas fa-table" headerClass="bg-light">
+      <app-data-table [data]="entryTableData()" [columns]="entryColumns" [loading]="loading"
+        [emptyTitle]="i18n.t('timesheets.entries.no_data')" [paginated]="false">
+      </app-data-table>
+    </app-section-card>
+
+    <!-- Audit History -->
+    <div class="row mt-3">
+      <div class="col-12">
+        <app-section-card [title]="i18n.t('history.title')" icon="fas fa-clock-rotate-left" headerClass="bg-light">
+          <app-audit-history [entityName]="'Timesheet'" [entityId]="timesheet()?.id" />
+        </app-section-card>
+      </div>
+    </div>
+  }
+</div>
+
+<!-- Reject Modal -->
+@if (showRejectModal()) {
+  <app-modal-wrapper [title]="i18n.t('timesheets.timesheets.reject')" [show]="showRejectModal()" (close)="showRejectModal.set(false)">
+    <div class="app-modern-form">
+      <div class="form-floating">
+        <textarea class="form-control" id="rejectReason" placeholder="Reason" style="height: 120px"
+          [ngModel]="rejectReason()" (ngModelChange)="rejectReason.set($event)"></textarea>
+        <label for="rejectReason">{{ i18n.t('timesheets.timesheets.rejection_reason') }} *</label>
+      </div>
+      <div class="app-form-actions mt-3">
+        <button class="btn btn-secondary" (click)="showRejectModal.set(false)">{{ i18n.t('common.cancel') }}</button>
+        <button class="btn btn-danger" (click)="rejectTimesheet()" [disabled]="actionLoading() || !rejectReason()">{{ i18n.t('timesheets.timesheets.reject') }}</button>
+      </div>
+    </div>
+  </app-modal-wrapper>
+}

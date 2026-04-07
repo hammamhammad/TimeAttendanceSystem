@@ -1,0 +1,29 @@
+<div class="container-fluid">
+  <app-page-header [title]="t('leave_encashments.title')" />
+
+  <app-unified-filter
+    [searchPlaceholder]="t('leave_encashments.search_placeholder')"
+    [showAddButton]="false"
+    [showRefreshButton]="true"
+    [refreshButtonText]="t('common.refresh')"
+    [refreshing]="loading()"
+    (searchChange)="onSearchChange($event)"
+    (refresh)="onRefreshData()">
+  </app-unified-filter>
+
+  <app-data-table
+    [columns]="tableColumns()"
+    [data]="tableData() || []"
+    [actions]="tableActions()"
+    [currentPage]="currentPage()"
+    [pageSize]="pageSize()"
+    [totalItems]="totalCount()"
+    [totalPages]="totalPages()"
+    [loading]="loading"
+    [emptyTitle]="t('leave_encashments.no_records_title')"
+    [emptyMessage]="t('leave_encashments.no_records')"
+    (actionClick)="onActionClick($event)"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+  </app-data-table>
+</div>

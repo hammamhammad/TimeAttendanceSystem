@@ -1,0 +1,22 @@
+<div class="app-list-page">
+  <app-page-header [title]="i18n.t('salary_advances.title')" />
+  <app-unified-filter [searchPlaceholder]="i18n.t('salary_advances.search')" [showRefreshButton]="true" [refreshing]="loading()"
+    [showAddButton]="true" [addButtonText]="i18n.t('salary_advances.create')"
+    (searchChange)="onSearchChange($event)" (refresh)="onRefreshData()" (add)="navigateToCreate()" />
+
+  <app-data-table [data]="data()" [columns]="columns" [actions]="tableActions()" [currentPage]="currentPage()"
+    [totalPages]="totalPages()" [totalItems]="totalCount()" [pageSize]="pageSize()" [loading]="loading"
+    [emptyTitle]="i18n.t('salary_advances.no_data')" [showPagination]="true"
+    (actionClick)="onActionClick($event)" (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)">
+    <ng-template #cellTemplate let-item let-column="column">
+      @if (column.key === 'status') {
+        <span class="badge" [class.bg-warning]="item.status === 'Pending'" [class.bg-success]="item.status === 'Approved' || item.status === 'Disbursed' || item.status === 'Deducted'"
+          [class.bg-danger]="item.status === 'Rejected'">
+          {{ i18n.t('salary_advances.status_' + item.status) }}
+        </span>
+      } @else if (column.key === 'requestedAmount' || column.key === 'approvedAmount') {
+        {{ item[column.key] != null ? item[column.key].toFixed(2) : '-' }}
+      } @else { {{ item[column.key] ?? '-' }} }
+    </ng-template>
+  </app-data-table>
+</div>

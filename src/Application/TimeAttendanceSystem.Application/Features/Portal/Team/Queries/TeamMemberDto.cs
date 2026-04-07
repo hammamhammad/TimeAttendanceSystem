@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Application.Features.Portal.Team.Queries;
+namespace TecAxle.Hrms.Application.Features.Portal.Team.Queries;
 
 /// <summary>
 /// Team member data transfer object

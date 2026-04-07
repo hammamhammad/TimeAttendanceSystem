@@ -1,8 +1,8 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Application.AuditLogs.Queries.GetAuditLogs;
+namespace TecAxle.Hrms.Application.AuditLogs.Queries.GetAuditLogs;
 
 public class GetAuditLogsQuery : IRequest<Result<GetAuditLogsResponse>>
 {
@@ -10,6 +10,7 @@ public class GetAuditLogsQuery : IRequest<Result<GetAuditLogsResponse>>
     public DateTime? EndDate { get; set; }
     public List<AuditAction>? Actions { get; set; }
     public string? EntityName { get; set; }
+    public string? EntityId { get; set; }
     public long? ActorUserId { get; set; }
     public string? SearchTerm { get; set; }
     public int PageNumber { get; set; } = 1;

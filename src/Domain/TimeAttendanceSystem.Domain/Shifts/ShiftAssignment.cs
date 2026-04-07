@@ -1,8 +1,8 @@
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Domain.Employees;
-using TimeAttendanceSystem.Domain.Branches;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Employees;
+using TecAxle.Hrms.Domain.Branches;
 
-namespace TimeAttendanceSystem.Domain.Shifts;
+namespace TecAxle.Hrms.Domain.Shifts;
 
 /// <summary>
 /// Domain entity representing shift assignments to employees, departments, or branches.

@@ -1,0 +1,127 @@
+<div class="app-list-page">
+  <app-page-header [title]="i18n.t('training_budgets.title')" />
+
+  <!-- Budget Summary Cards -->
+  @if (summary()) {
+    <div class="row g-3 mb-3">
+      <div class="col-md-3">
+        <div class="card border-primary">
+          <div class="card-body text-center">
+            <div class="text-muted mb-1">{{ i18n.t('training_budgets.total_budget') }}</div>
+            <div class="fs-4 fw-bold text-primary">{{ summary()?.totalBudget?.toFixed(2) }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card border-info">
+          <div class="card-body text-center">
+            <div class="text-muted mb-1">{{ i18n.t('training_budgets.allocated') }}</div>
+            <div class="fs-4 fw-bold text-info">{{ summary()?.totalAllocated?.toFixed(2) }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card border-success">
+          <div class="card-body text-center">
+            <div class="text-muted mb-1">{{ i18n.t('training_budgets.spent') }}</div>
+            <div class="fs-4 fw-bold text-success">{{ summary()?.totalSpent?.toFixed(2) }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card border-warning">
+          <div class="card-body text-center">
+            <div class="text-muted mb-1">{{ i18n.t('training_budgets.utilization') }}</div>
+            <div class="fs-4 fw-bold text-warning">{{ summary()?.overallUtilization?.toFixed(1) }}%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <app-unified-filter [searchPlaceholder]="i18n.t('training_budgets.search')" [showRefreshButton]="true" [refreshing]="loading()"
+    [showAddButton]="true" [addButtonText]="i18n.t('training_budgets.create')"
+    (add)="openCreateModal()" (searchChange)="onSearchChange($event)" (refresh)="onRefreshData()" />
+
+  <app-data-table [data]="data()" [columns]="columns" [actions]="tableActions()" [currentPage]="currentPage()"
+    [totalPages]="totalPages()" [totalItems]="totalCount()" [pageSize]="pageSize()" [loading]="loading"
+    [emptyTitle]="i18n.t('training_budgets.no_data')" [showPagination]="true"
+    (actionClick)="onActionClick($event)" (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)">
+    <ng-template #cellTemplate let-item let-column="column">
+      @if (column.key === 'utilizationPercentage') {
+        <div class="d-flex align-items-center gap-2">
+          <div class="progress flex-grow-1" style="height:8px">
+            <div class="progress-bar" [class.bg-success]="item.utilizationPercentage < 75"
+              [class.bg-warning]="item.utilizationPercentage >= 75 && item.utilizationPercentage < 90"
+              [class.bg-danger]="item.utilizationPercentage >= 90"
+              [style.width.%]="item.utilizationPercentage"></div>
+          </div>
+          <small>{{ item.utilizationPercentage?.toFixed(1) }}%</small>
+        </div>
+      } @else if (column.key === 'totalBudget' || column.key === 'spentAmount') {
+        {{ item[column.key]?.toFixed(2) ?? '-' }}
+      } @else {
+        {{ item[column.key] ?? '-' }}
+      }
+    </ng-template>
+  </app-data-table>
+</div>
+
+<!-- Modal -->
+@if (showModal()) {
+  <div class="modal fade show d-block" tabindex="-1" style="background:rgba(0,0,0,0.5)">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ editingId() ? i18n.t('training_budgets.edit') : i18n.t('training_budgets.create') }}</h5>
+          <button type="button" class="btn-close" (click)="closeModal()"></button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="form">
+            <div class="mb-3">
+              <label class="form-label">{{ i18n.t('training_budgets.year') }} *</label>
+              <input type="number" class="form-control" formControlName="year">
+              @if (form.get('year')?.touched && form.get('year')?.invalid) {
+                <div class="invalid-feedback d-block">{{ i18n.t('common.required') }}</div>
+              }
+            </div>
+            <div class="mb-3">
+              <label class="form-label">{{ i18n.t('training_budgets.total_budget') }} *</label>
+              <input type="number" class="form-control" formControlName="totalBudget" step="0.01">
+              @if (form.get('totalBudget')?.touched && form.get('totalBudget')?.invalid) {
+                <div class="invalid-feedback d-block">{{ i18n.t('common.required') }}</div>
+              }
+            </div>
+            <div class="mb-3">
+              <label class="form-label">{{ i18n.t('training_budgets.currency') }} *</label>
+              <select class="form-select" formControlName="currency">
+                <option value="SAR">SAR - Saudi Riyal</option>
+                <option value="USD">USD - US Dollar</option>
+                <option value="EUR">EUR - Euro</option>
+                <option value="GBP">GBP - British Pound</option>
+                <option value="AED">AED - UAE Dirham</option>
+                <option value="KWD">KWD - Kuwaiti Dinar</option>
+                <option value="QAR">QAR - Qatari Riyal</option>
+                <option value="BHD">BHD - Bahraini Dinar</option>
+                <option value="OMR">OMR - Omani Rial</option>
+                <option value="EGP">EGP - Egyptian Pound</option>
+                <option value="JOD">JOD - Jordanian Dinar</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">{{ i18n.t('common.notes') }}</label>
+              <textarea class="form-control" formControlName="notes" rows="3"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">{{ i18n.t('common.cancel') }}</button>
+          <button type="button" class="btn btn-primary" (click)="onSave()" [disabled]="saving()">
+            @if (saving()) { <span class="spinner-border spinner-border-sm me-2"></span> }
+            {{ i18n.t('common.save') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

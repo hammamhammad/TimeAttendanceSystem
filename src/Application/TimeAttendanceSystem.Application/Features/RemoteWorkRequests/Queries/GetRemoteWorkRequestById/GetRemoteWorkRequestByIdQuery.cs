@@ -1,11 +1,14 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.Features.RemoteWorkRequests.Queries.GetRemoteWorkRequestById;
+namespace TecAxle.Hrms.Application.Features.RemoteWorkRequests.Queries.GetRemoteWorkRequestById;
 
 /// <summary>
 /// Query to get a remote work request by ID.
 /// </summary>
+[RequiresModule(SystemModule.RemoteWork, AllowReadWhenDisabled = true)]
 public class GetRemoteWorkRequestByIdQuery : IRequest<Result<RemoteWorkRequestDto>>
 {
     public long Id { get; set; }

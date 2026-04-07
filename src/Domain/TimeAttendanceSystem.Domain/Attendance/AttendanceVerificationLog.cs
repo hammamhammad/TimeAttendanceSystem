@@ -1,8 +1,8 @@
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Domain.Branches;
-using TimeAttendanceSystem.Domain.Employees;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Branches;
+using TecAxle.Hrms.Domain.Employees;
 
-namespace TimeAttendanceSystem.Domain.Attendance;
+namespace TecAxle.Hrms.Domain.Attendance;
 
 /// <summary>
 /// Domain entity representing an audit log entry for mobile attendance verification attempts.

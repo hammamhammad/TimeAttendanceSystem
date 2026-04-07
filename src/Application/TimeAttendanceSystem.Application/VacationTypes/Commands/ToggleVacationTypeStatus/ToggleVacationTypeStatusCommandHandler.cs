@@ -1,9 +1,9 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Abstractions;
 
-namespace TimeAttendanceSystem.Application.VacationTypes.Commands.ToggleVacationTypeStatus;
+namespace TecAxle.Hrms.Application.VacationTypes.Commands.ToggleVacationTypeStatus;
 
 /// <summary>
 /// Command handler for toggling vacation type status in the Time Attendance System.

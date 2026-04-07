@@ -1,7 +1,9 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.LeaveManagement.Commands.ProcessMonthlyAccrual;
+namespace TecAxle.Hrms.Application.LeaveManagement.Commands.ProcessMonthlyAccrual;
 
 /// <summary>
 /// CQRS command for processing monthly leave accrual for all eligible employees.
@@ -51,6 +53,7 @@ namespace TimeAttendanceSystem.Application.LeaveManagement.Commands.ProcessMonth
 /// - Includes detailed error messages for troubleshooting
 /// - Logs comprehensive information for monitoring
 /// </remarks>
+[RequiresModule(SystemModule.LeaveManagement)]
 public record ProcessMonthlyAccrualCommand(
     int Year,
     int Month,

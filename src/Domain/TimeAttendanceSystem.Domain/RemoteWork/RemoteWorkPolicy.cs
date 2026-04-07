@@ -1,7 +1,7 @@
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Domain.Branches;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Branches;
 
-namespace TimeAttendanceSystem.Domain.RemoteWork;
+namespace TecAxle.Hrms.Domain.RemoteWork;
 
 /// <summary>
 /// Domain entity representing remote work policy configuration within the organization.

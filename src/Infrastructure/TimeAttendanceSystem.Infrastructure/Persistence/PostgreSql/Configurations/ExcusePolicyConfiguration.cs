@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TimeAttendanceSystem.Domain.Excuses;
+using TecAxle.Hrms.Domain.Excuses;
 
-namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Configurations;
+namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Configurations;
 
 /// <summary>
 /// Entity Framework configuration for ExcusePolicy entity.

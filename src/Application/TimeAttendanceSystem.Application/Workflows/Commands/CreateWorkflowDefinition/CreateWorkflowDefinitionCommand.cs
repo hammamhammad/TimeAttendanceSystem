@@ -1,8 +1,8 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Workflows.Enums;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Workflows.Enums;
 
-namespace TimeAttendanceSystem.Application.Workflows.Commands.CreateWorkflowDefinition;
+namespace TecAxle.Hrms.Application.Workflows.Commands.CreateWorkflowDefinition;
 
 /// <summary>
 /// CQRS command for creating a new workflow definition in the Time Attendance System.

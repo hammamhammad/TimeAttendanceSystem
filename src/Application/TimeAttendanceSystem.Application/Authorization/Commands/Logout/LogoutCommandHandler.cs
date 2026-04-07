@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Users;
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Users;
+using TecAxle.Hrms.Domain.Common;
 using System.IdentityModel.Tokens.Jwt;
 
-namespace TimeAttendanceSystem.Application.Authorization.Commands.Logout;
+namespace TecAxle.Hrms.Application.Authorization.Commands.Logout;
 
 public class LogoutCommandHandler : BaseHandler<LogoutCommand, Result<bool>>
 {

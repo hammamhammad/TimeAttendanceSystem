@@ -1,23 +1,44 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Domain.Branches;
-using TimeAttendanceSystem.Domain.Employees;
-using TimeAttendanceSystem.Domain.Users;
-using TimeAttendanceSystem.Domain.Shifts;
-using TimeAttendanceSystem.Domain.Attendance;
-using TimeAttendanceSystem.Domain.Settings;
-using TimeAttendanceSystem.Domain.VacationTypes;
-using TimeAttendanceSystem.Domain.Vacations;
-using TimeAttendanceSystem.Domain.Excuses;
-using TimeAttendanceSystem.Domain.RemoteWork;
-using TimeAttendanceSystem.Domain.Workflows;
-using TimeAttendanceSystem.Domain.LeaveManagement;
-using TimeAttendanceSystem.Domain.Notifications;
-using TimeAttendanceSystem.Domain.Tenants;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Services;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Branches;
+using TecAxle.Hrms.Domain.Employees;
+using TecAxle.Hrms.Domain.Users;
+using TecAxle.Hrms.Domain.Shifts;
+using TecAxle.Hrms.Domain.Attendance;
+using TecAxle.Hrms.Domain.Settings;
+using TecAxle.Hrms.Domain.VacationTypes;
+using TecAxle.Hrms.Domain.Vacations;
+using TecAxle.Hrms.Domain.Excuses;
+using TecAxle.Hrms.Domain.RemoteWork;
+using TecAxle.Hrms.Domain.Workflows;
+using TecAxle.Hrms.Domain.LeaveManagement;
+using TecAxle.Hrms.Domain.Notifications;
+using TecAxle.Hrms.Domain.Tenants;
+using TecAxle.Hrms.Domain.Subscriptions;
+using TecAxle.Hrms.Domain.Payroll;
+using TecAxle.Hrms.Domain.Offboarding;
+using TecAxle.Hrms.Domain.Recruitment;
+using TecAxle.Hrms.Domain.Onboarding;
+using TecAxle.Hrms.Domain.Performance;
+using TecAxle.Hrms.Domain.Documents;
+using TecAxle.Hrms.Domain.Expenses;
+using TecAxle.Hrms.Domain.Loans;
+using TecAxle.Hrms.Domain.Announcements;
+using TecAxle.Hrms.Domain.Training;
+using TecAxle.Hrms.Domain.EmployeeRelations;
+using TecAxle.Hrms.Domain.Assets;
+using TecAxle.Hrms.Domain.Surveys;
+using TecAxle.Hrms.Domain.Analytics;
+using TecAxle.Hrms.Domain.Timesheets;
+using TecAxle.Hrms.Domain.Succession;
+using TecAxle.Hrms.Domain.Benefits;
+using TecAxle.Hrms.Domain.Reports;
+using TecAxle.Hrms.Domain.Configuration;
+using TecAxle.Hrms.Domain.Departments;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Services;
 
-namespace TimeAttendanceSystem.Infrastructure.Persistence;
+namespace TecAxle.Hrms.Infrastructure.Persistence;
 
 /// <summary>
 /// Entity Framework Core database context for the Time Attendance System providing comprehensive data access.
@@ -145,6 +166,202 @@ public class TimeAttendanceDbContext : DbContext, IApplicationDbContext
 
     // Multi-tenant entities
     public DbSet<Tenant> Tenants => Set<Tenant>();
+
+    // Subscription & Entitlements
+    public DbSet<SubscriptionPlan> SubscriptionPlans => Set<SubscriptionPlan>();
+    public DbSet<PlanModuleEntitlement> PlanModuleEntitlements => Set<PlanModuleEntitlement>();
+    public DbSet<PlanFeatureFlag> PlanFeatureFlags => Set<PlanFeatureFlag>();
+    public DbSet<PlanLimit> PlanLimits => Set<PlanLimit>();
+    public DbSet<TenantSubscription> TenantSubscriptions => Set<TenantSubscription>();
+    public DbSet<TenantModuleAddOn> TenantModuleAddOns => Set<TenantModuleAddOn>();
+    public DbSet<TenantFeatureOverride> TenantFeatureOverrides => Set<TenantFeatureOverride>();
+    public DbSet<EntitlementChangeLog> EntitlementChangeLogs => Set<EntitlementChangeLog>();
+
+    // Phase 1: Employee Lifecycle
+    public DbSet<EmployeeContract> EmployeeContracts => Set<EmployeeContract>();
+    public DbSet<EmployeeTransfer> EmployeeTransfers => Set<EmployeeTransfer>();
+    public DbSet<EmployeePromotion> EmployeePromotions => Set<EmployeePromotion>();
+    public DbSet<SalaryAdjustment> SalaryAdjustments => Set<SalaryAdjustment>();
+    public DbSet<EmployeeProfileChange> EmployeeProfileChanges => Set<EmployeeProfileChange>();
+    public DbSet<EmployeeBankDetail> EmployeeBankDetails => Set<EmployeeBankDetail>();
+    public DbSet<EmployeeDependent> EmployeeDependents => Set<EmployeeDependent>();
+    public DbSet<EmergencyContact> EmergencyContacts => Set<EmergencyContact>();
+    public DbSet<EmployeeAddress> EmployeeAddresses => Set<EmployeeAddress>();
+    public DbSet<EmployeeEducation> EmployeeEducations => Set<EmployeeEducation>();
+    public DbSet<EmployeeWorkExperience> EmployeeWorkExperiences => Set<EmployeeWorkExperience>();
+    public DbSet<EmployeeVisa> EmployeeVisas => Set<EmployeeVisa>();
+    public DbSet<JobGrade> JobGrades => Set<JobGrade>();
+
+    // Phase 1: Payroll
+    public DbSet<SalaryStructure> SalaryStructures => Set<SalaryStructure>();
+    public DbSet<SalaryComponent> SalaryComponents => Set<SalaryComponent>();
+    public DbSet<EmployeeSalary> EmployeeSalaries => Set<EmployeeSalary>();
+    public DbSet<EmployeeSalaryComponent> EmployeeSalaryComponents => Set<EmployeeSalaryComponent>();
+    public DbSet<PayrollPeriod> PayrollPeriods => Set<PayrollPeriod>();
+    public DbSet<PayrollRecord> PayrollRecords => Set<PayrollRecord>();
+    public DbSet<PayrollRecordDetail> PayrollRecordDetails => Set<PayrollRecordDetail>();
+    public DbSet<PayrollAdjustment> PayrollAdjustments => Set<PayrollAdjustment>();
+    public DbSet<TaxConfiguration> TaxConfigurations => Set<TaxConfiguration>();
+    public DbSet<TaxBracket> TaxBrackets => Set<TaxBracket>();
+    public DbSet<SocialInsuranceConfig> SocialInsuranceConfigs => Set<SocialInsuranceConfig>();
+    public DbSet<BankTransferFile> BankTransferFiles => Set<BankTransferFile>();
+    public DbSet<InsuranceProvider> InsuranceProviders => Set<InsuranceProvider>();
+    public DbSet<EmployeeInsurance> EmployeeInsurances => Set<EmployeeInsurance>();
+
+    // Allowance Management
+    public DbSet<AllowanceType> AllowanceTypes => Set<AllowanceType>();
+    public DbSet<AllowancePolicy> AllowancePolicies => Set<AllowancePolicy>();
+    public DbSet<AllowanceAssignment> AllowanceAssignments => Set<AllowanceAssignment>();
+    public DbSet<AllowanceRequest> AllowanceRequests => Set<AllowanceRequest>();
+    public DbSet<AllowanceChangeLog> AllowanceChangeLogs => Set<AllowanceChangeLog>();
+
+    // Phase 1: Offboarding
+    public DbSet<ResignationRequest> ResignationRequests => Set<ResignationRequest>();
+    public DbSet<TerminationRecord> TerminationRecords => Set<TerminationRecord>();
+    public DbSet<ClearanceChecklist> ClearanceChecklists => Set<ClearanceChecklist>();
+    public DbSet<ClearanceItem> ClearanceItems => Set<ClearanceItem>();
+    public DbSet<EndOfServiceBenefit> EndOfServiceBenefits => Set<EndOfServiceBenefit>();
+    public DbSet<FinalSettlement> FinalSettlements => Set<FinalSettlement>();
+    public DbSet<ExitInterview> ExitInterviews => Set<ExitInterview>();
+
+    // Phase 2: Recruitment
+    public DbSet<JobRequisition> JobRequisitions => Set<JobRequisition>();
+    public DbSet<JobPosting> JobPostings => Set<JobPosting>();
+    public DbSet<Candidate> Candidates => Set<Candidate>();
+    public DbSet<JobApplication> JobApplications => Set<JobApplication>();
+    public DbSet<InterviewSchedule> InterviewSchedules => Set<InterviewSchedule>();
+    public DbSet<InterviewFeedback> InterviewFeedbacks => Set<InterviewFeedback>();
+    public DbSet<OfferLetter> OfferLetters => Set<OfferLetter>();
+
+    // Phase 2: Onboarding
+    public DbSet<OnboardingTemplate> OnboardingTemplates => Set<OnboardingTemplate>();
+    public DbSet<OnboardingTemplateTask> OnboardingTemplateTasks => Set<OnboardingTemplateTask>();
+    public DbSet<OnboardingProcess> OnboardingProcesses => Set<OnboardingProcess>();
+    public DbSet<OnboardingTask> OnboardingTasks => Set<OnboardingTask>();
+    public DbSet<OnboardingDocument> OnboardingDocuments => Set<OnboardingDocument>();
+
+    // Phase 2: Performance
+    public DbSet<PerformanceReviewCycle> PerformanceReviewCycles => Set<PerformanceReviewCycle>();
+    public DbSet<PerformanceReview> PerformanceReviews => Set<PerformanceReview>();
+    public DbSet<GoalDefinition> GoalDefinitions => Set<GoalDefinition>();
+    public DbSet<CompetencyFramework> CompetencyFrameworks => Set<CompetencyFramework>();
+    public DbSet<Competency> Competencies => Set<Competency>();
+    public DbSet<CompetencyAssessment> CompetencyAssessments => Set<CompetencyAssessment>();
+    public DbSet<PerformanceImprovementPlan> PerformanceImprovementPlans => Set<PerformanceImprovementPlan>();
+    public DbSet<FeedbackRequest360> FeedbackRequests360 => Set<FeedbackRequest360>();
+    public DbSet<Feedback360Response> Feedback360Responses => Set<Feedback360Response>();
+
+    // File Management
+    public DbSet<FileAttachment> FileAttachments => Set<FileAttachment>();
+
+    // Phase 3: Documents & Letters
+    public DbSet<DocumentCategory> DocumentCategories => Set<DocumentCategory>();
+    public DbSet<EmployeeDocument> EmployeeDocuments => Set<EmployeeDocument>();
+    public DbSet<CompanyPolicy> CompanyPolicies => Set<CompanyPolicy>();
+    public DbSet<PolicyAcknowledgment> PolicyAcknowledgments => Set<PolicyAcknowledgment>();
+    public DbSet<LetterTemplate> LetterTemplates => Set<LetterTemplate>();
+    public DbSet<LetterRequest> LetterRequests => Set<LetterRequest>();
+
+    // Phase 3: Expenses
+    public DbSet<ExpenseCategory> ExpenseCategories => Set<ExpenseCategory>();
+    public DbSet<ExpensePolicy> ExpensePolicies => Set<ExpensePolicy>();
+    public DbSet<ExpenseClaim> ExpenseClaims => Set<ExpenseClaim>();
+    public DbSet<ExpenseClaimItem> ExpenseClaimItems => Set<ExpenseClaimItem>();
+    public DbSet<ExpenseReimbursement> ExpenseReimbursements => Set<ExpenseReimbursement>();
+
+    // Phase 3: Loans
+    public DbSet<LoanType> LoanTypes => Set<LoanType>();
+    public DbSet<LoanPolicy> LoanPolicies => Set<LoanPolicy>();
+    public DbSet<LoanApplication> LoanApplications => Set<LoanApplication>();
+    public DbSet<LoanRepayment> LoanRepayments => Set<LoanRepayment>();
+    public DbSet<SalaryAdvance> SalaryAdvances => Set<SalaryAdvance>();
+
+    // Phase 4: Announcements
+    public DbSet<AnnouncementCategory> AnnouncementCategories => Set<AnnouncementCategory>();
+    public DbSet<Announcement> Announcements => Set<Announcement>();
+    public DbSet<AnnouncementAcknowledgment> AnnouncementAcknowledgments => Set<AnnouncementAcknowledgment>();
+    public DbSet<AnnouncementAttachment> AnnouncementAttachments => Set<AnnouncementAttachment>();
+
+    // Phase 4: Training & Development
+    public DbSet<TrainingCategory> TrainingCategories => Set<TrainingCategory>();
+    public DbSet<TrainingCourse> TrainingCourses => Set<TrainingCourse>();
+    public DbSet<TrainingProgram> TrainingPrograms => Set<TrainingProgram>();
+    public DbSet<TrainingProgramCourse> TrainingProgramCourses => Set<TrainingProgramCourse>();
+    public DbSet<TrainingSession> TrainingSessions => Set<TrainingSession>();
+    public DbSet<TrainingEnrollment> TrainingEnrollments => Set<TrainingEnrollment>();
+    public DbSet<TrainingAttendance> TrainingAttendanceRecords => Set<TrainingAttendance>();
+    public DbSet<TrainingEvaluation> TrainingEvaluations => Set<TrainingEvaluation>();
+    public DbSet<EmployeeCertification> EmployeeCertifications => Set<EmployeeCertification>();
+    public DbSet<TrainingBudget> TrainingBudgets => Set<TrainingBudget>();
+
+    // Phase 4: Employee Relations
+    public DbSet<Grievance> Grievances => Set<Grievance>();
+    public DbSet<GrievanceNote> GrievanceNotes => Set<GrievanceNote>();
+    public DbSet<GrievanceAttachment> GrievanceAttachments => Set<GrievanceAttachment>();
+    public DbSet<DisciplinaryAction> DisciplinaryActions => Set<DisciplinaryAction>();
+    public DbSet<DisciplinaryAttachment> DisciplinaryAttachments => Set<DisciplinaryAttachment>();
+    public DbSet<Investigation> Investigations => Set<Investigation>();
+    public DbSet<InvestigationNote> InvestigationNotes => Set<InvestigationNote>();
+    public DbSet<InvestigationAttachment> InvestigationAttachments => Set<InvestigationAttachment>();
+    public DbSet<CounselingRecord> CounselingRecords => Set<CounselingRecord>();
+
+    // Phase 5: Asset Management
+    public DbSet<AssetCategory> AssetCategories => Set<AssetCategory>();
+    public DbSet<Asset> Assets => Set<Asset>();
+    public DbSet<AssetAssignment> AssetAssignments => Set<AssetAssignment>();
+    public DbSet<AssetMaintenanceRecord> AssetMaintenanceRecords => Set<AssetMaintenanceRecord>();
+
+    // Phase 5: Employee Engagement & Surveys
+    public DbSet<SurveyTemplate> SurveyTemplates => Set<SurveyTemplate>();
+    public DbSet<SurveyQuestion> SurveyQuestions => Set<SurveyQuestion>();
+    public DbSet<SurveyDistribution> SurveyDistributions => Set<SurveyDistribution>();
+    public DbSet<SurveyParticipant> SurveyParticipants => Set<SurveyParticipant>();
+    public DbSet<SurveyResponse> SurveyResponses => Set<SurveyResponse>();
+
+    // Phase 5: Advanced Analytics
+    public DbSet<AnalyticsSnapshot> AnalyticsSnapshots => Set<AnalyticsSnapshot>();
+    public DbSet<SavedDashboard> SavedDashboards => Set<SavedDashboard>();
+
+    // Phase 6: Timesheet Management
+    public DbSet<Project> Projects => Set<Project>();
+    public DbSet<ProjectTask> ProjectTasks => Set<ProjectTask>();
+    public DbSet<TimesheetPeriod> TimesheetPeriods => Set<TimesheetPeriod>();
+    public DbSet<Timesheet> Timesheets => Set<Timesheet>();
+    public DbSet<TimesheetEntry> TimesheetEntries => Set<TimesheetEntry>();
+
+    // Phase 6: Succession Planning & Talent Management
+    public DbSet<KeyPosition> KeyPositions => Set<KeyPosition>();
+    public DbSet<TalentProfile> TalentProfiles => Set<TalentProfile>();
+    public DbSet<TalentSkill> TalentSkills => Set<TalentSkill>();
+    public DbSet<SuccessionPlan> SuccessionPlans => Set<SuccessionPlan>();
+    public DbSet<SuccessionCandidate> SuccessionCandidates => Set<SuccessionCandidate>();
+    public DbSet<CareerPath> CareerPaths => Set<CareerPath>();
+    public DbSet<CareerPathStep> CareerPathSteps => Set<CareerPathStep>();
+
+    // Phase 6: Benefits Administration
+    public DbSet<BenefitPlan> BenefitPlans => Set<BenefitPlan>();
+    public DbSet<BenefitPlanOption> BenefitPlanOptions => Set<BenefitPlanOption>();
+    public DbSet<BenefitEligibilityRule> BenefitEligibilityRules => Set<BenefitEligibilityRule>();
+    public DbSet<OpenEnrollmentPeriod> OpenEnrollmentPeriods => Set<OpenEnrollmentPeriod>();
+    public DbSet<BenefitEnrollment> BenefitEnrollments => Set<BenefitEnrollment>();
+    public DbSet<BenefitDependent> BenefitDependents => Set<BenefitDependent>();
+    public DbSet<BenefitClaim> BenefitClaims => Set<BenefitClaim>();
+
+    // Phase 7: Enhancements
+    public DbSet<ShiftSwapRequest> ShiftSwapRequests => Set<ShiftSwapRequest>();
+    public DbSet<OnCallSchedule> OnCallSchedules => Set<OnCallSchedule>();
+    public DbSet<CompensatoryOff> CompensatoryOffs => Set<CompensatoryOff>();
+    public DbSet<LeaveEncashment> LeaveEncashments => Set<LeaveEncashment>();
+    public DbSet<CustomReportDefinition> CustomReportDefinitions => Set<CustomReportDefinition>();
+    public DbSet<ScheduledReport> ScheduledReports => Set<ScheduledReport>();
+
+    // Tenant Configuration & Policy Framework
+    public DbSet<TenantSettings> TenantSettings => Set<TenantSettings>();
+    public DbSet<BranchSettingsOverride> BranchSettingsOverrides => Set<BranchSettingsOverride>();
+    public DbSet<DepartmentSettingsOverride> DepartmentSettingsOverrides => Set<DepartmentSettingsOverride>();
+    public DbSet<PolicyTemplate> PolicyTemplates => Set<PolicyTemplate>();
+    public DbSet<PolicyTemplateItem> PolicyTemplateItems => Set<PolicyTemplateItem>();
+    public DbSet<SetupStep> SetupSteps => Set<SetupStep>();
 
     /// <summary>
     /// Configures the database model using Fluent API configurations from the current assembly.

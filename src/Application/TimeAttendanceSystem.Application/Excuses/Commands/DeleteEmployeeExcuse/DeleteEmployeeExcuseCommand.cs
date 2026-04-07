@@ -1,6 +1,9 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.Excuses.Commands.DeleteEmployeeExcuse;
+namespace TecAxle.Hrms.Application.Excuses.Commands.DeleteEmployeeExcuse;
 
+[RequiresModule(SystemModule.LeaveManagement)]
 public record DeleteEmployeeExcuseCommand(long Id) : IRequest<Result<bool>>;

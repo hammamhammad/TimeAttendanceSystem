@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Api.Models;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Api.Models;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 /// <summary>
 /// API controller for comprehensive dashboard data.

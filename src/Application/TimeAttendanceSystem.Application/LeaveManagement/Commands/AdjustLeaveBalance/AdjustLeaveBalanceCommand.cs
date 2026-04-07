@@ -1,7 +1,9 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.LeaveManagement.Commands.AdjustLeaveBalance;
+namespace TecAxle.Hrms.Application.LeaveManagement.Commands.AdjustLeaveBalance;
 
 /// <summary>
 /// CQRS command for manually adjusting employee leave balance.
@@ -57,6 +59,7 @@ namespace TimeAttendanceSystem.Application.LeaveManagement.Commands.AdjustLeaveB
 /// - Includes new balance information in success message
 /// - Supports localized error messages
 /// </remarks>
+[RequiresModule(SystemModule.LeaveManagement)]
 public record AdjustLeaveBalanceCommand(
     long EmployeeId,
     long VacationTypeId,

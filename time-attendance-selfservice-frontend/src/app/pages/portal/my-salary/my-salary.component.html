@@ -1,0 +1,239 @@
+<!-- Page Header -->
+<app-page-header
+  [title]="i18n.t('portal.salary.title')">
+  <div header-actions>
+    <button
+      class="btn btn-outline-primary btn-sm"
+      (click)="refresh()"
+      [disabled]="loading()"
+      type="button">
+      <i class="bi bi-arrow-clockwise" [class.spin]="loading()"></i>
+      {{ i18n.t('common.refresh') }}
+    </button>
+  </div>
+</app-page-header>
+
+<!-- Loading State -->
+@if (loading() && !salary()) {
+  <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+}
+
+<!-- Error State -->
+@if (error() && !salary()) {
+  <div class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    {{ error() }}
+    <button class="btn btn-sm btn-outline-danger ms-3" (click)="refresh()" type="button">
+      {{ i18n.t('common.retry') }}
+    </button>
+  </div>
+}
+
+<!-- Empty State -->
+@if (!loading() && !salary() && !error()) {
+  <app-empty-state
+    icon="bi bi-wallet2"
+    [title]="i18n.t('portal.salary.no_salary')"
+    [message]="i18n.t('portal.salary.no_salary_message')">
+  </app-empty-state>
+}
+
+<!-- Salary Content -->
+@if (salary(); as sal) {
+  <!-- Net Salary Summary Card -->
+  <div class="salary-summary-card mb-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center py-4">
+        <p class="text-muted mb-1 small text-uppercase fw-semibold">{{ i18n.t('portal.salary.net_salary') }}</p>
+        <h2 class="display-5 fw-bold text-primary mb-1">
+          {{ formatCurrency(sal.netSalary) }}
+          <small class="fs-5 text-muted">{{ getCurrencyLabel() }}</small>
+        </h2>
+        @if (sal.effectiveDate) {
+          <p class="text-muted small mb-0">
+            {{ i18n.t('portal.salary.effective_date') }}: {{ formatDate(sal.effectiveDate) }}
+          </p>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <!-- Basic Salary -->
+    <div class="col-md-4">
+      <div class="card h-100">
+        <div class="card-body text-center">
+          <div class="stat-icon mb-2">
+            <i class="bi bi-cash-stack text-success fs-3"></i>
+          </div>
+          <p class="text-muted small mb-1">{{ i18n.t('portal.salary.basic_salary') }}</p>
+          <h4 class="fw-bold mb-0">{{ formatCurrency(sal.basicSalary) }}</h4>
+          <small class="text-muted">{{ getCurrencyLabel() }}</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Allowances -->
+    <div class="col-md-4">
+      <div class="card h-100">
+        <div class="card-body text-center">
+          <div class="stat-icon mb-2">
+            <i class="bi bi-plus-circle text-info fs-3"></i>
+          </div>
+          <p class="text-muted small mb-1">{{ i18n.t('portal.salary.total_allowances') }}</p>
+          <h4 class="fw-bold text-success mb-0">+{{ formatCurrency(sal.totalAllowances) }}</h4>
+          <small class="text-muted">{{ getCurrencyLabel() }}</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Deductions -->
+    <div class="col-md-4">
+      <div class="card h-100">
+        <div class="card-body text-center">
+          <div class="stat-icon mb-2">
+            <i class="bi bi-dash-circle text-danger fs-3"></i>
+          </div>
+          <p class="text-muted small mb-1">{{ i18n.t('portal.salary.total_deductions') }}</p>
+          <h4 class="fw-bold text-danger mb-0">-{{ formatCurrency(sal.totalDeductions) }}</h4>
+          <small class="text-muted">{{ getCurrencyLabel() }}</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Allowances Detail -->
+  @if (hasAllowances()) {
+    <div class="card mt-4">
+      <div class="card-header bg-light">
+        <h6 class="mb-0">
+          <i class="bi bi-plus-circle text-success me-2"></i>
+          {{ i18n.t('portal.salary.allowances') }}
+        </h6>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-striped mb-0">
+          <thead>
+            <tr>
+              <th>{{ i18n.t('portal.salary.item_name') }}</th>
+              <th class="text-end">{{ i18n.t('portal.salary.amount') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of sal.allowances; track item.name) {
+              <tr>
+                <td>
+                  {{ getItemName(item) }}
+                  @if (item.isPercentage && item.percentage) {
+                    <span class="text-muted small">({{ item.percentage }}%)</span>
+                  }
+                </td>
+                <td class="text-end text-success fw-semibold">+{{ formatCurrency(item.amount) }}</td>
+              </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr class="table-light fw-bold">
+              <td>{{ i18n.t('portal.salary.total_allowances') }}</td>
+              <td class="text-end text-success">+{{ formatCurrency(sal.totalAllowances) }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  }
+
+  <!-- Deductions Detail -->
+  @if (hasDeductions()) {
+    <div class="card mt-3">
+      <div class="card-header bg-light">
+        <h6 class="mb-0">
+          <i class="bi bi-dash-circle text-danger me-2"></i>
+          {{ i18n.t('portal.salary.deductions') }}
+        </h6>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-striped mb-0">
+          <thead>
+            <tr>
+              <th>{{ i18n.t('portal.salary.item_name') }}</th>
+              <th class="text-end">{{ i18n.t('portal.salary.amount') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of sal.deductions; track item.name) {
+              <tr>
+                <td>
+                  {{ getItemName(item) }}
+                  @if (item.isPercentage && item.percentage) {
+                    <span class="text-muted small">({{ item.percentage }}%)</span>
+                  }
+                </td>
+                <td class="text-end text-danger fw-semibold">-{{ formatCurrency(item.amount) }}</td>
+              </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr class="table-light fw-bold">
+              <td>{{ i18n.t('portal.salary.total_deductions') }}</td>
+              <td class="text-end text-danger">-{{ formatCurrency(sal.totalDeductions) }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  }
+
+  <!-- Salary Breakdown Summary -->
+  <div class="card mt-3">
+    <div class="card-header bg-light">
+      <h6 class="mb-0">
+        <i class="bi bi-calculator text-primary me-2"></i>
+        {{ i18n.t('portal.salary.salary_breakdown') }}
+      </h6>
+    </div>
+    <div class="card-body p-0">
+      <table class="table mb-0">
+        <tbody>
+          <tr>
+            <td>{{ i18n.t('portal.salary.basic_salary') }}</td>
+            <td class="text-end fw-semibold">{{ formatCurrency(sal.basicSalary) }}</td>
+          </tr>
+          <tr>
+            <td>{{ i18n.t('portal.salary.total_allowances') }}</td>
+            <td class="text-end text-success fw-semibold">+{{ formatCurrency(sal.totalAllowances) }}</td>
+          </tr>
+          <tr>
+            <td class="fw-semibold">{{ i18n.t('portal.salary.gross_salary') }}</td>
+            <td class="text-end fw-bold">{{ formatCurrency(sal.grossSalary) }}</td>
+          </tr>
+          <tr>
+            <td>{{ i18n.t('portal.salary.total_deductions') }}</td>
+            <td class="text-end text-danger fw-semibold">-{{ formatCurrency(sal.totalDeductions) }}</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr class="table-primary">
+            <td class="fw-bold fs-5">{{ i18n.t('portal.salary.net_salary') }}</td>
+            <td class="text-end fw-bold fs-5">{{ formatCurrency(sal.netSalary) }} {{ getCurrencyLabel() }}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <!-- Info Card -->
+  <div class="card mt-3">
+    <div class="card-body">
+      <div class="d-flex align-items-start">
+        <i class="bi bi-info-circle text-info me-3 mt-1 fs-4"></i>
+        <div>
+          <h6 class="mb-2">{{ i18n.t('portal.salary.info_title') }}</h6>
+          <p class="text-muted mb-0 small">
+            {{ i18n.t('portal.salary.info_text') }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+}

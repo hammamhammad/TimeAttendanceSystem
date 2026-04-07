@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Application.ShiftAssignments.Queries.GetShiftAssignments;
+namespace TecAxle.Hrms.Application.ShiftAssignments.Queries.GetShiftAssignments;
 
 /// <summary>
 /// Data Transfer Object representing a shift assignment with comprehensive details.

@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Application.Departments.Queries.GetDepartments;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Departments.Queries.GetDepartments;
 
-namespace TimeAttendanceSystem.Application.Departments.Queries.GetDepartmentById;
+namespace TecAxle.Hrms.Application.Departments.Queries.GetDepartmentById;
 
 public class GetDepartmentByIdQueryHandler : BaseHandler<GetDepartmentByIdQuery, Result<DepartmentDto>>
 {

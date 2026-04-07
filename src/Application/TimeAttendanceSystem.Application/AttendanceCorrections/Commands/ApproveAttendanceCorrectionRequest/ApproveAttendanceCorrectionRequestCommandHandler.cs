@@ -1,12 +1,12 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Application.Extensions;
-using TimeAttendanceSystem.Domain.Attendance;
-using TimeAttendanceSystem.Domain.Excuses;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Extensions;
+using TecAxle.Hrms.Domain.Attendance;
+using TecAxle.Hrms.Domain.Excuses;
 
-namespace TimeAttendanceSystem.Application.AttendanceCorrections.Commands.ApproveAttendanceCorrectionRequest;
+namespace TecAxle.Hrms.Application.AttendanceCorrections.Commands.ApproveAttendanceCorrectionRequest;
 
 /// <summary>
 /// Command handler for approving or rejecting attendance correction requests.

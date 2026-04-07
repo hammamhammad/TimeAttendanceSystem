@@ -1,6 +1,6 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Sessions.Queries.GetUserSessions;
+namespace TecAxle.Hrms.Application.Sessions.Queries.GetUserSessions;
 
 public record GetUserSessionsQuery : IRequest<Result<GetUserSessionsResponse>>;

@@ -1,7 +1,9 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.Excuses.Commands.DeleteExcusePolicy;
+namespace TecAxle.Hrms.Application.Excuses.Commands.DeleteExcusePolicy;
 
 /// <summary>
 /// CQRS command for deleting an excuse policy (soft delete).
@@ -25,6 +27,7 @@ namespace TimeAttendanceSystem.Application.Excuses.Commands.DeleteExcusePolicy;
 /// - Branch-scoped access control for multi-tenant environments
 /// - Audit trail maintained for compliance
 /// </remarks>
+[RequiresModule(SystemModule.LeaveManagement)]
 public record DeleteExcusePolicyCommand(
     long Id
 ) : IRequest<Result<bool>>;

@@ -1,0 +1,29 @@
+<div class="container-fluid">
+  <app-page-header
+    [title]="t('allowance_policies.title')">
+  </app-page-header>
+
+  <app-unified-filter
+    moduleName="allowance_policies"
+    [refreshing]="loading()"
+    (filtersChange)="onFiltersChange($event)"
+    (add)="onCreatePolicy()"
+    (refresh)="onRefreshData()">
+  </app-unified-filter>
+
+  <app-data-table
+    [columns]="tableColumns()"
+    [data]="tableData() || []"
+    [actions]="tableActions()"
+    [currentPage]="currentPage()"
+    [pageSize]="pageSize()"
+    [totalItems]="totalCount()"
+    [totalPages]="totalPages()"
+    [loading]="loading"
+    [emptyTitle]="t('allowance_policies.no_records_title')"
+    [emptyMessage]="hasActiveFilters() ? t('common.try_different_filters') : t('allowance_policies.no_records')"
+    (actionClick)="onActionClick($event)"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+  </app-data-table>
+</div>

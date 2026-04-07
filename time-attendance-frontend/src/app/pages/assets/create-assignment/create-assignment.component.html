@@ -1,0 +1,99 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header
+    [mode]="'create'"
+    [title]="i18n.t('assets.assignments.create')"
+    moduleName="asset-assignments"
+    moduleRoute="assets/assignments"
+    [loading]="false">
+  </app-form-header>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <form [formGroup]="assignmentForm" (ngSubmit)="onSubmit()" novalidate>
+        <app-form-section [title]="i18n.t('assets.assignments.assignment_details')" [variant]="'modern'">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <div class="app-modern-field">
+                <label class="app-modern-label">{{ i18n.t('assets.assignments.asset') }} <span class="text-danger">*</span></label>
+                <app-searchable-select
+                  [options]="assetOptions"
+                  [placeholder]="i18n.t('assets.assignments.select_asset')"
+                  [value]="assignmentForm.get('assetId')?.value"
+                  [disabled]="saving()"
+                  (selectionChange)="assignmentForm.get('assetId')?.setValue($event)">
+                </app-searchable-select>
+              </div>
+              @if (hasError('assetId')) {
+                <div class="invalid-feedback d-block">{{ getErrorMessage('assetId') }}</div>
+              }
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="app-modern-field">
+                <label class="app-modern-label">{{ i18n.t('assets.assignments.employee') }} <span class="text-danger">*</span></label>
+                <app-searchable-select
+                  [options]="employeeOptions"
+                  [placeholder]="i18n.t('common.select_employee')"
+                  [value]="assignmentForm.get('employeeId')?.value"
+                  [disabled]="saving()"
+                  (selectionChange)="assignmentForm.get('employeeId')?.setValue($event)">
+                </app-searchable-select>
+              </div>
+              @if (hasError('employeeId')) {
+                <div class="invalid-feedback d-block">{{ getErrorMessage('employeeId') }}</div>
+              }
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <div class="form-floating">
+                <input type="date" class="form-control" id="assignedDate" formControlName="assignedDate"
+                  placeholder="Assigned Date" [class.is-invalid]="isFieldInvalid('assignedDate')">
+                <label for="assignedDate">{{ i18n.t('assets.assignments.assigned_date') }} <span class="text-danger">*</span></label>
+              </div>
+              @if (hasError('assignedDate')) {
+                <div class="invalid-feedback d-block">{{ getErrorMessage('assignedDate') }}</div>
+              }
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="form-floating">
+                <input type="date" class="form-control" id="expectedReturnDate" formControlName="expectedReturnDate"
+                  placeholder="Expected Return Date">
+                <label for="expectedReturnDate">{{ i18n.t('assets.assignments.expected_return') }}</label>
+              </div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <div class="form-floating">
+              <textarea class="form-control" id="assignmentNotes" formControlName="notes"
+                placeholder="Notes" style="height: 80px"></textarea>
+              <label for="assignmentNotes">{{ i18n.t('common.notes') }}</label>
+            </div>
+          </div>
+        </app-form-section>
+
+        <div class="app-form-actions">
+          <button type="button" class="btn btn-secondary" (click)="onCancel()" [disabled]="saving()">
+            {{ i18n.t('common.cancel') }}
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="assignmentForm.invalid || saving()">
+            @if (saving()) {
+              <span class="spinner-border spinner-border-sm me-2"></span>
+            }
+            {{ i18n.t('assets.assignments.create') }}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card">
+        <div class="card-header">
+          <h6 class="card-title mb-0"><i class="fas fa-info-circle me-2"></i>{{ i18n.t('assets.assignments.help_title') }}</h6>
+        </div>
+        <div class="card-body">
+          <p class="small text-muted mb-0">{{ i18n.t('assets.assignments.help_text') }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

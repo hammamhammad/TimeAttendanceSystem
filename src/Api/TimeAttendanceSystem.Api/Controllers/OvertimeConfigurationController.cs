@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Settings.Queries.GetOvertimeConfigurations;
-using TimeAttendanceSystem.Application.Settings.Commands.CreateOvertimeConfiguration;
-using TimeAttendanceSystem.Application.Settings.Commands.UpdateOvertimeConfiguration;
-using TimeAttendanceSystem.Application.Settings.Commands.ActivateOvertimeConfiguration;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Settings.Queries.GetOvertimeConfigurations;
+using TecAxle.Hrms.Application.Settings.Commands.CreateOvertimeConfiguration;
+using TecAxle.Hrms.Application.Settings.Commands.UpdateOvertimeConfiguration;
+using TecAxle.Hrms.Application.Settings.Commands.ActivateOvertimeConfiguration;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 /// <summary>
 /// API controller for managing overtime configurations.

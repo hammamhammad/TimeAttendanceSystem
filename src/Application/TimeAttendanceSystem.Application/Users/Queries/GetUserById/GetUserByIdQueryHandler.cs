@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Users.Queries.GetUserById;
+namespace TecAxle.Hrms.Application.Users.Queries.GetUserById;
 
 public class GetUserByIdQueryHandler : BaseHandler<GetUserByIdQuery, Result<UserDetailDto>>
 {

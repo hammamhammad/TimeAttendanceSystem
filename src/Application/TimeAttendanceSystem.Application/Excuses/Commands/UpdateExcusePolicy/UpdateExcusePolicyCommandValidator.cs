@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace TimeAttendanceSystem.Application.Excuses.Commands.UpdateExcusePolicy;
+namespace TecAxle.Hrms.Application.Excuses.Commands.UpdateExcusePolicy;
 
 /// <summary>
 /// Fluent Validation rules for UpdateExcusePolicyCommand.

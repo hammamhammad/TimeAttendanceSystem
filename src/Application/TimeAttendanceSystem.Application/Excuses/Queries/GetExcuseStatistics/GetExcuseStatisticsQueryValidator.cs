@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace TimeAttendanceSystem.Application.Excuses.Queries.GetExcuseStatistics;
+namespace TecAxle.Hrms.Application.Excuses.Queries.GetExcuseStatistics;
 
 /// <summary>
 /// Fluent Validation rules for GetExcuseStatisticsQuery.

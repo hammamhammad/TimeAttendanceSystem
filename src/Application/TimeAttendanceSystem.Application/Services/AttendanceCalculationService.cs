@@ -1,15 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Extensions;
-using TimeAttendanceSystem.Domain.Attendance;
-using TimeAttendanceSystem.Domain.Shifts;
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Domain.Vacations;
-using TimeAttendanceSystem.Domain.RemoteWork;
-using TimeAttendanceSystem.Domain.Excuses;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Extensions;
+using TecAxle.Hrms.Domain.Attendance;
+using TecAxle.Hrms.Domain.Shifts;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Vacations;
+using TecAxle.Hrms.Domain.RemoteWork;
+using TecAxle.Hrms.Domain.Excuses;
 
-namespace TimeAttendanceSystem.Application.Services;
+namespace TecAxle.Hrms.Application.Services;
 
 /// <summary>
 /// Service implementation for attendance calculation operations.
@@ -20,17 +20,20 @@ public class AttendanceCalculationService : IAttendanceCalculationService
     private readonly IApplicationDbContext _context;
     private readonly IOvertimeConfigurationService _overtimeConfigService;
     private readonly IPublicHolidayService _publicHolidayService;
+    private readonly ITenantSettingsResolver? _tenantSettingsResolver;
     private readonly ILogger<AttendanceCalculationService>? _logger;
 
     public AttendanceCalculationService(
         IApplicationDbContext context,
         IOvertimeConfigurationService overtimeConfigService,
         IPublicHolidayService publicHolidayService,
+        ITenantSettingsResolver? tenantSettingsResolver = null,
         ILogger<AttendanceCalculationService>? logger = null)
     {
         _context = context;
         _overtimeConfigService = overtimeConfigService;
         _publicHolidayService = publicHolidayService;
+        _tenantSettingsResolver = tenantSettingsResolver;
         _logger = logger;
     }
 
@@ -869,7 +872,10 @@ public class AttendanceCalculationService : IAttendanceCalculationService
             // Grace Period Business Rules:
             // - If late entry <= grace period: No delay counted (0 late minutes)
             // - If late entry > grace period: Count the FULL late time (not reduced by grace period)
-            var graceMinutes = shift?.GracePeriodMinutes ?? 0;
+            // Priority: Shift-level grace period → TenantSettings grace period → 0
+            var graceMinutes = shift?.GracePeriodMinutes
+                ?? await GetTenantLateGracePeriodAsync(cancellationToken)
+                ?? 0;
 
             if (lateMinutes <= 0)
             {
@@ -924,7 +930,7 @@ public class AttendanceCalculationService : IAttendanceCalculationService
             // Example: Check-in 09:15 + 8 hours = Required end time 17:15
             // If checkout at 16:30, then early leave = 17:15 - 16:30 = 45 minutes
 
-            var requiredWorkingHours = 8.0m; // Standard 8-hour shift
+            var requiredWorkingHours = shift.RequiredHours ?? 8.0m;
             var requiredEndTime = TimeOnly.FromDateTime(actualCheckInTime.Value).AddMinutes((int)(requiredWorkingHours * 60));
 
             // Apply flexible hours constraints
@@ -956,7 +962,15 @@ public class AttendanceCalculationService : IAttendanceCalculationService
         var earlySpan = requiredEndDateTime - actualCheckOutTime.Value;
         var earlyMinutes = (int)earlySpan.TotalMinutes;
 
-        return Math.Max(0, earlyMinutes);
+        if (earlyMinutes <= 0)
+            return 0;
+
+        // Apply early leave grace period from TenantSettings
+        var earlyLeaveGrace = await GetTenantEarlyLeaveGracePeriodAsync(cancellationToken) ?? 0;
+        if (earlyMinutes <= earlyLeaveGrace)
+            return 0;
+
+        return earlyMinutes;
     }
 
     public async Task<TransactionValidationResult> ValidateTransactionSequenceAsync(
@@ -1236,7 +1250,7 @@ public class AttendanceCalculationService : IAttendanceCalculationService
             if (shift != null && shift.AllowFlexibleHours && actualCheckInTime.HasValue)
             {
                 // For flexible shifts, employee must work the full required hours from check-in time
-                var requiredWorkingHours = 8.0m; // Standard 8-hour shift
+                var requiredWorkingHours = shift.RequiredHours ?? 8.0m;
                 var requiredEndTime = TimeOnly.FromDateTime(actualCheckInTime.Value).AddMinutes((int)(requiredWorkingHours * 60));
 
                 // Apply flexible hours constraints
@@ -1303,4 +1317,50 @@ public class AttendanceCalculationService : IAttendanceCalculationService
         int EarlyLeaveMinutesOffset,
         bool IsFullDayExcuse,
         ExcuseType? DominantExcuseType);
+
+    // ── TenantSettings Helpers ────────────────────────────────
+
+    /// <summary>
+    /// Gets the tenant-level late grace period from TenantSettings.
+    /// Returns null if resolver is not available or no settings configured.
+    /// Shift-level grace period takes priority over this.
+    /// </summary>
+    private async Task<int?> GetTenantLateGracePeriodAsync(CancellationToken ct)
+    {
+        if (_tenantSettingsResolver == null) return null;
+        try
+        {
+            // Resolve tenant from the first employee's branch in the current context
+            var resolved = await _tenantSettingsResolver.GetSettingsAsync(await GetCurrentTenantIdAsync(ct), ct: ct);
+            return resolved.LateGracePeriodMinutes > 0 ? resolved.LateGracePeriodMinutes : null;
+        }
+        catch { return null; }
+    }
+
+    /// <summary>
+    /// Gets the tenant-level early leave grace period from TenantSettings.
+    /// </summary>
+    private async Task<int?> GetTenantEarlyLeaveGracePeriodAsync(CancellationToken ct)
+    {
+        if (_tenantSettingsResolver == null) return null;
+        try
+        {
+            var resolved = await _tenantSettingsResolver.GetSettingsAsync(await GetCurrentTenantIdAsync(ct), ct: ct);
+            return resolved.EarlyLeaveGracePeriodMinutes > 0 ? resolved.EarlyLeaveGracePeriodMinutes : null;
+        }
+        catch { return null; }
+    }
+
+    /// <summary>
+    /// Resolves the current tenant ID from the first available tenant.
+    /// </summary>
+    private async Task<long> GetCurrentTenantIdAsync(CancellationToken ct)
+    {
+        var tenant = await _context.Tenants
+            .Where(t => t.IsActive && !t.IsDeleted)
+            .OrderBy(t => t.Id)
+            .Select(t => t.Id)
+            .FirstOrDefaultAsync(ct);
+        return tenant;
+    }
 }

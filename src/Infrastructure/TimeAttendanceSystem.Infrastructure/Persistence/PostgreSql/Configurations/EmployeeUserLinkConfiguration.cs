@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TimeAttendanceSystem.Domain.Employees;
+using TecAxle.Hrms.Domain.Employees;
 
-namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Configurations;
+namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Configurations;
 
 public class EmployeeUserLinkConfiguration : IEntityTypeConfiguration<EmployeeUserLink>
 {

@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Domain.Workflows.Enums;
+namespace TecAxle.Hrms.Domain.Workflows.Enums;
 
 /// <summary>
 /// Defines how the approver is determined for a workflow step.

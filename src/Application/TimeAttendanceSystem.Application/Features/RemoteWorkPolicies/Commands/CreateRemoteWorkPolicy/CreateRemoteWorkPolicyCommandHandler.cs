@@ -1,10 +1,10 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Domain.RemoteWork;
-using TimeAttendanceSystem.Shared.Common.Exceptions;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Domain.RemoteWork;
+using TecAxle.Hrms.Shared.Common.Exceptions;
 
-namespace TimeAttendanceSystem.Application.Features.RemoteWorkPolicies.Commands.CreateRemoteWorkPolicy;
+namespace TecAxle.Hrms.Application.Features.RemoteWorkPolicies.Commands.CreateRemoteWorkPolicy;
 
 /// <summary>
 /// Handler for creating a new remote work policy.

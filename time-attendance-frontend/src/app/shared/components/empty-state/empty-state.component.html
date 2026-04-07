@@ -1,43 +1,71 @@
-<div class="empty-state text-center" [class]="getPaddingClass()">
-  <!-- Icon -->
-  <i [class]="icon + ' ' + getIconSize() + ' text-muted mb-3'"></i>
-
-  <!-- Title -->
-  @if (title) {
-    <h5 class="empty-state-title mb-2">{{ title }}</h5>
-  }
-
-  <!-- Message -->
-  <p class="text-muted mb-3">{{ message }}</p>
-
-  <!-- Actions -->
-  <div class="empty-state-actions">
+@if (variant === 'module-disabled') {
+  <div class="empty-state text-center py-5">
+    <div class="module-disabled-icon mb-3">
+      <i class="fa-solid fa-lock fa-3x text-muted"></i>
+    </div>
+    <h5 class="empty-state-title mb-2">{{ title || 'Module Not Available' }}</h5>
+    <p class="text-muted mb-1">{{ message || 'This feature is not included in your organization\'s current plan.' }}</p>
+    @if (moduleName) {
+      <p class="text-muted small mb-3">{{ moduleName }}</p>
+    }
     @if (actionText) {
-      <button
-        type="button"
-        class="btn btn-primary"
-        (click)="onActionClick()">
+      <button type="button" class="btn btn-primary" (click)="onActionClick()">
         @if (actionIcon) {
           <i [class]="actionIcon + ' me-2'"></i>
         }
         {{ actionText }}
       </button>
     }
-
-    @if (showClearFilters) {
-      <button
-        type="button"
-        class="btn btn-outline-secondary"
-        [class.ms-2]="actionText"
-        (click)="onClearFiltersClick()">
-        <i class="fa-solid fa-filter-circle-xmark me-2"></i>
-        {{ clearFiltersText }}
+  </div>
+} @else if (variant === 'feature-locked') {
+  <div class="empty-state text-center py-5">
+    <div class="feature-locked-icon mb-3">
+      <i class="fa-solid fa-shield-halved fa-3x text-muted"></i>
+    </div>
+    <h5 class="empty-state-title mb-2">{{ title || 'Feature Locked' }}</h5>
+    <p class="text-muted mb-3">{{ message || 'Upgrade your plan to access this feature.' }}</p>
+    @if (actionText) {
+      <button type="button" class="btn btn-primary" (click)="onActionClick()">
+        @if (actionIcon) {
+          <i [class]="actionIcon + ' me-2'"></i>
+        }
+        {{ actionText }}
       </button>
     }
   </div>
+} @else {
+  <!-- Default empty state -->
+  <div class="empty-state text-center" [class]="getPaddingClass()">
+    <i [class]="icon + ' ' + getIconSize() + ' text-muted mb-3'"></i>
 
-  <!-- Custom content slot -->
-  <div class="empty-state-custom mt-3">
-    <ng-content></ng-content>
+    @if (title) {
+      <h5 class="empty-state-title mb-2">{{ title }}</h5>
+    }
+
+    <p class="text-muted mb-3">{{ message }}</p>
+
+    <div class="empty-state-actions">
+      @if (actionText) {
+        <button type="button" class="btn btn-primary" (click)="onActionClick()">
+          @if (actionIcon) {
+            <i [class]="actionIcon + ' me-2'"></i>
+          }
+          {{ actionText }}
+        </button>
+      }
+
+      @if (showClearFilters) {
+        <button type="button" class="btn btn-outline-secondary"
+                [class.ms-2]="actionText"
+                (click)="onClearFiltersClick()">
+          <i class="fa-solid fa-filter-circle-xmark me-2"></i>
+          {{ clearFiltersText }}
+        </button>
+      }
+    </div>
+
+    <div class="empty-state-custom mt-3">
+      <ng-content></ng-content>
+    </div>
   </div>
-</div>
+}

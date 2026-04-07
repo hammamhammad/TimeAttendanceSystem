@@ -1,7 +1,7 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Tenants.Queries.DiscoverTenant;
+namespace TecAxle.Hrms.Application.Tenants.Queries.DiscoverTenant;
 
 /// <summary>
 /// Query to discover tenant configuration by subdomain or custom domain.

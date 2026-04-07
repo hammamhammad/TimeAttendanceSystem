@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace TimeAttendanceSystem.Application.Excuses.Commands.ToggleExcusePolicyStatus;
+namespace TecAxle.Hrms.Application.Excuses.Commands.ToggleExcusePolicyStatus;
 
 /// <summary>
 /// Fluent Validation rules for ToggleExcusePolicyStatusCommand.

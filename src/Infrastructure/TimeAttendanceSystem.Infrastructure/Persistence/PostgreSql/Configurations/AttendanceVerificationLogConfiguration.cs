@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TimeAttendanceSystem.Domain.Attendance;
+using TecAxle.Hrms.Domain.Attendance;
 
-namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Configurations;
+namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Configurations;
 
 /// <summary>
 /// Entity Framework configuration for the AttendanceVerificationLog entity.

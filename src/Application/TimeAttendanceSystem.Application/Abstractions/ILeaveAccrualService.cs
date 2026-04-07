@@ -1,7 +1,7 @@
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.LeaveManagement;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.LeaveManagement;
 
-namespace TimeAttendanceSystem.Application.Abstractions;
+namespace TecAxle.Hrms.Application.Abstractions;
 
 /// <summary>
 /// Service interface for leave accrual calculations and balance management.

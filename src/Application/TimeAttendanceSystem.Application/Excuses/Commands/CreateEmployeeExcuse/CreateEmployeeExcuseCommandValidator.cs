@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace TimeAttendanceSystem.Application.Excuses.Commands.CreateEmployeeExcuse;
+namespace TecAxle.Hrms.Application.Excuses.Commands.CreateEmployeeExcuse;
 
 /// <summary>
 /// Fluent Validation rules for CreateEmployeeExcuseCommand.

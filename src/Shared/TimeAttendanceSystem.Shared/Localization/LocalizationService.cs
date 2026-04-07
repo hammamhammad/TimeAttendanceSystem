@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Localization;
 using System.Globalization;
 
-namespace TimeAttendanceSystem.Shared.Localization;
+namespace TecAxle.Hrms.Shared.Localization;
 
 public class LocalizationService
 {

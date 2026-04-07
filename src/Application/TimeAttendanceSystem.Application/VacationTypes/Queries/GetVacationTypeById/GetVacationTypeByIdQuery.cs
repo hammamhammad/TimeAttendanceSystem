@@ -1,7 +1,9 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.VacationTypes.Queries.GetVacationTypeById;
+namespace TecAxle.Hrms.Application.VacationTypes.Queries.GetVacationTypeById;
 
 /// <summary>
 /// CQRS query for retrieving a single vacation type by its unique identifier.
@@ -64,4 +66,5 @@ namespace TimeAttendanceSystem.Application.VacationTypes.Queries.GetVacationType
 /// - Administrative dashboard with stats: GetVacationTypeByIdQuery(123, true)
 /// - API endpoint for single vacation type: GetVacationTypeByIdQuery(id)
 /// </remarks>
+[RequiresModule(SystemModule.LeaveManagement, AllowReadWhenDisabled = true)]
 public record GetVacationTypeByIdQuery(long Id, bool IncludeUsageStatistics = false) : IRequest<Result<VacationTypeDetailDto>>;

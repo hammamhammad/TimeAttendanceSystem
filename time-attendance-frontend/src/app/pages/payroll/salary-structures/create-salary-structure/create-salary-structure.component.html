@@ -1,0 +1,141 @@
+<div class="app-modern-form">
+  <app-form-header
+    [mode]="isEditMode() ? 'edit' : 'create'"
+    [title]="isEditMode() ? i18n.t('payroll.salary_structures.edit') : i18n.t('payroll.salary_structures.create')"
+    moduleName="payroll.salary_structures"
+    moduleRoute="payroll/salary-structures"
+    [entityId]="editId() || undefined">
+  </app-form-header>
+
+  @if (loading()) {
+    <div class="text-center py-5"><app-loading-spinner /></div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <app-form-section [title]="i18n.t('common.basic_info')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="name" formControlName="name" placeholder="Name">
+            <label for="name">{{ i18n.t('common.name') }}</label>
+          </div>
+          <small class="text-muted">{{ i18n.t('payroll.salary_structures.hints.name') }}</small>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="nameAr" formControlName="nameAr" placeholder="Name (Arabic)">
+            <label for="nameAr">{{ i18n.t('common.name_ar') }}</label>
+          </div>
+          <small class="text-muted">{{ i18n.t('payroll.salary_structures.hints.name_ar') }}</small>
+        </div>
+        <div class="col-md-12">
+          <div class="form-floating">
+            <textarea class="form-control" id="description" formControlName="description" placeholder="Description" style="height: 80px"></textarea>
+            <label for="description">{{ i18n.t('common.description') }}</label>
+          </div>
+          <small class="text-muted">{{ i18n.t('payroll.salary_structures.hints.description') }}</small>
+        </div>
+        <div class="col-md-6">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('common.branch') }}</label>
+            <app-searchable-select [options]="branchOptions" [placeholder]="i18n.t('common.select')" [value]="form.get('branchId')?.value" (selectionChange)="form.get('branchId')?.setValue($event)" />
+          </div>
+          <small class="text-muted">{{ i18n.t('payroll.salary_structures.hints.branch') }}</small>
+        </div>
+        <div class="col-md-6">
+          <div class="form-check mt-3">
+            <input type="checkbox" class="form-check-input" id="isActive" formControlName="isActive">
+            <label class="form-check-label" for="isActive">{{ i18n.t('common.active') }}</label>
+          </div>
+        </div>
+      </div>
+    </app-form-section>
+
+    <app-form-section [title]="i18n.t('payroll.salary_structures.components')" variant="modern">
+      <div formArrayName="components">
+        @for (comp of components.controls; track $index; let i = $index) {
+          <div class="card mb-3" [formGroupName]="i">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="mb-0">{{ i18n.t('payroll.salary_structures.component') }} #{{ i + 1 }}</h6>
+                <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeComponent(i)">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <div class="form-floating">
+                    <input type="text" class="form-control" [id]="'compName' + i" formControlName="name" placeholder="Name">
+                    <label [for]="'compName' + i">{{ i18n.t('common.name') }}</label>
+                  </div>
+                  <small class="text-muted">{{ i18n.t('payroll.salary_structures.hints.component_name') }}</small>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-floating">
+                    <select class="form-select" [id]="'compType' + i" formControlName="type">
+                      @for (opt of componentTypeOptions(); track opt.value) {
+                        <option [ngValue]="opt.value">{{ opt.label }}</option>
+                      }
+                    </select>
+                    <label [for]="'compType' + i">{{ i18n.t('payroll.salary_structures.component_type') }}</label>
+                  </div>
+                  <small class="text-muted">{{ i18n.t('payroll.salary_structures.hints.component_type') }}</small>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-floating">
+                    <select class="form-select" [id]="'calcType' + i" formControlName="calculationType">
+                      @for (opt of calculationTypeOptions; track opt.value) {
+                        <option [ngValue]="opt.value">{{ i18n.t('payroll.calculation_types.' + opt.label) }}</option>
+                      }
+                    </select>
+                    <label [for]="'calcType' + i">{{ i18n.t('payroll.salary_structures.calculation_type') }}</label>
+                  </div>
+                  <small class="text-muted">{{ i18n.t('payroll.salary_structures.hints.calculation_type') }}</small>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-floating">
+                    <input type="number" class="form-control" [id]="'amount' + i" formControlName="amount" placeholder="Amount">
+                    <label [for]="'amount' + i">{{ i18n.t('common.amount') }}</label>
+                  </div>
+                  <small class="text-muted">{{ i18n.t('payroll.salary_structures.hints.amount') }}</small>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-floating">
+                    <input type="number" class="form-control" [id]="'percentage' + i" formControlName="percentage" placeholder="Percentage">
+                    <label [for]="'percentage' + i">{{ i18n.t('common.percentage') }}</label>
+                  </div>
+                  <small class="text-muted">{{ i18n.t('payroll.salary_structures.hints.percentage') }}</small>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-check mt-3">
+                    <input type="checkbox" class="form-check-input" [id]="'taxable' + i" formControlName="isTaxable">
+                    <label class="form-check-label" [for]="'taxable' + i">{{ i18n.t('payroll.salary_structures.taxable') }}</label>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-check mt-3">
+                    <input type="checkbox" class="form-check-input" [id]="'fixed' + i" formControlName="isFixed">
+                    <label class="form-check-label" [for]="'fixed' + i">{{ i18n.t('payroll.salary_structures.fixed') }}</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+      <button type="button" class="btn btn-outline-primary" (click)="addComponent()">
+        <i class="fa-solid fa-plus me-2"></i>{{ i18n.t('payroll.salary_structures.add_component') }}
+      </button>
+    </app-form-section>
+
+    <div class="app-form-actions">
+      <button type="button" class="btn btn-secondary" routerLink="/payroll/salary-structures">{{ i18n.t('common.cancel') }}</button>
+      <button type="submit" class="btn btn-primary" [disabled]="form.invalid || submitting()">
+        @if (submitting()) {
+          <span class="spinner-border spinner-border-sm me-2"></span>
+        }
+        {{ i18n.t('common.save') }}
+      </button>
+    </div>
+  </form>
+</div>

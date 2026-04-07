@@ -1,9 +1,9 @@
 using OtpNet;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
 using System.Security.Cryptography;
 
-namespace TimeAttendanceSystem.Infrastructure.Services;
+namespace TecAxle.Hrms.Infrastructure.Services;
 
 public class TwoFactorService : ITwoFactorService
 {
@@ -13,7 +13,7 @@ public class TwoFactorService : ITwoFactorService
         return Base32Encoding.ToString(key);
     }
 
-    public string GenerateQrCodeUri(string email, string secretKey, string issuer = "TimeAttendanceSystem")
+    public string GenerateQrCodeUri(string email, string secretKey, string issuer = "TecAxle.Hrms")
     {
         // Format: otpauth://totp/{issuer}:{email}?secret={secret}&issuer={issuer}
         return $"otpauth://totp/{Uri.EscapeDataString(issuer)}:{Uri.EscapeDataString(email)}?secret={secretKey}&issuer={Uri.EscapeDataString(issuer)}";

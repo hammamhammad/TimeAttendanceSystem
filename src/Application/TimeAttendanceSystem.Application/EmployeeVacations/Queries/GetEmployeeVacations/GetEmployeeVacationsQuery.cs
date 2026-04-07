@@ -1,8 +1,10 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Application.EmployeeVacations.Queries.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.EmployeeVacations.Queries.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.EmployeeVacations.Queries.GetEmployeeVacations;
+namespace TecAxle.Hrms.Application.EmployeeVacations.Queries.GetEmployeeVacations;
 
 /// <summary>
 /// CQRS query for retrieving employee vacation records with filtering and pagination.
@@ -42,6 +44,7 @@ namespace TimeAttendanceSystem.Application.EmployeeVacations.Queries.GetEmployee
 /// - Pagination prevents large result sets
 /// - Lazy loading disabled for predictable performance
 /// </remarks>
+[RequiresModule(SystemModule.LeaveManagement, AllowReadWhenDisabled = true)]
 public record GetEmployeeVacationsQuery(
     long? EmployeeId = null,
     long? VacationTypeId = null,

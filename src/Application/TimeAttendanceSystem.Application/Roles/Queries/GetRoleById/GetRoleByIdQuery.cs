@@ -1,7 +1,7 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Application.Roles.Queries.GetRoles;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Roles.Queries.GetRoles;
 
-namespace TimeAttendanceSystem.Application.Roles.Queries.GetRoleById;
+namespace TecAxle.Hrms.Application.Roles.Queries.GetRoleById;
 
 public record GetRoleByIdQuery(long Id) : IRequest<Result<RoleDto>>;

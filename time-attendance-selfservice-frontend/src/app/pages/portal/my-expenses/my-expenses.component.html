@@ -1,0 +1,126 @@
+<!-- Page Header -->
+<app-page-header [title]="i18n.t('portal.expenses.title')">
+  <div header-actions>
+    <button
+      class="btn btn-primary btn-sm me-2"
+      (click)="openNewClaim()"
+      type="button">
+      <i class="bi bi-plus me-1"></i>{{ i18n.t('portal.expenses.new_claim') }}
+    </button>
+    <button
+      class="btn btn-outline-primary btn-sm"
+      (click)="refresh()"
+      [disabled]="loading()"
+      type="button">
+      <i class="bi bi-arrow-clockwise" [class.spin]="loading()"></i>
+      {{ i18n.t('common.refresh') }}
+    </button>
+  </div>
+</app-page-header>
+
+<!-- Loading State (only when no data) -->
+@if (loading() && claims().length === 0) {
+  <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+}
+
+<!-- Error State -->
+@if (error() && claims().length === 0) {
+  <div class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle me-2"></i>{{ error() }}
+    <button class="btn btn-sm btn-outline-danger ms-3" (click)="refresh()" type="button">{{ i18n.t('common.retry') }}</button>
+  </div>
+}
+
+<!-- Empty State -->
+@if (!loading() && claims().length === 0 && !error()) {
+  <app-empty-state
+    icon="bi bi-receipt"
+    [title]="i18n.t('portal.expenses.no_claims')">
+  </app-empty-state>
+}
+
+<!-- Data Table -->
+@if (claims().length > 0) {
+  <div class="card">
+    <div class="card-body">
+      <app-data-table
+        [data]="tableData()"
+        [columns]="columns"
+        [actions]="tableActions()"
+        [loading]="loading()"
+        [paginated]="true"
+        [pageSize]="10">
+      </app-data-table>
+    </div>
+  </div>
+
+  <!-- Info Card -->
+  <div class="card mt-3">
+    <div class="card-body">
+      <div class="d-flex align-items-start">
+        <i class="bi bi-info-circle text-info me-3 mt-1" style="font-size: 1.5rem;"></i>
+        <div>
+          <h6 class="mb-2">{{ i18n.t('portal.expenses.info_title') }}</h6>
+          <p class="text-muted mb-0 small">{{ i18n.t('portal.expenses.info_text') }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- New Expense Claim Modal -->
+@if (showModal()) {
+  <app-modal-wrapper [title]="i18n.t('portal.expenses.new_claim')" [show]="showModal()" (close)="showModal.set(false)" size="lg">
+    <div class="app-modern-form">
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="title" placeholder="Title" [ngModel]="claimTitle()" (ngModelChange)="claimTitle.set($event)">
+            <label for="title">{{ i18n.t('portal.expenses.title_field') }} *</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="desc" placeholder="Description" [ngModel]="claimDescription()" (ngModelChange)="claimDescription.set($event)">
+            <label for="desc">{{ i18n.t('common.description') }}</label>
+          </div>
+        </div>
+      </div>
+
+      <h6 class="mb-2">{{ i18n.t('portal.expenses.items') }}</h6>
+      @for (item of items(); track $index; let idx = $index) {
+        <div class="row g-2 mb-2 align-items-end">
+          <div class="col-md-3">
+            <select class="form-select form-select-sm" [ngModel]="item.categoryId" (ngModelChange)="updateItem(idx, 'categoryId', $event)">
+              <option [ngValue]="0">{{ i18n.t('portal.expenses.select_category') }}</option>
+              @for (c of categories(); track c.id) { <option [ngValue]="c.id">{{ c.name }}</option> }
+            </select>
+          </div>
+          <div class="col-md-3">
+            <input type="text" class="form-control form-control-sm" [placeholder]="i18n.t('common.description')" [ngModel]="item.description"
+              (ngModelChange)="updateItem(idx, 'description', $event)">
+          </div>
+          <div class="col-md-2">
+            <input type="number" class="form-control form-control-sm" placeholder="0.00" [ngModel]="item.amount"
+              (ngModelChange)="updateItem(idx, 'amount', $event)">
+          </div>
+          <div class="col-md-3">
+            <input type="date" class="form-control form-control-sm" [ngModel]="item.expenseDate"
+              (ngModelChange)="updateItem(idx, 'expenseDate', $event)">
+          </div>
+          <div class="col-md-1">
+            @if (items().length > 1) {
+              <button class="btn btn-sm btn-outline-danger" (click)="removeItem(idx)"><i class="bi bi-x"></i></button>
+            }
+          </div>
+        </div>
+      }
+      <button class="btn btn-sm btn-outline-primary mb-3" (click)="addItem()"><i class="bi bi-plus me-1"></i>{{ i18n.t('portal.expenses.add_item') }}</button>
+
+      <div class="app-form-actions">
+        <button class="btn btn-secondary" (click)="showModal.set(false)">{{ i18n.t('common.cancel') }}</button>
+        <button class="btn btn-primary" (click)="submitClaim()" [disabled]="saving()">{{ i18n.t('common.submit') }}</button>
+      </div>
+    </div>
+  </app-modal-wrapper>
+}

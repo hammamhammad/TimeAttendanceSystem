@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Application.Common;
+namespace TecAxle.Hrms.Application.Common;
 
 /// <summary>
 /// Generic container for paginated query results with comprehensive pagination metadata.

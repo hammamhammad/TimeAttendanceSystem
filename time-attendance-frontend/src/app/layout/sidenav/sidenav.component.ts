@@ -4,6 +4,7 @@ import { RouterModule, Router } from '@angular/router';
 import { MenuService, MenuItem } from '../../core/menu/menu.service';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { PermissionService } from '../../core/auth/permission.service';
+import { EntitlementService } from '../../core/services/entitlement.service';
 
 @Component({
   selector: 'app-sidenav',
@@ -20,6 +21,7 @@ export class SidenavComponent {
   private router = inject(Router);
   public i18n = inject(I18nService);
   public permissionService = inject(PermissionService);
+  private entitlementService = inject(EntitlementService);
 
   menuItems = this.menuService.getMenuItems$();
 
@@ -40,6 +42,11 @@ export class SidenavComponent {
 
   // Check permissions for child menu items with special handling
   hasChildMenuPermission(child: MenuItem): boolean {
+    // Check module entitlement first
+    if (child.module && !this.entitlementService.isModuleEnabled(child.module)) {
+      return false;
+    }
+
     // Special case for public holidays - use the proper permission service method
     if (child.path === '/settings/public-holidays') {
       return this.permissionService.canReadPublicHolidays();
@@ -51,6 +58,11 @@ export class SidenavComponent {
 
   // Special permission check for parent menus that should show with any related permission
   hasParentMenuPermission(item: MenuItem): boolean {
+    // Check module entitlement first
+    if (item.module && !this.entitlementService.isModuleEnabled(item.module)) {
+      return false;
+    }
+
     // Special case for shift menu - show if user has any shift-related permission
     if (item.path === '/shifts') {
       return this.permissionService.canAccessShifts();
@@ -63,8 +75,8 @@ export class SidenavComponent {
              this.permissionService.has('attendance.calculate');
     }
 
-    // Special case for reports menu - show if user has access to any child report
-    if (item.path === '/reports') {
+    // For any item with children, only show if at least one child is accessible
+    if (item.children && item.children.length > 0) {
       return this.hasVisibleChildren(item);
     }
 

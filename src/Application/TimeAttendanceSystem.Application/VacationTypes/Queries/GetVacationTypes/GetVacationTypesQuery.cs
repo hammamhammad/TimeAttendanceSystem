@@ -1,7 +1,9 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.VacationTypes.Queries.GetVacationTypes;
+namespace TecAxle.Hrms.Application.VacationTypes.Queries.GetVacationTypes;
 
 /// <summary>
 /// CQRS query for retrieving paginated vacation type lists with advanced filtering capabilities.
@@ -80,6 +82,7 @@ namespace TimeAttendanceSystem.Application.VacationTypes.Queries.GetVacationType
 /// - Vacation types requiring approval: GetVacationTypesQuery(RequiresApproval: true)
 /// - Specific accrual type: GetVacationTypesQuery(AccrualType: "Monthly")
 /// </remarks>
+[RequiresModule(SystemModule.LeaveManagement, AllowReadWhenDisabled = true)]
 public record GetVacationTypesQuery(
     int Page = 1,
     int PageSize = 10,

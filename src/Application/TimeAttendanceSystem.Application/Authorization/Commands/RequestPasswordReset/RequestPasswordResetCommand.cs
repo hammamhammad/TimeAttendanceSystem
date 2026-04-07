@@ -1,6 +1,6 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Authorization.Commands.RequestPasswordReset;
+namespace TecAxle.Hrms.Application.Authorization.Commands.RequestPasswordReset;
 
 public record RequestPasswordResetCommand(string Email) : IRequest<Result<bool>>;

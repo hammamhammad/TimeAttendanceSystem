@@ -1,0 +1,147 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header [title]="i18n.t(isEditMode() ? 'succession.talent_profiles.edit' : 'succession.talent_profiles.create')" moduleName="talent_profiles" moduleRoute="succession/talent-profiles" />
+  @if (loadingData()) {
+    <div class="text-center py-5"><app-loading-spinner [message]="i18n.t('common.loading')" [variant]="'primary'" [centered]="true" /></div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <app-form-section [title]="i18n.t('common.basic_info')" [variant]="'modern'">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="app-modern-field">
+              <label class="app-modern-label">{{ i18n.t('succession.talent_profiles.employee') }} <span class="text-danger">*</span></label>
+              <app-searchable-select [options]="employeeOptions()" [formControl]="$any(form.get('employeeId'))" [placeholder]="i18n.t('common.select')" [disabled]="isEditMode()" />
+            </div>
+          </div>
+          <div class="col-md-6"><div class="form-floating"><input type="date" class="form-control" id="lastAssessmentDate" formControlName="lastAssessmentDate" placeholder="x"><label for="lastAssessmentDate">{{ i18n.t('succession.talent_profiles.last_assessment_date') }}</label></div></div>
+        </div>
+      </app-form-section>
+
+      <app-form-section [title]="i18n.t('succession.talent_profiles.ratings')" [variant]="'modern'">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="form-floating">
+              <select class="form-select" id="performanceRating" formControlName="performanceRating">
+                <option value="">{{ i18n.t('common.select') }}</option>
+                <option value="Unsatisfactory">{{ i18n.t('succession.enums.Unsatisfactory') }}</option>
+                <option value="NeedsImprovement">{{ i18n.t('succession.enums.NeedsImprovement') }}</option>
+                <option value="MeetsExpectations">{{ i18n.t('succession.enums.MeetsExpectations') }}</option>
+                <option value="ExceedsExpectations">{{ i18n.t('succession.enums.ExceedsExpectations') }}</option>
+                <option value="Outstanding">{{ i18n.t('succession.enums.Outstanding') }}</option>
+              </select>
+              <label for="performanceRating">{{ i18n.t('succession.talent_profiles.performance_rating') }}</label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-floating">
+              <select class="form-select" id="potentialRating" formControlName="potentialRating">
+                <option value="Low">{{ i18n.t('succession.enums.Low') }}</option>
+                <option value="Moderate">{{ i18n.t('succession.enums.Moderate') }}</option>
+                <option value="High">{{ i18n.t('succession.enums.High') }}</option>
+                <option value="VeryHigh">{{ i18n.t('succession.enums.VeryHigh') }}</option>
+              </select>
+              <label for="potentialRating">{{ i18n.t('succession.talent_profiles.potential_rating') }} <span class="text-danger">*</span></label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-floating">
+              <select class="form-select" id="nineBoxPosition" formControlName="nineBoxPosition">
+                <option value="LowPerformanceLowPotential">{{ i18n.t('succession.enums.LowPerformanceLowPotential') }}</option>
+                <option value="LowPerformanceModeratePotential">{{ i18n.t('succession.enums.LowPerformanceModeratePotential') }}</option>
+                <option value="LowPerformanceHighPotential">{{ i18n.t('succession.enums.LowPerformanceHighPotential') }}</option>
+                <option value="ModeratePerformanceLowPotential">{{ i18n.t('succession.enums.ModeratePerformanceLowPotential') }}</option>
+                <option value="ModeratePerformanceModeratePotential">{{ i18n.t('succession.enums.ModeratePerformanceModeratePotential') }}</option>
+                <option value="ModeratePerformanceHighPotential">{{ i18n.t('succession.enums.ModeratePerformanceHighPotential') }}</option>
+                <option value="HighPerformanceLowPotential">{{ i18n.t('succession.enums.HighPerformanceLowPotential') }}</option>
+                <option value="HighPerformanceModeratePotential">{{ i18n.t('succession.enums.HighPerformanceModeratePotential') }}</option>
+                <option value="HighPerformanceHighPotential">{{ i18n.t('succession.enums.HighPerformanceHighPotential') }}</option>
+              </select>
+              <label for="nineBoxPosition">{{ i18n.t('succession.talent_profiles.nine_box') }} <span class="text-danger">*</span></label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-floating">
+              <select class="form-select" id="readinessLevel" formControlName="readinessLevel">
+                <option value="NotReady">{{ i18n.t('succession.enums.NotReady') }}</option>
+                <option value="DevelopmentNeeded">{{ i18n.t('succession.enums.DevelopmentNeeded') }}</option>
+                <option value="ReadyWithDevelopment">{{ i18n.t('succession.enums.ReadyWithDevelopment') }}</option>
+                <option value="ReadyNow">{{ i18n.t('succession.enums.ReadyNow') }}</option>
+              </select>
+              <label for="readinessLevel">{{ i18n.t('succession.talent_profiles.readiness') }} <span class="text-danger">*</span></label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-floating">
+              <select class="form-select" id="retentionRisk" formControlName="retentionRisk">
+                <option value="Low">{{ i18n.t('succession.enums.Low') }}</option>
+                <option value="Medium">{{ i18n.t('succession.enums.Medium') }}</option>
+                <option value="High">{{ i18n.t('succession.enums.High') }}</option>
+                <option value="Critical">{{ i18n.t('succession.enums.Critical') }}</option>
+              </select>
+              <label for="retentionRisk">{{ i18n.t('succession.talent_profiles.retention_risk') }} <span class="text-danger">*</span></label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-check form-switch mt-3">
+              <input class="form-check-input" type="checkbox" id="isHighPotential" formControlName="isHighPotential">
+              <label class="form-check-label" for="isHighPotential">{{ i18n.t('succession.talent_profiles.high_potential') }}</label>
+            </div>
+          </div>
+          @if (isEditMode()) {
+            <div class="col-md-6">
+              <div class="form-check form-switch mt-3">
+                <input class="form-check-input" type="checkbox" id="isActive" formControlName="isActive">
+                <label class="form-check-label" for="isActive">{{ i18n.t('common.active') }}</label>
+              </div>
+            </div>
+          }
+        </div>
+      </app-form-section>
+
+      <app-form-section [title]="i18n.t('succession.talent_profiles.development_info')" [variant]="'modern'">
+        <div class="row g-3">
+          <div class="col-md-6"><div class="form-floating"><textarea class="form-control" id="careerAspiration" formControlName="careerAspiration" placeholder="x" style="height:80px"></textarea><label for="careerAspiration">{{ i18n.t('succession.talent_profiles.career_aspiration') }}</label></div></div>
+          <div class="col-md-6"><div class="form-floating"><textarea class="form-control" id="careerAspirationAr" formControlName="careerAspirationAr" placeholder="x" style="height:80px" dir="rtl"></textarea><label for="careerAspirationAr">{{ i18n.t('succession.talent_profiles.career_aspiration_ar') }}</label></div></div>
+          <div class="col-md-6"><div class="form-floating"><textarea class="form-control" id="strengthsSummary" formControlName="strengthsSummary" placeholder="x" style="height:80px"></textarea><label for="strengthsSummary">{{ i18n.t('succession.talent_profiles.strengths') }}</label></div></div>
+          <div class="col-md-6"><div class="form-floating"><textarea class="form-control" id="developmentAreas" formControlName="developmentAreas" placeholder="x" style="height:80px"></textarea><label for="developmentAreas">{{ i18n.t('succession.talent_profiles.development_areas') }}</label></div></div>
+          <div class="col-12"><div class="form-floating"><textarea class="form-control" id="notes" formControlName="notes" placeholder="x" style="height:80px"></textarea><label for="notes">{{ i18n.t('fields.notes') }}</label></div></div>
+        </div>
+      </app-form-section>
+
+      <app-form-section [title]="i18n.t('succession.talent_profiles.skills')" [variant]="'modern'">
+        <div class="mb-3">
+          <button type="button" class="btn btn-outline-primary btn-sm" (click)="addSkill()"><i class="fas fa-plus me-1"></i>{{ i18n.t('succession.talent_profiles.add_skill') }}</button>
+        </div>
+        @for (skill of skills(); track $index) {
+          <div class="row g-2 mb-2 align-items-end">
+            <div class="col-md-3"><div class="form-floating"><input type="text" class="form-control" [id]="'skillName_'+$index" [value]="skill.skillName" (input)="updateSkill($index, 'skillName', $any($event.target).value)" placeholder="x"><label [for]="'skillName_'+$index">{{ i18n.t('succession.talent_profiles.skill_name') }}</label></div></div>
+            <div class="col-md-3"><div class="form-floating"><input type="text" class="form-control" [id]="'skillNameAr_'+$index" [value]="skill.skillNameAr" (input)="updateSkill($index, 'skillNameAr', $any($event.target).value)" placeholder="x" dir="rtl"><label [for]="'skillNameAr_'+$index">{{ i18n.t('succession.talent_profiles.skill_name_ar') }}</label></div></div>
+            <div class="col-md-2">
+              <div class="form-floating">
+                <select class="form-select" [id]="'proficiency_'+$index" [value]="skill.proficiencyLevel" (change)="updateSkill($index, 'proficiencyLevel', $any($event.target).value)">
+                  <option value="Beginner">{{ i18n.t('succession.enums.Beginner') }}</option>
+                  <option value="Intermediate">{{ i18n.t('succession.enums.Intermediate') }}</option>
+                  <option value="Advanced">{{ i18n.t('succession.enums.Advanced') }}</option>
+                  <option value="Expert">{{ i18n.t('succession.enums.Expert') }}</option>
+                </select>
+                <label [for]="'proficiency_'+$index">{{ i18n.t('succession.talent_profiles.proficiency') }}</label>
+              </div>
+            </div>
+            <div class="col-md-2"><div class="form-floating"><input type="number" class="form-control" [id]="'years_'+$index" [value]="skill.yearsOfExperience" (input)="updateSkill($index, 'yearsOfExperience', +$any($event.target).value || null)" placeholder="x"><label [for]="'years_'+$index">{{ i18n.t('succession.talent_profiles.years_exp') }}</label></div></div>
+            <div class="col-md-2 d-flex align-items-center gap-2">
+              <div class="form-check"><input class="form-check-input" type="checkbox" [checked]="skill.isVerified" (change)="updateSkill($index, 'isVerified', $any($event.target).checked)" [id]="'verified_'+$index"><label class="form-check-label" [for]="'verified_'+$index">{{ i18n.t('succession.talent_profiles.verified') }}</label></div>
+              <button type="button" class="btn btn-outline-danger btn-sm" (click)="removeSkill($index)"><i class="fas fa-times"></i></button>
+            </div>
+          </div>
+        }
+        @if (skills().length === 0) {
+          <p class="text-muted">{{ i18n.t('succession.talent_profiles.no_skills') }}</p>
+        }
+      </app-form-section>
+
+      <div class="app-form-actions">
+        <button type="button" class="btn btn-secondary" routerLink="/succession/talent-profiles">{{ i18n.t('common.cancel') }}</button>
+        <button type="submit" class="btn btn-primary" [disabled]="form.invalid || submitting()">@if (submitting()) { <span class="spinner-border spinner-border-sm me-1"></span> }{{ i18n.t('common.save') }}</button>
+      </div>
+    </form>
+  }
+</div>

@@ -1,0 +1,66 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header [title]="i18n.t('salary_advances.create')" moduleName="salary_advances" moduleRoute="loans/salary-advances" />
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <app-form-section [title]="i18n.t('common.basic_info')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('salary_advances.employee') }} <span class="text-danger">*</span></label>
+            <app-searchable-select [options]="employeeOptions" [placeholder]="i18n.t('common.select')" [value]="form.get('employeeId')?.value" (selectionChange)="form.get('employeeId')?.setValue($event)" />
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="number" class="form-control" id="amount" placeholder="0" formControlName="amount" min="1" step="0.01">
+            <label for="amount">{{ i18n.t('salary_advances.requested_amount') }} <span class="text-danger">*</span></label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <select class="form-select" id="currency" formControlName="currency">
+              <option value="SAR">SAR - Saudi Riyal</option>
+              <option value="USD">USD - US Dollar</option>
+              <option value="EUR">EUR - Euro</option>
+              <option value="GBP">GBP - British Pound</option>
+              <option value="AED">AED - UAE Dirham</option>
+              <option value="KWD">KWD - Kuwaiti Dinar</option>
+              <option value="QAR">QAR - Qatari Riyal</option>
+              <option value="BHD">BHD - Bahraini Dinar</option>
+              <option value="OMR">OMR - Omani Rial</option>
+              <option value="EGP">EGP - Egyptian Pound</option>
+              <option value="JOD">JOD - Jordanian Dinar</option>
+            </select>
+            <label for="currency">{{ i18n.t('salary_advances.currency') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="number" class="form-control" id="deductionMonth" placeholder="1" formControlName="deductionMonth" min="1" max="12">
+            <label for="deductionMonth">{{ i18n.t('salary_advances.deduction_month') }} <span class="text-danger">*</span></label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <textarea class="form-control" id="reason" placeholder="Reason" formControlName="reason" style="height:80px"></textarea>
+            <label for="reason">{{ i18n.t('salary_advances.reason') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <textarea class="form-control" id="reasonAr" placeholder="Reason (Arabic)" formControlName="reasonAr" style="height:80px"></textarea>
+            <label for="reasonAr">{{ i18n.t('salary_advances.reason_ar') }}</label>
+          </div>
+        </div>
+      </div>
+    </app-form-section>
+
+    <div class="app-form-actions">
+      <button type="button" class="btn btn-secondary" (click)="cancel()">{{ i18n.t('common.cancel') }}</button>
+      <button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving()">
+        @if (saving()) { <span class="spinner-border spinner-border-sm me-1"></span> }
+        {{ i18n.t('common.save') }}
+      </button>
+    </div>
+  </form>
+</div>

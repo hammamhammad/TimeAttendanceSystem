@@ -1,15 +1,15 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TimeAttendanceSystem.Application.Excuses.Commands.CreateExcusePolicy;
-using TimeAttendanceSystem.Application.Excuses.Commands.UpdateExcusePolicy;
-using TimeAttendanceSystem.Application.Excuses.Commands.ToggleExcusePolicyStatus;
-using TimeAttendanceSystem.Application.Excuses.Commands.DeleteExcusePolicy;
-using TimeAttendanceSystem.Application.Excuses.Queries.GetExcusePolicies;
-using TimeAttendanceSystem.Application.Excuses.Queries.GetExcusePolicyById;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Excuses.Commands.CreateExcusePolicy;
+using TecAxle.Hrms.Application.Excuses.Commands.UpdateExcusePolicy;
+using TecAxle.Hrms.Application.Excuses.Commands.ToggleExcusePolicyStatus;
+using TecAxle.Hrms.Application.Excuses.Commands.DeleteExcusePolicy;
+using TecAxle.Hrms.Application.Excuses.Queries.GetExcusePolicies;
+using TecAxle.Hrms.Application.Excuses.Queries.GetExcusePolicyById;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 /// <summary>
 /// API controller for managing excuse policies.

@@ -1,0 +1,119 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header
+    [title]="isEditMode() ? i18n.t('salary_adjustments.edit') : i18n.t('salary_adjustments.create_adjustment')"
+    moduleName="salary_adjustments"
+    moduleRoute="salary-adjustments">
+  </app-form-header>
+
+  @if (loading()) {
+    <div class="text-center py-5">
+      <app-loading-spinner [message]="i18n.t('common.loading')" [variant]="'primary'" [centered]="true" />
+    </div>
+  }
+
+  @if (!loading()) {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <app-form-section [title]="i18n.t('common.basic_info')" [variant]="'modern'">
+        <div class="row g-3">
+          <!-- Employee -->
+          <div class="col-md-6">
+            <div class="app-modern-field">
+              <label class="app-modern-label">{{ i18n.t('fields.employee') }} <span class="text-danger">*</span></label>
+              <app-searchable-select
+                [options]="employeeOptions"
+                [placeholder]="i18n.t('common.select_employee')"
+                [value]="form.get('employeeId')?.value"
+                [disabled]="submitting()"
+                (selectionChange)="form.get('employeeId')?.setValue($event)">
+              </app-searchable-select>
+            </div>
+            <small class="text-muted">{{ i18n.t('salary_adjustments.hints.employee') }}</small>
+          </div>
+
+          <!-- Adjustment Type -->
+          <div class="col-md-6">
+            <div class="app-modern-field">
+              <label class="app-modern-label">{{ i18n.t('salary_adjustments.adjustment_type') }} <span class="text-danger">*</span></label>
+              <app-searchable-select
+                [options]="adjustmentTypeOptions()"
+                [placeholder]="i18n.t('common.select')"
+                [value]="form.get('adjustmentType')?.value"
+                [disabled]="submitting()"
+                (selectionChange)="form.get('adjustmentType')?.setValue($event)">
+              </app-searchable-select>
+            </div>
+            <small class="text-muted">{{ i18n.t('salary_adjustments.hints.adjustment_type') }}</small>
+          </div>
+
+          <!-- New Base Salary -->
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input type="number" class="form-control" id="newBaseSalary" formControlName="newBaseSalary" placeholder="x" min="0">
+              <label for="newBaseSalary">{{ i18n.t('salary_adjustments.new_salary') }} <span class="text-danger">*</span></label>
+            </div>
+            <small class="text-muted">{{ i18n.t('salary_adjustments.hints.new_salary') }}</small>
+          </div>
+
+          <!-- Effective Date -->
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input type="date" class="form-control" id="effectiveDate" formControlName="effectiveDate" placeholder="x">
+              <label for="effectiveDate">{{ i18n.t('fields.effective_date') }} <span class="text-danger">*</span></label>
+            </div>
+            <small class="text-muted">{{ i18n.t('salary_adjustments.hints.effective_date') }}</small>
+          </div>
+
+          <!-- Reason -->
+          <div class="col-md-6">
+            <div class="form-floating">
+              <textarea class="form-control" id="reason" formControlName="reason" placeholder="x" style="height: 100px"></textarea>
+              <label for="reason">{{ i18n.t('fields.reason') }}</label>
+            </div>
+            <small class="text-muted">{{ i18n.t('salary_adjustments.hints.reason') }}</small>
+          </div>
+
+          <!-- Reason (Arabic) -->
+          <div class="col-md-6">
+            <div class="form-floating">
+              <textarea class="form-control" id="reasonAr" formControlName="reasonAr" placeholder="x" style="height: 100px" dir="rtl"></textarea>
+              <label for="reasonAr">{{ i18n.t('fields.reason_ar') }}</label>
+            </div>
+            <small class="text-muted">{{ i18n.t('salary_adjustments.hints.reason_ar') }}</small>
+          </div>
+
+          <!-- Justification -->
+          <div class="col-12">
+            <div class="form-floating">
+              <textarea class="form-control" id="justification" formControlName="justification" placeholder="x" style="height: 100px"></textarea>
+              <label for="justification">{{ i18n.t('salary_adjustments.justification') }}</label>
+            </div>
+            <small class="text-muted">{{ i18n.t('salary_adjustments.hints.justification') }}</small>
+          </div>
+
+          <!-- Supporting Document -->
+          <div class="col-12">
+            <label class="app-modern-label mb-2">{{ i18n.t('files.upload_document') }}</label>
+            <app-file-upload
+              [label]="i18n.t('files.upload_document')"
+              [category]="'salary-adjustments'"
+              [accept]="'.pdf,.doc,.docx,.xlsx'"
+              [currentFileUrl]="form.get('documentUrl')?.value || undefined"
+              (fileUploaded)="onFileUploaded('documentUrl', $event)">
+            </app-file-upload>
+            <small class="text-muted">{{ i18n.t('files.allowed_types') }}</small>
+          </div>
+        </div>
+      </app-form-section>
+
+      <div class="app-form-actions">
+        <button type="button" class="btn btn-secondary" routerLink="/salary-adjustments">{{ i18n.t('common.cancel') }}</button>
+        <button type="submit" class="btn btn-primary" [disabled]="form.invalid || submitting()">
+          @if (submitting()) {
+            <span class="spinner-border spinner-border-sm me-1"></span>
+          }
+          {{ i18n.t('common.save') }}
+        </button>
+      </div>
+    </form>
+  }
+</div>

@@ -1,0 +1,57 @@
+<div class="app-list-page">
+  <app-page-header [title]="i18n.t('announcements.title')" />
+  <app-unified-filter [searchPlaceholder]="i18n.t('announcements.search')" [showAddButton]="true"
+    [addButtonText]="i18n.t('announcements.create')" [showRefreshButton]="true" [refreshing]="loading()"
+    (searchChange)="onSearchChange($event)" (add)="onAdd()" (refresh)="onRefreshData()" />
+
+  <!-- Filters -->
+  <div class="row mb-3 g-2">
+    <div class="col-md-3">
+      <select class="form-select form-select-sm" [ngModel]="statusFilter()" (ngModelChange)="onStatusChange($event)">
+        <option value="">{{ i18n.t('common.all') }} - {{ i18n.t('announcements.status') }}</option>
+        @for (s of statusOptions; track s) {
+          <option [value]="s">{{ i18n.t('announcements.status_' + s) }}</option>
+        }
+      </select>
+    </div>
+    <div class="col-md-3">
+      <select class="form-select form-select-sm" [ngModel]="categoryFilter()" (ngModelChange)="onCategoryChange($event)">
+        <option value="">{{ i18n.t('common.all') }} - {{ i18n.t('announcements.category') }}</option>
+        @for (c of categoryOptions(); track c.id) {
+          <option [value]="c.id">{{ c.name }}</option>
+        }
+      </select>
+    </div>
+    <div class="col-md-3">
+      <select class="form-select form-select-sm" [ngModel]="priorityFilter()" (ngModelChange)="onPriorityChange($event)">
+        <option value="">{{ i18n.t('common.all') }} - {{ i18n.t('announcements.priority') }}</option>
+        @for (p of priorityOptions; track p) {
+          <option [value]="p">{{ i18n.t('announcements.priority_' + p) }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <app-data-table [data]="data()" [columns]="columns" [actions]="tableActions()" [currentPage]="currentPage()"
+    [totalPages]="totalPages()" [totalItems]="totalCount()" [pageSize]="pageSize()" [loading]="loading"
+    [emptyTitle]="i18n.t('announcements.no_data')" [showPagination]="true"
+    (actionClick)="onActionClick($event)" (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)">
+    <ng-template #cellTemplate let-item let-column="column">
+      @if (column.key === 'status') {
+        <span [class]="getStatusBadgeClass(item.status)">
+          {{ i18n.t('announcements.status_' + item.status) }}
+        </span>
+      } @else if (column.key === 'priority') {
+        <span [class]="getPriorityBadgeClass(item.priority)">
+          {{ i18n.t('announcements.priority_' + item.priority) }}
+        </span>
+      } @else if (column.key === 'targetAudience') {
+        {{ i18n.t('announcements.target_' + item.targetAudience) }}
+      } @else if (column.key === 'createdAtUtc') {
+        {{ item.createdAtUtc ? (item.createdAtUtc | date:'mediumDate') : '-' }}
+      } @else {
+        {{ item[column.key] ?? '-' }}
+      }
+    </ng-template>
+  </app-data-table>
+</div>

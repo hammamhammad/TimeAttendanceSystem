@@ -1,0 +1,231 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header
+    [mode]="isEditMode() ? 'edit' : 'create'"
+    [title]="isEditMode() ? t('allowance_types.edit') : t('allowance_types.create')"
+    [entityId]="editId() ?? undefined"
+    moduleName="allowance_types"
+    moduleRoute="settings/allowance-types">
+  </app-form-header>
+
+  <form #formRef="ngForm" (ngSubmit)="onSubmit()">
+    <div class="row">
+      <!-- Basic Information -->
+      <div class="col-md-6 mb-4">
+        <app-form-section [title]="t('common.basic_info')" variant="modern">
+          <div class="mb-3">
+            <div class="form-floating">
+              <input
+                type="text"
+                id="code"
+                class="form-control"
+                [(ngModel)]="form.code"
+                name="code"
+                placeholder="{{ t('allowance_types.code') }}"
+                required>
+              <label for="code">{{ t('allowance_types.code') }}</label>
+            </div>
+            <small class="text-muted">{{ t('allowance_types.hints.code') }}</small>
+            @if (validationErrors()['code']) {
+              <div class="invalid-feedback d-block">{{ validationErrors()['code'] }}</div>
+            }
+          </div>
+          <div class="mb-3">
+            <div class="form-floating">
+              <input
+                type="text"
+                id="name"
+                class="form-control"
+                [(ngModel)]="form.name"
+                name="name"
+                placeholder="{{ t('common.name') }}"
+                required>
+              <label for="name">{{ t('common.name') }}</label>
+            </div>
+            <small class="text-muted">{{ t('allowance_types.hints.name') }}</small>
+            @if (validationErrors()['name']) {
+              <div class="invalid-feedback d-block">{{ validationErrors()['name'] }}</div>
+            }
+          </div>
+          <div class="mb-3">
+            <div class="form-floating">
+              <input
+                type="text"
+                id="nameAr"
+                class="form-control"
+                [(ngModel)]="form.nameAr"
+                name="nameAr"
+                placeholder="{{ t('common.name_ar') }}">
+              <label for="nameAr">{{ t('common.name_ar') }}</label>
+            </div>
+            <small class="text-muted">{{ t('allowance_types.hints.name_ar') }}</small>
+          </div>
+          <div class="mb-3">
+            <div class="form-floating">
+              <textarea
+                id="description"
+                class="form-control"
+                [(ngModel)]="form.description"
+                name="description"
+                placeholder="{{ t('common.description') }}"
+                style="height: 80px"></textarea>
+              <label for="description">{{ t('common.description') }}</label>
+            </div>
+            <small class="text-muted">{{ t('allowance_types.hints.description') }}</small>
+          </div>
+        </app-form-section>
+      </div>
+
+      <!-- Configuration -->
+      <div class="col-md-6 mb-4">
+        <app-form-section [title]="t('common.configuration')" variant="modern">
+          <div class="mb-3">
+            <div class="form-floating">
+              <select id="category" class="form-select" [(ngModel)]="form.category" name="category" required>
+                @for (cat of categories; track cat) {
+                  <option [value]="cat">{{ getCategoryLabel(cat) }}</option>
+                }
+              </select>
+              <label for="category">{{ t('allowance_types.category') }}</label>
+            </div>
+            <small class="text-muted">{{ t('allowance_types.hints.category') }}</small>
+            @if (validationErrors()['category']) {
+              <div class="invalid-feedback d-block">{{ validationErrors()['category'] }}</div>
+            }
+          </div>
+          <div class="mb-3">
+            <div class="form-floating">
+              <select id="defaultCalculationType" class="form-select" [(ngModel)]="form.defaultCalculationType" name="defaultCalculationType" required>
+                @for (ct of calculationTypes; track ct) {
+                  <option [value]="ct">{{ getCalcTypeLabel(ct) }}</option>
+                }
+              </select>
+              <label for="defaultCalculationType">{{ t('allowance_types.default_calculation_type') }}</label>
+            </div>
+            <small class="text-muted">{{ t('allowance_types.hints.calculation_type') }}</small>
+            @if (validationErrors()['defaultCalculationType']) {
+              <div class="invalid-feedback d-block">{{ validationErrors()['defaultCalculationType'] }}</div>
+            }
+          </div>
+          @if (form.defaultCalculationType === 'Fixed') {
+            <div class="mb-3">
+              <div class="form-floating">
+                <input
+                  type="number"
+                  id="defaultAmount"
+                  class="form-control"
+                  [(ngModel)]="form.defaultAmount"
+                  name="defaultAmount"
+                  min="0"
+                  step="0.01"
+                  placeholder="{{ t('allowance_types.default_amount') }}">
+                <label for="defaultAmount">{{ t('allowance_types.default_amount') }}</label>
+              </div>
+              <small class="text-muted">{{ t('allowance_types.hints.default_amount') }}</small>
+              @if (validationErrors()['defaultAmount']) {
+                <div class="invalid-feedback d-block">{{ validationErrors()['defaultAmount'] }}</div>
+              }
+            </div>
+          } @else {
+            <div class="mb-3">
+              <div class="form-floating">
+                <input
+                  type="number"
+                  id="defaultPercentage"
+                  class="form-control"
+                  [(ngModel)]="form.defaultPercentage"
+                  name="defaultPercentage"
+                  min="0"
+                  max="100"
+                  step="0.01"
+                  placeholder="{{ t('allowance_types.default_percentage') }}">
+                <label for="defaultPercentage">{{ t('allowance_types.default_percentage') }}</label>
+              </div>
+              <small class="text-muted">{{ t('allowance_types.hints.default_percentage') }}</small>
+              @if (validationErrors()['defaultPercentage']) {
+                <div class="invalid-feedback d-block">{{ validationErrors()['defaultPercentage'] }}</div>
+              }
+            </div>
+          }
+          <div class="mb-3">
+            <div class="form-floating">
+              <select id="branchId" class="form-select" [(ngModel)]="form.branchId" name="branchId">
+                <option [ngValue]="null">{{ t('common.all_branches') }}</option>
+                @for (branch of branches(); track branch.id) {
+                  <option [ngValue]="branch.id">{{ branch.name }}</option>
+                }
+              </select>
+              <label for="branchId">{{ t('common.branch') }}</label>
+            </div>
+            <small class="text-muted">{{ t('allowance_types.hints.branch') }}</small>
+          </div>
+        </app-form-section>
+      </div>
+
+      <!-- Options -->
+      <div class="col-md-12 mb-4">
+        <app-form-section [title]="t('common.options')" variant="modern">
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <div class="form-check form-switch">
+                <input
+                  type="checkbox"
+                  class="form-check-input"
+                  id="isTaxable"
+                  [(ngModel)]="form.isTaxable"
+                  name="isTaxable">
+                <label class="form-check-label" for="isTaxable">
+                  {{ t('allowance_types.is_taxable') }}
+                </label>
+              </div>
+              <small class="text-muted">{{ t('allowance_types.hints.is_taxable') }}</small>
+            </div>
+            <div class="col-md-4 mb-3">
+              <div class="form-check form-switch">
+                <input
+                  type="checkbox"
+                  class="form-check-input"
+                  id="isSocialInsurable"
+                  [(ngModel)]="form.isSocialInsurable"
+                  name="isSocialInsurable">
+                <label class="form-check-label" for="isSocialInsurable">
+                  {{ t('allowance_types.is_social_insurable') }}
+                </label>
+              </div>
+              <small class="text-muted">{{ t('allowance_types.hints.is_social_insurable') }}</small>
+            </div>
+            @if (isEditMode()) {
+              <div class="col-md-4 mb-3">
+                <div class="form-check form-switch">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    id="isActive"
+                    [(ngModel)]="form.isActive"
+                    name="isActive">
+                  <label class="form-check-label" for="isActive">
+                    {{ t('common.active') }}
+                  </label>
+                </div>
+              </div>
+            }
+          </div>
+        </app-form-section>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="col-12">
+        <div class="app-form-actions">
+          <button type="button" class="btn btn-outline-secondary" (click)="onCancel()" [disabled]="submitting()">
+            {{ t('common.cancel') }}
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="submitting()">
+            @if (submitting()) {
+              <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            }
+            {{ t('common.save') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

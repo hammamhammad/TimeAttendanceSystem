@@ -1,11 +1,11 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using FluentValidation;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.VacationTypes;
-using TimeAttendanceSystem.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.VacationTypes;
+using TecAxle.Hrms.Application.Abstractions;
 
-namespace TimeAttendanceSystem.Application.VacationTypes.Commands.UpdateVacationType;
+namespace TecAxle.Hrms.Application.VacationTypes.Commands.UpdateVacationType;
 
 /// <summary>
 /// Command handler for updating existing vacation types in the Time Attendance System.
@@ -119,6 +119,9 @@ public class UpdateVacationTypeCommandHandler : IRequestHandler<UpdateVacationTy
         existingVacationType.BranchId = request.BranchId;
         existingVacationType.Name = request.Name.Trim();
         existingVacationType.NameAr = request.NameAr?.Trim();
+        existingVacationType.AllowHalfDay = request.AllowHalfDay;
+        existingVacationType.AllowEncashment = request.AllowEncashment;
+        existingVacationType.EncashmentMaxDays = request.AllowEncashment ? request.EncashmentMaxDays : null;
 
         // Stage 6: Database Persistence with Transaction Support
         try

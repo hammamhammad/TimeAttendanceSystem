@@ -2,11 +2,11 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.MobileAttendance.Commands.ProcessMobileTransaction;
-using TimeAttendanceSystem.Domain.Attendance;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.MobileAttendance.Commands.ProcessMobileTransaction;
+using TecAxle.Hrms.Domain.Attendance;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 /// <summary>
 /// Controller for mobile attendance transactions with GPS + NFC dual verification.

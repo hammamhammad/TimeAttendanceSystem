@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Users;
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Users;
+using TecAxle.Hrms.Domain.Common;
 using System.Security.Cryptography;
 
-namespace TimeAttendanceSystem.Application.Authorization.Commands.ResetPassword;
+namespace TecAxle.Hrms.Application.Authorization.Commands.ResetPassword;
 
 public class ResetPasswordCommandHandler : BaseHandler<ResetPasswordCommand, Result<bool>>
 {

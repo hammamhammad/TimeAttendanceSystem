@@ -1,0 +1,80 @@
+<div class="app-modern-form">
+  <div class="d-flex align-items-center mb-4">
+    <button class="btn btn-outline-secondary me-3" (click)="onCancel()">
+      <i class="fa-solid fa-arrow-left"></i>
+    </button>
+    <h4 class="mb-0">{{ isEditMode() ? i18n.t('customReports.edit') : i18n.t('customReports.create') }}</h4>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <app-form-section [title]="i18n.t('common.basic_info')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="name" formControlName="name" [placeholder]="i18n.t('customReports.name')">
+            <label for="name">{{ i18n.t('customReports.name') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="nameAr" formControlName="nameAr" [placeholder]="i18n.t('customReports.name')" dir="rtl">
+            <label for="nameAr">{{ i18n.t('customReports.name') }} ({{ i18n.t('common.arabic') }})</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <textarea class="form-control" id="description" formControlName="description" [placeholder]="i18n.t('common.description')" style="height: 80px"></textarea>
+            <label for="description">{{ i18n.t('common.description') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <select class="form-select" id="dataSource" formControlName="dataSource">
+              <option value="">{{ i18n.t('common.select') }}</option>
+              @for (ds of dataSources(); track ds.name) {
+                <option [value]="ds.name">{{ ds.displayName }}</option>
+              }
+            </select>
+            <label for="dataSource">{{ i18n.t('customReports.data_source') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-check form-switch mt-3">
+            <input class="form-check-input" type="checkbox" id="isPublic" formControlName="isPublic">
+            <label class="form-check-label" for="isPublic">{{ i18n.t('customReports.is_public') }}</label>
+          </div>
+        </div>
+      </div>
+    </app-form-section>
+
+    @if (availableColumns().length > 0) {
+      <app-form-section [title]="i18n.t('customReports.columns')" variant="modern">
+        <div class="row g-2">
+          @for (col of availableColumns(); track col.name) {
+            <div class="col-md-4">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" [id]="'col_' + col.name"
+                  [checked]="selectedColumns().includes(col.name)"
+                  (change)="toggleColumn(col.name)">
+                <label class="form-check-label" [for]="'col_' + col.name">
+                  {{ col.displayName }}
+                  <small class="text-muted">({{ col.dataType }})</small>
+                </label>
+              </div>
+            </div>
+          }
+        </div>
+      </app-form-section>
+    }
+
+    <div class="app-form-actions">
+      <button type="button" class="btn btn-secondary" (click)="onCancel()">{{ i18n.t('common.cancel') }}</button>
+      <button type="submit" class="btn btn-primary" [disabled]="form.invalid || loading()">
+        @if (loading()) {
+          <span class="spinner-border spinner-border-sm me-1"></span>
+        }
+        {{ isEditMode() ? i18n.t('common.save') : i18n.t('common.create') }}
+      </button>
+    </div>
+  </form>
+</div>

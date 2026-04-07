@@ -1,10 +1,10 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Shifts.Queries.GetShifts;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Shifts.Queries.GetShifts;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Shifts.Queries.GetDefaultShift;
+namespace TecAxle.Hrms.Application.Shifts.Queries.GetDefaultShift;
 
 public class GetDefaultShiftQueryHandler : IRequestHandler<GetDefaultShiftQuery, Result<ShiftDto?>>
 {

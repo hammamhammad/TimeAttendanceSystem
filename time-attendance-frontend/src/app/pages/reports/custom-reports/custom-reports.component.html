@@ -1,0 +1,31 @@
+<div class="container-fluid">
+  <app-page-header [title]="t('custom_reports.title')" />
+
+  <app-unified-filter
+    [searchPlaceholder]="t('custom_reports.search_placeholder')"
+    [showAddButton]="true"
+    [addButtonText]="t('custom_reports.create')"
+    [showRefreshButton]="true"
+    [refreshButtonText]="t('common.refresh')"
+    [refreshing]="loading()"
+    (searchChange)="onSearchChange($event)"
+    (add)="navigateToCreate()"
+    (refresh)="onRefreshData()">
+  </app-unified-filter>
+
+  <app-data-table
+    [columns]="tableColumns()"
+    [data]="tableData() || []"
+    [actions]="tableActions()"
+    [currentPage]="currentPage()"
+    [pageSize]="pageSize()"
+    [totalItems]="totalCount()"
+    [totalPages]="totalPages()"
+    [loading]="loading"
+    [emptyTitle]="t('custom_reports.no_records_title')"
+    [emptyMessage]="t('custom_reports.no_records')"
+    (actionClick)="onActionClick($event)"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+  </app-data-table>
+</div>

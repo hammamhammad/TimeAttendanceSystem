@@ -1,0 +1,145 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header
+    [mode]="isEdit() ? 'edit' : 'create'"
+    [title]="isEdit() ? t('benefits.plans.edit') : t('benefits.plans.create')"
+    moduleName="benefits.plans"
+    moduleRoute="benefits/plans">
+  </app-form-header>
+
+  <form (ngSubmit)="onSubmit()">
+    <app-form-section [title]="t('benefits.plans.basic_info')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="code" [(ngModel)]="form.code" name="code" placeholder="x" required>
+            <label for="code">{{ t('benefits.plans.code') }} *</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="name" [(ngModel)]="form.name" name="name" placeholder="x" required>
+            <label for="name">{{ t('common.name') }} *</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="nameAr" [(ngModel)]="form.nameAr" name="nameAr" placeholder="x">
+            <label for="nameAr">{{ t('common.name_ar') }}</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <select class="form-select" id="benefitType" [(ngModel)]="form.benefitType" name="benefitType">
+              @for (type of benefitTypes; track type) {
+                <option [value]="type">{{ t('benefits.types.' + type.toLowerCase()) }}</option>
+              }
+            </select>
+            <label for="benefitType">{{ t('benefits.plans.benefit_type') }} *</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="number" class="form-control" id="planYear" [(ngModel)]="form.planYear" name="planYear" placeholder="x" required>
+            <label for="planYear">{{ t('benefits.plans.plan_year') }} *</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <select class="form-select" id="currency" [(ngModel)]="form.currency" name="currency">
+              @for (c of currencies; track c) {
+                <option [value]="c">{{ c }}</option>
+              }
+            </select>
+            <label for="currency">{{ t('common.currency') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="effectiveStartDate" [(ngModel)]="form.effectiveStartDate" name="effectiveStartDate" placeholder="x" required>
+            <label for="effectiveStartDate">{{ t('benefits.plans.effective_start') }} *</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="effectiveEndDate" [(ngModel)]="form.effectiveEndDate" name="effectiveEndDate" placeholder="x" required>
+            <label for="effectiveEndDate">{{ t('benefits.plans.effective_end') }} *</label>
+          </div>
+        </div>
+      </div>
+    </app-form-section>
+
+    <app-form-section [title]="t('benefits.plans.premium_info')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="number" class="form-control" id="employeePremiumAmount" [(ngModel)]="form.employeePremiumAmount" name="employeePremiumAmount" placeholder="x" step="0.01">
+            <label for="employeePremiumAmount">{{ t('benefits.plans.employee_premium') }}</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="number" class="form-control" id="employerPremiumAmount" [(ngModel)]="form.employerPremiumAmount" name="employerPremiumAmount" placeholder="x" step="0.01">
+            <label for="employerPremiumAmount">{{ t('benefits.plans.employer_premium') }}</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="number" class="form-control" id="dependentPremiumAmount" [(ngModel)]="form.dependentPremiumAmount" name="dependentPremiumAmount" placeholder="x" step="0.01">
+            <label for="dependentPremiumAmount">{{ t('benefits.plans.dependent_premium') }}</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="number" class="form-control" id="maxDependents" [(ngModel)]="form.maxDependents" name="maxDependents" placeholder="x">
+            <label for="maxDependents">{{ t('benefits.plans.max_dependents') }}</label>
+          </div>
+        </div>
+        <div class="col-md-8">
+          <div class="form-check mt-3">
+            <input class="form-check-input" type="checkbox" id="isActive" [(ngModel)]="form.isActive" name="isActive">
+            <label class="form-check-label" for="isActive">{{ t('common.active') }}</label>
+          </div>
+        </div>
+      </div>
+    </app-form-section>
+
+    <app-form-section [title]="t('common.description')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="form-floating">
+            <textarea class="form-control" id="description" [(ngModel)]="form.description" name="description" placeholder="x" rows="3" style="height: 100px"></textarea>
+            <label for="description">{{ t('common.description') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <textarea class="form-control" id="descriptionAr" [(ngModel)]="form.descriptionAr" name="descriptionAr" placeholder="x" rows="3" style="height: 100px"></textarea>
+            <label for="descriptionAr">{{ t('common.description_ar') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <textarea class="form-control" id="coverageDetails" [(ngModel)]="form.coverageDetails" name="coverageDetails" placeholder="x" rows="3" style="height: 100px"></textarea>
+            <label for="coverageDetails">{{ t('benefits.plans.coverage_details') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <textarea class="form-control" id="coverageDetailsAr" [(ngModel)]="form.coverageDetailsAr" name="coverageDetailsAr" placeholder="x" rows="3" style="height: 100px"></textarea>
+            <label for="coverageDetailsAr">{{ t('benefits.plans.coverage_details_ar') }}</label>
+          </div>
+        </div>
+      </div>
+    </app-form-section>
+
+    <div class="app-form-actions">
+      <button type="button" class="btn btn-outline-secondary" (click)="onCancel()">{{ t('common.cancel') }}</button>
+      <button type="submit" class="btn btn-primary" [disabled]="submitting()">
+        @if (submitting()) {
+          <span class="spinner-border spinner-border-sm me-1"></span>
+        }
+        {{ isEdit() ? t('common.save_changes') : t('common.create') }}
+      </button>
+    </div>
+  </form>
+</div>

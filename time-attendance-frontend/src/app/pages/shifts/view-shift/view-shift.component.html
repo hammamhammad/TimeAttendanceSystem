@@ -252,5 +252,12 @@
         </div>
       </div>
     </div>
+
+    <!-- Audit History -->
+    <div class="mt-4">
+      <app-section-card [title]="i18n.t('history.title')" icon="fas fa-clock-rotate-left" headerClass="bg-light">
+        <app-audit-history [entityName]="'Shift'" [entityId]="shift()?.id" />
+      </app-section-card>
+    </div>
   }
 </div>

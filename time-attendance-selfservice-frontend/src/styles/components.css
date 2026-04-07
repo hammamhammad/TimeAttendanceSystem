@@ -6,7 +6,7 @@
 
 .app-card {
   background: white;
-  border: 1px solid var(--app-gray-300);
+  border: 1px solid var(--app-gray-200);
   border-radius: var(--app-border-radius-md);
   box-shadow: var(--app-shadow-sm);
   transition: all var(--app-transition-normal) var(--app-transition-ease);
@@ -965,185 +965,204 @@
 }
 
 /* ============================================================
-   MODERN FORM STYLES - Material Design Floating Labels
-   All styles scoped under .app-modern-form for opt-in usage
+   MODERN FORM STYLES - ERP Label-Above-Input
+   Adapted from floating labels: forces label permanently above
+   with full-bordered inputs. No HTML template changes needed.
    ============================================================ */
 
 /* --- Form Section Card --- */
 .app-modern-form .app-form-section,
 .app-modern-form .app-form-section-modern {
   background: #fff;
-  border-radius: var(--app-float-section-radius, var(--app-border-radius-lg));
-  padding: var(--app-float-section-padding);
+  border-radius: var(--app-border-radius-lg, 12px);
+  padding: var(--app-float-section-padding, 2rem);
   margin-bottom: var(--app-spacing-xl);
-  box-shadow: var(--app-shadow-sm);
-  border-left: 4px solid var(--app-primary);
-  transition: box-shadow var(--app-transition-normal) var(--app-transition-ease);
+  border: 1px solid var(--app-gray-200, #EAECF0);
+  box-shadow: var(--app-shadow-xs);
+  transition: box-shadow 0.2s ease;
 }
 
 .app-modern-form .app-form-section:hover,
 .app-modern-form .app-form-section-modern:hover {
-  box-shadow: var(--app-shadow-md);
+  box-shadow: var(--app-shadow-sm);
 }
 
-/* Section header inside modern form */
+/* Section header - icon + title + separator line */
 .app-modern-form .app-form-section-header {
   border-left: none;
   padding-left: 0;
   margin-bottom: var(--app-spacing-lg);
-  padding-bottom: var(--app-spacing-sm);
-  border-bottom: 1px solid var(--app-gray-200);
+  padding-bottom: var(--app-spacing-md);
+  border-bottom: 1px solid var(--app-gray-200, #EAECF0);
 }
 
 .app-modern-form .app-form-section-header h3,
 .app-modern-form .app-form-section-header .app-section-primary {
-  font-size: var(--app-font-size-lg);
-  font-weight: var(--app-font-weight-semibold);
-  color: var(--app-gray-800);
-  letter-spacing: 0.01em;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--app-gray-800, #1D2939);
+  letter-spacing: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-/* --- Floating Label Inputs (Bottom Border Only) --- */
+.app-modern-form .app-form-section-header h3 i,
+.app-modern-form .app-form-section-header .app-section-primary i {
+  color: var(--app-primary-400, #6384FF);
+  font-size: 18px;
+}
+
+/* --- Floating Label → ERP Label-Above-Input --- */
 .app-modern-form .form-floating {
   position: relative;
   margin-bottom: 0;
 }
 
-/* Animated underline pseudo-element */
+/* Remove the animated underline pseudo-element */
 .app-modern-form .form-floating::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  width: 0;
-  height: var(--app-float-border-width);
-  background-color: var(--app-primary);
-  transition: width var(--app-float-underline-speed) ease, left var(--app-float-underline-speed) ease;
-  pointer-events: none;
-  z-index: 1;
+  display: none;
 }
 
-.app-modern-form .form-floating:focus-within::after {
-  width: 100%;
-  left: 0;
-}
-
-/* Input base - bottom border only */
+/* Input: full border, not bottom-only */
 .app-modern-form .form-floating > .form-control {
-  border: none;
-  border-bottom: var(--app-float-border-width) solid var(--app-gray-400);
-  border-radius: 0;
-  background-color: transparent;
-  padding: var(--app-float-input-padding-top) 0 var(--app-float-input-padding-bottom) 0;
-  height: var(--app-float-input-height);
-  font-size: var(--app-font-size-md);
-  line-height: 1.25;
-  transition: border-color var(--app-float-transition-speed) ease,
-              background-color var(--app-float-transition-speed) ease;
+  border: 1px solid var(--app-gray-300, #D0D5DD);
+  border-radius: var(--app-border-radius-sm, 6px);
+  background-color: #fff;
+  padding: 26px 14px 8px 14px;
+  height: auto;
+  min-height: 52px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--app-gray-900, #101828);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-/* Input focus state */
+/* Focus: primary border + focus ring */
 .app-modern-form .form-floating > .form-control:focus {
-  border-bottom-color: var(--app-primary);
-  box-shadow: none;
-  background-color: var(--app-float-focus-bg);
+  border-color: var(--app-primary, #4F6BF6);
+  box-shadow: 0 0 0 3px var(--app-primary-100, #D8E0FF);
+  background-color: #fff;
   outline: none;
 }
 
-/* Label base */
-.app-modern-form .form-floating > label {
-  padding: 1rem 0;
-  color: var(--app-gray-600);
-  transform-origin: 0 0;
-  transition: opacity var(--app-float-transition-speed) ease-in-out,
-              transform var(--app-float-transition-speed) ease-in-out,
-              color var(--app-float-transition-speed) ease-in-out;
-  border: none;
-  font-weight: var(--app-font-weight-normal);
+/* Disabled input */
+.app-modern-form .form-floating > .form-control:disabled {
+  background-color: var(--app-gray-50, #F9FAFB);
+  color: var(--app-gray-400, #98A2B3);
+  cursor: not-allowed;
 }
 
-/* Label floated state */
+/* Label: ALWAYS show in "above" position */
+.app-modern-form .form-floating > label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 6px 14px 0 14px;
+  transform: none !important;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--app-gray-700, #344054);
+  opacity: 1 !important;
+  pointer-events: none;
+  transition: color 0.15s ease;
+  border: none;
+  height: auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(100% - 28px);
+}
+
+/* Override Bootstrap's floated label transforms */
 .app-modern-form .form-floating > .form-control:focus ~ label,
-.app-modern-form .form-floating > .form-control:not(:placeholder-shown) ~ label {
-  transform: scale(var(--app-float-label-scale)) translateY(var(--app-float-label-translate-y));
-  color: var(--app-primary);
-  opacity: 1;
-  font-weight: var(--app-font-weight-medium);
+.app-modern-form .form-floating > .form-control:not(:placeholder-shown) ~ label,
+.app-modern-form .form-floating > .form-control:-webkit-autofill ~ label {
+  transform: none !important;
+  font-size: 13px;
+  opacity: 1 !important;
+  font-weight: 500;
+}
+
+/* On focus, label turns primary */
+.app-modern-form .form-floating > .form-control:focus ~ label {
+  color: var(--app-primary, #4F6BF6);
 }
 
 /* --- Select Elements --- */
 .app-modern-form .form-floating > .form-select {
-  border: none;
-  border-bottom: var(--app-float-border-width) solid var(--app-gray-400);
-  border-radius: 0;
-  background-color: transparent;
-  padding-top: var(--app-float-input-padding-top);
-  padding-bottom: var(--app-float-input-padding-bottom);
-  padding-left: 0;
-  height: var(--app-float-input-height);
-  font-size: var(--app-font-size-md);
-  transition: border-color var(--app-float-transition-speed) ease,
-              background-color var(--app-float-transition-speed) ease;
+  border: 1px solid var(--app-gray-300, #D0D5DD);
+  border-radius: var(--app-border-radius-sm, 6px);
+  background-color: #fff;
+  padding: 26px 36px 8px 14px;
+  height: auto;
+  min-height: 52px;
+  font-size: 14px;
+  color: var(--app-gray-900, #101828);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .app-modern-form .form-floating > .form-select:focus {
-  border-bottom-color: var(--app-primary);
-  box-shadow: none;
-  background-color: var(--app-float-focus-bg);
+  border-color: var(--app-primary, #4F6BF6);
+  box-shadow: 0 0 0 3px var(--app-primary-100, #D8E0FF);
+  background-color: #fff;
   outline: none;
 }
 
-/* Select label always floated */
+/* Select label - always above */
 .app-modern-form .form-floating > .form-select ~ label {
-  transform: scale(var(--app-float-label-scale)) translateY(var(--app-float-label-translate-y));
-  color: var(--app-gray-600);
-  opacity: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 6px 14px 0 14px;
+  transform: none !important;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--app-gray-700, #344054);
+  opacity: 1 !important;
 }
 
 .app-modern-form .form-floating > .form-select:focus ~ label {
-  color: var(--app-primary);
-  font-weight: var(--app-font-weight-medium);
+  color: var(--app-primary, #4F6BF6);
 }
 
 /* --- Textarea --- */
 .app-modern-form .form-floating > textarea.form-control {
   height: auto;
-  min-height: var(--app-float-input-height);
+  min-height: 80px;
+  resize: vertical;
 }
 
 /* --- Validation States --- */
 .app-modern-form .form-floating > .form-control.is-invalid,
 .app-modern-form .form-floating > .form-select.is-invalid {
-  border-bottom-color: var(--app-danger);
+  border-color: var(--app-danger, #EF4444);
   background-image: none;
+}
+
+.app-modern-form .form-floating > .form-control.is-invalid:focus,
+.app-modern-form .form-floating > .form-select.is-invalid:focus {
+  box-shadow: 0 0 0 3px var(--app-danger-100, #FEE2E2);
 }
 
 .app-modern-form .form-floating > .form-control.is-invalid ~ label,
 .app-modern-form .form-floating > .form-select.is-invalid ~ label {
-  color: var(--app-danger);
-}
-
-/* Error underline color */
-.app-modern-form .form-floating:has(.is-invalid)::after {
-  background-color: var(--app-danger);
-}
-
-.app-modern-form .form-floating:has(.is-invalid):focus-within::after {
-  background-color: var(--app-danger);
+  color: var(--app-danger, #EF4444);
 }
 
 /* Error message styling */
 .app-modern-form .invalid-feedback {
-  font-size: var(--app-font-size-xs);
-  padding-top: 0.25rem;
+  font-size: 12px;
+  color: var(--app-danger, #EF4444);
+  padding-top: 4px;
   padding-left: 0;
 }
 
 /* Help text in modern form */
 .app-modern-form .form-text {
-  font-size: var(--app-font-size-xs);
-  color: var(--app-gray-600);
-  margin-top: 0.25rem;
+  font-size: 12px;
+  color: var(--app-gray-400, #98A2B3);
+  margin-top: 4px;
   padding-left: 0;
 }
 
@@ -1155,43 +1174,40 @@
 
 .app-modern-form .app-modern-label {
   display: block;
-  font-size: var(--app-font-size-xs);
-  font-weight: var(--app-font-weight-medium);
-  color: var(--app-gray-600);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.5rem;
-  transition: color var(--app-float-transition-speed) ease;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--app-gray-700, #344054);
+  margin-bottom: 6px;
+  transition: color 0.15s ease;
 }
 
 .app-modern-form .app-modern-field:focus-within .app-modern-label {
-  color: var(--app-primary);
+  color: var(--app-primary, #4F6BF6);
 }
 
-/* Style the SearchableSelect input to match material inputs */
+/* Style the SearchableSelect input to match ERP inputs */
 .app-modern-form .app-modern-field .searchable-select .form-control {
-  border: none;
-  border-bottom: var(--app-float-border-width) solid var(--app-gray-400);
-  border-radius: 0;
-  padding-left: 0;
-  transition: border-color var(--app-float-transition-speed) ease;
+  border: 1px solid var(--app-gray-300, #D0D5DD);
+  border-radius: var(--app-border-radius-sm, 6px);
+  padding-left: 14px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .app-modern-form .app-modern-field .searchable-select .form-control:focus {
-  border-bottom-color: var(--app-primary);
-  box-shadow: none;
-  background-color: var(--app-float-focus-bg);
+  border-color: var(--app-primary, #4F6BF6);
+  box-shadow: 0 0 0 3px var(--app-primary-100, #D8E0FF);
+  background-color: #fff;
 }
 
 .app-modern-form .app-modern-field .searchable-select .input-group-text {
-  border: none;
-  border-bottom: var(--app-float-border-width) solid var(--app-gray-400);
-  border-radius: 0;
-  background-color: transparent;
+  border: 1px solid var(--app-gray-300, #D0D5DD);
+  border-left: none;
+  border-radius: 0 var(--app-border-radius-sm, 6px) var(--app-border-radius-sm, 6px) 0;
+  background-color: var(--app-gray-50, #F9FAFB);
 }
 
 .app-modern-form .app-modern-field .searchable-select .input-group:focus-within .input-group-text {
-  border-bottom-color: var(--app-primary);
+  border-color: var(--app-primary, #4F6BF6);
 }
 
 /* --- Checkbox / Switch Enhancement --- */
@@ -1203,23 +1219,24 @@
 .app-modern-form .form-check-input {
   width: 1.15em;
   height: 1.15em;
-  border: var(--app-float-border-width) solid var(--app-gray-400);
-  transition: all var(--app-float-transition-speed) ease;
+  border: 1.5px solid var(--app-gray-300, #D0D5DD);
+  border-radius: 4px;
+  transition: all 0.15s ease;
 }
 
 .app-modern-form .form-check-input:checked {
-  background-color: var(--app-primary);
-  border-color: var(--app-primary);
+  background-color: var(--app-primary, #4F6BF6);
+  border-color: var(--app-primary, #4F6BF6);
 }
 
 .app-modern-form .form-check-input:focus {
-  box-shadow: 0 0 0 0.15rem rgba(var(--app-primary-rgb), 0.25);
-  border-color: var(--app-primary);
+  box-shadow: 0 0 0 3px rgba(79, 107, 246, 0.15);
+  border-color: var(--app-primary, #4F6BF6);
 }
 
 .app-modern-form .form-check-label {
-  font-weight: var(--app-font-weight-medium);
-  color: var(--app-gray-700);
+  font-weight: 500;
+  color: var(--app-gray-700, #344054);
 }
 
 /* --- Form Action Buttons --- */
@@ -1228,7 +1245,7 @@
   justify-content: flex-end;
   gap: var(--app-spacing-md);
   padding-top: var(--app-spacing-lg);
-  border-top: 1px solid var(--app-gray-200);
+  border-top: 1px solid var(--app-gray-200, #EAECF0);
   margin-top: var(--app-spacing-md);
 }
 
@@ -1297,7 +1314,7 @@
 }
 
 /* ============================================================
-   MODERN VIEW STYLES - Enhanced View/Detail Pages
+   MODERN VIEW STYLES - ERP Entity Detail Pages
    All styles scoped under .app-modern-view for opt-in usage
    ============================================================ */
 
@@ -1305,44 +1322,47 @@
 .app-modern-view > .card,
 .app-modern-view .row > [class*="col"] > .card,
 .app-modern-view .col > .card {
-  border: none;
-  border-radius: var(--app-view-card-radius);
-  box-shadow: var(--app-view-card-shadow);
-  border-left: var(--app-view-accent-width) solid var(--app-view-accent);
-  transition: box-shadow var(--app-view-transition), transform var(--app-view-transition);
+  border: 1px solid var(--app-gray-200, #EAECF0);
+  border-radius: var(--app-border-radius-lg, 12px);
+  box-shadow: var(--app-shadow-sm);
+  transition: box-shadow 0.2s ease;
   overflow: hidden;
 }
 
 .app-modern-view > .card:hover,
 .app-modern-view .row > [class*="col"] > .card:hover,
 .app-modern-view .col > .card:hover {
-  box-shadow: var(--app-view-card-shadow-hover);
+  box-shadow: var(--app-shadow-md);
 }
 
 /* --- Card Header Enhancements --- */
 .app-modern-view .card > .card-header {
-  background: linear-gradient(135deg, rgba(var(--app-primary-rgb), 0.06) 0%, rgba(var(--app-primary-rgb), 0.02) 100%);
-  border-bottom: 1px solid var(--app-view-divider);
-  padding: var(--app-spacing-md) var(--app-spacing-lg);
+  background: var(--app-gray-25, #FCFCFD);
+  border-bottom: 1px solid var(--app-gray-200, #EAECF0);
+  padding: 16px 24px;
 }
 
 .app-modern-view .card > .card-header .card-title,
 .app-modern-view .card > .card-header h5,
 .app-modern-view .card > .card-header h6 {
-  font-weight: var(--app-font-weight-semibold);
-  color: var(--app-gray-800);
-  letter-spacing: 0.01em;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--app-gray-800, #1D2939);
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .app-modern-view .card > .card-header .card-title i,
 .app-modern-view .card > .card-header h5 i,
 .app-modern-view .card > .card-header h6 i {
-  color: var(--app-view-accent);
+  color: var(--app-primary-400, #6384FF);
+  font-size: 18px;
 }
 
 /* --- Card Body Padding --- */
 .app-modern-view .card > .card-body {
-  padding: var(--app-spacing-lg);
+  padding: 24px;
 }
 
 /* --- Definition List Enhancements --- */
@@ -1351,23 +1371,13 @@
 }
 
 .app-modern-view app-definition-list .row > [class*="col"] {
-  padding-top: var(--app-spacing-sm);
-  padding-bottom: var(--app-spacing-sm);
-  border-bottom: 1px solid var(--app-view-divider);
-  transition: background-color var(--app-view-transition);
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--app-gray-100, #F2F4F7);
+  transition: background-color 0.1s ease;
 }
 
 .app-modern-view app-definition-list .row > [class*="col"]:hover {
-  background-color: rgba(var(--app-primary-rgb), 0.02);
-}
-
-/* Stripe effect on every other row pair */
-.app-modern-view app-definition-list .row:nth-child(even) > [class*="col"] {
-  background-color: var(--app-view-stripe-bg);
-}
-
-.app-modern-view app-definition-list .row:nth-child(even) > [class*="col"]:hover {
-  background-color: rgba(var(--app-primary-rgb), 0.04);
+  background-color: var(--app-primary-50, #EEF2FF);
 }
 
 /* Remove border from last row */
@@ -1375,21 +1385,21 @@
   border-bottom: none;
 }
 
-/* Label styling */
+/* Label styling - ERP: normal case, 13px, gray-500 */
 .app-modern-view app-definition-list dt,
 .app-modern-view app-definition-list .text-muted {
-  font-weight: var(--app-font-weight-medium);
-  font-size: var(--app-font-size-sm);
-  color: var(--app-gray-600);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--app-gray-500, #667085);
+  text-transform: none;
+  letter-spacing: normal;
 }
 
 /* Value styling */
 .app-modern-view app-definition-list dd {
-  font-size: var(--app-font-size-sm);
-  color: var(--app-gray-800);
-  font-weight: var(--app-font-weight-medium);
+  font-size: 14px;
+  color: var(--app-gray-900, #101828);
+  font-weight: 400;
 }
 
 /* --- Status Header Area (optional utility) --- */
@@ -1420,32 +1430,29 @@
 /* --- Stat Mini-Cards --- */
 .app-modern-view .app-view-stat {
   background: white;
-  border-radius: var(--app-view-card-radius);
-  padding: var(--app-spacing-md) var(--app-spacing-lg);
-  box-shadow: var(--app-view-card-shadow);
-  border-left: var(--app-view-accent-width) solid var(--app-view-accent);
+  border: 1px solid var(--app-gray-200, #EAECF0);
+  border-radius: var(--app-border-radius-lg, 12px);
+  padding: 20px;
+  box-shadow: var(--app-shadow-xs);
   text-align: center;
-  transition: transform var(--app-view-transition), box-shadow var(--app-view-transition);
+  transition: box-shadow 0.15s ease;
 }
 
 .app-modern-view .app-view-stat:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--app-view-card-shadow-hover);
+  box-shadow: var(--app-shadow-sm);
 }
 
 .app-modern-view .app-view-stat .stat-value {
-  font-size: var(--app-font-size-2xl);
-  font-weight: var(--app-font-weight-bold);
-  color: var(--app-gray-800);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--app-gray-900, #101828);
   line-height: 1.2;
 }
 
 .app-modern-view .app-view-stat .stat-label {
-  font-size: var(--app-font-size-xs);
-  color: var(--app-gray-600);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-top: var(--app-spacing-xs);
+  font-size: 13px;
+  color: var(--app-gray-500, #667085);
+  margin-top: 2px;
 }
 
 /* --- Timeline / Approval History --- */
@@ -1497,50 +1504,64 @@
 /* --- Table inside Modern View --- */
 .app-modern-view .table {
   margin-bottom: 0;
+  font-size: 13px;
 }
 
 .app-modern-view .table thead th {
-  background-color: rgba(var(--app-primary-rgb), 0.04);
-  border-bottom: 2px solid var(--app-view-divider);
-  font-size: var(--app-font-size-xs);
+  background-color: var(--app-gray-50, #F9FAFB);
+  border-bottom: 1px solid var(--app-gray-200, #EAECF0);
+  font-size: 12px;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--app-gray-700);
-  font-weight: var(--app-font-weight-semibold);
+  letter-spacing: 0.5px;
+  color: var(--app-gray-600, #475467);
+  font-weight: 600;
+  padding: 12px 16px;
+}
+
+.app-modern-view .table tbody td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--app-gray-100, #F2F4F7);
+  color: var(--app-gray-700, #344054);
 }
 
 .app-modern-view .table tbody tr {
-  transition: background-color var(--app-view-transition);
+  transition: background-color 0.1s ease;
 }
 
 .app-modern-view .table tbody tr:hover {
-  background-color: rgba(var(--app-primary-rgb), 0.03);
+  background-color: var(--app-primary-50, #EEF2FF);
 }
 
-/* --- Nav Tabs Enhancement --- */
+/* --- Nav Tabs Enhancement - ERP tab bar --- */
 .app-modern-view .nav-tabs {
-  border-bottom: 2px solid var(--app-view-divider);
+  border-bottom: 2px solid var(--app-gray-200, #EAECF0);
+  background: white;
+  padding: 0 24px;
 }
 
 .app-modern-view .nav-tabs .nav-link {
   border: none;
   border-bottom: 2px solid transparent;
-  color: var(--app-gray-600);
-  font-weight: var(--app-font-weight-medium);
-  padding: var(--app-spacing-sm) var(--app-spacing-md);
-  transition: color var(--app-view-transition), border-color var(--app-view-transition);
+  color: var(--app-gray-500, #667085);
+  font-weight: 500;
+  font-size: 14px;
+  padding: 14px 20px;
+  transition: all 0.15s ease;
   margin-bottom: -2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .app-modern-view .nav-tabs .nav-link:hover {
-  color: var(--app-view-accent);
-  border-bottom-color: rgba(var(--app-primary-rgb), 0.3);
+  color: var(--app-gray-700, #344054);
+  border-bottom-color: transparent;
 }
 
 .app-modern-view .nav-tabs .nav-link.active {
-  color: var(--app-view-accent);
-  border-bottom-color: var(--app-view-accent);
-  font-weight: var(--app-font-weight-semibold);
+  color: var(--app-primary, #4F6BF6);
+  border-bottom-color: var(--app-primary, #4F6BF6);
+  font-weight: 500;
   background: transparent;
 }
 
@@ -1572,4 +1593,209 @@
   .app-modern-view .app-view-timeline {
     padding-left: var(--app-spacing-lg);
   }
+}
+
+/* ============================================================
+   ERP BUTTON OVERRIDES
+   Override Bootstrap button classes to match ERP design system
+   ============================================================ */
+
+.btn {
+  font-family: var(--app-font-family);
+  font-weight: 500;
+  border-radius: var(--app-border-radius-sm, 6px);
+  transition: all 0.15s ease;
+  font-size: 14px;
+  line-height: 1.5;
+  padding: var(--app-btn-padding-y, 10px) var(--app-btn-padding-x, 18px);
+}
+
+.btn:focus-visible {
+  box-shadow: 0 0 0 3px rgba(79, 107, 246, 0.15);
+}
+
+.btn-sm {
+  padding: var(--app-btn-padding-y-sm, 6px) var(--app-btn-padding-x-sm, 12px);
+  font-size: 13px;
+}
+
+.btn-lg {
+  padding: var(--app-btn-padding-y-lg, 12px) var(--app-btn-padding-x-lg, 24px);
+  font-size: 15px;
+}
+
+.btn-icon {
+  padding: 8px;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-ghost,
+.btn-link {
+  background: transparent;
+  border: none;
+  color: var(--app-primary, #4F6BF6);
+  box-shadow: none;
+  padding: var(--app-btn-padding-y, 10px) var(--app-btn-padding-x, 18px);
+}
+
+.btn-ghost:hover,
+.btn-link:hover {
+  background-color: var(--app-primary-50, #EEF2FF);
+  color: var(--app-primary-600, #3B51D4);
+  text-decoration: none;
+}
+
+.btn-primary {
+  background-color: var(--app-primary, #4F6BF6);
+  border-color: var(--app-primary, #4F6BF6);
+  color: #fff;
+  box-shadow: 0 1px 2px rgba(79, 107, 246, 0.3);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--app-primary-600, #3B51D4);
+  border-color: var(--app-primary-600, #3B51D4);
+  color: #fff;
+}
+
+.btn-primary:active {
+  background-color: var(--app-primary-700, #2D3EB3);
+  border-color: var(--app-primary-700, #2D3EB3);
+}
+
+.btn-success {
+  background-color: var(--app-success, #22C55E);
+  border-color: var(--app-success, #22C55E);
+  color: #fff;
+}
+
+.btn-success:hover,
+.btn-success:focus {
+  background-color: var(--app-success-600, #16A34A);
+  border-color: var(--app-success-600, #16A34A);
+  color: #fff;
+}
+
+.btn-danger {
+  background-color: var(--app-danger, #EF4444);
+  border-color: var(--app-danger, #EF4444);
+  color: #fff;
+}
+
+.btn-danger:hover,
+.btn-danger:focus {
+  background-color: var(--app-danger-600, #DC2626);
+  border-color: var(--app-danger-600, #DC2626);
+  color: #fff;
+}
+
+.btn-warning {
+  background-color: var(--app-warning, #F59E0B);
+  border-color: var(--app-warning, #F59E0B);
+  color: #fff;
+}
+
+.btn-warning:hover,
+.btn-warning:focus {
+  background-color: var(--app-warning-600, #D97706);
+  border-color: var(--app-warning-600, #D97706);
+  color: #fff;
+}
+
+.btn-info {
+  background-color: var(--app-info, #3B82F6);
+  border-color: var(--app-info, #3B82F6);
+  color: #fff;
+}
+
+.btn-info:hover,
+.btn-info:focus {
+  background-color: var(--app-info-600, #2563EB);
+  border-color: var(--app-info-600, #2563EB);
+  color: #fff;
+}
+
+.btn-secondary {
+  background-color: #fff;
+  border-color: var(--app-gray-300, #D0D5DD);
+  color: var(--app-gray-700, #344054);
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus {
+  background-color: var(--app-gray-50, #F9FAFB);
+  border-color: var(--app-gray-300, #D0D5DD);
+  color: var(--app-gray-800, #1D2939);
+}
+
+.btn-outline-primary {
+  color: var(--app-primary, #4F6BF6);
+  border-color: var(--app-primary, #4F6BF6);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--app-primary, #4F6BF6);
+  border-color: var(--app-primary, #4F6BF6);
+  color: #fff;
+}
+
+.btn-outline-secondary {
+  color: var(--app-gray-700, #344054);
+  border-color: var(--app-gray-300, #D0D5DD);
+  background-color: #fff;
+}
+
+.btn-outline-secondary:hover {
+  background-color: var(--app-gray-50, #F9FAFB);
+  border-color: var(--app-gray-300, #D0D5DD);
+  color: var(--app-gray-800, #1D2939);
+}
+
+.btn-outline-info {
+  color: var(--app-info, #3B82F6);
+  border-color: var(--app-info, #3B82F6);
+}
+
+.btn-outline-info:hover {
+  background-color: var(--app-info, #3B82F6);
+  border-color: var(--app-info, #3B82F6);
+  color: #fff;
+}
+
+.btn-outline-danger {
+  color: var(--app-danger, #EF4444);
+  border-color: var(--app-danger, #EF4444);
+}
+
+.btn-outline-danger:hover {
+  background-color: var(--app-danger, #EF4444);
+  border-color: var(--app-danger, #EF4444);
+  color: #fff;
+}
+
+.btn-outline-success {
+  color: var(--app-success, #22C55E);
+  border-color: var(--app-success, #22C55E);
+}
+
+.btn-outline-success:hover {
+  background-color: var(--app-success, #22C55E);
+  border-color: var(--app-success, #22C55E);
+  color: #fff;
+}
+
+.btn-outline-warning {
+  color: var(--app-warning-600, #D97706);
+  border-color: var(--app-warning, #F59E0B);
+}
+
+.btn-outline-warning:hover {
+  background-color: var(--app-warning, #F59E0B);
+  border-color: var(--app-warning, #F59E0B);
+  color: #fff;
 }

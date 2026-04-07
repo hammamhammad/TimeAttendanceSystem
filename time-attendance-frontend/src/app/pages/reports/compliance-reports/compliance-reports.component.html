@@ -1,0 +1,173 @@
+<div class="container-fluid">
+  <app-page-header [title]="t('compliance_reports.title')" />
+
+  <!-- Tabs -->
+  <ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+      <button class="nav-link" [class.active]="activeTab() === 'contracts'" (click)="setTab('contracts')">
+        <i class="fas fa-file-contract me-1"></i> {{ t('compliance_reports.contract_expiry') }}
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" [class.active]="activeTab() === 'documents'" (click)="setTab('documents')">
+        <i class="fas fa-id-card me-1"></i> {{ t('compliance_reports.document_expiry') }}
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" [class.active]="activeTab() === 'certifications'" (click)="setTab('certifications')">
+        <i class="fas fa-certificate me-1"></i> {{ t('compliance_reports.certification_expiry') }}
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" [class.active]="activeTab() === 'summary'" (click)="setTab('summary')">
+        <i class="fas fa-chart-pie me-1"></i> {{ t('compliance_reports.summary') }}
+      </button>
+    </li>
+  </ul>
+
+  <!-- Contract Expiry Tab -->
+  @if (activeTab() === 'contracts') {
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-3">
+            <label class="form-label">{{ t('compliance_reports.days_threshold') }}</label>
+            <select class="form-select" [ngModel]="daysThreshold()" (ngModelChange)="daysThreshold.set(+$event)">
+              @for (opt of thresholdOptions; track opt) {
+                <option [value]="opt">{{ opt }} {{ t('fields.daysUnit') }}</option>
+              }
+            </select>
+          </div>
+          <div class="col-md-3">
+            <button class="btn btn-primary" (click)="loadContracts()" [disabled]="loading()">
+              @if (loading()) { <span class="spinner-border spinner-border-sm me-1"></span> }
+              {{ t('compliance_reports.generate') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <app-data-table
+      [columns]="contractColumns()"
+      [data]="contractData()"
+      [loading]="loading"
+      [emptyTitle]="t('compliance_reports.no_data_title')"
+      [emptyMessage]="t('compliance_reports.no_contracts')">
+    </app-data-table>
+  }
+
+  <!-- Document Expiry Tab -->
+  @if (activeTab() === 'documents') {
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-3">
+            <label class="form-label">{{ t('compliance_reports.days_threshold') }}</label>
+            <select class="form-select" [ngModel]="daysThreshold()" (ngModelChange)="daysThreshold.set(+$event)">
+              @for (opt of thresholdOptions; track opt) {
+                <option [value]="opt">{{ opt }} {{ t('fields.daysUnit') }}</option>
+              }
+            </select>
+          </div>
+          <div class="col-md-3">
+            <button class="btn btn-primary" (click)="loadDocuments()" [disabled]="loading()">
+              @if (loading()) { <span class="spinner-border spinner-border-sm me-1"></span> }
+              {{ t('compliance_reports.generate') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <app-data-table
+      [columns]="documentColumns()"
+      [data]="documentData()"
+      [loading]="loading"
+      [emptyTitle]="t('compliance_reports.no_data_title')"
+      [emptyMessage]="t('compliance_reports.no_documents')">
+    </app-data-table>
+  }
+
+  <!-- Certification Expiry Tab -->
+  @if (activeTab() === 'certifications') {
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-3">
+            <label class="form-label">{{ t('compliance_reports.days_threshold') }}</label>
+            <select class="form-select" [ngModel]="daysThreshold()" (ngModelChange)="daysThreshold.set(+$event)">
+              @for (opt of thresholdOptions; track opt) {
+                <option [value]="opt">{{ opt }} {{ t('fields.daysUnit') }}</option>
+              }
+            </select>
+          </div>
+          <div class="col-md-3">
+            <button class="btn btn-primary" (click)="loadCertifications()" [disabled]="loading()">
+              @if (loading()) { <span class="spinner-border spinner-border-sm me-1"></span> }
+              {{ t('compliance_reports.generate') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <app-data-table
+      [columns]="certificationColumns()"
+      [data]="certificationData()"
+      [loading]="loading"
+      [emptyTitle]="t('compliance_reports.no_data_title')"
+      [emptyMessage]="t('compliance_reports.no_certifications')">
+    </app-data-table>
+  }
+
+  <!-- Summary Tab -->
+  @if (activeTab() === 'summary') {
+    <div class="card mb-3">
+      <div class="card-body">
+        <button class="btn btn-primary" (click)="loadSummary()" [disabled]="loading()">
+          @if (loading()) { <span class="spinner-border spinner-border-sm me-1"></span> }
+          {{ t('compliance_reports.generate') }}
+        </button>
+      </div>
+    </div>
+
+    @if (loading()) {
+      <app-loading-spinner [message]="t('common.loading')" [variant]="'primary'" [centered]="true" />
+    }
+
+    @if (!loading() && summaryData()) {
+      <div class="row g-3">
+        <div class="col-md-3">
+          <div class="card text-center">
+            <div class="card-body">
+              <h5 class="card-title text-warning">{{ summaryData()?.expiringContracts ?? 0 }}</h5>
+              <p class="card-text text-muted">{{ t('compliance_reports.expiring_contracts') }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card text-center">
+            <div class="card-body">
+              <h5 class="card-title text-danger">{{ summaryData()?.expiringDocuments ?? 0 }}</h5>
+              <p class="card-text text-muted">{{ t('compliance_reports.expiring_documents') }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card text-center">
+            <div class="card-body">
+              <h5 class="card-title text-info">{{ summaryData()?.expiringCertifications ?? 0 }}</h5>
+              <p class="card-text text-muted">{{ t('compliance_reports.expiring_certifications') }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card text-center">
+            <div class="card-body">
+              <h5 class="card-title text-primary">{{ summaryData()?.totalIssues ?? 0 }}</h5>
+              <p class="card-text text-muted">{{ t('compliance_reports.total_issues') }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  }
+</div>

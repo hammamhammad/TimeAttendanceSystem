@@ -1,14 +1,14 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Vacations;
-using TimeAttendanceSystem.Domain.Attendance;
-using TimeAttendanceSystem.Domain.Employees;
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Vacations;
+using TecAxle.Hrms.Domain.Attendance;
+using TecAxle.Hrms.Domain.Employees;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Application.EmployeeVacations.Commands.CreateBulkEmployeeVacation;
+namespace TecAxle.Hrms.Application.EmployeeVacations.Commands.CreateBulkEmployeeVacation;
 
 /// <summary>
 /// Command handler for creating bulk employee vacation records.

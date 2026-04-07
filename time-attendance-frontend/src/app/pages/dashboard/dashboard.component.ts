@@ -5,6 +5,7 @@ import { AuthService } from '../../core/auth/auth.service';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { DashboardService, DashboardOverview, DashboardFilters } from './dashboard.service';
 import { NotificationService } from '../../core/notifications/notification.service';
+import { EntitlementService } from '../../core/services/entitlement.service';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
 import { StatsGridComponent, StatGridItem } from '../../shared/components/stats-grid/stats-grid.component';
@@ -37,12 +38,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
   lastRefresh!: any;
   autoRefresh!: any;
 
-  // Dashboard cards computed from API data
+  // Map internal card module names to SystemModule entitlement names
+  private readonly cardModuleMap: Record<string, string | null> = {
+    'humanResources': null,  // Core - always shown
+    'attendance': 'TimeAttendance',
+    'leaves': 'LeaveManagement',
+    'shifts': 'TimeAttendance',
+    'organization': null,  // Core - always shown
+    'system': null  // Core - always shown
+  };
+
+  // Dashboard cards computed from API data, filtered by module entitlements
   dashboardCards = computed(() => {
     const data = this.dashboardData();
     if (!data) return [];
 
-    return [
+    const allCards = [
       {
         title: this.t('dashboard.total_employees'),
         value: data.humanResources?.totalEmployees || 0,
@@ -70,7 +81,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         color: 'warning',
         trend: 'stable' as const,
         module: 'leaves',
-        route: '/approvals' // Redirect to approvals for managers
+        route: '/approvals'
       },
       {
         title: this.t('dashboard.active_shifts'),
@@ -117,6 +128,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
         module: 'system'
       }
     ];
+
+    // Filter cards by module entitlement
+    return allCards.filter(card => {
+      const entitlementModule = this.cardModuleMap[card.module];
+      return !entitlementModule || this.entitlementService.isModuleEnabled(entitlementModule);
+    });
   });
 
   // Transform dashboard cards to StatGridItems for StatsGridComponent
@@ -141,12 +158,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
   availableBranches = signal<any[]>([]);
   availableDepartments = signal<any[]>([]);
 
-  // Widget visibility based on user permissions
+  // Widget visibility based on user permissions AND module entitlements
   showOrganizationWidget = computed(() => this.hasPermission('branch.read') || this.hasPermission('department.read'));
   showHumanResourcesWidget = computed(() => this.hasPermission('user.read') || this.hasPermission('employee.read'));
-  showAttendanceWidget = computed(() => this.hasPermission('attendance.read'));
-  showVacationWidget = computed(() => this.hasPermission('vacation.read'));
-  showShiftWidget = computed(() => this.hasPermission('shift.read'));
+  showAttendanceWidget = computed(() => this.hasPermission('attendance.read') && this.entitlementService.isModuleEnabled('TimeAttendance'));
+  showVacationWidget = computed(() => this.hasPermission('vacation.read') && this.entitlementService.isModuleEnabled('LeaveManagement'));
+  showShiftWidget = computed(() => this.hasPermission('shift.read') && this.entitlementService.isModuleEnabled('TimeAttendance'));
   showSystemWidget = computed(() => this.isSystemAdmin());
 
   // Auto-refresh options
@@ -157,6 +174,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     { value: 300, label: '5 minutes' },
     { value: 900, label: '15 minutes' }
   ];
+
+  private entitlementService = inject(EntitlementService);
 
   constructor(
     private authService: AuthService,

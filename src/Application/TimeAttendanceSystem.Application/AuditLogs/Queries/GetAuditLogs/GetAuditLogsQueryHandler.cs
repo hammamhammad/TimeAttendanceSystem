@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Application.AuditLogs.Queries.GetAuditLogs;
+namespace TecAxle.Hrms.Application.AuditLogs.Queries.GetAuditLogs;
 
 public class GetAuditLogsQueryHandler : BaseHandler<GetAuditLogsQuery, Result<GetAuditLogsResponse>>
 {
@@ -39,6 +39,12 @@ public class GetAuditLogsQueryHandler : BaseHandler<GetAuditLogsQuery, Result<Ge
         if (!string.IsNullOrWhiteSpace(request.EntityName))
         {
             query = query.Where(a => a.EntityName == request.EntityName);
+        }
+
+        // Apply entity ID filter
+        if (!string.IsNullOrWhiteSpace(request.EntityId))
+        {
+            query = query.Where(a => a.EntityId == request.EntityId);
         }
 
         // Apply actor user filter

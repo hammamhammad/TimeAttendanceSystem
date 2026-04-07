@@ -1,7 +1,9 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.LeaveManagement.Commands.SetLeaveEntitlement;
+namespace TecAxle.Hrms.Application.LeaveManagement.Commands.SetLeaveEntitlement;
 
 /// <summary>
 /// CQRS command for setting or updating employee leave entitlement configuration.
@@ -58,6 +60,7 @@ namespace TimeAttendanceSystem.Application.LeaveManagement.Commands.SetLeaveEnti
 /// - Includes warnings for potential balance impacts
 /// - Supports localized error messages based on user language
 /// </remarks>
+[RequiresModule(SystemModule.LeaveManagement)]
 public record SetLeaveEntitlementCommand(
     long EmployeeId,
     long VacationTypeId,

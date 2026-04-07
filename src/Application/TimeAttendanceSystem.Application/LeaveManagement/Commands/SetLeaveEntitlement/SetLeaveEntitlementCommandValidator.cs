@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace TimeAttendanceSystem.Application.LeaveManagement.Commands.SetLeaveEntitlement;
+namespace TecAxle.Hrms.Application.LeaveManagement.Commands.SetLeaveEntitlement;
 
 /// <summary>
 /// FluentValidation validator for SetLeaveEntitlementCommand ensuring comprehensive leave entitlement validation.

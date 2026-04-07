@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Domain.Shifts;
+namespace TecAxle.Hrms.Domain.Shifts;
 
 /// <summary>
 /// Enumeration defining the types of shifts supported by the time attendance system.

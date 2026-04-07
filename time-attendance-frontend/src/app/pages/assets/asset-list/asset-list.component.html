@@ -1,0 +1,57 @@
+<div class="app-list-page">
+  <app-page-header [title]="i18n.t('assets.title')"></app-page-header>
+
+  <app-unified-filter
+    moduleName="assets"
+    [refreshing]="loading()"
+    [showAddButton]="true"
+    [addButtonText]="i18n.t('assets.create')"
+    [showRefreshButton]="true"
+    [refreshButtonText]="i18n.t('common.refresh')"
+    (searchChange)="onSearchChange($event)"
+    (add)="navigateToCreate()"
+    (refresh)="onRefresh()">
+  </app-unified-filter>
+
+  <app-data-table
+    [data]="assets()"
+    [columns]="tableColumns"
+    [actions]="tableActions()"
+    [currentPage]="currentPage()"
+    [totalPages]="totalPages()"
+    [totalItems]="totalItems()"
+    [pageSize]="pageSize()"
+    [loading]="loading"
+    [emptyTitle]="i18n.t('assets.no_assets')"
+    [emptyMessage]="i18n.t('assets.no_assets_message')"
+    [showPagination]="true"
+    [responsiveMode]="'auto'"
+    (actionClick)="onActionClick($event)"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+
+    <ng-template #cellTemplate let-item let-column="column">
+      @if (column.key === 'status') {
+        <app-status-badge
+          [status]="i18n.t('assets.status_' + item.status)"
+          [variant]="getStatusVariant(item.status)">
+        </app-status-badge>
+      } @else if (column.key === 'condition') {
+        <app-status-badge
+          [status]="i18n.t('assets.condition_' + item.condition)"
+          [variant]="getConditionVariant(item.condition)">
+        </app-status-badge>
+      } @else if (column.key === 'purchaseDate') {
+        {{ formatDate(item.purchaseDate) }}
+      } @else if (column.key === 'categoryName') {
+        {{ item.categoryName || '-' }}
+      } @else if (column.key === 'branchName') {
+        {{ item.branchName || '-' }}
+      } @else if (column.key === 'serialNumber') {
+        {{ item.serialNumber || '-' }}
+      } @else {
+        {{ item[column.key] }}
+      }
+    </ng-template>
+  </app-data-table>
+</div>

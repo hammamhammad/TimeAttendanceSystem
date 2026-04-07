@@ -1,8 +1,8 @@
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Domain.Users;
-using TimeAttendanceSystem.Domain.Workflows.Enums;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Users;
+using TecAxle.Hrms.Domain.Workflows.Enums;
 
-namespace TimeAttendanceSystem.Domain.Workflows;
+namespace TecAxle.Hrms.Domain.Workflows;
 
 /// <summary>
 /// Domain entity representing the execution of a single workflow step.

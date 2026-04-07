@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TimeAttendanceSystem.Domain.Vacations;
+using TecAxle.Hrms.Domain.Vacations;
 
-namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Configurations;
+namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Configurations;
 
 /// <summary>
 /// Entity Framework configuration for the EmployeeVacation entity.
@@ -50,6 +50,15 @@ public class EmployeeVacationConfiguration : IEntityTypeConfiguration<EmployeeVa
             .HasMaxLength(1000)
             .IsUnicode(true)
             .HasComment("Optional notes about the vacation");
+
+        builder.Property(ev => ev.IsHalfDay)
+            .IsRequired()
+            .HasDefaultValue(false)
+            .HasComment("Whether this is a half-day leave");
+
+        builder.Property(ev => ev.HalfDayType)
+            .IsRequired(false)
+            .HasComment("Half-day type: Morning or Afternoon (nullable)");
 
         // Relationships
         builder.HasOne(ev => ev.Employee)

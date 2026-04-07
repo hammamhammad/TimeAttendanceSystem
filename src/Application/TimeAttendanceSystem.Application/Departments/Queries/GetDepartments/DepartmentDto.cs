@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Application.Departments.Queries.GetDepartments;
+namespace TecAxle.Hrms.Application.Departments.Queries.GetDepartments;
 
 public class DepartmentDto
 {

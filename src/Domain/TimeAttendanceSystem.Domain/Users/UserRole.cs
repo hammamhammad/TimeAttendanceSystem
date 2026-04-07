@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Domain.Users;
+namespace TecAxle.Hrms.Domain.Users;
 
 public class UserRole
 {

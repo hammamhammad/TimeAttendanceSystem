@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.Attendance;
+using TecAxle.Hrms.Domain.Attendance;
 
-namespace TimeAttendanceSystem.Application.Abstractions;
+namespace TecAxle.Hrms.Application.Abstractions;
 
 /// <summary>
 /// Repository interface for attendance transaction data access operations.

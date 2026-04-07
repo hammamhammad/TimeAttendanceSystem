@@ -1,13 +1,13 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TimeAttendanceSystem.Application.Departments.Commands.CreateDepartment;
-using TimeAttendanceSystem.Application.Departments.Commands.UpdateDepartment;
-using TimeAttendanceSystem.Application.Departments.Commands.DeleteDepartment;
-using TimeAttendanceSystem.Application.Departments.Queries.GetDepartments;
-using TimeAttendanceSystem.Application.Departments.Queries.GetDepartmentById;
+using TecAxle.Hrms.Application.Departments.Commands.CreateDepartment;
+using TecAxle.Hrms.Application.Departments.Commands.UpdateDepartment;
+using TecAxle.Hrms.Application.Departments.Commands.DeleteDepartment;
+using TecAxle.Hrms.Application.Departments.Queries.GetDepartments;
+using TecAxle.Hrms.Application.Departments.Queries.GetDepartmentById;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/departments")]

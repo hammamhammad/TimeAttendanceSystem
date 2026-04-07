@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Application.Authorization.Commands.Login;
+namespace TecAxle.Hrms.Application.Authorization.Commands.Login;
 
 /// <summary>
 /// Response model for successful authentication operations containing JWT tokens and user information.

@@ -1,7 +1,7 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Employees.Queries.GetEmployees;
+namespace TecAxle.Hrms.Application.Employees.Queries.GetEmployees;
 
 /// <summary>
 /// CQRS query for retrieving paginated employee lists with comprehensive filtering capabilities.

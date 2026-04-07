@@ -1,0 +1,64 @@
+<div class="app-modern-form">
+  <app-form-header
+    mode="create"
+    [title]="isEditMode() ? i18n.t('payroll.periods.edit') : i18n.t('payroll.periods.create')"
+    moduleName="payroll.periods"
+    moduleRoute="payroll/periods">
+  </app-form-header>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <app-form-section [title]="i18n.t('common.basic_info')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="name" formControlName="name" placeholder="Name">
+            <label for="name">{{ i18n.t('common.name') }}</label>
+          </div>
+          <small class="text-muted">{{ i18n.t('payroll.periods.hints.name') }}</small>
+        </div>
+        <div class="col-md-6">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('common.branch') }} <span class="text-danger">*</span></label>
+            <app-searchable-select [options]="branchOptions" [placeholder]="i18n.t('common.select')" [value]="form.get('branchId')?.value" (selectionChange)="form.get('branchId')?.setValue($event)" />
+          </div>
+          <small class="text-muted">{{ i18n.t('payroll.periods.hints.branch') }}</small>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <select class="form-select" id="periodType" formControlName="periodType">
+              @for (pt of periodTypes; track pt) {
+                <option [value]="pt">{{ i18n.t('payroll.period_types.' + pt) }}</option>
+              }
+            </select>
+            <label for="periodType">{{ i18n.t('payroll.periods.period_type') }}</label>
+          </div>
+          <small class="text-muted">{{ i18n.t('payroll.periods.hints.period_type') }}</small>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="startDate" formControlName="startDate" placeholder="Start Date">
+            <label for="startDate">{{ i18n.t('common.start_date') }}</label>
+          </div>
+          <small class="text-muted">{{ i18n.t('payroll.periods.hints.start_date') }}</small>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="endDate" formControlName="endDate" placeholder="End Date">
+            <label for="endDate">{{ i18n.t('common.end_date') }}</label>
+          </div>
+          <small class="text-muted">{{ i18n.t('payroll.periods.hints.end_date') }}</small>
+        </div>
+      </div>
+    </app-form-section>
+
+    <div class="app-form-actions">
+      <button type="button" class="btn btn-secondary" routerLink="/payroll/periods">{{ i18n.t('common.cancel') }}</button>
+      <button type="submit" class="btn btn-primary" [disabled]="form.invalid || submitting()">
+        @if (submitting()) {
+          <span class="spinner-border spinner-border-sm me-2"></span>
+        }
+        {{ i18n.t('common.save') }}
+      </button>
+    </div>
+  </form>
+</div>

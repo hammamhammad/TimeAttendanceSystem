@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Domain.Settings;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Domain.Settings;
 
-namespace TimeAttendanceSystem.Infrastructure.Persistence.Repositories;
+namespace TecAxle.Hrms.Infrastructure.Persistence.Repositories;
 
 /// <summary>
 /// Repository implementation for managing system settings including overtime configuration,

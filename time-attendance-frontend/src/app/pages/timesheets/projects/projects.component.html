@@ -1,0 +1,12 @@
+<div class="app-list-page">
+  <app-page-header [title]="i18n.t('timesheets.projects.title')" />
+  <app-unified-filter [searchPlaceholder]="i18n.t('timesheets.projects.search')" [showAddButton]="true"
+    [addButtonText]="i18n.t('timesheets.projects.create')" [showRefreshButton]="true" [refreshing]="loading()"
+    (searchChange)="onSearchChange($event)" (add)="onAdd()" (refresh)="onRefreshData()" />
+
+  <app-data-table [data]="tableData()" [columns]="columns" [actions]="tableActions()" [currentPage]="currentPage()"
+    [totalPages]="totalPages()" [totalItems]="totalCount()" [pageSize]="pageSize()" [loading]="loading"
+    [emptyTitle]="i18n.t('timesheets.projects.no_data')" [showPagination]="true"
+    (actionClick)="onActionClick($event)" (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)">
+  </app-data-table>
+</div>

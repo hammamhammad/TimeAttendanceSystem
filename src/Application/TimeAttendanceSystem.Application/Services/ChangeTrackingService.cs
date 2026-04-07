@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Application.Services;
+namespace TecAxle.Hrms.Application.Services;
 
 /// <summary>
 /// Service providing comprehensive change tracking functionality for audit trail generation.

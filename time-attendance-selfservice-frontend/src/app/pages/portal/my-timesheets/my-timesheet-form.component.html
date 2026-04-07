@@ -1,0 +1,172 @@
+<!-- Page Header -->
+<app-page-header [title]="isEdit() ? i18n.t('portal.timesheets.edit') : i18n.t('portal.timesheets.create')">
+  <div header-actions>
+    <button class="btn btn-outline-secondary btn-sm" (click)="router.navigate(['/my-timesheets'])" type="button">
+      <i class="bi bi-arrow-left me-1"></i>{{ i18n.t('common.back') }}
+    </button>
+  </div>
+</app-page-header>
+
+@if (loading()) {
+  <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+}
+
+@if (!loading()) {
+  <div class="app-modern-form">
+    <!-- Period Selection (only for new) -->
+    @if (!isEdit()) {
+      <div class="card mb-3">
+        <div class="card-header"><h6 class="card-title mb-0"><i class="bi bi-calendar3 me-2"></i>{{ i18n.t('portal.timesheets.select_period') }}</h6></div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="form-floating">
+                <select class="form-select" id="periodId" [ngModel]="selectedPeriodId()" (ngModelChange)="selectedPeriodId.set($event); onPeriodChange()">
+                  <option [ngValue]="null">{{ i18n.t('common.select') }}</option>
+                  @for (p of periods(); track p.id) {
+                    <option [ngValue]="p.id">{{ p.name }} ({{ p.startDate | date:'shortDate' }} - {{ p.endDate | date:'shortDate' }})</option>
+                  }
+                </select>
+                <label for="periodId">{{ i18n.t('portal.timesheets.period') }} *</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-floating">
+                <textarea class="form-control" id="notes" placeholder="Notes" style="height: 60px"
+                  [ngModel]="notes()" (ngModelChange)="notes.set($event)"></textarea>
+                <label for="notes">{{ i18n.t('portal.timesheets.notes') }}</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Project Selection -->
+    @if (selectedPeriodId() || isEdit()) {
+      <div class="card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h6 class="card-title mb-0"><i class="bi bi-kanban me-2"></i>{{ i18n.t('portal.timesheets.projects') }}</h6>
+          <div class="d-flex gap-2">
+            @if (isEdit() && canEdit()) {
+              <button class="btn btn-sm btn-outline-info" (click)="autoPopulate()" [disabled]="autoPopulating() || selectedProjects().length === 0" type="button">
+                <i class="bi bi-lightning me-1"></i>{{ i18n.t('portal.timesheets.auto_populate') }}
+              </button>
+            }
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row g-2 mb-3">
+            <div class="col-md-8">
+              <select class="form-select form-select-sm" #projectSelect>
+                <option value="">{{ i18n.t('portal.timesheets.add_project') }}</option>
+                @for (p of projects(); track p.id) {
+                  @if (!selectedProjects().includes(p.id)) {
+                    <option [value]="p.id">{{ p.code }} - {{ p.name }}</option>
+                  }
+                }
+              </select>
+            </div>
+            <div class="col-md-4">
+              <button class="btn btn-sm btn-primary" (click)="addProject(+projectSelect.value); projectSelect.value = ''" [disabled]="!canEdit()" type="button">
+                <i class="bi bi-plus me-1"></i>{{ i18n.t('portal.timesheets.add') }}
+              </button>
+            </div>
+          </div>
+
+          @if (selectedProjects().length > 0) {
+            <div class="d-flex flex-wrap gap-2">
+              @for (pid of selectedProjects(); track pid) {
+                <span class="badge bg-primary d-flex align-items-center gap-1">
+                  {{ getProjectName(pid) }}
+                  @if (canEdit()) {
+                    <button class="btn-close btn-close-white ms-1" style="font-size: 0.6rem;" (click)="removeProject(pid)" type="button"></button>
+                  }
+                </span>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Hours Grid -->
+    @if (dates().length > 0 && selectedProjects().length > 0) {
+      <div class="card mb-3">
+        <div class="card-header">
+          <h6 class="card-title mb-0"><i class="bi bi-grid-3x3 me-2"></i>{{ i18n.t('portal.timesheets.hours_grid') }}</h6>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-bordered table-sm mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th class="sticky-col">{{ i18n.t('portal.timesheets.date') }}</th>
+                  @for (pid of selectedProjects(); track pid) {
+                    <th class="text-center" style="min-width: 100px;">{{ getProjectName(pid) }}</th>
+                  }
+                  <th class="text-center fw-bold" style="min-width: 80px;">{{ i18n.t('portal.timesheets.daily_total') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (date of dates(); track date) {
+                  <tr [class.table-secondary]="isWeekend(date)">
+                    <td class="sticky-col small fw-medium" [class.text-muted]="isWeekend(date)">
+                      {{ formatDate(date) }}
+                    </td>
+                    @for (pid of selectedProjects(); track pid) {
+                      <td class="p-0">
+                        <input type="number" class="form-control form-control-sm border-0 text-center"
+                          [value]="getCellValue(date, pid)"
+                          (input)="updateCell(date, pid, +$any($event.target).value)"
+                          [disabled]="!canEdit()"
+                          min="0" max="24" step="0.5"
+                          style="background: transparent;">
+                      </td>
+                    }
+                    <td class="text-center fw-bold small">{{ getDayTotal(date) }}</td>
+                  </tr>
+                }
+              </tbody>
+              <tfoot class="table-light">
+                <tr>
+                  <td class="sticky-col fw-bold">{{ i18n.t('portal.timesheets.project_total') }}</td>
+                  @for (pid of selectedProjects(); track pid) {
+                    <td class="text-center fw-bold">{{ getProjectTotal(pid) }}</td>
+                  }
+                  <td class="text-center fw-bold text-primary">{{ totalHours() }}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Action Buttons -->
+    @if (selectedPeriodId() || isEdit()) {
+      <div class="card">
+        <div class="card-body d-flex justify-content-between">
+          <button class="btn btn-outline-secondary" (click)="router.navigate(['/my-timesheets'])" type="button">
+            {{ i18n.t('common.cancel') }}
+          </button>
+          <div class="d-flex gap-2">
+            @if (canRecall()) {
+              <button class="btn btn-warning" (click)="recallTimesheet()" [disabled]="saving()" type="button">
+                <i class="bi bi-arrow-counterclockwise me-1"></i>{{ i18n.t('portal.timesheets.recall') }}
+              </button>
+            }
+            @if (canEdit()) {
+              <button class="btn btn-secondary" (click)="save()" [disabled]="saving()" type="button">
+                <i class="bi bi-save me-1"></i>{{ i18n.t('portal.timesheets.save_draft') }}
+              </button>
+              <button class="btn btn-primary" (click)="submitTimesheet()" [disabled]="saving() || totalHours() === 0" type="button">
+                <i class="bi bi-send me-1"></i>{{ i18n.t('common.submit') }}
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}

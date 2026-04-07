@@ -1,6 +1,6 @@
 .filter-panel {
   background: white;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--app-gray-200, #EAECF0);
   border-radius: 8px;
   margin-bottom: 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -8,8 +8,8 @@
 
 .filter-header {
   padding: 1rem;
-  border-bottom: 1px solid #e9ecef;
-  background: #f8f9fa;
+  border-bottom: 1px solid var(--app-gray-200, #EAECF0);
+  background: var(--app-gray-50, #F9FAFB);
   border-radius: 8px 8px 0 0;
 }
 
@@ -19,12 +19,12 @@
 }
 
 .filter-header.collapsible:hover {
-  background: #e9ecef;
+  background: var(--app-gray-200, #EAECF0);
 }
 
 .filter-title {
   font-weight: 600;
-  color: #495057;
+  color: var(--app-gray-700, #344054);
   display: flex;
   align-items: center;
 }
@@ -58,14 +58,14 @@
 
 .form-label {
   font-weight: 500;
-  color: #495057;
+  color: var(--app-gray-700, #344054);
   margin-bottom: 0.5rem;
   font-size: 0.875rem;
 }
 
 .form-label.small {
   font-size: 0.8rem;
-  color: #6c757d;
+  color: var(--app-gray-500, #667085);
 }
 
 .form-control,
@@ -79,7 +79,7 @@
 
 .form-control:focus,
 .form-select:focus {
-  border-color: #80bdff;
+  border-color: var(--app-primary-300, #8BA3FF);
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
@@ -97,22 +97,22 @@
 }
 
 .btn-group-sm .btn:not(:last-child) {
-  border-right: 1px solid #dee2e6;
+  border-right: 1px solid var(--app-gray-200, #EAECF0);
 }
 
 .btn-outline-secondary {
-  color: #6c757d;
+  color: var(--app-gray-500, #667085);
   border-color: #ced4da;
 }
 
 .btn-outline-secondary:hover {
-  background-color: #6c757d;
-  border-color: #6c757d;
+  background-color: var(--app-gray-500, #667085);
+  border-color: var(--app-gray-500, #667085);
   color: white;
 }
 
 .filter-actions {
-  background: #f8f9fa;
+  background: var(--app-gray-50, #F9FAFB);
   border-radius: 0 0 8px 8px;
   margin: 0 -1rem -1rem -1rem;
   padding: 1rem;
@@ -128,7 +128,7 @@
 
 .form-check-label {
   font-size: 0.875rem;
-  color: #495057;
+  color: var(--app-gray-700, #344054);
 }
 
 /* Multi-select styling */
@@ -142,7 +142,7 @@ select[multiple] option {
 }
 
 select[multiple] option:checked {
-  background-color: #007bff;
+  background-color: var(--app-primary, #4F6BF6);
   color: white;
 }
 
@@ -153,12 +153,12 @@ select[multiple] option:checked {
 }
 
 .btn-link {
-  color: #6c757d;
+  color: var(--app-gray-500, #667085);
   text-decoration: none;
 }
 
 .btn-link:hover {
-  color: #495057;
+  color: var(--app-gray-700, #344054);
 }
 
 /* Responsive design */
@@ -224,7 +224,7 @@ select[multiple] option:checked {
 
 /* Focus management */
 .filter-panel:focus-within .filter-header {
-  border-color: #80bdff;
+  border-color: var(--app-primary-300, #8BA3FF);
 }
 
 /* Loading state support */

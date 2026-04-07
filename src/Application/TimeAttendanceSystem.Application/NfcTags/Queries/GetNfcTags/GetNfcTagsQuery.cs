@@ -1,12 +1,15 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Branches;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Branches;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.NfcTags.Queries.GetNfcTags;
+namespace TecAxle.Hrms.Application.NfcTags.Queries.GetNfcTags;
 
 /// <summary>
 /// Query to get a paginated list of NFC tags.
 /// </summary>
+[RequiresModule(SystemModule.TimeAttendance, AllowReadWhenDisabled = true)]
 public record GetNfcTagsQuery(
     int Page,
     int PageSize,

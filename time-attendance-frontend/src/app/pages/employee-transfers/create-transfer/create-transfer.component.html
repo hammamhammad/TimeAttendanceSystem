@@ -1,0 +1,121 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header
+    [title]="isEditMode() ? i18n.t('employee_transfers.edit') : i18n.t('employee_transfers.create_transfer')"
+    moduleName="employee_transfers"
+    moduleRoute="employee-transfers">
+  </app-form-header>
+
+  @if (loading()) {
+    <div class="text-center py-5">
+      <app-loading-spinner [message]="i18n.t('common.loading')" [variant]="'primary'" [centered]="true" />
+    </div>
+  }
+
+  @if (!loading()) {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <app-form-section [title]="i18n.t('common.basic_info')" [variant]="'modern'">
+        <div class="row g-3">
+          <!-- Employee -->
+          <div class="col-md-6">
+            <div class="app-modern-field">
+              <label class="app-modern-label">{{ i18n.t('fields.employee') }} <span class="text-danger">*</span></label>
+              <app-searchable-select
+                [options]="employeeOptions"
+                [placeholder]="i18n.t('common.select_employee')"
+                [value]="form.get('employeeId')?.value"
+                [disabled]="submitting()"
+                (selectionChange)="form.get('employeeId')?.setValue($event)">
+              </app-searchable-select>
+            </div>
+            <small class="text-muted">{{ i18n.t('employee_transfers.hints.employee') }}</small>
+          </div>
+
+          <!-- To Branch -->
+          <div class="col-md-6">
+            <div class="app-modern-field">
+              <label class="app-modern-label">{{ i18n.t('employee_transfers.to_branch') }} <span class="text-danger">*</span></label>
+              <app-searchable-select
+                [options]="branchOptions"
+                [placeholder]="i18n.t('common.select_branch')"
+                [value]="form.get('toBranchId')?.value"
+                [disabled]="submitting()"
+                (selectionChange)="onBranchChange($event)">
+              </app-searchable-select>
+            </div>
+            <small class="text-muted">{{ i18n.t('employee_transfers.hints.to_branch') }}</small>
+          </div>
+
+          <!-- To Department -->
+          <div class="col-md-6">
+            <div class="app-modern-field">
+              <label class="app-modern-label">{{ i18n.t('employee_transfers.to_department') }} <span class="text-danger">*</span></label>
+              <app-searchable-select
+                [options]="departmentOptions"
+                [placeholder]="i18n.t('common.select_department')"
+                [value]="form.get('toDepartmentId')?.value"
+                [disabled]="submitting()"
+                (selectionChange)="form.get('toDepartmentId')?.setValue($event)">
+              </app-searchable-select>
+            </div>
+            <small class="text-muted">{{ i18n.t('employee_transfers.hints.to_department') }}</small>
+          </div>
+
+          <!-- To Job Title -->
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input type="text" class="form-control" id="toJobTitle" formControlName="toJobTitle" placeholder="x">
+              <label for="toJobTitle">{{ i18n.t('employee_transfers.to_job_title') }}</label>
+            </div>
+            <small class="text-muted">{{ i18n.t('employee_transfers.hints.to_job_title') }}</small>
+          </div>
+
+          <!-- To Job Title (Arabic) -->
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input type="text" class="form-control" id="toJobTitleAr" formControlName="toJobTitleAr" placeholder="x" dir="rtl">
+              <label for="toJobTitleAr">{{ i18n.t('employee_transfers.to_job_title_ar') }}</label>
+            </div>
+            <small class="text-muted">{{ i18n.t('employee_transfers.hints.to_job_title_ar') }}</small>
+          </div>
+
+          <!-- Effective Date -->
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input type="date" class="form-control" id="effectiveDate" formControlName="effectiveDate" placeholder="x">
+              <label for="effectiveDate">{{ i18n.t('fields.effective_date') }} <span class="text-danger">*</span></label>
+            </div>
+            <small class="text-muted">{{ i18n.t('employee_transfers.hints.effective_date') }}</small>
+          </div>
+
+          <!-- Reason -->
+          <div class="col-md-6">
+            <div class="form-floating">
+              <textarea class="form-control" id="reason" formControlName="reason" placeholder="x" style="height: 100px"></textarea>
+              <label for="reason">{{ i18n.t('fields.reason') }}</label>
+            </div>
+            <small class="text-muted">{{ i18n.t('employee_transfers.hints.reason') }}</small>
+          </div>
+
+          <!-- Reason (Arabic) -->
+          <div class="col-md-6">
+            <div class="form-floating">
+              <textarea class="form-control" id="reasonAr" formControlName="reasonAr" placeholder="x" style="height: 100px" dir="rtl"></textarea>
+              <label for="reasonAr">{{ i18n.t('fields.reason_ar') }}</label>
+            </div>
+            <small class="text-muted">{{ i18n.t('employee_transfers.hints.reason_ar') }}</small>
+          </div>
+        </div>
+      </app-form-section>
+
+      <div class="app-form-actions">
+        <button type="button" class="btn btn-secondary" routerLink="/employee-transfers">{{ i18n.t('common.cancel') }}</button>
+        <button type="submit" class="btn btn-primary" [disabled]="form.invalid || submitting()">
+          @if (submitting()) {
+            <span class="spinner-border spinner-border-sm me-1"></span>
+          }
+          {{ i18n.t('common.save') }}
+        </button>
+      </div>
+    </form>
+  }
+</div>

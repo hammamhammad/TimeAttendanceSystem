@@ -1,7 +1,9 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.VacationTypes.Commands.UpdateVacationType;
+namespace TecAxle.Hrms.Application.VacationTypes.Commands.UpdateVacationType;
 
 /// <summary>
 /// Simplified CQRS command for updating an existing vacation type in the Time Attendance System.
@@ -22,9 +24,13 @@ namespace TimeAttendanceSystem.Application.VacationTypes.Commands.UpdateVacation
 /// - Vacation type name uniqueness enforced per branch scope
 /// - Multi-tenant isolation through branch relationship (null = all branches)
 /// </remarks>
+[RequiresModule(SystemModule.LeaveManagement)]
 public record UpdateVacationTypeCommand(
     long Id,
     long? BranchId,
     string Name,
-    string? NameAr
+    string? NameAr,
+    bool AllowHalfDay = false,
+    bool AllowEncashment = false,
+    int? EncashmentMaxDays = null
 ) : IRequest<Result>;

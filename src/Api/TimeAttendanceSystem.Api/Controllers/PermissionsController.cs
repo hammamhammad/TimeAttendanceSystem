@@ -1,9 +1,9 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TimeAttendanceSystem.Application.Permissions.Queries.GetPermissions;
+using TecAxle.Hrms.Application.Permissions.Queries.GetPermissions;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/permissions")]

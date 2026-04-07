@@ -1,8 +1,10 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Settings;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Settings;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.PublicHolidays.Queries.GetPublicHolidays;
+namespace TecAxle.Hrms.Application.PublicHolidays.Queries.GetPublicHolidays;
 
 /// <summary>
 /// Query for retrieving paginated public holidays with comprehensive filtering options.
@@ -67,6 +69,7 @@ namespace TimeAttendanceSystem.Application.PublicHolidays.Queries.GetPublicHolid
 /// - Contains conflict indicators for overlapping holidays
 /// - Includes usage statistics for administrative insights
 /// </remarks>
+[RequiresModule(SystemModule.TimeAttendance, AllowReadWhenDisabled = true)]
 public record GetPublicHolidaysQuery(
     int Page = 1,
     int PageSize = 10,

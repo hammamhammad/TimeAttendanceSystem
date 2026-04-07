@@ -1,0 +1,34 @@
+<div class="employee-promotions-page">
+  <!-- Page Header -->
+  <app-page-header [title]="i18n.t('employee_promotions.title')" />
+
+  <!-- Filters -->
+  <app-unified-filter
+    moduleName="employee_promotions"
+    [showAddButton]="true"
+    [addButtonText]="i18n.t('employee_promotions.create')"
+    [showRefreshButton]="true"
+    [refreshing]="loading()"
+    (searchChange)="onSearchChange($event)"
+    (filtersChange)="onFiltersChange($event)"
+    (add)="navigateToCreate()"
+    (refresh)="onRefreshData()">
+  </app-unified-filter>
+
+  <!-- Data Table -->
+  <app-data-table
+    [data]="displayData()"
+    [columns]="tableColumns"
+    [actions]="tableActions"
+    [loading]="loading"
+    [totalItems]="totalCount()"
+    [currentPage]="currentPage()"
+    [pageSize]="pageSize()"
+    [pageSizeOptions]="[10, 25, 50, 100]"
+    [emptyTitle]="i18n.t('employee_promotions.no_records_title')"
+    [emptyMessage]="i18n.t('employee_promotions.no_records')"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)"
+    (actionClick)="onTableAction($event)">
+  </app-data-table>
+</div>

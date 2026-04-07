@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace TimeAttendanceSystem.Application.EmployeeVacations.Commands.CreateEmployeeVacation;
+namespace TecAxle.Hrms.Application.EmployeeVacations.Commands.CreateEmployeeVacation;
 
 /// <summary>
 /// Fluent Validation rules for CreateEmployeeVacationCommand.
@@ -37,6 +37,18 @@ public class CreateEmployeeVacationCommandValidator : AbstractValidator<CreateEm
             .Must(HaveValidDateRange)
             .WithMessage("Vacation period cannot exceed 365 days")
             .WithName("DateRange");
+
+        // Half-day leave validation
+        RuleFor(x => x.HalfDayType)
+            .NotNull()
+            .When(x => x.IsHalfDay)
+            .WithMessage("Half-day type (Morning or Afternoon) is required when requesting half-day leave");
+
+        RuleFor(x => x)
+            .Must(x => x.StartDate.Date == x.EndDate.Date)
+            .When(x => x.IsHalfDay)
+            .WithMessage("Half-day leave must be for a single day (start date must equal end date)")
+            .WithName("HalfDayDateRange");
     }
 
     private static bool HaveValidDateRange(CreateEmployeeVacationCommand command)

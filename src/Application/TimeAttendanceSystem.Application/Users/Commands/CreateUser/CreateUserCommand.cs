@@ -1,7 +1,7 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Users.Commands.CreateUser;
+namespace TecAxle.Hrms.Application.Users.Commands.CreateUser;
 
 public record CreateUserCommand(
     string Username,

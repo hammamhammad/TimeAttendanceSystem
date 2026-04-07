@@ -2,19 +2,34 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Application.Excuses.Queries.GetEmployeeExcuses;
-using TimeAttendanceSystem.Application.Features.Portal.EmployeeDashboard.Queries;
-using TimeAttendanceSystem.Application.Features.Portal.ManagerDashboard.Queries;
-using TimeAttendanceSystem.Application.Features.Portal.Team.Queries;
-using TimeAttendanceSystem.Application.Workflows.Queries.GetPendingApprovals;
-using TimeAttendanceSystem.Domain.Attendance;
-using TimeAttendanceSystem.Domain.Excuses;
-using TimeAttendanceSystem.Domain.RemoteWork;
-using TimeAttendanceSystem.Domain.Workflows.Enums;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Excuses.Queries.GetEmployeeExcuses;
+using TecAxle.Hrms.Application.Features.Portal.EmployeeDashboard.Queries;
+using TecAxle.Hrms.Application.Features.Portal.ManagerDashboard.Queries;
+using TecAxle.Hrms.Application.Features.Portal.Team.Queries;
+using TecAxle.Hrms.Application.Workflows.Queries.GetPendingApprovals;
+using TecAxle.Hrms.Domain.Attendance;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Excuses;
+using TecAxle.Hrms.Domain.Offboarding;
+using TecAxle.Hrms.Domain.Payroll;
+using TecAxle.Hrms.Domain.RemoteWork;
+using TecAxle.Hrms.Domain.Documents;
+using TecAxle.Hrms.Domain.Expenses;
+using TecAxle.Hrms.Domain.Loans;
+using TecAxle.Hrms.Domain.Announcements;
+using TecAxle.Hrms.Domain.Training;
+using TecAxle.Hrms.Domain.EmployeeRelations;
+using TecAxle.Hrms.Domain.Assets;
+using TecAxle.Hrms.Domain.Surveys;
+using TecAxle.Hrms.Domain.Notifications;
+using TecAxle.Hrms.Domain.Workflows.Enums;
+using TecAxle.Hrms.Domain.Timesheets;
+using TecAxle.Hrms.Domain.Succession;
+using TecAxle.Hrms.Domain.Benefits;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 /// <summary>
 /// API controller for employee self-service portal features.
@@ -651,7 +666,9 @@ public class PortalController : ControllerBase
                     ev.CreatedAtUtc,
                     ev.CreatedBy,
                     ev.ModifiedAtUtc,
-                    ev.ModifiedBy
+                    ev.ModifiedBy,
+                    ev.IsHalfDay,
+                    ev.HalfDayType
                 })
                 .FirstOrDefaultAsync();
 
@@ -759,7 +776,10 @@ public class PortalController : ControllerBase
                 currentStep?.StepOrder,
                 totalSteps > 0 ? totalSteps : null,
                 approvalHistory,
-                workflow?.Id
+                workflow?.Id,
+                IsHalfDay: vacation.IsHalfDay,
+                HalfDayType: vacation.HalfDayType?.ToString(),
+                HalfDayTypeName: vacation.HalfDayType?.ToString()
             );
 
             return Ok(dto);
@@ -861,7 +881,9 @@ public class PortalController : ControllerBase
                     ev.CreatedAtUtc,
                     ev.CreatedBy,
                     ev.ModifiedAtUtc,
-                    ev.ModifiedBy
+                    ev.ModifiedBy,
+                    ev.IsHalfDay,
+                    ev.HalfDayType
                 })
                 .FirstOrDefaultAsync();
 
@@ -956,7 +978,10 @@ public class PortalController : ControllerBase
                 currentStep?.StepOrder,
                 totalSteps > 0 ? totalSteps : null,
                 approvalHistory,
-                workflow?.Id
+                workflow?.Id,
+                IsHalfDay: vacation.IsHalfDay,
+                HalfDayType: vacation.HalfDayType?.ToString(),
+                HalfDayTypeName: vacation.HalfDayType?.ToString()
             );
 
             return Ok(dto);
@@ -2263,6 +2288,2988 @@ public class PortalController : ControllerBase
 
         return businessDays;
     }
+
+    /// <summary>
+    /// Get current employee's active allowances
+    /// </summary>
+    [HttpGet("my-allowances")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetMyAllowances()
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+            {
+                return Unauthorized(new { error = "User not authenticated" });
+            }
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+            {
+                return NotFound(new { error = "Employee profile not found for current user" });
+            }
+
+            var allowances = await _context.AllowanceAssignments
+                .Include(a => a.AllowanceType)
+                .Where(a => a.EmployeeId == employeeLink.EmployeeId
+                    && a.Status == AllowanceAssignmentStatus.Active
+                    && !a.IsDeleted)
+                .Select(a => new
+                {
+                    a.Id,
+                    a.AllowanceTypeId,
+                    AllowanceTypeName = a.AllowanceType != null ? a.AllowanceType.Name : "Unknown",
+                    AllowanceTypeNameAr = a.AllowanceType != null ? a.AllowanceType.NameAr : (string?)null,
+                    a.Amount,
+                    a.Percentage,
+                    a.Currency,
+                    a.EffectiveFromDate,
+                    a.EffectiveToDate,
+                    Status = a.Status.ToString(),
+                    a.Reason
+                })
+                .ToListAsync();
+
+            return Ok(allowances);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving employee allowances");
+            return StatusCode(500, new { error = "An error occurred while retrieving allowances" });
+        }
+    }
+
+    /// <summary>
+    /// Get current employee's allowance summary (total)
+    /// </summary>
+    [HttpGet("my-allowances/summary")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetMyAllowanceSummary()
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+            {
+                return Unauthorized(new { error = "User not authenticated" });
+            }
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+            {
+                return NotFound(new { error = "Employee profile not found for current user" });
+            }
+
+            var total = await _context.AllowanceAssignments
+                .Where(a => a.EmployeeId == employeeLink.EmployeeId
+                    && a.Status == AllowanceAssignmentStatus.Active
+                    && !a.IsDeleted)
+                .SumAsync(a => a.Amount);
+
+            return Ok(new { totalAllowances = total });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving employee allowance summary");
+            return StatusCode(500, new { error = "An error occurred while retrieving allowance summary" });
+        }
+    }
+
+    // ============================================================
+    // Payroll & Compensation Endpoints
+    // ============================================================
+
+    /// <summary>
+    /// Get current employee's payslip history
+    /// </summary>
+    [HttpGet("my-payslips")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetMyPayslips([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+            {
+                return Unauthorized(new { error = "User not authenticated" });
+            }
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+            {
+                return NotFound(new { error = "Employee profile not found for current user" });
+            }
+
+            var employeeId = employeeLink.EmployeeId;
+
+            var query = _context.PayrollRecords
+                .Include(pr => pr.PayrollPeriod)
+                .Include(pr => pr.Details)
+                .Where(pr => pr.EmployeeId == employeeId && !pr.IsDeleted)
+                .OrderByDescending(pr => pr.PayrollPeriod.EndDate);
+
+            var totalCount = await query.CountAsync();
+
+            var payslips = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(pr => new
+                {
+                    pr.Id,
+                    periodName = pr.PayrollPeriod.Name,
+                    periodNameAr = pr.PayrollPeriod.NameAr,
+                    periodStart = pr.PayrollPeriod.StartDate,
+                    periodEnd = pr.PayrollPeriod.EndDate,
+                    pr.BaseSalary,
+                    pr.TotalAllowances,
+                    pr.GrossEarnings,
+                    pr.TotalDeductions,
+                    pr.TaxAmount,
+                    pr.SocialInsuranceEmployee,
+                    pr.OvertimePay,
+                    pr.AbsenceDeduction,
+                    pr.LoanDeduction,
+                    pr.OtherDeductions,
+                    pr.NetSalary,
+                    pr.WorkingDays,
+                    pr.PaidDays,
+                    pr.OvertimeHours,
+                    pr.AbsentDays,
+                    status = pr.Status.ToString(),
+                    pr.PaySlipGeneratedAt,
+                    details = pr.Details.Select(d => new
+                    {
+                        d.ComponentName,
+                        d.ComponentNameAr,
+                        componentType = d.ComponentType.ToString(),
+                        d.Amount,
+                        d.Notes
+                    }).ToList()
+                })
+                .ToListAsync();
+
+            return Ok(new
+            {
+                isSuccess = true,
+                value = new
+                {
+                    items = payslips,
+                    totalCount,
+                    page,
+                    pageSize,
+                    totalPages = (int)Math.Ceiling((double)totalCount / pageSize)
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving employee payslips");
+            return StatusCode(500, new { error = "An error occurred while retrieving payslips" });
+        }
+    }
+
+    /// <summary>
+    /// Get current employee's salary details
+    /// </summary>
+    [HttpGet("my-salary")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetMySalary()
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+            {
+                return Unauthorized(new { error = "User not authenticated" });
+            }
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+            {
+                return NotFound(new { error = "Employee profile not found for current user" });
+            }
+
+            var employeeId = employeeLink.EmployeeId;
+
+            var currentSalary = await _context.EmployeeSalaries
+                .Include(s => s.Components)
+                    .ThenInclude(c => c.SalaryComponent)
+                .Where(s => s.EmployeeId == employeeId && s.IsCurrent && !s.IsDeleted)
+                .Select(s => new
+                {
+                    s.Id,
+                    s.BaseSalary,
+                    s.Currency,
+                    s.EffectiveDate,
+                    s.EndDate,
+                    components = s.Components.Select(c => new
+                    {
+                        c.Id,
+                        componentName = c.SalaryComponent.Name,
+                        componentNameAr = c.SalaryComponent.NameAr,
+                        componentType = c.SalaryComponent.ComponentType.ToString(),
+                        c.Amount
+                    }).ToList()
+                })
+                .FirstOrDefaultAsync();
+
+            if (currentSalary == null)
+            {
+                return Ok(new { isSuccess = true, value = (object?)null });
+            }
+
+            return Ok(new { isSuccess = true, value = currentSalary });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving employee salary details");
+            return StatusCode(500, new { error = "An error occurred while retrieving salary details" });
+        }
+    }
+
+    // ============================================================
+    // Resignation Endpoints
+    // ============================================================
+
+    /// <summary>
+    /// Get current employee's resignation request (if any)
+    /// </summary>
+    [HttpGet("my-resignation")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetMyResignation()
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+            {
+                return Unauthorized(new { error = "User not authenticated" });
+            }
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+            {
+                return NotFound(new { error = "Employee profile not found for current user" });
+            }
+
+            var employeeId = employeeLink.EmployeeId;
+
+            var resignations = await _context.ResignationRequests
+                .Where(r => r.EmployeeId == employeeId && !r.IsDeleted)
+                .OrderByDescending(r => r.CreatedAtUtc)
+                .Select(r => new
+                {
+                    r.Id,
+                    r.ResignationDate,
+                    r.LastWorkingDate,
+                    r.NoticePeriodDays,
+                    r.WaivedNoticeDays,
+                    r.Reason,
+                    r.ReasonAr,
+                    status = r.Status.ToString(),
+                    r.RejectionReason,
+                    r.Notes,
+                    r.CreatedAtUtc
+                })
+                .ToListAsync();
+
+            return Ok(new { isSuccess = true, value = resignations });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving employee resignation");
+            return StatusCode(500, new { error = "An error occurred while retrieving resignation" });
+        }
+    }
+
+    /// <summary>
+    /// Submit a resignation request for the current employee
+    /// </summary>
+    [HttpPost("my-resignation")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> SubmitMyResignation([FromBody] SubmitResignationRequest request)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+            {
+                return Unauthorized(new { error = "User not authenticated" });
+            }
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+            {
+                return NotFound(new { error = "Employee profile not found for current user" });
+            }
+
+            var employeeId = employeeLink.EmployeeId;
+
+            // Check for existing pending resignation
+            var existingPending = await _context.ResignationRequests
+                .AnyAsync(r => r.EmployeeId == employeeId
+                    && r.Status == ResignationStatus.Pending
+                    && !r.IsDeleted);
+
+            if (existingPending)
+            {
+                return BadRequest(new { error = "You already have a pending resignation request" });
+            }
+
+            // Validate resignation date is in the future
+            if (request.ResignationDate.Date <= DateTime.UtcNow.Date)
+            {
+                return BadRequest(new { error = "Resignation date must be in the future" });
+            }
+
+            // Validate last working date is on or after resignation date
+            if (request.LastWorkingDate.Date < request.ResignationDate.Date)
+            {
+                return BadRequest(new { error = "Last working date cannot be before resignation date" });
+            }
+
+            var noticePeriodDays = (request.LastWorkingDate.Date - request.ResignationDate.Date).Days;
+
+            var resignation = new ResignationRequest
+            {
+                EmployeeId = employeeId,
+                ResignationDate = request.ResignationDate,
+                LastWorkingDate = request.LastWorkingDate,
+                NoticePeriodDays = noticePeriodDays,
+                Reason = request.Reason,
+                ReasonAr = request.ReasonAr,
+                Status = ResignationStatus.Pending,
+                SubmittedByUserId = _currentUser.UserId,
+                CreatedBy = _currentUser.Username ?? "system"
+            };
+
+            _context.ResignationRequests.Add(resignation);
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                isSuccess = true,
+                value = new
+                {
+                    resignation.Id,
+                    resignation.ResignationDate,
+                    resignation.LastWorkingDate,
+                    resignation.NoticePeriodDays,
+                    resignation.Reason,
+                    resignation.ReasonAr,
+                    status = resignation.Status.ToString(),
+                    resignation.CreatedAtUtc
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error submitting resignation request");
+            return StatusCode(500, new { error = "An error occurred while submitting resignation request" });
+        }
+    }
+
+    // ============================================================
+    // Phase 3: Documents, Expenses & Loans Self-Service Endpoints
+    // ============================================================
+
+    /// <summary>
+    /// Get current employee's documents
+    /// </summary>
+    [HttpGet("my-documents")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetMyDocuments()
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var employeeId = employeeLink.EmployeeId;
+
+            var items = await _context.EmployeeDocuments
+                .Where(x => x.EmployeeId == employeeId && !x.IsDeleted)
+                .OrderByDescending(x => x.CreatedAtUtc)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.DocumentName,
+                    x.DocumentNameAr,
+                    DocumentType = x.DocumentType.ToString(),
+                    x.FileUrl,
+                    x.ExpiryDate,
+                    x.IssuedDate,
+                    VerificationStatus = x.VerificationStatus.ToString(),
+                    x.Notes,
+                    CategoryName = x.DocumentCategory != null ? x.DocumentCategory.Name : (string?)null,
+                    CategoryNameAr = x.DocumentCategory != null ? x.DocumentCategory.NameAr : (string?)null,
+                    x.CreatedAtUtc
+                })
+                .ToListAsync();
+
+            return Ok(new { data = items, totalCount = items.Count });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving employee documents");
+            return StatusCode(500, new { error = "An error occurred while retrieving documents" });
+        }
+    }
+
+    /// <summary>
+    /// Get company policies with acknowledgment status for the current employee
+    /// </summary>
+    [HttpGet("company-policies")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetCompanyPolicies()
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var employeeId = employeeLink.EmployeeId;
+
+            var items = await _context.CompanyPolicies
+                .Where(x => x.Status == PolicyStatus.Published && !x.IsDeleted)
+                .OrderByDescending(x => x.EffectiveDate)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.Title,
+                    x.TitleAr,
+                    x.Description,
+                    x.DescriptionAr,
+                    x.DocumentUrl,
+                    x.Version,
+                    x.EffectiveDate,
+                    Status = x.Status.ToString(),
+                    x.RequiresAcknowledgment,
+                    CategoryName = x.DocumentCategory != null ? x.DocumentCategory.Name : (string?)null,
+                    CategoryNameAr = x.DocumentCategory != null ? x.DocumentCategory.NameAr : (string?)null,
+                    Acknowledged = x.Acknowledgments.Any(a => a.EmployeeId == employeeId),
+                    AcknowledgedAt = x.Acknowledgments
+                        .Where(a => a.EmployeeId == employeeId)
+                        .Select(a => (DateTime?)a.AcknowledgedAt)
+                        .FirstOrDefault(),
+                    x.CreatedAtUtc
+                })
+                .ToListAsync();
+
+            return Ok(new { data = items, totalCount = items.Count });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving company policies");
+            return StatusCode(500, new { error = "An error occurred while retrieving company policies" });
+        }
+    }
+
+    /// <summary>
+    /// Get current employee's letter requests
+    /// </summary>
+    [HttpGet("my-letter-requests")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetMyLetterRequests()
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var employeeId = employeeLink.EmployeeId;
+
+            var items = await _context.LetterRequests
+                .Where(x => x.EmployeeId == employeeId && !x.IsDeleted)
+                .OrderByDescending(x => x.CreatedAtUtc)
+                .Select(x => new
+                {
+                    x.Id,
+                    LetterType = x.LetterType.ToString(),
+                    x.Purpose,
+                    x.PurposeAr,
+                    x.AdditionalNotes,
+                    Status = x.Status.ToString(),
+                    x.RejectionReason,
+                    x.GeneratedDocumentUrl,
+                    x.GeneratedAt,
+                    x.TemplateId,
+                    TemplateName = x.Template != null ? x.Template.Name : (string?)null,
+                    x.ApprovedAt,
+                    x.CreatedAtUtc
+                })
+                .ToListAsync();
+
+            return Ok(new { data = items, totalCount = items.Count });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving employee letter requests");
+            return StatusCode(500, new { error = "An error occurred while retrieving letter requests" });
+        }
+    }
+
+    /// <summary>
+    /// Get current employee's expense claims
+    /// </summary>
+    [HttpGet("my-expense-claims")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetMyExpenseClaims()
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var employeeId = employeeLink.EmployeeId;
+
+            var items = await _context.ExpenseClaims
+                .Where(x => x.EmployeeId == employeeId && !x.IsDeleted)
+                .OrderByDescending(x => x.CreatedAtUtc)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.ClaimNumber,
+                    x.TotalAmount,
+                    x.Currency,
+                    x.Description,
+                    Status = x.Status.ToString(),
+                    x.RejectionReason,
+                    x.ApprovedAt,
+                    PolicyName = x.ExpensePolicy != null ? x.ExpensePolicy.Name : (string?)null,
+                    ItemCount = x.Items.Count,
+                    x.CreatedAtUtc
+                })
+                .ToListAsync();
+
+            return Ok(new { data = items, totalCount = items.Count });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving employee expense claims");
+            return StatusCode(500, new { error = "An error occurred while retrieving expense claims" });
+        }
+    }
+
+    /// <summary>
+    /// Get current employee's loan applications
+    /// </summary>
+    [HttpGet("my-loan-applications")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetMyLoanApplications()
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var employeeId = employeeLink.EmployeeId;
+
+            var items = await _context.LoanApplications
+                .Where(x => x.EmployeeId == employeeId && !x.IsDeleted)
+                .OrderByDescending(x => x.CreatedAtUtc)
+                .Select(x => new
+                {
+                    x.Id,
+                    LoanTypeName = x.LoanType.Name,
+                    LoanTypeNameAr = x.LoanType.NameAr,
+                    x.RequestedAmount,
+                    x.ApprovedAmount,
+                    x.RepaymentMonths,
+                    x.MonthlyInstallment,
+                    x.InterestRate,
+                    x.Purpose,
+                    x.PurposeAr,
+                    Status = x.Status.ToString(),
+                    x.StartDate,
+                    x.EndDate,
+                    x.RejectionReason,
+                    x.OutstandingBalance,
+                    x.Notes,
+                    x.ApprovedAt,
+                    x.CreatedAtUtc
+                })
+                .ToListAsync();
+
+            return Ok(new { data = items, totalCount = items.Count });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving employee loan applications");
+            return StatusCode(500, new { error = "An error occurred while retrieving loan applications" });
+        }
+    }
+
+    /// <summary>
+    /// Get current employee's salary advances
+    /// </summary>
+    [HttpGet("my-salary-advances")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetMySalaryAdvances()
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var employeeId = employeeLink.EmployeeId;
+
+            var items = await _context.SalaryAdvances
+                .Where(x => x.EmployeeId == employeeId && !x.IsDeleted)
+                .OrderByDescending(x => x.CreatedAtUtc)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.Amount,
+                    x.Currency,
+                    x.RequestDate,
+                    x.DeductionMonth,
+                    x.Reason,
+                    x.ReasonAr,
+                    Status = x.Status.ToString(),
+                    x.RejectionReason,
+                    x.ApprovedAt,
+                    x.CreatedAtUtc
+                })
+                .ToListAsync();
+
+            return Ok(new { data = items, totalCount = items.Count });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving employee salary advances");
+            return StatusCode(500, new { error = "An error occurred while retrieving salary advances" });
+        }
+    }
+
+    // ===== ANNOUNCEMENTS (PORTAL) =====
+
+    /// <summary>
+    /// Get published announcements for the current employee, filtered by branch/department/role targeting.
+    /// Includes acknowledged flag for each announcement.
+    /// </summary>
+    [HttpGet("announcements")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetAnnouncements()
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var employeeId = employeeLink.EmployeeId;
+
+            // Get employee details for targeting
+            var employee = await _context.Employees.AsNoTracking()
+                .Where(e => e.Id == employeeId)
+                .Select(e => new { e.BranchId, e.DepartmentId })
+                .FirstOrDefaultAsync();
+
+            if (employee == null)
+                return NotFound(new { error = "Employee not found" });
+
+            // Get the user's role IDs
+            var userRoleIds = await _context.UserRoles
+                .Where(ur => ur.UserId == _currentUser.UserId)
+                .Select(ur => ur.RoleId)
+                .ToListAsync();
+
+            var now = DateTime.UtcNow;
+
+            // Get published, non-expired announcements
+            var allAnnouncements = await _context.Announcements.AsNoTracking()
+                .Where(x => x.Status == AnnouncementStatus.Published
+                    && !x.IsDeleted
+                    && (x.ExpiryDate == null || x.ExpiryDate > now))
+                .OrderByDescending(x => x.IsPinned)
+                .ThenByDescending(x => x.PublishedAt)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.Title,
+                    x.TitleAr,
+                    x.Content,
+                    x.ContentAr,
+                    Priority = x.Priority.ToString(),
+                    TargetAudience = x.TargetAudience,
+                    x.TargetIds,
+                    CategoryName = x.Category != null ? x.Category.Name : (string?)null,
+                    CategoryNameAr = x.Category != null ? x.Category.NameAr : (string?)null,
+                    x.IsPinned,
+                    x.RequiresAcknowledgment,
+                    x.PublishedAt,
+                    x.ExpiryDate,
+                    Acknowledged = x.Acknowledgments.Any(a => a.EmployeeId == employeeId),
+                    AcknowledgedAt = x.Acknowledgments
+                        .Where(a => a.EmployeeId == employeeId)
+                        .Select(a => (DateTime?)a.AcknowledgedAt)
+                        .FirstOrDefault(),
+                    Attachments = x.Attachments
+                        .Where(a => !a.IsDeleted)
+                        .OrderBy(a => a.SortOrder)
+                        .Select(a => new
+                        {
+                            a.FileAttachmentId,
+                            FileName = a.FileAttachment.OriginalFileName,
+                            StoredFileName = a.FileAttachment.StoredFileName,
+                            ContentType = a.FileAttachment.ContentType,
+                            FileSize = a.FileAttachment.FileSize
+                        })
+                        .ToList(),
+                    x.CreatedAtUtc
+                })
+                .ToListAsync();
+
+            // Filter by target audience in memory (TargetIds is a JSON array string)
+            var branchIdStr = employee.BranchId.ToString();
+            var deptIdStr = employee.DepartmentId?.ToString();
+            var roleIdStrs = userRoleIds.Select(r => r.ToString()).ToHashSet();
+
+            var filtered = allAnnouncements.Where(a =>
+            {
+                if (a.TargetAudience == AnnouncementTargetAudience.All)
+                    return true;
+
+                if (string.IsNullOrWhiteSpace(a.TargetIds))
+                    return true; // No specific targets = all
+
+                var ids = a.TargetIds.Trim('[', ']').Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                    .Select(s => s.Trim('"', ' ')).ToHashSet();
+
+                return a.TargetAudience switch
+                {
+                    AnnouncementTargetAudience.Branch => ids.Contains(branchIdStr),
+                    AnnouncementTargetAudience.Department => deptIdStr != null && ids.Contains(deptIdStr),
+                    AnnouncementTargetAudience.Role => roleIdStrs.Any(r => ids.Contains(r)),
+                    _ => true
+                };
+            }).Select(a => new
+            {
+                a.Id,
+                a.Title,
+                a.TitleAr,
+                a.Content,
+                a.ContentAr,
+                a.Priority,
+                TargetAudience = a.TargetAudience.ToString(),
+                a.CategoryName,
+                a.CategoryNameAr,
+                a.IsPinned,
+                a.RequiresAcknowledgment,
+                a.PublishedAt,
+                a.ExpiryDate,
+                a.Acknowledged,
+                a.AcknowledgedAt,
+                a.Attachments,
+                a.CreatedAtUtc
+            }).ToList();
+
+            return Ok(new { data = filtered, totalCount = filtered.Count });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving announcements for portal");
+            return StatusCode(500, new { error = "An error occurred while retrieving announcements" });
+        }
+    }
+
+    /// <summary>
+    /// Acknowledge an announcement for the current employee.
+    /// </summary>
+    [HttpPost("announcements/{id}/acknowledge")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> AcknowledgeAnnouncement(long id)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var employeeId = employeeLink.EmployeeId;
+
+            var announcement = await _context.Announcements
+                .FirstOrDefaultAsync(x => x.Id == id && x.Status == AnnouncementStatus.Published && !x.IsDeleted);
+
+            if (announcement == null)
+                return NotFound(new { error = "Announcement not found or not published." });
+
+            if (!announcement.RequiresAcknowledgment)
+                return BadRequest(new { error = "This announcement does not require acknowledgment." });
+
+            // Check if already acknowledged
+            var alreadyAcknowledged = await _context.AnnouncementAcknowledgments
+                .AnyAsync(x => x.AnnouncementId == id && x.EmployeeId == employeeId && !x.IsDeleted);
+
+            if (alreadyAcknowledged)
+                return Ok(new { message = "Already acknowledged." });
+
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+
+            var acknowledgment = new AnnouncementAcknowledgment
+            {
+                AnnouncementId = id,
+                EmployeeId = employeeId,
+                AcknowledgedAt = DateTime.UtcNow,
+                IpAddress = ipAddress,
+                CreatedAtUtc = DateTime.UtcNow,
+                CreatedBy = _currentUser.Username ?? "system"
+            };
+
+            _context.AnnouncementAcknowledgments.Add(acknowledgment);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Announcement acknowledged successfully." });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error acknowledging announcement {AnnouncementId}", id);
+            return StatusCode(500, new { error = "An error occurred while acknowledging the announcement" });
+        }
+    }
+
+    // ===== TRAINING & DEVELOPMENT (PORTAL) =====
+
+    /// <summary>
+    /// Get current employee's training enrollments with session/course info
+    /// </summary>
+    [HttpGet("my-training")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetMyTraining()
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var employeeId = employeeLink.EmployeeId;
+
+            var items = await _context.TrainingEnrollments
+                .Where(x => x.EmployeeId == employeeId && !x.IsDeleted)
+                .OrderByDescending(x => x.EnrolledAt)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.TrainingSessionId,
+                    SessionTitle = x.Session != null ? x.Session.Title : (string?)null,
+                    CourseTitle = x.Session != null ? x.Session.Course.Title : (string?)null,
+                    CourseTitleAr = x.Session != null ? x.Session.Course.TitleAr : (string?)null,
+                    CourseCode = x.Session != null ? x.Session.Course.Code : (string?)null,
+                    SessionStartDate = x.Session != null ? x.Session.StartDate : (DateTime?)null,
+                    SessionEndDate = x.Session != null ? x.Session.EndDate : (DateTime?)null,
+                    SessionLocation = x.Session != null ? x.Session.Location : (string?)null,
+                    SessionLocationAr = x.Session != null ? x.Session.LocationAr : (string?)null,
+                    InstructorName = x.Session != null ? x.Session.InstructorName : (string?)null,
+                    InstructorNameAr = x.Session != null ? x.Session.InstructorNameAr : (string?)null,
+                    x.TrainingProgramId,
+                    ProgramTitle = x.Program != null ? x.Program.Title : (string?)null,
+                    ProgramTitleAr = x.Program != null ? x.Program.TitleAr : (string?)null,
+                    Status = x.Status.ToString(),
+                    x.EnrolledAt,
+                    x.CompletedAt,
+                    x.CancelledAt,
+                    x.CancellationReason,
+                    x.CreatedAtUtc
+                })
+                .ToListAsync();
+
+            return Ok(new { data = items, totalCount = items.Count });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving employee training enrollments");
+            return StatusCode(500, new { error = "An error occurred while retrieving training enrollments" });
+        }
+    }
+
+    /// <summary>
+    /// Get current employee's certifications
+    /// </summary>
+    [HttpGet("my-certifications")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetMyCertifications()
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var employeeId = employeeLink.EmployeeId;
+
+            var items = await _context.EmployeeCertifications
+                .Where(x => x.EmployeeId == employeeId && !x.IsDeleted)
+                .OrderByDescending(x => x.IssueDate)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.CertificationName,
+                    x.CertificationNameAr,
+                    x.IssuingAuthority,
+                    x.IssuingAuthorityAr,
+                    x.CertificationNumber,
+                    x.IssueDate,
+                    x.ExpiryDate,
+                    Status = x.Status.ToString(),
+                    x.DocumentUrl,
+                    x.RenewalRequired,
+                    x.RenewalReminderDays,
+                    CourseTitle = x.Course != null ? x.Course.Title : (string?)null,
+                    CourseTitleAr = x.Course != null ? x.Course.TitleAr : (string?)null,
+                    x.CreatedAtUtc
+                })
+                .ToListAsync();
+
+            return Ok(new { data = items, totalCount = items.Count });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving employee certifications");
+            return StatusCode(500, new { error = "An error occurred while retrieving certifications" });
+        }
+    }
+
+    /// <summary>
+    /// Get training catalog - active sessions and programs available for enrollment
+    /// </summary>
+    [HttpGet("training-catalog")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetTrainingCatalog()
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var employeeId = employeeLink.EmployeeId;
+
+            var sessions = await _context.TrainingSessions.AsNoTracking()
+                .Where(x => (x.Status == TrainingSessionStatus.Scheduled || x.Status == TrainingSessionStatus.InProgress)
+                    && x.StartDate >= DateTime.UtcNow.Date
+                    && !x.IsDeleted)
+                .OrderBy(x => x.StartDate)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.Title,
+                    CourseCode = x.Course.Code,
+                    CourseTitle = x.Course.Title,
+                    CourseTitleAr = x.Course.TitleAr,
+                    DeliveryMethod = x.Course.DeliveryMethod.ToString(),
+                    CourseDurationHours = x.Course.DurationHours,
+                    CategoryName = x.Course.Category != null ? x.Course.Category.Name : (string?)null,
+                    CategoryNameAr = x.Course.Category != null ? x.Course.Category.NameAr : (string?)null,
+                    x.Location,
+                    x.LocationAr,
+                    x.InstructorName,
+                    x.InstructorNameAr,
+                    x.StartDate,
+                    x.EndDate,
+                    x.StartTime,
+                    x.EndTime,
+                    x.MaxParticipants,
+                    Status = x.Status.ToString(),
+                    BranchName = x.Branch != null ? x.Branch.Name : (string?)null,
+                    CurrentEnrollments = x.Enrollments.Count(e => !e.IsDeleted && e.Status != TrainingEnrollmentStatus.Cancelled && e.Status != TrainingEnrollmentStatus.Rejected),
+                    IsEnrolled = x.Enrollments.Any(e => e.EmployeeId == employeeId && !e.IsDeleted && e.Status != TrainingEnrollmentStatus.Cancelled && e.Status != TrainingEnrollmentStatus.Rejected),
+                    ProgramTitle = x.Program != null ? x.Program.Title : (string?)null,
+                    ProgramTitleAr = x.Program != null ? x.Program.TitleAr : (string?)null
+                })
+                .ToListAsync();
+
+            var programs = await _context.TrainingPrograms.AsNoTracking()
+                .Where(x => x.IsActive && x.Status == TrainingProgramStatus.Active && !x.IsDeleted)
+                .OrderBy(x => x.Title)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.Code,
+                    x.Title,
+                    x.TitleAr,
+                    x.Description,
+                    x.DescriptionAr,
+                    x.TotalDurationHours,
+                    x.StartDate,
+                    x.EndDate,
+                    CourseCount = x.ProgramCourses.Count(pc => !pc.IsDeleted),
+                    IsEnrolled = x.Enrollments.Any(e => e.EmployeeId == employeeId && !e.IsDeleted && e.Status != TrainingEnrollmentStatus.Cancelled && e.Status != TrainingEnrollmentStatus.Rejected)
+                })
+                .ToListAsync();
+
+            return Ok(new { sessions, programs });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving training catalog");
+            return StatusCode(500, new { error = "An error occurred while retrieving training catalog" });
+        }
+    }
+
+    // ============================
+    // Employee Relations Endpoints
+    // ============================
+
+    /// <summary>
+    /// Get current employee's grievances
+    /// </summary>
+    [HttpGet("my-grievances")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetMyGrievances(
+        [FromQuery] GrievanceStatus? status = null,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 20)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var employeeId = employeeLink.EmployeeId;
+
+            var query = _context.Grievances.AsNoTracking()
+                .Where(x => x.EmployeeId == employeeId);
+
+            if (status.HasValue) query = query.Where(x => x.Status == status.Value);
+
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .OrderByDescending(x => x.CreatedAtUtc)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.GrievanceNumber,
+                    GrievanceType = x.GrievanceType.ToString(),
+                    x.Subject,
+                    x.SubjectAr,
+                    Priority = x.Priority.ToString(),
+                    Status = x.Status.ToString(),
+                    x.FiledDate,
+                    x.DueDate,
+                    x.ResolutionDate,
+                    x.ResolutionSummary,
+                    x.ResolutionSummaryAr,
+                    x.CreatedAtUtc
+                })
+                .ToListAsync();
+
+            return Ok(new { data = items, totalCount, pageNumber, pageSize });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving employee grievances");
+            return StatusCode(500, new { error = "An error occurred while retrieving grievances" });
+        }
+    }
+
+    /// <summary>
+    /// File a new grievance as current employee
+    /// </summary>
+    [HttpPost("my-grievances")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> FileMyGrievance([FromBody] PortalFileGrievanceRequest request)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            // Generate auto-number
+            var lastNumber = await _context.Grievances
+                .IgnoreQueryFilters()
+                .OrderByDescending(x => x.Id)
+                .Select(x => x.GrievanceNumber)
+                .FirstOrDefaultAsync();
+
+            var nextSeq = 1;
+            if (!string.IsNullOrEmpty(lastNumber) && lastNumber.StartsWith("GRV-"))
+            {
+                if (int.TryParse(lastNumber.Substring(4), out var parsed)) nextSeq = parsed + 1;
+            }
+            var grievanceNumber = $"GRV-{nextSeq:D6}";
+
+            var entity = new Grievance
+            {
+                GrievanceNumber = grievanceNumber,
+                EmployeeId = employeeLink.EmployeeId,
+                GrievanceType = request.GrievanceType,
+                Subject = request.Subject,
+                SubjectAr = request.SubjectAr,
+                Description = request.Description,
+                DescriptionAr = request.DescriptionAr,
+                Priority = request.Priority,
+                Status = GrievanceStatus.Filed,
+                IsConfidential = request.IsConfidential,
+                AgainstEmployeeId = request.AgainstEmployeeId,
+                FiledDate = DateTime.UtcNow,
+                Notes = request.Notes,
+                CreatedAtUtc = DateTime.UtcNow,
+                CreatedBy = _currentUser.Username ?? "system"
+            };
+
+            _context.Grievances.Add(entity);
+
+            // Notify HR about new grievance
+            var hrUserIds = await _context.UserRoles
+                .Where(ur => ur.Role.Name == "HR" || ur.Role.Name == "SystemAdmin")
+                .Select(ur => ur.UserId)
+                .Distinct()
+                .ToListAsync();
+
+            foreach (var hrUserId in hrUserIds)
+            {
+                _context.Notifications.Add(new Notification
+                {
+                    UserId = hrUserId,
+                    Type = NotificationType.RequestSubmitted,
+                    TitleEn = "New Grievance Filed",
+                    TitleAr = "شكوى جديدة مقدمة",
+                    MessageEn = $"A new grievance ({grievanceNumber}) has been filed and requires attention.",
+                    MessageAr = $"تم تقديم شكوى جديدة ({grievanceNumber}) وتحتاج إلى اهتمام.",
+                    EntityType = "Grievance",
+                    EntityId = entity.Id,
+                    IsRead = false,
+                    CreatedAtUtc = DateTime.UtcNow,
+                    CreatedBy = "SYSTEM"
+                });
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Created($"/api/v1/portal/my-grievances", new { id = entity.Id, grievanceNumber });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error filing grievance");
+            return StatusCode(500, new { error = "An error occurred while filing the grievance" });
+        }
+    }
+
+    /// <summary>
+    /// Get current employee's disciplinary actions
+    /// </summary>
+    [HttpGet("my-disciplinary-actions")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetMyDisciplinaryActions(
+        [FromQuery] DisciplinaryActionStatus? status = null,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 20)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var employeeId = employeeLink.EmployeeId;
+
+            var query = _context.DisciplinaryActions.AsNoTracking()
+                .Where(x => x.EmployeeId == employeeId);
+
+            if (status.HasValue) query = query.Where(x => x.Status == status.Value);
+
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .OrderByDescending(x => x.CreatedAtUtc)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.ActionNumber,
+                    ActionType = x.ActionType.ToString(),
+                    Severity = x.Severity.ToString(),
+                    x.Subject,
+                    x.SubjectAr,
+                    x.Description,
+                    x.DescriptionAr,
+                    Status = x.Status.ToString(),
+                    x.IncidentDate,
+                    x.ActionDate,
+                    x.EndDate,
+                    x.AcknowledgedByEmployee,
+                    x.AcknowledgedAt,
+                    x.AppealSubmitted,
+                    x.AppealDate,
+                    x.AppealOutcome,
+                    x.AppealResolvedDate,
+                    x.CreatedAtUtc
+                })
+                .ToListAsync();
+
+            return Ok(new { data = items, totalCount, pageNumber, pageSize });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving employee disciplinary actions");
+            return StatusCode(500, new { error = "An error occurred while retrieving disciplinary actions" });
+        }
+    }
+
+    /// <summary>
+    /// Employee acknowledges a disciplinary action via portal
+    /// </summary>
+    [HttpPost("my-disciplinary-actions/{id}/acknowledge")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> AcknowledgeMyDisciplinaryAction(long id)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var entity = await _context.DisciplinaryActions
+                .FirstOrDefaultAsync(x => x.Id == id && x.EmployeeId == employeeLink.EmployeeId);
+
+            if (entity == null)
+                return NotFound(new { error = "Disciplinary action not found." });
+
+            if (entity.Status != DisciplinaryActionStatus.Approved)
+                return BadRequest(new { error = "Only approved disciplinary actions can be acknowledged." });
+
+            entity.AcknowledgedByEmployee = true;
+            entity.AcknowledgedAt = DateTime.UtcNow;
+            entity.Status = DisciplinaryActionStatus.Acknowledged;
+            entity.ModifiedAtUtc = DateTime.UtcNow;
+            entity.ModifiedBy = _currentUser.Username;
+
+            // Notify HR about acknowledgement
+            var hrUserIds = await _context.UserRoles
+                .Where(ur => ur.Role.Name == "HR" || ur.Role.Name == "SystemAdmin")
+                .Select(ur => ur.UserId)
+                .Distinct()
+                .ToListAsync();
+
+            foreach (var hrUserId in hrUserIds)
+            {
+                _context.Notifications.Add(new Notification
+                {
+                    UserId = hrUserId,
+                    Type = NotificationType.RequestApproved,
+                    TitleEn = "Disciplinary Action Acknowledged",
+                    TitleAr = "تم الإقرار بالإجراء التأديبي",
+                    MessageEn = $"Disciplinary action {entity.ActionNumber} has been acknowledged by the employee.",
+                    MessageAr = $"تم الإقرار بالإجراء التأديبي {entity.ActionNumber} من قبل الموظف.",
+                    EntityType = "DisciplinaryAction",
+                    EntityId = entity.Id,
+                    IsRead = false,
+                    CreatedAtUtc = DateTime.UtcNow,
+                    CreatedBy = "SYSTEM"
+                });
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Disciplinary action acknowledged." });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error acknowledging disciplinary action");
+            return StatusCode(500, new { error = "An error occurred while acknowledging the disciplinary action" });
+        }
+    }
+
+    // =====================================================
+    // ASSET MANAGEMENT - My Assets
+    // =====================================================
+
+    /// <summary>
+    /// Gets the current employee's active asset assignments
+    /// </summary>
+    [HttpGet("my-assets")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetMyAssets(
+        [FromQuery] AssetAssignmentStatus? status = null,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 20)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var employeeId = employeeLink.EmployeeId;
+
+            var query = _context.AssetAssignments.AsNoTracking()
+                .Where(x => x.EmployeeId == employeeId);
+
+            if (status.HasValue)
+                query = query.Where(x => x.Status == status.Value);
+            else
+                query = query.Where(x => x.Status == AssetAssignmentStatus.Active || x.Status == AssetAssignmentStatus.Overdue);
+
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .OrderByDescending(x => x.AssignedDate)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.AssetId,
+                    AssetName = x.Asset.Name,
+                    AssetNameAr = x.Asset.NameAr,
+                    AssetTag = x.Asset.AssetTag,
+                    AssetSerialNumber = x.Asset.SerialNumber,
+                    AssetModel = x.Asset.Model,
+                    AssetManufacturer = x.Asset.Manufacturer,
+                    CategoryName = x.Asset.Category.Name,
+                    CategoryNameAr = x.Asset.Category.NameAr,
+                    AssetCondition = x.Asset.Condition.ToString(),
+                    x.AssignedDate,
+                    x.ExpectedReturnDate,
+                    x.ActualReturnDate,
+                    Status = x.Status.ToString(),
+                    x.AssignmentNotes,
+                    x.CreatedAtUtc
+                })
+                .ToListAsync();
+
+            return Ok(new { data = items, totalCount, pageNumber, pageSize });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving employee assets");
+            return StatusCode(500, new { error = "An error occurred while retrieving your assets" });
+        }
+    }
+
+    // =====================================================
+    // EMPLOYEE ENGAGEMENT & SURVEYS - My Surveys
+    // =====================================================
+
+    /// <summary>
+    /// Gets current employee's pending and completed surveys
+    /// </summary>
+    [HttpGet("my-surveys")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetMySurveys(
+        [FromQuery] SurveyParticipantStatus? status = null,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 20)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var employeeId = employeeLink.EmployeeId;
+
+            var query = _context.SurveyParticipants.AsNoTracking()
+                .Where(x => x.EmployeeId == employeeId
+                    && x.Distribution.Status == SurveyDistributionStatus.Active);
+
+            if (status.HasValue)
+                query = query.Where(x => x.Status == status.Value);
+
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .OrderByDescending(x => x.InvitedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.SurveyDistributionId,
+                    DistributionTitle = x.Distribution.Title,
+                    DistributionTitleAr = x.Distribution.TitleAr,
+                    SurveyType = x.Distribution.Template.SurveyType.ToString(),
+                    IsAnonymous = x.Distribution.Template.IsAnonymous,
+                    EstimatedDurationMinutes = x.Distribution.Template.EstimatedDurationMinutes,
+                    Status = x.Status.ToString(),
+                    x.InvitedAt,
+                    x.CompletedAt,
+                    EndDate = x.Distribution.EndDate,
+                    QuestionCount = x.Distribution.Template.Questions.Count(q => !q.IsDeleted)
+                })
+                .ToListAsync();
+
+            return Ok(new { data = items, totalCount, pageNumber, pageSize });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving employee surveys");
+            return StatusCode(500, new { error = "An error occurred while retrieving your surveys" });
+        }
+    }
+
+    /// <summary>
+    /// Gets survey questions for a distribution (for the employee to respond to)
+    /// </summary>
+    [HttpGet("my-surveys/{distributionId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetMySurveyQuestions(long distributionId)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var employeeId = employeeLink.EmployeeId;
+
+            // Find participant record
+            var participant = await _context.SurveyParticipants.AsNoTracking()
+                .Where(x => x.EmployeeId == employeeId && x.SurveyDistributionId == distributionId)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.AnonymousToken,
+                    x.Status,
+                    DistributionStatus = x.Distribution.Status,
+                    x.Distribution.SurveyTemplateId,
+                    x.Distribution.Title,
+                    x.Distribution.TitleAr,
+                    x.Distribution.EndDate,
+                    SurveyType = x.Distribution.Template.SurveyType.ToString(),
+                    IsAnonymous = x.Distribution.Template.IsAnonymous,
+                    Description = x.Distribution.Template.Description,
+                    DescriptionAr = x.Distribution.Template.DescriptionAr,
+                    EstimatedDurationMinutes = x.Distribution.Template.EstimatedDurationMinutes
+                })
+                .FirstOrDefaultAsync();
+
+            if (participant == null)
+                return NotFound(new { error = "You are not a participant in this survey." });
+
+            if (participant.DistributionStatus != SurveyDistributionStatus.Active)
+                return BadRequest(new { error = "This survey is not currently active." });
+
+            // Get questions
+            var questions = await _context.SurveyQuestions.AsNoTracking()
+                .Where(q => q.SurveyTemplateId == participant.SurveyTemplateId && !q.IsDeleted)
+                .OrderBy(q => q.DisplayOrder)
+                .Select(q => new
+                {
+                    q.Id,
+                    q.QuestionText,
+                    q.QuestionTextAr,
+                    QuestionType = q.QuestionType.ToString(),
+                    q.IsRequired,
+                    q.DisplayOrder,
+                    q.SectionName,
+                    q.SectionNameAr,
+                    q.OptionsJson,
+                    q.MinValue,
+                    q.MaxValue,
+                    q.MinLabel,
+                    q.MaxLabel,
+                    q.MinLabelAr,
+                    q.MaxLabelAr
+                })
+                .ToListAsync();
+
+            return Ok(new
+            {
+                participant.AnonymousToken,
+                Status = participant.Status.ToString(),
+                participant.Title,
+                participant.TitleAr,
+                participant.SurveyType,
+                participant.IsAnonymous,
+                participant.Description,
+                participant.DescriptionAr,
+                participant.EstimatedDurationMinutes,
+                participant.EndDate,
+                Questions = questions
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving survey questions for distribution {DistributionId}", distributionId);
+            return StatusCode(500, new { error = "An error occurred while retrieving survey questions" });
+        }
+    }
+
+    /// <summary>
+    /// Submits anonymous survey responses for the current employee.
+    /// Validates the participant token, marks participant as completed.
+    /// </summary>
+    [HttpPost("my-surveys/{distributionId}/submit")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> SubmitMySurvey(long distributionId, [FromBody] PortalSubmitSurveyRequest request)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var employeeId = employeeLink.EmployeeId;
+
+            // Find participant record
+            var participant = await _context.SurveyParticipants
+                .Include(p => p.Distribution)
+                .FirstOrDefaultAsync(p => p.EmployeeId == employeeId
+                    && p.SurveyDistributionId == distributionId
+                    && !p.IsDeleted);
+
+            if (participant == null)
+                return NotFound(new { error = "You are not a participant in this survey." });
+
+            if (participant.Status == SurveyParticipantStatus.Completed)
+                return BadRequest(new { error = "You have already completed this survey." });
+
+            if (participant.Distribution.Status != SurveyDistributionStatus.Active)
+                return BadRequest(new { error = "This survey is not currently active." });
+
+            if (DateTime.UtcNow > participant.Distribution.EndDate)
+                return BadRequest(new { error = "Survey deadline has passed." });
+
+            if (request.Responses == null || !request.Responses.Any())
+                return BadRequest(new { error = "At least one response is required." });
+
+            // Validate question IDs
+            var validQuestionIds = await _context.SurveyQuestions.AsNoTracking()
+                .Where(q => q.SurveyTemplateId == participant.Distribution.SurveyTemplateId && !q.IsDeleted)
+                .Select(q => q.Id)
+                .ToListAsync();
+
+            var now = DateTime.UtcNow;
+            var token = participant.AnonymousToken ?? Guid.NewGuid().ToString("N");
+
+            // Save responses using anonymous token (NOT employee identity)
+            foreach (var resp in request.Responses)
+            {
+                if (!validQuestionIds.Contains(resp.QuestionId))
+                    continue;
+
+                var response = new SurveyResponse
+                {
+                    SurveyDistributionId = distributionId,
+                    SurveyQuestionId = resp.QuestionId,
+                    ParticipantToken = token,
+                    ResponseText = resp.ResponseText,
+                    ResponseValue = resp.ResponseValue,
+                    SelectedOptions = resp.SelectedOptions,
+                    CreatedAtUtc = now,
+                    CreatedBy = "ANONYMOUS"
+                };
+                _context.SurveyResponses.Add(response);
+            }
+
+            // Update participant status
+            participant.Status = SurveyParticipantStatus.Completed;
+            participant.CompletedAt = now;
+            participant.ModifiedAtUtc = now;
+            participant.ModifiedBy = "SYSTEM";
+
+            // Update distribution response count
+            participant.Distribution.TotalResponses = await _context.SurveyParticipants
+                .CountAsync(p => p.SurveyDistributionId == distributionId
+                    && p.Status == SurveyParticipantStatus.Completed) + 1;
+            participant.Distribution.ModifiedAtUtc = now;
+            participant.Distribution.ModifiedBy = "SYSTEM";
+
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Survey responses submitted successfully." });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error submitting survey responses for distribution {DistributionId}", distributionId);
+            return StatusCode(500, new { error = "An error occurred while submitting your survey responses" });
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════
+    //  Timesheet Self-Service Endpoints
+    // ══════════════════════════════════════════════════════════
+
+    /// <summary>Gets the current employee's timesheets (paginated).</summary>
+    [HttpGet("my-timesheets")]
+    public async Task<IActionResult> GetMyTimesheets(
+        [FromQuery] TimesheetStatus? status = null,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 20)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var query = _context.Timesheets.AsNoTracking()
+                .Where(x => x.EmployeeId == employeeLink.EmployeeId);
+
+            if (status.HasValue)
+                query = query.Where(x => x.Status == status.Value);
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                .OrderByDescending(x => x.CreatedAtUtc)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.TimesheetPeriodId,
+                    PeriodName = x.TimesheetPeriod.Name,
+                    PeriodStartDate = x.TimesheetPeriod.StartDate,
+                    PeriodEndDate = x.TimesheetPeriod.EndDate,
+                    x.Status,
+                    x.TotalHours,
+                    x.RegularHours,
+                    x.OvertimeHours,
+                    x.SubmittedAt,
+                    x.ApprovedAt,
+                    x.RejectedAt,
+                    x.RejectionReason,
+                    x.Notes,
+                    EntryCount = x.Entries.Count(e => !e.IsDeleted),
+                    x.CreatedAtUtc
+                })
+                .ToListAsync();
+
+            return Ok(new { data = items, totalCount, pageNumber, pageSize });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving my timesheets");
+            return StatusCode(500, new { error = "An error occurred while retrieving timesheets" });
+        }
+    }
+
+    /// <summary>Gets a specific timesheet for the current employee with entries.</summary>
+    [HttpGet("my-timesheets/{id}")]
+    public async Task<IActionResult> GetMyTimesheetById(long id)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var item = await _context.Timesheets.AsNoTracking()
+                .Where(x => x.Id == id && x.EmployeeId == employeeLink.EmployeeId)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.TimesheetPeriodId,
+                    PeriodName = x.TimesheetPeriod.Name,
+                    PeriodStartDate = x.TimesheetPeriod.StartDate,
+                    PeriodEndDate = x.TimesheetPeriod.EndDate,
+                    PeriodStatus = x.TimesheetPeriod.Status,
+                    x.Status,
+                    x.TotalHours,
+                    x.RegularHours,
+                    x.OvertimeHours,
+                    x.SubmittedAt,
+                    x.ApprovedAt,
+                    x.RejectedAt,
+                    x.RejectionReason,
+                    x.Notes,
+                    x.CreatedAtUtc,
+                    Entries = x.Entries
+                        .Where(e => !e.IsDeleted)
+                        .OrderBy(e => e.EntryDate)
+                        .ThenBy(e => e.ProjectId)
+                        .Select(e => new
+                        {
+                            e.Id,
+                            e.ProjectId,
+                            ProjectName = e.Project.Name,
+                            ProjectCode = e.Project.Code,
+                            e.ProjectTaskId,
+                            ProjectTaskName = e.ProjectTask != null ? e.ProjectTask.Name : null,
+                            e.EntryDate,
+                            e.Hours,
+                            e.OvertimeHours,
+                            e.Notes,
+                            e.IsAutoPopulated,
+                            e.AttendanceRecordId
+                        })
+                        .ToList()
+                })
+                .FirstOrDefaultAsync();
+
+            if (item == null)
+                return NotFound(new { error = "Timesheet not found." });
+
+            return Ok(item);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving timesheet {TimesheetId}", id);
+            return StatusCode(500, new { error = "An error occurred while retrieving the timesheet" });
+        }
+    }
+
+    /// <summary>Creates a timesheet for the current employee.</summary>
+    [HttpPost("my-timesheets")]
+    public async Task<IActionResult> CreateMyTimesheet([FromBody] PortalCreateTimesheetRequest request)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            // Validate period
+            var period = await _context.TimesheetPeriods.FindAsync(request.TimesheetPeriodId);
+            if (period == null || period.IsDeleted)
+                return BadRequest(new { error = "Timesheet period not found." });
+
+            if (period.Status != TimesheetPeriodStatus.Open)
+                return BadRequest(new { error = "Timesheet period is not open." });
+
+            // Check for duplicate
+            var exists = await _context.Timesheets
+                .AnyAsync(x => x.TimesheetPeriodId == request.TimesheetPeriodId
+                    && x.EmployeeId == employeeLink.EmployeeId);
+            if (exists)
+                return BadRequest(new { error = "A timesheet already exists for this period." });
+
+            var entity = new Timesheet
+            {
+                TimesheetPeriodId = request.TimesheetPeriodId,
+                EmployeeId = employeeLink.EmployeeId,
+                Status = TimesheetStatus.Draft,
+                TotalHours = 0,
+                RegularHours = 0,
+                OvertimeHours = 0,
+                Notes = request.Notes,
+                CreatedAtUtc = DateTime.UtcNow,
+                CreatedBy = _currentUser.Username ?? "SYSTEM"
+            };
+
+            _context.Timesheets.Add(entity);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { id = entity.Id });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating my timesheet");
+            return StatusCode(500, new { error = "An error occurred while creating the timesheet" });
+        }
+    }
+
+    /// <summary>Updates a timesheet and its entries for the current employee.</summary>
+    [HttpPut("my-timesheets/{id}")]
+    public async Task<IActionResult> UpdateMyTimesheet(long id, [FromBody] PortalUpdateTimesheetRequest request)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var entity = await _context.Timesheets
+                .Include(x => x.Entries.Where(e => !e.IsDeleted))
+                .FirstOrDefaultAsync(x => x.Id == id && x.EmployeeId == employeeLink.EmployeeId && !x.IsDeleted);
+
+            if (entity == null)
+                return NotFound(new { error = "Timesheet not found." });
+
+            if (entity.Status != TimesheetStatus.Draft && entity.Status != TimesheetStatus.Rejected)
+                return BadRequest(new { error = "Only draft or rejected timesheets can be updated." });
+
+            entity.Notes = request.Notes;
+            entity.ModifiedAtUtc = DateTime.UtcNow;
+            entity.ModifiedBy = _currentUser.Username ?? "SYSTEM";
+
+            // Remove existing entries
+            foreach (var existing in entity.Entries.ToList())
+            {
+                existing.IsDeleted = true;
+                existing.ModifiedAtUtc = DateTime.UtcNow;
+                existing.ModifiedBy = _currentUser.Username ?? "SYSTEM";
+            }
+
+            // Add new entries
+            if (request.Entries != null)
+            {
+                foreach (var entryReq in request.Entries)
+                {
+                    var entry = new TimesheetEntry
+                    {
+                        TimesheetId = entity.Id,
+                        ProjectId = entryReq.ProjectId,
+                        ProjectTaskId = entryReq.ProjectTaskId,
+                        EntryDate = entryReq.EntryDate,
+                        Hours = entryReq.Hours,
+                        OvertimeHours = entryReq.OvertimeHours,
+                        Notes = entryReq.Notes,
+                        IsAutoPopulated = false,
+                        AttendanceRecordId = entryReq.AttendanceRecordId,
+                        CreatedAtUtc = DateTime.UtcNow,
+                        CreatedBy = _currentUser.Username ?? "SYSTEM"
+                    };
+                    _context.TimesheetEntries.Add(entry);
+                }
+            }
+
+            // Recalculate totals
+            var newEntries = request.Entries ?? new List<PortalTimesheetEntryRequest>();
+            entity.TotalHours = newEntries.Sum(e => e.Hours + e.OvertimeHours);
+            entity.RegularHours = newEntries.Sum(e => e.Hours);
+            entity.OvertimeHours = newEntries.Sum(e => e.OvertimeHours);
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { id = entity.Id });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating my timesheet {TimesheetId}", id);
+            return StatusCode(500, new { error = "An error occurred while updating the timesheet" });
+        }
+    }
+
+    /// <summary>Submits a timesheet for approval for the current employee.</summary>
+    [HttpPost("my-timesheets/{id}/submit")]
+    public async Task<IActionResult> SubmitMyTimesheet(long id)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var entity = await _context.Timesheets
+                .Include(x => x.TimesheetPeriod)
+                .FirstOrDefaultAsync(x => x.Id == id && x.EmployeeId == employeeLink.EmployeeId && !x.IsDeleted);
+
+            if (entity == null)
+                return NotFound(new { error = "Timesheet not found." });
+
+            if (entity.Status != TimesheetStatus.Draft && entity.Status != TimesheetStatus.Rejected)
+                return BadRequest(new { error = "Only draft or rejected timesheets can be submitted." });
+
+            if (entity.TimesheetPeriod.Status != TimesheetPeriodStatus.Open)
+                return BadRequest(new { error = "Timesheet period is not open for submissions." });
+
+            var hasEntries = await _context.TimesheetEntries
+                .AnyAsync(x => x.TimesheetId == id && !x.IsDeleted);
+            if (!hasEntries)
+                return BadRequest(new { error = "Cannot submit a timesheet with no entries." });
+
+            entity.Status = TimesheetStatus.Submitted;
+            entity.SubmittedAt = DateTime.UtcNow;
+            entity.SubmittedByUserId = _currentUser.UserId;
+            entity.RejectedAt = null;
+            entity.RejectionReason = null;
+            entity.ModifiedAtUtc = DateTime.UtcNow;
+            entity.ModifiedBy = _currentUser.Username ?? "SYSTEM";
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { id = entity.Id, status = entity.Status });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error submitting my timesheet {TimesheetId}", id);
+            return StatusCode(500, new { error = "An error occurred while submitting the timesheet" });
+        }
+    }
+
+    /// <summary>Recalls a submitted timesheet for the current employee.</summary>
+    [HttpPost("my-timesheets/{id}/recall")]
+    public async Task<IActionResult> RecallMyTimesheet(long id)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var entity = await _context.Timesheets
+                .FirstOrDefaultAsync(x => x.Id == id && x.EmployeeId == employeeLink.EmployeeId && !x.IsDeleted);
+
+            if (entity == null)
+                return NotFound(new { error = "Timesheet not found." });
+
+            if (entity.Status != TimesheetStatus.Submitted)
+                return BadRequest(new { error = "Only submitted timesheets can be recalled." });
+
+            entity.Status = TimesheetStatus.Recalled;
+            entity.SubmittedAt = null;
+            entity.SubmittedByUserId = null;
+            entity.ModifiedAtUtc = DateTime.UtcNow;
+            entity.ModifiedBy = _currentUser.Username ?? "SYSTEM";
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { id = entity.Id, status = entity.Status });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error recalling my timesheet {TimesheetId}", id);
+            return StatusCode(500, new { error = "An error occurred while recalling the timesheet" });
+        }
+    }
+
+    /// <summary>Auto-populates a timesheet from attendance records for the current employee.</summary>
+    [HttpGet("my-timesheets/{id}/auto-populate")]
+    public async Task<IActionResult> GetMyTimesheetAutoPopulate(long id)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var timesheet = await _context.Timesheets
+                .Include(x => x.TimesheetPeriod)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == id && x.EmployeeId == employeeLink.EmployeeId && !x.IsDeleted);
+
+            if (timesheet == null)
+                return NotFound(new { error = "Timesheet not found." });
+
+            // Get attendance records for the period
+            var attendanceRecords = await _context.AttendanceRecords
+                .AsNoTracking()
+                .Where(ar => ar.EmployeeId == employeeLink.EmployeeId
+                    && ar.AttendanceDate >= timesheet.TimesheetPeriod.StartDate
+                    && ar.AttendanceDate <= timesheet.TimesheetPeriod.EndDate
+                    && !ar.IsDeleted)
+                .OrderBy(ar => ar.AttendanceDate)
+                .Select(ar => new
+                {
+                    ar.Id,
+                    Date = ar.AttendanceDate,
+                    ar.WorkingHours,
+                    ar.OvertimeHours,
+                    ar.Status
+                })
+                .ToListAsync();
+
+            return Ok(new
+            {
+                timesheetId = id,
+                periodStartDate = timesheet.TimesheetPeriod.StartDate,
+                periodEndDate = timesheet.TimesheetPeriod.EndDate,
+                attendanceRecords
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error auto-populating timesheet {TimesheetId}", id);
+            return StatusCode(500, new { error = "An error occurred while retrieving attendance data" });
+        }
+    }
+
+    /// <summary>Gets active projects for dropdown (self-service).</summary>
+    [HttpGet("projects/dropdown")]
+    public async Task<IActionResult> GetPortalProjectsDropdown()
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var items = await _context.Projects.AsNoTracking()
+                .Where(x => x.IsActive && x.Status == ProjectStatus.Active)
+                .OrderBy(x => x.Name)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.Code,
+                    x.Name,
+                    x.NameAr,
+                    x.BranchId
+                })
+                .ToListAsync();
+
+            return Ok(items);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving projects dropdown");
+            return StatusCode(500, new { error = "An error occurred while retrieving projects" });
+        }
+    }
+
+    /// <summary>Gets active project tasks for dropdown (self-service).</summary>
+    [HttpGet("project-tasks/dropdown")]
+    public async Task<IActionResult> GetPortalProjectTasksDropdown([FromQuery] long? projectId = null)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var query = _context.ProjectTasks.AsNoTracking()
+                .Where(x => x.IsActive);
+
+            if (projectId.HasValue)
+                query = query.Where(x => x.ProjectId == projectId.Value);
+
+            var items = await query
+                .OrderBy(x => x.DisplayOrder)
+                .ThenBy(x => x.Name)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.Code,
+                    x.Name,
+                    x.NameAr,
+                    x.ProjectId
+                })
+                .ToListAsync();
+
+            return Ok(items);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving project tasks dropdown");
+            return StatusCode(500, new { error = "An error occurred while retrieving project tasks" });
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════
+    //  Succession Planning & Career Self-Service Endpoints
+    // ══════════════════════════════════════════════════════════
+
+    /// <summary>Gets the current employee's talent profile.</summary>
+    [HttpGet("my-career/talent-profile")]
+    public async Task<IActionResult> GetMyTalentProfile()
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var profile = await _context.TalentProfiles.AsNoTracking()
+                .Where(x => x.EmployeeId == employeeLink.EmployeeId && x.IsActive)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.EmployeeId,
+                    PerformanceRating = x.PerformanceRating != null ? x.PerformanceRating.ToString() : null,
+                    PotentialRating = x.PotentialRating.ToString(),
+                    NineBoxPosition = x.NineBoxPosition.ToString(),
+                    ReadinessLevel = x.ReadinessLevel.ToString(),
+                    RetentionRisk = x.RetentionRisk.ToString(),
+                    x.CareerAspiration,
+                    x.CareerAspirationAr,
+                    x.StrengthsSummary,
+                    x.DevelopmentAreas,
+                    x.LastAssessmentDate,
+                    x.IsHighPotential,
+                    Skills = x.Skills.Where(s => !s.IsDeleted).Select(s => new
+                    {
+                        s.Id,
+                        s.SkillName,
+                        s.SkillNameAr,
+                        ProficiencyLevel = s.ProficiencyLevel.ToString(),
+                        s.YearsOfExperience,
+                        s.IsVerified,
+                        s.VerifiedDate
+                    }).ToList()
+                })
+                .FirstOrDefaultAsync();
+
+            if (profile == null)
+                return Ok(new { hasProfile = false });
+
+            return Ok(new { hasProfile = true, profile });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving talent profile for current user");
+            return StatusCode(500, new { error = "An error occurred while retrieving talent profile" });
+        }
+    }
+
+    /// <summary>Gets career paths available for the current employee.</summary>
+    [HttpGet("my-career/career-paths")]
+    public async Task<IActionResult> GetMyCareerPaths()
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var careerPaths = await _context.CareerPaths.AsNoTracking()
+                .Where(x => x.IsActive)
+                .OrderBy(x => x.Name)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.Name,
+                    x.NameAr,
+                    x.Description,
+                    x.DescriptionAr,
+                    Steps = x.Steps.Where(s => !s.IsDeleted)
+                        .OrderBy(s => s.StepOrder)
+                        .Select(s => new
+                        {
+                            s.Id,
+                            s.JobTitle,
+                            s.JobTitleAr,
+                            s.FromJobGradeId,
+                            FromJobGradeName = s.FromJobGrade != null ? s.FromJobGrade.Name : null,
+                            s.ToJobGradeId,
+                            ToJobGradeName = s.ToJobGrade.Name,
+                            ToJobGradeNameAr = s.ToJobGrade.NameAr,
+                            s.TypicalDurationMonths,
+                            s.RequiredCompetencies,
+                            s.StepOrder
+                        }).ToList()
+                })
+                .ToListAsync();
+
+            return Ok(careerPaths);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving career paths for current user");
+            return StatusCode(500, new { error = "An error occurred while retrieving career paths" });
+        }
+    }
+
+    /// <summary>Gets development suggestions for the current employee based on their talent profile.</summary>
+    [HttpGet("my-career/development-suggestions")]
+    public async Task<IActionResult> GetMyDevelopmentSuggestions()
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var employeeId = employeeLink.EmployeeId;
+
+            // Get talent profile
+            var profile = await _context.TalentProfiles.AsNoTracking()
+                .Include(x => x.Skills)
+                .FirstOrDefaultAsync(x => x.EmployeeId == employeeId && x.IsActive);
+
+            // Get succession candidacies for this employee
+            var candidacies = await _context.SuccessionCandidates.AsNoTracking()
+                .Where(x => x.EmployeeId == employeeId && !x.IsDeleted && x.Status == CandidateSuccessionStatus.Active)
+                .Select(x => new
+                {
+                    x.Id,
+                    SuccessionPlanName = x.SuccessionPlan.Name,
+                    SuccessionPlanNameAr = x.SuccessionPlan.NameAr,
+                    KeyPositionTitle = x.SuccessionPlan.KeyPosition.JobTitle,
+                    KeyPositionTitleAr = x.SuccessionPlan.KeyPosition.JobTitleAr,
+                    ReadinessLevel = x.ReadinessLevel.ToString(),
+                    ReadinessTimeline = x.ReadinessTimeline.ToString(),
+                    x.Priority,
+                    x.DevelopmentPlan,
+                    x.DevelopmentPlanAr,
+                    x.GapAnalysis
+                })
+                .ToListAsync();
+
+            return Ok(new
+            {
+                hasProfile = profile != null,
+                developmentAreas = profile?.DevelopmentAreas,
+                strengthsSummary = profile?.StrengthsSummary,
+                readinessLevel = profile?.ReadinessLevel.ToString(),
+                retentionRisk = profile?.RetentionRisk.ToString(),
+                skillGaps = profile?.Skills?
+                    .Where(s => !s.IsDeleted && s.ProficiencyLevel <= ProficiencyLevel.Intermediate)
+                    .Select(s => new
+                    {
+                        s.SkillName,
+                        s.SkillNameAr,
+                        currentLevel = s.ProficiencyLevel.ToString(),
+                        s.YearsOfExperience
+                    }).ToList(),
+                successionCandidacies = candidacies
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving development suggestions for current user");
+            return StatusCode(500, new { error = "An error occurred while retrieving development suggestions" });
+        }
+    }
+
+    // ===== BENEFITS ADMINISTRATION (PORTAL) =====
+
+    /// <summary>Gets current employee's benefit enrollments summary.</summary>
+    [HttpGet("my-benefits")]
+    public async Task<IActionResult> GetMyBenefits()
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var employeeId = employeeLink.EmployeeId;
+
+            var enrollments = await _context.BenefitEnrollments
+                .AsNoTracking()
+                .Where(x => x.EmployeeId == employeeId && !x.IsDeleted)
+                .OrderByDescending(x => x.CreatedAtUtc)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.BenefitPlanId,
+                    BenefitPlanName = x.BenefitPlan.Name,
+                    BenefitPlanNameAr = x.BenefitPlan.NameAr,
+                    BenefitPlanCode = x.BenefitPlan.Code,
+                    BenefitType = x.BenefitPlan.BenefitType.ToString(),
+                    PlanOptionName = x.PlanOption != null ? x.PlanOption.Name : null,
+                    PlanOptionNameAr = x.PlanOption != null ? x.PlanOption.NameAr : null,
+                    Status = x.Status.ToString(),
+                    x.EnrollmentDate,
+                    x.EffectiveDate,
+                    x.TerminationDate,
+                    x.EmployeeMonthlyContribution,
+                    x.EmployerMonthlyContribution,
+                    x.Currency,
+                    DependentsCount = x.Dependents.Count(d => !d.IsDeleted && d.IsActive),
+                    x.CreatedAtUtc
+                })
+                .ToListAsync();
+
+            return Ok(new { data = enrollments, totalCount = enrollments.Count });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving employee benefits");
+            return StatusCode(500, new { error = "An error occurred while retrieving benefits" });
+        }
+    }
+
+    /// <summary>Gets available benefit plans filtered by eligibility for current employee.</summary>
+    [HttpGet("my-benefits/available-plans")]
+    public async Task<IActionResult> GetAvailableBenefitPlans()
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var employeeId = employeeLink.EmployeeId;
+
+            var employee = await _context.Employees
+                .AsNoTracking()
+                .Where(x => x.Id == employeeId)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.BranchId,
+                    x.DepartmentId,
+                    x.HireDate
+                })
+                .FirstOrDefaultAsync();
+
+            if (employee == null)
+                return NotFound(new { error = "Employee not found" });
+
+            var today = DateTime.UtcNow.Date;
+
+            // Get active plans where effective date range covers today
+            var plans = await _context.BenefitPlans
+                .AsNoTracking()
+                .Where(x => x.IsActive && x.EffectiveStartDate <= today && x.EffectiveEndDate >= today)
+                .Include(x => x.Options.Where(o => !o.IsDeleted && o.IsActive))
+                .Select(x => new
+                {
+                    x.Id,
+                    x.Code,
+                    x.Name,
+                    x.NameAr,
+                    x.Description,
+                    x.DescriptionAr,
+                    BenefitType = x.BenefitType.ToString(),
+                    x.EmployeePremiumAmount,
+                    x.EmployerPremiumAmount,
+                    x.Currency,
+                    x.CoverageDetails,
+                    x.CoverageDetailsAr,
+                    x.MaxDependents,
+                    x.DependentPremiumAmount,
+                    Options = x.Options.Where(o => !o.IsDeleted && o.IsActive).Select(o => new
+                    {
+                        o.Id,
+                        o.Name,
+                        o.NameAr,
+                        o.Description,
+                        o.EmployeeCost,
+                        o.EmployerCost,
+                        o.Currency,
+                        CoverageLevel = o.CoverageLevel.ToString(),
+                        o.IsDefault
+                    }),
+                    AlreadyEnrolled = x.Enrollments.Any(e =>
+                        e.EmployeeId == employeeId &&
+                        e.Status == BenefitEnrollmentStatus.Active &&
+                        !e.IsDeleted)
+                })
+                .ToListAsync();
+
+            return Ok(new { data = plans, totalCount = plans.Count });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving available benefit plans");
+            return StatusCode(500, new { error = "An error occurred while retrieving available benefit plans" });
+        }
+    }
+
+    /// <summary>Enrolls the current employee in a benefit plan.</summary>
+    [HttpPost("my-benefits/enroll")]
+    public async Task<IActionResult> EnrollInBenefitPlan([FromBody] PortalBenefitEnrollRequest request)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var employeeId = employeeLink.EmployeeId;
+
+            // Validate plan
+            var plan = await _context.BenefitPlans.AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == request.BenefitPlanId && x.IsActive);
+
+            if (plan == null)
+                return BadRequest(new { error = "Benefit plan not found or inactive." });
+
+            // Check duplicate
+            var hasDuplicate = await _context.BenefitEnrollments
+                .AnyAsync(x => x.EmployeeId == employeeId
+                    && x.BenefitPlanId == request.BenefitPlanId
+                    && x.Status == BenefitEnrollmentStatus.Active);
+
+            if (hasDuplicate)
+                return BadRequest(new { error = "You already have an active enrollment for this benefit plan." });
+
+            var entity = new BenefitEnrollment
+            {
+                EmployeeId = employeeId,
+                BenefitPlanId = request.BenefitPlanId,
+                BenefitPlanOptionId = request.BenefitPlanOptionId,
+                OpenEnrollmentPeriodId = request.OpenEnrollmentPeriodId,
+                Status = BenefitEnrollmentStatus.PendingApproval,
+                EnrollmentDate = DateTime.UtcNow,
+                EffectiveDate = request.EffectiveDate,
+                EmployeeMonthlyContribution = request.EmployeeMonthlyContribution,
+                EmployerMonthlyContribution = request.EmployerMonthlyContribution,
+                Currency = request.Currency ?? "SAR",
+                LifeEventType = request.LifeEventType,
+                LifeEventDate = request.LifeEventDate,
+                Notes = request.Notes,
+                CreatedBy = _currentUser.Username ?? "system"
+            };
+
+            _context.BenefitEnrollments.Add(entity);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { id = entity.Id });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error enrolling in benefit plan");
+            return StatusCode(500, new { error = "An error occurred while enrolling in benefit plan" });
+        }
+    }
+
+    /// <summary>Updates current employee's benefit enrollment (only pending).</summary>
+    [HttpPut("my-benefits/enrollments/{id}")]
+    public async Task<IActionResult> UpdateMyEnrollment(long id, [FromBody] PortalUpdateBenefitEnrollRequest request)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var entity = await _context.BenefitEnrollments
+                .FirstOrDefaultAsync(x => x.Id == id && x.EmployeeId == employeeLink.EmployeeId);
+
+            if (entity == null)
+                return NotFound(new { error = "Benefit enrollment not found." });
+
+            if (entity.Status != BenefitEnrollmentStatus.PendingApproval && entity.Status != BenefitEnrollmentStatus.Pending)
+                return BadRequest(new { error = "Can only update enrollments in Draft or PendingApproval status." });
+
+            entity.BenefitPlanOptionId = request.BenefitPlanOptionId;
+            entity.EffectiveDate = request.EffectiveDate;
+            entity.EmployeeMonthlyContribution = request.EmployeeMonthlyContribution;
+            entity.EmployerMonthlyContribution = request.EmployerMonthlyContribution;
+            entity.Notes = request.Notes;
+            entity.ModifiedAtUtc = DateTime.UtcNow;
+            entity.ModifiedBy = _currentUser.Username;
+
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating benefit enrollment");
+            return StatusCode(500, new { error = "An error occurred while updating benefit enrollment" });
+        }
+    }
+
+    /// <summary>Cancels current employee's benefit enrollment.</summary>
+    [HttpPost("my-benefits/enrollments/{id}/cancel")]
+    public async Task<IActionResult> CancelMyEnrollment(long id)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var entity = await _context.BenefitEnrollments
+                .FirstOrDefaultAsync(x => x.Id == id && x.EmployeeId == employeeLink.EmployeeId);
+
+            if (entity == null)
+                return NotFound(new { error = "Benefit enrollment not found." });
+
+            if (entity.Status == BenefitEnrollmentStatus.Terminated || entity.Status == BenefitEnrollmentStatus.Cancelled)
+                return BadRequest(new { error = "Enrollment is already terminated or cancelled." });
+
+            entity.Status = BenefitEnrollmentStatus.Cancelled;
+            entity.TerminationDate = DateTime.UtcNow;
+            entity.TerminationReason = "Cancelled by employee";
+            entity.ModifiedAtUtc = DateTime.UtcNow;
+            entity.ModifiedBy = _currentUser.Username;
+
+            await _context.SaveChangesAsync();
+            return Ok(new { status = entity.Status.ToString() });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error cancelling benefit enrollment");
+            return StatusCode(500, new { error = "An error occurred while cancelling benefit enrollment" });
+        }
+    }
+
+    /// <summary>Gets current employee's benefit dependents across all enrollments.</summary>
+    [HttpGet("my-benefits/dependents")]
+    public async Task<IActionResult> GetMyBenefitDependents()
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var dependents = await _context.BenefitDependents
+                .AsNoTracking()
+                .Where(x => x.BenefitEnrollment.EmployeeId == employeeLink.EmployeeId && !x.IsDeleted)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.BenefitEnrollmentId,
+                    BenefitPlanName = x.BenefitEnrollment.BenefitPlan.Name,
+                    x.FirstName,
+                    x.FirstNameAr,
+                    x.LastName,
+                    x.LastNameAr,
+                    Relationship = x.Relationship.ToString(),
+                    x.DateOfBirth,
+                    x.NationalId,
+                    x.CoverageStartDate,
+                    x.CoverageEndDate,
+                    x.AdditionalPremium,
+                    x.Currency,
+                    x.IsActive
+                })
+                .ToListAsync();
+
+            return Ok(new { data = dependents, totalCount = dependents.Count });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving benefit dependents");
+            return StatusCode(500, new { error = "An error occurred while retrieving benefit dependents" });
+        }
+    }
+
+    /// <summary>Adds a dependent to current employee's benefit enrollment.</summary>
+    [HttpPost("my-benefits/dependents")]
+    public async Task<IActionResult> AddMyBenefitDependent([FromBody] PortalAddBenefitDependentRequest request)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var enrollment = await _context.BenefitEnrollments
+                .Include(x => x.BenefitPlan)
+                .Include(x => x.Dependents.Where(d => !d.IsDeleted))
+                .FirstOrDefaultAsync(x => x.Id == request.BenefitEnrollmentId && x.EmployeeId == employeeLink.EmployeeId);
+
+            if (enrollment == null)
+                return NotFound(new { error = "Benefit enrollment not found." });
+
+            if (enrollment.Status != BenefitEnrollmentStatus.Active && enrollment.Status != BenefitEnrollmentStatus.PendingApproval)
+                return BadRequest(new { error = "Cannot add dependents to this enrollment." });
+
+            if (enrollment.BenefitPlan.MaxDependents.HasValue &&
+                enrollment.Dependents.Count >= enrollment.BenefitPlan.MaxDependents.Value)
+                return BadRequest(new { error = $"Maximum number of dependents ({enrollment.BenefitPlan.MaxDependents.Value}) reached." });
+
+            var entity = new BenefitDependent
+            {
+                BenefitEnrollmentId = request.BenefitEnrollmentId,
+                EmployeeDependentId = request.EmployeeDependentId,
+                FirstName = request.FirstName,
+                FirstNameAr = request.FirstNameAr,
+                LastName = request.LastName,
+                LastNameAr = request.LastNameAr,
+                Relationship = request.Relationship,
+                DateOfBirth = request.DateOfBirth,
+                NationalId = request.NationalId,
+                CoverageStartDate = request.CoverageStartDate,
+                CoverageEndDate = request.CoverageEndDate,
+                AdditionalPremium = request.AdditionalPremium,
+                Currency = request.Currency ?? "SAR",
+                IsActive = true,
+                CreatedBy = _currentUser.Username ?? "system"
+            };
+
+            _context.BenefitDependents.Add(entity);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { id = entity.Id });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error adding benefit dependent");
+            return StatusCode(500, new { error = "An error occurred while adding benefit dependent" });
+        }
+    }
+
+    /// <summary>Removes a dependent from current employee's benefit enrollment.</summary>
+    [HttpDelete("my-benefits/dependents/{id}")]
+    public async Task<IActionResult> RemoveMyBenefitDependent(long id)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var entity = await _context.BenefitDependents
+                .Include(x => x.BenefitEnrollment)
+                .FirstOrDefaultAsync(x => x.Id == id && x.BenefitEnrollment.EmployeeId == employeeLink.EmployeeId);
+
+            if (entity == null)
+                return NotFound(new { error = "Benefit dependent not found." });
+
+            entity.IsDeleted = true;
+            entity.ModifiedAtUtc = DateTime.UtcNow;
+            entity.ModifiedBy = _currentUser.Username;
+
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error removing benefit dependent");
+            return StatusCode(500, new { error = "An error occurred while removing benefit dependent" });
+        }
+    }
+
+    /// <summary>Gets current employee's benefit claims.</summary>
+    [HttpGet("my-benefits/claims")]
+    public async Task<IActionResult> GetMyBenefitClaims()
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var claims = await _context.BenefitClaims
+                .AsNoTracking()
+                .Where(x => x.EmployeeId == employeeLink.EmployeeId && !x.IsDeleted)
+                .OrderByDescending(x => x.ClaimDate)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.BenefitEnrollmentId,
+                    BenefitPlanName = x.BenefitEnrollment.BenefitPlan.Name,
+                    BenefitPlanNameAr = x.BenefitEnrollment.BenefitPlan.NameAr,
+                    x.ClaimDate,
+                    x.ClaimAmount,
+                    x.ApprovedAmount,
+                    x.Currency,
+                    ClaimType = x.ClaimType.ToString(),
+                    x.Description,
+                    x.DescriptionAr,
+                    Status = x.Status.ToString(),
+                    x.ProcessedAt,
+                    x.RejectionReason,
+                    x.CreatedAtUtc
+                })
+                .ToListAsync();
+
+            return Ok(new { data = claims, totalCount = claims.Count });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving employee benefit claims");
+            return StatusCode(500, new { error = "An error occurred while retrieving benefit claims" });
+        }
+    }
+
+    /// <summary>Creates a benefit claim for the current employee.</summary>
+    [HttpPost("my-benefits/claims")]
+    public async Task<IActionResult> CreateMyBenefitClaim([FromBody] PortalCreateBenefitClaimRequest request)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var employeeId = employeeLink.EmployeeId;
+
+            // Validate enrollment belongs to employee and is active
+            var enrollment = await _context.BenefitEnrollments
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == request.BenefitEnrollmentId && x.EmployeeId == employeeId);
+
+            if (enrollment == null)
+                return BadRequest(new { error = "Benefit enrollment not found." });
+
+            if (enrollment.Status != BenefitEnrollmentStatus.Active)
+                return BadRequest(new { error = "Claims can only be submitted against active enrollments." });
+
+            var entity = new BenefitClaim
+            {
+                BenefitEnrollmentId = request.BenefitEnrollmentId,
+                EmployeeId = employeeId,
+                ClaimDate = DateTime.UtcNow,
+                ClaimAmount = request.ClaimAmount,
+                Currency = request.Currency ?? "SAR",
+                ClaimType = request.ClaimType,
+                Description = request.Description,
+                DescriptionAr = request.DescriptionAr,
+                Status = BenefitClaimStatus.Submitted,
+                Notes = request.Notes,
+                CreatedBy = _currentUser.Username ?? "system"
+            };
+
+            _context.BenefitClaims.Add(entity);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { id = entity.Id });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating benefit claim");
+            return StatusCode(500, new { error = "An error occurred while creating benefit claim" });
+        }
+    }
+
+    /// <summary>Gets a specific benefit claim for the current employee.</summary>
+    [HttpGet("my-benefits/claims/{id}")]
+    public async Task<IActionResult> GetMyBenefitClaimById(long id)
+    {
+        try
+        {
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == null)
+                return Unauthorized(new { error = "User not authenticated" });
+
+            var employeeLink = await _context.EmployeeUserLinks
+                .FirstOrDefaultAsync(eul => eul.UserId == _currentUser.UserId);
+
+            if (employeeLink == null)
+                return NotFound(new { error = "Employee profile not found for current user" });
+
+            var item = await _context.BenefitClaims
+                .AsNoTracking()
+                .Where(x => x.Id == id && x.EmployeeId == employeeLink.EmployeeId && !x.IsDeleted)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.BenefitEnrollmentId,
+                    BenefitPlanName = x.BenefitEnrollment.BenefitPlan.Name,
+                    BenefitPlanNameAr = x.BenefitEnrollment.BenefitPlan.NameAr,
+                    BenefitPlanCode = x.BenefitEnrollment.BenefitPlan.Code,
+                    BenefitType = x.BenefitEnrollment.BenefitPlan.BenefitType.ToString(),
+                    x.ClaimDate,
+                    x.ClaimAmount,
+                    x.ApprovedAmount,
+                    x.Currency,
+                    ClaimType = x.ClaimType.ToString(),
+                    x.Description,
+                    x.DescriptionAr,
+                    Status = x.Status.ToString(),
+                    x.ProcessedAt,
+                    x.RejectionReason,
+                    x.Notes,
+                    x.CreatedAtUtc
+                })
+                .FirstOrDefaultAsync();
+
+            if (item == null)
+                return NotFound(new { error = "Benefit claim not found." });
+
+            return Ok(item);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving benefit claim");
+            return StatusCode(500, new { error = "An error occurred while retrieving benefit claim" });
+        }
+    }
 }
 
 /// <summary>
@@ -2347,4 +5354,116 @@ public class DelegationEmployeeDto
     public string? JobTitle { get; set; }
     public string? DepartmentName { get; set; }
     public string? BranchName { get; set; }
+}
+
+/// <summary>
+/// Request for submitting a resignation
+/// </summary>
+public class PortalFileGrievanceRequest
+{
+    public GrievanceType GrievanceType { get; set; }
+    public string Subject { get; set; } = string.Empty;
+    public string? SubjectAr { get; set; }
+    public string Description { get; set; } = string.Empty;
+    public string? DescriptionAr { get; set; }
+    public GrievancePriority Priority { get; set; }
+    public bool IsConfidential { get; set; }
+    public long? AgainstEmployeeId { get; set; }
+    public string? Notes { get; set; }
+}
+
+public class SubmitResignationRequest
+{
+    public DateTime ResignationDate { get; set; }
+    public DateTime LastWorkingDate { get; set; }
+    public string? Reason { get; set; }
+    public string? ReasonAr { get; set; }
+}
+
+public class PortalSubmitSurveyRequest
+{
+    public List<PortalSurveyResponseItem> Responses { get; set; } = new();
+}
+
+public class PortalSurveyResponseItem
+{
+    public long QuestionId { get; set; }
+    public string? ResponseText { get; set; }
+    public int? ResponseValue { get; set; }
+    public string? SelectedOptions { get; set; }
+}
+
+public class PortalCreateTimesheetRequest
+{
+    public long TimesheetPeriodId { get; set; }
+    public string? Notes { get; set; }
+}
+
+public class PortalUpdateTimesheetRequest
+{
+    public string? Notes { get; set; }
+    public List<PortalTimesheetEntryRequest>? Entries { get; set; }
+}
+
+public class PortalTimesheetEntryRequest
+{
+    public long ProjectId { get; set; }
+    public long? ProjectTaskId { get; set; }
+    public DateTime EntryDate { get; set; }
+    public decimal Hours { get; set; }
+    public decimal OvertimeHours { get; set; }
+    public string? Notes { get; set; }
+    public long? AttendanceRecordId { get; set; }
+}
+
+// Benefits Portal DTOs
+public class PortalBenefitEnrollRequest
+{
+    public long BenefitPlanId { get; set; }
+    public long? BenefitPlanOptionId { get; set; }
+    public long? OpenEnrollmentPeriodId { get; set; }
+    public DateTime EffectiveDate { get; set; }
+    public decimal EmployeeMonthlyContribution { get; set; }
+    public decimal EmployerMonthlyContribution { get; set; }
+    public string? Currency { get; set; }
+    public LifeEventType? LifeEventType { get; set; }
+    public DateTime? LifeEventDate { get; set; }
+    public string? Notes { get; set; }
+}
+
+public class PortalUpdateBenefitEnrollRequest
+{
+    public long? BenefitPlanOptionId { get; set; }
+    public DateTime EffectiveDate { get; set; }
+    public decimal EmployeeMonthlyContribution { get; set; }
+    public decimal EmployerMonthlyContribution { get; set; }
+    public string? Notes { get; set; }
+}
+
+public class PortalAddBenefitDependentRequest
+{
+    public long BenefitEnrollmentId { get; set; }
+    public long? EmployeeDependentId { get; set; }
+    public string FirstName { get; set; } = string.Empty;
+    public string? FirstNameAr { get; set; }
+    public string LastName { get; set; } = string.Empty;
+    public string? LastNameAr { get; set; }
+    public DependentRelationship Relationship { get; set; }
+    public DateTime? DateOfBirth { get; set; }
+    public string? NationalId { get; set; }
+    public DateTime CoverageStartDate { get; set; }
+    public DateTime? CoverageEndDate { get; set; }
+    public decimal AdditionalPremium { get; set; }
+    public string? Currency { get; set; }
+}
+
+public class PortalCreateBenefitClaimRequest
+{
+    public long BenefitEnrollmentId { get; set; }
+    public decimal ClaimAmount { get; set; }
+    public string? Currency { get; set; }
+    public BenefitClaimType ClaimType { get; set; }
+    public string? Description { get; set; }
+    public string? DescriptionAr { get; set; }
+    public string? Notes { get; set; }
 }

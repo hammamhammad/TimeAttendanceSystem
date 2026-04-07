@@ -1,7 +1,7 @@
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Domain.Branches;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Branches;
 
-namespace TimeAttendanceSystem.Domain.VacationTypes;
+namespace TecAxle.Hrms.Domain.VacationTypes;
 
 /// <summary>
 /// Domain entity representing a simplified vacation type configuration within the organization.
@@ -53,6 +53,27 @@ public class VacationType : BaseEntity
     /// </summary>
     /// <value>True if available for new requests, false if disabled</value>
     public bool IsActive { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets whether this vacation type allows half-day leave requests.
+    /// When true, employees can request morning or afternoon half-day leaves.
+    /// </summary>
+    /// <value>True if half-day leave is allowed for this vacation type</value>
+    public bool AllowHalfDay { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether this vacation type allows leave encashment.
+    /// When true, employees can convert unused leave balance to cash.
+    /// </summary>
+    /// <value>True if leave encashment is allowed for this vacation type</value>
+    public bool AllowEncashment { get; set; }
+
+    /// <summary>
+    /// Gets or sets the maximum number of days that can be encashed.
+    /// Only applicable when AllowEncashment is true. Null means no limit.
+    /// </summary>
+    /// <value>Maximum encashable days (nullable, null = no limit)</value>
+    public int? EncashmentMaxDays { get; set; }
 
     // Navigation Properties
 

@@ -18,6 +18,8 @@
 .app-fw-semibold { font-weight: var(--app-font-weight-semibold); }
 .app-fw-bold { font-weight: var(--app-font-weight-bold); }
 
+.app-font-mono { font-family: var(--app-font-family-mono, 'JetBrains Mono', 'Courier New', monospace) !important; }
+
 .app-truncate {
   overflow: hidden;
   text-overflow: ellipsis;

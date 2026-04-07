@@ -1,0 +1,111 @@
+<!-- Page Header -->
+<app-page-header [title]="i18n.t('portal.training.my_certifications')">
+  <div header-actions>
+    <button
+      class="btn btn-outline-primary btn-sm"
+      (click)="refresh()"
+      [disabled]="loading()"
+      type="button">
+      <i class="bi bi-arrow-clockwise" [class.spin]="loading()"></i>
+      {{ i18n.t('common.refresh') }}
+    </button>
+  </div>
+</app-page-header>
+
+<!-- Summary Cards -->
+@if (certifications().length > 0) {
+  <div class="row g-3 mb-3">
+    <div class="col-md-4">
+      <div class="card border-start border-4 border-success">
+        <div class="card-body py-2">
+          <div class="d-flex align-items-center">
+            <i class="bi bi-patch-check text-success me-3" style="font-size: 1.5rem;"></i>
+            <div>
+              <div class="small text-muted">{{ i18n.t('portal.training.total_certifications') }}</div>
+              <div class="fw-bold">{{ certifications().length }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    @if (expiringCount() > 0) {
+      <div class="col-md-4">
+        <div class="card border-start border-4 border-warning">
+          <div class="card-body py-2">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-exclamation-triangle text-warning me-3" style="font-size: 1.5rem;"></i>
+              <div>
+                <div class="small text-muted">{{ i18n.t('portal.training.expiring_soon') }}</div>
+                <div class="fw-bold text-warning">{{ expiringCount() }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+    @if (expiredCount() > 0) {
+      <div class="col-md-4">
+        <div class="card border-start border-4 border-danger">
+          <div class="card-body py-2">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-x-circle text-danger me-3" style="font-size: 1.5rem;"></i>
+              <div>
+                <div class="small text-muted">{{ i18n.t('portal.training.expired_certs') }}</div>
+                <div class="fw-bold text-danger">{{ expiredCount() }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}
+
+<!-- Loading State (only when no data) -->
+@if (loading() && certifications().length === 0) {
+  <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+}
+
+<!-- Error State -->
+@if (error() && certifications().length === 0) {
+  <div class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle me-2"></i>{{ error() }}
+    <button class="btn btn-sm btn-outline-danger ms-3" (click)="refresh()" type="button">{{ i18n.t('common.retry') }}</button>
+  </div>
+}
+
+<!-- Empty State -->
+@if (!loading() && certifications().length === 0 && !error()) {
+  <app-empty-state
+    icon="bi bi-patch-check"
+    [title]="i18n.t('portal.training.no_certifications')">
+  </app-empty-state>
+}
+
+<!-- Data Table -->
+@if (certifications().length > 0) {
+  <div class="card">
+    <div class="card-body">
+      <app-data-table
+        [data]="tableData()"
+        [columns]="columns"
+        [loading]="loading()"
+        [paginated]="true"
+        [pageSize]="10">
+      </app-data-table>
+    </div>
+  </div>
+
+  <!-- Info Card -->
+  <div class="card mt-3">
+    <div class="card-body">
+      <div class="d-flex align-items-start">
+        <i class="bi bi-info-circle text-info me-3 mt-1" style="font-size: 1.5rem;"></i>
+        <div>
+          <h6 class="mb-2">{{ i18n.t('portal.training.cert_info_title') }}</h6>
+          <p class="text-muted mb-0 small">{{ i18n.t('portal.training.cert_info_text') }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+}

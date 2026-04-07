@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Application.Roles.Queries.GetRoles;
+namespace TecAxle.Hrms.Application.Roles.Queries.GetRoles;
 
 public class RoleDto
 {

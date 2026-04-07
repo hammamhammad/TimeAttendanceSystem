@@ -1,8 +1,8 @@
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Domain.Employees;
-using TimeAttendanceSystem.Domain.Users;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Employees;
+using TecAxle.Hrms.Domain.Users;
 
-namespace TimeAttendanceSystem.Domain.Attendance;
+namespace TecAxle.Hrms.Domain.Attendance;
 
 /// <summary>
 /// Domain entity representing an individual attendance transaction (check-in, check-out, break).

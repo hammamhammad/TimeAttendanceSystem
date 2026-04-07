@@ -4,8 +4,8 @@
   left: 0;
   height: 100vh;
   width: 250px;
-  background-color: var(--bs-dark);
-  color: var(--bs-light);
+  background-color: var(--app-sidebar-bg, #0F1629);
+  color: var(--app-sidebar-text, #94A3C4);
   transition: width 0.3s ease;
   z-index: 1000;
   overflow-x: hidden;
@@ -17,7 +17,7 @@
 }
 
 .sidenav-header {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   min-height: 48px;
   display: flex;
   align-items: center;
@@ -44,22 +44,23 @@
 
 /* Nav link base - LTR */
 .nav-link {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--app-sidebar-text, #94A3C4);
   padding: 0.5rem 0.6rem !important;
   border-radius: 0;
   transition: all 0.2s ease;
   border-left: 3px solid transparent;
+  font-size: 14px;
 }
 
 .nav-link:hover {
-  color: var(--bs-light);
-  background-color: rgba(255, 255, 255, 0.1);
+  color: #C4D0E8;
+  background-color: var(--app-sidebar-hover, #1A2342);
 }
 
 .nav-link.active {
-  color: var(--bs-light);
-  background-color: rgba(255, 255, 255, 0.1);
-  border-left-color: var(--bs-primary);
+  color: var(--app-sidebar-text-active, #FFFFFF);
+  background-color: var(--app-sidebar-active, #252F4A);
+  border-left-color: var(--app-primary, #4F6BF6);
 }
 
 /* Icon styling - LTR */
@@ -69,6 +70,7 @@
   flex-shrink: 0;
   margin-right: 0.5rem;
   margin-left: 0;
+  font-size: 15px;
 }
 
 .nav-link span {
@@ -91,7 +93,7 @@
 
 /* Submenu styles - LTR */
 .submenu {
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.15);
   border-radius: 0.25rem;
   margin-top: 0.25rem;
   margin-bottom: 0.25rem;
@@ -104,17 +106,37 @@
 }
 
 .submenu .nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+  color: #C4D0E8;
+  background-color: rgba(255, 255, 255, 0.04);
 }
 
 .submenu .nav-link.active {
-  background-color: rgba(255, 255, 255, 0.15);
-  border-left: 3px solid var(--bs-primary);
+  color: var(--app-primary-400, #6384FF);
+  background-color: rgba(255, 255, 255, 0.08);
+  border-left: 3px solid var(--app-primary, #4F6BF6);
 }
 
 /* Chevron rotation animation */
 .rotate-180 {
   transform: rotate(180deg);
+}
+
+/* Scrollbar styling for sidebar */
+.sidenav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidenav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidenav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+.sidenav::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* ========================================
@@ -153,7 +175,7 @@
 }
 
 :host-context([dir="rtl"]) .nav-link.active {
-  border-right-color: var(--bs-primary);
+  border-right-color: var(--app-primary, #4F6BF6);
   border-left: none;
 }
 
@@ -178,7 +200,7 @@
 
 :host-context([dir="rtl"]) .submenu .nav-link.active {
   border-left: none;
-  border-right: 3px solid var(--bs-primary);
+  border-right: 3px solid var(--app-primary, #4F6BF6);
 }
 
 /* Collapsed in RTL */

@@ -1,0 +1,172 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header
+    [title]="isEditMode() ? i18n.t('employee_contracts.edit') : i18n.t('employee_contracts.create_contract')"
+    moduleName="employee_contracts"
+    moduleRoute="employee-contracts">
+  </app-form-header>
+
+  @if (loading()) {
+    <div class="text-center py-5">
+      <app-loading-spinner [message]="i18n.t('common.loading')" [variant]="'primary'" [centered]="true" />
+    </div>
+  }
+
+  @if (!loading()) {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <app-form-section [title]="i18n.t('common.basic_info')" [variant]="'modern'">
+        <div class="row g-3">
+          <!-- Employee -->
+          <div class="col-md-6">
+            <div class="app-modern-field">
+              <label class="app-modern-label">{{ i18n.t('fields.employee') }} <span class="text-danger">*</span></label>
+              <app-searchable-select
+                [options]="employeeOptions"
+                [placeholder]="i18n.t('common.select_employee')"
+                [value]="form.get('employeeId')?.value"
+                [disabled]="submitting()"
+                (selectionChange)="form.get('employeeId')?.setValue($event)">
+              </app-searchable-select>
+            </div>
+            <small class="text-muted">{{ i18n.t('employee_contracts.hints.employee') }}</small>
+          </div>
+
+          <!-- Contract Number -->
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input type="text" class="form-control" id="contractNumber" formControlName="contractNumber" placeholder="x">
+              <label for="contractNumber">{{ i18n.t('employee_contracts.contract_number') }} <span class="text-danger">*</span></label>
+            </div>
+            <small class="text-muted">{{ i18n.t('employee_contracts.hints.contract_number') }}</small>
+          </div>
+
+          <!-- Contract Type -->
+          <div class="col-md-6">
+            <div class="app-modern-field">
+              <label class="app-modern-label">{{ i18n.t('employee_contracts.contract_type') }} <span class="text-danger">*</span></label>
+              <app-searchable-select
+                [options]="contractTypeOptions()"
+                [placeholder]="i18n.t('common.select')"
+                [value]="form.get('contractType')?.value"
+                [disabled]="submitting()"
+                (selectionChange)="form.get('contractType')?.setValue($event)">
+              </app-searchable-select>
+            </div>
+            <small class="text-muted">{{ i18n.t('employee_contracts.hints.contract_type') }}</small>
+          </div>
+
+          <!-- Start Date -->
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input type="date" class="form-control" id="startDate" formControlName="startDate" placeholder="x">
+              <label for="startDate">{{ i18n.t('fields.start_date') }} <span class="text-danger">*</span></label>
+            </div>
+            <small class="text-muted">{{ i18n.t('employee_contracts.hints.start_date') }}</small>
+          </div>
+
+          <!-- End Date -->
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input type="date" class="form-control" id="endDate" formControlName="endDate" placeholder="x">
+              <label for="endDate">{{ i18n.t('fields.end_date') }}</label>
+            </div>
+            <small class="text-muted">{{ i18n.t('employee_contracts.hints.end_date') }}</small>
+          </div>
+
+          <!-- Basic Salary -->
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input type="number" class="form-control" id="basicSalary" formControlName="basicSalary" placeholder="x" min="0">
+              <label for="basicSalary">{{ i18n.t('employee_contracts.basic_salary') }} <span class="text-danger">*</span></label>
+            </div>
+            <small class="text-muted">{{ i18n.t('employee_contracts.hints.basic_salary') }}</small>
+          </div>
+
+          <!-- Currency -->
+          <div class="col-md-6">
+            <div class="form-floating">
+              <select class="form-select" id="currency" formControlName="currency">
+                <option value="SAR">SAR - Saudi Riyal</option>
+                <option value="USD">USD - US Dollar</option>
+                <option value="EUR">EUR - Euro</option>
+                <option value="GBP">GBP - British Pound</option>
+                <option value="AED">AED - UAE Dirham</option>
+                <option value="KWD">KWD - Kuwaiti Dinar</option>
+                <option value="QAR">QAR - Qatari Riyal</option>
+                <option value="BHD">BHD - Bahraini Dinar</option>
+                <option value="OMR">OMR - Omani Rial</option>
+                <option value="EGP">EGP - Egyptian Pound</option>
+                <option value="JOD">JOD - Jordanian Dinar</option>
+              </select>
+              <label for="currency">{{ i18n.t('employee_contracts.currency') }}</label>
+            </div>
+            <small class="text-muted">{{ i18n.t('employee_contracts.hints.currency') }}</small>
+          </div>
+
+          <!-- Probation Period Days -->
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input type="number" class="form-control" id="probationPeriodDays" formControlName="probationPeriodDays" placeholder="x" min="0">
+              <label for="probationPeriodDays">{{ i18n.t('employee_contracts.probation_period_days') }}</label>
+            </div>
+            <small class="text-muted">{{ i18n.t('employee_contracts.hints.probation_period') }}</small>
+          </div>
+
+          <!-- Notice Period Days -->
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input type="number" class="form-control" id="noticePeriodDays" formControlName="noticePeriodDays" placeholder="x" min="0">
+              <label for="noticePeriodDays">{{ i18n.t('employee_contracts.notice_period_days') }}</label>
+            </div>
+            <small class="text-muted">{{ i18n.t('employee_contracts.hints.notice_period') }}</small>
+          </div>
+
+          <!-- Auto Renew -->
+          <div class="col-md-6">
+            <div class="form-check mt-3">
+              <input type="checkbox" class="form-check-input" id="autoRenew" formControlName="autoRenew">
+              <label class="form-check-label" for="autoRenew">{{ i18n.t('employee_contracts.auto_renew') }}</label>
+            </div>
+            <small class="text-muted">{{ i18n.t('employee_contracts.hints.auto_renew') }}</small>
+          </div>
+        </div>
+      </app-form-section>
+
+      <app-form-section [title]="i18n.t('employee_contracts.terms')" [variant]="'modern'">
+        <div class="row g-3">
+          <div class="col-12">
+            <div class="form-floating">
+              <textarea class="form-control" id="terms" formControlName="terms" placeholder="x" style="height: 120px"></textarea>
+              <label for="terms">{{ i18n.t('employee_contracts.terms') }}</label>
+            </div>
+            <small class="text-muted">{{ i18n.t('employee_contracts.hints.terms') }}</small>
+          </div>
+        </div>
+      </app-form-section>
+
+      <app-form-section [title]="i18n.t('files.upload_document')" [variant]="'modern'">
+        <div class="row g-3">
+          <div class="col-12">
+            <app-file-upload
+              [label]="i18n.t('files.upload_document')"
+              [category]="'contracts'"
+              [accept]="'.pdf,.doc,.docx'"
+              [currentFileUrl]="form.get('documentUrl')?.value || undefined"
+              (fileUploaded)="onFileUploaded('documentUrl', $event)">
+            </app-file-upload>
+            <small class="text-muted">{{ i18n.t('files.allowed_types') }}</small>
+          </div>
+        </div>
+      </app-form-section>
+
+      <div class="app-form-actions">
+        <button type="button" class="btn btn-secondary" routerLink="/employee-contracts">{{ i18n.t('common.cancel') }}</button>
+        <button type="submit" class="btn btn-primary" [disabled]="form.invalid || submitting()">
+          @if (submitting()) {
+            <span class="spinner-border spinner-border-sm me-1"></span>
+          }
+          {{ i18n.t('common.save') }}
+        </button>
+      </div>
+    </form>
+  }
+</div>

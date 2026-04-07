@@ -1,0 +1,115 @@
+<div class="app-modern-form">
+  <app-form-header
+    [title]="isEditMode() ? i18n.t('counseling_records.edit') : i18n.t('counseling_records.create')"
+    moduleName="counseling" moduleRoute="employee-relations/counseling" [loading]="saving()">
+  </app-form-header>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <app-form-section [title]="i18n.t('counseling_records.session_info')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('counseling_records.employee') }} *</label>
+            <app-searchable-select [options]="employeeOptions()" [placeholder]="i18n.t('common.select')"
+              [value]="form.get('employeeId')?.value" (selectionChange)="form.get('employeeId')?.setValue($event)">
+            </app-searchable-select>
+          </div>
+          @if (form.get('employeeId')?.touched && form.get('employeeId')?.hasError('required')) {
+            <div class="invalid-feedback d-block">{{ i18n.t('common.required') }}</div>
+          }
+        </div>
+        <div class="col-md-6">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('counseling_records.counselor') }}</label>
+            <app-searchable-select [options]="employeeOptions()" [placeholder]="i18n.t('common.select')"
+              [value]="form.get('counselorEmployeeId')?.value" (selectionChange)="form.get('counselorEmployeeId')?.setValue($event)">
+            </app-searchable-select>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="sessionDate" formControlName="sessionDate" placeholder="Session Date">
+            <label for="sessionDate">{{ i18n.t('counseling_records.session_date') }} *</label>
+          </div>
+          @if (form.get('sessionDate')?.touched && form.get('sessionDate')?.hasError('required')) {
+            <div class="invalid-feedback d-block">{{ i18n.t('common.required') }}</div>
+          }
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <select class="form-select" id="counselingType" formControlName="counselingType">
+              @for (t of counselingTypes; track t) {
+                <option [value]="t">{{ i18n.t('counseling_records.type_' + t) }}</option>
+              }
+            </select>
+            <label for="counselingType">{{ i18n.t('counseling_records.session_type') }} *</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-check mt-3">
+            <input type="checkbox" class="form-check-input" id="isConfidential" formControlName="isConfidential">
+            <label class="form-check-label" for="isConfidential">{{ i18n.t('counseling_records.confidential') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="subject" formControlName="subject" placeholder="Subject">
+            <label for="subject">{{ i18n.t('counseling_records.subject') }} *</label>
+          </div>
+          @if (form.get('subject')?.touched && form.get('subject')?.hasError('required')) {
+            <div class="invalid-feedback d-block">{{ i18n.t('common.required') }}</div>
+          }
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="subjectAr" formControlName="subjectAr" placeholder="Subject (Arabic)">
+            <label for="subjectAr">{{ i18n.t('counseling_records.subject') }} ({{ i18n.t('common.arabic') }})</label>
+          </div>
+        </div>
+        <div class="col-md-12">
+          <div class="form-floating">
+            <textarea class="form-control" id="description" formControlName="description" placeholder="Notes" style="height: 120px"></textarea>
+            <label for="description">{{ i18n.t('counseling_records.notes') }}</label>
+          </div>
+        </div>
+      </div>
+    </app-form-section>
+
+    <app-form-section [title]="i18n.t('counseling_records.follow_up_info')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="form-check mt-2">
+            <input type="checkbox" class="form-check-input" id="followUpRequired" formControlName="followUpRequired">
+            <label class="form-check-label" for="followUpRequired">{{ i18n.t('counseling_records.follow_up_required') }}</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="followUpDate" formControlName="followUpDate" placeholder="Follow-up Date">
+            <label for="followUpDate">{{ i18n.t('counseling_records.follow_up_date') }}</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="number" class="form-control" id="relatedDisciplinaryActionId" formControlName="relatedDisciplinaryActionId" placeholder="Related Disciplinary Action ID">
+            <label for="relatedDisciplinaryActionId">{{ i18n.t('counseling_records.related_disciplinary_action') }}</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="number" class="form-control" id="relatedGrievanceId" formControlName="relatedGrievanceId" placeholder="Related Grievance ID">
+            <label for="relatedGrievanceId">{{ i18n.t('counseling_records.related_grievance') }}</label>
+          </div>
+        </div>
+      </div>
+    </app-form-section>
+
+    <div class="app-form-actions">
+      <button type="button" class="btn btn-secondary" routerLink="/employee-relations/counseling">{{ i18n.t('common.cancel') }}</button>
+      <button type="submit" class="btn btn-primary" [disabled]="saving()">
+        @if (saving()) { <span class="spinner-border spinner-border-sm me-2"></span> }
+        {{ i18n.t('common.save') }}
+      </button>
+    </div>
+  </form>
+</div>

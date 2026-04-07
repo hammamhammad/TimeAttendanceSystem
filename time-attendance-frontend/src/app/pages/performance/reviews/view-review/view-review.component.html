@@ -1,0 +1,101 @@
+<div class="container-fluid app-modern-view">
+  <app-form-header mode="view" [title]="i18n.t('performance_reviews.view')" moduleName="performance_reviews" moduleRoute="performance/reviews" [entityId]="item()?.id" [loading]="loading()" [actions]="headerActions()" />
+  @if (loading()) { <div class="text-center py-5"><app-loading-spinner [message]="i18n.t('common.loading')" [variant]="'primary'" [centered]="true" /></div> }
+  @if (error()) { <div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>{{ error() }}</div> }
+  @if (item() && !loading()) {
+    <div class="row g-4">
+      <div class="col-12"><div class="d-flex align-items-center gap-2 mb-3"><span class="fw-medium">{{ i18n.t('fields.status') }}:</span><app-status-badge [status]="statusBadge().label" [variant]="statusBadge().variant" /></div></div>
+      <div class="col-lg-6"><app-section-card [title]="i18n.t('common.basic_info')"><app-definition-list [items]="infoItems()" [labelWidth]="'5'" [valueWidth]="'7'" /></app-section-card></div>
+      @if (item()?.strengths || item()?.areasForImprovement) {
+        <div class="col-lg-6">
+          <app-section-card [title]="i18n.t('performance_reviews.feedback')">
+            @if (item()?.strengths) { <h6>{{ i18n.t('performance_reviews.strengths') }}</h6><p style="white-space: pre-wrap;">{{ item()?.strengths }}</p> }
+            @if (item()?.areasForImprovement) { <h6>{{ i18n.t('performance_reviews.areas_improvement') }}</h6><p style="white-space: pre-wrap;">{{ item()?.areasForImprovement }}</p> }
+          </app-section-card>
+        </div>
+      }
+
+      <!-- Self-Assessment Form -->
+      @if (showSelfForm()) {
+        <div class="col-12">
+          <app-section-card [title]="i18n.t('performance_reviews.submit_self_review')">
+            <form [formGroup]="selfForm" (ngSubmit)="submitSelfReview()" novalidate>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label fw-medium">{{ i18n.t('performance_reviews.self_rating') }} <span class="text-danger">*</span></label>
+                  <select class="form-select" formControlName="selfRating">
+                    @for (r of ratingOptions; track r) { <option [value]="r">{{ r }}</option> }
+                  </select>
+                </div>
+                <div class="col-12">
+                  <label class="form-label fw-medium">{{ i18n.t('performance_reviews.self_comments') }}</label>
+                  <textarea class="form-control" formControlName="selfComments" rows="4"></textarea>
+                </div>
+                <div class="col-12 d-flex gap-2">
+                  <button type="submit" class="btn btn-primary" [disabled]="selfForm.invalid || submittingAction()">
+                    @if (submittingAction()) { <span class="spinner-border spinner-border-sm me-1"></span> }{{ i18n.t('common.submit') }}
+                  </button>
+                  <button type="button" class="btn btn-secondary" (click)="showSelfForm.set(false)">{{ i18n.t('common.cancel') }}</button>
+                </div>
+              </div>
+            </form>
+          </app-section-card>
+        </div>
+      }
+
+      <!-- Manager Review Form -->
+      @if (showManagerForm()) {
+        <div class="col-12">
+          <app-section-card [title]="i18n.t('performance_reviews.submit_manager_review')">
+            <form [formGroup]="managerForm" (ngSubmit)="submitManagerReview()" novalidate>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label fw-medium">{{ i18n.t('performance_reviews.manager_rating') }} <span class="text-danger">*</span></label>
+                  <select class="form-select" formControlName="managerRating">
+                    @for (r of ratingOptions; track r) { <option [value]="r">{{ r }}</option> }
+                  </select>
+                </div>
+                <div class="col-12">
+                  <label class="form-label fw-medium">{{ i18n.t('performance_reviews.manager_comments') }}</label>
+                  <textarea class="form-control" formControlName="managerComments" rows="3"></textarea>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-medium">{{ i18n.t('performance_reviews.strengths') }}</label>
+                  <textarea class="form-control" formControlName="strengths" rows="3"></textarea>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-medium">{{ i18n.t('performance_reviews.areas_improvement') }}</label>
+                  <textarea class="form-control" formControlName="areasForImprovement" rows="3"></textarea>
+                </div>
+                <div class="col-12 d-flex gap-2">
+                  <button type="submit" class="btn btn-primary" [disabled]="managerForm.invalid || submittingAction()">
+                    @if (submittingAction()) { <span class="spinner-border spinner-border-sm me-1"></span> }{{ i18n.t('common.submit') }}
+                  </button>
+                  <button type="button" class="btn btn-secondary" (click)="showManagerForm.set(false)">{{ i18n.t('common.cancel') }}</button>
+                </div>
+              </div>
+            </form>
+          </app-section-card>
+        </div>
+      }
+
+      @if (item()?.goals?.length) {
+        <div class="col-12">
+          <app-section-card [title]="i18n.t('goals.title')">
+            <div class="table-responsive">
+              <table class="table table-sm table-hover mb-0">
+                <thead><tr><th>{{ i18n.t('goals.goal_title') }}</th><th>{{ i18n.t('goals.category') }}</th><th>{{ i18n.t('goals.weight') }}</th><th>{{ i18n.t('goals.progress') }}</th><th>{{ i18n.t('fields.status') }}</th></tr></thead>
+                <tbody>
+                  @for (goal of item()!.goals; track goal.id) {
+                    <tr><td>{{ goal.title }}</td><td>{{ goal.goalType }}</td><td>{{ goal.weight }}%</td><td>{{ goal.progressPercentage }}%</td><td><span class="badge bg-{{ goal.status === 'Completed' ? 'success' : goal.status === 'Active' || goal.status === 'InProgress' ? 'info' : 'secondary' }}">{{ goal.status }}</span></td></tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </app-section-card>
+        </div>
+      }
+      <div class="col-12"><app-section-card [title]="i18n.t('history.title')" icon="fas fa-clock-rotate-left" headerClass="bg-light"><app-audit-history [entityName]="'PerformanceReview'" [entityId]="item()?.id" /></app-section-card></div>
+    </div>
+  }
+</div>

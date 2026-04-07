@@ -1,7 +1,7 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Workflows.Commands.DelegateApproval;
+namespace TecAxle.Hrms.Application.Workflows.Commands.DelegateApproval;
 
 /// <summary>
 /// CQRS command for delegating approval to another user.

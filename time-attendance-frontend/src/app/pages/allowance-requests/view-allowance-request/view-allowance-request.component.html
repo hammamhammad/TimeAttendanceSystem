@@ -1,0 +1,131 @@
+<div class="container-fluid app-modern-view">
+  @if (loading()) {
+    <app-loading-spinner></app-loading-spinner>
+  }
+
+  @if (!loading() && request()) {
+    <app-form-header
+      mode="view"
+      [title]="t('allowance_requests.view')"
+      [entityId]="entityId() ?? undefined"
+      moduleName="allowance_requests"
+      moduleRoute="allowance-requests">
+    </app-form-header>
+
+    <div class="row">
+      <!-- Request Information -->
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header bg-light">
+            <h6 class="mb-0">
+              <i class="fas fa-file-invoice-dollar me-2"></i>
+              {{ t('allowance_requests.view') }}
+            </h6>
+          </div>
+          <div class="card-body">
+            <app-definition-list [items]="requestInfoItems()">
+              <ng-container *ngTemplateOutlet="statusBadgeTemplate"></ng-container>
+            </app-definition-list>
+          </div>
+        </div>
+      </div>
+
+      <!-- Amount & Dates -->
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header bg-light">
+            <h6 class="mb-0">
+              <i class="fas fa-money-bill-wave me-2"></i>
+              {{ t('allowance_requests.requested_amount') }}
+            </h6>
+          </div>
+          <div class="card-body">
+            <app-definition-list [items]="amountInfoItems()"></app-definition-list>
+          </div>
+        </div>
+      </div>
+
+      <!-- Details -->
+      @if (detailsItems().length > 0) {
+        <div class="col-12 mb-4">
+          <div class="card">
+            <div class="card-header bg-light">
+              <h6 class="mb-0">
+                <i class="fas fa-info-circle me-2"></i>
+                {{ t('common.details') }}
+              </h6>
+            </div>
+            <div class="card-body">
+              <app-definition-list [items]="detailsItems()" [labelWidth]="'2'" [valueWidth]="'10'"></app-definition-list>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Supporting Document -->
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header bg-light">
+            <h6 class="mb-0">
+              <i class="fas fa-paperclip me-2"></i>
+              {{ t('allowance_requests.supporting_document') }}
+            </h6>
+          </div>
+          <div class="card-body">
+            <app-file-upload
+              [label]="i18n.t('files.upload_document')"
+              [category]="'allowance-requests'"
+              [accept]="'.pdf,.doc,.docx,.jpg,.jpeg,.png'"
+              [currentFileUrl]="request()?.supportingDocumentUrl"
+              [entityType]="'AllowanceRequest'"
+              [entityId]="entityId() ?? undefined"
+              [fieldName]="'supportingDocumentUrl'"
+              (fileUploaded)="onDocumentUploaded($event)">
+            </app-file-upload>
+          </div>
+        </div>
+      </div>
+
+      <!-- Audit Information -->
+      <div class="col-12 mb-4">
+        <div class="card">
+          <div class="card-header bg-light">
+            <h6 class="mb-0">
+              <i class="fas fa-history me-2"></i>
+              {{ t('common.audit_info') }}
+            </h6>
+          </div>
+          <div class="card-body">
+            <app-definition-list [items]="auditInfoItems()" [labelWidth]="'2'" [valueWidth]="'10'"></app-definition-list>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Audit History -->
+    <div class="col-12 mb-4">
+      <app-section-card [title]="t('history.title')" icon="fas fa-clock-rotate-left" headerClass="bg-light">
+        <app-audit-history [entityName]="'AllowanceRequest'" [entityId]="entityId()" />
+      </app-section-card>
+    </div>
+
+    <!-- Action Buttons -->
+    @if (isPending() && permissionService.has(PERMISSIONS.APPROVE)) {
+      <div class="d-flex gap-2 mt-3">
+        <button class="btn btn-success" (click)="onApprove()">
+          <i class="fas fa-check me-1"></i> {{ t('common.approve') }}
+        </button>
+        <button class="btn btn-danger" (click)="onReject()">
+          <i class="fas fa-times me-1"></i> {{ t('common.reject') }}
+        </button>
+      </div>
+    }
+  }
+</div>
+
+<ng-template #statusBadgeTemplate>
+  <app-status-badge
+    [status]="statusBadge().label"
+    [variant]="statusBadge().variant">
+  </app-status-badge>
+</ng-template>

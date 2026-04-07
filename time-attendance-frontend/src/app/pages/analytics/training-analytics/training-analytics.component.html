@@ -1,0 +1,149 @@
+<div class="training-analytics-page">
+  <app-page-header
+    [title]="i18n.t('analytics.training_title')"
+    [showBackButton]="true"
+    backRoute="/analytics">
+  </app-page-header>
+
+  <!-- Filters -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label">{{ i18n.t('analytics.start_date') }}</label>
+          <input type="date" class="form-control" [ngModel]="startDate()" (ngModelChange)="startDate.set($event)">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">{{ i18n.t('analytics.end_date') }}</label>
+          <input type="date" class="form-control" [ngModel]="endDate()" (ngModelChange)="endDate.set($event)">
+        </div>
+        <div class="col-md-3">
+          <button class="btn btn-primary" (click)="onFilter()">
+            <i class="fa-solid fa-filter me-1"></i>
+            {{ i18n.t('analytics.apply_filter') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <app-loading-spinner></app-loading-spinner>
+  } @else if (data()) {
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="card stat-card h-100">
+          <div class="card-body text-center">
+            <div class="stat-icon bg-primary-subtle mb-2">
+              <i class="fa-solid fa-clock text-primary"></i>
+            </div>
+            <h3 class="mb-1">{{ data()!.totalTrainingHours }}</h3>
+            <p class="text-muted mb-0">{{ i18n.t('analytics.total_training_hours') }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card stat-card h-100">
+          <div class="card-body text-center">
+            <div class="stat-icon bg-success-subtle mb-2">
+              <i class="fa-solid fa-check-circle text-success"></i>
+            </div>
+            <h3 class="mb-1">{{ data()!.completionRate }}%</h3>
+            <p class="text-muted mb-0">{{ i18n.t('analytics.training_completion') }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card stat-card h-100">
+          <div class="card-body text-center">
+            <div class="stat-icon bg-info-subtle mb-2">
+              <i class="fa-solid fa-user-graduate text-info"></i>
+            </div>
+            <h3 class="mb-1">{{ data()!.totalEnrollments }}</h3>
+            <p class="text-muted mb-0">{{ i18n.t('analytics.total_enrollments') }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card stat-card h-100">
+          <div class="card-body text-center">
+            <div class="stat-icon bg-warning-subtle mb-2">
+              <i class="fa-solid fa-user-clock text-warning"></i>
+            </div>
+            <h3 class="mb-1">{{ data()!.hoursPerEmployee }}</h3>
+            <p class="text-muted mb-0">{{ i18n.t('analytics.hours_per_employee') }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Enrollment Breakdown -->
+    <div class="row g-4 mb-4">
+      <div class="col-lg-6">
+        <div class="card h-100">
+          <div class="card-header">
+            <h5 class="card-title mb-0">{{ i18n.t('analytics.enrollment_breakdown') }}</h5>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-6">
+                <div class="p-3 rounded bg-light text-center">
+                  <p class="text-muted mb-1 small">{{ i18n.t('analytics.completed') }}</p>
+                  <h4 class="mb-0 text-success">{{ data()!.completed }}</h4>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="p-3 rounded bg-light text-center">
+                  <p class="text-muted mb-1 small">{{ i18n.t('analytics.in_progress') }}</p>
+                  <h4 class="mb-0 text-info">{{ data()!.inProgress }}</h4>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="p-3 rounded bg-light text-center">
+                  <p class="text-muted mb-1 small">{{ i18n.t('analytics.cancelled') }}</p>
+                  <h4 class="mb-0 text-danger">{{ data()!.cancelled }}</h4>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="p-3 rounded bg-light text-center">
+                  <p class="text-muted mb-1 small">{{ i18n.t('analytics.total_enrollments') }}</p>
+                  <h4 class="mb-0 text-primary">{{ data()!.totalEnrollments }}</h4>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- By Status -->
+      <div class="col-lg-6">
+        <div class="card h-100">
+          <div class="card-header">
+            <h5 class="card-title mb-0">{{ i18n.t('analytics.by_status') }}</h5>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>{{ i18n.t('analytics.status') }}</th>
+                    <th class="text-end">{{ i18n.t('analytics.count') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of data()!.byStatus ?? []; track item.status) {
+                    <tr>
+                      <td class="fw-medium">{{ item.status }}</td>
+                      <td class="text-end">{{ item.count }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

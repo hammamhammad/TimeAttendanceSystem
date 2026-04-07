@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Api.Models;
+namespace TecAxle.Hrms.Api.Models;
 
 /// <summary>
 /// Request model for generating attendance reports with filtering options.

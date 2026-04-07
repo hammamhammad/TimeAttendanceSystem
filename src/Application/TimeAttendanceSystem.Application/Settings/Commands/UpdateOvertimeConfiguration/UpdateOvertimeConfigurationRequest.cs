@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Application.Settings.Commands.UpdateOvertimeConfiguration;
+namespace TecAxle.Hrms.Application.Settings.Commands.UpdateOvertimeConfiguration;
 
 /// <summary>
 /// Request object for updating an existing overtime configuration.

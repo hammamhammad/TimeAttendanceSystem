@@ -1,0 +1,48 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header [title]="i18n.t(isEditMode() ? 'succession.plans.edit' : 'succession.plans.create')" moduleName="succession_plans" moduleRoute="succession/plans" />
+  @if (loadingData()) {
+    <div class="text-center py-5"><app-loading-spinner [message]="i18n.t('common.loading')" [variant]="'primary'" [centered]="true" /></div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <app-form-section [title]="i18n.t('common.basic_info')" [variant]="'modern'">
+        <div class="row g-3">
+          <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" id="name" formControlName="name" placeholder="x"><label for="name">{{ i18n.t('succession.plans.name') }} <span class="text-danger">*</span></label></div></div>
+          <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" id="nameAr" formControlName="nameAr" placeholder="x" dir="rtl"><label for="nameAr">{{ i18n.t('succession.plans.name_ar') }}</label></div></div>
+          <div class="col-md-6">
+            <div class="app-modern-field">
+              <label class="app-modern-label">{{ i18n.t('succession.plans.key_position') }} <span class="text-danger">*</span></label>
+              <app-searchable-select [options]="keyPositionOptions()" [formControl]="$any(form.get('keyPositionId'))" [placeholder]="i18n.t('common.select')" [disabled]="isEditMode()" />
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-floating">
+              <select class="form-select" id="status" formControlName="status">
+                <option value="Draft">{{ i18n.t('succession.enums.Draft') }}</option>
+                <option value="Active">{{ i18n.t('succession.enums.Active') }}</option>
+                <option value="UnderReview">{{ i18n.t('succession.enums.UnderReview') }}</option>
+                <option value="Approved">{{ i18n.t('succession.enums.Approved') }}</option>
+                <option value="Archived">{{ i18n.t('succession.enums.Archived') }}</option>
+              </select>
+              <label for="status">{{ i18n.t('fields.status') }} <span class="text-danger">*</span></label>
+            </div>
+          </div>
+          <div class="col-md-6"><div class="form-floating"><input type="date" class="form-control" id="effectiveDate" formControlName="effectiveDate" placeholder="x"><label for="effectiveDate">{{ i18n.t('succession.plans.effective_date') }} <span class="text-danger">*</span></label></div></div>
+          <div class="col-md-6"><div class="form-floating"><input type="date" class="form-control" id="reviewDate" formControlName="reviewDate" placeholder="x"><label for="reviewDate">{{ i18n.t('succession.plans.review_date') }}</label></div></div>
+          @if (isEditMode()) {
+            <div class="col-md-6">
+              <div class="form-check form-switch mt-3">
+                <input class="form-check-input" type="checkbox" id="isActive" formControlName="isActive">
+                <label class="form-check-label" for="isActive">{{ i18n.t('common.active') }}</label>
+              </div>
+            </div>
+          }
+          <div class="col-12"><div class="form-floating"><textarea class="form-control" id="notes" formControlName="notes" placeholder="x" style="height:80px"></textarea><label for="notes">{{ i18n.t('fields.notes') }}</label></div></div>
+        </div>
+      </app-form-section>
+      <div class="app-form-actions">
+        <button type="button" class="btn btn-secondary" routerLink="/succession/plans">{{ i18n.t('common.cancel') }}</button>
+        <button type="submit" class="btn btn-primary" [disabled]="form.invalid || submitting()">@if (submitting()) { <span class="spinner-border spinner-border-sm me-1"></span> }{{ i18n.t('common.save') }}</button>
+      </div>
+    </form>
+  }
+</div>

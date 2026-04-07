@@ -1,8 +1,8 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Notifications;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Notifications;
 
-namespace TimeAttendanceSystem.Application.Notifications.Commands.CreateBroadcast;
+namespace TecAxle.Hrms.Application.Notifications.Commands.CreateBroadcast;
 
 /// <summary>
 /// Command to create and send a notification broadcast to targeted recipients.

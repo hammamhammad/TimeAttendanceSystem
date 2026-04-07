@@ -1,0 +1,140 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header [title]="isEdit() ? i18n.t('surveys.edit_template') : i18n.t('surveys.create_template')" moduleName="surveys" moduleRoute="surveys/templates" [loading]="saving()" />
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <app-form-section [title]="i18n.t('common.basic_information')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="name" placeholder="Name" formControlName="name">
+            <label for="name">{{ i18n.t('surveys.template_name') }} *</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="nameAr" placeholder="Name AR" formControlName="nameAr">
+            <label for="nameAr">{{ i18n.t('surveys.template_name_ar') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('surveys.type') }} *</label>
+            <app-searchable-select [options]="typeOptions()" [placeholder]="i18n.t('common.select')" [value]="form.get('surveyType')?.value" (selectionChange)="form.get('surveyType')?.setValue($event)" />
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-check form-switch mt-4">
+            <input class="form-check-input" type="checkbox" id="isActive" formControlName="isActive">
+            <label class="form-check-label" for="isActive">{{ i18n.t('common.active') }}</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-floating">
+            <textarea class="form-control" id="description" placeholder="Description" formControlName="description" style="height:80px"></textarea>
+            <label for="description">{{ i18n.t('common.description') }}</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-floating">
+            <textarea class="form-control" id="descriptionAr" placeholder="Description AR" formControlName="descriptionAr" style="height:80px"></textarea>
+            <label for="descriptionAr">{{ i18n.t('surveys.description_ar') }}</label>
+          </div>
+        </div>
+      </div>
+    </app-form-section>
+
+    <app-form-section [title]="i18n.t('surveys.questions')" variant="modern">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="text-muted">{{ i18n.t('surveys.questions_count', { count: questionsArray.length }) }}</span>
+        <button type="button" class="btn btn-outline-primary btn-sm" (click)="addQuestion()">
+          <i class="fas fa-plus me-1"></i>{{ i18n.t('surveys.add_question') }}
+        </button>
+      </div>
+
+      <div formArrayName="questions">
+      @for (question of questionsArray.controls; track $index; let i = $index) {
+        <div class="card mb-3 border-start border-primary border-3">
+          <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <span class="fw-semibold">{{ i18n.t('surveys.question') }} #{{ i + 1 }}</span>
+            <div class="btn-group btn-group-sm">
+              <button type="button" class="btn btn-outline-secondary" (click)="moveQuestion(i, 'up')" [disabled]="i === 0" [title]="i18n.t('surveys.move_up')">
+                <i class="fas fa-arrow-up"></i>
+              </button>
+              <button type="button" class="btn btn-outline-secondary" (click)="moveQuestion(i, 'down')" [disabled]="i === questionsArray.length - 1" [title]="i18n.t('surveys.move_down')">
+                <i class="fas fa-arrow-down"></i>
+              </button>
+              <button type="button" class="btn btn-outline-danger" (click)="removeQuestion(i)" [title]="i18n.t('common.delete')">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+          <div class="card-body" [formGroupName]="i">
+            <div class="row g-3">
+              <div class="col-md-8">
+                <div class="form-floating">
+                  <input type="text" class="form-control" [id]="'qtext_' + i" placeholder="Question" formControlName="questionText">
+                  <label [for]="'qtext_' + i">{{ i18n.t('surveys.question_text') }} *</label>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="app-modern-field">
+                  <label class="app-modern-label">{{ i18n.t('surveys.question_type') }} *</label>
+                  <app-searchable-select [options]="questionTypeOptions()" [placeholder]="i18n.t('common.select')" [value]="getQuestionType(i)" (selectionChange)="questionsArray.at(i).get('questionType')?.setValue($event)" />
+                </div>
+              </div>
+              <div class="col-md-8">
+                <div class="form-floating">
+                  <input type="text" class="form-control" [id]="'qtextar_' + i" placeholder="Question AR" formControlName="questionTextAr">
+                  <label [for]="'qtextar_' + i">{{ i18n.t('surveys.question_text_ar') }}</label>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-check form-switch mt-4">
+                  <input class="form-check-input" type="checkbox" [id]="'qreq_' + i" formControlName="isRequired">
+                  <label class="form-check-label" [for]="'qreq_' + i">{{ i18n.t('surveys.required') }}</label>
+                </div>
+              </div>
+
+              @if (needsOptions(i)) {
+                <div class="col-12">
+                  <label class="form-label fw-semibold">{{ i18n.t('surveys.options') }}</label>
+                  @for (opt of getOptions(i); track $index; let oi = $index) {
+                    <div class="d-flex gap-2 mb-2 align-items-center">
+                      <span class="badge bg-secondary">{{ oi + 1 }}</span>
+                      <input type="text" class="form-control form-control-sm" [value]="opt" (input)="updateOption(i, oi, $any($event.target).value)" [placeholder]="i18n.t('surveys.option_text')">
+                      <button type="button" class="btn btn-outline-danger btn-sm" (click)="removeOption(i, oi)">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                  }
+                  <button type="button" class="btn btn-outline-secondary btn-sm" (click)="addOption(i)">
+                    <i class="fas fa-plus me-1"></i>{{ i18n.t('surveys.add_option') }}
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+      </div>
+
+      @if (questionsArray.length === 0) {
+        <div class="text-center text-muted py-4">
+          <i class="fas fa-clipboard-question fa-2x mb-2"></i>
+          <p>{{ i18n.t('surveys.no_questions_yet') }}</p>
+          <button type="button" class="btn btn-primary btn-sm" (click)="addQuestion()">
+            <i class="fas fa-plus me-1"></i>{{ i18n.t('surveys.add_question') }}
+          </button>
+        </div>
+      }
+    </app-form-section>
+
+    <div class="app-form-actions">
+      <button type="button" class="btn btn-secondary" (click)="router.navigate(['/surveys/templates'])">{{ i18n.t('common.cancel') }}</button>
+      <button type="submit" class="btn btn-primary" [disabled]="saving()">
+        @if (saving()) { <i class="fas fa-spinner fa-spin me-1"></i> }
+        {{ i18n.t('common.save') }}
+      </button>
+    </div>
+  </form>
+</div>

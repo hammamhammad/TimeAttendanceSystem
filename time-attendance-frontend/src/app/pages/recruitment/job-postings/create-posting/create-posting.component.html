@@ -1,0 +1,56 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header [title]="i18n.t('job_postings.create')" moduleName="job_postings" moduleRoute="recruitment/postings" />
+  @if (loading()) { <div class="text-center py-5"><app-loading-spinner [message]="i18n.t('common.loading')" [variant]="'primary'" [centered]="true" /></div> }
+  @if (!loading()) {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <app-form-section [title]="i18n.t('common.basic_info')" [variant]="'modern'">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="app-modern-field">
+              <label class="app-modern-label">{{ i18n.t('job_postings.requisition') }} <span class="text-danger">*</span></label>
+              <app-searchable-select [options]="requisitionOptions" [placeholder]="i18n.t('common.select')" [value]="form.get('jobRequisitionId')?.value" (selectionChange)="form.get('jobRequisitionId')?.setValue($event)" />
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input type="text" class="form-control" id="postingTitle" formControlName="postingTitle" placeholder="x">
+              <label for="postingTitle">{{ i18n.t('job_postings.title_field') }} <span class="text-danger">*</span></label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input type="text" class="form-control" id="postingTitleAr" formControlName="postingTitleAr" placeholder="x" dir="rtl">
+              <label for="postingTitleAr">{{ i18n.t('job_postings.title_ar') }}</label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input type="text" class="form-control" id="location" formControlName="location" placeholder="x">
+              <label for="location">{{ i18n.t('job_postings.location') }}</label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input type="date" class="form-control" id="expiryDate" formControlName="expiryDate" placeholder="x">
+              <label for="expiryDate">{{ i18n.t('job_postings.expiry_date') }}</label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-check mt-3"><input type="checkbox" class="form-check-input" id="isInternal" formControlName="isInternal"><label class="form-check-label" for="isInternal">{{ i18n.t('job_postings.internal') }}</label></div>
+          </div>
+        </div>
+      </app-form-section>
+      <app-form-section [title]="i18n.t('job_postings.details')" [variant]="'modern'">
+        <div class="row g-3">
+          <div class="col-12"><div class="form-floating"><textarea class="form-control" id="externalDescription" formControlName="externalDescription" placeholder="x" style="height: 100px"></textarea><label for="externalDescription">{{ i18n.t('job_postings.description') }}</label></div></div>
+          <div class="col-12"><div class="form-floating"><textarea class="form-control" id="responsibilities" formControlName="responsibilities" placeholder="x" style="height: 100px"></textarea><label for="responsibilities">{{ i18n.t('job_postings.responsibilities') }}</label></div></div>
+          <div class="col-12"><div class="form-floating"><textarea class="form-control" id="benefits" formControlName="benefits" placeholder="x" style="height: 80px"></textarea><label for="benefits">{{ i18n.t('job_postings.benefits') }}</label></div></div>
+        </div>
+      </app-form-section>
+      <div class="app-form-actions">
+        <button type="button" class="btn btn-secondary" routerLink="/recruitment/postings">{{ i18n.t('common.cancel') }}</button>
+        <button type="submit" class="btn btn-primary" [disabled]="form.invalid || submitting()">@if (submitting()) { <span class="spinner-border spinner-border-sm me-1"></span> }{{ i18n.t('common.save') }}</button>
+      </div>
+    </form>
+  }
+</div>

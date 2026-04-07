@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.Settings;
+using TecAxle.Hrms.Domain.Settings;
 
-namespace TimeAttendanceSystem.Application.Abstractions;
+namespace TecAxle.Hrms.Application.Abstractions;
 
 /// <summary>
 /// Repository interface for managing system settings including overtime configuration,

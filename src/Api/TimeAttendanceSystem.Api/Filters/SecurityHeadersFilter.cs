@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace TimeAttendanceSystem.Api.Filters;
+namespace TecAxle.Hrms.Api.Filters;
 
 public class SecurityHeadersFilter : IActionFilter
 {

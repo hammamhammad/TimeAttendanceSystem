@@ -1,0 +1,40 @@
+<div class="app-list-page">
+  <app-page-header [title]="i18n.t('offboarding.resignations.title')" />
+
+  <app-unified-filter
+    [showAddButton]="false"
+    [showRefreshButton]="true"
+    [refreshing]="loading()"
+    (refresh)="loadData()">
+  </app-unified-filter>
+
+  <app-data-table
+    [data]="items()"
+    [columns]="tableColumns"
+    [actions]="tableActions"
+    [currentPage]="currentPage()"
+    [totalItems]="totalCount()"
+    [pageSize]="pageSize()"
+    [loading]="loading"
+    [emptyTitle]="i18n.t('offboarding.resignations.no_records')"
+    [emptyMessage]="i18n.t('offboarding.resignations.no_records_message')"
+    [showPagination]="true"
+    (actionClick)="onActionClick($event)"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+    <ng-template #cellTemplate let-item let-column="column">
+      @if (column.key === 'status') {
+        <app-status-badge
+          [status]="getStatusVariant(item.status)"
+          [label]="i18n.t('offboarding.statuses.' + item.status)">
+        </app-status-badge>
+      } @else if (column.key === 'resignationDate' || column.key === 'lastWorkingDate') {
+        {{ formatDate(item[column.key]) }}
+      } @else if (column.key === 'noticePeriodDays') {
+        {{ item.noticePeriodDays }} {{ i18n.t('common.days') }}
+      } @else {
+        {{ item[column.key] }}
+      }
+    </ng-template>
+  </app-data-table>
+</div>

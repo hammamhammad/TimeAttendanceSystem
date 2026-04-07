@@ -634,6 +634,369 @@ export class PortalService {
       })
     );
   }
+
+  // ===== MY ALLOWANCES METHODS =====
+
+  /**
+   * Loads active allowances for the current employee
+   */
+  getMyAllowances(): Observable<any[]> {
+    return this.http.get<any[]>(
+      `${this.portalApiUrl}/my-allowances`
+    ).pipe(
+      catchError(error => {
+        const errorMessage = error.error?.error || error.message || 'Failed to load allowances';
+        this.notificationService.error(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Loads allowance summary (total) for the current employee
+   */
+  getMyAllowanceSummary(): Observable<any> {
+    return this.http.get<any>(
+      `${this.portalApiUrl}/my-allowances/summary`
+    ).pipe(
+      catchError(error => {
+        const errorMessage = error.error?.error || error.message || 'Failed to load allowance summary';
+        this.notificationService.error(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  // ===== MY PAYSLIPS METHODS =====
+
+  /**
+   * Loads payslips for the current employee
+   */
+  getMyPayslips(year?: number): Observable<any[]> {
+    let params = new HttpParams();
+    if (year) {
+      params = params.set('year', year.toString());
+    }
+
+    return this.http.get<any>(
+      `${this.portalApiUrl}/my-payslips`,
+      { params }
+    ).pipe(
+      map(response => {
+        // Backend returns { isSuccess, value: { items: [...], totalCount } }
+        const val = response?.value ?? response;
+        if (val?.items) return val.items;
+        if (Array.isArray(val)) return val;
+        return [];
+      }),
+      catchError(error => {
+        const errorMessage = error.error?.error || error.message || 'Failed to load payslips';
+        this.notificationService.error(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Downloads a payslip PDF
+   */
+  downloadPayslipPdf(payslipId: number): Observable<Blob> {
+    return this.http.get(
+      `${this.portalApiUrl}/my-payslips/${payslipId}/download`,
+      { responseType: 'blob' }
+    ).pipe(
+      catchError(error => {
+        const errorMessage = error.error?.error || error.message || 'Failed to download payslip';
+        this.notificationService.error(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  // ===== MY SALARY METHODS =====
+
+  /**
+   * Loads current salary breakdown for the current employee
+   */
+  getMyCurrentSalary(): Observable<any> {
+    return this.http.get<any>(
+      `${this.portalApiUrl}/my-salary`
+    ).pipe(
+      map(response => {
+        // Backend returns { isSuccess, value: { baseSalary, currency, components, ... } }
+        return response?.value ?? response;
+      }),
+      catchError(error => {
+        const errorMessage = error.error?.error || error.message || 'Failed to load salary';
+        this.notificationService.error(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  // ===== MY RESIGNATION METHODS =====
+
+  /**
+   * Loads current resignation request for the employee (if any)
+   */
+  getMyResignation(): Observable<any> {
+    return this.http.get<any>(
+      `${this.portalApiUrl}/my-resignation`
+    ).pipe(
+      map(response => {
+        // Backend returns { isSuccess, value: [array] }
+        const val = response?.value ?? response;
+        if (Array.isArray(val)) return val.length > 0 ? val[0] : null;
+        return val;
+      }),
+      catchError(error => {
+        // 404 means no resignation found - propagate the error so component handles it
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Submits a new resignation request
+   */
+  submitResignation(data: { resignationDate: string; lastWorkingDate: string; reason: string }): Observable<any> {
+    return this.http.post<{ isSuccess: boolean; value: any; error: string }>(
+      `${this.portalApiUrl}/my-resignation`,
+      data
+    ).pipe(
+      map(response => {
+        if (!response.isSuccess && response.value) {
+          return response.value;
+        }
+        return response.value || response;
+      }),
+      catchError(error => {
+        const errorMessage = error.error?.error || error.message || 'Failed to submit resignation';
+        this.notificationService.error(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Withdraws a pending resignation request
+   */
+  withdrawResignation(id: number): Observable<void> {
+    return this.http.post<void>(
+      `${environment.apiUrl}/api/v1/resignation-requests/${id}/withdraw`,
+      {}
+    ).pipe(
+      catchError(error => {
+        const errorMessage = error.error?.error || error.message || 'Failed to withdraw resignation';
+        this.notificationService.error(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  // ===== MY BENEFITS METHODS =====
+
+  getMyBenefits(): Observable<any> {
+    return this.http.get<any>(`${this.portalApiUrl}/my-benefits`).pipe(
+      catchError(error => {
+        const errorMessage = error.error?.error || error.message || 'Failed to load benefits';
+        this.notificationService.error(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  getAvailableBenefitPlans(): Observable<any> {
+    return this.http.get<any>(`${this.portalApiUrl}/my-benefits/available-plans`).pipe(
+      catchError(error => {
+        return throwError(() => error);
+      })
+    );
+  }
+
+  enrollInBenefitPlan(data: any): Observable<any> {
+    return this.http.post<any>(`${this.portalApiUrl}/my-benefits/enroll`, data).pipe(
+      catchError(error => {
+        const errorMessage = error.error?.error || error.message || 'Failed to enroll';
+        this.notificationService.error(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  cancelMyEnrollment(id: number): Observable<any> {
+    return this.http.post<any>(`${this.portalApiUrl}/my-benefits/enrollments/${id}/cancel`, {}).pipe(
+      catchError(error => {
+        const errorMessage = error.error?.error || error.message || 'Failed to cancel enrollment';
+        this.notificationService.error(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  getMyBenefitDependents(): Observable<any> {
+    return this.http.get<any>(`${this.portalApiUrl}/my-benefits/dependents`).pipe(
+      catchError(error => {
+        return throwError(() => error);
+      })
+    );
+  }
+
+  addMyBenefitDependent(data: any): Observable<any> {
+    return this.http.post<any>(`${this.portalApiUrl}/my-benefits/dependents`, data).pipe(
+      catchError(error => {
+        const errorMessage = error.error?.error || error.message || 'Failed to add dependent';
+        this.notificationService.error(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  removeMyBenefitDependent(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.portalApiUrl}/my-benefits/dependents/${id}`).pipe(
+      catchError(error => {
+        const errorMessage = error.error?.error || error.message || 'Failed to remove dependent';
+        this.notificationService.error(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  getMyBenefitClaims(): Observable<any> {
+    return this.http.get<any>(`${this.portalApiUrl}/my-benefits/claims`).pipe(
+      catchError(error => {
+        return throwError(() => error);
+      })
+    );
+  }
+
+  createMyBenefitClaim(data: any): Observable<any> {
+    return this.http.post<any>(`${this.portalApiUrl}/my-benefits/claims`, data).pipe(
+      catchError(error => {
+        const errorMessage = error.error?.error || error.message || 'Failed to submit claim';
+        this.notificationService.error(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  // ===== SHIFT SWAP REQUESTS METHODS =====
+
+  getMyShiftSwapRequests(): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/api/v1/shift-swap-requests`, { params: { page: '1', pageSize: '50' } }).pipe(
+      catchError(error => {
+        const errorMessage = error.error?.error || error.message || 'Failed to load shift swap requests';
+        this.notificationService.error(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  createShiftSwapRequest(data: any): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/api/v1/shift-swap-requests`, data).pipe(
+      catchError(error => {
+        const errorMessage = error.error?.error || error.message || 'Failed to create shift swap request';
+        this.notificationService.error(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  getShiftSwapRequestById(id: number): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/api/v1/shift-swap-requests/${id}`).pipe(
+      catchError(error => {
+        const errorMessage = error.error?.error || error.message || 'Failed to load shift swap request';
+        this.notificationService.error(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  partnerApproveShiftSwap(id: number): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/api/v1/shift-swap-requests/${id}/partner-approve`, {}).pipe(
+      catchError(error => {
+        const errorMessage = error.error?.error || error.message || 'Failed to approve shift swap';
+        this.notificationService.error(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  partnerRejectShiftSwap(id: number, reason: string): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/api/v1/shift-swap-requests/${id}/partner-reject`, { rejectionReason: reason }).pipe(
+      catchError(error => {
+        const errorMessage = error.error?.error || error.message || 'Failed to reject shift swap';
+        this.notificationService.error(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  cancelShiftSwapRequest(id: number): Observable<any> {
+    return this.http.delete<any>(`${environment.apiUrl}/api/v1/shift-swap-requests/${id}`).pipe(
+      catchError(error => {
+        const errorMessage = error.error?.error || error.message || 'Failed to cancel shift swap request';
+        this.notificationService.error(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  // ===== MY ON-CALL METHODS =====
+
+  getMyOnCallSchedules(): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/api/v1/on-call-schedules`, { params: { isActive: 'true', page: '1', pageSize: '50' } }).pipe(
+      catchError(error => {
+        const errorMessage = error.error?.error || error.message || 'Failed to load on-call schedules';
+        this.notificationService.error(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  // ===== COMPENSATORY OFFS METHODS =====
+
+  getMyCompensatoryOffs(): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/api/v1/compensatory-offs`, { params: { page: '1', pageSize: '50' } }).pipe(
+      catchError(error => {
+        const errorMessage = error.error?.error || error.message || 'Failed to load compensatory offs';
+        this.notificationService.error(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  // ===== LEAVE ENCASHMENTS METHODS =====
+
+  getMyLeaveEncashments(): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/api/v1/leave-encashments`, { params: { page: '1', pageSize: '50' } }).pipe(
+      catchError(error => {
+        const errorMessage = error.error?.error || error.message || 'Failed to load leave encashments';
+        this.notificationService.error(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  getEligibleLeaveEncashment(employeeId: number): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/api/v1/leave-encashments/employee/${employeeId}/eligible`).pipe(
+      catchError(error => {
+        const errorMessage = error.error?.error || error.message || 'Failed to load eligible leave encashment';
+        this.notificationService.error(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  createLeaveEncashment(data: any): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/api/v1/leave-encashments`, data).pipe(
+      catchError(error => {
+        const errorMessage = error.error?.error || error.message || 'Failed to create leave encashment';
+        this.notificationService.error(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
 }
 
 /**

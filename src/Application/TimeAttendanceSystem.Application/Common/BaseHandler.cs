@@ -1,7 +1,8 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Abstractions;
+using Microsoft.EntityFrameworkCore;
+using TecAxle.Hrms.Application.Abstractions;
 
-namespace TimeAttendanceSystem.Application.Common;
+namespace TecAxle.Hrms.Application.Common;
 
 /// <summary>
 /// Abstract base class for MediatR request handlers in the Application layer.
@@ -136,4 +137,28 @@ public abstract class BaseHandler<TRequest, TResponse> : IRequestHandler<TReques
     /// - Optimize for concurrent request handling
     /// </remarks>
     public abstract Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Resolves the tenant ID for the current user when TenantContext is not available.
+    /// For SystemAdmin users without a tenant_id claim, falls back to the first active tenant.
+    /// </summary>
+    protected async Task<long?> ResolveTenantIdAsync(CancellationToken ct = default)
+    {
+        // Try the user's own tenant ID first
+        if (CurrentUser.TenantId.HasValue)
+            return CurrentUser.TenantId.Value;
+
+        // SystemAdmin fallback: use the first active tenant
+        if (CurrentUser.IsSystemAdmin)
+        {
+            var firstTenant = await Context.Tenants
+                .Where(t => t.IsActive && !t.IsDeleted)
+                .OrderBy(t => t.Id)
+                .Select(t => (long?)t.Id)
+                .FirstOrDefaultAsync(ct);
+            return firstTenant;
+        }
+
+        return null;
+    }
 }

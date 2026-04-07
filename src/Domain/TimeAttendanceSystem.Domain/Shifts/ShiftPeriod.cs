@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Domain.Shifts;
+namespace TecAxle.Hrms.Domain.Shifts;
 
 /// <summary>
 /// Domain entity representing a working time period within a shift.

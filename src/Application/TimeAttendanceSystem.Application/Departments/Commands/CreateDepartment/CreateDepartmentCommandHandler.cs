@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Branches;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Branches;
 
-namespace TimeAttendanceSystem.Application.Departments.Commands.CreateDepartment;
+namespace TecAxle.Hrms.Application.Departments.Commands.CreateDepartment;
 
 public class CreateDepartmentCommandHandler : BaseHandler<CreateDepartmentCommand, Result<long>>
 {

@@ -1,13 +1,13 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using TimeAttendanceSystem.Application.Features.RemoteWorkPolicies.Commands.CreateRemoteWorkPolicy;
-using TimeAttendanceSystem.Application.Features.RemoteWorkPolicies.Commands.UpdateRemoteWorkPolicy;
-using TimeAttendanceSystem.Application.Features.RemoteWorkPolicies.Commands.DeleteRemoteWorkPolicy;
-using TimeAttendanceSystem.Application.Features.RemoteWorkPolicies.Commands.ToggleRemoteWorkPolicyStatus;
-using TimeAttendanceSystem.Application.Features.RemoteWorkPolicies.Queries.GetRemoteWorkPolicies;
-using TimeAttendanceSystem.Application.Features.RemoteWorkPolicies.Queries.GetRemoteWorkPolicyById;
+using TecAxle.Hrms.Application.Features.RemoteWorkPolicies.Commands.CreateRemoteWorkPolicy;
+using TecAxle.Hrms.Application.Features.RemoteWorkPolicies.Commands.UpdateRemoteWorkPolicy;
+using TecAxle.Hrms.Application.Features.RemoteWorkPolicies.Commands.DeleteRemoteWorkPolicy;
+using TecAxle.Hrms.Application.Features.RemoteWorkPolicies.Commands.ToggleRemoteWorkPolicyStatus;
+using TecAxle.Hrms.Application.Features.RemoteWorkPolicies.Queries.GetRemoteWorkPolicies;
+using TecAxle.Hrms.Application.Features.RemoteWorkPolicies.Queries.GetRemoteWorkPolicyById;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 /// <summary>
 /// Controller for managing remote work policies.

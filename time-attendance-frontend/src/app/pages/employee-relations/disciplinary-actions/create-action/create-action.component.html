@@ -1,0 +1,91 @@
+<div class="app-modern-form">
+  <app-form-header
+    [title]="isEditMode() ? i18n.t('disciplinary_actions.edit') : i18n.t('disciplinary_actions.create')"
+    moduleName="disciplinary_actions" moduleRoute="employee-relations/disciplinary-actions" [loading]="saving()">
+  </app-form-header>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <app-form-section [title]="i18n.t('disciplinary_actions.basic_info')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('common.employee') }} *</label>
+            <app-searchable-select [options]="employeeOptions()" [placeholder]="i18n.t('common.select')"
+              [value]="form.get('employeeId')?.value" (selectionChange)="form.get('employeeId')?.setValue($event)">
+            </app-searchable-select>
+          </div>
+          @if (form.get('employeeId')?.touched && form.get('employeeId')?.hasError('required')) {
+            <div class="invalid-feedback d-block">{{ i18n.t('common.required') }}</div>
+          }
+        </div>
+        <div class="col-md-3">
+          <div class="form-floating">
+            <select class="form-select" id="actionType" formControlName="actionType">
+              @for (t of actionTypes; track t) {
+                <option [value]="t">{{ i18n.t('disciplinary_actions.type_' + t) }}</option>
+              }
+            </select>
+            <label for="actionType">{{ i18n.t('disciplinary_actions.action_type') }} *</label>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-floating">
+            <select class="form-select" id="severity" formControlName="severity">
+              @for (s of severities; track s) {
+                <option [value]="s">{{ i18n.t('disciplinary_actions.severity_' + s) }}</option>
+              }
+            </select>
+            <label for="severity">{{ i18n.t('disciplinary_actions.severity') }} *</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="incidentDate" formControlName="incidentDate" placeholder="Incident Date">
+            <label for="incidentDate">{{ i18n.t('disciplinary_actions.incident_date') }} *</label>
+          </div>
+          @if (form.get('incidentDate')?.touched && form.get('incidentDate')?.hasError('required')) {
+            <div class="invalid-feedback d-block">{{ i18n.t('common.required') }}</div>
+          }
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="effectiveDate" formControlName="effectiveDate" placeholder="Effective Date">
+            <label for="effectiveDate">{{ i18n.t('disciplinary_actions.effective_date') }}</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="expiryDate" formControlName="expiryDate" placeholder="Expiry Date">
+            <label for="expiryDate">{{ i18n.t('disciplinary_actions.expiry_date') }}</label>
+          </div>
+        </div>
+        <div class="col-md-12">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="reason" formControlName="reason" placeholder="Reason">
+            <label for="reason">{{ i18n.t('common.reason') }} *</label>
+          </div>
+          @if (form.get('reason')?.touched && form.get('reason')?.hasError('required')) {
+            <div class="invalid-feedback d-block">{{ i18n.t('common.required') }}</div>
+          }
+        </div>
+        <div class="col-md-12">
+          <div class="form-floating">
+            <textarea class="form-control" id="description" formControlName="description" placeholder="Description" style="height: 120px"></textarea>
+            <label for="description">{{ i18n.t('common.description') }} *</label>
+          </div>
+          @if (form.get('description')?.touched && form.get('description')?.hasError('required')) {
+            <div class="invalid-feedback d-block">{{ i18n.t('common.required') }}</div>
+          }
+        </div>
+      </div>
+    </app-form-section>
+
+    <div class="app-form-actions">
+      <button type="button" class="btn btn-secondary" routerLink="/employee-relations/disciplinary-actions">{{ i18n.t('common.cancel') }}</button>
+      <button type="submit" class="btn btn-primary" [disabled]="saving()">
+        @if (saving()) { <span class="spinner-border spinner-border-sm me-2"></span> }
+        {{ i18n.t('common.save') }}
+      </button>
+    </div>
+  </form>
+</div>

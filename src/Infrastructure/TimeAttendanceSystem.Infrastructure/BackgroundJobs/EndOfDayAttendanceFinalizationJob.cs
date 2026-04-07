@@ -1,8 +1,8 @@
 using Coravel.Invocable;
 using Microsoft.Extensions.Logging;
-using TimeAttendanceSystem.Application.Abstractions;
+using TecAxle.Hrms.Application.Abstractions;
 
-namespace TimeAttendanceSystem.Infrastructure.BackgroundJobs;
+namespace TecAxle.Hrms.Infrastructure.BackgroundJobs;
 
 /// <summary>
 /// Background job that runs at end of day to finalize attendance records for past dates.

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.SignalR;
-using TimeAttendanceSystem.Application.Abstractions;
+using TecAxle.Hrms.Application.Abstractions;
 
-namespace TimeAttendanceSystem.Api.Hubs;
+namespace TecAxle.Hrms.Api.Hubs;
 
 /// <summary>
 /// Adapter that implements INotificationHubContext using SignalR's IHubContext.

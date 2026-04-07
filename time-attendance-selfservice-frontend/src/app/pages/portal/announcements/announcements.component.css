@@ -1,0 +1,53 @@
+/* Announcement Cards */
+.announcement-card {
+  border: none;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.announcement-card:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.announcement-card:focus {
+  outline: 2px solid var(--bs-primary);
+  outline-offset: -2px;
+}
+
+.announcement-card.pinned {
+  border-left: 4px solid var(--bs-info);
+}
+
+.announcement-card .card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--bs-body-color);
+}
+
+.announcement-card:hover .card-title {
+  color: var(--bs-primary);
+}
+
+.announcement-card .card-text {
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* RTL support */
+:host-context([dir="rtl"]) .announcement-card.pinned {
+  border-left: none;
+  border-right: 4px solid var(--bs-info);
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+  .announcement-card .card-title {
+    font-size: 1rem;
+  }
+
+  .announcement-card .card-text {
+    font-size: 0.85rem;
+  }
+}

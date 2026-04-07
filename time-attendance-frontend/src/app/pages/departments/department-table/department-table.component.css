@@ -20,7 +20,7 @@
 /* Component-Specific Table Styles */
 .table tbody tr.selected-row {
   background-color: #e3f2fd;
-  border-left: 4px solid #2196f3;
+  border-left: 4px solid var(--app-primary, #4F6BF6);
 }
 
 .table tbody tr.table-warning {
@@ -50,7 +50,7 @@
 }
 
 .sortable:hover {
-  color: #2196f3;
+  color: var(--app-primary, #4F6BF6);
   background-color: #f0f7ff;
 }
 
@@ -74,8 +74,8 @@
 
 /* Component-Specific Checkbox States */
 .form-check-input:checked {
-  background-color: #2196f3;
-  border-color: #2196f3;
+  background-color: var(--app-primary, #4F6BF6);
+  border-color: var(--app-primary, #4F6BF6);
 }
 
 .form-check-input:indeterminate {
@@ -84,20 +84,20 @@
 }
 
 .form-select:focus {
-  border-color: #2196f3;
+  border-color: var(--app-primary, #4F6BF6);
   box-shadow: 0 0 0 0.2rem rgba(33, 150, 243, 0.25);
 }
 
 /* Component-Specific Pagination Colors */
 .page-link:hover {
-  color: #2196f3;
+  color: var(--app-primary, #4F6BF6);
   background-color: var(--app-gray-100);
   border-color: var(--app-gray-300);
 }
 
 .page-item.active .page-link {
-  background-color: #2196f3;
-  border-color: #2196f3;
+  background-color: var(--app-primary, #4F6BF6);
+  border-color: var(--app-primary, #4F6BF6);
   color: white;
 }
 
@@ -105,12 +105,12 @@
 .alert-info {
   background-color: #e3f2fd;
   color: #0277bd;
-  border-left: 4px solid #2196f3;
+  border-left: 4px solid var(--app-primary, #4F6BF6);
 }
 
 /* Component-Specific Loading State */
 .spinner-border {
-  color: #2196f3;
+  color: var(--app-primary, #4F6BF6);
   width: 3rem;
   height: 3rem;
 }
@@ -124,7 +124,7 @@
 /* Component-Specific RTL Support */
 [dir="rtl"] .table tbody tr.selected-row {
   border-left: none;
-  border-right: 4px solid #2196f3;
+  border-right: 4px solid var(--app-primary, #4F6BF6);
 }
 
 [dir="rtl"] .indent-1 { margin-right: 20px; margin-left: 0; }
@@ -135,7 +135,7 @@
 
 [dir="rtl"] .alert-info {
   border-left: none;
-  border-right: 4px solid #2196f3;
+  border-right: 4px solid var(--app-primary, #4F6BF6);
 }
 
 /* Component-Specific Responsive Design */
@@ -224,7 +224,7 @@
 
 /* Component-Specific Focus States */
 .table tbody tr:focus-within {
-  outline: 2px solid #2196f3;
+  outline: 2px solid var(--app-primary, #4F6BF6);
   outline-offset: -2px;
 }
 

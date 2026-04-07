@@ -1,7 +1,9 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.EmployeeVacations.Commands.ToggleEmployeeVacationStatus;
+namespace TecAxle.Hrms.Application.EmployeeVacations.Commands.ToggleEmployeeVacationStatus;
 
 /// <summary>
 /// CQRS command for toggling the approval status of an employee vacation record.
@@ -25,6 +27,7 @@ namespace TimeAttendanceSystem.Application.EmployeeVacations.Commands.ToggleEmpl
 /// - Rejection: Removes/reverts attendance records for vacation period
 /// - Audit log entry created for status change
 /// </remarks>
+[RequiresModule(SystemModule.LeaveManagement)]
 public record ToggleEmployeeVacationStatusCommand(
     long Id
 ) : IRequest<Result>;

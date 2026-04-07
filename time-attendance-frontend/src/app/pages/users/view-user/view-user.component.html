@@ -132,6 +132,13 @@
         </div>
       </div>
     </div>
+
+    <!-- Audit History -->
+    <div class="mt-4">
+      <app-section-card [title]="t('history.title')" icon="fas fa-clock-rotate-left" headerClass="bg-light">
+        <app-audit-history [entityName]="'User'" [entityId]="user()?.id" />
+      </app-section-card>
+    </div>
   } @else {
     <div class="alert alert-danger">
       <i class="fa-solid fa-exclamation-triangle me-2"></i>

@@ -1,8 +1,8 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Workflows.Enums;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Workflows.Enums;
 
-namespace TimeAttendanceSystem.Application.Workflows.Commands.CreateDelegation;
+namespace TecAxle.Hrms.Application.Workflows.Commands.CreateDelegation;
 
 /// <summary>
 /// CQRS command for creating an approval delegation.

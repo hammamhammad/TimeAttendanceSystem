@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Domain.Settings;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Domain.Settings;
 using System.Text.Json;
 
-namespace TimeAttendanceSystem.Infrastructure.Services;
+namespace TecAxle.Hrms.Infrastructure.Services;
 
 /// <summary>
 /// Service implementation for managing public holidays and providing business logic

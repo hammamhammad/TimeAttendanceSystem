@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace TimeAttendanceSystem.Application.LeaveManagement.Commands.ProcessMonthlyAccrual;
+namespace TecAxle.Hrms.Application.LeaveManagement.Commands.ProcessMonthlyAccrual;
 
 /// <summary>
 /// FluentValidation validator for ProcessMonthlyAccrualCommand ensuring valid accrual processing parameters.

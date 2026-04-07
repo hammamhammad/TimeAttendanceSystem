@@ -2,18 +2,18 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
-using TimeAttendanceSystem.Application.Excuses.Commands.CreateEmployeeExcuse;
-using TimeAttendanceSystem.Application.Excuses.Commands.ApproveEmployeeExcuse;
-using TimeAttendanceSystem.Application.Excuses.Commands.UpdateEmployeeExcuse;
-using TimeAttendanceSystem.Application.Excuses.Commands.DeleteEmployeeExcuse;
-using TimeAttendanceSystem.Application.Excuses.Commands.ValidateExcuse;
-using TimeAttendanceSystem.Application.Excuses.Queries.GetEmployeeExcuses;
-using TimeAttendanceSystem.Application.Excuses.Queries.GetEmployeeExcuseById;
-using TimeAttendanceSystem.Application.Excuses.Queries.GetExcuseStatistics;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Excuses;
+using TecAxle.Hrms.Application.Excuses.Commands.CreateEmployeeExcuse;
+using TecAxle.Hrms.Application.Excuses.Commands.ApproveEmployeeExcuse;
+using TecAxle.Hrms.Application.Excuses.Commands.UpdateEmployeeExcuse;
+using TecAxle.Hrms.Application.Excuses.Commands.DeleteEmployeeExcuse;
+using TecAxle.Hrms.Application.Excuses.Commands.ValidateExcuse;
+using TecAxle.Hrms.Application.Excuses.Queries.GetEmployeeExcuses;
+using TecAxle.Hrms.Application.Excuses.Queries.GetEmployeeExcuseById;
+using TecAxle.Hrms.Application.Excuses.Queries.GetExcuseStatistics;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Excuses;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 /// <summary>
 /// Request model for creating an employee excuse.

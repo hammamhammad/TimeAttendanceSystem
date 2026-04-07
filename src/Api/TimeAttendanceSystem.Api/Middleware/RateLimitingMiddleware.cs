@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace TimeAttendanceSystem.Api.Middleware;
+namespace TecAxle.Hrms.Api.Middleware;
 
 public class RateLimitingMiddleware
 {

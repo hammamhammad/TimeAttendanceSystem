@@ -1,0 +1,40 @@
+.notes-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.note-item {
+  padding: 0.75rem 1rem;
+  border-left: 3px solid var(--bs-primary);
+  background-color: var(--app-gray-100);
+  border-radius: 0 0.375rem 0.375rem 0;
+}
+
+.note-item.internal {
+  border-left-color: var(--app-warning);
+  background-color: #fff8e1;
+}
+
+.note-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.note-body {
+  white-space: pre-wrap;
+  font-size: 0.9375rem;
+}
+
+:host-context([dir="rtl"]) .note-item {
+  border-left: none;
+  border-right: 3px solid var(--bs-primary);
+  border-radius: 0.375rem 0 0 0.375rem;
+}
+
+:host-context([dir="rtl"]) .note-item.internal {
+  border-right-color: var(--app-warning);
+}

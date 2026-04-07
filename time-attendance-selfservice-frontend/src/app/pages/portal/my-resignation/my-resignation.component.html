@@ -1,0 +1,301 @@
+<!-- Page Header -->
+<app-page-header
+  [title]="i18n.t('portal.resignation.title')">
+  <div header-actions>
+    <button
+      class="btn btn-outline-primary btn-sm"
+      (click)="refresh()"
+      [disabled]="loading()"
+      type="button">
+      <i class="bi bi-arrow-clockwise" [class.spin]="loading()"></i>
+      {{ i18n.t('common.refresh') }}
+    </button>
+  </div>
+</app-page-header>
+
+<!-- Loading State -->
+@if (loading() && !resignation() && showForm()) {
+  <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+}
+
+<!-- Error State -->
+@if (error() && !resignation()) {
+  <div class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    {{ error() }}
+    <button class="btn btn-sm btn-outline-danger ms-3" (click)="refresh()" type="button">
+      {{ i18n.t('common.retry') }}
+    </button>
+  </div>
+}
+
+<!-- Existing Resignation Status -->
+@if (!loading() && resignation(); as r) {
+  <!-- Status Banner -->
+  <div class="card mb-4 border-0 shadow-sm">
+    <div class="card-body">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div class="d-flex align-items-center">
+          <div class="status-icon-wrapper me-3">
+            @switch (r.status) {
+              @case ('Pending') {
+                <i class="bi bi-hourglass-split text-warning fs-2"></i>
+              }
+              @case ('InProgress') {
+                <i class="bi bi-hourglass-split text-warning fs-2"></i>
+              }
+              @case ('Approved') {
+                <i class="bi bi-check-circle text-success fs-2"></i>
+              }
+              @case ('Rejected') {
+                <i class="bi bi-x-circle text-danger fs-2"></i>
+              }
+              @case ('Withdrawn') {
+                <i class="bi bi-arrow-counterclockwise text-secondary fs-2"></i>
+              }
+              @default {
+                <i class="bi bi-file-text text-muted fs-2"></i>
+              }
+            }
+          </div>
+          <div>
+            <h5 class="mb-1">{{ i18n.t('portal.resignation.request_status') }}</h5>
+            <span class="badge" [class]="getStatusBadgeClass(r.status)">
+              {{ getStatusLabel(r.status) }}
+            </span>
+          </div>
+        </div>
+        @if (canWithdraw()) {
+          <button
+            class="btn btn-warning btn-sm"
+            (click)="withdrawResignation()"
+            [disabled]="withdrawing()"
+            type="button">
+            @if (withdrawing()) {
+              <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+            } @else {
+              <i class="bi bi-arrow-counterclockwise me-1"></i>
+            }
+            {{ i18n.t('portal.resignation.withdraw') }}
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Resignation Details -->
+  <div class="card mb-3">
+    <div class="card-header bg-light">
+      <h6 class="mb-0">
+        <i class="bi bi-file-text me-2"></i>
+        {{ i18n.t('portal.resignation.request_details') }}
+      </h6>
+    </div>
+    <div class="card-body p-0">
+      <table class="table mb-0">
+        <tbody>
+          <tr>
+            <td class="text-muted fw-semibold table-label">{{ i18n.t('portal.resignation.resignation_date') }}</td>
+            <td>{{ formatDate(r.resignationDate) }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted fw-semibold">{{ i18n.t('portal.resignation.last_working_date') }}</td>
+            <td>{{ formatDate(r.lastWorkingDate) }}</td>
+          </tr>
+          @if (r.noticePeriodDays) {
+            <tr>
+              <td class="text-muted fw-semibold">{{ i18n.t('portal.resignation.notice_period') }}</td>
+              <td>{{ r.noticePeriodDays }} {{ i18n.t('common.days_unit') }}</td>
+            </tr>
+          }
+          <tr>
+            <td class="text-muted fw-semibold">{{ i18n.t('portal.reason') }}</td>
+            <td>{{ r.reason }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted fw-semibold">{{ i18n.t('portal.submitted_date') }}</td>
+            <td>{{ formatDateTime(r.submittedDate) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Review Information (if reviewed) -->
+  @if (r.reviewedDate) {
+    <div class="card mb-3">
+      <div class="card-header bg-light">
+        <h6 class="mb-0">
+          <i class="bi bi-clipboard-check me-2"></i>
+          {{ i18n.t('portal.resignation.review_information') }}
+        </h6>
+      </div>
+      <div class="card-body p-0">
+        <table class="table mb-0">
+          <tbody>
+            <tr>
+              <td class="text-muted fw-semibold table-label">{{ i18n.t('portal.reviewed_by') }}</td>
+              <td>{{ r.reviewedBy }}</td>
+            </tr>
+            <tr>
+              <td class="text-muted fw-semibold">{{ i18n.t('portal.resignation.review_date') }}</td>
+              <td>{{ formatDateTime(r.reviewedDate) }}</td>
+            </tr>
+            @if (r.reviewComments) {
+              <tr>
+                <td class="text-muted fw-semibold">{{ i18n.t('portal.comments') }}</td>
+                <td>{{ r.reviewComments }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+
+  <!-- Status Messages -->
+  @switch (r.status) {
+    @case ('Pending') {
+      <div class="alert alert-warning d-flex align-items-start">
+        <i class="bi bi-hourglass-split me-2 mt-1"></i>
+        <div>{{ i18n.t('portal.resignation.pending_message') }}</div>
+      </div>
+    }
+    @case ('InProgress') {
+      <div class="alert alert-warning d-flex align-items-start">
+        <i class="bi bi-hourglass-split me-2 mt-1"></i>
+        <div>{{ i18n.t('portal.resignation.pending_message') }}</div>
+      </div>
+    }
+    @case ('Approved') {
+      <div class="alert alert-success d-flex align-items-start">
+        <i class="bi bi-check-circle me-2 mt-1"></i>
+        <div>{{ i18n.t('portal.resignation.approved_message') }}</div>
+      </div>
+    }
+    @case ('Rejected') {
+      <div class="alert alert-danger d-flex align-items-start">
+        <i class="bi bi-x-circle me-2 mt-1"></i>
+        <div>{{ i18n.t('portal.resignation.rejected_message') }}</div>
+      </div>
+    }
+  }
+}
+
+<!-- Resignation Form -->
+@if (!loading() && showForm() && !hasActiveResignation()) {
+  <div class="app-modern-form">
+    <!-- Warning Banner -->
+    <div class="alert alert-warning d-flex align-items-start mb-4">
+      <i class="bi bi-exclamation-triangle me-2 mt-1 fs-5"></i>
+      <div>
+        <strong>{{ i18n.t('portal.resignation.important_notice') }}</strong>
+        <p class="mb-0 mt-1 small">{{ i18n.t('portal.resignation.important_notice_text') }}</p>
+      </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submitResignation()">
+      <app-form-section
+        [title]="i18n.t('portal.resignation.request_details')"
+        variant="modern">
+        <div class="row g-3">
+          <!-- Resignation Date -->
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input
+                type="date"
+                class="form-control"
+                id="resignationDate"
+                formControlName="resignationDate"
+                [min]="minDate()"
+                placeholder=" "
+                [class.is-invalid]="form.get('resignationDate')?.invalid && form.get('resignationDate')?.touched">
+              <label for="resignationDate">{{ i18n.t('portal.resignation.resignation_date') }} *</label>
+            </div>
+            @if (form.get('resignationDate')?.invalid && form.get('resignationDate')?.touched) {
+              <div class="invalid-feedback d-block">
+                {{ i18n.t('common.field_required') }}
+              </div>
+            }
+          </div>
+
+          <!-- Last Working Date -->
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input
+                type="date"
+                class="form-control"
+                id="lastWorkingDate"
+                formControlName="lastWorkingDate"
+                [min]="minDate()"
+                placeholder=" "
+                [class.is-invalid]="form.get('lastWorkingDate')?.invalid && form.get('lastWorkingDate')?.touched">
+              <label for="lastWorkingDate">{{ i18n.t('portal.resignation.last_working_date') }} *</label>
+            </div>
+            @if (form.get('lastWorkingDate')?.invalid && form.get('lastWorkingDate')?.touched) {
+              <div class="invalid-feedback d-block">
+                {{ i18n.t('common.field_required') }}
+              </div>
+            }
+          </div>
+
+          <!-- Reason -->
+          <div class="col-12">
+            <div class="form-floating">
+              <textarea
+                class="form-control"
+                id="reason"
+                formControlName="reason"
+                placeholder=" "
+                style="height: 120px"
+                [class.is-invalid]="form.get('reason')?.invalid && form.get('reason')?.touched"></textarea>
+              <label for="reason">{{ i18n.t('portal.reason') }} *</label>
+            </div>
+            @if (form.get('reason')?.invalid && form.get('reason')?.touched) {
+              <div class="invalid-feedback d-block">
+                @if (form.get('reason')?.hasError('required')) {
+                  {{ i18n.t('common.field_required') }}
+                } @else if (form.get('reason')?.hasError('minlength')) {
+                  {{ i18n.t('portal.min_10_characters') }}
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </app-form-section>
+
+      <!-- Form Actions -->
+      <div class="app-form-actions mt-3">
+        <button
+          type="submit"
+          class="btn btn-danger"
+          [disabled]="submitting() || form.invalid">
+          @if (submitting()) {
+            <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+            {{ i18n.t('common.saving') }}
+          } @else {
+            <i class="bi bi-send me-1"></i>
+            {{ i18n.t('portal.resignation.submit_resignation') }}
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+}
+
+<!-- Info Card (show when form is visible) -->
+@if (showForm() && !hasActiveResignation() && !loading()) {
+  <div class="card mt-3">
+    <div class="card-body">
+      <div class="d-flex align-items-start">
+        <i class="bi bi-info-circle text-info me-3 mt-1 fs-4"></i>
+        <div>
+          <h6 class="mb-2">{{ i18n.t('portal.resignation.info_title') }}</h6>
+          <p class="text-muted mb-0 small">
+            {{ i18n.t('portal.resignation.info_text') }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+}

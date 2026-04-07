@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Application.Settings.Commands.CreateOvertimeConfiguration;
+namespace TecAxle.Hrms.Application.Settings.Commands.CreateOvertimeConfiguration;
 
 /// <summary>
 /// Request object for creating a new overtime configuration.

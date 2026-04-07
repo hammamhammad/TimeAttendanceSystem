@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.Users;
+using TecAxle.Hrms.Domain.Users;
 
-namespace TimeAttendanceSystem.Domain.Employees;
+namespace TecAxle.Hrms.Domain.Employees;
 
 public class EmployeeUserLink
 {

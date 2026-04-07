@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Application.Employees.Queries.GetEmployees;
+namespace TecAxle.Hrms.Application.Employees.Queries.GetEmployees;
 
 /// <summary>
 /// Data Transfer Object representing comprehensive employee information for HR management operations.

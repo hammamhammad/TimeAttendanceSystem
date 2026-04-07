@@ -1,8 +1,10 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Excuses;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Excuses;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.Excuses.Queries.GetEmployeeExcuses;
+namespace TecAxle.Hrms.Application.Excuses.Queries.GetEmployeeExcuses;
 
 /// <summary>
 /// CQRS query for retrieving employee excuse requests with filtering and pagination.
@@ -38,6 +40,7 @@ namespace TimeAttendanceSystem.Application.Excuses.Queries.GetEmployeeExcuses;
 /// - Projection to DTOs for minimal data transfer
 /// - Date range filtering for performance on large datasets
 /// </remarks>
+[RequiresModule(SystemModule.LeaveManagement, AllowReadWhenDisabled = true)]
 public record GetEmployeeExcusesQuery(
     long? EmployeeId = null,
     DateTime? StartDate = null,

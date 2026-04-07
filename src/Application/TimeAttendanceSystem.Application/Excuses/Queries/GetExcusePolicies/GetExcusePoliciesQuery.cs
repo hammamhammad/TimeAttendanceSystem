@@ -1,7 +1,9 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.Excuses.Queries.GetExcusePolicies;
+namespace TecAxle.Hrms.Application.Excuses.Queries.GetExcusePolicies;
 
 /// <summary>
 /// CQRS query for retrieving excuse policies with filtering and pagination.
@@ -29,6 +31,7 @@ namespace TimeAttendanceSystem.Application.Excuses.Queries.GetExcusePolicies;
 /// - Lazy loading of related entities
 /// - Projection to DTOs for minimal data transfer
 /// </remarks>
+[RequiresModule(SystemModule.LeaveManagement, AllowReadWhenDisabled = true)]
 public record GetExcusePoliciesQuery(
     long? BranchId = null,
     bool? IsActive = null,

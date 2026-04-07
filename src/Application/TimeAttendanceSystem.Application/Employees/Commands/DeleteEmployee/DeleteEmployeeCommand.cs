@@ -1,7 +1,7 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Employees.Commands.DeleteEmployee;
+namespace TecAxle.Hrms.Application.Employees.Commands.DeleteEmployee;
 
 /// <summary>
 /// Command to delete an employee (soft-delete using IsDeleted flag)

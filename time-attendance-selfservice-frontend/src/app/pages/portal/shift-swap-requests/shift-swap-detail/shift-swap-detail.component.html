@@ -1,0 +1,46 @@
+<app-page-header [title]="i18n.t('portal.shift_swaps.detail')">
+  <div header-actions>
+    <button class="btn btn-outline-secondary btn-sm" (click)="goBack()" type="button">
+      <i class="bi bi-arrow-left me-1"></i> {{ i18n.t('common.back') }}
+    </button>
+  </div>
+</app-page-header>
+
+@if (loading()) {
+  <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+}
+
+@if (error() && !item()) {
+  <div class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle me-2"></i>{{ error() }}
+  </div>
+}
+
+@if (item()) {
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h6 class="mb-0">{{ i18n.t('portal.shift_swaps.detail') }}</h6>
+      <app-status-badge [status]="statusBadge().label" [variant]="statusBadge().variant"></app-status-badge>
+    </div>
+    <div class="card-body">
+      <app-definition-list [items]="detailItems()" [labelWidth]="'4'" [valueWidth]="'8'"></app-definition-list>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  @if (item().status === 'Pending' || item().status === 'PendingPartnerApproval') {
+    <div class="card mt-3">
+      <div class="card-body d-flex gap-2">
+        <button class="btn btn-success btn-sm" (click)="partnerApprove()" [disabled]="actionLoading()" type="button">
+          <i class="bi bi-check-circle me-1"></i> {{ i18n.t('common.approve') }}
+        </button>
+        <button class="btn btn-danger btn-sm" (click)="partnerReject()" [disabled]="actionLoading()" type="button">
+          <i class="bi bi-x-circle me-1"></i> {{ i18n.t('common.reject') }}
+        </button>
+        <button class="btn btn-outline-secondary btn-sm" (click)="cancelRequest()" [disabled]="actionLoading()" type="button">
+          <i class="bi bi-trash me-1"></i> {{ i18n.t('common.cancel') }}
+        </button>
+      </div>
+    </div>
+  }
+}

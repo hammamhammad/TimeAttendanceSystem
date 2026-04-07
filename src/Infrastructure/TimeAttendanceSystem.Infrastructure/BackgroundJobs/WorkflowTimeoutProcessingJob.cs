@@ -1,8 +1,8 @@
 using Coravel.Invocable;
 using Microsoft.Extensions.Logging;
-using TimeAttendanceSystem.Application.Workflows.Services;
+using TecAxle.Hrms.Application.Workflows.Services;
 
-namespace TimeAttendanceSystem.Infrastructure.BackgroundJobs;
+namespace TecAxle.Hrms.Infrastructure.BackgroundJobs;
 
 /// <summary>
 /// Background job that runs hourly to process workflow step timeouts.

@@ -30,21 +30,21 @@
 
 .permission-item {
   padding: 0.75rem;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--app-gray-200, #EAECF0);
   border-radius: 0.375rem;
   transition: all 0.15s ease-in-out;
   background-color: #ffffff;
 }
 
 .permission-item:hover {
-  border-color: #0d6efd;
-  background-color: #f8f9fa;
+  border-color: var(--app-primary, #4F6BF6);
+  background-color: var(--app-gray-50, #F9FAFB);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .permission-item.bg-light {
   background-color: #e3f2fd !important;
-  border-color: #2196f3 !important;
+  border-color: var(--app-primary, #4F6BF6) !important;
   box-shadow: 0 2px 4px rgba(33, 150, 243, 0.2);
 }
 
@@ -55,7 +55,7 @@
 
 .permission-group {
   background-color: #ffffff;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--app-gray-200, #EAECF0);
   border-radius: 0.5rem;
   padding: 1rem;
   margin-bottom: 1rem;
@@ -92,7 +92,7 @@
 }
 
 .permissions-groups .border {
-  border-color: #dee2e6 !important;
+  border-color: var(--app-gray-200, #EAECF0) !important;
 }
 
 /* Custom badge colors for actions */
@@ -135,7 +135,7 @@
 }
 
 .role-info {
-  background-color: #f8f9fa;
+  background-color: var(--app-gray-50, #F9FAFB);
   border-radius: 0.5rem;
   padding: 1rem;
 }
@@ -148,7 +148,7 @@ th.sortable {
 }
 
 th.sortable:hover {
-  background-color: #e9ecef;
+  background-color: var(--app-gray-200, #EAECF0);
 }
 
 th.sortable i {

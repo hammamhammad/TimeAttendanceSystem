@@ -1,7 +1,7 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Workflows.Commands.CancelWorkflow;
+namespace TecAxle.Hrms.Application.Workflows.Commands.CancelWorkflow;
 
 /// <summary>
 /// CQRS command for cancelling a workflow.

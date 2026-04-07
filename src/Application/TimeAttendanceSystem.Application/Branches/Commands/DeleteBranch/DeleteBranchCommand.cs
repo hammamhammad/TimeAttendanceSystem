@@ -1,5 +1,5 @@
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Branches.Commands.DeleteBranch;
+namespace TecAxle.Hrms.Application.Branches.Commands.DeleteBranch;
 
 public record DeleteBranchCommand(long Id) : ICommand<Result>;

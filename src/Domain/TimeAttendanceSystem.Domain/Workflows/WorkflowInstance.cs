@@ -1,8 +1,8 @@
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Domain.Users;
-using TimeAttendanceSystem.Domain.Workflows.Enums;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Users;
+using TecAxle.Hrms.Domain.Workflows.Enums;
 
-namespace TimeAttendanceSystem.Domain.Workflows;
+namespace TecAxle.Hrms.Domain.Workflows;
 
 /// <summary>
 /// Domain entity representing a running instance of a workflow.
@@ -193,11 +193,12 @@ public class WorkflowInstance : BaseEntity
 
     /// <summary>
     /// Checks if the workflow can be modified.
+    /// Frozen workflows cannot be modified until the module is re-enabled.
     /// </summary>
     /// <returns>True if workflow can still be modified</returns>
     public bool CanBeModified()
     {
-        return !IsTerminated();
+        return !IsTerminated() && Status != WorkflowStatus.Frozen;
     }
 
     /// <summary>

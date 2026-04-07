@@ -1,8 +1,10 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.VacationTypes;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.VacationTypes;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.VacationTypes.Commands.CreateVacationType;
+namespace TecAxle.Hrms.Application.VacationTypes.Commands.CreateVacationType;
 
 /// <summary>
 /// Simplified CQRS command for creating a new vacation type in the Time Attendance System.
@@ -22,8 +24,12 @@ namespace TimeAttendanceSystem.Application.VacationTypes.Commands.CreateVacation
 /// - Active status defaults to true for immediate availability
 /// - Multi-tenant isolation through branch relationship (null = all branches)
 /// </remarks>
+[RequiresModule(SystemModule.LeaveManagement)]
 public record CreateVacationTypeCommand(
     long? BranchId,
     string Name,
-    string? NameAr
+    string? NameAr,
+    bool AllowHalfDay = false,
+    bool AllowEncashment = false,
+    int? EncashmentMaxDays = null
 ) : IRequest<Result<long>>;

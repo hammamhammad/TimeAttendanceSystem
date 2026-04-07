@@ -1,0 +1,66 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header [title]="i18n.t(isEditMode() ? 'succession.career_paths.edit' : 'succession.career_paths.create')" moduleName="career_paths" moduleRoute="succession/career-paths" />
+  @if (loadingData()) {
+    <div class="text-center py-5"><app-loading-spinner [message]="i18n.t('common.loading')" [variant]="'primary'" [centered]="true" /></div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <app-form-section [title]="i18n.t('common.basic_info')" [variant]="'modern'">
+        <div class="row g-3">
+          <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" id="name" formControlName="name" placeholder="x"><label for="name">{{ i18n.t('succession.career_paths.name') }} <span class="text-danger">*</span></label></div></div>
+          <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" id="nameAr" formControlName="nameAr" placeholder="x" dir="rtl"><label for="nameAr">{{ i18n.t('succession.career_paths.name_ar') }}</label></div></div>
+          <div class="col-md-6"><div class="form-floating"><textarea class="form-control" id="description" formControlName="description" placeholder="x" style="height:80px"></textarea><label for="description">{{ i18n.t('succession.career_paths.description') }}</label></div></div>
+          <div class="col-md-6"><div class="form-floating"><textarea class="form-control" id="descriptionAr" formControlName="descriptionAr" placeholder="x" style="height:80px" dir="rtl"></textarea><label for="descriptionAr">{{ i18n.t('succession.career_paths.description_ar') }}</label></div></div>
+          @if (isEditMode()) {
+            <div class="col-md-6">
+              <div class="form-check form-switch mt-3">
+                <input class="form-check-input" type="checkbox" id="isActive" formControlName="isActive">
+                <label class="form-check-label" for="isActive">{{ i18n.t('common.active') }}</label>
+              </div>
+            </div>
+          }
+        </div>
+      </app-form-section>
+
+      @if (!isEditMode()) {
+        <app-form-section [title]="i18n.t('succession.career_paths.steps')" [variant]="'modern'">
+          <div class="mb-3">
+            <button type="button" class="btn btn-outline-primary btn-sm" (click)="addStep()"><i class="fas fa-plus me-1"></i>{{ i18n.t('succession.career_paths.add_step') }}</button>
+          </div>
+          @for (step of steps(); track $index) {
+            <div class="card mb-3">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <strong>{{ i18n.t('succession.career_paths.step') }} {{ step.stepOrder }}</strong>
+                  <button type="button" class="btn btn-outline-danger btn-sm" (click)="removeStep($index)"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="row g-2">
+                  <div class="col-md-4"><div class="form-floating"><input type="text" class="form-control" [id]="'stepTitle_'+$index" [value]="step.jobTitle" (input)="updateStep($index, 'jobTitle', $any($event.target).value)" placeholder="x"><label [for]="'stepTitle_'+$index">{{ i18n.t('succession.career_paths.step_job_title') }}</label></div></div>
+                  <div class="col-md-4">
+                    <div class="app-modern-field">
+                      <label class="app-modern-label">{{ i18n.t('succession.career_paths.to_job_grade') }}</label>
+                      <select class="form-select form-select-sm" [value]="step.toJobGradeId" (change)="updateStep($index, 'toJobGradeId', +$any($event.target).value || null)">
+                        <option [value]="null">{{ i18n.t('common.select') }}</option>
+                        @for (g of jobGrades(); track g.id) {
+                          <option [value]="g.id">{{ g.name }}</option>
+                        }
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-4"><div class="form-floating"><input type="number" class="form-control" [id]="'duration_'+$index" [value]="step.typicalDurationMonths" (input)="updateStep($index, 'typicalDurationMonths', +$any($event.target).value || null)" placeholder="x"><label [for]="'duration_'+$index">{{ i18n.t('succession.career_paths.duration_months') }}</label></div></div>
+                </div>
+              </div>
+            </div>
+          }
+          @if (steps().length === 0) {
+            <p class="text-muted">{{ i18n.t('succession.career_paths.no_steps') }}</p>
+          }
+        </app-form-section>
+      }
+
+      <div class="app-form-actions">
+        <button type="button" class="btn btn-secondary" routerLink="/succession/career-paths">{{ i18n.t('common.cancel') }}</button>
+        <button type="submit" class="btn btn-primary" [disabled]="form.invalid || submitting()">@if (submitting()) { <span class="spinner-border spinner-border-sm me-1"></span> }{{ i18n.t('common.save') }}</button>
+      </div>
+    </form>
+  }
+</div>

@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TimeAttendanceSystem.Domain.Users;
+using TecAxle.Hrms.Domain.Users;
 
-namespace TimeAttendanceSystem.Infrastructure.Configurations;
+namespace TecAxle.Hrms.Infrastructure.Configurations;
 
 public class TwoFactorBackupCodeConfiguration : IEntityTypeConfiguration<TwoFactorBackupCode>
 {

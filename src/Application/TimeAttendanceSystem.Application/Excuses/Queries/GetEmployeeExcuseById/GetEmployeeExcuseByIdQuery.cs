@@ -1,6 +1,9 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.Excuses.Queries.GetEmployeeExcuseById;
+namespace TecAxle.Hrms.Application.Excuses.Queries.GetEmployeeExcuseById;
 
+[RequiresModule(SystemModule.LeaveManagement, AllowReadWhenDisabled = true)]
 public record GetEmployeeExcuseByIdQuery(long Id) : IRequest<Result<EmployeeExcuseDetailDto>>;

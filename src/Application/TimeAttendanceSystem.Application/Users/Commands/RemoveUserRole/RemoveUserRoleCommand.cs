@@ -1,7 +1,7 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Users.Commands.RemoveUserRole;
+namespace TecAxle.Hrms.Application.Users.Commands.RemoveUserRole;
 
 public record RemoveUserRoleCommand : IRequest<Result<Unit>>
 {

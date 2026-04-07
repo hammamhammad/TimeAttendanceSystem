@@ -1,10 +1,10 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Application.Excuses.Queries.GetExcusePolicies;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Excuses.Queries.GetExcusePolicies;
 
-namespace TimeAttendanceSystem.Application.Excuses.Queries.GetExcusePolicyById;
+namespace TecAxle.Hrms.Application.Excuses.Queries.GetExcusePolicyById;
 
 public class GetExcusePolicyByIdQueryHandler : IRequestHandler<GetExcusePolicyByIdQuery, Result<ExcusePolicyDto>>
 {

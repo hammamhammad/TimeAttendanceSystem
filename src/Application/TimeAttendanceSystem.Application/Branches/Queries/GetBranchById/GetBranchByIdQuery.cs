@@ -1,7 +1,7 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Application.Branches.Queries.GetBranches;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Branches.Queries.GetBranches;
 
-namespace TimeAttendanceSystem.Application.Branches.Queries.GetBranchById;
+namespace TecAxle.Hrms.Application.Branches.Queries.GetBranchById;
 
 public record GetBranchByIdQuery(long Id) : IRequest<Result<BranchDto>>;

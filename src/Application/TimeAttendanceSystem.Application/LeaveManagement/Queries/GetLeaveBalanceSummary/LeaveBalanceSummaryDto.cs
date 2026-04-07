@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Application.LeaveManagement.Queries.GetLeaveBalanceSummary;
+namespace TecAxle.Hrms.Application.LeaveManagement.Queries.GetLeaveBalanceSummary;
 
 /// <summary>
 /// Data Transfer Object representing a comprehensive leave balance summary for an employee.

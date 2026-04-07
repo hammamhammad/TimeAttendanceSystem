@@ -1,10 +1,10 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Notifications;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Notifications;
 
-namespace TimeAttendanceSystem.Application.Notifications.Commands.CreateBroadcast;
+namespace TecAxle.Hrms.Application.Notifications.Commands.CreateBroadcast;
 
 /// <summary>
 /// Handler for creating notification broadcasts.

@@ -1,7 +1,7 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Authorization.Commands.Register;
+namespace TecAxle.Hrms.Application.Authorization.Commands.Register;
 
 public record RegisterCommand(
     string Username,

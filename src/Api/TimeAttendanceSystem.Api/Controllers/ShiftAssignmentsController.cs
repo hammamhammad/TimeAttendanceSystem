@@ -2,12 +2,12 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
-using TimeAttendanceSystem.Application.ShiftAssignments.Commands.CreateShiftAssignment;
-using TimeAttendanceSystem.Application.ShiftAssignments.Queries.GetShiftAssignments;
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Api.Models;
+using TecAxle.Hrms.Application.ShiftAssignments.Commands.CreateShiftAssignment;
+using TecAxle.Hrms.Application.ShiftAssignments.Queries.GetShiftAssignments;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Api.Models;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 /// <summary>
 /// API controller for managing shift assignments with comprehensive CRUD operations.

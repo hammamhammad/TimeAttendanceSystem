@@ -1,7 +1,7 @@
-using TimeAttendanceSystem.Domain.Shifts;
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Domain.Shifts;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Api.Models;
+namespace TecAxle.Hrms.Api.Models;
 
 /// <summary>
 /// Request model for creating a new shift with comprehensive shift management capabilities.

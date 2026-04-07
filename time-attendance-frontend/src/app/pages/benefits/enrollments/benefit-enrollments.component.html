@@ -1,0 +1,29 @@
+<div class="container-fluid">
+  <app-page-header [title]="t('benefits.enrollments.title')" />
+
+  <app-unified-filter
+    [searchPlaceholder]="t('benefits.enrollments.search_placeholder')"
+    [showAddButton]="false"
+    [showRefreshButton]="true"
+    [refreshButtonText]="t('common.refresh')"
+    [refreshing]="loading()"
+    (searchChange)="onSearchChange($event)"
+    (refresh)="onRefreshData()">
+  </app-unified-filter>
+
+  <app-data-table
+    [columns]="tableColumns()"
+    [data]="tableData() || []"
+    [actions]="tableActions()"
+    [currentPage]="currentPage()"
+    [pageSize]="pageSize()"
+    [totalItems]="totalCount()"
+    [totalPages]="totalPages()"
+    [loading]="loading"
+    [emptyTitle]="t('benefits.enrollments.no_records_title')"
+    [emptyMessage]="t('benefits.enrollments.no_records')"
+    (actionClick)="onActionClick($event)"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+  </app-data-table>
+</div>

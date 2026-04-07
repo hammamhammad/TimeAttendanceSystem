@@ -1,0 +1,107 @@
+<div class="container-fluid">
+  <app-page-header [title]="t('payroll_reports.title')" />
+
+  <!-- Tabs -->
+  <ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+      <button class="nav-link" [class.active]="activeTab() === 'salary'" (click)="setTab('salary')">
+        <i class="fas fa-file-invoice-dollar me-1"></i> {{ t('payroll_reports.salary_register') }}
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" [class.active]="activeTab() === 'department'" (click)="setTab('department')">
+        <i class="fas fa-building me-1"></i> {{ t('payroll_reports.department_cost') }}
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" [class.active]="activeTab() === 'ytd'" (click)="setTab('ytd')">
+        <i class="fas fa-chart-line me-1"></i> {{ t('payroll_reports.ytd_earnings') }}
+      </button>
+    </li>
+  </ul>
+
+  <!-- Salary Register Tab -->
+  @if (activeTab() === 'salary') {
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-4">
+            <label class="form-label">{{ t('payroll_reports.payroll_period_id') }}</label>
+            <input type="number" class="form-control" [ngModel]="periodId()" (ngModelChange)="periodId.set($event)" [placeholder]="t('payroll_reports.enter_period_id')">
+          </div>
+          <div class="col-md-3">
+            <button class="btn btn-primary" (click)="loadSalaryRegister()" [disabled]="loading() || !periodId()">
+              @if (loading()) { <span class="spinner-border spinner-border-sm me-1"></span> }
+              {{ t('payroll_reports.generate') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <app-data-table
+      [columns]="salaryColumns()"
+      [data]="salaryData()"
+      [loading]="loading"
+      [emptyTitle]="t('payroll_reports.no_data_title')"
+      [emptyMessage]="t('payroll_reports.no_data')">
+    </app-data-table>
+  }
+
+  <!-- Department Cost Tab -->
+  @if (activeTab() === 'department') {
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-3">
+            <label class="form-label">{{ t('payroll_reports.year') }}</label>
+            <input type="number" class="form-control" [ngModel]="currentYear()" (ngModelChange)="currentYear.set($event)">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">{{ t('payroll_reports.month') }}</label>
+            <input type="number" class="form-control" [ngModel]="currentMonth()" (ngModelChange)="currentMonth.set($event)" min="1" max="12">
+          </div>
+          <div class="col-md-3">
+            <button class="btn btn-primary" (click)="loadDepartmentCost()" [disabled]="loading()">
+              @if (loading()) { <span class="spinner-border spinner-border-sm me-1"></span> }
+              {{ t('payroll_reports.generate') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <app-data-table
+      [columns]="departmentColumns()"
+      [data]="departmentData()"
+      [loading]="loading"
+      [emptyTitle]="t('payroll_reports.no_data_title')"
+      [emptyMessage]="t('payroll_reports.no_data')">
+    </app-data-table>
+  }
+
+  <!-- YTD Earnings Tab -->
+  @if (activeTab() === 'ytd') {
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-3">
+            <label class="form-label">{{ t('payroll_reports.year') }}</label>
+            <input type="number" class="form-control" [ngModel]="currentYear()" (ngModelChange)="currentYear.set($event)">
+          </div>
+          <div class="col-md-3">
+            <button class="btn btn-primary" (click)="loadYtdEarnings()" [disabled]="loading()">
+              @if (loading()) { <span class="spinner-border spinner-border-sm me-1"></span> }
+              {{ t('payroll_reports.generate') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <app-data-table
+      [columns]="ytdColumns()"
+      [data]="ytdData()"
+      [loading]="loading"
+      [emptyTitle]="t('payroll_reports.no_data_title')"
+      [emptyMessage]="t('payroll_reports.no_data')">
+    </app-data-table>
+  }
+</div>

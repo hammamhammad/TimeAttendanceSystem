@@ -1,21 +1,21 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TimeAttendanceSystem.Application.NfcTags.Commands.CreateNfcTag;
-using TimeAttendanceSystem.Application.NfcTags.Commands.UpdateNfcTag;
-using TimeAttendanceSystem.Application.NfcTags.Commands.DeleteNfcTag;
-using TimeAttendanceSystem.Application.NfcTags.Commands.LockNfcTag;
-using TimeAttendanceSystem.Application.NfcTags.Queries.GetNfcTags;
-using TimeAttendanceSystem.Application.NfcTags.Queries.GetNfcTagById;
-using TimeAttendanceSystem.Application.NfcTags.Queries.GetNfcTagsByBranch;
-using TimeAttendanceSystem.Application.NfcTags.Queries.ValidateNfcTag;
-using TimeAttendanceSystem.Application.NfcTags.Queries.GetNfcWriteData;
-using TimeAttendanceSystem.Application.NfcTags.Commands.ConfirmWriteProtection;
-using TimeAttendanceSystem.Application.NfcTags.Commands.DisableNfcTag;
-using TimeAttendanceSystem.Application.NfcTags.Commands.EnableNfcTag;
-using TimeAttendanceSystem.Application.NfcTags.Commands.ReportLostNfcTag;
+using TecAxle.Hrms.Application.NfcTags.Commands.CreateNfcTag;
+using TecAxle.Hrms.Application.NfcTags.Commands.UpdateNfcTag;
+using TecAxle.Hrms.Application.NfcTags.Commands.DeleteNfcTag;
+using TecAxle.Hrms.Application.NfcTags.Commands.LockNfcTag;
+using TecAxle.Hrms.Application.NfcTags.Queries.GetNfcTags;
+using TecAxle.Hrms.Application.NfcTags.Queries.GetNfcTagById;
+using TecAxle.Hrms.Application.NfcTags.Queries.GetNfcTagsByBranch;
+using TecAxle.Hrms.Application.NfcTags.Queries.ValidateNfcTag;
+using TecAxle.Hrms.Application.NfcTags.Queries.GetNfcWriteData;
+using TecAxle.Hrms.Application.NfcTags.Commands.ConfirmWriteProtection;
+using TecAxle.Hrms.Application.NfcTags.Commands.DisableNfcTag;
+using TecAxle.Hrms.Application.NfcTags.Commands.EnableNfcTag;
+using TecAxle.Hrms.Application.NfcTags.Commands.ReportLostNfcTag;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 /// <summary>
 /// Controller for managing NFC tags used in mobile check-in verification.

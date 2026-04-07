@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Application.Reports.Queries;
+namespace TecAxle.Hrms.Application.Reports.Queries;
 
 public class ReportFilter
 {

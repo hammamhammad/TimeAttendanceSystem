@@ -1,0 +1,33 @@
+/* Announcement Detail Styles */
+
+.announcement-title {
+  font-weight: 700;
+  color: var(--bs-body-color);
+}
+
+.announcement-content {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--bs-body-color);
+}
+
+.announcement-content p {
+  margin-bottom: 1rem;
+}
+
+.announcement-content ul,
+.announcement-content ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+
+:host-context([dir="rtl"]) .announcement-content ul,
+:host-context([dir="rtl"]) .announcement-content ol {
+  padding-left: 0;
+  padding-right: 1.5rem;
+}
+
+.list-group-item-action:hover .bi-download {
+  transform: translateY(2px);
+  transition: transform 0.2s ease;
+}

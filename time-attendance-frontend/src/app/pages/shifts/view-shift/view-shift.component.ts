@@ -13,6 +13,8 @@ import { DetailCardComponent, DetailField } from '../../../shared/components/det
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 import { FormHeaderComponent, FormHeaderAction } from '../../../shared/components/form-header/form-header.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
+import { AuditHistoryComponent } from '../../../shared/components/audit-history/audit-history.component';
+import { SectionCardComponent } from '../../../shared/components/section-card/section-card.component';
 
 @Component({
   selector: 'app-view-shift',
@@ -21,7 +23,9 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
     LoadingSpinnerComponent,
     DetailCardComponent,
     FormHeaderComponent,
-    StatusBadgeComponent
+    StatusBadgeComponent,
+    AuditHistoryComponent,
+    SectionCardComponent
 ],
   templateUrl: './view-shift.component.html',
   styleUrls: ['./view-shift.component.css']

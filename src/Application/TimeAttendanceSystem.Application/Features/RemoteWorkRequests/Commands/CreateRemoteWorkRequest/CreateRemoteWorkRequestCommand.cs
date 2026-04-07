@@ -1,8 +1,10 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.RemoteWork;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.RemoteWork;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.Features.RemoteWorkRequests.Commands.CreateRemoteWorkRequest;
+namespace TecAxle.Hrms.Application.Features.RemoteWorkRequests.Commands.CreateRemoteWorkRequest;
 
 /// <summary>
 /// Command to create a remote work request for an employee.
@@ -15,6 +17,7 @@ namespace TimeAttendanceSystem.Application.Features.RemoteWorkRequests.Commands.
 /// - Manager must be in the employee's management chain (recursive)
 /// - If manager is in the approval workflow, their step is auto-approved
 /// </remarks>
+[RequiresModule(SystemModule.RemoteWork)]
 public class CreateRemoteWorkRequestCommand : IRequest<Result<long>>
 {
     public long EmployeeId { get; set; }

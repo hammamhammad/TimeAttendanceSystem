@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Domain.Attendance;
+namespace TecAxle.Hrms.Domain.Attendance;
 
 /// <summary>
 /// Enum representing the work location type for an attendance record.

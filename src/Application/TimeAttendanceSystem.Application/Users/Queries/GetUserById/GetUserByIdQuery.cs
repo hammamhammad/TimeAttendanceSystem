@@ -1,6 +1,6 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Users.Queries.GetUserById;
+namespace TecAxle.Hrms.Application.Users.Queries.GetUserById;
 
 public record GetUserByIdQuery(long UserId) : IRequest<Result<UserDetailDto>>;

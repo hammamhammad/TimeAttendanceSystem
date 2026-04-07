@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.Users;
+using TecAxle.Hrms.Domain.Users;
 
-namespace TimeAttendanceSystem.Application.Abstractions;
+namespace TecAxle.Hrms.Application.Abstractions;
 
 /// <summary>
 /// Abstraction for JWT (JSON Web Token) generation and management services.
@@ -83,7 +83,7 @@ public interface IJwtTokenGenerator
     /// Token Format: "Bearer {access_token}"
     /// Lifetime: Configurable, typically 15-60 minutes
     /// </remarks>
-    string GenerateAccessToken(User user, IReadOnlyList<string> roles, IReadOnlyList<string> permissions, IReadOnlyList<long> branchIds, bool rememberMe = false);
+    string GenerateAccessToken(User user, IReadOnlyList<string> roles, IReadOnlyList<string> permissions, IReadOnlyList<long> branchIds, long? tenantId = null, bool rememberMe = false);
 
     /// <summary>
     /// Generates a cryptographically secure refresh token for token renewal operations.

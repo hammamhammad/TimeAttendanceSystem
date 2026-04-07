@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.Branches;
+using TecAxle.Hrms.Domain.Branches;
 
-namespace TimeAttendanceSystem.Application.Abstractions;
+namespace TecAxle.Hrms.Application.Abstractions;
 
 /// <summary>
 /// Service for generating and verifying HMAC-SHA256 signed payloads for NFC tags.

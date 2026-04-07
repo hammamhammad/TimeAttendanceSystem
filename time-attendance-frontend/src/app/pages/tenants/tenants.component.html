@@ -1,0 +1,37 @@
+<div class="app-list-page">
+  <!-- Page Header -->
+  <app-page-header
+    [title]="'Tenants'">
+  </app-page-header>
+
+  <!-- Filters -->
+  <app-unified-filter
+    [searchPlaceholder]="'Search tenants...'"
+    [showAddButton]="true"
+    [addButtonText]="'Create Tenant'"
+    [showRefreshButton]="true"
+    [refreshing]="loading()"
+    (searchChange)="onSearchChange($event)"
+    (add)="onAddTenant()"
+    (refresh)="onRefreshData()">
+  </app-unified-filter>
+
+  <!-- Data Table -->
+  <app-data-table
+    [data]="tableData() || []"
+    [columns]="tableColumns()"
+    [actions]="tableActions()"
+    [loading]="loading"
+    [emptyTitle]="'No Tenants Found'"
+    [emptyMessage]="'No tenants match your search criteria.'"
+    [paginated]="true"
+    [currentPage]="currentPage"
+    [totalPages]="totalPages"
+    [totalItems]="totalCount"
+    [pageSize]="pageSize"
+    [responsiveMode]="'auto'"
+    (actionClick)="onActionClick($event)"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+  </app-data-table>
+</div>

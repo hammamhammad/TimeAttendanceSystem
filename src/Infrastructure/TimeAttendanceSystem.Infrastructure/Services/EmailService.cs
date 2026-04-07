@@ -1,8 +1,8 @@
-using TimeAttendanceSystem.Application.Abstractions;
+using TecAxle.Hrms.Application.Abstractions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 
-namespace TimeAttendanceSystem.Infrastructure.Services;
+namespace TecAxle.Hrms.Infrastructure.Services;
 
 public class EmailService : IEmailService
 {

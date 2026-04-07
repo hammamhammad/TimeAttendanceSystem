@@ -1,7 +1,7 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Notifications.Commands.RegisterPushToken;
+namespace TecAxle.Hrms.Application.Notifications.Commands.RegisterPushToken;
 
 /// <summary>
 /// Command to register or update a push notification token for a device.

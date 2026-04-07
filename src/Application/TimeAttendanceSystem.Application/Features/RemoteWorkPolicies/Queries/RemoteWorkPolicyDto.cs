@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Application.Features.RemoteWorkPolicies.Queries;
+namespace TecAxle.Hrms.Application.Features.RemoteWorkPolicies.Queries;
 
 /// <summary>
 /// DTO for remote work policy information.

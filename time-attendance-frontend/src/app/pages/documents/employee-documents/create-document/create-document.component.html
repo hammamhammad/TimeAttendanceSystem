@@ -1,0 +1,80 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header [title]="i18n.t('employee_documents.create')" moduleName="employee-documents" moduleRoute="documents/employee-documents" [loading]="saving()" />
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <app-form-section [title]="i18n.t('employee_documents.basic_info')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('employee_documents.employee') }} *</label>
+            <app-searchable-select [options]="employeeOptions" [placeholder]="i18n.t('common.select')" [value]="form.get('employeeId')?.value" (selectionChange)="form.get('employeeId')?.setValue($event)" />
+          </div>
+          @if (form.get('employeeId')?.touched && form.get('employeeId')?.hasError('required')) {
+            <div class="invalid-feedback d-block">{{ i18n.t('validation.required') }}</div>
+          }
+        </div>
+        <div class="col-md-6">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('employee_documents.category') }} *</label>
+            <app-searchable-select [options]="categoryOptions" [placeholder]="i18n.t('common.select')" [value]="form.get('categoryId')?.value" (selectionChange)="form.get('categoryId')?.setValue($event)" />
+          </div>
+          @if (form.get('categoryId')?.touched && form.get('categoryId')?.hasError('required')) {
+            <div class="invalid-feedback d-block">{{ i18n.t('validation.required') }}</div>
+          }
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="title" placeholder="Title" formControlName="title">
+            <label for="title">{{ i18n.t('employee_documents.title_field') }} *</label>
+          </div>
+          @if (form.get('title')?.touched && form.get('title')?.hasError('required')) {
+            <div class="invalid-feedback d-block">{{ i18n.t('validation.required') }}</div>
+          }
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="documentNumber" placeholder="Document Number" formControlName="documentNumber">
+            <label for="documentNumber">{{ i18n.t('employee_documents.document_number') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="issueDate" placeholder="Issue Date" formControlName="issueDate">
+            <label for="issueDate">{{ i18n.t('employee_documents.issue_date') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="expiryDate" placeholder="Expiry Date" formControlName="expiryDate">
+            <label for="expiryDate">{{ i18n.t('employee_documents.expiry_date') }}</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-floating">
+            <textarea class="form-control" id="description" placeholder="Description" formControlName="description" style="height:80px"></textarea>
+            <label for="description">{{ i18n.t('common.description') }}</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-floating">
+            <textarea class="form-control" id="notes" placeholder="Notes" formControlName="notes" style="height:80px"></textarea>
+            <label for="notes">{{ i18n.t('employee_documents.notes') }}</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <label class="form-label">{{ i18n.t('employee_documents.file') }} *</label>
+          <input type="file" class="form-control" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xlsx" (change)="onFileSelect($event)">
+          <div class="form-text">{{ i18n.t('employee_documents.file_help') }}</div>
+        </div>
+      </div>
+    </app-form-section>
+
+    <div class="app-form-actions">
+      <button type="button" class="btn btn-secondary" routerLink="/documents/employee-documents">{{ i18n.t('common.cancel') }}</button>
+      <button type="submit" class="btn btn-primary" [disabled]="saving()">
+        @if (saving()) { <i class="fas fa-spinner fa-spin me-1"></i> }
+        {{ i18n.t('common.save') }}
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Users;
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Users;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Application.Authorization.Commands.Register;
+namespace TecAxle.Hrms.Application.Authorization.Commands.Register;
 
 public class RegisterCommandHandler : BaseHandler<RegisterCommand, Result<RegisterResponse>>
 {

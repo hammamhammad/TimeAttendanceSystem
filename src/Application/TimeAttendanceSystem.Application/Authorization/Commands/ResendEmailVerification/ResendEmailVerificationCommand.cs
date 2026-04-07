@@ -1,6 +1,6 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Authorization.Commands.ResendEmailVerification;
+namespace TecAxle.Hrms.Application.Authorization.Commands.ResendEmailVerification;
 
 public record ResendEmailVerificationCommand(string Email) : IRequest<Result<bool>>;

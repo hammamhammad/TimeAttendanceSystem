@@ -1,20 +1,20 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using TimeAttendanceSystem.Application.Authorization.Commands.Login;
-using TimeAttendanceSystem.Application.Authorization.Commands.RefreshToken;
-using TimeAttendanceSystem.Application.Authorization.Commands.Logout;
-using TimeAttendanceSystem.Application.Authorization.Commands.RequestPasswordReset;
-using TimeAttendanceSystem.Application.Authorization.Commands.ResetPassword;
-using TimeAttendanceSystem.Application.Authorization.Commands.EnableTwoFactor;
-using TimeAttendanceSystem.Application.Authorization.Commands.ConfirmTwoFactor;
-using TimeAttendanceSystem.Application.Authorization.Commands.VerifyTwoFactor;
-using TimeAttendanceSystem.Application.Authorization.Commands.Register;
-using TimeAttendanceSystem.Application.Authorization.Commands.VerifyEmail;
-using TimeAttendanceSystem.Application.Authorization.Commands.ResendEmailVerification;
-using TimeAttendanceSystem.Application.Authorization.Commands.ChangePassword;
+using TecAxle.Hrms.Application.Authorization.Commands.Login;
+using TecAxle.Hrms.Application.Authorization.Commands.RefreshToken;
+using TecAxle.Hrms.Application.Authorization.Commands.Logout;
+using TecAxle.Hrms.Application.Authorization.Commands.RequestPasswordReset;
+using TecAxle.Hrms.Application.Authorization.Commands.ResetPassword;
+using TecAxle.Hrms.Application.Authorization.Commands.EnableTwoFactor;
+using TecAxle.Hrms.Application.Authorization.Commands.ConfirmTwoFactor;
+using TecAxle.Hrms.Application.Authorization.Commands.VerifyTwoFactor;
+using TecAxle.Hrms.Application.Authorization.Commands.Register;
+using TecAxle.Hrms.Application.Authorization.Commands.VerifyEmail;
+using TecAxle.Hrms.Application.Authorization.Commands.ResendEmailVerification;
+using TecAxle.Hrms.Application.Authorization.Commands.ChangePassword;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 /// <summary>
 /// API controller for authentication and authorization operations.

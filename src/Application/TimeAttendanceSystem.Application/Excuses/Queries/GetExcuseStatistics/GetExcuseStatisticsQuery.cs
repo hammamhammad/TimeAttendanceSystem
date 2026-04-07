@@ -1,7 +1,9 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.Excuses.Queries.GetExcuseStatistics;
+namespace TecAxle.Hrms.Application.Excuses.Queries.GetExcuseStatistics;
 
 /// <summary>
 /// CQRS query for retrieving employee excuse usage statistics.
@@ -30,6 +32,7 @@ namespace TimeAttendanceSystem.Application.Excuses.Queries.GetExcuseStatistics;
 /// - Branch-scoped access for multi-tenant environments
 /// - Sensitive data filtering based on user permissions
 /// </remarks>
+[RequiresModule(SystemModule.LeaveManagement, AllowReadWhenDisabled = true)]
 public record GetExcuseStatisticsQuery(
     long EmployeeId,
     int Year,

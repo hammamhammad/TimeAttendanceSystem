@@ -1,10 +1,10 @@
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Domain.Employees;
-using TimeAttendanceSystem.Domain.Shifts;
-using TimeAttendanceSystem.Domain.Settings;
-using TimeAttendanceSystem.Domain.RemoteWork;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Employees;
+using TecAxle.Hrms.Domain.Shifts;
+using TecAxle.Hrms.Domain.Settings;
+using TecAxle.Hrms.Domain.RemoteWork;
 
-namespace TimeAttendanceSystem.Domain.Attendance;
+namespace TecAxle.Hrms.Domain.Attendance;
 
 /// <summary>
 /// Domain entity representing a daily attendance record for an employee.

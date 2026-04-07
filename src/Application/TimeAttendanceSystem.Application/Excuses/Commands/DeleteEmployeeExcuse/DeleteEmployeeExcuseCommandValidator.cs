@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace TimeAttendanceSystem.Application.Excuses.Commands.DeleteEmployeeExcuse;
+namespace TecAxle.Hrms.Application.Excuses.Commands.DeleteEmployeeExcuse;
 
 public class DeleteEmployeeExcuseCommandValidator : AbstractValidator<DeleteEmployeeExcuseCommand>
 {

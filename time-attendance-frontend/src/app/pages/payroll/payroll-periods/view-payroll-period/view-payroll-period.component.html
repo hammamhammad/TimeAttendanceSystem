@@ -1,0 +1,57 @@
+<div class="app-view-page app-modern-view">
+  <app-form-header
+    mode="view"
+    [title]="i18n.t('payroll.periods.view_details')"
+    moduleName="payroll.periods"
+    moduleRoute="payroll/periods"
+    [entityId]="period()?.id"
+    [loading]="loading()"
+    [actions]="headerActions()">
+  </app-form-header>
+
+  @if (loading()) {
+    <div class="text-center py-5">
+      <app-loading-spinner [message]="i18n.t('common.loading')" [variant]="'primary'" [centered]="true"></app-loading-spinner>
+    </div>
+  }
+
+  @if (period() && !loading()) {
+    <div class="row mb-4">
+      <div class="col-lg-6">
+        <app-section-card [title]="i18n.t('payroll.periods.period_info')" icon="fas fa-calendar" headerClass="bg-light" class="mb-4">
+          <app-definition-list [items]="periodInfoItems()" [labelWidth]="'5'" [valueWidth]="'7'"></app-definition-list>
+        </app-section-card>
+      </div>
+      <div class="col-lg-6">
+        <app-section-card [title]="i18n.t('payroll.periods.financial_summary')" icon="fas fa-coins" headerClass="bg-light" class="mb-4">
+          <app-definition-list [items]="financialItems()" [labelWidth]="'5'" [valueWidth]="'7'"></app-definition-list>
+        </app-section-card>
+      </div>
+    </div>
+
+    <app-section-card [title]="i18n.t('payroll.records.title')" icon="fas fa-users" headerClass="bg-light">
+      <div class="d-flex justify-content-end mb-3">
+        <button class="btn btn-outline-secondary btn-sm" (click)="exportCsv()">
+          <i class="fa-solid fa-download me-2"></i>{{ i18n.t('common.export_csv') }}
+        </button>
+      </div>
+      <app-data-table
+        [data]="records()"
+        [columns]="recordColumns"
+        [showPagination]="false"
+        [emptyTitle]="i18n.t('payroll.records.no_records')">
+        <ng-template #cellTemplate let-item let-column="column">
+          @if (column.key === 'basicSalary' || column.key === 'grossSalary' || column.key === 'totalDeductions' || column.key === 'netSalary') {
+            {{ formatCurrency(item[column.key]) }}
+          } @else {
+            {{ item[column.key] }}
+          }
+        </ng-template>
+      </app-data-table>
+    </app-section-card>
+
+    <app-section-card [title]="i18n.t('history.title')" icon="fas fa-clock-rotate-left" headerClass="bg-light" class="mb-4">
+      <app-audit-history [entityName]="'PayrollPeriod'" [entityId]="period()?.id" />
+    </app-section-card>
+  }
+</div>

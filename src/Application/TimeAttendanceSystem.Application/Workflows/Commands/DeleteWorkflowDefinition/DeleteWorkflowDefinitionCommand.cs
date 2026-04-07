@@ -1,7 +1,7 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Workflows.Commands.DeleteWorkflowDefinition;
+namespace TecAxle.Hrms.Application.Workflows.Commands.DeleteWorkflowDefinition;
 
 /// <summary>
 /// CQRS command for soft-deleting a workflow definition.

@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Application.Features.Portal.EmployeeDashboard.Queries;
+namespace TecAxle.Hrms.Application.Features.Portal.EmployeeDashboard.Queries;
 
 /// <summary>
 /// Employee dashboard data transfer object for self-service portal

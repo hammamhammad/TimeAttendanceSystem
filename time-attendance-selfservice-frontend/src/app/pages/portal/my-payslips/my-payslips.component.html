@@ -1,0 +1,85 @@
+<!-- Page Header -->
+<app-page-header
+  [title]="i18n.t('portal.payslips.title')">
+  <div header-actions>
+    <select
+      class="form-select form-select-sm d-inline-block w-auto me-2"
+      [value]="selectedYear()"
+      (change)="onYearChange($event)">
+      @for (year of availableYears(); track year) {
+        <option [value]="year">{{ year }}</option>
+      }
+    </select>
+    <button
+      class="btn btn-outline-primary btn-sm"
+      (click)="refresh()"
+      [disabled]="loading()"
+      type="button">
+      <i class="bi bi-arrow-clockwise" [class.spin]="loading()"></i>
+      {{ i18n.t('common.refresh') }}
+    </button>
+  </div>
+</app-page-header>
+
+<!-- Loading State -->
+@if (loading() && payslips().length === 0) {
+  <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+}
+
+<!-- Error State -->
+@if (error() && payslips().length === 0) {
+  <div class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    {{ error() }}
+    <button class="btn btn-sm btn-outline-danger ms-3" (click)="refresh()" type="button">
+      {{ i18n.t('common.retry') }}
+    </button>
+  </div>
+}
+
+<!-- Empty State -->
+@if (!loading() && payslips().length === 0 && !error()) {
+  <app-empty-state
+    icon="bi bi-receipt"
+    [title]="i18n.t('portal.payslips.no_payslips')"
+    [message]="i18n.t('portal.payslips.no_payslips_message')">
+  </app-empty-state>
+}
+
+<!-- Data Table -->
+@if (payslips().length > 0) {
+  <div class="card">
+    <div class="card-body">
+      <app-data-table
+        [data]="tableData()"
+        [columns]="columns"
+        [actions]="tableActions"
+        [loading]="loading()"
+        [pageSize]="12"
+        [paginated]="true"
+        [sortable]="true"
+        [sortColumn]="sortColumn"
+        [sortDirection]="sortDirection"
+        (sortChange)="onSort($event)"
+        (actionClick)="onActionClick($event)">
+      </app-data-table>
+    </div>
+  </div>
+}
+
+<!-- Info Card -->
+@if (payslips().length > 0) {
+  <div class="card mt-3">
+    <div class="card-body">
+      <div class="d-flex align-items-start">
+        <i class="bi bi-info-circle text-info me-3 mt-1 fs-4"></i>
+        <div>
+          <h6 class="mb-2">{{ i18n.t('portal.payslips.info_title') }}</h6>
+          <p class="text-muted mb-0 small">
+            {{ i18n.t('portal.payslips.info_text') }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+}

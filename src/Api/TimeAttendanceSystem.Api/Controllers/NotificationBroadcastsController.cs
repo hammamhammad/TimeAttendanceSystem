@@ -1,11 +1,11 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TimeAttendanceSystem.Application.Notifications.Commands.CreateBroadcast;
-using TimeAttendanceSystem.Application.Notifications.Queries.GetBroadcasts;
-using TimeAttendanceSystem.Domain.Notifications;
+using TecAxle.Hrms.Application.Notifications.Commands.CreateBroadcast;
+using TecAxle.Hrms.Application.Notifications.Queries.GetBroadcasts;
+using TecAxle.Hrms.Domain.Notifications;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 /// <summary>
 /// Controller for managing notification broadcasts.

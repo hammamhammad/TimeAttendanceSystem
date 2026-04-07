@@ -1,8 +1,8 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Workflows.Enums;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Workflows.Enums;
 
-namespace TimeAttendanceSystem.Application.Workflows.Commands.StartWorkflow;
+namespace TecAxle.Hrms.Application.Workflows.Commands.StartWorkflow;
 
 /// <summary>
 /// CQRS command for starting a workflow for an entity.

@@ -1,8 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using TimeAttendanceSystem.Domain.Settings;
+using TecAxle.Hrms.Domain.Settings;
 
-namespace TimeAttendanceSystem.Api.Converters;
+namespace TecAxle.Hrms.Api.Converters;
 
 /// <summary>
 /// Custom JSON converter for HolidayType enum that handles both string and integer values.

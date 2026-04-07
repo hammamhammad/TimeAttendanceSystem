@@ -1,7 +1,7 @@
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Domain.Branches;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Branches;
 
-namespace TimeAttendanceSystem.Domain.Excuses;
+namespace TecAxle.Hrms.Domain.Excuses;
 
 /// <summary>
 /// Domain entity representing organizational policy for employee excuse management.

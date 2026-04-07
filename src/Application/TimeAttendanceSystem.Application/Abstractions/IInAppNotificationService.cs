@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.Notifications;
+using TecAxle.Hrms.Domain.Notifications;
 
-namespace TimeAttendanceSystem.Application.Abstractions;
+namespace TecAxle.Hrms.Application.Abstractions;
 
 /// <summary>
 /// Service interface for managing in-app notifications.

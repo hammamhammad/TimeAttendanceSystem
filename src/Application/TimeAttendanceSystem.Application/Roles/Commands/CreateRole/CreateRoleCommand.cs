@@ -1,7 +1,7 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Roles.Commands.CreateRole;
+namespace TecAxle.Hrms.Application.Roles.Commands.CreateRole;
 
 public record CreateRoleCommand : IRequest<Result<long>>
 {

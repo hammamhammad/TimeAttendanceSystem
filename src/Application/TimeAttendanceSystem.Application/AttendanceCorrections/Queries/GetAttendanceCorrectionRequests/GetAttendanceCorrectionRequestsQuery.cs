@@ -1,9 +1,11 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Attendance;
-using TimeAttendanceSystem.Domain.Excuses;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Attendance;
+using TecAxle.Hrms.Domain.Excuses;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.AttendanceCorrections.Queries.GetAttendanceCorrectionRequests;
+namespace TecAxle.Hrms.Application.AttendanceCorrections.Queries.GetAttendanceCorrectionRequests;
 
 /// <summary>
 /// CQRS query for retrieving attendance correction requests with filtering and pagination.
@@ -33,6 +35,7 @@ namespace TimeAttendanceSystem.Application.AttendanceCorrections.Queries.GetAtte
 /// - Manager users can see requests for their subordinates
 /// - Admin/HR users can see all requests in their branch scope
 /// </remarks>
+[RequiresModule(SystemModule.TimeAttendance, AllowReadWhenDisabled = true)]
 public record GetAttendanceCorrectionRequestsQuery(
     long? EmployeeId = null,
     DateTime? StartDate = null,

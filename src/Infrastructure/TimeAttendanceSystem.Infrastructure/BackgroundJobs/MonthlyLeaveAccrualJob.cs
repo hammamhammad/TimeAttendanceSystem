@@ -1,9 +1,9 @@
 using Coravel.Invocable;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using TimeAttendanceSystem.Application.LeaveManagement.Commands.ProcessMonthlyAccrual;
+using TecAxle.Hrms.Application.LeaveManagement.Commands.ProcessMonthlyAccrual;
 
-namespace TimeAttendanceSystem.Infrastructure.BackgroundJobs;
+namespace TecAxle.Hrms.Infrastructure.BackgroundJobs;
 
 /// <summary>
 /// Background job that runs monthly to process leave accrual for all employees.

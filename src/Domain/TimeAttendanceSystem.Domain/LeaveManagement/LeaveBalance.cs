@@ -1,7 +1,7 @@
-using TimeAttendanceSystem.Domain.Employees;
-using TimeAttendanceSystem.Domain.VacationTypes;
+using TecAxle.Hrms.Domain.Employees;
+using TecAxle.Hrms.Domain.VacationTypes;
 
-namespace TimeAttendanceSystem.Domain.LeaveManagement;
+namespace TecAxle.Hrms.Domain.LeaveManagement;
 
 /// <summary>
 /// Represents the current leave balance for an employee for a specific vacation type.

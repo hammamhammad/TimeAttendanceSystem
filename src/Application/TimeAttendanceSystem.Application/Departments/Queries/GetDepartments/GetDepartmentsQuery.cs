@@ -1,7 +1,7 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Departments.Queries.GetDepartments;
+namespace TecAxle.Hrms.Application.Departments.Queries.GetDepartments;
 
 public record GetDepartmentsQuery(
     long? BranchId = null,

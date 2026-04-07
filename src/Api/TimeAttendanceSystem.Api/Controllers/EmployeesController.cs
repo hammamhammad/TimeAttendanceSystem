@@ -1,16 +1,16 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TimeAttendanceSystem.Application.Employees.Commands.CreateEmployee;
-using TimeAttendanceSystem.Application.Employees.Commands.UpdateEmployee;
-using TimeAttendanceSystem.Application.Employees.Commands.DeleteEmployee;
-using TimeAttendanceSystem.Application.Employees.Commands.ToggleEmployeeStatus;
-using TimeAttendanceSystem.Application.Employees.Queries.GetEmployees;
-using TimeAttendanceSystem.Application.Employees.Queries.GetEmployeeById;
-using TimeAttendanceSystem.Application.ShiftAssignments.Commands.UpdateEmployeeShift;
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Application.Employees.Commands.CreateEmployee;
+using TecAxle.Hrms.Application.Employees.Commands.UpdateEmployee;
+using TecAxle.Hrms.Application.Employees.Commands.DeleteEmployee;
+using TecAxle.Hrms.Application.Employees.Commands.ToggleEmployeeStatus;
+using TecAxle.Hrms.Application.Employees.Queries.GetEmployees;
+using TecAxle.Hrms.Application.Employees.Queries.GetEmployeeById;
+using TecAxle.Hrms.Application.ShiftAssignments.Commands.UpdateEmployeeShift;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 /// <summary>
 /// REST API controller for comprehensive employee management operations in the time attendance system.

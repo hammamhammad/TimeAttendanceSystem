@@ -1,7 +1,7 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Employees.Commands.ToggleEmployeeStatus;
+namespace TecAxle.Hrms.Application.Employees.Commands.ToggleEmployeeStatus;
 
 /// <summary>
 /// Command to toggle employee active/inactive status

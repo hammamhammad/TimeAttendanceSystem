@@ -7,11 +7,13 @@ import { I18nService } from '../../../core/i18n/i18n.service';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { DefinitionListComponent, DefinitionItem } from '../../../shared/components/definition-list/definition-list.component';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
+import { AuditHistoryComponent } from '../../../shared/components/audit-history/audit-history.component';
+import { SectionCardComponent } from '../../../shared/components/section-card/section-card.component';
 
 @Component({
   selector: 'app-view-department',
   standalone: true,
-  imports: [RouterModule, LoadingSpinnerComponent, DefinitionListComponent, StatusBadgeComponent],
+  imports: [RouterModule, LoadingSpinnerComponent, DefinitionListComponent, StatusBadgeComponent, AuditHistoryComponent, SectionCardComponent],
   template: `
     <div class="container-fluid app-modern-view">
       <!-- Header -->
@@ -248,6 +250,13 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
             </div>
           </div>
         }
+
+        <!-- Audit History -->
+        <div class="mt-4">
+          <app-section-card [title]="i18n.t('history.title')" icon="fas fa-clock-rotate-left" headerClass="bg-light">
+            <app-audit-history [entityName]="'Department'" [entityId]="department()?.id" />
+          </app-section-card>
+        </div>
       } @else {
         <div class="alert alert-danger">
           <i class="fa-solid fa-exclamation-triangle me-2"></i>

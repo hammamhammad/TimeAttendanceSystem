@@ -3,9 +3,11 @@
 }
 
 .searchable-select .dropdown-menu {
-  border: 1px solid #dee2e6;
-  border-radius: 0.375rem;
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--app-gray-200, #EAECF0);
+  border-radius: var(--app-border-radius-md, 8px);
+  box-shadow: var(--app-shadow-lg);
+  max-height: 280px;
+  overflow-y: auto;
 }
 
 .searchable-select .dropdown-item {
@@ -17,21 +19,29 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-size: 13px;
+  color: var(--app-gray-700, #344054);
+  transition: background 0.1s;
+  border-bottom: 1px solid var(--app-gray-50, #F9FAFB);
+}
+
+.searchable-select .dropdown-item:last-child {
+  border-bottom: none;
 }
 
 .searchable-select .dropdown-item:hover:not(.disabled) {
-  background-color: #f8f9fa;
-  color: #495057;
+  background-color: var(--app-primary-50, #EEF2FF);
+  color: var(--app-gray-800, #1D2939);
 }
 
 .searchable-select .dropdown-item:focus:not(.disabled) {
-  background-color: #e9ecef;
-  color: #495057;
+  background-color: var(--app-primary-50, #EEF2FF);
+  color: var(--app-gray-800, #1D2939);
   outline: 0;
 }
 
 .searchable-select .dropdown-item.disabled {
-  color: #6c757d;
+  color: var(--app-gray-400, #98A2B3);
   cursor: not-allowed;
   pointer-events: none;
 }
@@ -52,22 +62,22 @@
 }
 
 .searchable-select .input-group .btn {
-  border-color: #ced4da;
+  border-color: var(--app-gray-300, #D0D5DD);
 }
 
 .searchable-select .input-group .btn:hover {
-  border-color: #adb5bd;
-  background-color: #e9ecef;
+  border-color: var(--app-gray-400, #98A2B3);
+  background-color: var(--app-gray-50, #F9FAFB);
 }
 
 .searchable-select .input-group .btn:focus {
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-  border-color: #80bdff;
+  box-shadow: 0 0 0 3px rgba(79, 107, 246, 0.12);
+  border-color: var(--app-primary, #4F6BF6);
 }
 
 .searchable-select .form-control:focus {
-  border-color: #80bdff;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  border-color: var(--app-primary, #4F6BF6);
+  box-shadow: 0 0 0 3px rgba(79, 107, 246, 0.12);
 }
 
 .searchable-select .form-control[readonly] {
@@ -85,26 +95,50 @@
 }
 
 .searchable-select .dropdown-menu::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--app-gray-50, #F9FAFB);
 }
 
 .searchable-select .dropdown-menu::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: var(--app-gray-300, #D0D5DD);
   border-radius: 3px;
 }
 
 .searchable-select .dropdown-menu::-webkit-scrollbar-thumb:hover {
-  background: #a1a1a1;
+  background: var(--app-gray-400, #98A2B3);
 }
 
 /* RTL Support */
-[dir="rtl"] .searchable-select .dropdown-item {
+:host-context([dir="rtl"]) .searchable-select .dropdown-item {
   text-align: right;
 }
 
-[dir="rtl"] .searchable-select .input-group .btn {
-  border-right: 1px solid #ced4da;
-  border-left: none;
+:host-context([dir="rtl"]) .searchable-select .form-control {
+  text-align: right;
+}
+
+:host-context([dir="rtl"]) .searchable-select .input-group {
+  direction: rtl;
+}
+
+/* Fix border-radius: input gets rounded on right, last button rounded on left */
+:host-context([dir="rtl"]) .searchable-select .input-group > .form-control {
+  border-top-right-radius: var(--app-border-radius-sm, 6px) !important;
+  border-bottom-right-radius: var(--app-border-radius-sm, 6px) !important;
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+
+:host-context([dir="rtl"]) .searchable-select .input-group > .btn:last-child,
+:host-context([dir="rtl"]) .searchable-select .input-group > .btn:only-of-type:last-child {
+  border-top-left-radius: var(--app-border-radius-sm, 6px) !important;
+  border-bottom-left-radius: var(--app-border-radius-sm, 6px) !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+:host-context([dir="rtl"]) .searchable-select .input-group > .btn:not(:last-child),
+:host-context([dir="rtl"]) .searchable-select .input-group > .input-group-text {
+  border-radius: 0 !important;
 }
 
 /* Responsive adjustments */
@@ -142,6 +176,6 @@
 
 /* Focus within */
 .searchable-select:focus-within .input-group .form-control {
-  border-color: #80bdff;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  border-color: var(--app-primary, #4F6BF6);
+  box-shadow: 0 0 0 3px rgba(79, 107, 246, 0.12);
 }

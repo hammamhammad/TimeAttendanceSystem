@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Branches.Commands.CreateBranch;
+namespace TecAxle.Hrms.Application.Branches.Commands.CreateBranch;
 
 public record CreateBranchCommand(
     string Code,

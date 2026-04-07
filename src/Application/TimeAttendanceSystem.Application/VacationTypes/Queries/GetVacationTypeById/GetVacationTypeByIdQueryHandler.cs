@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.VacationTypes.Queries.GetVacationTypeById;
+namespace TecAxle.Hrms.Application.VacationTypes.Queries.GetVacationTypeById;
 
 /// <summary>
 /// Query handler for retrieving a single vacation type with comprehensive details and operational permissions.
@@ -137,7 +137,10 @@ public class GetVacationTypeByIdQueryHandler : BaseHandler<GetVacationTypeByIdQu
                 vacationType.CreatedAtUtc,
                 vacationType.ModifiedAtUtc,
                 canBeModified,
-                canBeDeleted
+                canBeDeleted,
+                vacationType.AllowHalfDay,
+                vacationType.AllowEncashment,
+                vacationType.EncashmentMaxDays
             );
 
             return Result.Success(detailDto);

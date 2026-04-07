@@ -1,0 +1,262 @@
+<div class="executive-dashboard-page">
+  <app-page-header [title]="i18n.t('analytics.executive_dashboard')"></app-page-header>
+
+  <!-- Date Range Filter -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label">{{ i18n.t('analytics.start_date') }}</label>
+          <input type="date" class="form-control" [ngModel]="startDate()" (ngModelChange)="startDate.set($event)">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">{{ i18n.t('analytics.end_date') }}</label>
+          <input type="date" class="form-control" [ngModel]="endDate()" (ngModelChange)="endDate.set($event)">
+        </div>
+        <div class="col-md-3">
+          <button class="btn btn-primary" (click)="onFilter()">
+            <i class="fa-solid fa-filter me-1"></i>
+            {{ i18n.t('analytics.apply_filter') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <app-loading-spinner></app-loading-spinner>
+  } @else if (data()) {
+    <!-- KPI Cards Row 1 -->
+    <div class="row g-4 mb-4">
+      <!-- Total Active Headcount -->
+      <div class="col-md-6 col-lg-3">
+        <div class="card kpi-card h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <p class="kpi-label mb-1">{{ i18n.t('analytics.total_headcount') }}</p>
+                <h3 class="kpi-value mb-0">{{ formatNumber(data()!.headcount?.totalActive) }}</h3>
+              </div>
+              <div class="kpi-icon bg-primary-subtle">
+                <i class="fa-solid fa-users text-primary"></i>
+              </div>
+            </div>
+            <div class="mt-2">
+              <span class="text-muted small">{{ i18n.t('analytics.active_employees') }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Attrition Rate -->
+      <div class="col-md-6 col-lg-3">
+        <div class="card kpi-card h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <p class="kpi-label mb-1">{{ i18n.t('analytics.attrition_rate') }}</p>
+                <h3 class="kpi-value mb-0">{{ formatPercent(data()!.attrition?.annualAttritionRate) }}</h3>
+              </div>
+              <div class="kpi-icon bg-danger-subtle">
+                <i class="fa-solid fa-user-minus text-danger"></i>
+              </div>
+            </div>
+            <div class="mt-2">
+              <span class="text-muted small">{{ data()!.attrition?.totalSeparations12Months ?? 0 }} {{ i18n.t('analytics.separations_12m') }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- New Hires This Month -->
+      <div class="col-md-6 col-lg-3">
+        <div class="card kpi-card h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <p class="kpi-label mb-1">{{ i18n.t('analytics.new_hires') }}</p>
+                <h3 class="kpi-value mb-0">{{ formatNumber(data()!.headcount?.newHiresThisMonth) }}</h3>
+              </div>
+              <div class="kpi-icon bg-success-subtle">
+                <i class="fa-solid fa-user-plus text-success"></i>
+              </div>
+            </div>
+            <div class="mt-2">
+              <span class="text-muted small">{{ i18n.t('analytics.this_month') }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overtime Hours This Month -->
+      <div class="col-md-6 col-lg-3">
+        <div class="card kpi-card h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <p class="kpi-label mb-1">{{ i18n.t('analytics.avg_overtime_hours') }}</p>
+                <h3 class="kpi-value mb-0">{{ formatNumber(data()!.overtime?.totalOvertimeHoursThisMonth) }}</h3>
+              </div>
+              <div class="kpi-icon bg-warning-subtle">
+                <i class="fa-solid fa-clock text-warning"></i>
+              </div>
+            </div>
+            <div class="mt-2">
+              <span class="text-muted small">{{ i18n.t('analytics.this_month') }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI Cards Row 2 -->
+    <div class="row g-4 mb-4">
+      <!-- Employees On Leave Today -->
+      <div class="col-md-6 col-lg-3">
+        <div class="card kpi-card h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <p class="kpi-label mb-1">{{ i18n.t('analytics.leave_utilization') }}</p>
+                <h3 class="kpi-value mb-0">{{ formatNumber(data()!.leave?.employeesOnLeaveToday) }}</h3>
+              </div>
+              <div class="kpi-icon bg-info-subtle">
+                <i class="fa-solid fa-calendar-minus text-info"></i>
+              </div>
+            </div>
+            <div class="mt-2">
+              <span class="text-muted small">{{ i18n.t('analytics.on_leave_today') }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Training Completion Rate -->
+      <div class="col-md-6 col-lg-3">
+        <div class="card kpi-card h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <p class="kpi-label mb-1">{{ i18n.t('analytics.training_completion') }}</p>
+                <h3 class="kpi-value mb-0">{{ formatPercent(data()!.training?.completionRate) }}</h3>
+              </div>
+              <div class="kpi-icon bg-success-subtle">
+                <i class="fa-solid fa-graduation-cap text-success"></i>
+              </div>
+            </div>
+            <div class="mt-2">
+              <span class="text-muted small">{{ i18n.t('analytics.overall_rate') }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Latest Payroll Net -->
+      <div class="col-md-6 col-lg-3">
+        <div class="card kpi-card h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <p class="kpi-label mb-1">{{ i18n.t('analytics.payroll_net') }}</p>
+                <h3 class="kpi-value mb-0">{{ formatCurrency(data()!.payroll?.latestNet) }}</h3>
+              </div>
+              <div class="kpi-icon bg-primary-subtle">
+                <i class="fa-solid fa-money-bill-wave text-primary"></i>
+              </div>
+            </div>
+            <div class="mt-2">
+              <span class="text-muted small">{{ data()!.payroll?.employeeCount ?? 0 }} {{ i18n.t('analytics.employees') }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Open Positions -->
+      <div class="col-md-6 col-lg-3">
+        <div class="card kpi-card h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <p class="kpi-label mb-1">{{ i18n.t('analytics.open_positions') }}</p>
+                <h3 class="kpi-value mb-0">{{ formatNumber(data()!.recruitment?.openPositions) }}</h3>
+              </div>
+              <div class="kpi-icon bg-warning-subtle">
+                <i class="fa-solid fa-briefcase text-warning"></i>
+              </div>
+            </div>
+            <div class="mt-2">
+              <span class="text-muted small">{{ i18n.t('analytics.active_requisitions') }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Navigation -->
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">{{ i18n.t('analytics.detailed_analytics') }}</h5>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-4 col-lg-3">
+            <a routerLink="/analytics/headcount" class="nav-card d-block text-decoration-none p-3 rounded border">
+              <i class="fa-solid fa-users text-primary mb-2 fs-4"></i>
+              <div class="fw-semibold">{{ i18n.t('analytics.headcount_title') }}</div>
+              <small class="text-muted">{{ i18n.t('analytics.headcount_desc') }}</small>
+            </a>
+          </div>
+          <div class="col-md-4 col-lg-3">
+            <a routerLink="/analytics/attrition" class="nav-card d-block text-decoration-none p-3 rounded border">
+              <i class="fa-solid fa-user-minus text-danger mb-2 fs-4"></i>
+              <div class="fw-semibold">{{ i18n.t('analytics.attrition_title') }}</div>
+              <small class="text-muted">{{ i18n.t('analytics.attrition_desc') }}</small>
+            </a>
+          </div>
+          <div class="col-md-4 col-lg-3">
+            <a routerLink="/analytics/recruitment" class="nav-card d-block text-decoration-none p-3 rounded border">
+              <i class="fa-solid fa-briefcase text-success mb-2 fs-4"></i>
+              <div class="fw-semibold">{{ i18n.t('analytics.recruitment_title') }}</div>
+              <small class="text-muted">{{ i18n.t('analytics.recruitment_desc') }}</small>
+            </a>
+          </div>
+          <div class="col-md-4 col-lg-3">
+            <a routerLink="/analytics/leave" class="nav-card d-block text-decoration-none p-3 rounded border">
+              <i class="fa-solid fa-calendar-minus text-info mb-2 fs-4"></i>
+              <div class="fw-semibold">{{ i18n.t('analytics.leave_title') }}</div>
+              <small class="text-muted">{{ i18n.t('analytics.leave_desc') }}</small>
+            </a>
+          </div>
+          <div class="col-md-4 col-lg-3">
+            <a routerLink="/analytics/overtime" class="nav-card d-block text-decoration-none p-3 rounded border">
+              <i class="fa-solid fa-clock text-warning mb-2 fs-4"></i>
+              <div class="fw-semibold">{{ i18n.t('analytics.overtime_title') }}</div>
+              <small class="text-muted">{{ i18n.t('analytics.overtime_desc') }}</small>
+            </a>
+          </div>
+          <div class="col-md-4 col-lg-3">
+            <a routerLink="/analytics/training" class="nav-card d-block text-decoration-none p-3 rounded border">
+              <i class="fa-solid fa-graduation-cap text-success mb-2 fs-4"></i>
+              <div class="fw-semibold">{{ i18n.t('analytics.training_title') }}</div>
+              <small class="text-muted">{{ i18n.t('analytics.training_desc') }}</small>
+            </a>
+          </div>
+          <div class="col-md-4 col-lg-3">
+            <a routerLink="/analytics/payroll" class="nav-card d-block text-decoration-none p-3 rounded border">
+              <i class="fa-solid fa-money-check-alt text-primary mb-2 fs-4"></i>
+              <div class="fw-semibold">{{ i18n.t('analytics.payroll_title') }}</div>
+              <small class="text-muted">{{ i18n.t('analytics.payroll_desc') }}</small>
+            </a>
+          </div>
+          <div class="col-md-4 col-lg-3">
+            <a routerLink="/analytics/engagement" class="nav-card d-block text-decoration-none p-3 rounded border">
+              <i class="fa-solid fa-heart text-danger mb-2 fs-4"></i>
+              <div class="fw-semibold">{{ i18n.t('analytics.engagement_title') }}</div>
+              <small class="text-muted">{{ i18n.t('analytics.engagement_desc') }}</small>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

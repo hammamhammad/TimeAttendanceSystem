@@ -1,0 +1,29 @@
+<div class="on-call-page">
+  <app-page-header [title]="i18n.t('onCall.title')" />
+
+  <app-unified-filter
+    [searchPlaceholder]="i18n.t('common.search')"
+    [showAddButton]="true"
+    [addButtonText]="i18n.t('onCall.create')"
+    [showRefreshButton]="true"
+    [refreshButtonText]="i18n.t('common.refresh')"
+    [refreshing]="loading()"
+    (searchChange)="onSearchChange($event)"
+    (add)="navigateToCreate()"
+    (refresh)="onRefreshData()">
+  </app-unified-filter>
+
+  <app-data-table
+    [columns]="tableColumns()"
+    [data]="tableData()"
+    [loading]="loading"
+    [totalItems]="totalCount()"
+    [currentPage]="currentPage()"
+    [pageSize]="pageSize()"
+    [actions]="tableActions()"
+    [paginated]="true"
+    [showPagination]="true"
+    (pageChange)="onPageChange($event)"
+    (actionClick)="onTableAction($event)">
+  </app-data-table>
+</div>

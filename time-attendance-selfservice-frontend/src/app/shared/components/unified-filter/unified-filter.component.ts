@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, signal, inject, OnInit, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { FILTER_CONFIGURATIONS } from '../../../core/configs/filter-configurations';
@@ -7,7 +7,7 @@ import { FILTER_CONFIGURATIONS } from '../../../core/configs/filter-configuratio
 @Component({
   selector: 'app-unified-filter',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   template: `
     <div class="search-filter">
       <div class="row g-3 align-items-center">
@@ -40,7 +40,7 @@ import { FILTER_CONFIGURATIONS } from '../../../core/configs/filter-configuratio
           <div class="d-flex justify-content-md-end justify-content-center gap-2 flex-wrap">
             @if (showRefreshButton) {
               <button
-                class="btn btn-outline-info"
+                class="btn btn-outline-secondary"
                 type="button"
                 [disabled]="refreshing"
                 (click)="onRefresh()">
@@ -50,7 +50,7 @@ import { FILTER_CONFIGURATIONS } from '../../../core/configs/filter-configuratio
             }
             @if (showAddButton) {
               <button
-                class="btn btn-success"
+                class="btn btn-primary"
                 type="button"
                 (click)="onAdd()">
                 <i class="fas fa-plus me-2"></i>

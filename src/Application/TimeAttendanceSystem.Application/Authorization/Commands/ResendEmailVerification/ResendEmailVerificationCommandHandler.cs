@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Application.Authorization.Commands.ResendEmailVerification;
+namespace TecAxle.Hrms.Application.Authorization.Commands.ResendEmailVerification;
 
 public class ResendEmailVerificationCommandHandler : BaseHandler<ResendEmailVerificationCommand, Result<bool>>
 {

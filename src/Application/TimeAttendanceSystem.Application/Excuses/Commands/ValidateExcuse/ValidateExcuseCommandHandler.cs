@@ -1,10 +1,10 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Excuses;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Excuses;
 
-namespace TimeAttendanceSystem.Application.Excuses.Commands.ValidateExcuse;
+namespace TecAxle.Hrms.Application.Excuses.Commands.ValidateExcuse;
 
 /// <summary>
 /// Command handler for validating excuse creation parameters.

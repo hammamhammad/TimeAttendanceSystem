@@ -1,14 +1,14 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TimeAttendanceSystem.Api.Models;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Attendance.Queries.GetMonthlyReport;
-using TimeAttendanceSystem.Application.Attendance.Queries.GetLeaveExcuseDetails;
-using TimeAttendanceSystem.Domain.Attendance;
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Api.Models;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Attendance.Queries.GetMonthlyReport;
+using TecAxle.Hrms.Application.Attendance.Queries.GetLeaveExcuseDetails;
+using TecAxle.Hrms.Domain.Attendance;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 /// <summary>
 /// API controller for attendance management operations.

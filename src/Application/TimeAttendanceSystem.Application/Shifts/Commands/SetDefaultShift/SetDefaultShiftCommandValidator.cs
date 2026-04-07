@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace TimeAttendanceSystem.Application.Shifts.Commands.SetDefaultShift;
+namespace TecAxle.Hrms.Application.Shifts.Commands.SetDefaultShift;
 
 public class SetDefaultShiftCommandValidator : AbstractValidator<SetDefaultShiftCommand>
 {

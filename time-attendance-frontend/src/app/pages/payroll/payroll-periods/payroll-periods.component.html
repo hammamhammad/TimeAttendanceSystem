@@ -1,0 +1,44 @@
+<div class="app-list-page">
+  <app-page-header [title]="i18n.t('payroll.periods.title')" />
+
+  <app-unified-filter
+    [showAddButton]="true"
+    [addButtonText]="i18n.t('payroll.periods.create')"
+    [showRefreshButton]="true"
+    [refreshing]="loading()"
+    (add)="create()"
+    (refresh)="loadData()">
+  </app-unified-filter>
+
+  <app-data-table
+    [data]="items()"
+    [columns]="tableColumns"
+    [actions]="tableActions"
+    [currentPage]="currentPage()"
+    [totalItems]="totalCount()"
+    [pageSize]="pageSize()"
+    [loading]="loading"
+    [emptyTitle]="i18n.t('payroll.periods.no_records')"
+    [emptyMessage]="i18n.t('payroll.periods.no_records_message')"
+    [showPagination]="true"
+    (actionClick)="onActionClick($event)"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+    <ng-template #cellTemplate let-item let-column="column">
+      @if (column.key === 'status') {
+        <app-status-badge
+          [status]="getStatusVariant(item.status)"
+          [label]="i18n.t('payroll.statuses.' + item.status)">
+        </app-status-badge>
+      } @else if (column.key === 'startDate' || column.key === 'endDate') {
+        {{ formatDate(item[column.key]) }}
+      } @else if (column.key === 'totalNetSalary') {
+        {{ formatCurrency(item.totalNetSalary) }}
+      } @else if (column.key === 'periodType') {
+        {{ i18n.t('payroll.period_types.' + item.periodType) }}
+      } @else {
+        {{ item[column.key] }}
+      }
+    </ng-template>
+  </app-data-table>
+</div>

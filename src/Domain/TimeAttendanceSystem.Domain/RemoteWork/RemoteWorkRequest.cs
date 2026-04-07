@@ -1,9 +1,9 @@
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Domain.Employees;
-using TimeAttendanceSystem.Domain.Users;
-using TimeAttendanceSystem.Domain.Workflows;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Employees;
+using TecAxle.Hrms.Domain.Users;
+using TecAxle.Hrms.Domain.Workflows;
 
-namespace TimeAttendanceSystem.Domain.RemoteWork;
+namespace TecAxle.Hrms.Domain.RemoteWork;
 
 /// <summary>
 /// Domain entity representing a remote work request for an employee.

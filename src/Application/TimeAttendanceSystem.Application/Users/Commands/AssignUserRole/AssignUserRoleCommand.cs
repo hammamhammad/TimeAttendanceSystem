@@ -1,7 +1,7 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Users.Commands.AssignUserRole;
+namespace TecAxle.Hrms.Application.Users.Commands.AssignUserRole;
 
 public record AssignUserRoleCommand : IRequest<Result<Unit>>
 {

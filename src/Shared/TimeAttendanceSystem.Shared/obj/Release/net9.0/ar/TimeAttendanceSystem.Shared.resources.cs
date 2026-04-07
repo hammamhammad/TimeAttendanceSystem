@@ -10,12 +10,12 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("TimeAttendanceSystem.Shared")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("TecAxle.Hrms.Shared")]
 [assembly: System.Reflection.AssemblyCopyrightAttribute(" ")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1783e841af4792cffa1da217648f3fe101a78366")]
-[assembly: System.Reflection.AssemblyProductAttribute("TimeAttendanceSystem.Shared")]
-[assembly: System.Reflection.AssemblyTitleAttribute("TimeAttendanceSystem.Shared")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+423d57ab39bee39b5cb6f7ec3ff77b547ab387b7")]
+[assembly: System.Reflection.AssemblyProductAttribute("TecAxle.Hrms.Shared")]
+[assembly: System.Reflection.AssemblyTitleAttribute("TecAxle.Hrms.Shared")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
 [assembly: System.Reflection.AssemblyCultureAttribute("ar")]
 

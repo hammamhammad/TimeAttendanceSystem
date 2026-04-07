@@ -1,7 +1,9 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.Excuses.Commands.CreateExcusePolicy;
+namespace TecAxle.Hrms.Application.Excuses.Commands.CreateExcusePolicy;
 
 /// <summary>
 /// CQRS command for creating a new excuse policy configuration.
@@ -37,6 +39,7 @@ namespace TimeAttendanceSystem.Application.Excuses.Commands.CreateExcusePolicy;
 /// - Previous policies deactivated automatically
 /// - Policy hierarchy: Branch-specific overrides organization-wide
 /// </remarks>
+[RequiresModule(SystemModule.LeaveManagement)]
 public record CreateExcusePolicyCommand(
     long? BranchId,
     int MaxPersonalExcusesPerMonth,

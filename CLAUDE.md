@@ -2,7 +2,9 @@
 
 ## System Overview
 
-The Time Attendance System is a comprehensive enterprise-grade workforce management solution that provides:
+The Time Attendance System (ClockN) is a comprehensive enterprise-grade multi-tenant SaaS workforce management solution that provides:
+- **Multi-Tenant SaaS Architecture**: Tenant isolation, subscription plans, module entitlements, and usage limits
+- **Subscription & Entitlements**: Configurable plans (Starter/Professional/Enterprise), per-tenant module enable/disable, feature flags, and usage limits
 - **Time & Attendance Tracking**: Automated attendance recording, overtime calculation, and reporting
 - **Leave Management**: Vacation requests, leave balances, accruals, and approvals
 - **Employee Self-Service Portal**: Separate frontend for employees to manage their own requests
@@ -12,6 +14,12 @@ The Time Attendance System is a comprehensive enterprise-grade workforce managem
 - **Remote Work Management**: Policies and requests for remote/hybrid work
 - **Real-Time Notifications**: SignalR-based in-app notification system
 - **Comprehensive Reporting**: Analytics, dashboards, and audit logging
+- **Recruitment & Hiring**: Job requisitions, postings, candidates, applications, interviews, and offers
+- **Onboarding**: Templates, processes, tasks, and document management
+- **Performance Management**: Review cycles, reviews, goals, competencies, PIPs, and 360 feedback
+- **Payroll & Compensation**: Salary structures, payroll periods, allowances, and adjustments
+- **Employee Lifecycle**: Contracts, promotions, transfers, and offboarding
+- **File Upload & Attachments**: Centralized file storage with entity-linked attachments
 
 ---
 
@@ -25,16 +33,70 @@ The Time Attendance System is a comprehensive enterprise-grade workforce managem
 - Role-based access control (RBAC)
 - Permission-based authorization
 - Branch-scoped access control (multi-tenancy)
+- Tenant-scoped access via `tenant_id` JWT claim
 - Session management and blacklisted tokens
 - Password policies and history tracking
 - Login attempt tracking and lockout
 
+#### 1b. Multi-Tenant SaaS & Subscription Architecture
+- **Tenant Entity**: Each company/organization is a Tenant with subdomain, branding, company info, and regional defaults
+- **Tenant-Branch Relationship**: Branches belong to a Tenant via `TenantId` FK — all data isolation flows through this
+- **Tenant Context Pipeline**: `tenant_id` claim in JWT, `TenantResolutionMiddleware`, `ITenantContext` scoped service
+- **Module Registry**: 26 system modules defined in `SystemModule` enum with metadata, permission mappings, dependency rules, and background job associations
+- **Subscription Plans**: `SubscriptionPlan` entity with tiers (Starter/Professional/Enterprise/Custom), pricing, module entitlements, feature flags, and usage limits
+- **Tenant Subscriptions**: `TenantSubscription` links tenant to plan with billing cycle, status, period tracking
+- **Module Add-Ons**: `TenantModuleAddOn` for optional modules purchased on top of base plan
+- **Feature Overrides**: `TenantFeatureOverride` for per-tenant feature flag overrides (sales/beta access)
+- **Entitlement Service**: `IEntitlementService` with per-tenant caching (5-min TTL), checks modules/features/limits
+- **MediatR Pipeline Behaviors**: `[RequiresModule]` attribute + `ModuleEntitlementBehavior` for automatic module enforcement; `[RequiresLimit]` + `UsageLimitBehavior` for usage limit enforcement. **173 commands/queries decorated** across all non-Core modules with two-tier access: commands fully blocked, queries allow read-only historical access via `AllowReadWhenDisabled = true`
+- **Module-Aware Background Jobs**: `ModuleAwareJob` abstract base class — iterates tenants, skips those without required module
+- **Frontend Entitlement Service**: Signal-based `EntitlementService` with `isModuleEnabled()` and `isModuleReadOnly()`, `moduleGuard` on 201 routes (strict mode for create/edit, read-only for list/view), module-tagged navigation items, `ModuleStatusBannerComponent` for read-only warning
+- **Default Plans**: Starter (5 modules, 50 employees), Professional (13 modules, 500 employees), Enterprise (all 26 modules, unlimited)
+- **Tenant Management UI**: Admin pages for CRUD tenants, view/assign/change/cancel subscriptions, subscription plan cards
+
+#### 1d. Operational Strength & Module Lifecycle (Phase 4)
+- **Module Entitlement Enforcement**: All 173 non-Core commands/queries decorated with `[RequiresModule(SystemModule.X)]`. Commands are fully blocked when module disabled; queries allow historical data access via `AllowReadWhenDisabled = true`. SystemAdmin bypasses all checks.
+- **Reports Module Checks**: `ReportsController` checks `IEntitlementService.IsModuleEnabledAsync()` per endpoint — attendance→TimeAttendance, leave→LeaveManagement, payroll→Payroll, contracts→EmployeeLifecycle, documents→Documents, certifications→Training, compliance→EmployeeLifecycle. SystemAdmin bypasses.
+- **Entitlement Audit Trail**: `EntitlementChangeLog` entity tracks all subscription/entitlement state transitions (plan changes, module enable/disable, cancellations). Append-only with before/after JSON snapshots. Integrated into `ChangePlanCommandHandler` and `CancelSubscriptionCommandHandler`.
+- **Safe Module Deactivation**: `IModuleDeactivationService` orchestrates module disable/enable. On deactivation: in-flight workflows are frozen (`WorkflowStatus.Frozen = 7`), previous status stored in `ContextJson` for restoration. On reactivation: frozen workflows resume from previous state.
+- **Workflow Freeze/Unfreeze**: `WorkflowEntityType` → `SystemModule` mapping in `ModuleMetadata.GetModuleForEntityType()`. `WorkflowInstance.CanBeModified()` returns false for frozen workflows. `FrozenWorkflowCleanupJob` auto-cancels workflows frozen > 90 days.
+- **Cross-Module Dependency Enforcement**: `ChangePlanCommandHandler` validates `ModuleDependencyRules.GetDependentModules()` before allowing plan downgrade. Cannot disable a module that enabled modules depend on.
+- **Frontend Read-Only Mode**: `moduleGuard` allows list/view route access when module disabled (read-only), blocks create/edit routes (`moduleStrict: true`). `ModuleStatusBannerComponent` shows warning banner. `UnifiedFilterComponent` hides Add button via `[readOnly]` input.
+
+#### 1c. Tenant Configuration & Policy Framework
+- **TenantSettings Entity**: Centralized strongly-typed operational settings per tenant covering 7 categories (General, Attendance, Leave, Payroll, Approval, Notification, Mobile, Security). One row per tenant in `TenantSettings` table.
+- **BranchSettingsOverride Entity**: Branch-level overrides for attendance and mobile settings. All properties nullable — null = inherit from TenantSettings. One optional row per branch in `BranchSettingsOverrides` table.
+- **DepartmentSettingsOverride Entity**: Department-level overrides with limited scope (default shift, approval comments only). One optional row per department in `DepartmentSettingsOverrides` table.
+- **Settings Inheritance Chain**: Platform Defaults → Tenant Settings → Branch Overrides → Department Overrides. Resolved by `ITenantSettingsResolver` service with 5-min caching and per-field source tracking ("tenant", "branch", "department").
+- **PolicyTemplate / PolicyTemplateItem Entities**: Named collections of policy configurations (JSON blobs) for quick tenant setup. System templates and tenant-created custom templates. Supported PolicyTypes: `TenantSettings`, `VacationType`, `ExcusePolicy`, `Shift` (with ShiftPeriods), `OffDay`, `OvertimeConfiguration`, `RemoteWorkPolicy`.
+- **Seeded Policy Templates** (8 total, auto-seeded on first run):
+  - **Saudi Standard** (`saudi-standard`, SA): 12 items — TenantSettings, 7 vacation types (Annual/Sick/Marriage/Maternity/Paternity/Bereavement/Hajj per Saudi Labor Law Articles 109/114/117/151), ExcusePolicy, Shift (Sun-Thu 08:00-17:00), OffDay (Fri-Sat), OvertimeConfiguration
+  - **UAE Standard** (`uae-standard`, AE): 11 items — TenantSettings, 6 vacation types per Decree-Law 33/2021, ExcusePolicy, Shift (Mon-Fri 09:00-18:00), OffDay (Sat-Sun), OvertimeConfiguration
+  - **6 Industry Templates** (SA): Healthcare (12h rotating shifts), Construction (06:00-14:00), Technology (flexible + remote work), Retail (split shifts), Government (07:30-14:30), Education (07:00-14:00)
+- **SetupStep Entity**: Tracks tenant onboarding completion per step (company_info, branches, departments, shifts, vacation_types, excuse_policies, workflows, employees, payroll). Auto-detection logic checks DB for actual data.
+- **Auto-Initialization**: When a tenant is created, `TenantSettings` defaults and 9 `SetupStep` rows are automatically created.
+- **SystemAdmin Fallback**: `BaseHandler.ResolveTenantIdAsync()` allows SystemAdmin users (who have no `tenant_id` JWT claim) to access tenant configuration by falling back to the first active tenant.
+- **API Endpoints**:
+  - `GET/PUT /api/v1/tenant-configuration` — tenant settings CRUD
+  - `GET /api/v1/tenant-configuration/resolved?branchId=&deptId=` — resolved settings with inheritance + source tracking
+  - `GET/PUT/DELETE /api/v1/tenant-configuration/branches/{id}` — branch overrides
+  - `GET/POST /api/v1/tenant-configuration/setup-status` — setup tracking with auto-detection
+  - `GET /api/v1/policy-templates?region=&industry=` — policy template listing with region/industry filters
+  - `GET /api/v1/policy-templates/{id}` — get template by ID with items and ConfigurationJson
+  - `POST /api/v1/policy-templates` — create custom tenant template
+  - `PUT /api/v1/policy-templates/{id}` — update template (system templates require SystemAdmin)
+  - `DELETE /api/v1/policy-templates/{id}` — delete custom template (system templates cannot be deleted)
+  - `POST /api/v1/policy-templates/{id}/apply?branchId=` — apply template to tenant or branch
+- **Frontend Tenant Administration Console**: Sidebar + content layout at `/settings/tenant-config` with 9 child routes (General, Attendance, Leave, Approval, Notification, Mobile, Security, Policy Templates, Setup Status). External policy links (Excuse Policies, Overtime, Workflows, etc.) are permission-gated.
+- **Frontend Service**: `TenantConfigurationService` in `time-attendance-frontend/src/app/pages/settings/tenant-configuration/services/`
+
 #### 2. Organization Structure
-- **Branches**: Multi-branch organization support with branch-scoped data, GPS geofencing (latitude, longitude, radius)
+- **Tenants**: Top-level company/organization entity — owns branches, has subscription plan, company info, and regional defaults
+- **Branches**: Multi-branch organization support with branch-scoped data, GPS geofencing (latitude, longitude, radius). Each branch belongs to a Tenant via `TenantId`.
 - **Departments**: Hierarchical department structure (parent-child relationships)
 - **Employees**: Complete employee lifecycle management
 - **Users**: User accounts with role and branch assignments
-- **Roles & Permissions**: Fine-grained permission system
+- **Roles & Permissions**: Fine-grained permission system (70+ resources, 26 actions, 223+ authorization policies)
 
 #### 3. Time & Attendance
 - **Attendance Records**: Daily automated generation of attendance records
@@ -195,6 +257,63 @@ The Time Attendance System is a comprehensive enterprise-grade workforce managem
 - **Read Tracking**: Mark notifications as read
 - **Action URLs**: Navigate directly to related entities
 
+#### 19. Recruitment & Hiring
+- **Job Requisitions**: Create, approve, and track hiring requests with priority, budget, and target dates
+- **Job Postings**: Publish requisitions internally/externally with descriptions, requirements, and benefits
+- **Candidates**: Manage candidate profiles with resumes, skills, experience, and salary expectations
+- **Job Applications**: Track applications through pipeline stages (Applied, Screening, Interview, Assessment, Offered, Hired, Rejected)
+- **Interviews**: Schedule phone, video, in-person, panel, technical, and HR interviews with multiple interviewers
+- **Interview Feedback**: Collect structured feedback with technical, communication, culture fit, and overall ratings
+- **Offer Letters**: Generate, approve, send, and track offer letters with salary, benefits, and terms
+- **Recruitment Dashboard**: Pipeline analytics, time-to-hire metrics, and source effectiveness
+
+#### 20. Onboarding
+- **Onboarding Templates**: Reusable task templates with categories (Documentation, IT, HR, Training, Equipment, Access, Introduction)
+- **Onboarding Processes**: Employee-specific onboarding instances created from templates
+- **Onboarding Tasks**: Track task completion with priorities, due dates, assignees, and mandatory flags
+- **Onboarding Documents**: File upload and document management per onboarding process
+- **Onboarding Dashboard**: Active processes, completion rates, overdue tracking, and task distribution by category
+
+#### 21. Performance Management
+- **Review Cycles**: Define review periods (Annual, Semi-Annual, Quarterly, Monthly, Probation, Project-Based, 360-Degree)
+- **Performance Reviews**: Structured reviews with overall ratings, strengths, areas for improvement, and goals
+- **Goals & Objectives**: SMART goal setting with progress tracking and weight-based scoring
+- **Competency Framework**: Define competencies with proficiency levels and department-specific requirements
+- **Performance Improvement Plans (PIPs)**: Formal improvement plans with milestones, check-ins, and outcomes
+- **360-Degree Feedback**: Multi-rater feedback collection from managers, peers, direct reports, and self
+- **Performance Dashboard**: Rating distributions, goal completion rates, and review cycle progress
+
+#### 22. Employee Lifecycle Management
+- **Employee Contracts**: Contract creation, activation, renewal, termination, and document attachment
+- **Salary Adjustments**: Annual increments, promotions, market adjustments, and corrections with approval workflow
+- **Employee Promotions**: Track promotions with salary changes, title changes, and effective dates
+- **Employee Transfers**: Inter-branch and inter-department transfers with history tracking
+- **Job Grades**: Grade structure with salary ranges for compensation planning
+
+#### 23. Payroll & Compensation
+- **Salary Structures**: Define salary components (Basic, HRA, Transport, etc.) with calculation types
+- **Payroll Periods**: Monthly payroll processing with record generation and finalization
+- **Allowance Types & Policies**: Configurable allowance types with eligibility rules and calculation methods
+- **Allowance Assignments**: Assign allowances to employees with effective date ranges
+- **Allowance Requests**: Employee-initiated allowance requests with approval workflow
+- **End-of-Service Benefits**: Saudi labor law compliant EOS calculation
+
+#### 24. Offboarding
+- **Resignation Requests**: Employee resignation submission with notice period tracking
+- **Termination Records**: Employment termination with reason classification and documentation
+- **Exit Interviews**: Structured exit interview feedback collection
+- **Clearance Checklists**: Department-specific clearance items with completion tracking
+- **Final Settlements**: Calculate final settlement including pending salary, leave encashment, and EOS
+
+#### 25. File Upload & Attachment System
+- **File Storage**: Local disk storage in `uploads/` directory (configurable for cloud in production)
+- **Upload API**: `POST /api/v1/files/upload` - multipart form data, 10MB max
+- **Download API**: `GET /api/v1/files/{storedFileName}`
+- **Reusable Component**: `FileUploadComponent` in `shared/components/file-upload/`
+- **Supported Types**: PDF, DOC, DOCX, JPG, JPEG, PNG, XLSX
+- **Entity Tracking**: `FileAttachment` entity links files to any entity via EntityType + EntityId
+- **Integrated Forms**: File upload integrated into employee edit (photo), contracts (document), salary adjustments (supporting docs), candidates (resume), applications (cover letter), offer letters (PDF), onboarding processes (documents), and allowance requests (supporting documents)
+
 ---
 
 ## General Development Rules
@@ -239,7 +358,8 @@ The Time Attendance System is a comprehensive enterprise-grade workforce managem
 - Use Angular Signals for reactive state management
 - **All user-facing text must use `i18n.t('key')`** - never hardcode English strings in templates
 - **Component CSS RTL**: Use `:host-context([dir="rtl"])` instead of `:root[dir="rtl"]` for RTL styles in component CSS files (Angular view encapsulation requires this)
-- **CSS Variables**: Use `var(--app-*)` CSS variables from `styles/variables.css` instead of hardcoded hex colors
+- **CSS Variables**: Use `var(--app-*)` CSS variables from `styles/variables.css` and `styles/erp-tokens.css` instead of hardcoded hex colors
+- **ERP Design System**: The UI follows the ERP Design System (`ERP_Design_System.html`). All colors, typography, and component styles are defined via CSS tokens in `erp-tokens.css`
 
 ---
 
@@ -286,6 +406,44 @@ When creating list pages, **always use**:
 - `BulkActionsToolbarComponent` for bulk operations
 - `PaginationComponent` for pagination
 - `EmptyStateComponent` for empty states
+
+**Required List Page Pattern** (IMPORTANT):
+```html
+<div class="xxx-page">
+  <!-- Page Header - NO child content, NO buttons inside -->
+  <app-page-header [title]="i18n.t('module.title')" />
+
+  <!-- Unified Filter - handles Search, Refresh, and Add buttons -->
+  <app-unified-filter
+    [searchPlaceholder]="i18n.t('module.search_placeholder')"
+    [showAddButton]="true"
+    [addButtonText]="i18n.t('module.create')"
+    [showRefreshButton]="true"
+    [refreshButtonText]="i18n.t('common.refresh')"
+    [refreshing]="loading()"
+    (searchChange)="onSearchChange($event)"
+    (add)="navigateToCreate()"
+    (refresh)="onRefreshData()">
+  </app-unified-filter>
+
+  <!-- Data Table -->
+  <app-data-table ... />
+</div>
+```
+
+**NEVER** put buttons inside `<app-page-header>` on list pages. The "Create/Add" button is rendered by `<app-unified-filter>` via `[showAddButton]` and `[addButtonText]`. Use `(add)` event for navigation.
+
+**Table Actions** must use `computed<TableAction[]>()` signal with `condition` functions for conditional visibility:
+```typescript
+tableActions = computed<TableAction[]>(() => [
+  { key: 'view', label: this.i18n.t('common.view'), icon: 'fa-eye', color: 'info' },
+  { key: 'edit', label: this.i18n.t('common.edit'), icon: 'fa-edit', color: 'primary',
+    condition: (item: any) => item.status === 'Draft' },
+  { key: 'delete', label: this.i18n.t('common.delete'), icon: 'fa-trash', color: 'danger' }
+]);
+```
+
+**Enum Values**: Frontend TypeScript enums must use **string values** matching the backend JSON serialization (e.g., `Draft = 'Draft'`, not `Draft = 1`). The .NET backend serializes enums as strings by default.
 
 #### Form Pages
 When creating form pages, **always use**:
@@ -349,36 +507,87 @@ When creating form pages, **always use**:
 - Use i18n service for all user-facing text: `i18n.t('key')` - never hardcode strings
 - Never use `|| 'Fallback Text'` pattern with i18n - use `i18n.t('key')` for fallbacks too
 
-### Styling Standards
-- Use Bootstrap 5 utility classes
-- Follow established spacing patterns
-- Maintain responsive design (mobile-first)
-- Use CSS files for component-specific styles
-- **Use CSS variables** from `styles/variables.css` instead of hardcoded hex colors (e.g., `var(--app-success)` not `#198754`)
-- **RTL in component CSS**: Always use `:host-context([dir="rtl"])` selector, never `:root[dir="rtl"]` (Angular encapsulation blocks `:root` selectors)
-- **RTL padding fix**: `<ul>` elements need explicit `padding-right: 0` in RTL (browser default `padding-inline-start` shifts to right)
-- Common CSS variable mappings:
+### Styling Standards — ERP Design System
 
-| Hex | CSS Variable |
-|-----|-------------|
-| `#f8f9fa` | `var(--app-gray-100)` |
-| `#e9ecef` | `var(--app-gray-200)` |
-| `#dee2e6` | `var(--app-gray-300)` |
-| `#6c757d` | `var(--app-gray-600)` |
-| `#0d6efd` | `var(--bs-primary)` |
-| `#198754` | `var(--app-success)` |
-| `#dc3545` | `var(--app-danger)` |
-| `#ffc107` | `var(--app-warning)` |
-| `#0dcaf0` | `var(--app-info)` |
+The UI follows the **ERP Design System** defined in `ERP_Design_System.html`. All styling uses CSS custom properties (design tokens).
 
-### Modern Form Design System (Material Design Floating Labels)
+- Use Bootstrap 5 utility classes for layout
+- **Never hardcode hex colors** — always use `var(--app-*)` tokens from `styles/erp-tokens.css`
+- **Typography**: Inter font for UI, JetBrains Mono for codes/money (`var(--app-font-family-mono)`)
+- **RTL in component CSS**: Always use `:host-context([dir="rtl"])` selector, never `:root[dir="rtl"]`
+- **RTL padding fix**: `<ul>` elements need explicit `padding-right: 0` in RTL
 
-All create/edit forms **must** use the `.app-modern-form` CSS class system. This applies to both the admin frontend and self-service frontend.
+**CSS Architecture** (import order in `styles.css`):
+```
+styles/variables.css    → Base design tokens
+styles/erp-tokens.css   → ERP color/shadow/typography overrides (THE source of truth)
+styles/utilities.css    → Utility classes
+styles/components.css   → Component patterns (buttons, cards, forms, badges, views)
+styles/patterns.css     → Complex UI patterns
+```
+
+**Color Palette** (ERP Indigo Blue):
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--app-primary` | `#4F6BF6` | Primary actions, links, focus indicators |
+| `--app-success` | `#22C55E` | Active, approved, success states |
+| `--app-danger` | `#EF4444` | Errors, rejected, inactive states |
+| `--app-warning` | `#F59E0B` | Pending, warning states |
+| `--app-info` | `#3B82F6` | Info, in-progress states |
+| `--app-accent` | `#F97316` | Highlights, accent elements |
+| `--app-gray-200` | `#EAECF0` | Borders, dividers |
+| `--app-gray-300` | `#D0D5DD` | Input borders |
+| `--app-gray-500` | `#667085` | Secondary text, labels |
+| `--app-gray-700` | `#344054` | Primary text |
+| `--app-gray-900` | `#101828` | Headings, dark text |
+
+Each semantic color has shade variants: `--app-{color}-50` (lightest bg), `--app-{color}-100`, `--app-{color}-400`, `--app-{color}-500`, `--app-{color}-600` (darkest text).
+
+**Page Background**: `#F5F6FA` (`--app-page-bg`)
+**Sidebar**: Deep navy `#0F1629` (`--app-sidebar-bg`)
+
+**Shadows** (use `rgba(16,24,40,...)` not `rgba(0,0,0,...)`):
+
+| Token | Usage |
+|-------|-------|
+| `--app-shadow-xs` | Inputs, small elements |
+| `--app-shadow-sm` | Cards, panels |
+| `--app-shadow-md` | Hover states, dropdowns |
+| `--app-shadow-lg` | Toasts, popovers |
+| `--app-shadow-xl` | Modals, dialogs |
+
+**Button Classes** (overridden in `components.css`):
+
+| Class | Style |
+|-------|-------|
+| `.btn-primary` | Indigo bg (#4F6BF6), white text |
+| `.btn-secondary` | White bg, gray-300 border, gray-700 text |
+| `.btn-ghost` / `.btn-link` | Transparent bg, primary text, primary-50 hover |
+| `.btn-success/danger/warning/info` | Semantic color bg, white text |
+| `.btn-sm` | 6px 12px padding, 13px font |
+| `.btn-lg` | 12px 24px padding, 15px font |
+
+**Status Badges** (ERP pill design with dot indicator):
+
+StatusBadgeComponent renders pill-shaped badges (border-radius 16px) with a 6px colored dot. Uses `erp-badge-*` classes with semantic-50 backgrounds and semantic-600 text. Never use Bootstrap `bg-*` badge classes.
+
+### Modern Form Design System (ERP Label-Above-Input)
+
+All create/edit forms **must** use the `.app-modern-form` CSS class system. This applies to both frontends.
+
+**Design**: Labels permanently positioned above inputs (NOT floating/animated). Full-bordered inputs with focus ring.
 
 **CSS Architecture**:
-- Design tokens: `styles/variables.css` (under `--app-float-*` prefix)
+- Design tokens: `styles/erp-tokens.css` (button/form/shadow overrides)
 - Form styles: `styles/components.css` (scoped under `.app-modern-form`)
 - RTL overrides: `styles.css` (under `:root[dir="rtl"] .app-modern-form`)
+
+**Form Field Specs**:
+- Label: 13px, font-weight 500, color gray-700 (`#344054`)
+- Input: `1px solid gray-300`, border-radius 6px, font-size 14px, padding `10px 14px`
+- Focus: border `--app-primary`, box-shadow `0 0 0 3px --app-primary-100` (#D8E0FF)
+- Validation: border `--app-danger`, box-shadow `0 0 0 3px --app-danger-100` (#FEE2E2)
 
 **How to Apply**:
 1. Add `app-modern-form` class to the outermost container `<div>`
@@ -396,7 +605,19 @@ All create/edit forms **must** use the `.app-modern-form` CSS class system. This
 4. Move `.invalid-feedback` outside `form-floating`, add `d-block` class
 5. Use `<div class="app-form-actions">` for submit/cancel buttons
 
-**Reference**: See create-employee form for the prototype implementation.
+**Section Cards**: White bg, `1px solid gray-200` border, 12px radius, shadow-xs. Header has icon + title + separator line.
+
+### Modern View Design System (ERP Entity Detail Pages)
+
+All view/detail pages use the `.app-modern-view` CSS class system.
+
+**Card Design**: Clean white cards with `1px solid gray-200` border, 12px radius, shadow-sm. No accent left-border.
+**Card Headers**: Flat `gray-25` background, 16px 600-weight title with icon, gray-200 bottom border.
+**Definition Lists**: Labels are 13px gray-500 (normal case, not uppercase). Values are 14px gray-900.
+**Tabs**: 2px bottom border, active tab has primary color + primary bottom border. Font 14px, weight 500.
+**Stat Cards**: Clean bordered cards, 28px bold value, 13px gray-500 label.
+
+**Reference**: See `ERP_Design_System.html` for the full visual spec.
 
 ---
 
@@ -751,6 +972,32 @@ async approveRequest(requestId: number, requestType: string) {
   }
 }
 ```
+
+### API Endpoints for Tenant & Subscription Management
+
+#### Tenant Management (Base: `/api/v1/tenants`) — SystemAdmin only
+- `GET /` - List tenants (paginated, search, filter by status/isActive)
+- `GET /{id}` - Get tenant by ID with subscription details
+- `POST /` - Create tenant
+- `PUT /{id}` - Update tenant
+- `POST /{id}/activate` - Activate tenant
+- `POST /{id}/suspend` - Suspend tenant
+- `GET /discover` - Tenant discovery for mobile apps (public, no auth)
+
+#### Subscription Plans (Base: `/api/v1/subscription-plans`) — SystemAdmin only
+- `GET /` - List all subscription plans with module entitlements and limits
+- `GET /{id}` - Get plan by ID with full details
+
+#### Tenant Subscriptions (Base: `/api/v1/tenants/{tenantId}/subscription`) — SystemAdmin only
+- `GET /` - Get active subscription for a tenant
+- `POST /` - Assign a subscription plan to a tenant
+- `PUT /change-plan` - Change tenant's subscription plan
+- `POST /cancel` - Cancel tenant's subscription
+
+#### Entitlements (Base: `/api/v1/entitlements`) — Authenticated users
+- `GET /` - Get current tenant's full entitlement summary (plan, modules, features, limits)
+- `GET /modules` - Get list of enabled module names for current tenant
+- `GET /usage` - Get usage vs limits for current tenant
 
 ### API Endpoints for Self-Service
 
@@ -1205,6 +1452,18 @@ The admin frontend (`time-attendance-frontend`) is the full-featured management 
 - Audit logs with detail modal
 - Sessions (active sessions, login history)
 
+#### Platform Management (`pages/tenants/`, `pages/subscription-plans/`)
+- **Tenants List** (`tenants/`) - Paginated table with search, status filter, CRUD actions
+- **Create Tenant** (`tenants/create-tenant/`) - Modern form with Basic Info, Company Info, Default Settings sections
+- **Edit Tenant** (`tenants/edit-tenant/`) - Pre-populated form (subdomain read-only)
+- **View Tenant** (`tenants/view-tenant/`) - Overview tab (DefinitionList) + Subscription tab (plan details, enabled modules, limits, assign/change/cancel actions)
+- **Subscription Plans** (`subscription-plans/`) - Card-based pricing page showing Starter/Professional/Enterprise plans with modules and limits
+
+#### Entitlement Infrastructure (`core/services/`, `core/auth/guards/`)
+- **EntitlementService** (`core/services/entitlement.service.ts`) - Signal-based service that loads tenant entitlements on login, provides `isModuleEnabled()`, `isFeatureEnabled()`, `getLimit()`, `getCurrentUsage()`
+- **Module Guard** (`core/auth/guards/module.guard.ts`) - `CanMatchFn` that blocks routes for disabled modules
+- **Module-Aware Navigation** - Menu items tagged with `module` property, sidenav filters by entitlement
+
 #### Error Pages
 - Not Found (404)
 - Unauthorized (403)
@@ -1253,7 +1512,7 @@ time-attendance-frontend/
 
 ## Backend API Architecture
 
-### Controllers (35 total)
+### Controllers (130+ total)
 
 #### Core Management
 - **AuthController** - Authentication (login, logout, 2FA, password management)
@@ -1263,6 +1522,14 @@ time-attendance-frontend/
 - **EmployeesController** - Employee CRUD operations
 - **BranchesController** - Branch management
 - **DepartmentsController** - Department management
+
+#### Multi-Tenant & Subscription Management
+- **TenantsController** - Tenant CRUD (list, create, edit, activate, suspend) + mobile tenant discovery
+- **SubscriptionPlansController** - List and view subscription plans with module entitlements and limits
+- **TenantSubscriptionsController** - Manage tenant subscriptions (assign plan, change plan, cancel)
+- **EntitlementsController** - Get current tenant's entitlements (modules, features, limits, usage)
+- **TenantConfigurationController** - Tenant settings CRUD, resolved settings with inheritance, branch overrides, setup status
+- **PolicyTemplatesController** - Policy template CRUD (list with region/industry filters, get by ID, create, update, delete) and apply to tenant/branch
 
 #### Time & Attendance
 - **AttendanceController** - Attendance records management
@@ -1291,7 +1558,6 @@ time-attendance-frontend/
 - **MobileScheduleController** - Mobile schedule viewing
 - **PushTokensController** - Firebase push notification token management
 - **NfcTagsController** - NFC tag management for attendance verification
-- **TenantsController** - Multi-tenant discovery for mobile app
 
 #### Workflows & Approvals
 - **ApprovalsController** - Approval actions
@@ -1309,6 +1575,56 @@ time-attendance-frontend/
 - **ReportsController** - Report generation
 - **AuditLogsController** - Audit trail
 
+#### Recruitment & Hiring (Phase 2)
+- **JobRequisitionsController** - Job requisition CRUD and status management
+- **JobPostingsController** - Job posting management and publishing
+- **CandidatesController** - Candidate profile management
+- **ApplicationsController** - Application pipeline and status advancement
+- **InterviewsController** - Interview scheduling and feedback
+- **OffersController** - Offer letter generation and lifecycle
+
+#### Onboarding (Phase 2)
+- **OnboardingTemplatesController** - Onboarding template CRUD
+- **OnboardingProcessesController** - Process management and task tracking
+- **OnboardingDashboardController** - Onboarding analytics
+
+#### Performance Management (Phase 2)
+- **ReviewCyclesController** - Review cycle management
+- **PerformanceReviewsController** - Performance review CRUD
+- **GoalsController** - Goal setting and tracking
+- **CompetenciesController** - Competency framework management
+- **PIPsController** - Performance improvement plans
+- **FeedbackController** - 360-degree feedback collection
+
+#### Employee Lifecycle (Phase 2)
+- **EmployeeContractsController** - Contract lifecycle management
+- **EmployeeSalariesController** - Salary and compensation management
+- **SalaryAdjustmentsController** - Salary adjustment requests and approvals
+- **EmployeePromotionsController** - Promotion tracking
+- **EmployeeTransfersController** - Transfer management
+- **JobGradesController** - Job grade structure
+- **EmployeeDetailsController** - Extended employee sub-entities (addresses, bank details, dependents, education, etc.)
+
+#### Payroll & Compensation (Phase 2)
+- **SalaryStructuresController** - Salary structure and components
+- **PayrollPeriodsController** - Payroll period processing
+- **PayrollSettingsController** - Payroll configuration
+- **AllowanceTypesController** - Allowance type management
+- **AllowancePoliciesController** - Allowance policy rules
+- **AllowanceAssignmentsController** - Allowance assignment management
+- **AllowanceRequestsController** - Allowance request workflow
+- **EndOfServiceController** - EOS benefit calculation
+
+#### Offboarding (Phase 2)
+- **ResignationRequestsController** - Resignation management
+- **TerminationsController** - Termination records
+- **ExitInterviewsController** - Exit interview tracking
+- **ClearanceController** - Clearance checklist management
+- **FinalSettlementsController** - Final settlement calculation
+
+#### File Management (Phase 2)
+- **FilesController** - File upload and download
+
 ### SignalR Hub
 - **NotificationHub** (`/hubs/notifications`) - Real-time notification delivery
   - User connection management
@@ -1317,8 +1633,22 @@ time-attendance-frontend/
 
 ### Domain Entities
 
+#### Multi-Tenant & Subscription
+- Tenant, TenantStatus (enum)
+- SubscriptionPlan, PlanTier (enum), PlanModuleEntitlement, PlanFeatureFlag, PlanLimit, LimitType (enum)
+- TenantSubscription, SubscriptionStatus (enum), BillingCycle (enum), TenantModuleAddOn, TenantFeatureOverride
+- EntitlementChangeLog, EntitlementChangeType (enum - 9 types: PlanAssigned, PlanChanged, SubscriptionCancelled, etc.)
+- SystemModule (enum - 26 modules), ModuleMetadata (includes WorkflowEntityType→SystemModule mapping), ModuleDependencyRules
+
+#### Tenant Configuration
+- TenantSettings (one per tenant, 7 setting categories)
+- BranchSettingsOverride (nullable overrides, one per branch)
+- DepartmentSettingsOverride (shift + approval overrides, one per department)
+- PolicyTemplate (Code, Region, Industry, IsSystemTemplate, TenantId), PolicyTemplateItem (PolicyType, ConfigurationJson, SortOrder)
+- SetupStep (per-tenant onboarding tracking)
+
 #### Organization
-- Branch, Department, Employee, EmployeeUserLink
+- Branch (with TenantId FK), Department, Employee, EmployeeUserLink
 
 #### Authentication & Security
 - User, Role, Permission, RolePermission, UserRole
@@ -1348,7 +1678,7 @@ time-attendance-frontend/
 - PublicHoliday, OvertimeConfiguration
 
 #### Workflows
-- WorkflowDefinition, WorkflowInstance, WorkflowStep
+- WorkflowDefinition, WorkflowInstance (WorkflowStatus: Pending, InProgress, Approved, Rejected, Cancelled, Expired, **Frozen**), WorkflowStep
 - WorkflowStepExecution, ApprovalDelegation
 
 #### Notifications
@@ -1356,6 +1686,27 @@ time-attendance-frontend/
 
 #### Audit
 - AuditLog, AuditChange
+
+#### Employee Lifecycle (Phase 2)
+- EmployeeContract, EmployeePromotion, EmployeeTransfer, SalaryAdjustment
+- EmployeeAddress, EmployeeBankDetail, EmployeeDependent, EmployeeEducation
+- EmployeeWorkExperience, EmployeeVisa, EmergencyContact, EmployeeProfileChange
+- JobGrade
+
+#### Payroll & Compensation (Phase 2)
+- SalaryStructure, SalaryComponent, EmployeeSalary, EmployeeSalaryComponent
+- PayrollPeriod, PayrollRecord, PayrollRecordDetail, PayrollAdjustment
+- AllowanceType, AllowancePolicy, AllowanceAssignment, AllowanceRequest, AllowanceChangeLog
+- TaxConfiguration, TaxBracket, SocialInsuranceConfig
+- InsuranceProvider, EmployeeInsurance, BankTransferFile
+
+#### Offboarding (Phase 2)
+- ResignationRequest, TerminationRecord, ExitInterview
+- ClearanceChecklist, ClearanceItem
+- EndOfServiceBenefit, FinalSettlement
+
+#### File Management (Phase 2)
+- FileAttachment
 
 ### Application Services
 
@@ -1368,14 +1719,34 @@ time-attendance-frontend/
 - ChangeTrackingService
 - NfcTagEncryptionService (HMAC-SHA256 payload signing/verification)
 
+#### Multi-Tenant & Entitlement Services
+- **EntitlementService** (`IEntitlementService`) - Cached per-tenant entitlement checking (modules, features, limits). 5-minute TTL. Call `InvalidateCache(tenantId)` after subscription changes.
+- **TenantContext** (`ITenantContext`) - Scoped service holding resolved tenant ID. Populated by `TenantResolutionMiddleware`.
+- **ModuleEntitlementBehavior** - MediatR `IPipelineBehavior` that checks `[RequiresModule]` attribute on requests. Supports `AllowReadWhenDisabled` for read-only historical access. 173 commands/queries decorated.
+- **UsageLimitBehavior** - MediatR `IPipelineBehavior` that checks `[RequiresLimit]` attribute on creation commands
+- **ModuleAwareJob** - Abstract base class for background jobs that skip tenants without required module
+- **ModuleDeactivationService** (`IModuleDeactivationService`) - Orchestrates safe module deactivation/reactivation: freezes/unfreezes in-flight workflows, logs entitlement changes, invalidates caches
+
 ### Background Jobs (Coravel)
 - `DailyAttendanceGenerationJob` - Daily at 2:00 AM
 - `EndOfDayAttendanceFinalizationJob` - Daily at 11:59 PM
 - `MonthlyLeaveAccrualJob` - Monthly on 1st at 1:00 AM UTC
 - `WorkflowTimeoutProcessingJob` - Hourly
+- `ContractExpiryAlertJob` - Daily, alerts for expiring employee contracts
+- `VisaExpiryAlertJob` - Daily, alerts for expiring employee visas
+- `ApplyScheduledProfileChangesJob` - Daily, applies scheduled employee profile changes
+- `ExpireTemporaryAllowancesJob` - Daily, expires temporary allowance assignments
+- `OnboardingTaskOverdueJob` - Daily at 5:00 AM, marks overdue onboarding tasks
+- `ReviewCycleReminderJob` - Daily at 7:00 AM, sends reminders for pending reviews
+- `PIPExpiryCheckJob` - Daily at 6:00 AM, checks for expired performance improvement plans
+- `FrozenWorkflowCleanupJob` - Daily at 3:00 AM, auto-cancels workflows frozen > 90 days due to module deactivation
 
 ### Middleware Pipeline
-- CORS → Global Exception Handler → Rate Limiting → Localization → Authentication → Authorization → Routing → SignalR Hub
+- CORS → Global Exception Handler → Rate Limiting → Localization → Authentication → **Tenant Resolution** → Authorization → Routing → SignalR Hub
+- **Tenant Resolution Middleware**: `src/Api/TimeAttendanceSystem.Api/Middleware/TenantResolutionMiddleware.cs`
+  - Resolves tenant from JWT `tenant_id` claim (authenticated) or `X-Tenant-Id` header (pre-auth)
+  - Sets `ITenantContext.TenantId` for the request scope
+  - Unauthenticated endpoints (login, discovery) proceed without tenant context
 - **Global Exception Handler**: `src/Api/TimeAttendanceSystem.Api/Middleware/GlobalExceptionHandlerMiddleware.cs`
   - Maps `ValidationException` → 400, `UnauthorizedAccessException` → 401, `NotFoundException` → 404, others → 500
   - Returns JSON: `{ statusCode, message, traceId, detail?, stackTrace? }` (detail/stackTrace only in Development)
@@ -2107,18 +2478,45 @@ Once all applications are running:
 - SignalR Hubs: `src/Api/TimeAttendanceSystem.Api/Hubs/`
 - Services: `src/Application/TimeAttendanceSystem.Application/Services/`
 - Entities: `src/Domain/TimeAttendanceSystem.Domain/`
+- Module Registry: `src/Domain/TimeAttendanceSystem.Domain/Modules/` (SystemModule, ModuleMetadata, ModuleDependencyRules)
+- Subscription Entities: `src/Domain/TimeAttendanceSystem.Domain/Subscriptions/` (SubscriptionPlan, TenantSubscription, etc.)
+- Tenant Entity: `src/Domain/TimeAttendanceSystem.Domain/Tenants/` (Tenant, TenantStatus, TenantSettings)
+- Tenant Configuration Entities: `src/Domain/TimeAttendanceSystem.Domain/Configuration/` (PolicyTemplate, PolicyTemplateItem, SetupStep)
+- Branch Settings Override: `src/Domain/TimeAttendanceSystem.Domain/Branches/BranchSettingsOverride.cs`
+- Department Settings Override: `src/Domain/TimeAttendanceSystem.Domain/Departments/DepartmentSettingsOverride.cs`
+- Tenant Configuration CQRS: `src/Application/TimeAttendanceSystem.Application/TenantConfiguration/` (Commands, Queries, Dtos)
+- Policy Templates CQRS: `src/Application/TimeAttendanceSystem.Application/PolicyTemplates/` (Commands: Apply, Create, Update, Delete; Queries: GetAll, GetById; Dtos)
+- Setup Tracking CQRS: `src/Application/TimeAttendanceSystem.Application/SetupTracking/` (Commands, Queries, Dtos)
+- Settings Resolver: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/Services/TenantSettingsResolver.cs`
+- Settings Resolver Interface: `src/Application/TimeAttendanceSystem.Application/Abstractions/ITenantSettingsResolver.cs`
 - Repositories: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/Repositories/`
 - DTOs: `src/Application/TimeAttendanceSystem.Application/` (within feature folders)
+- Tenant CQRS: `src/Application/TimeAttendanceSystem.Application/Tenants/` (Commands, Queries, Dtos)
+- Subscription CQRS: `src/Application/TimeAttendanceSystem.Application/Subscriptions/` (Commands, Queries, Dtos)
+- MediatR Behaviors: `src/Application/TimeAttendanceSystem.Application/Common/Behaviors/` (RequiresModuleAttribute with AllowReadWhenDisabled, ModuleEntitlementBehavior, UsageLimitBehavior)
+- Entitlement Service: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/Services/EntitlementService.cs`
+- Module Deactivation Service: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/Services/ModuleDeactivationService.cs`
+- Tenant Context: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/Services/TenantContext.cs`
 - Background Jobs: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/BackgroundJobs/`
-- Middleware: `src/Api/TimeAttendanceSystem.Api/Middleware/` (GlobalExceptionHandlerMiddleware)
+- Module-Aware Job Base: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/BackgroundJobs/ModuleAwareJob.cs`
+- Frozen Workflow Cleanup: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/BackgroundJobs/FrozenWorkflowCleanupJob.cs`
+- Entitlement Change Log: `src/Domain/TimeAttendanceSystem.Domain/Subscriptions/EntitlementChangeLog.cs`
+- Middleware: `src/Api/TimeAttendanceSystem.Api/Middleware/` (GlobalExceptionHandler, TenantResolution, RateLimiting, Localization)
 
 #### Frontend (Admin)
 - Pages: `time-attendance-frontend/src/app/pages/`
+- Tenant Pages: `time-attendance-frontend/src/app/pages/tenants/` (list, create, edit, view with subscription management)
+- Subscription Plans Page: `time-attendance-frontend/src/app/pages/subscription-plans/`
 - Shared Components: `time-attendance-frontend/src/app/shared/components/` (29 components)
 - Core Services: `time-attendance-frontend/src/app/core/services/`
+- Entitlement Service: `time-attendance-frontend/src/app/core/services/entitlement.service.ts` (isModuleEnabled, isModuleReadOnly, isLoaded)
+- Entitlement Models: `time-attendance-frontend/src/app/shared/models/entitlement.model.ts`
+- Module Guard: `time-attendance-frontend/src/app/core/auth/guards/module.guard.ts` (read-only default, moduleStrict for create/edit routes)
+- Module Status Banner: `time-attendance-frontend/src/app/shared/components/module-status-banner/module-status-banner.component.ts`
 - i18n Translations: `time-attendance-frontend/src/app/core/i18n/translations/` (en.json, ar.json)
 - CSS Design System: `time-attendance-frontend/src/styles/` (variables.css, components.css, utilities.css, patterns.css)
-- Layout Components: `time-attendance-frontend/src/app/layout/` (sidenav, topbar, layout)
+- Layout Components: `time-attendance-frontend/src/app/layout/` (sidenav with module-aware filtering, topbar, layout)
+- Menu Service: `time-attendance-frontend/src/app/core/menu/menu.service.ts` (module-tagged menu items)
 - Models: `time-attendance-frontend/src/app/shared/models/`
 - Guards: `time-attendance-frontend/src/app/core/guards/`
 
@@ -2170,5 +2568,5 @@ Once all applications are running:
 
 ---
 
-**Last Updated**: March 26, 2026
-**Version**: 6.0 - Mobile GPS+NFC dual-verification attendance, NFC tag security (HMAC-SHA256 payload signing), AttendanceVerificationLog audit system, expanded Flutter mobile app (excuse/remote work/schedule/admin/manager features), ShellRoute navigation, Riverpod providers (13 total), Android NFC/GPS/Biometric permissions, production deployment (api.clockn.net / www.clockn.net / portal.clockn.net via Cloudflare Pages), NfcEncryption configuration section
+**Last Updated**: April 7, 2026
+**Version**: 10.0 - Phase 5B Industry Templates & Regional Expansion: 8 seeded policy templates (Saudi Standard with 12 Saudi Labor Law items, UAE Standard with 11 Decree-Law 33/2021 items, 6 SA industry templates: Healthcare/Construction/Technology/Retail/Government/Education), full template CRUD (create/update/delete custom templates, system templates read-only), ApplyPolicyTemplateCommandHandler extended with Shift/OffDay/OvertimeConfiguration support, region+industry filtering, expand/collapse item preview with names from ConfigurationJson, user-friendly duplicate error handling, IApplicationDbContext extended with OvertimeConfigurations and OffDays DbSets

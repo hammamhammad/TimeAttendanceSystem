@@ -1,8 +1,10 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.ShiftAssignments.Queries.GetShiftAssignments;
+namespace TecAxle.Hrms.Application.ShiftAssignments.Queries.GetShiftAssignments;
 
 /// <summary>
 /// Query for retrieving shift assignments with comprehensive filtering and pagination capabilities.
@@ -32,6 +34,7 @@ namespace TimeAttendanceSystem.Application.ShiftAssignments.Queries.GetShiftAssi
 /// - Selective loading of related entities to minimize data transfer
 /// - Query optimization for common filtering scenarios
 /// </remarks>
+[RequiresModule(SystemModule.TimeAttendance, AllowReadWhenDisabled = true)]
 public record GetShiftAssignmentsQuery(
     /// <summary>
     /// Page number for pagination (1-based indexing).

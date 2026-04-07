@@ -1,0 +1,48 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header [title]="i18n.t('letter_requests.create')" moduleName="letter_requests" moduleRoute="documents/letter-requests" />
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <app-form-section [title]="i18n.t('common.basic_info')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('letter_requests.employee') }} <span class="text-danger">*</span></label>
+            <app-searchable-select [options]="employeeOptions" [placeholder]="i18n.t('common.select')" [value]="form.get('employeeId')?.value" (selectionChange)="form.get('employeeId')?.setValue($event)" />
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('letter_requests.letter_type') }} <span class="text-danger">*</span></label>
+            <app-searchable-select [options]="letterTypeOptions" [placeholder]="i18n.t('common.select')" [value]="form.get('letterType')?.value" (selectionChange)="form.get('letterType')?.setValue($event)" />
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <textarea class="form-control" id="purpose" placeholder="Purpose" formControlName="purpose" style="height:80px"></textarea>
+            <label for="purpose">{{ i18n.t('letter_requests.purpose') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <textarea class="form-control" id="purposeAr" placeholder="Purpose (Arabic)" formControlName="purposeAr" style="height:80px"></textarea>
+            <label for="purposeAr">{{ i18n.t('letter_requests.purpose_ar') }}</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-floating">
+            <textarea class="form-control" id="additionalNotes" placeholder="Notes" formControlName="additionalNotes" style="height:80px"></textarea>
+            <label for="additionalNotes">{{ i18n.t('letter_requests.additional_notes') }}</label>
+          </div>
+        </div>
+      </div>
+    </app-form-section>
+
+    <div class="app-form-actions">
+      <button type="button" class="btn btn-secondary" (click)="cancel()">{{ i18n.t('common.cancel') }}</button>
+      <button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving()">
+        @if (saving()) { <span class="spinner-border spinner-border-sm me-1"></span> }
+        {{ i18n.t('common.save') }}
+      </button>
+    </div>
+  </form>
+</div>

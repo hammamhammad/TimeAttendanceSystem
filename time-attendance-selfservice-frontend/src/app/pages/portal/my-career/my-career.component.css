@@ -1,0 +1,56 @@
+.my-career-page {
+  padding: 0;
+}
+
+.career-path-steps {
+  position: relative;
+  padding-left: 2rem;
+}
+.career-path-steps::before {
+  content: '';
+  position: absolute;
+  left: 0.875rem;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--app-gray-300, #dee2e6);
+}
+.path-step {
+  display: flex;
+  gap: 0.75rem;
+  padding-bottom: 1.25rem;
+  position: relative;
+}
+.path-step:last-child {
+  padding-bottom: 0;
+}
+.step-indicator {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: var(--bs-primary, #0d6efd);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+  z-index: 1;
+}
+.step-details {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  background: var(--app-gray-100, #f8f9fa);
+  border-radius: 0.375rem;
+  border: 1px solid var(--app-gray-200, #e9ecef);
+}
+
+:host-context([dir="rtl"]) .career-path-steps {
+  padding-left: 0;
+  padding-right: 2rem;
+}
+:host-context([dir="rtl"]) .career-path-steps::before {
+  left: auto;
+  right: 0.875rem;
+}

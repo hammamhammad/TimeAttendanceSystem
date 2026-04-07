@@ -1,9 +1,9 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Shared.Common.Exceptions;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Shared.Common.Exceptions;
 
-namespace TimeAttendanceSystem.Application.Features.RemoteWorkPolicies.Commands.ToggleRemoteWorkPolicyStatus;
+namespace TecAxle.Hrms.Application.Features.RemoteWorkPolicies.Commands.ToggleRemoteWorkPolicyStatus;
 
 /// <summary>
 /// Handler for toggling the active status of a remote work policy.

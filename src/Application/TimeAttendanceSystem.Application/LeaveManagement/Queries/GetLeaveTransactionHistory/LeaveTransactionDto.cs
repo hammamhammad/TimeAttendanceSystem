@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.LeaveManagement;
+using TecAxle.Hrms.Domain.LeaveManagement;
 
-namespace TimeAttendanceSystem.Application.LeaveManagement.Queries.GetLeaveTransactionHistory;
+namespace TecAxle.Hrms.Application.LeaveManagement.Queries.GetLeaveTransactionHistory;
 
 /// <summary>
 /// Data Transfer Object representing a leave balance transaction.

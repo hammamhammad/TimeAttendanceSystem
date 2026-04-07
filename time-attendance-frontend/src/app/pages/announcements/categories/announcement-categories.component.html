@@ -1,0 +1,87 @@
+<div class="app-list-page">
+  <app-page-header [title]="i18n.t('announcement_categories.title')" />
+  <app-unified-filter [searchPlaceholder]="i18n.t('announcement_categories.search')" [showAddButton]="true"
+    [addButtonText]="i18n.t('announcement_categories.create')" [showRefreshButton]="true" [refreshing]="loading()"
+    (searchChange)="onSearchChange($event)" (add)="onAdd()" (refresh)="onRefreshData()" />
+
+  <app-data-table [data]="data()" [columns]="columns" [actions]="tableActions()" [currentPage]="currentPage()"
+    [totalPages]="totalPages()" [totalItems]="totalCount()" [pageSize]="pageSize()" [loading]="loading"
+    [emptyTitle]="i18n.t('announcement_categories.no_data')" [emptyMessage]="i18n.t('announcement_categories.no_data')"
+    [showPagination]="true" (actionClick)="onActionClick($event)" (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+    <ng-template #cellTemplate let-item let-column="column">
+      @if (column.key === 'isActive') {
+        <span class="badge" [class.bg-success]="item.isActive" [class.bg-secondary]="!item.isActive">
+          {{ item.isActive ? i18n.t('common.active') : i18n.t('common.inactive') }}
+        </span>
+      } @else if (column.key === 'icon') {
+        @if (item.icon) {
+          <i [class]="item.icon"></i> {{ item.icon }}
+        } @else {
+          -
+        }
+      } @else {
+        {{ item[column.key] ?? '-' }}
+      }
+    </ng-template>
+  </app-data-table>
+</div>
+
+@if (showModal()) {
+  <app-modal-wrapper [title]="editingItem() ? i18n.t('announcement_categories.edit') : i18n.t('announcement_categories.create')"
+    [show]="showModal()" (close)="showModal.set(false)">
+    <div class="app-modern-form">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="name" placeholder="Name" [ngModel]="formData().name"
+              (ngModelChange)="updateField('name', $event)">
+            <label for="name">{{ i18n.t('announcement_categories.name') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="nameAr" placeholder="Name AR" [ngModel]="formData().nameAr"
+              (ngModelChange)="updateField('nameAr', $event)">
+            <label for="nameAr">{{ i18n.t('announcement_categories.name_ar') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="icon" placeholder="Icon" [ngModel]="formData().icon"
+              (ngModelChange)="updateField('icon', $event)">
+            <label for="icon">{{ i18n.t('announcement_categories.icon') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="number" class="form-control" id="sortOrder" placeholder="Sort Order" [ngModel]="formData().sortOrder"
+              (ngModelChange)="updateField('sortOrder', $event)">
+            <label for="sortOrder">{{ i18n.t('announcement_categories.sort_order') }}</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-floating">
+            <textarea class="form-control" id="description" placeholder="Description" [ngModel]="formData().description"
+              (ngModelChange)="updateField('description', $event)"></textarea>
+            <label for="description">{{ i18n.t('common.description') }}</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="isActive" [ngModel]="formData().isActive"
+              (ngModelChange)="updateField('isActive', $event)">
+            <label class="form-check-label" for="isActive">{{ i18n.t('common.active') }}</label>
+          </div>
+        </div>
+      </div>
+      <div class="app-form-actions mt-3">
+        <button class="btn btn-secondary" (click)="showModal.set(false)">{{ i18n.t('common.cancel') }}</button>
+        <button class="btn btn-primary" (click)="saveItem()" [disabled]="saving()">
+          @if (saving()) { <i class="fas fa-spinner fa-spin me-1"></i> }
+          {{ i18n.t('common.save') }}
+        </button>
+      </div>
+    </div>
+  </app-modal-wrapper>
+}

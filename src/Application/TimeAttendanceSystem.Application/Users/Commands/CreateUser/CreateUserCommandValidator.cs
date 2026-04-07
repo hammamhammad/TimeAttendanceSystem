@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace TimeAttendanceSystem.Application.Users.Commands.CreateUser;
+namespace TecAxle.Hrms.Application.Users.Commands.CreateUser;
 
 public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
 {

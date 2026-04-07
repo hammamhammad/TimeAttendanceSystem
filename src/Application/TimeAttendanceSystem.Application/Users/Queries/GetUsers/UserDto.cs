@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Application.Users.Queries.GetUsers;
+namespace TecAxle.Hrms.Application.Users.Queries.GetUsers;
 
 /// <summary>
 /// Data Transfer Object representing user information for list views and administrative operations.

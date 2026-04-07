@@ -1,14 +1,17 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.RemoteWork;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.RemoteWork;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.Features.RemoteWorkRequests.Commands.UpdateRemoteWorkRequest;
+namespace TecAxle.Hrms.Application.Features.RemoteWorkRequests.Commands.UpdateRemoteWorkRequest;
 
 /// <summary>
 /// Command to update an existing remote work request.
 /// HR can update dates, reason, status, and approval comments.
 /// Employee assignment cannot be changed.
 /// </summary>
+[RequiresModule(SystemModule.RemoteWork)]
 public class UpdateRemoteWorkRequestCommand : IRequest<Result>
 {
     public long Id { get; set; }

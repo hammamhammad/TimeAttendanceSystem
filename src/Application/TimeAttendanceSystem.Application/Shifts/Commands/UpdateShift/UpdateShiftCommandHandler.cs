@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Domain.Shifts;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Shifts;
 
-namespace TimeAttendanceSystem.Application.Shifts.Commands.UpdateShift;
+namespace TecAxle.Hrms.Application.Shifts.Commands.UpdateShift;
 
 /// <summary>
 /// Command handler for updating existing shifts with comprehensive validation and business rule enforcement.

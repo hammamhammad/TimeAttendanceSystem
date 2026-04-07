@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Domain.Settings;
+namespace TecAxle.Hrms.Domain.Settings;
 
 /// <summary>
 /// Domain entity representing the overtime calculation configuration for the organization.

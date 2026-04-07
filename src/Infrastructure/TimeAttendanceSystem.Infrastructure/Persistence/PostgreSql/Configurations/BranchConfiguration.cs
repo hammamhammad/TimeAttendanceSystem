@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TimeAttendanceSystem.Domain.Branches;
+using TecAxle.Hrms.Domain.Branches;
 
-namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Configurations;
+namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Configurations;
 
 public class BranchConfiguration : IEntityTypeConfiguration<Branch>
 {
@@ -36,8 +36,19 @@ public class BranchConfiguration : IEntityTypeConfiguration<Branch>
             .IsRequired()
             .HasDefaultValue(new byte[] { 1 });
 
-        builder.HasIndex(x => x.Code)
+        // Tenant relationship
+        builder.HasOne(x => x.Tenant)
+            .WithMany(t => t.Branches)
+            .HasForeignKey(x => x.TenantId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(x => x.TenantId)
+            .HasDatabaseName("IX_Branches_TenantId");
+
+        // Unique code per tenant (not globally unique)
+        builder.HasIndex(x => new { x.TenantId, x.Code })
             .IsUnique()
+            .HasDatabaseName("IX_Branches_TenantId_Code")
             .HasFilter("\"IsDeleted\" = false");
 
         builder.HasQueryFilter(x => !x.IsDeleted);

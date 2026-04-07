@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace TimeAttendanceSystem.Application.VacationTypes.Commands.CreateVacationType;
+namespace TecAxle.Hrms.Application.VacationTypes.Commands.CreateVacationType;
 
 /// <summary>
 /// FluentValidation validator for CreateVacationTypeCommand providing essential input validation.

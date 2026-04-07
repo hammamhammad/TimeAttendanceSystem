@@ -1,0 +1,242 @@
+<!-- Page Header -->
+<app-page-header [title]="getTitle() || i18n.t('portal.training.session_details')">
+  <div header-actions>
+    <button class="btn btn-outline-secondary btn-sm" (click)="goBack()" type="button">
+      <i class="bi bi-arrow-left me-1"></i>{{ i18n.t('common.back') }}
+    </button>
+  </div>
+</app-page-header>
+
+<!-- Loading State -->
+@if (loading()) {
+  <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+}
+
+<!-- Error State -->
+@if (error() && !detail()) {
+  <div class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle me-2"></i>{{ error() }}
+    <button class="btn btn-sm btn-outline-danger ms-3" (click)="goBack()" type="button">{{ i18n.t('common.back') }}</button>
+  </div>
+}
+
+@if (detail(); as d) {
+  <div class="row g-3">
+    <!-- Main Details Card -->
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex flex-wrap gap-2 mb-3">
+            <span class="badge bg-light text-dark border">{{ getCategoryLabel() }}</span>
+            <span class="badge" [class]="d.deliveryMethod === 'Online' ? 'bg-info' : d.deliveryMethod === 'InPerson' ? 'bg-primary' : 'bg-secondary'">
+              {{ getDeliveryLabel(d.deliveryMethod) }}
+            </span>
+            @if (d.enrollmentStatus) {
+              <span class="badge" [class]="getStatusBadgeClass(d.enrollmentStatus)">
+                {{ i18n.t('portal.training.status_' + d.enrollmentStatus) }}
+              </span>
+            }
+          </div>
+
+          @if (getDescription()) {
+            <h6 class="text-muted mb-2">{{ i18n.t('common.description') }}</h6>
+            <p class="mb-3">{{ getDescription() }}</p>
+          }
+
+          @if (d.objectives) {
+            <h6 class="text-muted mb-2">{{ i18n.t('portal.training.objectives') }}</h6>
+            <p class="mb-3">{{ d.objectives }}</p>
+          }
+
+          @if (d.prerequisites) {
+            <h6 class="text-muted mb-2">{{ i18n.t('portal.training.prerequisites') }}</h6>
+            <p class="mb-3">{{ d.prerequisites }}</p>
+          }
+
+          @if (d.instructorBio) {
+            <h6 class="text-muted mb-2">{{ i18n.t('portal.training.instructor_bio') }}</h6>
+            <p class="mb-0">{{ d.instructorBio }}</p>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar Details -->
+    <div class="col-lg-4">
+      <div class="card">
+        <div class="card-body">
+          <h6 class="card-title mb-3">{{ i18n.t('portal.training.session_info') }}</h6>
+          <dl class="row mb-0">
+            <dt class="col-5 text-muted small">{{ i18n.t('portal.training.start_date') }}</dt>
+            <dd class="col-7 small">{{ formatDate(d.startDate) }}</dd>
+
+            <dt class="col-5 text-muted small">{{ i18n.t('portal.training.end_date') }}</dt>
+            <dd class="col-7 small">{{ formatDate(d.endDate) }}</dd>
+
+            @if (d.duration) {
+              <dt class="col-5 text-muted small">{{ i18n.t('portal.training.duration') }}</dt>
+              <dd class="col-7 small">{{ d.duration }}</dd>
+            }
+
+            @if (d.location) {
+              <dt class="col-5 text-muted small">{{ i18n.t('portal.training.location') }}</dt>
+              <dd class="col-7 small">{{ d.location }}</dd>
+            }
+
+            @if (d.instructorName) {
+              <dt class="col-5 text-muted small">{{ i18n.t('portal.training.instructor') }}</dt>
+              <dd class="col-7 small">{{ d.instructorName }}</dd>
+            }
+
+            <dt class="col-5 text-muted small">{{ i18n.t('portal.training.capacity') }}</dt>
+            <dd class="col-7 small">{{ d.enrolledCount }}/{{ d.maxParticipants }}</dd>
+
+            <dt class="col-5 text-muted small">{{ i18n.t('portal.training.available_spots') }}</dt>
+            <dd class="col-7 small">
+              @if (d.availableSpots > 0) {
+                <span class="text-success">{{ d.availableSpots }}</span>
+              } @else {
+                <span class="text-danger">{{ i18n.t('portal.training.full') }}</span>
+              }
+            </dd>
+          </dl>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="card mt-3">
+        <div class="card-body d-grid gap-2">
+          @if (canEnroll()) {
+            <button class="btn btn-primary" (click)="enroll()" [disabled]="enrolling()" type="button">
+              @if (enrolling()) {
+                <span class="spinner-border spinner-border-sm me-1"></span>
+              } @else {
+                <i class="bi bi-plus-circle me-1"></i>
+              }
+              {{ i18n.t('portal.training.enroll') }}
+            </button>
+          }
+          @if (d.isEnrolled && d.enrollmentStatus !== 'Completed') {
+            <div class="alert alert-info mb-0 small">
+              <i class="bi bi-check-circle me-1"></i>{{ i18n.t('portal.training.already_enrolled') }}
+            </div>
+          }
+          @if (canEvaluate()) {
+            <button class="btn btn-success" (click)="openEvaluation()" type="button">
+              <i class="bi bi-star me-1"></i>{{ i18n.t('portal.training.evaluate') }}
+            </button>
+          }
+          @if (d.hasEvaluated) {
+            <div class="alert alert-success mb-0 small">
+              <i class="bi bi-check-circle me-1"></i>{{ i18n.t('portal.training.evaluation_done') }}
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Evaluation Form -->
+  @if (showEvalForm()) {
+    <div class="card mt-3">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h6 class="mb-0">{{ i18n.t('portal.training.evaluation_form') }}</h6>
+        <button class="btn btn-sm btn-outline-secondary" (click)="showEvalForm.set(false)" type="button">
+          <i class="bi bi-x"></i>
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="app-modern-form">
+          <div class="row g-3">
+            <!-- Overall Rating -->
+            <div class="col-md-6">
+              <label class="form-label">{{ i18n.t('portal.training.overall_rating') }} *</label>
+              <div class="d-flex gap-1">
+                @for (star of ratingOptions; track star) {
+                  <button
+                    class="btn btn-sm p-1"
+                    [class.text-warning]="evaluation().overallRating >= star"
+                    [class.text-muted]="evaluation().overallRating < star"
+                    (click)="setRating('overallRating', star)"
+                    type="button">
+                    <i class="bi" [class.bi-star-fill]="evaluation().overallRating >= star" [class.bi-star]="evaluation().overallRating < star" style="font-size: 1.5rem;"></i>
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- Content Rating -->
+            <div class="col-md-6">
+              <label class="form-label">{{ i18n.t('portal.training.content_rating') }}</label>
+              <div class="d-flex gap-1">
+                @for (star of ratingOptions; track star) {
+                  <button
+                    class="btn btn-sm p-1"
+                    [class.text-warning]="evaluation().contentRating >= star"
+                    [class.text-muted]="evaluation().contentRating < star"
+                    (click)="setRating('contentRating', star)"
+                    type="button">
+                    <i class="bi" [class.bi-star-fill]="evaluation().contentRating >= star" [class.bi-star]="evaluation().contentRating < star" style="font-size: 1.5rem;"></i>
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- Instructor Rating -->
+            <div class="col-md-6">
+              <label class="form-label">{{ i18n.t('portal.training.instructor_rating') }}</label>
+              <div class="d-flex gap-1">
+                @for (star of ratingOptions; track star) {
+                  <button
+                    class="btn btn-sm p-1"
+                    [class.text-warning]="evaluation().instructorRating >= star"
+                    [class.text-muted]="evaluation().instructorRating < star"
+                    (click)="setRating('instructorRating', star)"
+                    type="button">
+                    <i class="bi" [class.bi-star-fill]="evaluation().instructorRating >= star" [class.bi-star]="evaluation().instructorRating < star" style="font-size: 1.5rem;"></i>
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- Materials Rating -->
+            <div class="col-md-6">
+              <label class="form-label">{{ i18n.t('portal.training.materials_rating') }}</label>
+              <div class="d-flex gap-1">
+                @for (star of ratingOptions; track star) {
+                  <button
+                    class="btn btn-sm p-1"
+                    [class.text-warning]="evaluation().materialsRating >= star"
+                    [class.text-muted]="evaluation().materialsRating < star"
+                    (click)="setRating('materialsRating', star)"
+                    type="button">
+                    <i class="bi" [class.bi-star-fill]="evaluation().materialsRating >= star" [class.bi-star]="evaluation().materialsRating < star" style="font-size: 1.5rem;"></i>
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- Comments -->
+            <div class="col-12">
+              <div class="form-floating">
+                <textarea class="form-control" id="evalComments" placeholder="Comments" style="height: 100px"
+                  [ngModel]="evaluation().comments" (ngModelChange)="setComments($event)"></textarea>
+                <label for="evalComments">{{ i18n.t('common.comments') }}</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="app-form-actions mt-3">
+            <button class="btn btn-secondary" (click)="showEvalForm.set(false)" type="button">{{ i18n.t('common.cancel') }}</button>
+            <button class="btn btn-primary" (click)="submitEvaluation()" [disabled]="submittingEval() || evaluation().overallRating === 0" type="button">
+              @if (submittingEval()) {
+                <span class="spinner-border spinner-border-sm me-1"></span>
+              }
+              {{ i18n.t('common.submit') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+}

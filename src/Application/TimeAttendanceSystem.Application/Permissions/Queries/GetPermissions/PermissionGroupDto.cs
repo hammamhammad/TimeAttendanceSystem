@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Application.Permissions.Queries.GetPermissions;
+namespace TecAxle.Hrms.Application.Permissions.Queries.GetPermissions;
 
 public class PermissionGroupDto
 {

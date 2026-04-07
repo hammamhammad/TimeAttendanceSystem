@@ -1,0 +1,164 @@
+<div class="container-fluid app-modern-view">
+  <app-form-header [title]="i18n.t('surveys.results_title')" moduleName="surveys" moduleRoute="surveys/distributions" [loading]="loading()" />
+
+  @if (loading()) { <app-loading-spinner [message]="i18n.t('common.loading')" [centered]="true" /> }
+  @if (error()) { <div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>{{ error() }}</div> }
+  @if (results() && !loading()) {
+    <!-- Overview Cards -->
+    <div class="row mb-4">
+      <div class="col-md-3">
+        <div class="card text-center">
+          <div class="card-body">
+            <div class="text-muted small mb-1">{{ i18n.t('surveys.total_participants') }}</div>
+            <div class="display-6 fw-bold text-primary">{{ results()!.totalParticipants }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center">
+          <div class="card-body">
+            <div class="text-muted small mb-1">{{ i18n.t('surveys.completed_count') }}</div>
+            <div class="display-6 fw-bold text-success">{{ results()!.completedCount }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center">
+          <div class="card-body">
+            <div class="text-muted small mb-1">{{ i18n.t('surveys.completion_rate') }}</div>
+            <div class="display-6 fw-bold text-info">{{ results()!.completionRate }}%</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center">
+          <div class="card-body">
+            <button class="btn btn-outline-primary btn-sm" (click)="exportResults()" [disabled]="exporting()">
+              @if (exporting()) { <i class="fas fa-spinner fa-spin me-1"></i> }
+              @else { <i class="fas fa-download me-1"></i> }
+              {{ i18n.t('surveys.export_csv') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- eNPS Gauge (if applicable) -->
+    @if (results()!.enpsScore !== undefined && results()!.enpsScore !== null) {
+      <div class="card mb-4">
+        <div class="card-header"><h5 class="card-title mb-0"><i class="fas fa-gauge-high me-2"></i>{{ i18n.t('surveys.enps_score') }}</h5></div>
+        <div class="card-body">
+          <div class="row align-items-center">
+            <div class="col-md-4 text-center">
+              <div class="display-3 fw-bold" [class]="'text-' + enpsColor()">{{ results()!.enpsScore }}</div>
+              <div class="fw-semibold" [class]="'text-' + enpsColor()">{{ enpsLabel() }}</div>
+            </div>
+            <div class="col-md-8">
+              <div class="row text-center">
+                <div class="col-4">
+                  <div class="fw-bold text-success fs-4">{{ results()!.enpsPromoters }}%</div>
+                  <small class="text-muted">{{ i18n.t('surveys.enps_promoters') }}</small>
+                  <div class="progress mt-1" style="height: 6px;"><div class="progress-bar bg-success" [style.width.%]="results()!.enpsPromoters"></div></div>
+                </div>
+                <div class="col-4">
+                  <div class="fw-bold text-warning fs-4">{{ results()!.enpsPassives }}%</div>
+                  <small class="text-muted">{{ i18n.t('surveys.enps_passives') }}</small>
+                  <div class="progress mt-1" style="height: 6px;"><div class="progress-bar bg-warning" [style.width.%]="results()!.enpsPassives"></div></div>
+                </div>
+                <div class="col-4">
+                  <div class="fw-bold text-danger fs-4">{{ results()!.enpsDetractors }}%</div>
+                  <small class="text-muted">{{ i18n.t('surveys.enps_detractors') }}</small>
+                  <div class="progress mt-1" style="height: 6px;"><div class="progress-bar bg-danger" [style.width.%]="results()!.enpsDetractors"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Question-by-Question Results -->
+    <app-section-card [title]="i18n.t('surveys.question_results')" icon="fas fa-chart-bar" headerClass="bg-light">
+      @for (q of results()!.questionResults; track q.questionId; let i = $index) {
+        <div class="mb-4 p-3 border rounded">
+          <div class="d-flex align-items-start mb-2">
+            <span class="badge bg-primary me-2">{{ i + 1 }}</span>
+            <div class="flex-grow-1">
+              <div class="fw-semibold">{{ q.questionText }}</div>
+              <small class="text-muted"><i [class]="getQuestionIcon(q.questionType) + ' me-1'"></i>{{ i18n.t('surveys.question_type_' + q.questionType) }} &middot; {{ q.responseCount }} {{ i18n.t('surveys.responses') }}</small>
+            </div>
+          </div>
+
+          <!-- Rating Result -->
+          @if (q.questionType === 'Rating' && q.averageRating !== undefined) {
+            <div class="d-flex align-items-center gap-2">
+              @for (star of getRatingStars(q.averageRating!); track star) {
+                <i class="fas fa-star" [class.text-warning]="star <= q.averageRating!" [class.text-muted]="star > q.averageRating!"></i>
+              }
+              <span class="fw-bold ms-2">{{ q.averageRating!.toFixed(1) }} / 5</span>
+            </div>
+          }
+
+          <!-- Multiple Choice / Multi Select Result -->
+          @if ((q.questionType === 'MultipleChoice' || q.questionType === 'MultiSelect') && q.optionCounts?.length) {
+            @for (opt of q.optionCounts; track opt.option) {
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <div style="min-width: 120px;" class="small text-truncate">{{ opt.option }}</div>
+                <div class="progress flex-grow-1" style="height: 20px;">
+                  <div class="progress-bar" [style.width.%]="getOptionPercentage(opt.count, q.responseCount)">
+                    {{ getOptionPercentage(opt.count, q.responseCount) }}%
+                  </div>
+                </div>
+                <small class="text-muted" style="min-width: 30px;">{{ opt.count }}</small>
+              </div>
+            }
+          }
+
+          <!-- NPS Result -->
+          @if (q.questionType === 'NPS' && q.npsScore !== undefined) {
+            <div class="d-flex align-items-center gap-3">
+              <span class="fw-bold fs-5">{{ i18n.t('surveys.nps') }}: {{ q.npsScore }}</span>
+            </div>
+          }
+
+          <!-- Yes/No Result -->
+          @if (q.questionType === 'YesNo') {
+            <div class="d-flex gap-4">
+              <div>
+                <span class="badge bg-success me-1">{{ i18n.t('common.yes') }}</span>
+                <span class="fw-bold">{{ q.yesCount ?? 0 }}</span>
+                <small class="text-muted">({{ getOptionPercentage(q.yesCount ?? 0, q.responseCount) }}%)</small>
+              </div>
+              <div>
+                <span class="badge bg-danger me-1">{{ i18n.t('common.no') }}</span>
+                <span class="fw-bold">{{ q.noCount ?? 0 }}</span>
+                <small class="text-muted">({{ getOptionPercentage(q.noCount ?? 0, q.responseCount) }}%)</small>
+              </div>
+            </div>
+          }
+
+          <!-- Open Text Responses -->
+          @if (q.questionType === 'OpenText' && q.textResponses && q.textResponses.length > 0) {
+            <div class="mt-2">
+              @for (text of q.textResponses!.slice(0, 5); track $index) {
+                <div class="border-start border-3 ps-2 mb-1 small text-muted fst-italic">"{{ text }}"</div>
+              }
+              @if (q.textResponses!.length > 5) {
+                <small class="text-muted">... {{ i18n.t('surveys.and_more', { count: q.textResponses!.length - 5 }) }}</small>
+              }
+            </div>
+          }
+        </div>
+      }
+    </app-section-card>
+
+    <!-- Audit History -->
+    <div class="row mt-3">
+      <div class="col-12">
+        <app-section-card [title]="i18n.t('history.title')" icon="fas fa-clock-rotate-left" headerClass="bg-light">
+          <app-audit-history [entityName]="'SurveyDistribution'" [entityId]="distributionId()" />
+        </app-section-card>
+      </div>
+    </div>
+  }
+</div>

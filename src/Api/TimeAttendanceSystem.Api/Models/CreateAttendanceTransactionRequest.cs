@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.Attendance;
+using TecAxle.Hrms.Domain.Attendance;
 
-namespace TimeAttendanceSystem.Api.Models;
+namespace TecAxle.Hrms.Api.Models;
 
 /// <summary>
 /// Request model for creating a new attendance transaction.

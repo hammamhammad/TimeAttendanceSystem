@@ -1,7 +1,9 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.VacationTypes.Commands.DeleteVacationType;
+namespace TecAxle.Hrms.Application.VacationTypes.Commands.DeleteVacationType;
 
 /// <summary>
 /// CQRS command for soft-deleting a vacation type in the Time Attendance System.
@@ -44,4 +46,5 @@ namespace TimeAttendanceSystem.Application.VacationTypes.Commands.DeleteVacation
 /// - Includes specific reasons why deletion might be prevented
 /// - Supports localized error messages based on user language preferences
 /// </remarks>
+[RequiresModule(SystemModule.LeaveManagement)]
 public record DeleteVacationTypeCommand(long Id) : IRequest<Result<bool>>;

@@ -27,7 +27,7 @@ h2 {
 /* Filters */
 .form-label {
   font-weight: 500;
-  color: #495057;
+  color: var(--app-gray-700, #344054);
   margin-bottom: 0.5rem;
 }
 
@@ -38,7 +38,7 @@ h2 {
 }
 
 .form-select:focus {
-  border-color: #80bdff;
+  border-color: var(--app-primary-300, #8BA3FF);
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
@@ -56,32 +56,32 @@ h2 {
 }
 
 .btn-primary {
-  background-color: #007bff;
-  border-color: #007bff;
+  background-color: var(--app-primary, #4F6BF6);
+  border-color: var(--app-primary, #4F6BF6);
 }
 
 .btn-primary:hover {
-  background-color: #0056b3;
+  background-color: var(--app-primary-700, #2D3EB3);
   border-color: #004085;
 }
 
 .btn-outline-primary {
-  color: #007bff;
-  border-color: #007bff;
+  color: var(--app-primary, #4F6BF6);
+  border-color: var(--app-primary, #4F6BF6);
 }
 
 .btn-outline-primary:hover {
-  background-color: #007bff;
+  background-color: var(--app-primary, #4F6BF6);
   color: #fff;
 }
 
 .btn-outline-secondary {
-  color: #6c757d;
-  border-color: #6c757d;
+  color: var(--app-gray-500, #667085);
+  border-color: var(--app-gray-500, #667085);
 }
 
 .btn-outline-secondary:hover {
-  background-color: #6c757d;
+  background-color: var(--app-gray-500, #667085);
   color: #fff;
 }
 

@@ -9,11 +9,12 @@ import { Department } from '../../../shared/models/department.model';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { SearchableSelectComponent, SearchableSelectOption } from '../../../shared/components/searchable-select/searchable-select.component';
 import { FormSectionComponent } from '../../../shared/components/form-section/form-section.component';
+import { FileUploadComponent, FileUploadedEvent } from '../../../shared/components/file-upload/file-upload.component';
 
 @Component({
   selector: 'app-edit-employee',
   standalone: true,
-  imports: [RouterModule, ReactiveFormsModule, SearchableSelectComponent, FormSectionComponent],
+  imports: [RouterModule, ReactiveFormsModule, SearchableSelectComponent, FormSectionComponent, FileUploadComponent],
   template: `
     <div class="container-fluid app-modern-form">
       <!-- Header -->
@@ -377,6 +378,24 @@ import { FormSectionComponent } from '../../../shared/components/form-section/fo
             </div>
           </app-form-section>
 
+          <!-- Photo Upload Section -->
+          <app-form-section [title]="i18n.t('files.upload_photo')" variant="modern">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <app-file-upload
+                  [label]="i18n.t('files.upload_photo')"
+                  [category]="'employee-photos'"
+                  [accept]="'.jpg,.jpeg,.png'"
+                  [currentFileUrl]="employeeForm.get('photoUrl')?.value || undefined"
+                  [entityType]="'Employee'"
+                  [entityId]="employee()?.id"
+                  [fieldName]="'photoUrl'"
+                  (fileUploaded)="onPhotoUploaded($event)">
+                </app-file-upload>
+              </div>
+            </div>
+          </app-form-section>
+
           <!-- Form Actions -->
           <div class="app-form-actions">
             <button type="button" class="btn btn-outline-secondary" (click)="onCancel()" [disabled]="saving()">
@@ -451,7 +470,8 @@ export class EditEmployeeComponent implements OnInit {
       employmentStatus: ['', Validators.required],
       workLocationType: ['', Validators.required],
       departmentId: [''],
-      managerEmployeeId: ['']
+      managerEmployeeId: [''],
+      photoUrl: ['']
     });
   }
 
@@ -554,7 +574,8 @@ export class EditEmployeeComponent implements OnInit {
       employmentStatus: employee.employmentStatus,
       workLocationType: employee.workLocationType,
       departmentId: employee.departmentId ? employee.departmentId.toString() : '',
-      managerEmployeeId: employee.managerEmployeeId ? employee.managerEmployeeId.toString() : ''
+      managerEmployeeId: employee.managerEmployeeId ? employee.managerEmployeeId.toString() : '',
+      photoUrl: employee.photoUrl || ''
     });
   }
 
@@ -584,7 +605,7 @@ export class EditEmployeeComponent implements OnInit {
       workLocationType: +formValue.workLocationType,
       departmentId: formValue.departmentId ? +formValue.departmentId : null,
       managerEmployeeId: formValue.managerEmployeeId ? +formValue.managerEmployeeId : null,
-      photoUrl: null
+      photoUrl: formValue.photoUrl || null
     };
 
     this.employeesService.updateEmployee(this.employee()!.id, updateRequest).subscribe({
@@ -663,6 +684,10 @@ export class EditEmployeeComponent implements OnInit {
   }
 
 
+
+  onPhotoUploaded(event: FileUploadedEvent): void {
+    this.employeeForm.patchValue({ photoUrl: event.fileUrl });
+  }
 
   private getErrorMessage(error: any): string {
     if (error?.error?.error) {

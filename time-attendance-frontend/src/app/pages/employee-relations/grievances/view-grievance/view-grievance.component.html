@@ -1,0 +1,78 @@
+<div class="app-view-page app-modern-view">
+  <app-form-header
+    mode="view"
+    [title]="i18n.t('grievances.view_details')"
+    moduleName="grievances"
+    moduleRoute="employee-relations/grievances"
+    [entityId]="grievance()?.id"
+    [loading]="loading()"
+    [actions]="headerActions()">
+  </app-form-header>
+
+  @if (loading()) {
+    <div class="text-center py-5">
+      <app-loading-spinner [message]="i18n.t('common.loading')" [variant]="'primary'" [centered]="true"></app-loading-spinner>
+    </div>
+  }
+
+  @if (grievance() && !loading()) {
+    <app-section-card [title]="i18n.t('grievances.details')" icon="fas fa-exclamation-circle" headerClass="bg-light" class="mb-4">
+      <app-definition-list [items]="basicInfoItems()" [labelWidth]="'4'" [valueWidth]="'8'"></app-definition-list>
+    </app-section-card>
+
+    @if (assignmentInfoItems().length > 0) {
+      <app-section-card [title]="i18n.t('grievances.assignment_resolution')" icon="fas fa-clipboard-check" headerClass="bg-light" class="mb-4">
+        <app-definition-list [items]="assignmentInfoItems()" [labelWidth]="'4'" [valueWidth]="'8'"></app-definition-list>
+      </app-section-card>
+    }
+
+    <app-section-card [title]="i18n.t('grievances.notes')" icon="fas fa-sticky-note" headerClass="bg-light" class="mb-4">
+      @if (notes().length > 0) {
+        <div class="notes-timeline">
+          @for (note of notes(); track note.id) {
+            <div class="note-item" [class.internal]="note.isInternal">
+              <div class="note-header">
+                <strong>{{ note.createdByName || i18n.t('common.system') }}</strong>
+                <span class="text-muted ms-2">{{ formatDate(note.createdAtUtc) }}</span>
+                @if (note.isInternal) {
+                  <app-status-badge status="warning" [label]="i18n.t('grievances.internal_note')"></app-status-badge>
+                }
+              </div>
+              <div class="note-body">{{ note.note }}</div>
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="text-muted mb-0">{{ i18n.t('grievances.no_notes') }}</p>
+      }
+
+      <hr>
+      <form [formGroup]="noteForm" (ngSubmit)="submitNote()" class="mt-3">
+        <div class="row g-3">
+          <div class="col-12">
+            <div class="form-floating">
+              <textarea class="form-control" id="noteText" formControlName="note" placeholder="Note" style="height: 80px"></textarea>
+              <label for="noteText">{{ i18n.t('grievances.add_note') }}</label>
+            </div>
+          </div>
+          <div class="col-auto">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="isInternal" formControlName="isInternal">
+              <label class="form-check-label" for="isInternal">{{ i18n.t('grievances.internal_note') }}</label>
+            </div>
+          </div>
+          <div class="col-auto ms-auto">
+            <button type="submit" class="btn btn-primary btn-sm" [disabled]="addingNote()">
+              @if (addingNote()) { <span class="spinner-border spinner-border-sm me-1"></span> }
+              {{ i18n.t('grievances.add_note') }}
+            </button>
+          </div>
+        </div>
+      </form>
+    </app-section-card>
+
+    <app-section-card [title]="i18n.t('history.title')" icon="fas fa-clock-rotate-left" headerClass="bg-light" class="mb-4">
+      <app-audit-history [entityName]="'Grievance'" [entityId]="grievance()?.id" />
+    </app-section-card>
+  }
+</div>

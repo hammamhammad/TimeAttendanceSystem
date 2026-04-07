@@ -1,0 +1,44 @@
+<div class="file-upload-wrapper">
+  @if (currentFileUrl && !uploadedFile()) {
+    <div class="current-file d-flex align-items-center gap-2 mb-2">
+      <i class="fa-solid fa-paperclip"></i>
+      <a [href]="getFullFileUrl(currentFileUrl)" target="_blank" class="text-primary text-truncate">{{ currentFileName || i18n.t('files.view_file') }}</a>
+      <button type="button" class="btn btn-sm btn-outline-danger ms-auto" (click)="removeFile()" [title]="i18n.t('files.remove')">
+        <i class="fa-solid fa-times"></i>
+      </button>
+    </div>
+  }
+
+  @if (uploadedFile()) {
+    <div class="uploaded-file d-flex align-items-center gap-2 mb-2">
+      <i class="fa-solid fa-check-circle text-success"></i>
+      <span class="text-truncate">{{ uploadedFile()!.fileName }}</span>
+      <button type="button" class="btn btn-sm btn-outline-danger ms-auto" (click)="removeFile()" [title]="i18n.t('files.remove')">
+        <i class="fa-solid fa-times"></i>
+      </button>
+    </div>
+  }
+
+  @if (!uploadedFile()) {
+    <div class="upload-area">
+      <label class="upload-label d-flex align-items-center gap-2 p-3 border border-dashed rounded"
+             [class.border-danger]="error()">
+        @if (uploading()) {
+          <span class="spinner-border spinner-border-sm"></span>
+          <span>{{ i18n.t('files.uploading') }}</span>
+        } @else {
+          <i class="fa-solid fa-cloud-upload-alt text-muted"></i>
+          <span class="text-muted">{{ displayLabel }}</span>
+        }
+        <input type="file"
+               class="d-none"
+               [accept]="accept"
+               (change)="onFileSelected($event)"
+               [disabled]="uploading()">
+      </label>
+      @if (error()) {
+        <small class="text-danger mt-1 d-block">{{ error() }}</small>
+      }
+    </div>
+  }
+</div>

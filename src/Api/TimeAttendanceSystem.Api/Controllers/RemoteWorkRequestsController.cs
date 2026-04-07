@@ -2,17 +2,17 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Features.RemoteWorkRequests.Commands.CreateRemoteWorkRequest;
-using TimeAttendanceSystem.Application.Features.RemoteWorkRequests.Commands.CancelRemoteWorkRequest;
-using TimeAttendanceSystem.Application.Features.RemoteWorkRequests.Commands.UpdateRemoteWorkRequest;
-using TimeAttendanceSystem.Application.Features.RemoteWorkRequests.Commands.ApproveRemoteWorkRequest;
-using TimeAttendanceSystem.Application.Features.RemoteWorkRequests.Queries.GetRemoteWorkRequests;
-using TimeAttendanceSystem.Application.Features.RemoteWorkRequests.Queries.GetRemoteWorkRequestById;
-using TimeAttendanceSystem.Domain.RemoteWork;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Features.RemoteWorkRequests.Commands.CreateRemoteWorkRequest;
+using TecAxle.Hrms.Application.Features.RemoteWorkRequests.Commands.CancelRemoteWorkRequest;
+using TecAxle.Hrms.Application.Features.RemoteWorkRequests.Commands.UpdateRemoteWorkRequest;
+using TecAxle.Hrms.Application.Features.RemoteWorkRequests.Commands.ApproveRemoteWorkRequest;
+using TecAxle.Hrms.Application.Features.RemoteWorkRequests.Queries.GetRemoteWorkRequests;
+using TecAxle.Hrms.Application.Features.RemoteWorkRequests.Queries.GetRemoteWorkRequestById;
+using TecAxle.Hrms.Domain.RemoteWork;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 /// <summary>
 /// API controller for managing remote work requests.

@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Permissions.Queries.GetPermissions;
+namespace TecAxle.Hrms.Application.Permissions.Queries.GetPermissions;
 
 public class GetPermissionsQueryHandler : BaseHandler<GetPermissionsQuery, Result<List<PermissionGroupDto>>>
 {

@@ -1,7 +1,7 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Workflows.Commands.DeleteDelegation;
+namespace TecAxle.Hrms.Application.Workflows.Commands.DeleteDelegation;
 
 /// <summary>
 /// CQRS command for deleting an approval delegation.

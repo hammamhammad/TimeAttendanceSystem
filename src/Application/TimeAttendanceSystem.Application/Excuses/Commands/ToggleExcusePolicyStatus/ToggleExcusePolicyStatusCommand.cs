@@ -1,7 +1,9 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.Excuses.Commands.ToggleExcusePolicyStatus;
+namespace TecAxle.Hrms.Application.Excuses.Commands.ToggleExcusePolicyStatus;
 
 /// <summary>
 /// CQRS command for toggling an excuse policy's active status.
@@ -25,6 +27,7 @@ namespace TimeAttendanceSystem.Application.Excuses.Commands.ToggleExcusePolicySt
 /// - Branch-scoped access control for multi-tenant environments
 /// - Audit trail maintained for compliance
 /// </remarks>
+[RequiresModule(SystemModule.LeaveManagement)]
 public record ToggleExcusePolicyStatusCommand(
     long Id
 ) : IRequest<Result<bool>>;

@@ -40,10 +40,13 @@ export class SignalRService {
 
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(`${environment.apiUrl}/hubs/notifications`, {
-        accessTokenFactory: () => token
+        accessTokenFactory: () => this.authService.getAccessToken() || '',
+        // Force LongPolling - JWT token (10KB+) exceeds URL length limits for WebSocket/SSE query strings.
+        // LongPolling sends the token via HTTP headers which have no size limit.
+        transport: signalR.HttpTransportType.LongPolling
       })
       .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
-      .configureLogging(signalR.LogLevel.Information)
+      .configureLogging(signalR.LogLevel.Warning)
       .build();
 
     this.registerHandlers();
@@ -51,9 +54,8 @@ export class SignalRService {
     try {
       await this.hubConnection.start();
       this.isConnected.set(true);
-      console.log('SignalR connected');
     } catch (error) {
-      console.error('SignalR connection error:', error);
+      // Silently handle connection failure - will auto-retry via reconnect
       this.isConnected.set(false);
     }
   }
@@ -66,9 +68,8 @@ export class SignalRService {
       try {
         await this.hubConnection.stop();
         this.isConnected.set(false);
-        console.log('SignalR disconnected');
       } catch (error) {
-        console.error('SignalR disconnection error:', error);
+        // Silently handle disconnection errors
       }
     }
   }
@@ -87,19 +88,22 @@ export class SignalRService {
       this.unreadCount.set(count);
     });
 
-    this.hubConnection.onreconnecting((error) => {
+    this.hubConnection.onreconnecting(() => {
       this.isConnected.set(false);
-      console.log('SignalR reconnecting...', error);
     });
 
-    this.hubConnection.onreconnected((connectionId) => {
+    this.hubConnection.onreconnected(() => {
       this.isConnected.set(true);
-      console.log('SignalR reconnected:', connectionId);
     });
 
-    this.hubConnection.onclose((error) => {
+    this.hubConnection.onclose(() => {
       this.isConnected.set(false);
-      console.log('SignalR connection closed:', error);
+      // Attempt reconnection after 5 seconds if user is still authenticated
+      setTimeout(() => {
+        if (this.authService.getAccessToken()) {
+          this.startConnection();
+        }
+      }, 5000);
     });
   }
 }

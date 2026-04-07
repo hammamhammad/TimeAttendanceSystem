@@ -1,0 +1,25 @@
+<div class="app-list-page">
+  <app-page-header [title]="i18n.t('training_sessions.title')" />
+  <app-unified-filter [searchPlaceholder]="i18n.t('training_sessions.search')" [showRefreshButton]="true" [refreshing]="loading()"
+    [showAddButton]="true" [addButtonText]="i18n.t('training_sessions.create')"
+    (add)="navigateToCreate()" (searchChange)="onSearchChange($event)" (refresh)="onRefreshData()" />
+
+  <app-data-table [data]="data()" [columns]="columns" [actions]="tableActions()" [currentPage]="currentPage()"
+    [totalPages]="totalPages()" [totalItems]="totalCount()" [pageSize]="pageSize()" [loading]="loading"
+    [emptyTitle]="i18n.t('training_sessions.no_data')" [showPagination]="true"
+    (actionClick)="onActionClick($event)" (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)">
+    <ng-template #cellTemplate let-item let-column="column">
+      @if (column.key === 'status') {
+        <span class="badge" [class.bg-primary]="item.status === 'Scheduled'" [class.bg-info]="item.status === 'InProgress'"
+          [class.bg-success]="item.status === 'Completed'" [class.bg-danger]="item.status === 'Cancelled'"
+          [class.bg-warning]="item.status === 'Postponed'">
+          {{ i18n.t('training_sessions.status_' + item.status) }}
+        </span>
+      } @else if (column.key === 'startDate' || column.key === 'endDate') {
+        {{ item[column.key] ? (item[column.key] | date) : '-' }}
+      } @else {
+        {{ item[column.key] ?? '-' }}
+      }
+    </ng-template>
+  </app-data-table>
+</div>

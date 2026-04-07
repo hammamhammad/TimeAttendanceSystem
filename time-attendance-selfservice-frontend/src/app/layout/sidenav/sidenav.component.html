@@ -16,6 +16,7 @@
   <ul class="nav flex-column mt-2">
     @for (item of menuItems(); track item.path || item.titleKey) {
       @if (item.isSeparator) {
+        <!-- Separator -->
         <li class="nav-separator">
           @if (!collapsed()) {
             <hr class="my-2">
@@ -24,7 +25,46 @@
             <hr class="my-2">
           }
         </li>
+      } @else if (item.children && item.children.length > 0) {
+        <!-- Grouped menu item with children -->
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center justify-content-between"
+             [class.active]="isParentActive(item)"
+             (click)="toggleSubmenu(item.path)"
+             style="cursor: pointer"
+             [title]="collapsed() ? t(item.titleKey) : ''">
+            <div class="d-flex align-items-center">
+              <i class="{{ item.icon }} nav-icon"></i>
+              @if (!collapsed()) {
+                <span class="text-truncate">{{ t(item.titleKey) }}</span>
+              }
+            </div>
+            @if (!collapsed() && hasVisibleChildren(item)) {
+              <i class="bi bi-chevron-down submenu-chevron"
+                 [class.rotate-180]="isSubmenuOpen(item.path)"></i>
+            }
+          </a>
+          <!-- Submenu children -->
+          @if (!collapsed() && isSubmenuOpen(item.path) && hasVisibleChildren(item)) {
+            <ul class="nav flex-column submenu">
+              @for (child of item.children; track child.path) {
+                @if (isChildVisible(child)) {
+                  <li class="nav-item">
+                    <a class="nav-link d-flex align-items-center"
+                       [routerLink]="child.path"
+                       routerLinkActive="active"
+                       [title]="t(child.titleKey)">
+                      <i class="{{ child.icon }} nav-icon"></i>
+                      <span class="text-truncate">{{ t(child.titleKey) }}</span>
+                    </a>
+                  </li>
+                }
+              }
+            </ul>
+          }
+        </li>
       } @else {
+        <!-- Simple menu item (no children) -->
         <li class="nav-item">
           <a class="nav-link d-flex align-items-center"
              [routerLink]="item.path"

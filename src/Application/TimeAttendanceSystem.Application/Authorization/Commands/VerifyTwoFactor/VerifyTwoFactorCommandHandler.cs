@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Application.Authorization.Commands.Login;
-using TimeAttendanceSystem.Domain.Users;
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Authorization.Commands.Login;
+using TecAxle.Hrms.Domain.Users;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Application.Authorization.Commands.VerifyTwoFactor;
+namespace TecAxle.Hrms.Application.Authorization.Commands.VerifyTwoFactor;
 
 public class VerifyTwoFactorCommandHandler : BaseHandler<VerifyTwoFactorCommand, Result<LoginResponse>>
 {
@@ -97,13 +97,18 @@ public class VerifyTwoFactorCommandHandler : BaseHandler<VerifyTwoFactorCommand,
 
         var branchIds = user.UserBranchScopes.Select(ubs => ubs.BranchId).ToList();
 
+        // Resolve tenant from user's branch scope
+        var tenantId = user.UserBranchScopes
+            .Select(ubs => ubs.Branch?.TenantId)
+            .FirstOrDefault(tid => tid.HasValue && tid.Value > 0);
+
         // Generate tokens
-        var accessToken = _tokenGenerator.GenerateAccessToken(user, roles, permissions, branchIds);
+        var accessToken = _tokenGenerator.GenerateAccessToken(user, roles, permissions, branchIds, tenantId);
         var refreshToken = _tokenGenerator.GenerateRefreshToken();
         var expiresAt = _tokenGenerator.GetTokenExpiration();
 
         // Store refresh token
-        var refreshTokenEntity = new TimeAttendanceSystem.Domain.Users.RefreshToken
+        var refreshTokenEntity = new TecAxle.Hrms.Domain.Users.RefreshToken
         {
             UserId = user.Id,
             Token = refreshToken,

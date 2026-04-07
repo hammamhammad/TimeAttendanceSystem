@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Application.VacationTypes.Queries.GetVacationTypes;
+namespace TecAxle.Hrms.Application.VacationTypes.Queries.GetVacationTypes;
 
 /// <summary>
 /// Simplified Data Transfer Object representing vacation type information for list views and administrative operations.
@@ -28,5 +28,8 @@ public record VacationTypeDto(
     string? NameAr,
     bool IsActive,
     DateTime CreatedAtUtc,
-    DateTime? ModifiedAtUtc
+    DateTime? ModifiedAtUtc,
+    bool AllowHalfDay = false,
+    bool AllowEncashment = false,
+    int? EncashmentMaxDays = null
 );

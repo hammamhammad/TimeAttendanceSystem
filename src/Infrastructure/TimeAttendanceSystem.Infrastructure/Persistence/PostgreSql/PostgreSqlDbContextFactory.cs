@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 
-namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql;
+namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql;
 
 /// <summary>
 /// Design-time factory for PostgreSQL DbContext to support EF Core tooling (migrations, scaffolding, etc.)
@@ -14,8 +14,8 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql;
 /// - Configured specifically for PostgreSQL (Npgsql) provider
 ///
 /// Usage:
-/// dotnet ef migrations add MigrationName --project src/Infrastructure/TimeAttendanceSystem.Infrastructure --startup-project src/Api/TimeAttendanceSystem.Api --output-dir Persistence/PostgreSql/Migrations
-/// dotnet ef database update --project src/Infrastructure/TimeAttendanceSystem.Infrastructure --startup-project src/Api/TimeAttendanceSystem.Api
+/// dotnet ef migrations add MigrationName --project src/Infrastructure/TecAxle.Hrms.Infrastructure --startup-project src/Api/TecAxle.Hrms.Api --output-dir Persistence/PostgreSql/Migrations
+/// dotnet ef database update --project src/Infrastructure/TecAxle.Hrms.Infrastructure --startup-project src/Api/TecAxle.Hrms.Api
 /// </remarks>
 public class PostgreSqlDbContextFactory : IDesignTimeDbContextFactory<TimeAttendanceDbContext>
 {
@@ -23,7 +23,7 @@ public class PostgreSqlDbContextFactory : IDesignTimeDbContextFactory<TimeAttend
     {
         // Build configuration to read connection string
         var configuration = new ConfigurationBuilder()
-            .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../../Api/TimeAttendanceSystem.Api"))
+            .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../../Api/TecAxle.Hrms.Api"))
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
             .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
             .AddEnvironmentVariables()

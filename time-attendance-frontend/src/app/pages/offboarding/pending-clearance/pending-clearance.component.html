@@ -1,0 +1,21 @@
+<div class="pending-clearance-page">
+  <app-page-header [title]="i18n.t('offboarding.pending_clearance.title')" />
+  <app-unified-filter
+    [showAddButton]="false"
+    [showRefreshButton]="true"
+    [refreshButtonText]="i18n.t('common.refresh')"
+    [refreshing]="loading()"
+    (refresh)="onRefreshData()">
+  </app-unified-filter>
+  <app-data-table
+    [data]="displayData()"
+    [columns]="tableColumns"
+    [actions]="tableActions"
+    [loading]="loading"
+    [totalItems]="items().length"
+    [currentPage]="1"
+    [pageSize]="100"
+    [emptyTitle]="i18n.t('offboarding.pending_clearance.no_records_title')"
+    [emptyMessage]="i18n.t('offboarding.pending_clearance.no_records')"
+    (actionClick)="onTableAction($event)" />
+</div>

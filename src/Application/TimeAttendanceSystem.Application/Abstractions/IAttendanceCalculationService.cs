@@ -1,8 +1,8 @@
-using TimeAttendanceSystem.Application.Services;
-using TimeAttendanceSystem.Domain.Attendance;
-using TimeAttendanceSystem.Domain.Shifts;
+using TecAxle.Hrms.Application.Services;
+using TecAxle.Hrms.Domain.Attendance;
+using TecAxle.Hrms.Domain.Shifts;
 
-namespace TimeAttendanceSystem.Application.Abstractions;
+namespace TecAxle.Hrms.Application.Abstractions;
 
 /// <summary>
 /// Service interface for attendance calculation operations.

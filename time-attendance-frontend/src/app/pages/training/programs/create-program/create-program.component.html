@@ -1,0 +1,97 @@
+<div class="app-modern-form">
+  <app-form-header
+    [title]="isEditMode() ? i18n.t('training_programs.edit') : i18n.t('training_programs.create')"
+    moduleName="training_programs" moduleRoute="training/programs" [loading]="saving()">
+  </app-form-header>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <app-form-section [title]="i18n.t('training_programs.basic_info')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="name" formControlName="name" placeholder="Name">
+            <label for="name">{{ i18n.t('training_programs.name') }} *</label>
+          </div>
+          @if (form.get('name')?.touched && form.get('name')?.hasError('required')) {
+            <div class="invalid-feedback d-block">{{ i18n.t('common.required') }}</div>
+          }
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="nameAr" formControlName="nameAr" placeholder="Name AR" dir="rtl">
+            <label for="nameAr">{{ i18n.t('training_programs.name_ar') }}</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <select class="form-select" id="status" formControlName="status">
+              @for (s of statuses; track s) {
+                <option [value]="s">{{ i18n.t('training_programs.status_' + s) }}</option>
+              }
+            </select>
+            <label for="status">{{ i18n.t('common.status') }} *</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="startDate" formControlName="startDate" placeholder="Start">
+            <label for="startDate">{{ i18n.t('training_programs.start_date') }}</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="endDate" formControlName="endDate" placeholder="End">
+            <label for="endDate">{{ i18n.t('training_programs.end_date') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <textarea class="form-control" id="description" formControlName="description" placeholder="Description" style="height:80px"></textarea>
+            <label for="description">{{ i18n.t('common.description') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <textarea class="form-control" id="descriptionAr" formControlName="descriptionAr" placeholder="Description AR" dir="rtl" style="height:80px"></textarea>
+            <label for="descriptionAr">{{ i18n.t('training_programs.description_ar') }}</label>
+          </div>
+        </div>
+      </div>
+    </app-form-section>
+
+    <app-form-section [title]="i18n.t('training_programs.courses')" variant="modern">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th style="width:40px"></th>
+              <th>{{ i18n.t('training_courses.name') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (opt of courseOptions(); track opt.value) {
+              <tr (click)="toggleCourse(opt.value)" style="cursor:pointer">
+                <td>
+                  <input type="checkbox" class="form-check-input" [checked]="isCourseSelected(opt.value)" (click)="$event.stopPropagation(); toggleCourse(opt.value)">
+                </td>
+                <td>{{ opt.label }}</td>
+              </tr>
+            }
+            @if (courseOptions().length === 0) {
+              <tr><td colspan="2" class="text-center text-muted">{{ i18n.t('training_programs.no_courses_available') }}</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="text-muted mt-2">{{ i18n.t('training_programs.selected_courses') }}: {{ selectedCourseIds().length }}</p>
+    </app-form-section>
+
+    <div class="app-form-actions">
+      <button type="button" class="btn btn-secondary" routerLink="/training/programs">{{ i18n.t('common.cancel') }}</button>
+      <button type="submit" class="btn btn-primary" [disabled]="saving()">
+        @if (saving()) { <span class="spinner-border spinner-border-sm me-2"></span> }
+        {{ i18n.t('common.save') }}
+      </button>
+    </div>
+  </form>
+</div>

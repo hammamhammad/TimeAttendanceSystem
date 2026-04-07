@@ -1,9 +1,9 @@
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Domain.Employees;
-using TimeAttendanceSystem.Domain.Users;
-using TimeAttendanceSystem.Domain.Workflows;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Employees;
+using TecAxle.Hrms.Domain.Users;
+using TecAxle.Hrms.Domain.Workflows;
 
-namespace TimeAttendanceSystem.Domain.Excuses;
+namespace TecAxle.Hrms.Domain.Excuses;
 
 /// <summary>
 /// Domain entity representing an employee's excuse request for time away from work.

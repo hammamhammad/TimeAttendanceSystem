@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Application.Attendance.Queries.GetMonthlyReport;
+namespace TecAxle.Hrms.Application.Attendance.Queries.GetMonthlyReport;
 
 public class MonthlyReportResponse
 {

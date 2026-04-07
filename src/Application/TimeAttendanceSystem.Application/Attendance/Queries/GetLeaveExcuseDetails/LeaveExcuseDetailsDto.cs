@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.Excuses;
+using TecAxle.Hrms.Domain.Excuses;
 
-namespace TimeAttendanceSystem.Application.Attendance.Queries.GetLeaveExcuseDetails;
+namespace TecAxle.Hrms.Application.Attendance.Queries.GetLeaveExcuseDetails;
 
 /// <summary>
 /// Response model containing leave, excuse, and remote work details for a specific employee and date.

@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Logging;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Domain.Settings;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Domain.Settings;
 
-namespace TimeAttendanceSystem.Application.Services;
+namespace TecAxle.Hrms.Application.Services;
 
 /// <summary>
 /// Service implementation for managing overtime configurations and providing business logic

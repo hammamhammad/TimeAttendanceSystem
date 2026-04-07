@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using TimeAttendanceSystem.Infrastructure.Persistence;
+using TecAxle.Hrms.Infrastructure.Persistence;
 
 #nullable disable
 
-namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
+namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
 {
     [DbContext(typeof(TimeAttendanceDbContext))]
     [Migration("20251102171735_AddIsActiveToEmployee")]
@@ -25,7 +25,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.AttendanceRecord", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Attendance.AttendanceRecord", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -200,7 +200,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("AttendanceRecords", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.AttendanceTransaction", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Attendance.AttendanceTransaction", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -310,7 +310,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("AttendanceTransactions", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.WorkingDay", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Attendance.WorkingDay", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -412,7 +412,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("WorkingDays", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Branches.Branch", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Branches.Branch", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -472,7 +472,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("Branches", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Branches.Department", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Branches.Department", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -576,7 +576,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("Departments", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Common.AuditChange", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Common.AuditChange", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -634,7 +634,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("AuditChanges", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Common.AuditLog", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Common.AuditLog", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -705,7 +705,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("AuditLogs", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Employees.Employee", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.Employee", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -831,7 +831,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("Employees", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Employees.EmployeeUserLink", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.EmployeeUserLink", b =>
                 {
                     b.Property<long>("EmployeeId")
                         .HasColumnType("bigint");
@@ -849,7 +849,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("EmployeeUserLinks", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Excuses.EmployeeExcuse", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Excuses.EmployeeExcuse", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -973,7 +973,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("EmployeeExcuses", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Excuses.ExcusePolicy", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Excuses.ExcusePolicy", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1083,7 +1083,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("ExcusePolicies", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.FingerprintRequests.FingerprintRequest", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.FingerprintRequests.FingerprintRequest", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1174,7 +1174,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("FingerprintRequests", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.RemoteWork.RemoteWorkPolicy", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.RemoteWork.RemoteWorkPolicy", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1245,7 +1245,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("RemoteWorkPolicies");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.RemoteWork.RemoteWorkRequest", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.RemoteWork.RemoteWorkRequest", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1322,7 +1322,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("RemoteWorkRequests");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Settings.OffDay", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Settings.OffDay", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1460,7 +1460,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("OffDays", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Settings.OvertimeConfiguration", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Settings.OvertimeConfiguration", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1566,7 +1566,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("OvertimeConfigurations", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Settings.PublicHoliday", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Settings.PublicHoliday", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1689,7 +1689,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("PublicHolidays", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Shifts.Shift", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Shifts.Shift", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1835,7 +1835,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("Shifts", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Shifts.ShiftAssignment", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Shifts.ShiftAssignment", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1956,7 +1956,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("ShiftAssignments", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Shifts.ShiftPeriod", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Shifts.ShiftPeriod", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -2019,7 +2019,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("ShiftPeriods", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.BlacklistedToken", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.BlacklistedToken", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -2080,7 +2080,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("BlacklistedTokens", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.LoginAttempt", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.LoginAttempt", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -2150,7 +2150,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("LoginAttempts", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.PasswordHistory", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.PasswordHistory", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -2203,7 +2203,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("PasswordHistory", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.Permission", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.Permission", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -2260,7 +2260,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("Permissions", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.RefreshToken", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.RefreshToken", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -2321,7 +2321,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("RefreshTokens", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.Role", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.Role", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -2377,7 +2377,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("Roles", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.RolePermission", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.RolePermission", b =>
                 {
                     b.Property<long>("RoleId")
                         .HasColumnType("bigint");
@@ -2392,7 +2392,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("RolePermissions", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.TwoFactorBackupCode", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.TwoFactorBackupCode", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -2440,7 +2440,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("TwoFactorBackupCodes");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.User", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.User", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -2553,7 +2553,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.UserBranchScope", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.UserBranchScope", b =>
                 {
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
@@ -2568,7 +2568,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("UserBranchScopes", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.UserRole", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.UserRole", b =>
                 {
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
@@ -2583,7 +2583,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("UserRoles", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.UserSession", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.UserSession", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -2665,7 +2665,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("UserSessions");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.VacationTypes.VacationType", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.VacationTypes.VacationType", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -2738,7 +2738,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("VacationTypes", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Vacations.EmployeeVacation", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Vacations.EmployeeVacation", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -2841,20 +2841,20 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("EmployeeVacations", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.AttendanceRecord", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Attendance.AttendanceRecord", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("TimeAttendanceSystem.Domain.RemoteWork.RemoteWorkRequest", "RemoteWorkRequest")
+                    b.HasOne("TecAxle.Hrms.Domain.RemoteWork.RemoteWorkRequest", "RemoteWorkRequest")
                         .WithMany()
                         .HasForeignKey("RemoteWorkRequestId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Shifts.ShiftAssignment", "ShiftAssignment")
+                    b.HasOne("TecAxle.Hrms.Domain.Shifts.ShiftAssignment", "ShiftAssignment")
                         .WithMany()
                         .HasForeignKey("ShiftAssignmentId")
                         .OnDelete(DeleteBehavior.SetNull);
@@ -2866,25 +2866,25 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("ShiftAssignment");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.AttendanceTransaction", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Attendance.AttendanceTransaction", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Attendance.AttendanceRecord", null)
+                    b.HasOne("TecAxle.Hrms.Domain.Attendance.AttendanceRecord", null)
                         .WithMany("Transactions")
                         .HasForeignKey("AttendanceRecordId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "EnteredByUser")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "EnteredByUser")
                         .WithMany()
                         .HasForeignKey("EnteredByUserId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "VerifiedByUser")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "VerifiedByUser")
                         .WithMany()
                         .HasForeignKey("VerifiedByUserId")
                         .OnDelete(DeleteBehavior.NoAction);
@@ -2896,26 +2896,26 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("VerifiedByUser");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.WorkingDay", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Attendance.WorkingDay", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Attendance.AttendanceRecord", "AttendanceRecord")
+                    b.HasOne("TecAxle.Hrms.Domain.Attendance.AttendanceRecord", "AttendanceRecord")
                         .WithOne()
-                        .HasForeignKey("TimeAttendanceSystem.Domain.Attendance.WorkingDay", "AttendanceRecordId")
+                        .HasForeignKey("TecAxle.Hrms.Domain.Attendance.WorkingDay", "AttendanceRecordId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("AttendanceRecord");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Branches.Department", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Branches.Department", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Branch", "Branch")
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
                         .WithMany("Departments")
                         .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Department", "ParentDepartment")
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Department", "ParentDepartment")
                         .WithMany("SubDepartments")
                         .HasForeignKey("ParentDepartmentId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -2925,9 +2925,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("ParentDepartment");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Common.AuditChange", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Common.AuditChange", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Common.AuditLog", "AuditLog")
+                    b.HasOne("TecAxle.Hrms.Domain.Common.AuditLog", "AuditLog")
                         .WithMany("Changes")
                         .HasForeignKey("AuditLogId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2936,24 +2936,24 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("AuditLog");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Employees.Employee", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.Employee", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Branch", "Branch")
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Department", "Department")
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Department", "Department")
                         .WithMany()
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Department", null)
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Department", null)
                         .WithMany("Employees")
                         .HasForeignKey("DepartmentId1");
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Manager")
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Manager")
                         .WithMany("DirectReports")
                         .HasForeignKey("ManagerEmployeeId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -2965,15 +2965,15 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("Manager");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Employees.EmployeeUserLink", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.EmployeeUserLink", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
                         .WithOne("EmployeeUserLink")
-                        .HasForeignKey("TimeAttendanceSystem.Domain.Employees.EmployeeUserLink", "EmployeeId")
+                        .HasForeignKey("TecAxle.Hrms.Domain.Employees.EmployeeUserLink", "EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "User")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2984,14 +2984,14 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Excuses.EmployeeExcuse", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Excuses.EmployeeExcuse", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "ApprovedBy")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "ApprovedBy")
                         .WithMany()
                         .HasForeignKey("ApprovedById")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -3002,9 +3002,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("Employee");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Excuses.ExcusePolicy", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Excuses.ExcusePolicy", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Branch", "Branch")
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.SetNull);
@@ -3012,15 +3012,15 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("Branch");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.FingerprintRequests.FingerprintRequest", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.FingerprintRequests.FingerprintRequest", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "Technician")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "Technician")
                         .WithMany()
                         .HasForeignKey("TechnicianId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -3030,34 +3030,34 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("Technician");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.RemoteWork.RemoteWorkPolicy", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.RemoteWork.RemoteWorkPolicy", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Branch", "Branch")
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId");
 
                     b.Navigation("Branch");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.RemoteWork.RemoteWorkRequest", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.RemoteWork.RemoteWorkRequest", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "ApprovedByUser")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "ApprovedByUser")
                         .WithMany()
                         .HasForeignKey("ApprovedByUserId");
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "CreatedByUser")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedByUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TimeAttendanceSystem.Domain.RemoteWork.RemoteWorkPolicy", "RemoteWorkPolicy")
+                    b.HasOne("TecAxle.Hrms.Domain.RemoteWork.RemoteWorkPolicy", "RemoteWorkPolicy")
                         .WithMany("RemoteWorkRequests")
                         .HasForeignKey("RemoteWorkPolicyId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3072,45 +3072,45 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("RemoteWorkPolicy");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Settings.OffDay", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Settings.OffDay", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Branch", null)
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", null)
                         .WithMany()
                         .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .HasConstraintName("FK_OffDays_Branches");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Settings.PublicHoliday", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Settings.PublicHoliday", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Branch", null)
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", null)
                         .WithMany()
                         .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .HasConstraintName("FK_PublicHolidays_Branches");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Shifts.ShiftAssignment", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Shifts.ShiftAssignment", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Branch", "Branch")
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("FK_ShiftAssignments_Branches");
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Department", "Department")
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Department", "Department")
                         .WithMany()
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("FK_ShiftAssignments_Departments");
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("FK_ShiftAssignments_Employees");
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Shifts.Shift", "Shift")
+                    b.HasOne("TecAxle.Hrms.Domain.Shifts.Shift", "Shift")
                         .WithMany()
                         .HasForeignKey("ShiftId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -3126,9 +3126,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("Shift");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Shifts.ShiftPeriod", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Shifts.ShiftPeriod", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Shifts.Shift", "Shift")
+                    b.HasOne("TecAxle.Hrms.Domain.Shifts.Shift", "Shift")
                         .WithMany("ShiftPeriods")
                         .HasForeignKey("ShiftId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3137,9 +3137,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("Shift");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.BlacklistedToken", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.BlacklistedToken", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "User")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3148,9 +3148,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.LoginAttempt", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.LoginAttempt", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "User")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "User")
                         .WithMany("LoginAttempts")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.SetNull);
@@ -3158,9 +3158,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.PasswordHistory", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.PasswordHistory", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "User")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "User")
                         .WithMany("PasswordHistory")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3169,9 +3169,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.RefreshToken", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.RefreshToken", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "User")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "User")
                         .WithMany("RefreshTokens")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3180,15 +3180,15 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.RolePermission", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.RolePermission", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.Permission", "Permission")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.Permission", "Permission")
                         .WithMany("RolePermissions")
                         .HasForeignKey("PermissionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.Role", "Role")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.Role", "Role")
                         .WithMany("RolePermissions")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3199,9 +3199,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.TwoFactorBackupCode", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.TwoFactorBackupCode", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "User")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "User")
                         .WithMany("TwoFactorBackupCodes")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3210,15 +3210,15 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.UserBranchScope", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.UserBranchScope", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Branch", "Branch")
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "User")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "User")
                         .WithMany("UserBranchScopes")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3229,15 +3229,15 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.UserRole", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.UserRole", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.Role", "Role")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.Role", "Role")
                         .WithMany("UserRoles")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "User")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "User")
                         .WithMany("UserRoles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3248,9 +3248,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.UserSession", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.UserSession", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "User")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "User")
                         .WithMany("UserSessions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3259,9 +3259,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.VacationTypes.VacationType", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.VacationTypes.VacationType", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Branch", "Branch")
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -3269,16 +3269,16 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("Branch");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Vacations.EmployeeVacation", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Vacations.EmployeeVacation", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK_EmployeeVacations_Employees");
 
-                    b.HasOne("TimeAttendanceSystem.Domain.VacationTypes.VacationType", "VacationType")
+                    b.HasOne("TecAxle.Hrms.Domain.VacationTypes.VacationType", "VacationType")
                         .WithMany()
                         .HasForeignKey("VacationTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -3290,58 +3290,58 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("VacationType");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.AttendanceRecord", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Attendance.AttendanceRecord", b =>
                 {
                     b.Navigation("Transactions");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Branches.Branch", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Branches.Branch", b =>
                 {
                     b.Navigation("Departments");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Branches.Department", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Branches.Department", b =>
                 {
                     b.Navigation("Employees");
 
                     b.Navigation("SubDepartments");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Common.AuditLog", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Common.AuditLog", b =>
                 {
                     b.Navigation("Changes");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Employees.Employee", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.Employee", b =>
                 {
                     b.Navigation("DirectReports");
 
                     b.Navigation("EmployeeUserLink");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.RemoteWork.RemoteWorkPolicy", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.RemoteWork.RemoteWorkPolicy", b =>
                 {
                     b.Navigation("RemoteWorkRequests");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Shifts.Shift", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Shifts.Shift", b =>
                 {
                     b.Navigation("ShiftPeriods");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.Permission", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.Permission", b =>
                 {
                     b.Navigation("RolePermissions");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.Role", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.Role", b =>
                 {
                     b.Navigation("RolePermissions");
 
                     b.Navigation("UserRoles");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.User", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.User", b =>
                 {
                     b.Navigation("LoginAttempts");
 

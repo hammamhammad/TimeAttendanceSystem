@@ -1,10 +1,10 @@
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Configuration;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Domain.Branches;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Domain.Branches;
 
-namespace TimeAttendanceSystem.Infrastructure.Services;
+namespace TecAxle.Hrms.Infrastructure.Services;
 
 /// <summary>
 /// HMAC-SHA256 based encryption service for NFC tag payload signing and verification.

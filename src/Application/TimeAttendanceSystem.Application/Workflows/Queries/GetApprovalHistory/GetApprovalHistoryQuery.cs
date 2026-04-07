@@ -1,8 +1,8 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Workflows.Enums;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Workflows.Enums;
 
-namespace TimeAttendanceSystem.Application.Workflows.Queries.GetApprovalHistory;
+namespace TecAxle.Hrms.Application.Workflows.Queries.GetApprovalHistory;
 
 /// <summary>
 /// Query to get approval history for a user.

@@ -1,7 +1,7 @@
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Domain.Users;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Users;
 
-namespace TimeAttendanceSystem.Domain.Notifications;
+namespace TecAxle.Hrms.Domain.Notifications;
 
 /// <summary>
 /// Represents an in-app notification sent to a user.

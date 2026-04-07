@@ -1,11 +1,11 @@
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Branches;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Branches;
 
-namespace TimeAttendanceSystem.Application.NfcTags.Commands.ConfirmWriteProtection;
+namespace TecAxle.Hrms.Application.NfcTags.Commands.ConfirmWriteProtection;
 
 /// <summary>
 /// Handler for confirming NFC tag provisioning.

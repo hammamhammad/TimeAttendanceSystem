@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.NfcTags.Commands.UpdateNfcTag;
+namespace TecAxle.Hrms.Application.NfcTags.Commands.UpdateNfcTag;
 
 /// <summary>
 /// Handler for updating NFC tag information.

@@ -1,0 +1,96 @@
+<div class="app-list-page">
+  <app-page-header [title]="i18n.t('assets.assignments.title')"></app-page-header>
+
+  <app-unified-filter
+    moduleName="asset-assignments"
+    [refreshing]="loading()"
+    [showAddButton]="true"
+    [addButtonText]="i18n.t('assets.assignments.create')"
+    [showRefreshButton]="true"
+    [refreshButtonText]="i18n.t('common.refresh')"
+    (searchChange)="onSearchChange($event)"
+    (add)="navigateToCreate()"
+    (refresh)="onRefresh()">
+  </app-unified-filter>
+
+  <app-data-table
+    [data]="assignments()"
+    [columns]="tableColumns"
+    [actions]="tableActions()"
+    [currentPage]="currentPage()"
+    [totalPages]="totalPages()"
+    [totalItems]="totalItems()"
+    [pageSize]="pageSize()"
+    [loading]="loading"
+    [emptyTitle]="i18n.t('assets.assignments.no_assignments')"
+    [emptyMessage]="i18n.t('assets.assignments.no_assignments_message')"
+    [showPagination]="true"
+    [responsiveMode]="'auto'"
+    (actionClick)="onActionClick($event)"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+
+    <ng-template #cellTemplate let-item let-column="column">
+      @if (column.key === 'status') {
+        <app-status-badge
+          [status]="i18n.t('assets.assignments.status_' + item.status)"
+          [variant]="getAssignmentStatusVariant(item.status)">
+        </app-status-badge>
+      } @else if (column.key === 'assignedDate' || column.key === 'returnDate' || column.key === 'expectedReturnDate') {
+        {{ formatDate(item[column.key]) }}
+      } @else {
+        {{ item[column.key] || '-' }}
+      }
+    </ng-template>
+  </app-data-table>
+</div>
+
+<!-- Return Modal -->
+@if (showReturnModal()) {
+  <app-modal-wrapper [title]="i18n.t('assets.assignments.return_asset')" [show]="showReturnModal()" (close)="showReturnModal.set(false)">
+    <div class="app-modern-form">
+      <div class="mb-3">
+        <p class="text-muted">
+          {{ i18n.t('assets.assignments.return_confirm_text') }}
+          <strong>{{ returningAssignment()?.assetName }}</strong>
+        </p>
+      </div>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="returnDate"
+              [ngModel]="returnDate()" (ngModelChange)="returnDate.set($event)" placeholder="Return Date">
+            <label for="returnDate">{{ i18n.t('assets.assignments.return_date') }} <span class="text-danger">*</span></label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <select class="form-select" id="returnCondition"
+              [ngModel]="returnCondition()" (ngModelChange)="returnCondition.set($event)">
+              @for (opt of conditionOptions; track opt.value) {
+                <option [value]="opt.value">{{ i18n.t(opt.label) }}</option>
+              }
+            </select>
+            <label for="returnCondition">{{ i18n.t('assets.condition') }}</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-floating">
+            <textarea class="form-control" id="returnNotes" placeholder="Notes" style="height: 80px"
+              [ngModel]="returnNotes()" (ngModelChange)="returnNotes.set($event)"></textarea>
+            <label for="returnNotes">{{ i18n.t('common.notes') }}</label>
+          </div>
+        </div>
+      </div>
+      <div class="app-form-actions mt-3">
+        <button class="btn btn-secondary" (click)="showReturnModal.set(false)">{{ i18n.t('common.cancel') }}</button>
+        <button class="btn btn-warning" (click)="submitReturn()" [disabled]="returning() || !returnDate()">
+          @if (returning()) {
+            <span class="spinner-border spinner-border-sm me-1"></span>
+          }
+          {{ i18n.t('assets.assignments.return') }}
+        </button>
+      </div>
+    </div>
+  </app-modal-wrapper>
+}

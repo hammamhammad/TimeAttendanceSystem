@@ -1,15 +1,15 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TimeAttendanceSystem.Api.Models;
-using TimeAttendanceSystem.Application.VacationTypes.Commands.CreateVacationType;
-using TimeAttendanceSystem.Application.VacationTypes.Commands.UpdateVacationType;
-using TimeAttendanceSystem.Application.VacationTypes.Commands.DeleteVacationType;
-using TimeAttendanceSystem.Application.VacationTypes.Commands.ToggleVacationTypeStatus;
-using TimeAttendanceSystem.Application.VacationTypes.Queries.GetVacationTypes;
-using TimeAttendanceSystem.Application.VacationTypes.Queries.GetVacationTypeById;
+using TecAxle.Hrms.Api.Models;
+using TecAxle.Hrms.Application.VacationTypes.Commands.CreateVacationType;
+using TecAxle.Hrms.Application.VacationTypes.Commands.UpdateVacationType;
+using TecAxle.Hrms.Application.VacationTypes.Commands.DeleteVacationType;
+using TecAxle.Hrms.Application.VacationTypes.Commands.ToggleVacationTypeStatus;
+using TecAxle.Hrms.Application.VacationTypes.Queries.GetVacationTypes;
+using TecAxle.Hrms.Application.VacationTypes.Queries.GetVacationTypeById;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 /// <summary>
 /// API controller for vacation type management operations in the Time Attendance System.
@@ -151,7 +151,10 @@ public class VacationTypesController : ControllerBase
         var command = new CreateVacationTypeCommand(
             request.BranchId,
             request.Name,
-            request.NameAr
+            request.NameAr,
+            request.AllowHalfDay,
+            request.AllowEncashment,
+            request.EncashmentMaxDays
         );
 
         var result = await _mediator.Send(command);
@@ -184,7 +187,10 @@ public class VacationTypesController : ControllerBase
             id,
             request.BranchId,
             request.Name,
-            request.NameAr
+            request.NameAr,
+            request.AllowHalfDay,
+            request.AllowEncashment,
+            request.EncashmentMaxDays
         );
 
         var result = await _mediator.Send(command);

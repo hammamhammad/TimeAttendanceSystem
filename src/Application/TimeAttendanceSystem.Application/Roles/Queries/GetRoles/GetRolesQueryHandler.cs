@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Roles.Queries.GetRoles;
+namespace TecAxle.Hrms.Application.Roles.Queries.GetRoles;
 
 public class GetRolesQueryHandler : BaseHandler<GetRolesQuery, Result<List<RoleDto>>>
 {

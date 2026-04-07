@@ -1,8 +1,8 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Application.Workflows.Services;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Workflows.Services;
 
-namespace TimeAttendanceSystem.Application.Workflows.Commands.CancelWorkflow;
+namespace TecAxle.Hrms.Application.Workflows.Commands.CancelWorkflow;
 
 /// <summary>
 /// Handler for CancelWorkflowCommand.

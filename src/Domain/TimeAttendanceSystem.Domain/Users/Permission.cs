@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Domain.Users;
+namespace TecAxle.Hrms.Domain.Users;
 
 public class Permission : BaseEntity
 {

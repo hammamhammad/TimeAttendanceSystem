@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.Users;
+using TecAxle.Hrms.Domain.Users;
 
-namespace TimeAttendanceSystem.Application.Abstractions;
+namespace TecAxle.Hrms.Application.Abstractions;
 
 public interface IDeviceService
 {

@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.Branches;
+using TecAxle.Hrms.Domain.Branches;
 
-namespace TimeAttendanceSystem.Domain.Users;
+namespace TecAxle.Hrms.Domain.Users;
 
 public class UserBranchScope
 {

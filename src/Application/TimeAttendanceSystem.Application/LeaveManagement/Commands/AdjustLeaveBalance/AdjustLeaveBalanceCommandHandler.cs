@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.LeaveManagement.Commands.AdjustLeaveBalance;
+namespace TecAxle.Hrms.Application.LeaveManagement.Commands.AdjustLeaveBalance;
 
 /// <summary>
 /// Command handler for manually adjusting employee leave balances.

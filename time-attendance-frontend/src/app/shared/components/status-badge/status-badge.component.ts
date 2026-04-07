@@ -25,12 +25,72 @@ interface StatusStyleConfig {
   template: `
     <span [class]="getBadgeClasses()"
           [attr.title]="title || resolvedLabel">
+      <span [class]="'erp-badge-dot ' + getDotClass()"></span>
       @if (showIcon && resolvedIcon) {
-        <i [class]="resolvedIcon + ' me-1'" [class.app-pulse]="resolvedPulse"></i>
+        <i [class]="resolvedIcon" [class.app-pulse]="resolvedPulse"></i>
       }
       {{ resolvedLabel }}
     </span>
-  `
+  `,
+  styles: [`
+    :host { display: inline-block; }
+    .erp-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      border-radius: 16px;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.4;
+      white-space: nowrap;
+    }
+    .erp-badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .erp-badge-sm { padding: 2px 8px; font-size: 11px; }
+    .erp-badge-sm .erp-badge-dot { width: 5px; height: 5px; }
+    .erp-badge-lg { padding: 4px 14px; font-size: 13px; }
+
+    /* Success / Active / Approved */
+    .erp-badge-success { background: var(--app-success-50, #F0FDF4); color: var(--app-success-600, #16A34A); }
+    .erp-badge-success .erp-badge-dot { background: var(--app-success, #22C55E); }
+
+    /* Danger / Inactive / Rejected */
+    .erp-badge-danger { background: var(--app-danger-50, #FEF2F2); color: var(--app-danger-600, #DC2626); }
+    .erp-badge-danger .erp-badge-dot { background: var(--app-danger, #EF4444); }
+
+    /* Warning / Pending */
+    .erp-badge-warning { background: var(--app-warning-50, #FFFBEB); color: var(--app-warning-600, #D97706); }
+    .erp-badge-warning .erp-badge-dot { background: var(--app-warning, #F59E0B); }
+
+    /* Info / Processing */
+    .erp-badge-info { background: var(--app-info-50, #EFF6FF); color: var(--app-info-600, #2563EB); }
+    .erp-badge-info .erp-badge-dot { background: var(--app-info, #3B82F6); }
+
+    /* Primary */
+    .erp-badge-primary { background: var(--app-primary-50, #EEF2FF); color: var(--app-primary-600, #3B51D4); }
+    .erp-badge-primary .erp-badge-dot { background: var(--app-primary, #4F6BF6); }
+
+    /* Secondary / Cancelled */
+    .erp-badge-secondary { background: var(--app-gray-100, #F2F4F7); color: var(--app-gray-500, #667085); }
+    .erp-badge-secondary .erp-badge-dot { background: var(--app-gray-400, #98A2B3); }
+
+    /* Accent */
+    .erp-badge-accent { background: var(--app-accent-50, #FFF7ED); color: var(--app-accent-600, #EA580C); }
+    .erp-badge-accent .erp-badge-dot { background: var(--app-accent, #F97316); }
+
+    /* Light */
+    .erp-badge-light { background: var(--app-gray-100, #F2F4F7); color: var(--app-gray-700, #344054); }
+    .erp-badge-light .erp-badge-dot { background: var(--app-gray-400, #98A2B3); }
+
+    /* Dark */
+    .erp-badge-dark { background: var(--app-gray-800, #1D2939); color: #FFFFFF; }
+    .erp-badge-dark .erp-badge-dot { background: var(--app-gray-400, #98A2B3); }
+  `]
 })
 export class StatusBadgeComponent {
   private i18n = inject(I18nService);
@@ -129,41 +189,43 @@ export class StatusBadgeComponent {
 
   getBadgeClasses(): string {
     const variant = this.resolvedVariant;
-    const sizeClass = this.size === 'sm' ? 'badge-sm' : this.size === 'lg' ? 'badge-lg' : '';
+    const sizeClass = this.size === 'sm' ? 'erp-badge-sm' : this.size === 'lg' ? 'erp-badge-lg' : '';
+    const variantClass = this.getErpVariant(variant);
 
-    // Map custom variants to Bootstrap classes
-    const variantClass = this.getBootstrapVariant(variant);
-
-    return `badge ${variantClass} ${sizeClass}`.trim();
+    return `erp-badge ${variantClass} ${sizeClass}`.trim();
   }
 
-  private getBootstrapVariant(variant: StatusVariant): string {
+  getDotClass(): string {
+    return this.getErpVariant(this.resolvedVariant);
+  }
+
+  private getErpVariant(variant: StatusVariant): string {
     switch (variant) {
       case 'active':
       case 'success':
       case 'approved':
-        return 'bg-success';
+        return 'erp-badge-success';
       case 'inactive':
       case 'danger':
       case 'rejected':
-        return 'bg-danger';
+        return 'erp-badge-danger';
       case 'pending':
       case 'warning':
-        return 'bg-warning';
+        return 'erp-badge-warning';
       case 'processing':
       case 'info':
-        return 'bg-info';
+        return 'erp-badge-info';
       case 'cancelled':
       case 'secondary':
-        return 'bg-secondary';
+        return 'erp-badge-secondary';
       case 'primary':
-        return 'bg-primary';
+        return 'erp-badge-primary';
       case 'light':
-        return 'bg-light text-dark';
+        return 'erp-badge-light';
       case 'dark':
-        return 'bg-dark';
+        return 'erp-badge-dark';
       default:
-        return 'bg-secondary';
+        return 'erp-badge-secondary';
     }
   }
 }

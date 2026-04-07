@@ -9,11 +9,13 @@ import { PermissionResources, PermissionActions } from '../../../shared/utils/pe
 import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
 import { DefinitionListComponent, DefinitionItem } from '../../../shared/components/definition-list/definition-list.component';
 import { StatusBadgeComponent, StatusVariant } from '../../../shared/components/status-badge/status-badge.component';
+import { AuditHistoryComponent } from '../../../shared/components/audit-history/audit-history.component';
+import { SectionCardComponent } from '../../../shared/components/section-card/section-card.component';
 
 @Component({
   selector: 'app-view-role',
   standalone: true,
-  imports: [CommonModule, RouterModule, HasPermissionDirective, DefinitionListComponent, StatusBadgeComponent],
+  imports: [CommonModule, RouterModule, HasPermissionDirective, DefinitionListComponent, StatusBadgeComponent, AuditHistoryComponent, SectionCardComponent],
   template: `
     <div class="container-fluid app-modern-view">
       <!-- Header -->
@@ -172,6 +174,13 @@ import { StatusBadgeComponent, StatusVariant } from '../../../shared/components/
               </div>
             }
           </div>
+        </div>
+
+        <!-- Audit History -->
+        <div class="mt-4">
+          <app-section-card [title]="i18n.t('history.title')" icon="fas fa-clock-rotate-left" headerClass="bg-light">
+            <app-audit-history [entityName]="'Role'" [entityId]="role()?.id" />
+          </app-section-card>
         </div>
       } @else {
         <div class="alert alert-danger">

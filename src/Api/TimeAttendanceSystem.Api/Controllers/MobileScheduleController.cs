@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Domain.Shifts;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Shifts;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 /// <summary>
 /// Controller for mobile schedule data.

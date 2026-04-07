@@ -1,15 +1,15 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TimeAttendanceSystem.Api.Models;
-using TimeAttendanceSystem.Application.LeaveManagement.Commands.SetLeaveEntitlement;
-using TimeAttendanceSystem.Application.LeaveManagement.Commands.ProcessMonthlyAccrual;
-using TimeAttendanceSystem.Application.LeaveManagement.Commands.AdjustLeaveBalance;
-using TimeAttendanceSystem.Application.LeaveManagement.Queries.GetEmployeeLeaveBalance;
-using TimeAttendanceSystem.Application.LeaveManagement.Queries.GetLeaveBalanceSummary;
-using TimeAttendanceSystem.Application.LeaveManagement.Queries.GetLeaveTransactionHistory;
+using TecAxle.Hrms.Api.Models;
+using TecAxle.Hrms.Application.LeaveManagement.Commands.SetLeaveEntitlement;
+using TecAxle.Hrms.Application.LeaveManagement.Commands.ProcessMonthlyAccrual;
+using TecAxle.Hrms.Application.LeaveManagement.Commands.AdjustLeaveBalance;
+using TecAxle.Hrms.Application.LeaveManagement.Queries.GetEmployeeLeaveBalance;
+using TecAxle.Hrms.Application.LeaveManagement.Queries.GetLeaveBalanceSummary;
+using TecAxle.Hrms.Application.LeaveManagement.Queries.GetLeaveTransactionHistory;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 /// <summary>
 /// API controller for employee leave balance and entitlement management.

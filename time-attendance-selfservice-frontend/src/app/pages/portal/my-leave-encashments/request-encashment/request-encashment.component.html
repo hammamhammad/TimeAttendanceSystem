@@ -1,0 +1,64 @@
+<app-page-header [title]="i18n.t('portal.leave_encashments.request')">
+  <div header-actions>
+    <button class="btn btn-outline-secondary btn-sm" (click)="cancel()" type="button">
+      <i class="bi bi-arrow-left me-1"></i> {{ i18n.t('common.back') }}
+    </button>
+  </div>
+</app-page-header>
+
+@if (loading()) {
+  <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+}
+
+@if (!loading()) {
+  <div class="card">
+    <div class="card-body">
+      <!-- Eligible leave types info -->
+      @if (eligibleData()) {
+        <div class="alert alert-info mb-4">
+          <i class="bi bi-info-circle me-2"></i>
+          @if (eligibleData()?.eligibleTypes?.length > 0) {
+            {{ i18n.t('portal.leave_encashments.leave_type') }}: {{ eligibleData().eligibleTypes.length }}
+          } @else {
+            {{ i18n.t('portal.leave_encashments.no_records') }}
+          }
+        </div>
+      }
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">{{ i18n.t('portal.leave_encashments.leave_type') }} *</label>
+          @if (eligibleData()?.eligibleTypes?.length > 0) {
+            <select class="form-select" [(ngModel)]="vacationTypeId">
+              <option [ngValue]="null">{{ i18n.t('common.select') }}...</option>
+              @for (type of eligibleData().eligibleTypes; track type.vacationTypeId || type.id) {
+                <option [ngValue]="type.vacationTypeId || type.id">{{ type.vacationTypeName || type.name }} ({{ type.availableDays ?? type.balance ?? 0 }} {{ i18n.t('portal.leave_encashments.days') }})</option>
+              }
+            </select>
+          } @else {
+            <input type="number" class="form-control" [(ngModel)]="vacationTypeId" min="1">
+          }
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">{{ i18n.t('portal.leave_encashments.days') }} *</label>
+          <input type="number" class="form-control" [(ngModel)]="daysToEncash" min="1">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">{{ i18n.t('portal.leave_encashments.year') }}</label>
+          <input type="number" class="form-control" [(ngModel)]="year" min="2020" max="2099">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">{{ i18n.t('common.notes') }}</label>
+          <input type="text" class="form-control" [(ngModel)]="notes">
+        </div>
+      </div>
+      <div class="mt-4 d-flex gap-2">
+        <button class="btn btn-primary" (click)="submit()" [disabled]="saving()" type="button">
+          @if (saving()) { <span class="spinner-border spinner-border-sm me-1"></span> }
+          {{ i18n.t('common.submit') }}
+        </button>
+        <button class="btn btn-outline-secondary" (click)="cancel()" type="button">{{ i18n.t('common.cancel') }}</button>
+      </div>
+    </div>
+  </div>
+}

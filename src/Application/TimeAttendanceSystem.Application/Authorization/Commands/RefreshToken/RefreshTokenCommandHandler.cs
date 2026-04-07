@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Application.Authorization.Commands.Login;
-using TimeAttendanceSystem.Domain.Users;
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Authorization.Commands.Login;
+using TecAxle.Hrms.Domain.Users;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Application.Authorization.Commands.RefreshToken;
+namespace TecAxle.Hrms.Application.Authorization.Commands.RefreshToken;
 
 /// <summary>
 /// Command handler for refresh token operations implementing secure token rotation.
@@ -110,6 +110,11 @@ public class RefreshTokenCommandHandler : BaseHandler<RefreshTokenCommand, Resul
 
         var branchIds = user.UserBranchScopes.Select(ubs => ubs.BranchId).ToList();
 
+        // Resolve tenant from user's branch scope
+        var tenantId = user.UserBranchScopes
+            .Select(ubs => ubs.Branch?.TenantId)
+            .FirstOrDefault(tid => tid.HasValue && tid.Value > 0);
+
         // Fetch linked employee for full name and employee context
         string? employeeFullName = null;
         string? employeeFullNameAr = null;
@@ -132,12 +137,12 @@ public class RefreshTokenCommandHandler : BaseHandler<RefreshTokenCommand, Resul
         }
 
         // Generate new tokens
-        var accessToken = _tokenGenerator.GenerateAccessToken(user, roles, permissions, branchIds);
+        var accessToken = _tokenGenerator.GenerateAccessToken(user, roles, permissions, branchIds, tenantId);
         var newRefreshToken = _tokenGenerator.GenerateRefreshToken();
         var expiresAt = _tokenGenerator.GetTokenExpiration();
 
         // Store new refresh token
-        var newRefreshTokenEntity = new TimeAttendanceSystem.Domain.Users.RefreshToken
+        var newRefreshTokenEntity = new TecAxle.Hrms.Domain.Users.RefreshToken
         {
             UserId = user.Id,
             Token = newRefreshToken,

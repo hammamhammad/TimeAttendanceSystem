@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using TimeAttendanceSystem.Infrastructure.Persistence;
+using TecAxle.Hrms.Infrastructure.Persistence;
 
 #nullable disable
 
-namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
+namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
 {
     [DbContext(typeof(TimeAttendanceDbContext))]
     partial class TimeAttendanceDbContextModelSnapshot : ModelSnapshot
@@ -22,7 +22,804 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.AttendanceCorrectionRequest", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Analytics.AnalyticsSnapshot", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("AdditionalDataJson")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<long?>("BranchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long?>("DepartmentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("MetricType")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("PeriodType")
+                        .HasColumnType("integer");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<DateTime>("SnapshotDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("Value")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId");
+
+                    b.HasIndex("DepartmentId");
+
+                    b.HasIndex("MetricType")
+                        .HasDatabaseName("IX_AnalyticsSnapshots_MetricType");
+
+                    b.HasIndex("PeriodType")
+                        .HasDatabaseName("IX_AnalyticsSnapshots_PeriodType");
+
+                    b.HasIndex("SnapshotDate", "MetricType", "BranchId", "DepartmentId", "PeriodType")
+                        .HasDatabaseName("IX_AnalyticsSnapshots_Date_Metric_Branch_Dept_Period");
+
+                    b.ToTable("AnalyticsSnapshots", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Analytics.SavedDashboard", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LayoutJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("IX_SavedDashboards_UserId");
+
+                    b.ToTable("SavedDashboards", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Announcements.Announcement", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("AnnouncementCategoryId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ContentAr")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime?>("ExpiryDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsPinned")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("PublishedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("PublishedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("RequiresAcknowledgment")
+                        .HasColumnType("boolean");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<DateTime?>("ScheduledPublishDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("SendNotification")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TargetAudience")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TargetIds")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("TitleAr")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AnnouncementCategoryId");
+
+                    b.HasIndex("ExpiryDate")
+                        .HasDatabaseName("IX_Announcements_ExpiryDate");
+
+                    b.HasIndex("Priority")
+                        .HasDatabaseName("IX_Announcements_Priority");
+
+                    b.HasIndex("ScheduledPublishDate")
+                        .HasDatabaseName("IX_Announcements_ScheduledPublishDate");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_Announcements_Status");
+
+                    b.ToTable("Announcements", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Announcements.AnnouncementAcknowledgment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("AcknowledgedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("AnnouncementId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("IpAddress")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("AnnouncementId", "EmployeeId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_AnnouncementAcknowledgments_Announcement_Employee");
+
+                    b.ToTable("AnnouncementAcknowledgments", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Announcements.AnnouncementAttachment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("AnnouncementId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("FileAttachmentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AnnouncementId")
+                        .HasDatabaseName("IX_AnnouncementAttachments_AnnouncementId");
+
+                    b.HasIndex("FileAttachmentId");
+
+                    b.ToTable("AnnouncementAttachments", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Announcements.AnnouncementCategory", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("Icon")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AnnouncementCategories", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Assets.Asset", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("AssetCategoryId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("AssetTag")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("BranchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Condition")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LocationDescription")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("Manufacturer")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Model")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime?>("PurchaseDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal?>("PurchasePrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<string>("SerialNumber")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("WarrantyExpiryDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssetCategoryId")
+                        .HasDatabaseName("IX_Assets_AssetCategoryId");
+
+                    b.HasIndex("AssetTag")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Assets_AssetTag_Unique")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("IX_Assets_BranchId");
+
+                    b.HasIndex("SerialNumber")
+                        .HasDatabaseName("IX_Assets_SerialNumber");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_Assets_Status");
+
+                    b.ToTable("Assets", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Assets.AssetAssignment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("ActualReturnDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("AssetId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("AssignedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("AssignedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("AssignmentNotes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("ExpectedReturnDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int?>("ReturnCondition")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ReturnNotes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<long?>("ReturnReceivedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssetId")
+                        .HasDatabaseName("IX_AssetAssignments_AssetId");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_AssetAssignments_EmployeeId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_AssetAssignments_Status");
+
+                    b.HasIndex("AssetId", "Status")
+                        .HasDatabaseName("IX_AssetAssignments_Asset_Status");
+
+                    b.HasIndex("EmployeeId", "Status")
+                        .HasDatabaseName("IX_AssetAssignments_Employee_Status");
+
+                    b.ToTable("AssetAssignments", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Assets.AssetCategory", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int?>("DefaultUsefulLifeMonths")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal?>("DepreciationRatePercent")
+                        .HasColumnType("decimal(8,4)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<long?>("ParentCategoryId")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique()
+                        .HasDatabaseName("IX_AssetCategories_Code_Unique")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("ParentCategoryId")
+                        .HasDatabaseName("IX_AssetCategories_ParentCategoryId");
+
+                    b.ToTable("AssetCategories", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Assets.AssetMaintenanceRecord", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("AssetId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("CompletedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal?>("Cost")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("MaintenanceType")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<DateTime?>("ScheduledDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Vendor")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssetId")
+                        .HasDatabaseName("IX_AssetMaintenanceRecords_AssetId");
+
+                    b.HasIndex("MaintenanceType")
+                        .HasDatabaseName("IX_AssetMaintenanceRecords_MaintenanceType");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_AssetMaintenanceRecords_Status");
+
+                    b.ToTable("AssetMaintenanceRecords", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Attendance.AttendanceCorrectionRequest", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -145,7 +942,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("AttendanceCorrectionRequests", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.AttendanceRecord", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Attendance.AttendanceRecord", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -322,7 +1119,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("AttendanceRecords", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.AttendanceTransaction", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Attendance.AttendanceTransaction", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -432,7 +1229,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("AttendanceTransactions", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.AttendanceVerificationLog", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Attendance.AttendanceVerificationLog", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -568,7 +1365,172 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("AttendanceVerificationLogs", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.WorkingDay", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Attendance.OnCallSchedule", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("NotesAr")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int>("OnCallType")
+                        .HasColumnType("integer");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<long?>("ShiftId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ShiftId");
+
+                    b.HasIndex("EmployeeId", "StartDate", "EndDate")
+                        .HasDatabaseName("IX_OnCallSchedules_EmployeeId_StartDate_EndDate");
+
+                    b.ToTable("OnCallSchedules", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Attendance.ShiftSwapRequest", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("OriginalDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("OriginalShiftId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("ReasonAr")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("SwapDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("SwapShiftId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("SwapWithEmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("WorkflowInstanceId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OriginalShiftId");
+
+                    b.HasIndex("SwapShiftId");
+
+                    b.HasIndex("WorkflowInstanceId");
+
+                    b.HasIndex("EmployeeId", "OriginalDate")
+                        .HasDatabaseName("IX_ShiftSwapRequests_EmployeeId_OriginalDate");
+
+                    b.HasIndex("SwapWithEmployeeId", "SwapDate")
+                        .HasDatabaseName("IX_ShiftSwapRequests_SwapWithEmployeeId_SwapDate");
+
+                    b.ToTable("ShiftSwapRequests", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Attendance.WorkingDay", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -670,7 +1632,682 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("WorkingDays", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Branches.Branch", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Benefits.BenefitClaim", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal?>("ApprovedAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<long>("BenefitEnrollmentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal>("ClaimAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("ClaimDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("ClaimType")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasDefaultValue("SAR");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime?>("ProcessedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("ProcessedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BenefitEnrollmentId")
+                        .HasDatabaseName("IX_BenefitClaims_BenefitEnrollmentId");
+
+                    b.HasIndex("ClaimDate")
+                        .HasDatabaseName("IX_BenefitClaims_ClaimDate");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_BenefitClaims_EmployeeId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_BenefitClaims_Status");
+
+                    b.HasIndex("EmployeeId", "Status")
+                        .HasDatabaseName("IX_BenefitClaims_Employee_Status");
+
+                    b.ToTable("BenefitClaims", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Benefits.BenefitDependent", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("AdditionalPremium")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<long>("BenefitEnrollmentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("CoverageEndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CoverageStartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasDefaultValue("SAR");
+
+                    b.Property<DateTime?>("DateOfBirth")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("EmployeeDependentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("FirstNameAr")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("LastNameAr")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("NationalId")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("Relationship")
+                        .HasColumnType("integer");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BenefitEnrollmentId")
+                        .HasDatabaseName("IX_BenefitDependents_BenefitEnrollmentId");
+
+                    b.HasIndex("EmployeeDependentId")
+                        .HasDatabaseName("IX_BenefitDependents_EmployeeDependentId");
+
+                    b.ToTable("BenefitDependents", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Benefits.BenefitEligibilityRule", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("BenefitPlanId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("BranchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int?>("ContractTypeRequired")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long?>("DepartmentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int?>("EmploymentStatusRequired")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("MaxJobGradeLevel")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("MinJobGradeLevel")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("MinServiceMonths")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("RuleType")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BenefitPlanId")
+                        .HasDatabaseName("IX_BenefitEligibilityRules_BenefitPlanId");
+
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("IX_BenefitEligibilityRules_BranchId");
+
+                    b.HasIndex("DepartmentId")
+                        .HasDatabaseName("IX_BenefitEligibilityRules_DepartmentId");
+
+                    b.ToTable("BenefitEligibilityRules", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Benefits.BenefitEnrollment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("BenefitPlanId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("BenefitPlanOptionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasDefaultValue("SAR");
+
+                    b.Property<DateTime>("EffectiveDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal>("EmployeeMonthlyContribution")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("EmployerMonthlyContribution")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("EnrollmentDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LifeEventDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("LifeEventType")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<long?>("OpenEnrollmentPeriodId")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("TerminationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("TerminationReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<long?>("WorkflowInstanceId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BenefitPlanId")
+                        .HasDatabaseName("IX_BenefitEnrollments_BenefitPlanId");
+
+                    b.HasIndex("BenefitPlanOptionId");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_BenefitEnrollments_EmployeeId");
+
+                    b.HasIndex("OpenEnrollmentPeriodId")
+                        .HasDatabaseName("IX_BenefitEnrollments_OpenEnrollmentPeriodId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_BenefitEnrollments_Status");
+
+                    b.HasIndex("WorkflowInstanceId");
+
+                    b.HasIndex("EmployeeId", "BenefitPlanId", "Status")
+                        .HasDatabaseName("IX_BenefitEnrollments_Employee_Plan_Status");
+
+                    b.ToTable("BenefitEnrollments", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Benefits.BenefitPlan", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("BenefitType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("CoverageDetails")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<string>("CoverageDetailsAr")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasDefaultValue("SAR");
+
+                    b.Property<decimal>("DependentPremiumAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime>("EffectiveEndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("EffectiveStartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("EmployeePremiumAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("EmployerPremiumAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<long?>("InsuranceProviderId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("MaxDependents")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int>("PlanYear")
+                        .HasColumnType("integer");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BenefitType")
+                        .HasDatabaseName("IX_BenefitPlans_BenefitType");
+
+                    b.HasIndex("Code")
+                        .IsUnique()
+                        .HasDatabaseName("IX_BenefitPlans_Code");
+
+                    b.HasIndex("InsuranceProviderId")
+                        .HasDatabaseName("IX_BenefitPlans_InsuranceProviderId");
+
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("IX_BenefitPlans_IsActive");
+
+                    b.HasIndex("PlanYear")
+                        .HasDatabaseName("IX_BenefitPlans_PlanYear");
+
+                    b.ToTable("BenefitPlans", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Benefits.BenefitPlanOption", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("BenefitPlanId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("CoverageLevel")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasDefaultValue("SAR");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<decimal>("EmployeeCost")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("EmployerCost")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BenefitPlanId")
+                        .HasDatabaseName("IX_BenefitPlanOptions_BenefitPlanId");
+
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("IX_BenefitPlanOptions_IsActive");
+
+                    b.ToTable("BenefitPlanOptions", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Benefits.OpenEnrollmentPeriod", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("AllowLifeEventChanges")
+                        .HasColumnType("boolean");
+
+                    b.Property<long?>("BranchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<int>("PlanYear")
+                        .HasColumnType("integer");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("IX_OpenEnrollmentPeriods_BranchId");
+
+                    b.HasIndex("PlanYear")
+                        .HasDatabaseName("IX_OpenEnrollmentPeriods_PlanYear");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_OpenEnrollmentPeriods_Status");
+
+                    b.HasIndex("StartDate", "EndDate")
+                        .HasDatabaseName("IX_OpenEnrollmentPeriods_DateRange");
+
+                    b.ToTable("OpenEnrollmentPeriods", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Branches.Branch", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -725,6 +2362,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasColumnType("bytea")
                         .HasDefaultValue(new byte[] { 1 });
 
+                    b.Property<long>("TenantId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("TimeZone")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -732,14 +2372,108 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Code")
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_Branches_TenantId");
+
+                    b.HasIndex("TenantId", "Code")
                         .IsUnique()
+                        .HasDatabaseName("IX_Branches_TenantId_Code")
                         .HasFilter("\"IsDeleted\" = false");
 
                     b.ToTable("Branches", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Branches.Department", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Branches.BranchSettingsOverride", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool?>("AutoCheckOutEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<TimeOnly?>("AutoCheckOutTime")
+                        .HasColumnType("time without time zone");
+
+                    b.Property<long>("BranchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int?>("EarlyLeaveGracePeriodMinutes")
+                        .HasColumnType("integer");
+
+                    b.Property<bool?>("EnableBiometricAttendance")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("EnableGpsAttendance")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("EnableManualAttendance")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("EnableNfcAttendance")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<int?>("LateGracePeriodMinutes")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("MinimumWorkingHoursForPresent")
+                        .HasColumnType("integer");
+
+                    b.Property<bool?>("MobileCheckInEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("ModifiedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool?>("RequireGpsForMobile")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("RequireNfcForMobile")
+                        .HasColumnType("boolean");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<bool?>("TrackBreakTime")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_BranchSettingsOverrides_BranchId");
+
+                    b.ToTable("BranchSettingsOverrides", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Branches.Department", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -843,7 +2577,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("Departments", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Branches.NfcTag", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Branches.NfcTag", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -969,7 +2703,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("NfcTags", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Common.AuditChange", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Common.AuditChange", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1027,7 +2761,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("AuditChanges", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Common.AuditLog", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Common.AuditLog", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1098,7 +2832,1725 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("AuditLogs", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Employees.Employee", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Common.FileAttachment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Category")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<long?>("EntityId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("EntityType")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("FieldName")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<long>("FileSize")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("OriginalFileName")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<string>("StoredFileName")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<long?>("UploadedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Category")
+                        .HasDatabaseName("IX_FileAttachments_Category");
+
+                    b.HasIndex("StoredFileName")
+                        .IsUnique()
+                        .HasDatabaseName("IX_FileAttachments_StoredFileName");
+
+                    b.HasIndex("EntityType", "EntityId")
+                        .HasDatabaseName("IX_FileAttachments_EntityType_EntityId");
+
+                    b.ToTable("FileAttachments", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Configuration.PolicyTemplate", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("Industry")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsSystemTemplate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime>("ModifiedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Region")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(5)
+                        .HasColumnType("character varying(5)")
+                        .HasDefaultValue("SA");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<long?>("TenantId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Region")
+                        .HasDatabaseName("IX_PolicyTemplates_Region");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("Code", "TenantId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_PolicyTemplates_Code_TenantId");
+
+                    b.ToTable("PolicyTemplates", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Configuration.PolicyTemplateItem", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("ConfigurationJson")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime>("ModifiedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("PolicyTemplateId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("PolicyType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("SortOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PolicyTemplateId")
+                        .HasDatabaseName("IX_PolicyTemplateItems_PolicyTemplateId");
+
+                    b.ToTable("PolicyTemplateItems", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Configuration.SetupStep", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime?>("CompletedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CompletedByUserId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("IsCompleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsRequired")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime>("ModifiedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("SortOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("StepKey")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<long>("TenantId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_SetupSteps_TenantId");
+
+                    b.HasIndex("TenantId", "StepKey")
+                        .IsUnique()
+                        .HasDatabaseName("IX_SetupSteps_TenantId_StepKey");
+
+                    b.ToTable("SetupSteps", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Departments.DepartmentSettingsOverride", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long?>("DefaultShiftId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("DepartmentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime>("ModifiedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool?>("RequireApprovalComments")
+                        .HasColumnType("boolean");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DefaultShiftId");
+
+                    b.HasIndex("DepartmentId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_DepartmentSettingsOverrides_DepartmentId");
+
+                    b.ToTable("DepartmentSettingsOverrides", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Documents.CompanyPolicy", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<long?>("DocumentCategoryId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("DocumentUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime?>("EffectiveDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long?>("PublishedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("RequiresAcknowledgment")
+                        .HasColumnType("boolean");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("TitleAr")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("Version")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocumentCategoryId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_CompanyPolicies_Status");
+
+                    b.ToTable("CompanyPolicies", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Documents.DocumentCategory", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DocumentCategories", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Documents.EmployeeDocument", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long?>("DocumentCategoryId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("DocumentName")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("DocumentNameAr")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<int>("DocumentType")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("ExpiryDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FileUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("IssuedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("VerificationStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("VerifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("VerifiedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocumentCategoryId")
+                        .HasDatabaseName("IX_EmployeeDocuments_DocumentCategoryId");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_EmployeeDocuments_EmployeeId");
+
+                    b.HasIndex("ExpiryDate")
+                        .HasDatabaseName("IX_EmployeeDocuments_ExpiryDate");
+
+                    b.ToTable("EmployeeDocuments", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Documents.LetterRequest", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("AdditionalNotes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("ApprovedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("GeneratedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("GeneratedDocumentUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("LetterType")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Purpose")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("PurposeAr")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<long?>("SubmittedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("TemplateId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("WorkflowInstanceId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_LetterRequests_EmployeeId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_LetterRequests_Status");
+
+                    b.HasIndex("TemplateId");
+
+                    b.HasIndex("WorkflowInstanceId");
+
+                    b.ToTable("LetterRequests", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Documents.LetterTemplate", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("BranchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ContentAr")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("FooterText")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("FooterTextAr")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("HeaderLogoUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("LetterType")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("IX_LetterTemplates_BranchId");
+
+                    b.HasIndex("LetterType")
+                        .HasDatabaseName("IX_LetterTemplates_LetterType");
+
+                    b.ToTable("LetterTemplates", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Documents.PolicyAcknowledgment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("AcknowledgedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("CompanyPolicyId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("IpAddress")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("CompanyPolicyId", "EmployeeId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_PolicyAcknowledgments_Policy_Employee");
+
+                    b.ToTable("PolicyAcknowledgments", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.EmployeeRelations.CounselingRecord", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("CounselorUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("EmployeeId1")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("FollowUpCompleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("FollowUpDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("FollowUpRequired")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsConfidential")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<string>("Outcome")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("OutcomeAr")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<long?>("RelatedDisciplinaryActionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("RelatedGrievanceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<DateTime>("SessionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("SessionType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("SubjectAr")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_CounselingRecords_EmployeeId");
+
+                    b.HasIndex("EmployeeId1");
+
+                    b.HasIndex("RelatedDisciplinaryActionId");
+
+                    b.HasIndex("RelatedGrievanceId");
+
+                    b.HasIndex("SessionType")
+                        .HasDatabaseName("IX_CounselingRecords_SessionType")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("FollowUpRequired", "FollowUpCompleted")
+                        .HasDatabaseName("IX_CounselingRecords_FollowUp")
+                        .HasFilter("\"IsDeleted\" = false AND \"FollowUpRequired\" = true AND \"FollowUpCompleted\" = false");
+
+                    b.ToTable("CounselingRecords", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.EmployeeRelations.DisciplinaryAction", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("AcknowledgedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("AcknowledgedByEmployee")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("ActionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ActionNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("ActionType")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("AppealDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("AppealNotes")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<string>("AppealOutcome")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime?>("AppealResolvedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("AppealSubmitted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("EmployeeId1")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("IncidentDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsConfidential")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<long>("IssuedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<long?>("RelatedGrievanceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("RelatedInvestigationId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("RelatedTerminationId")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Severity")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("SubjectAr")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<long?>("WorkflowInstanceId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActionNumber")
+                        .IsUnique()
+                        .HasDatabaseName("IX_DisciplinaryActions_ActionNumber")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_DisciplinaryActions_EmployeeId");
+
+                    b.HasIndex("EmployeeId1");
+
+                    b.HasIndex("RelatedGrievanceId");
+
+                    b.HasIndex("RelatedInvestigationId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_DisciplinaryActions_Status")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("DisciplinaryActions", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.EmployeeRelations.DisciplinaryAttachment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("DisciplinaryActionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("FileAttachmentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DisciplinaryActionId")
+                        .HasDatabaseName("IX_DisciplinaryAttachments_DisciplinaryActionId");
+
+                    b.HasIndex("FileAttachmentId");
+
+                    b.ToTable("DisciplinaryAttachments", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.EmployeeRelations.Grievance", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("AgainstEmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("AssignedToUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("ClosedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<DateTime?>("DueDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("EmployeeId1")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("EscalatedToUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("EscalationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("FiledDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("GrievanceNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("GrievanceType")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsConfidential")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ResolutionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ResolutionSummary")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<string>("ResolutionSummaryAr")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("SubjectAr")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AgainstEmployeeId");
+
+                    b.HasIndex("AssignedToUserId")
+                        .HasDatabaseName("IX_Grievances_AssignedToUserId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_Grievances_EmployeeId");
+
+                    b.HasIndex("EmployeeId1");
+
+                    b.HasIndex("GrievanceNumber")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Grievances_GrievanceNumber")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_Grievances_Status")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("Grievances", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.EmployeeRelations.GrievanceAttachment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("FileAttachmentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("GrievanceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FileAttachmentId");
+
+                    b.HasIndex("GrievanceId")
+                        .HasDatabaseName("IX_GrievanceAttachments_GrievanceId");
+
+                    b.ToTable("GrievanceAttachments", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.EmployeeRelations.GrievanceNote", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("AuthorUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("GrievanceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsInternal")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GrievanceId")
+                        .HasDatabaseName("IX_GrievanceNotes_GrievanceId");
+
+                    b.ToTable("GrievanceNotes", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.EmployeeRelations.Investigation", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("CompletedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<DateTime?>("DueDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Findings")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<string>("FindingsAr")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<string>("InvestigationNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<long>("InvestigatorUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsConfidential")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Recommendation")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<string>("RecommendationAr")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<long?>("RelatedGrievanceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("SubjectEmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("TitleAr")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InvestigationNumber")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Investigations_InvestigationNumber")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("InvestigatorUserId")
+                        .HasDatabaseName("IX_Investigations_InvestigatorUserId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("RelatedGrievanceId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_Investigations_Status")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("SubjectEmployeeId")
+                        .HasDatabaseName("IX_Investigations_SubjectEmployeeId");
+
+                    b.ToTable("Investigations", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.EmployeeRelations.InvestigationAttachment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("FileAttachmentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("InvestigationId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FileAttachmentId");
+
+                    b.HasIndex("InvestigationId")
+                        .HasDatabaseName("IX_InvestigationAttachments_InvestigationId");
+
+                    b.ToTable("InvestigationAttachments", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.EmployeeRelations.InvestigationNote", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("AuthorUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("InvestigationId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsInternal")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InvestigationId")
+                        .HasDatabaseName("IX_InvestigationNotes_InvestigationId");
+
+                    b.ToTable("InvestigationNotes", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.EmergencyContact", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("AlternatePhone")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsPrimary")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("Relationship")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_EmergencyContacts_EmployeeId");
+
+                    b.ToTable("EmergencyContacts", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.Employee", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1109,6 +4561,10 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<long>("BranchId")
                         .HasColumnType("bigint");
 
+                    b.Property<string>("CostCenter")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("timestamp with time zone");
 
@@ -1116,6 +4572,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<int?>("CurrentContractType")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("timestamp with time zone");
@@ -1159,6 +4618,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<long?>("JobGradeId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("JobTitle")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -1177,8 +4639,22 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<DateTime?>("LastWorkingDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<long?>("ManagerEmployeeId")
                         .HasColumnType("bigint");
+
+                    b.Property<int?>("MaritalStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("MiddleName")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("MiddleNameAr")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<DateTime?>("ModifiedAtUtc")
                         .HasColumnType("timestamp with time zone");
@@ -1191,6 +4667,27 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
+                    b.Property<string>("Nationality")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("NationalityAr")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int?>("NoticePeriodDays")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("NumberOfDependents")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("PassportExpiryDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PassportNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
                     b.Property<string>("Phone")
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
@@ -1199,12 +4696,25 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
+                    b.Property<DateTime?>("ProbationEndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("ProbationStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Religion")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bytea")
                         .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<DateTime?>("TerminationDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("WorkLocationType")
                         .HasColumnType("integer");
@@ -1215,6 +4725,8 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
 
                     b.HasIndex("DepartmentId1");
 
+                    b.HasIndex("JobGradeId");
+
                     b.HasIndex("ManagerEmployeeId");
 
                     b.HasIndex("BranchId", "EmployeeNumber")
@@ -1224,7 +4736,846 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("Employees", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Employees.EmployeeUserLink", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.EmployeeAddress", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("AddressLine1")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("AddressLine2")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int>("AddressType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("City")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("CityAr")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Country")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("CountryAr")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsPrimary")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("PostalCode")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<string>("State")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("StateAr")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_EmployeeAddresses_EmployeeId");
+
+                    b.ToTable("EmployeeAddresses", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.EmployeeBankDetail", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("AccountHolderName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("AccountNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("BankName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("BankNameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("BranchName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Currency")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("IBAN")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsPrimary")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<string>("SwiftCode")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_EmployeeBankDetails_EmployeeId");
+
+                    b.ToTable("EmployeeBankDetails", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.EmployeeContract", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("ApprovedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("AutoRenew")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal>("BasicSalary")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("ContractNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("ContractType")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Currency")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<string>("DocumentUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<int?>("NoticePeriodDays")
+                        .HasColumnType("integer");
+
+                    b.Property<long?>("PreviousContractId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("ProbationEndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("ProbationPeriodDays")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ProbationStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("RenewalDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Terms")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("TermsAr")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_EmployeeContracts_EmployeeId");
+
+                    b.HasIndex("PreviousContractId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_EmployeeContracts_Status");
+
+                    b.HasIndex("EmployeeId", "Status")
+                        .HasDatabaseName("IX_EmployeeContracts_EmployeeId_Status");
+
+                    b.ToTable("EmployeeContracts", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.EmployeeDependent", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime?>("DateOfBirth")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("FirstNameAr")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int?>("Gender")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsBeneficiary")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsEmergencyContact")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("LastNameAr")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("NationalId")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("Phone")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<int>("Relationship")
+                        .HasColumnType("integer");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_EmployeeDependents_EmployeeId");
+
+                    b.ToTable("EmployeeDependents", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.EmployeeEducation", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("CertificateUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("Country")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Degree")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("DegreeAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FieldOfStudy")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("FieldOfStudyAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Grade")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("InstitutionName")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("InstitutionNameAr")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsHighestDegree")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("Level")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_EmployeeEducations_EmployeeId");
+
+                    b.ToTable("EmployeeEducations", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.EmployeeProfileChange", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("AppliedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("ApprovedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("ChangeType")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("EffectiveDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("FieldName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("IsApplied")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsCorrection")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("NewDisplayValue")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("NewValue")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("OldDisplayValue")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("OldValue")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("ReasonAr")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<long?>("RelatedEntityId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("RelatedEntityType")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EffectiveDate")
+                        .HasDatabaseName("IX_EmployeeProfileChanges_EffectiveDate");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_EmployeeProfileChanges_EmployeeId");
+
+                    b.HasIndex("IsApplied")
+                        .HasDatabaseName("IX_EmployeeProfileChanges_IsApplied");
+
+                    b.ToTable("EmployeeProfileChanges", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.EmployeePromotion", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("ApprovedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("EffectiveDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<decimal?>("NewBaseSalary")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<long?>("NewDepartmentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("NewGrade")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("NewJobTitle")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NewJobTitleAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<decimal?>("OldBaseSalary")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<long?>("OldDepartmentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("OldGrade")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("OldJobTitle")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("OldJobTitleAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("ReasonAr")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime>("RequestDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<long?>("SubmittedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("WorkflowInstanceId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EffectiveDate")
+                        .HasDatabaseName("IX_EmployeePromotions_EffectiveDate");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_EmployeePromotions_EmployeeId");
+
+                    b.HasIndex("NewDepartmentId");
+
+                    b.HasIndex("OldDepartmentId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_EmployeePromotions_Status");
+
+                    b.HasIndex("WorkflowInstanceId");
+
+                    b.ToTable("EmployeePromotions", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.EmployeeTransfer", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("ApprovedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("EffectiveDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("FromBranchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("FromDepartmentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("FromJobTitle")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("FromJobTitleAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("ReasonAr")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime>("RequestDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<long?>("SubmittedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ToBranchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("ToDepartmentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ToJobTitle")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("ToJobTitleAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<long?>("WorkflowInstanceId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EffectiveDate")
+                        .HasDatabaseName("IX_EmployeeTransfers_EffectiveDate");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_EmployeeTransfers_EmployeeId");
+
+                    b.HasIndex("FromBranchId");
+
+                    b.HasIndex("FromDepartmentId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_EmployeeTransfers_Status");
+
+                    b.HasIndex("ToBranchId");
+
+                    b.HasIndex("ToDepartmentId");
+
+                    b.HasIndex("WorkflowInstanceId");
+
+                    b.ToTable("EmployeeTransfers", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.EmployeeUserLink", b =>
                 {
                     b.Property<long>("EmployeeId")
                         .HasColumnType("bigint");
@@ -1242,7 +5593,391 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("EmployeeUserLinks", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Excuses.EmployeeExcuse", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.EmployeeVisa", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("DocumentUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("IssueDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("IssuingCountry")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<string>("SponsorName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("VisaNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("VisaType")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_EmployeeVisas_EmployeeId");
+
+                    b.HasIndex("ExpiryDate")
+                        .HasDatabaseName("IX_EmployeeVisas_ExpiryDate");
+
+                    b.ToTable("EmployeeVisas", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.EmployeeWorkExperience", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("CertificateUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("CompanyName")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("CompanyNameAr")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("Country")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("JobTitle")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("JobTitleAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("ReasonForLeaving")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("ReferenceContactName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("ReferenceContactPhone")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("Responsibilities")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_EmployeeWorkExperiences_EmployeeId");
+
+                    b.ToTable("EmployeeWorkExperiences", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.JobGrade", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Currency")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("Level")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal?>("MaxSalary")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("MidSalary")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("MinSalary")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique()
+                        .HasDatabaseName("IX_JobGrades_Code");
+
+                    b.ToTable("JobGrades", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.SalaryAdjustment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("AdjustmentAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("AdjustmentType")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("AppliedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("ApprovedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ComponentAdjustments")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<decimal>("CurrentBaseSalary")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("CurrentTotalPackage")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("DocumentUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime>("EffectiveDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsApplied")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Justification")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<decimal>("NewBaseSalary")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("PercentageChange")
+                        .HasColumnType("decimal(8,4)");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("ReasonAr")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<long?>("RelatedContractId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("RelatedPromotionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("RelatedTransferId")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<long?>("SubmittedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("WorkflowInstanceId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EffectiveDate")
+                        .HasDatabaseName("IX_SalaryAdjustments_EffectiveDate");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_SalaryAdjustments_EmployeeId");
+
+                    b.HasIndex("RelatedContractId");
+
+                    b.HasIndex("RelatedPromotionId");
+
+                    b.HasIndex("RelatedTransferId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_SalaryAdjustments_Status");
+
+                    b.HasIndex("WorkflowInstanceId");
+
+                    b.ToTable("SalaryAdjustments", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Excuses.EmployeeExcuse", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1374,7 +6109,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("EmployeeExcuses", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Excuses.ExcusePolicy", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Excuses.ExcusePolicy", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1484,7 +6219,450 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("ExcusePolicies", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.LeaveManagement.LeaveAccrualPolicy", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Expenses.ExpenseCategory", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal?>("MaxAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<bool>("RequiresReceipt")
+                        .HasColumnType("boolean");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ExpenseCategories", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Expenses.ExpenseClaim", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("ApprovedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ClaimNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Currency")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("ExpensePolicyId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<long?>("SubmittedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<long?>("WorkflowInstanceId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClaimNumber")
+                        .IsUnique()
+                        .HasDatabaseName("IX_ExpenseClaims_ClaimNumber");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_ExpenseClaims_EmployeeId");
+
+                    b.HasIndex("ExpensePolicyId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_ExpenseClaims_Status");
+
+                    b.HasIndex("WorkflowInstanceId");
+
+                    b.ToTable("ExpenseClaims", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Expenses.ExpenseClaimItem", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<long?>("ExpenseCategoryId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ExpenseClaimId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("ExpenseDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("ReceiptUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExpenseCategoryId");
+
+                    b.HasIndex("ExpenseClaimId")
+                        .HasDatabaseName("IX_ExpenseClaimItems_ExpenseClaimId");
+
+                    b.ToTable("ExpenseClaimItems", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Expenses.ExpensePolicy", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("BranchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal?>("MaxClaimPerMonth")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("MaxClaimPerYear")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<bool>("RequiresApproval")
+                        .HasColumnType("boolean");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("IX_ExpensePolicies_BranchId");
+
+                    b.ToTable("ExpensePolicies", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Expenses.ExpenseReimbursement", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("ExpenseClaimId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("Method")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<long?>("PayrollRecordId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ReferenceNumber")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime?>("ReimbursementDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExpenseClaimId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_ExpenseReimbursements_ExpenseClaimId");
+
+                    b.HasIndex("PayrollRecordId");
+
+                    b.ToTable("ExpenseReimbursements", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.LeaveManagement.CompensatoryOff", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("ApprovedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("EarnedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal?>("HoursWorked")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("ReasonAr")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<long?>("UsedVacationId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UsedVacationId");
+
+                    b.HasIndex("EmployeeId", "Status")
+                        .HasDatabaseName("IX_CompensatoryOffs_EmployeeId_Status");
+
+                    b.ToTable("CompensatoryOffs", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.LeaveManagement.LeaveAccrualPolicy", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1589,7 +6767,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("LeaveAccrualPolicies", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.LeaveManagement.LeaveBalance", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.LeaveManagement.LeaveBalance", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1662,7 +6840,90 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("LeaveBalances", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.LeaveManagement.LeaveEntitlement", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.LeaveManagement.LeaveEncashment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("AmountPerDay")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<long?>("ApprovedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<decimal>("DaysEncashed")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<long?>("PayrollRecordId")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<long>("VacationTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PayrollRecordId");
+
+                    b.HasIndex("VacationTypeId");
+
+                    b.HasIndex("EmployeeId", "Year")
+                        .HasDatabaseName("IX_LeaveEncashments_EmployeeId_Year");
+
+                    b.ToTable("LeaveEncashments", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.LeaveManagement.LeaveEntitlement", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1738,7 +6999,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("LeaveEntitlements", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.LeaveManagement.LeaveTransaction", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.LeaveManagement.LeaveTransaction", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1801,7 +7062,432 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("LeaveTransactions", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Notifications.Notification", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Loans.LoanApplication", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal?>("ApprovedAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("ApprovedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("InterestRate")
+                        .HasColumnType("decimal(8,4)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<long?>("LoanPolicyId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("LoanTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<decimal?>("MonthlyInstallment")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<decimal?>("OutstandingBalance")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Purpose")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("PurposeAr")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<int>("RepaymentMonths")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("RequestedAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<long?>("SubmittedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("WorkflowInstanceId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_LoanApplications_EmployeeId");
+
+                    b.HasIndex("LoanPolicyId");
+
+                    b.HasIndex("LoanTypeId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_LoanApplications_Status");
+
+                    b.HasIndex("WorkflowInstanceId");
+
+                    b.HasIndex("EmployeeId", "Status")
+                        .HasDatabaseName("IX_LoanApplications_Employee_Status");
+
+                    b.ToTable("LoanApplications", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Loans.LoanPolicy", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("BranchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<long>("LoanTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("MaxConcurrentLoans")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("MaxPercentageOfSalary")
+                        .HasColumnType("decimal(8,4)");
+
+                    b.Property<int>("MinServiceMonths")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("IX_LoanPolicies_BranchId");
+
+                    b.HasIndex("LoanTypeId")
+                        .HasDatabaseName("IX_LoanPolicies_LoanTypeId");
+
+                    b.ToTable("LoanPolicies", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Loans.LoanRepayment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("BalanceRemaining")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("InstallmentNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal?>("InterestAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<long>("LoanApplicationId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTime?>("PaidDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("PayrollRecordId")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal?>("PrincipalAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DueDate")
+                        .HasDatabaseName("IX_LoanRepayments_DueDate");
+
+                    b.HasIndex("LoanApplicationId")
+                        .HasDatabaseName("IX_LoanRepayments_LoanApplicationId");
+
+                    b.HasIndex("PayrollRecordId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_LoanRepayments_Status");
+
+                    b.ToTable("LoanRepayments", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Loans.LoanType", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<decimal>("InterestRate")
+                        .HasColumnType("decimal(8,4)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal>("MaxAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("MaxRepaymentMonths")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<bool>("RequiresGuarantor")
+                        .HasColumnType("boolean");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LoanTypes", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Loans.SalaryAdvance", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("ApprovedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Currency")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<int>("DeductionMonth")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long?>("PayrollRecordId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("ReasonAr")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTime>("RequestDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<long?>("SubmittedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("WorkflowInstanceId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DeductionMonth")
+                        .HasDatabaseName("IX_SalaryAdvances_DeductionMonth");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_SalaryAdvances_EmployeeId");
+
+                    b.HasIndex("PayrollRecordId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_SalaryAdvances_Status");
+
+                    b.HasIndex("WorkflowInstanceId");
+
+                    b.ToTable("SalaryAdvances", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Notifications.Notification", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1949,7 +7635,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("Notifications", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Notifications.NotificationBroadcast", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Notifications.NotificationBroadcast", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -2076,7 +7762,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("NotificationBroadcasts", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Notifications.PushNotificationToken", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Notifications.PushNotificationToken", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -2187,7 +7873,4667 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("PushNotificationTokens", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.RemoteWork.RemoteWorkPolicy", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Offboarding.ClearanceChecklist", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("When clearance was completed");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint")
+                        .HasComment("Employee identifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<int>("OverallStatus")
+                        .HasColumnType("integer")
+                        .HasComment("Overall clearance status");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
+                        .HasComment("Concurrency control timestamp");
+
+                    b.Property<long>("TerminationRecordId")
+                        .HasColumnType("bigint")
+                        .HasComment("Termination record identifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_ClearanceChecklists_EmployeeId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("OverallStatus")
+                        .HasDatabaseName("IX_ClearanceChecklists_OverallStatus")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("TerminationRecordId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_ClearanceChecklists_TerminationRecordId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("ClearanceChecklists", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Offboarding.ClearanceItem", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("ClearanceChecklistId")
+                        .HasColumnType("bigint")
+                        .HasComment("Clearance checklist identifier");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("When this item was completed");
+
+                    b.Property<long?>("CompletedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<int>("Department")
+                        .HasColumnType("integer")
+                        .HasComment("Department responsible for this clearance item");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasComment("Item description");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("integer")
+                        .HasComment("Display order for UI rendering");
+
+                    b.Property<bool>("IsCompleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Whether this item is completed");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<string>("ItemName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Clearance item name");
+
+                    b.Property<string>("ItemNameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Clearance item name in Arabic");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasComment("Additional notes");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
+                        .HasComment("Concurrency control timestamp");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClearanceChecklistId")
+                        .HasDatabaseName("IX_ClearanceItems_ClearanceChecklistId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("Department")
+                        .HasDatabaseName("IX_ClearanceItems_Department")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("ClearanceItems", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Offboarding.EndOfServiceBenefit", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("BasicSalary")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Employee basic salary at time of termination");
+
+                    b.Property<decimal>("CalculationBasis")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Salary basis used for EOS calculation");
+
+                    b.Property<string>("CalculationDetails")
+                        .HasColumnType("text")
+                        .HasComment("JSON details of the calculation breakdown");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<decimal>("DeductionAmount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Deductions from EOS benefit");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint")
+                        .HasComment("Employee identifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<decimal>("NetAmount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Net EOS benefit after deductions");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasComment("Additional notes");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
+                        .HasComment("Concurrency control timestamp");
+
+                    b.Property<int>("ServiceDays")
+                        .HasColumnType("integer")
+                        .HasComment("Additional days of service beyond full months");
+
+                    b.Property<int>("ServiceMonths")
+                        .HasColumnType("integer")
+                        .HasComment("Additional months of service beyond full years");
+
+                    b.Property<int>("ServiceYears")
+                        .HasColumnType("integer")
+                        .HasComment("Total years of service");
+
+                    b.Property<long>("TerminationRecordId")
+                        .HasColumnType("bigint")
+                        .HasComment("Termination record identifier");
+
+                    b.Property<decimal>("TotalAllowances")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Total allowances at time of termination");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Total end of service benefit amount");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_EndOfServiceBenefits_EmployeeId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("TerminationRecordId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_EndOfServiceBenefits_TerminationRecordId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("EndOfServiceBenefits", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Offboarding.ExitInterview", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("AdditionalComments")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasComment("Any additional comments");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint")
+                        .HasComment("Employee identifier");
+
+                    b.Property<string>("ImprovementSuggestions")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasComment("Suggestions for improvement");
+
+                    b.Property<DateTime>("InterviewDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("Date of the exit interview");
+
+                    b.Property<long>("InterviewerUserId")
+                        .HasColumnType("bigint")
+                        .HasComment("User who conducted the interview");
+
+                    b.Property<bool>("IsConfidential")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasComment("Whether this interview is confidential");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<string>("LikedMost")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasComment("What the employee liked most about the organization");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<int?>("OverallSatisfactionRating")
+                        .HasColumnType("integer")
+                        .HasComment("Overall satisfaction rating (1-5)");
+
+                    b.Property<string>("ReasonForLeaving")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasComment("Primary reason for leaving");
+
+                    b.Property<string>("ReasonForLeavingAr")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasComment("Reason for leaving in Arabic");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
+                        .HasComment("Concurrency control timestamp");
+
+                    b.Property<long>("TerminationRecordId")
+                        .HasColumnType("bigint")
+                        .HasComment("Termination record identifier");
+
+                    b.Property<bool?>("WouldRejoin")
+                        .HasColumnType("boolean")
+                        .HasComment("Whether employee would consider rejoining");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_ExitInterviews_EmployeeId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("InterviewDate")
+                        .HasDatabaseName("IX_ExitInterviews_InterviewDate")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("TerminationRecordId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_ExitInterviews_TerminationRecordId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("ExitInterviews", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Offboarding.FinalSettlement", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("AdvanceOutstanding")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Outstanding advance balance to deduct");
+
+                    b.Property<decimal>("AllowancesDue")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Allowances due for remaining period");
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("When the settlement was approved");
+
+                    b.Property<long?>("ApprovedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal>("BasicSalaryDue")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Basic salary due for remaining period");
+
+                    b.Property<string>("CalculationDetails")
+                        .HasColumnType("text")
+                        .HasComment("JSON details of the calculation breakdown");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint")
+                        .HasComment("Employee identifier");
+
+                    b.Property<decimal>("EndOfServiceAmount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("End of service benefit amount");
+
+                    b.Property<decimal>("GrossSettlement")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Gross settlement amount before deductions");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<decimal>("LeaveEncashmentAmount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Leave encashment amount");
+
+                    b.Property<int>("LeaveEncashmentDays")
+                        .HasColumnType("integer")
+                        .HasComment("Number of leave days encashed");
+
+                    b.Property<decimal>("LoanOutstanding")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Outstanding loan balance to deduct");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<decimal>("NetSettlement")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Net settlement amount to pay");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasComment("Additional notes");
+
+                    b.Property<decimal>("OtherAdditions")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Other additions");
+
+                    b.Property<decimal>("OtherDeductions")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Other deductions");
+
+                    b.Property<decimal>("OvertimeDue")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Overtime pay due");
+
+                    b.Property<DateTime?>("PaidAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("When the settlement was paid");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
+                        .HasComment("Concurrency control timestamp");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasComment("Settlement status (Draft, Pending, Approved, Paid)");
+
+                    b.Property<long?>("SubmittedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("TerminationRecordId")
+                        .HasColumnType("bigint")
+                        .HasComment("Termination record identifier");
+
+                    b.Property<decimal>("TotalDeductions")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Total deductions from settlement");
+
+                    b.Property<long?>("WorkflowInstanceId")
+                        .HasColumnType("bigint")
+                        .HasComment("Workflow instance ID for approval tracking");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_FinalSettlements_EmployeeId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_FinalSettlements_Status")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("TerminationRecordId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_FinalSettlements_TerminationRecordId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("WorkflowInstanceId");
+
+                    b.ToTable("FinalSettlements", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Offboarding.ResignationRequest", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("When the resignation was approved");
+
+                    b.Property<long?>("ApprovedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint")
+                        .HasComment("Employee identifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<DateTime>("LastWorkingDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("Last working date for the employee");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasComment("Additional notes");
+
+                    b.Property<int>("NoticePeriodDays")
+                        .HasColumnType("integer")
+                        .HasComment("Required notice period in days");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasComment("Reason for resignation");
+
+                    b.Property<string>("ReasonAr")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasComment("Reason for resignation in Arabic");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasComment("Reason for rejection if applicable");
+
+                    b.Property<DateTime>("ResignationDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("Date resignation was submitted");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
+                        .HasComment("Concurrency control timestamp");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasComment("Resignation request status");
+
+                    b.Property<long?>("SubmittedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("WaivedNoticeDays")
+                        .HasColumnType("integer")
+                        .HasComment("Number of notice days waived");
+
+                    b.Property<long?>("WorkflowInstanceId")
+                        .HasColumnType("bigint")
+                        .HasComment("Workflow instance ID for approval tracking");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_ResignationRequests_EmployeeId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_ResignationRequests_Status")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("WorkflowInstanceId");
+
+                    b.ToTable("ResignationRequests", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Offboarding.TerminationRecord", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint")
+                        .HasComment("Employee identifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<DateTime>("LastWorkingDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("Last working date");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasComment("Additional notes");
+
+                    b.Property<long?>("ProcessedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasComment("Reason for termination");
+
+                    b.Property<string>("ReasonAr")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasComment("Reason for termination in Arabic");
+
+                    b.Property<long?>("ResignationRequestId")
+                        .HasColumnType("bigint")
+                        .HasComment("Linked resignation request if applicable");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
+                        .HasComment("Concurrency control timestamp");
+
+                    b.Property<DateTime>("TerminationDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("Date of termination");
+
+                    b.Property<int>("TerminationType")
+                        .HasColumnType("integer")
+                        .HasComment("Type of termination (Resignation, Dismissal, etc.)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_TerminationRecords_EmployeeId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("ResignationRequestId");
+
+                    b.HasIndex("TerminationDate")
+                        .HasDatabaseName("IX_TerminationRecords_TerminationDate")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("TerminationType")
+                        .HasDatabaseName("IX_TerminationRecords_TerminationType")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("TerminationRecords", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Onboarding.OnboardingDocument", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("DocumentName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("DocumentType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("DocumentTypeAr")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("FileUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsRequired")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<long>("OnboardingProcessId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("SubmittedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("VerifiedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("VerifiedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OnboardingProcessId")
+                        .HasDatabaseName("IX_OnboardingDocuments_ProcessId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_OnboardingDocuments_Status");
+
+                    b.ToTable("OnboardingDocuments", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Onboarding.OnboardingProcess", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("ActualCompletionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("BuddyEmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("CompletedTasks")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("ExpectedCompletionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<long?>("MentorEmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<long?>("OfferLetterId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("OnboardingTemplateId")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TotalTasks")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BuddyEmployeeId");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_OnboardingProcesses_EmployeeId");
+
+                    b.HasIndex("MentorEmployeeId");
+
+                    b.HasIndex("OnboardingTemplateId")
+                        .HasDatabaseName("IX_OnboardingProcesses_TemplateId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_OnboardingProcesses_Status");
+
+                    b.ToTable("OnboardingProcesses", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Onboarding.OnboardingTask", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("AssignedToEmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Category")
+                        .HasColumnType("integer");
+
+                    b.Property<long?>("CompletedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("CompletedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsRequired")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<long>("OnboardingProcessId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("OnboardingTemplateTaskId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("integer");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TaskName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("TaskNameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssignedToEmployeeId")
+                        .HasDatabaseName("IX_OnboardingTasks_AssignedToEmployeeId");
+
+                    b.HasIndex("OnboardingProcessId")
+                        .HasDatabaseName("IX_OnboardingTasks_ProcessId");
+
+                    b.HasIndex("OnboardingTemplateTaskId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_OnboardingTasks_Status");
+
+                    b.ToTable("OnboardingTasks", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Onboarding.OnboardingTemplate", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("BranchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long?>("DepartmentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("IX_OnboardingTemplates_BranchId");
+
+                    b.HasIndex("DepartmentId")
+                        .HasDatabaseName("IX_OnboardingTemplates_DepartmentId");
+
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("IX_OnboardingTemplates_IsActive");
+
+                    b.ToTable("OnboardingTemplates", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Onboarding.OnboardingTemplateTask", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("Category")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("DueDaysAfterJoining")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsRequired")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("OnboardingTemplateId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("integer");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<string>("TaskName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("TaskNameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OnboardingTemplateId")
+                        .HasDatabaseName("IX_OnboardingTemplateTasks_TemplateId");
+
+                    b.HasIndex("OnboardingTemplateId", "DisplayOrder")
+                        .HasDatabaseName("IX_OnboardingTemplateTasks_Template_Order");
+
+                    b.ToTable("OnboardingTemplateTasks", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.AllowanceAssignment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("AllowanceRequestId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("AllowanceTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("AssignedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("AssignedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("CalculationType")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<DateTime>("EffectiveFromDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("EffectiveToDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("text");
+
+                    b.Property<decimal?>("Percentage")
+                        .HasColumnType("decimal(8,4)");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("ReasonAr")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AllowanceRequestId");
+
+                    b.HasIndex("AllowanceTypeId")
+                        .HasDatabaseName("IX_AllowanceAssignments_AllowanceTypeId");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_AllowanceAssignments_EmployeeId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_AllowanceAssignments_Status");
+
+                    b.HasIndex("EmployeeId", "AllowanceTypeId", "Status")
+                        .HasDatabaseName("IX_AllowanceAssignments_Employee_Type_Status");
+
+                    b.ToTable("AllowanceAssignments", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.AllowanceChangeLog", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("AllowanceRequestId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("AllowanceTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("ChangeType")
+                        .HasColumnType("integer");
+
+                    b.Property<long?>("ChangedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("EffectiveDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<decimal?>("NewAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("NewPercentage")
+                        .HasColumnType("decimal(8,4)");
+
+                    b.Property<decimal?>("PreviousAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("PreviousPercentage")
+                        .HasColumnType("decimal(8,4)");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<long?>("RelatedEntityId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("RelatedEntityType")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AllowanceRequestId");
+
+                    b.HasIndex("AllowanceTypeId");
+
+                    b.HasIndex("EffectiveDate")
+                        .HasDatabaseName("IX_AllowanceChangeLogs_EffectiveDate");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_AllowanceChangeLogs_EmployeeId");
+
+                    b.HasIndex("EmployeeId", "EffectiveDate")
+                        .HasDatabaseName("IX_AllowanceChangeLogs_Employee_EffectiveDate");
+
+                    b.ToTable("AllowanceChangeLogs", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.AllowancePolicy", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("AllowanceTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("BranchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime>("EffectiveDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("EligibilityRules")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsTemporaryAllowed")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal?>("MaxAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("MaxDurationMonths")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal?>("MaxPercentageOfBasic")
+                        .HasColumnType("decimal(8,4)");
+
+                    b.Property<decimal?>("MinAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<bool>("RequiresApproval")
+                        .HasColumnType("boolean");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AllowanceTypeId")
+                        .HasDatabaseName("IX_AllowancePolicies_AllowanceTypeId");
+
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("IX_AllowancePolicies_BranchId");
+
+                    b.HasIndex("AllowanceTypeId", "IsActive")
+                        .HasDatabaseName("IX_AllowancePolicies_TypeId_IsActive");
+
+                    b.ToTable("AllowancePolicies", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.AllowanceRequest", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("AllowancePolicyId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("AllowanceTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ApprovalComments")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("ApprovedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("EffectiveFromDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("EffectiveToDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Justification")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("ReasonAr")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<int>("RequestType")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal?>("RequestedAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("RequestedPercentage")
+                        .HasColumnType("decimal(8,4)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<long?>("SubmittedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("SupportingDocumentUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<long?>("WorkflowInstanceId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AllowancePolicyId");
+
+                    b.HasIndex("AllowanceTypeId")
+                        .HasDatabaseName("IX_AllowanceRequests_AllowanceTypeId");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_AllowanceRequests_EmployeeId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_AllowanceRequests_Status");
+
+                    b.HasIndex("WorkflowInstanceId");
+
+                    b.HasIndex("EmployeeId", "Status")
+                        .HasDatabaseName("IX_AllowanceRequests_Employee_Status");
+
+                    b.ToTable("AllowanceRequests", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.AllowanceType", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("BranchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Category")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<decimal?>("DefaultAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("DefaultCalculationType")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal?>("DefaultPercentage")
+                        .HasColumnType("decimal(8,4)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsSocialInsurable")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsTaxable")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId");
+
+                    b.HasIndex("Code")
+                        .IsUnique()
+                        .HasDatabaseName("IX_AllowanceTypes_Code_Unique")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("AllowanceTypes", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.BankTransferFile", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<int>("FileFormat")
+                        .HasColumnType("integer")
+                        .HasComment("Bank file format (CSV, WPS, SAM, etc.)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasComment("Generated file name");
+
+                    b.Property<string>("FileUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasComment("URL or path to the generated file");
+
+                    b.Property<DateTime>("GeneratedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("When the file was generated");
+
+                    b.Property<long>("GeneratedByUserId")
+                        .HasColumnType("bigint")
+                        .HasComment("User who generated the file");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<long>("PayrollPeriodId")
+                        .HasColumnType("bigint")
+                        .HasComment("Payroll period identifier");
+
+                    b.Property<int>("RecordCount")
+                        .HasColumnType("integer")
+                        .HasComment("Number of transfer records in the file");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
+                        .HasComment("Concurrency control timestamp");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Total transfer amount in the file");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PayrollPeriodId")
+                        .HasDatabaseName("IX_BankTransferFiles_PayrollPeriodId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("BankTransferFiles", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.EmployeeInsurance", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<int?>("CoveredDependentsCount")
+                        .HasColumnType("integer")
+                        .HasComment("Number of covered dependents");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<decimal?>("EmployeeContribution")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Employee contribution amount");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint")
+                        .HasComment("Employee identifier");
+
+                    b.Property<long?>("EmployeeId1")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal?>("EmployerContribution")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Employer contribution amount");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("Insurance coverage end date (null = ongoing)");
+
+                    b.Property<bool>("IncludesDependents")
+                        .HasColumnType("boolean")
+                        .HasComment("Whether coverage includes dependents");
+
+                    b.Property<int>("InsuranceClass")
+                        .HasColumnType("integer")
+                        .HasComment("Insurance class/tier");
+
+                    b.Property<long>("InsuranceProviderId")
+                        .HasColumnType("bigint")
+                        .HasComment("Insurance provider identifier");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasComment("Whether this insurance is active");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<string>("MembershipNumber")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("Insurance membership number");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<decimal?>("MonthlyPremium")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Monthly premium amount");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasComment("Additional notes");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
+                        .HasComment("Concurrency control timestamp");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("Insurance coverage start date");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_EmployeeInsurances_EmployeeId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("EmployeeId1");
+
+                    b.HasIndex("InsuranceProviderId")
+                        .HasDatabaseName("IX_EmployeeInsurances_InsuranceProviderId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("IX_EmployeeInsurances_IsActive")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("EmployeeInsurances", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.EmployeeSalary", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("ApprovedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal>("BaseSalary")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Base salary amount");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasDefaultValue("SAR")
+                        .HasComment("Currency code (e.g., SAR, USD)");
+
+                    b.Property<DateTime>("EffectiveDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("Date when this salary becomes effective");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint")
+                        .HasComment("Employee identifier");
+
+                    b.Property<long?>("EmployeeId1")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("Date when this salary ends (null = current)");
+
+                    b.Property<bool>("IsCurrent")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasComment("Whether this is the current active salary");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasComment("Reason for salary change");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
+                        .HasComment("Concurrency control timestamp");
+
+                    b.Property<long>("SalaryStructureId")
+                        .HasColumnType("bigint")
+                        .HasComment("Salary structure identifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_EmployeeSalaries_EmployeeId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("EmployeeId1");
+
+                    b.HasIndex("SalaryStructureId")
+                        .HasDatabaseName("IX_EmployeeSalaries_SalaryStructureId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("EmployeeId", "IsCurrent")
+                        .HasDatabaseName("IX_EmployeeSalaries_EmployeeId_IsCurrent")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("EmployeeSalaries", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.EmployeeSalaryComponent", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Calculated component amount");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<long>("EmployeeSalaryId")
+                        .HasColumnType("bigint")
+                        .HasComment("Employee salary record identifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<decimal?>("OverrideAmount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Manual override amount (null = use calculated)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
+                        .HasComment("Concurrency control timestamp");
+
+                    b.Property<long>("SalaryComponentId")
+                        .HasColumnType("bigint")
+                        .HasComment("Salary component identifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeSalaryId")
+                        .HasDatabaseName("IX_EmployeeSalaryComponents_EmployeeSalaryId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("SalaryComponentId")
+                        .HasDatabaseName("IX_EmployeeSalaryComponents_SalaryComponentId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("EmployeeSalaryComponents", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.InsuranceProvider", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("ContactPerson")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Contact person name");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Contact email address");
+
+                    b.Property<int>("InsuranceType")
+                        .HasColumnType("integer")
+                        .HasComment("Type of insurance (Health, Life, Dental, etc.)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasComment("Whether this provider is active");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Insurance provider name");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Insurance provider name in Arabic");
+
+                    b.Property<string>("Phone")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasComment("Contact phone number");
+
+                    b.Property<string>("PolicyNumber")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("Insurance policy number");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
+                        .HasComment("Concurrency control timestamp");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InsuranceType")
+                        .HasDatabaseName("IX_InsuranceProviders_InsuranceType")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("IX_InsuranceProviders_IsActive")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("InsuranceProviders", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.PayrollAdjustment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("AdjustmentType")
+                        .HasColumnType("integer")
+                        .HasComment("Type of payroll adjustment");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Adjustment amount");
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("When the adjustment was approved");
+
+                    b.Property<long?>("ApprovedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasComment("Adjustment description");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasComment("Adjustment description in Arabic");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint")
+                        .HasComment("Employee identifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<bool>("IsRecurring")
+                        .HasColumnType("boolean")
+                        .HasComment("Whether this adjustment recurs");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<long>("PayrollPeriodId")
+                        .HasColumnType("bigint")
+                        .HasComment("Payroll period identifier");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasComment("Reason for the adjustment");
+
+                    b.Property<int?>("RecurringMonths")
+                        .HasColumnType("integer")
+                        .HasComment("Number of months for recurring adjustment");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
+                        .HasComment("Concurrency control timestamp");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdjustmentType")
+                        .HasDatabaseName("IX_PayrollAdjustments_AdjustmentType")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_PayrollAdjustments_EmployeeId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("PayrollPeriodId")
+                        .HasDatabaseName("IX_PayrollAdjustments_PayrollPeriodId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("PayrollAdjustments", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.PayrollPeriod", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("When the payroll was approved");
+
+                    b.Property<long?>("ApprovedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("BranchId")
+                        .HasColumnType("bigint")
+                        .HasComment("Branch identifier");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<int>("EmployeeCount")
+                        .HasColumnType("integer")
+                        .HasComment("Number of employees in this payroll period");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("Period end date");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Payroll period name");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Payroll period name in Arabic");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasComment("Additional notes");
+
+                    b.Property<int>("PeriodType")
+                        .HasColumnType("integer")
+                        .HasComment("Payroll period type (Monthly, Bi-Weekly, etc.)");
+
+                    b.Property<DateTime?>("ProcessedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("When the payroll was processed");
+
+                    b.Property<long?>("ProcessedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
+                        .HasComment("Concurrency control timestamp");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("Period start date");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasComment("Payroll period status (Draft, Processing, etc.)");
+
+                    b.Property<long?>("SubmittedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal>("TotalDeductions")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Total deductions for the period");
+
+                    b.Property<decimal>("TotalGross")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Total gross earnings for the period");
+
+                    b.Property<decimal>("TotalNet")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Total net salary for the period");
+
+                    b.Property<long?>("WorkflowInstanceId")
+                        .HasColumnType("bigint")
+                        .HasComment("Workflow instance ID for approval tracking");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("IX_PayrollPeriods_BranchId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_PayrollPeriods_Status")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("WorkflowInstanceId");
+
+                    b.HasIndex("BranchId", "StartDate", "EndDate")
+                        .HasDatabaseName("IX_PayrollPeriods_BranchId_StartDate_EndDate")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("PayrollPeriods", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.PayrollRecord", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("AbsenceDeduction")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Deduction for absences");
+
+                    b.Property<int>("AbsentDays")
+                        .HasColumnType("integer")
+                        .HasComment("Number of absent days");
+
+                    b.Property<decimal>("BaseSalary")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Employee base salary for this period");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint")
+                        .HasComment("Employee identifier");
+
+                    b.Property<decimal>("GrossEarnings")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Gross earnings before deductions");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<decimal>("LoanDeduction")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Loan repayment deduction");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<decimal>("NetSalary")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Net salary after all deductions");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasComment("Additional notes");
+
+                    b.Property<decimal>("OtherDeductions")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Other miscellaneous deductions");
+
+                    b.Property<decimal>("OvertimeHours")
+                        .HasColumnType("decimal(8,2)")
+                        .HasComment("Total overtime hours worked");
+
+                    b.Property<decimal>("OvertimePay")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Overtime pay amount");
+
+                    b.Property<int>("PaidDays")
+                        .HasColumnType("integer")
+                        .HasComment("Number of paid days");
+
+                    b.Property<DateTime?>("PaySlipGeneratedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("When pay slip was generated");
+
+                    b.Property<long>("PayrollPeriodId")
+                        .HasColumnType("bigint")
+                        .HasComment("Payroll period identifier");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
+                        .HasComment("Concurrency control timestamp");
+
+                    b.Property<decimal>("SocialInsuranceEmployee")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Employee social insurance contribution");
+
+                    b.Property<decimal>("SocialInsuranceEmployer")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Employer social insurance contribution");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasComment("Payroll record status");
+
+                    b.Property<decimal>("TaxAmount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Tax deduction amount");
+
+                    b.Property<decimal>("TotalAllowances")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Total allowances amount");
+
+                    b.Property<decimal>("TotalDeductions")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Total deductions amount");
+
+                    b.Property<int>("WorkingDays")
+                        .HasColumnType("integer")
+                        .HasComment("Number of working days in period");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_PayrollRecords_EmployeeId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_PayrollRecords_Status")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("PayrollPeriodId", "EmployeeId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_PayrollRecords_PayrollPeriodId_EmployeeId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("PayrollRecords", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.PayrollRecordDetail", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("AllowanceTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Component amount");
+
+                    b.Property<string>("ComponentName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Component name snapshot");
+
+                    b.Property<string>("ComponentNameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Component name in Arabic");
+
+                    b.Property<int>("ComponentType")
+                        .HasColumnType("integer")
+                        .HasComment("Type of salary component");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasComment("Additional notes");
+
+                    b.Property<long>("PayrollRecordId")
+                        .HasColumnType("bigint")
+                        .HasComment("Payroll record identifier");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
+                        .HasComment("Concurrency control timestamp");
+
+                    b.Property<long?>("SalaryComponentId")
+                        .HasColumnType("bigint")
+                        .HasComment("Salary component identifier (null for ad-hoc items)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AllowanceTypeId");
+
+                    b.HasIndex("ComponentType")
+                        .HasDatabaseName("IX_PayrollRecordDetails_ComponentType")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("PayrollRecordId")
+                        .HasDatabaseName("IX_PayrollRecordDetails_PayrollRecordId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("SalaryComponentId");
+
+                    b.ToTable("PayrollRecordDetails", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.SalaryComponent", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("AllowanceTypeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal?>("Amount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Fixed amount for the component");
+
+                    b.Property<int>("CalculationType")
+                        .HasColumnType("integer")
+                        .HasComment("How the component amount is calculated");
+
+                    b.Property<int>("ComponentType")
+                        .HasColumnType("integer")
+                        .HasComment("Type of salary component (Earning, Deduction, etc.)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("integer")
+                        .HasComment("Display order for UI rendering");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<bool>("IsRecurring")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasComment("Whether this component recurs every pay period");
+
+                    b.Property<bool>("IsSocialInsurable")
+                        .HasColumnType("boolean")
+                        .HasComment("Whether this component is subject to social insurance");
+
+                    b.Property<bool>("IsTaxable")
+                        .HasColumnType("boolean")
+                        .HasComment("Whether this component is subject to tax");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Component name");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Component name in Arabic");
+
+                    b.Property<decimal?>("Percentage")
+                        .HasColumnType("decimal(8,4)")
+                        .HasComment("Percentage of base salary");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
+                        .HasComment("Concurrency control timestamp");
+
+                    b.Property<long>("SalaryStructureId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AllowanceTypeId");
+
+                    b.HasIndex("ComponentType")
+                        .HasDatabaseName("IX_SalaryComponents_ComponentType")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("SalaryStructureId")
+                        .HasDatabaseName("IX_SalaryComponents_SalaryStructureId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("SalaryComponents", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.SalaryStructure", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("BranchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasComment("Description of the salary structure");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasComment("Description in Arabic");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasComment("Whether this salary structure is active");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Salary structure name");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Salary structure name in Arabic");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
+                        .HasComment("Concurrency control timestamp");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("IX_SalaryStructures_BranchId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("IX_SalaryStructures_IsActive")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("SalaryStructures", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.SocialInsuranceConfig", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("BranchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<DateTime>("EffectiveDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("Date when this configuration becomes effective");
+
+                    b.Property<decimal>("EmployeeContributionRate")
+                        .HasColumnType("decimal(8,4)")
+                        .HasComment("Employee contribution rate (e.g., 0.0975 for 9.75%)");
+
+                    b.Property<decimal>("EmployerContributionRate")
+                        .HasColumnType("decimal(8,4)")
+                        .HasComment("Employer contribution rate (e.g., 0.1175 for 11.75%)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasComment("Whether this configuration is active");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<decimal>("MaxInsurableSalary")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Maximum salary subject to social insurance");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Social insurance configuration name");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Name in Arabic");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
+                        .HasComment("Concurrency control timestamp");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("IX_SocialInsuranceConfigs_BranchId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("IX_SocialInsuranceConfigs_IsActive")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("SocialInsuranceConfigs", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.TaxBracket", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<decimal>("FixedAmount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Fixed tax amount for this bracket");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<decimal>("MaxAmount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Maximum income amount for this bracket");
+
+                    b.Property<decimal>("MinAmount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("Minimum income amount for this bracket");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<decimal>("Rate")
+                        .HasColumnType("decimal(18,4)")
+                        .HasComment("Tax rate for this bracket");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
+                        .HasComment("Concurrency control timestamp");
+
+                    b.Property<long>("TaxConfigurationId")
+                        .HasColumnType("bigint")
+                        .HasComment("Tax configuration identifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TaxConfigurationId")
+                        .HasDatabaseName("IX_TaxBrackets_TaxConfigurationId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("TaxBrackets", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.TaxConfiguration", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("BranchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()")
+                        .HasComment("UTC timestamp when record was created");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who created the record");
+
+                    b.Property<DateTime>("EffectiveDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("Date when this tax configuration becomes effective");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasComment("Whether this tax configuration is active");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Soft delete flag");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp when record was last modified");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("User who last modified the record");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Tax configuration name");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasComment("Tax configuration name in Arabic");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 })
+                        .HasComment("Concurrency control timestamp");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("IX_TaxConfigurations_BranchId")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("IX_TaxConfigurations_IsActive")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("TaxConfigurations", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Performance.Competency", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Category")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("CategoryAr")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("CompetencyFrameworkId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompetencyFrameworkId")
+                        .HasDatabaseName("IX_Competencies_FrameworkId");
+
+                    b.HasIndex("CompetencyFrameworkId", "DisplayOrder")
+                        .HasDatabaseName("IX_Competencies_Framework_Order");
+
+                    b.ToTable("Competencies", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Performance.CompetencyAssessment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("CompetencyId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int?>("FinalRating")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("ManagerComments")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<int?>("ManagerRating")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("PerformanceReviewId")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<string>("SelfComments")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<int?>("SelfRating")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompetencyId")
+                        .HasDatabaseName("IX_CompetencyAssessments_CompetencyId");
+
+                    b.HasIndex("PerformanceReviewId")
+                        .HasDatabaseName("IX_CompetencyAssessments_ReviewId");
+
+                    b.HasIndex("PerformanceReviewId", "CompetencyId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_CompetencyAssessments_Review_Competency");
+
+                    b.ToTable("CompetencyAssessments", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Performance.CompetencyFramework", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("IX_CompetencyFrameworks_IsActive");
+
+                    b.ToTable("CompetencyFrameworks", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Performance.Feedback360Response", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("AdditionalComments")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("AreasForImprovement")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("FeedbackRequest360Id")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsAnonymous")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Ratings")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<string>("Strengths")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FeedbackRequest360Id")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Feedback360Responses_RequestId");
+
+                    b.ToTable("Feedback360Responses", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Performance.FeedbackRequest360", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime?>("Deadline")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("PerformanceReviewId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("RequestedFromEmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("SubmittedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PerformanceReviewId")
+                        .HasDatabaseName("IX_FeedbackRequests360_ReviewId");
+
+                    b.HasIndex("RequestedFromEmployeeId")
+                        .HasDatabaseName("IX_FeedbackRequests360_RequestedFromId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_FeedbackRequests360_Status");
+
+                    b.ToTable("FeedbackRequests360", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Performance.GoalDefinition", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("CurrentValue")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime?>("DueDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("GoalType")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("ManagerComments")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<int?>("ManagerRating")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long?>("PerformanceReviewId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ProgressPercentage")
+                        .HasColumnType("integer");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<string>("SelfComments")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<int?>("SelfRating")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TargetValue")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("TitleAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Unit")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<decimal>("Weight")
+                        .HasColumnType("decimal(8,4)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_GoalDefinitions_EmployeeId");
+
+                    b.HasIndex("PerformanceReviewId")
+                        .HasDatabaseName("IX_GoalDefinitions_PerformanceReviewId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_GoalDefinitions_Status");
+
+                    b.ToTable("GoalDefinitions", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Performance.PerformanceImprovementPlan", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("ApprovedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Goals")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<long>("ManagerEmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Milestones")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("OutcomeNotes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<long?>("PerformanceReviewId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("ReasonAr")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<long?>("SubmittedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("WorkflowInstanceId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_PerformanceImprovementPlans_EmployeeId");
+
+                    b.HasIndex("ManagerEmployeeId")
+                        .HasDatabaseName("IX_PerformanceImprovementPlans_ManagerId");
+
+                    b.HasIndex("PerformanceReviewId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_PerformanceImprovementPlans_Status");
+
+                    b.HasIndex("WorkflowInstanceId");
+
+                    b.ToTable("PerformanceImprovementPlans", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Performance.PerformanceReview", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("AcknowledgedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("ApprovedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("ApprovedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int?>("FinalRating")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("ManagerComments")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<int?>("ManagerRating")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ManagerReviewDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("OverallComments")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<long>("PerformanceReviewCycleId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("RelatedPipId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("RelatedPromotionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("RelatedSalaryAdjustmentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ReviewerEmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<string>("SelfAssessmentComments")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<DateTime?>("SelfAssessmentDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("SelfRating")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<long?>("SubmittedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("WorkflowInstanceId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_PerformanceReviews_EmployeeId");
+
+                    b.HasIndex("PerformanceReviewCycleId")
+                        .HasDatabaseName("IX_PerformanceReviews_CycleId");
+
+                    b.HasIndex("RelatedPromotionId");
+
+                    b.HasIndex("RelatedSalaryAdjustmentId");
+
+                    b.HasIndex("ReviewerEmployeeId")
+                        .HasDatabaseName("IX_PerformanceReviews_ReviewerEmployeeId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_PerformanceReviews_Status");
+
+                    b.HasIndex("WorkflowInstanceId");
+
+                    b.HasIndex("PerformanceReviewCycleId", "EmployeeId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_PerformanceReviews_Cycle_Employee");
+
+                    b.ToTable("PerformanceReviews", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Performance.PerformanceReviewCycle", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("BranchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("CompetencyFrameworkId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("CycleType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ManagerAssessmentDeadline")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<DateTime?>("SelfAssessmentDeadline")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("IX_PerformanceReviewCycles_BranchId");
+
+                    b.HasIndex("CompetencyFrameworkId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_PerformanceReviewCycles_Status");
+
+                    b.ToTable("PerformanceReviewCycles", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Recruitment.Candidate", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("ConvertedToEmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("CurrentCompany")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("CurrentJobTitle")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime?>("DateOfBirth")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("FirstNameAr")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int?>("Gender")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("LastNameAr")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("LinkedInUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("NationalId")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Nationality")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("NationalityAr")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("Phone")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("PortfolioUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<long?>("ReferredByEmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ResumeUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<string>("Skills")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<int>("Source")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("YearsOfExperience")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ConvertedToEmployeeId");
+
+                    b.HasIndex("Email")
+                        .HasDatabaseName("IX_Candidates_Email");
+
+                    b.HasIndex("NationalId")
+                        .HasDatabaseName("IX_Candidates_NationalId");
+
+                    b.HasIndex("ReferredByEmployeeId");
+
+                    b.ToTable("Candidates", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Recruitment.InterviewFeedback", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Comments")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<int>("CommunicationScore")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("CulturalFitScore")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("InterviewScheduleId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("InterviewerEmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("OverallScore")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Recommendation")
+                        .HasColumnType("integer");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<string>("Strengths")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<int>("TechnicalScore")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Weaknesses")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InterviewScheduleId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_InterviewFeedbacks_InterviewScheduleId");
+
+                    b.HasIndex("InterviewerEmployeeId")
+                        .HasDatabaseName("IX_InterviewFeedbacks_InterviewerEmployeeId");
+
+                    b.ToTable("InterviewFeedbacks", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Recruitment.InterviewSchedule", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("CancellationReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("DurationMinutes")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("InterviewType")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("InterviewerEmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<long>("JobApplicationId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Location")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("MeetingLink")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<int>("Result")
+                        .HasColumnType("integer");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<DateTime>("ScheduledDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InterviewerEmployeeId")
+                        .HasDatabaseName("IX_InterviewSchedules_InterviewerEmployeeId");
+
+                    b.HasIndex("JobApplicationId")
+                        .HasDatabaseName("IX_InterviewSchedules_JobApplicationId");
+
+                    b.HasIndex("ScheduledDate")
+                        .HasDatabaseName("IX_InterviewSchedules_ScheduledDate");
+
+                    b.ToTable("InterviewSchedules", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Recruitment.JobApplication", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("AppliedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("CandidateId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("CoverLetterUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<long>("JobPostingId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("RejectionReasonAr")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime?>("ReviewedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("ReviewedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<string>("ScreeningNotes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CandidateId")
+                        .HasDatabaseName("IX_JobApplications_CandidateId");
+
+                    b.HasIndex("JobPostingId")
+                        .HasDatabaseName("IX_JobApplications_JobPostingId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_JobApplications_Status");
+
+                    b.HasIndex("CandidateId", "JobPostingId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_JobApplications_Candidate_Posting");
+
+                    b.ToTable("JobApplications", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Recruitment.JobPosting", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("ApplicationCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Benefits")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("BenefitsAr")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime?>("ExpiryDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ExternalDescription")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<string>("ExternalDescriptionAr")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsInternal")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsPublished")
+                        .HasColumnType("boolean");
+
+                    b.Property<long>("JobRequisitionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Location")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("LocationAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("PostingTitle")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("PostingTitleAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime?>("PublishDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Responsibilities")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<string>("ResponsibilitiesAr")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JobRequisitionId")
+                        .HasDatabaseName("IX_JobPostings_JobRequisitionId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_JobPostings_Status");
+
+                    b.ToTable("JobPostings", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Recruitment.JobRequisition", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("ApprovedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("BranchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal?>("BudgetedSalaryMax")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("BudgetedSalaryMin")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Currency")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<long>("DepartmentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<int>("EmploymentType")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("FilledPositions")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsReplacement")
+                        .HasColumnType("boolean");
+
+                    b.Property<long?>("JobGradeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("JobTitle")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("JobTitleAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Justification")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("JustificationAr")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<int>("NumberOfPositions")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<long?>("ReplacingEmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("RequestedByEmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int?>("RequiredExperienceYears")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("RequiredQualifications")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("RequiredQualificationsAr")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("RequiredSkills")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("RequisitionNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<long?>("SubmittedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("TargetHireDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("WorkflowInstanceId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("IX_JobRequisitions_BranchId");
+
+                    b.HasIndex("DepartmentId")
+                        .HasDatabaseName("IX_JobRequisitions_DepartmentId");
+
+                    b.HasIndex("JobGradeId");
+
+                    b.HasIndex("ReplacingEmployeeId");
+
+                    b.HasIndex("RequestedByEmployeeId");
+
+                    b.HasIndex("RequisitionNumber")
+                        .IsUnique()
+                        .HasDatabaseName("IX_JobRequisitions_RequisitionNumber");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_JobRequisitions_Status");
+
+                    b.HasIndex("WorkflowInstanceId");
+
+                    b.ToTable("JobRequisitions", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Recruitment.OfferLetter", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("ApprovedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("BenefitsDescription")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("BenefitsDescriptionAr")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<long>("CandidateId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("ContractType")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long?>("CreatedEmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<string>("DocumentUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<long>("JobApplicationId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("JobGradeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("JobTitle")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("JobTitleAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<decimal>("OfferedSalary")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime?>("RespondedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<DateTime?>("SentAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("SpecialConditions")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<long?>("SubmittedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("WorkflowInstanceId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CandidateId")
+                        .HasDatabaseName("IX_OfferLetters_CandidateId");
+
+                    b.HasIndex("CreatedEmployeeId");
+
+                    b.HasIndex("JobApplicationId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_OfferLetters_JobApplicationId");
+
+                    b.HasIndex("JobGradeId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_OfferLetters_Status");
+
+                    b.HasIndex("WorkflowInstanceId");
+
+                    b.ToTable("OfferLetters", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.RemoteWork.RemoteWorkPolicy", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -2258,7 +12604,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("RemoteWorkPolicies");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.RemoteWork.RemoteWorkRequest", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.RemoteWork.RemoteWorkRequest", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -2343,7 +12689,176 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("RemoteWorkRequests");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Settings.OffDay", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Reports.CustomReportDefinition", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("BranchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ColumnsJson")
+                        .IsRequired()
+                        .HasMaxLength(10000)
+                        .HasColumnType("character varying(10000)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("CreatedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("DataSource")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("FiltersJson")
+                        .HasMaxLength(10000)
+                        .HasColumnType("character varying(10000)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsPublic")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<string>("SortingJson")
+                        .HasMaxLength(5000)
+                        .HasColumnType("character varying(5000)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CustomReportDefinitions", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Reports.ScheduledReport", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("CronExpression")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("CustomReportDefinitionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("EmailRecipients")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<int>("Format")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("LastRunAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastRunStatus")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime?>("NextRunAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomReportDefinitionId");
+
+                    b.HasIndex("NextRunAt", "IsActive")
+                        .HasDatabaseName("IX_ScheduledReports_NextRunAt_IsActive");
+
+                    b.ToTable("ScheduledReports", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Settings.OffDay", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -2481,7 +12996,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("OffDays", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Settings.OvertimeConfiguration", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Settings.OvertimeConfiguration", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -2587,7 +13102,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("OvertimeConfigurations", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Settings.PublicHoliday", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Settings.PublicHoliday", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -2710,7 +13225,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("PublicHolidays", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Shifts.Shift", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Shifts.Shift", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -2856,7 +13371,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("Shifts", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Shifts.ShiftAssignment", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Shifts.ShiftAssignment", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -2977,7 +13492,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("ShiftAssignments", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Shifts.ShiftPeriod", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Shifts.ShiftPeriod", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -3040,7 +13555,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("ShiftPeriods", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Tenants.Tenant", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Subscriptions.EntitlementChangeLog", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -3048,11 +13563,1556 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<int?>("AffectedModule")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ChangeType")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("NewValue")
+                        .HasColumnType("text");
+
+                    b.Property<long?>("PerformedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("PreviousValue")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<long>("TenantId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAtUtc");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("TenantId", "ChangeType");
+
+                    b.ToTable("EntitlementChangeLogs", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Subscriptions.PlanFeatureFlag", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("FeatureKey")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsEnabled")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<long>("PlanModuleEntitlementId")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlanModuleEntitlementId", "FeatureKey")
+                        .IsUnique()
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("PlanFeatureFlags", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Subscriptions.PlanLimit", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LimitType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("LimitValue")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("PlanId")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlanId", "LimitType")
+                        .IsUnique()
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("PlanLimits", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Subscriptions.PlanModuleEntitlement", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsIncluded")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Module")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("PlanId")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlanId", "Module")
+                        .IsUnique()
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("PlanModuleEntitlements", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Subscriptions.SubscriptionPlan", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("AnnualPriceUsd")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasDefaultValue("USD");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsPublic")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<decimal>("MonthlyPriceUsd")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Tier")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique()
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("SubscriptionPlans", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Subscriptions.TenantFeatureOverride", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("FeatureKey")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<long>("TenantSubscriptionId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantSubscriptionId", "FeatureKey")
+                        .IsUnique()
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("TenantFeatureOverrides", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Subscriptions.TenantModuleAddOn", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("ActivatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime?>("DeactivatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Module")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<decimal>("MonthlyPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<long>("TenantSubscriptionId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantSubscriptionId", "Module")
+                        .IsUnique()
+                        .HasDatabaseName("IX_TenantModuleAddOns_Subscription_Module")
+                        .HasFilter("\"IsDeleted\" = false AND \"IsActive\" = true");
+
+                    b.ToTable("TenantModuleAddOns", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Subscriptions.TenantSubscription", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("BillingCycle")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime?>("CancellationEffectiveDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("CancelledAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("CurrentPeriodEnd")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CurrentPeriodStart")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ExternalSubscriptionId")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<long>("PlanId")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<long>("TenantId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlanId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_TenantSubscriptions_Status");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_TenantSubscriptions_TenantId");
+
+                    b.ToTable("TenantSubscriptions", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Succession.CareerPath", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CareerPaths", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Succession.CareerPathStep", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("CareerPathId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long?>("FromJobGradeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("JobTitle")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("JobTitleAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("RequiredCompetencies")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("StepOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("ToJobGradeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int?>("TypicalDurationMonths")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CareerPathId")
+                        .HasDatabaseName("IX_CareerPathSteps_CareerPathId");
+
+                    b.HasIndex("FromJobGradeId")
+                        .HasDatabaseName("IX_CareerPathSteps_FromJobGradeId");
+
+                    b.HasIndex("ToJobGradeId")
+                        .HasDatabaseName("IX_CareerPathSteps_ToJobGradeId");
+
+                    b.HasIndex("CareerPathId", "StepOrder")
+                        .HasDatabaseName("IX_CareerPathSteps_Path_Order");
+
+                    b.ToTable("CareerPathSteps", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Succession.KeyPosition", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("BranchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("CriticalityLevel")
+                        .HasColumnType("integer");
+
+                    b.Property<long?>("CurrentHolderId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("DepartmentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ImpactOfVacancy")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("ImpactOfVacancyAr")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<long?>("JobGradeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("JobTitle")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("JobTitleAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int?>("MinExperienceYears")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("RequiredCompetencies")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("VacancyRisk")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("IX_KeyPositions_BranchId");
+
+                    b.HasIndex("CriticalityLevel")
+                        .HasDatabaseName("IX_KeyPositions_CriticalityLevel");
+
+                    b.HasIndex("CurrentHolderId")
+                        .HasDatabaseName("IX_KeyPositions_CurrentHolderId");
+
+                    b.HasIndex("DepartmentId")
+                        .HasDatabaseName("IX_KeyPositions_DepartmentId");
+
+                    b.HasIndex("JobGradeId")
+                        .HasDatabaseName("IX_KeyPositions_JobGradeId");
+
+                    b.HasIndex("VacancyRisk")
+                        .HasDatabaseName("IX_KeyPositions_VacancyRisk");
+
+                    b.ToTable("KeyPositions", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Succession.SuccessionCandidate", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("DevelopmentPlan")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("DevelopmentPlanAr")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("GapAnalysis")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ReadinessLevel")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ReadinessTimeline")
+                        .HasColumnType("integer");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("SuccessionPlanId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("TalentProfileId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_SuccessionCandidates_EmployeeId");
+
+                    b.HasIndex("SuccessionPlanId")
+                        .HasDatabaseName("IX_SuccessionCandidates_SuccessionPlanId");
+
+                    b.HasIndex("TalentProfileId")
+                        .HasDatabaseName("IX_SuccessionCandidates_TalentProfileId");
+
+                    b.HasIndex("SuccessionPlanId", "EmployeeId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_SuccessionCandidates_Plan_Employee_Unique")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("SuccessionCandidates", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Succession.SuccessionPlan", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("EffectiveDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<long>("KeyPositionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime?>("ReviewDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("ReviewedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("KeyPositionId")
+                        .HasDatabaseName("IX_SuccessionPlans_KeyPositionId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_SuccessionPlans_Status");
+
+                    b.ToTable("SuccessionPlans", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Succession.TalentProfile", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("AssessedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("CareerAspiration")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("CareerAspirationAr")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("DevelopmentAreas")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsHighPotential")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastAssessmentDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("NineBoxPosition")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<int?>("PerformanceRating")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PotentialRating")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ReadinessLevel")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RetentionRisk")
+                        .HasColumnType("integer");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<string>("StrengthsSummary")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_TalentProfiles_EmployeeId_Unique")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("IsHighPotential")
+                        .HasDatabaseName("IX_TalentProfiles_IsHighPotential");
+
+                    b.HasIndex("NineBoxPosition")
+                        .HasDatabaseName("IX_TalentProfiles_NineBoxPosition");
+
+                    b.HasIndex("RetentionRisk")
+                        .HasDatabaseName("IX_TalentProfiles_RetentionRisk");
+
+                    b.ToTable("TalentProfiles", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Succession.TalentSkill", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("ProficiencyLevel")
+                        .HasColumnType("integer");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<string>("SkillName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("SkillNameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<long>("TalentProfileId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("VerifiedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("VerifiedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("YearsOfExperience")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TalentProfileId")
+                        .HasDatabaseName("IX_TalentSkills_TalentProfileId");
+
+                    b.HasIndex("TalentProfileId", "SkillName")
+                        .HasDatabaseName("IX_TalentSkills_Profile_Skill");
+
+                    b.ToTable("TalentSkills", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Surveys.SurveyDistribution", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastReminderSentAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int?>("ReminderFrequencyDays")
+                        .HasColumnType("integer");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("SurveyTemplateId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("TargetAudience")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TargetIds")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("TitleAr")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int>("TotalRecipients")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TotalResponses")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_SurveyDistributions_Status");
+
+                    b.HasIndex("SurveyTemplateId")
+                        .HasDatabaseName("IX_SurveyDistributions_SurveyTemplateId");
+
+                    b.HasIndex("Status", "EndDate")
+                        .HasDatabaseName("IX_SurveyDistributions_Status_EndDate");
+
+                    b.HasIndex("Status", "StartDate")
+                        .HasDatabaseName("IX_SurveyDistributions_Status_StartDate");
+
+                    b.ToTable("SurveyDistributions", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Surveys.SurveyParticipant", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("AnonymousToken")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("InvitedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("SurveyDistributionId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AnonymousToken")
+                        .IsUnique()
+                        .HasDatabaseName("IX_SurveyParticipants_AnonymousToken")
+                        .HasFilter("\"AnonymousToken\" IS NOT NULL");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_SurveyParticipants_Status");
+
+                    b.HasIndex("SurveyDistributionId")
+                        .HasDatabaseName("IX_SurveyParticipants_SurveyDistributionId");
+
+                    b.HasIndex("SurveyDistributionId", "EmployeeId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_SurveyParticipants_Distribution_Employee");
+
+                    b.ToTable("SurveyParticipants", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Surveys.SurveyQuestion", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsRequired")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("MaxLabel")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("MaxLabelAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int?>("MaxValue")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("MinLabel")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("MinLabelAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int?>("MinValue")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("OptionsJson")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<string>("QuestionText")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("QuestionTextAr")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<int>("QuestionType")
+                        .HasColumnType("integer");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<string>("SectionName")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("SectionNameAr")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<long>("SurveyTemplateId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SurveyTemplateId")
+                        .HasDatabaseName("IX_SurveyQuestions_SurveyTemplateId");
+
+                    b.HasIndex("SurveyTemplateId", "DisplayOrder")
+                        .HasDatabaseName("IX_SurveyQuestions_Template_Order");
+
+                    b.ToTable("SurveyQuestions", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Surveys.SurveyResponse", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("ParticipantToken")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("ResponseText")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<int?>("ResponseValue")
+                        .HasColumnType("integer");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<string>("SelectedOptions")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<long>("SurveyDistributionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("SurveyQuestionId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParticipantToken")
+                        .HasDatabaseName("IX_SurveyResponses_ParticipantToken");
+
+                    b.HasIndex("SurveyDistributionId")
+                        .HasDatabaseName("IX_SurveyResponses_SurveyDistributionId");
+
+                    b.HasIndex("SurveyQuestionId")
+                        .HasDatabaseName("IX_SurveyResponses_SurveyQuestionId");
+
+                    b.HasIndex("SurveyDistributionId", "ParticipantToken")
+                        .HasDatabaseName("IX_SurveyResponses_Distribution_Token");
+
+                    b.ToTable("SurveyResponses", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Surveys.SurveyTemplate", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<int?>("EstimatedDurationMinutes")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsAnonymous")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("SurveyType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("TitleAr")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("IX_SurveyTemplates_IsActive");
+
+                    b.HasIndex("SurveyType")
+                        .HasDatabaseName("IX_SurveyTemplates_SurveyType");
+
+                    b.ToTable("SurveyTemplates", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Tenants.Tenant", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
                     b.Property<string>("ApiBaseUrl")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)")
                         .HasComment("Base URL for tenant's API endpoint");
+
+                    b.Property<string>("City")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("CompanyRegistrationNumber")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Country")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasDefaultValue("SA");
 
                     b.Property<DateTime>("CreatedAtUtc")
                         .ValueGeneratedOnAdd()
@@ -3075,6 +15135,35 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)")
                         .HasComment("Database connection identifier for tenant isolation");
+
+                    b.Property<string>("DefaultCurrency")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasDefaultValue("SAR");
+
+                    b.Property<string>("DefaultLanguage")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasDefaultValue("en");
+
+                    b.Property<string>("DefaultTimezone")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("Asia/Riyadh");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Industry")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -3115,6 +15204,10 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasColumnType("character varying(200)")
                         .HasComment("Arabic display name of the tenant organization");
 
+                    b.Property<string>("Phone")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .IsRequired()
@@ -3123,11 +15216,32 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasDefaultValue(new byte[] { 1 })
                         .HasComment("Concurrency control timestamp");
 
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasDefaultValue("Active");
+
                     b.Property<string>("Subdomain")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
                         .HasComment("Subdomain identifier for tenant (e.g., acme)");
+
+                    b.Property<string>("TaxIdentificationNumber")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime?>("TrialEndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("TrialStartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Website")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.HasKey("Id");
 
@@ -3148,7 +15262,1488 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("Tenants", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.BlacklistedToken", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Tenants.TenantSettings", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("AllowHalfDayLeave")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AllowLeaveEncashment")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AllowMockLocation")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AllowNegativeLeaveBalance")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AllowSelfApproval")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AutoApproveAfterTimeout")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AutoCheckOutEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<TimeOnly?>("AutoCheckOutTime")
+                        .HasColumnType("time without time zone");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("DailyAttendanceSummaryEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("DateFormat")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("dd/MM/yyyy");
+
+                    b.Property<int>("DefaultApprovalTimeoutHours")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("EarlyLeaveGracePeriodMinutes")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("EnableBiometricAttendance")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("EnableEmailNotifications")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("EnableEndOfServiceCalc")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("EnableGpsAttendance")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("EnableManualAttendance")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("EnableNfcAttendance")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("EnablePushNotifications")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("EnableSmsNotifications")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("FiscalYearStartMonth")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(2)
+                        .HasColumnType("character varying(2)")
+                        .HasDefaultValue("01");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<int>("LateGracePeriodMinutes")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("LeaveYearStart")
+                        .HasMaxLength(5)
+                        .HasColumnType("character varying(5)");
+
+                    b.Property<int>("MaxLoginAttempts")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MinDaysBeforeLeaveRequest")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MinimumWorkingHoursForPresent")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("MobileCheckInEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("ModifiedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("NotifyEmployeeOnApproval")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("NotifyManagerOnLeaveRequest")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("NumberFormat")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasDefaultValue("en-US");
+
+                    b.Property<int>("PasswordExpiryDays")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PasswordHistoryCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("PayrollCurrency")
+                        .HasMaxLength(3)
+                        .HasColumnType("character varying(3)");
+
+                    b.Property<int>("PayrollCutOffDay")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("Require2FA")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("RequireApprovalComments")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("RequireAttachmentForSickLeave")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("RequireGpsForMobile")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("RequireNfcForMobile")
+                        .HasColumnType("boolean");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<string>("SalaryCalculationBasis")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("Calendar");
+
+                    b.Property<int>("SessionTimeoutMinutes")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("TenantId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("TimeFormat")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("HH:mm");
+
+                    b.Property<bool>("TrackBreakTime")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("WeekStartDay")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("Sunday");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_TenantSettings_TenantId");
+
+                    b.ToTable("TenantSettings", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Timesheets.Project", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("BranchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal?>("BudgetHours")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("ClientName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("ClientNameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsChargeable")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<long?>("ManagerEmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("IX_Projects_BranchId");
+
+                    b.HasIndex("Code")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Projects_Code");
+
+                    b.HasIndex("ManagerEmployeeId")
+                        .HasDatabaseName("IX_Projects_ManagerEmployeeId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_Projects_Status");
+
+                    b.ToTable("Projects", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Timesheets.ProjectTask", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal?>("BudgetHours")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<long>("ProjectId")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId")
+                        .HasDatabaseName("IX_ProjectTasks_ProjectId");
+
+                    b.HasIndex("ProjectId", "Code")
+                        .IsUnique()
+                        .HasDatabaseName("IX_ProjectTasks_Project_Code");
+
+                    b.ToTable("ProjectTasks", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Timesheets.Timesheet", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("ApprovedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<decimal>("OvertimeHours")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("RegularHours")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("RejectedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("SubmittedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("SubmittedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("TimesheetPeriodId")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal>("TotalHours")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<long?>("WorkflowInstanceId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_Timesheets_EmployeeId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_Timesheets_Status");
+
+                    b.HasIndex("WorkflowInstanceId")
+                        .HasDatabaseName("IX_Timesheets_WorkflowInstanceId");
+
+                    b.HasIndex("TimesheetPeriodId", "EmployeeId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Timesheets_Period_Employee");
+
+                    b.ToTable("Timesheets", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Timesheets.TimesheetEntry", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("AttendanceRecordId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("EntryDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("Hours")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsAutoPopulated")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<decimal>("OvertimeHours")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<long>("ProjectId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("ProjectTaskId")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<long>("TimesheetId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AttendanceRecordId")
+                        .HasDatabaseName("IX_TimesheetEntries_AttendanceRecordId");
+
+                    b.HasIndex("ProjectId")
+                        .HasDatabaseName("IX_TimesheetEntries_ProjectId");
+
+                    b.HasIndex("ProjectTaskId")
+                        .HasDatabaseName("IX_TimesheetEntries_ProjectTaskId");
+
+                    b.HasIndex("TimesheetId")
+                        .HasDatabaseName("IX_TimesheetEntries_TimesheetId");
+
+                    b.HasIndex("TimesheetId", "EntryDate")
+                        .HasDatabaseName("IX_TimesheetEntries_Timesheet_Date");
+
+                    b.ToTable("TimesheetEntries", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Timesheets.TimesheetPeriod", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("BranchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int>("PeriodType")
+                        .HasColumnType("integer");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("SubmissionDeadline")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("IX_TimesheetPeriods_BranchId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_TimesheetPeriods_Status");
+
+                    b.HasIndex("BranchId", "StartDate", "EndDate")
+                        .HasDatabaseName("IX_TimesheetPeriods_Branch_Dates");
+
+                    b.ToTable("TimesheetPeriods", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Training.EmployeeCertification", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("CertificationName")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("CertificationNameAr")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("CertificationNumber")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("DocumentUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("ExpiryDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("IssueDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("IssuingAuthority")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("IssuingAuthorityAr")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<int?>("RenewalReminderDays")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("RenewalRequired")
+                        .HasColumnType("boolean");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<long?>("TrainingCourseId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_EmployeeCertifications_EmployeeId");
+
+                    b.HasIndex("ExpiryDate")
+                        .HasDatabaseName("IX_EmployeeCertifications_ExpiryDate");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_EmployeeCertifications_Status");
+
+                    b.HasIndex("TrainingCourseId")
+                        .HasDatabaseName("IX_EmployeeCertifications_CourseId");
+
+                    b.ToTable("EmployeeCertifications", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Training.TrainingAttendance", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("AttendanceDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<TimeSpan?>("CheckInTime")
+                        .HasColumnType("interval");
+
+                    b.Property<TimeSpan?>("CheckOutTime")
+                        .HasColumnType("interval");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("TrainingSessionId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_TrainingAttendance_EmployeeId");
+
+                    b.HasIndex("TrainingSessionId")
+                        .HasDatabaseName("IX_TrainingAttendance_SessionId");
+
+                    b.HasIndex("TrainingSessionId", "EmployeeId", "AttendanceDate")
+                        .IsUnique()
+                        .HasDatabaseName("IX_TrainingAttendance_Session_Employee_Date");
+
+                    b.ToTable("TrainingAttendanceRecords", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Training.TrainingBudget", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("AllocatedBudget")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<long?>("BranchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<long?>("DepartmentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("FiscalYear")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<decimal>("SpentAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("IX_TrainingBudgets_BranchId");
+
+                    b.HasIndex("DepartmentId")
+                        .HasDatabaseName("IX_TrainingBudgets_DepartmentId");
+
+                    b.HasIndex("FiscalYear")
+                        .HasDatabaseName("IX_TrainingBudgets_FiscalYear");
+
+                    b.HasIndex("FiscalYear", "BranchId", "DepartmentId")
+                        .HasDatabaseName("IX_TrainingBudgets_Year_Branch_Dept");
+
+                    b.ToTable("TrainingBudgets", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Training.TrainingCategory", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NameAr")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("IX_TrainingCategories_IsActive");
+
+                    b.ToTable("TrainingCategories", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Training.TrainingCourse", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("CertificationAwarded")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("CertificationName")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<int?>("CertificationValidityMonths")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<decimal?>("Cost")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<int>("DeliveryMethod")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<decimal>("DurationHours")
+                        .HasColumnType("decimal(8,2)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("MaxParticipants")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Prerequisites")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("PrerequisitesAr")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("Provider")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("ProviderAr")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("TitleAr")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<long?>("TrainingCategoryId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique()
+                        .HasDatabaseName("IX_TrainingCourses_Code");
+
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("IX_TrainingCourses_IsActive");
+
+                    b.HasIndex("TrainingCategoryId")
+                        .HasDatabaseName("IX_TrainingCourses_CategoryId");
+
+                    b.ToTable("TrainingCourses", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Training.TrainingEnrollment", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("CancellationReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTime?>("CancelledAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("EnrolledAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("EnrolledByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<long?>("TrainingProgramId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("TrainingSessionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("WorkflowInstanceId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_TrainingEnrollments_EmployeeId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_TrainingEnrollments_Status");
+
+                    b.HasIndex("TrainingProgramId")
+                        .HasDatabaseName("IX_TrainingEnrollments_ProgramId");
+
+                    b.HasIndex("TrainingSessionId")
+                        .HasDatabaseName("IX_TrainingEnrollments_SessionId");
+
+                    b.HasIndex("WorkflowInstanceId");
+
+                    b.HasIndex("EmployeeId", "TrainingSessionId")
+                        .HasDatabaseName("IX_TrainingEnrollments_EmployeeId_SessionId");
+
+                    b.ToTable("TrainingEnrollments", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Training.TrainingEvaluation", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Comments")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("CommentsAr")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<int?>("ContentRating")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int?>("InstructorRating")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("MaterialRating")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("OverallRating")
+                        .HasColumnType("integer");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<DateTime>("SubmittedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("TrainingSessionId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId")
+                        .HasDatabaseName("IX_TrainingEvaluations_EmployeeId");
+
+                    b.HasIndex("TrainingSessionId")
+                        .HasDatabaseName("IX_TrainingEvaluations_SessionId");
+
+                    b.HasIndex("TrainingSessionId", "EmployeeId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_TrainingEvaluations_Session_Employee");
+
+                    b.ToTable("TrainingEvaluations", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Training.TrainingProgram", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TargetAudience")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("TargetAudienceAr")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("TitleAr")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<decimal>("TotalDurationHours")
+                        .HasColumnType("decimal(8,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique()
+                        .HasDatabaseName("IX_TrainingPrograms_Code");
+
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("IX_TrainingPrograms_IsActive");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_TrainingPrograms_Status");
+
+                    b.ToTable("TrainingPrograms", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Training.TrainingProgramCourse", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsRequired")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("SequenceOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("TrainingCourseId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("TrainingProgramId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TrainingCourseId");
+
+                    b.HasIndex("TrainingProgramId", "TrainingCourseId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_TrainingProgramCourses_ProgramId_CourseId");
+
+                    b.ToTable("TrainingProgramCourses", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Training.TrainingSession", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("BranchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<TimeSpan?>("EndTime")
+                        .HasColumnType("interval");
+
+                    b.Property<string>("InstructorName")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("InstructorNameAr")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Location")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("LocationAr")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int?>("MaxParticipants")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<TimeSpan?>("StartTime")
+                        .HasColumnType("interval");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<long>("TrainingCourseId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("TrainingProgramId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("IX_TrainingSessions_BranchId");
+
+                    b.HasIndex("StartDate")
+                        .HasDatabaseName("IX_TrainingSessions_StartDate");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_TrainingSessions_Status");
+
+                    b.HasIndex("TrainingCourseId")
+                        .HasDatabaseName("IX_TrainingSessions_CourseId");
+
+                    b.HasIndex("TrainingProgramId")
+                        .HasDatabaseName("IX_TrainingSessions_ProgramId");
+
+                    b.ToTable("TrainingSessions", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.BlacklistedToken", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -3209,7 +16804,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("BlacklistedTokens", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.LoginAttempt", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.LoginAttempt", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -3279,7 +16874,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("LoginAttempts", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.PasswordHistory", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.PasswordHistory", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -3332,7 +16927,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("PasswordHistory", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.Permission", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.Permission", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -3389,7 +16984,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("Permissions", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.RefreshToken", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.RefreshToken", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -3450,7 +17045,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("RefreshTokens", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.Role", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.Role", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -3506,7 +17101,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("Roles", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.RolePermission", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.RolePermission", b =>
                 {
                     b.Property<long>("RoleId")
                         .HasColumnType("bigint");
@@ -3521,7 +17116,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("RolePermissions", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.TwoFactorBackupCode", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.TwoFactorBackupCode", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -3569,7 +17164,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("TwoFactorBackupCodes");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.User", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.User", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -3682,7 +17277,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.UserBranchScope", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.UserBranchScope", b =>
                 {
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
@@ -3697,7 +17292,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("UserBranchScopes", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.UserRole", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.UserRole", b =>
                 {
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
@@ -3712,7 +17307,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("UserRoles", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.UserSession", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.UserSession", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -3794,13 +17389,25 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("UserSessions");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.VacationTypes.VacationType", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.VacationTypes.VacationType", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("AllowEncashment")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Whether leave encashment is allowed for this vacation type");
+
+                    b.Property<bool>("AllowHalfDay")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Whether half-day leave is allowed for this vacation type");
 
                     b.Property<long?>("BranchId")
                         .HasColumnType("bigint");
@@ -3813,6 +17420,10 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int?>("EncashmentMaxDays")
+                        .HasColumnType("integer")
+                        .HasComment("Maximum number of days that can be encashed (null = no limit)");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -3867,7 +17478,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("VacationTypes", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Vacations.EmployeeVacation", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Vacations.EmployeeVacation", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -3895,6 +17506,10 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasComment("End date of vacation period");
 
+                    b.Property<int?>("HalfDayType")
+                        .HasColumnType("integer")
+                        .HasComment("Half-day type: Morning or Afternoon (nullable)");
+
                     b.Property<bool>("IsApproved")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
@@ -3906,6 +17521,12 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasColumnType("boolean")
                         .HasDefaultValue(false)
                         .HasComment("Soft delete flag");
+
+                    b.Property<bool>("IsHalfDay")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Whether this is a half-day leave");
 
                     b.Property<DateTime?>("ModifiedAtUtc")
                         .HasColumnType("timestamp with time zone")
@@ -3980,7 +17601,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("EmployeeVacations", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Workflows.ApprovalDelegation", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Workflows.ApprovalDelegation", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -4081,7 +17702,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("ApprovalDelegations", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Workflows.WorkflowDefinition", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Workflows.WorkflowDefinition", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -4202,7 +17823,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("WorkflowDefinitions", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Workflows.WorkflowInstance", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Workflows.WorkflowInstance", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -4329,7 +17950,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("WorkflowInstances", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Workflows.WorkflowStep", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Workflows.WorkflowStep", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -4501,7 +18122,7 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("WorkflowSteps", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Workflows.WorkflowStepExecution", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Workflows.WorkflowStepExecution", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -4642,25 +18263,160 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("WorkflowStepExecutions", (string)null);
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.AttendanceCorrectionRequest", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Analytics.AnalyticsSnapshot", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "ApprovedBy")
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
                         .WithMany()
-                        .HasForeignKey("ApprovedById")
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("Department");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Analytics.SavedDashboard", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Announcements.Announcement", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Announcements.AnnouncementCategory", "Category")
+                        .WithMany("Announcements")
+                        .HasForeignKey("AnnouncementCategoryId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Attendance.AttendanceTransaction", "CreatedTransaction")
-                        .WithMany()
-                        .HasForeignKey("CreatedTransactionId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                    b.Navigation("Category");
+                });
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Announcements.AnnouncementAcknowledgment", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Announcements.Announcement", "Announcement")
+                        .WithMany("Acknowledgments")
+                        .HasForeignKey("AnnouncementId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
+                    b.Navigation("Announcement");
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Announcements.AnnouncementAttachment", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Announcements.Announcement", "Announcement")
+                        .WithMany("Attachments")
+                        .HasForeignKey("AnnouncementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Common.FileAttachment", "FileAttachment")
+                        .WithMany()
+                        .HasForeignKey("FileAttachmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Announcement");
+
+                    b.Navigation("FileAttachment");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Assets.Asset", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Assets.AssetCategory", "Category")
+                        .WithMany("Assets")
+                        .HasForeignKey("AssetCategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Assets.AssetAssignment", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Assets.Asset", "Asset")
+                        .WithMany("Assignments")
+                        .HasForeignKey("AssetId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Asset");
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Assets.AssetCategory", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Assets.AssetCategory", "ParentCategory")
+                        .WithMany("ChildCategories")
+                        .HasForeignKey("ParentCategoryId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ParentCategory");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Assets.AssetMaintenanceRecord", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Assets.Asset", "Asset")
+                        .WithMany("MaintenanceRecords")
+                        .HasForeignKey("AssetId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Asset");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Attendance.AttendanceCorrectionRequest", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "ApprovedBy")
+                        .WithMany()
+                        .HasForeignKey("ApprovedById")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Attendance.AttendanceTransaction", "CreatedTransaction")
+                        .WithMany()
+                        .HasForeignKey("CreatedTransactionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
                         .WithMany()
                         .HasForeignKey("WorkflowInstanceId")
                         .OnDelete(DeleteBehavior.SetNull);
@@ -4674,20 +18430,20 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("WorkflowInstance");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.AttendanceRecord", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Attendance.AttendanceRecord", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("TimeAttendanceSystem.Domain.RemoteWork.RemoteWorkRequest", "RemoteWorkRequest")
+                    b.HasOne("TecAxle.Hrms.Domain.RemoteWork.RemoteWorkRequest", "RemoteWorkRequest")
                         .WithMany()
                         .HasForeignKey("RemoteWorkRequestId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Shifts.ShiftAssignment", "ShiftAssignment")
+                    b.HasOne("TecAxle.Hrms.Domain.Shifts.ShiftAssignment", "ShiftAssignment")
                         .WithMany()
                         .HasForeignKey("ShiftAssignmentId")
                         .OnDelete(DeleteBehavior.SetNull);
@@ -4699,25 +18455,25 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("ShiftAssignment");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.AttendanceTransaction", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Attendance.AttendanceTransaction", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Attendance.AttendanceRecord", null)
+                    b.HasOne("TecAxle.Hrms.Domain.Attendance.AttendanceRecord", null)
                         .WithMany("Transactions")
                         .HasForeignKey("AttendanceRecordId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "EnteredByUser")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "EnteredByUser")
                         .WithMany()
                         .HasForeignKey("EnteredByUserId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "VerifiedByUser")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "VerifiedByUser")
                         .WithMany()
                         .HasForeignKey("VerifiedByUserId")
                         .OnDelete(DeleteBehavior.NoAction);
@@ -4729,16 +18485,16 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("VerifiedByUser");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.AttendanceVerificationLog", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Attendance.AttendanceVerificationLog", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Branch", "Branch")
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK_AttendanceVerificationLogs_Branches");
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4750,26 +18506,239 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("Employee");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.WorkingDay", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Attendance.OnCallSchedule", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Attendance.AttendanceRecord", "AttendanceRecord")
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Shifts.Shift", "Shift")
+                        .WithMany()
+                        .HasForeignKey("ShiftId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Shift");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Attendance.ShiftSwapRequest", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Shifts.Shift", "OriginalShift")
+                        .WithMany()
+                        .HasForeignKey("OriginalShiftId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Shifts.Shift", "SwapShift")
+                        .WithMany()
+                        .HasForeignKey("SwapShiftId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "SwapWithEmployee")
+                        .WithMany()
+                        .HasForeignKey("SwapWithEmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
+                        .WithMany()
+                        .HasForeignKey("WorkflowInstanceId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("OriginalShift");
+
+                    b.Navigation("SwapShift");
+
+                    b.Navigation("SwapWithEmployee");
+
+                    b.Navigation("WorkflowInstance");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Attendance.WorkingDay", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Attendance.AttendanceRecord", "AttendanceRecord")
                         .WithOne()
-                        .HasForeignKey("TimeAttendanceSystem.Domain.Attendance.WorkingDay", "AttendanceRecordId")
+                        .HasForeignKey("TecAxle.Hrms.Domain.Attendance.WorkingDay", "AttendanceRecordId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("AttendanceRecord");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Branches.Department", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Benefits.BenefitClaim", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Branch", "Branch")
+                    b.HasOne("TecAxle.Hrms.Domain.Benefits.BenefitEnrollment", "BenefitEnrollment")
+                        .WithMany()
+                        .HasForeignKey("BenefitEnrollmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("BenefitEnrollment");
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Benefits.BenefitDependent", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Benefits.BenefitEnrollment", "BenefitEnrollment")
+                        .WithMany("Dependents")
+                        .HasForeignKey("BenefitEnrollmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.EmployeeDependent", "EmployeeDependent")
+                        .WithMany()
+                        .HasForeignKey("EmployeeDependentId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("BenefitEnrollment");
+
+                    b.Navigation("EmployeeDependent");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Benefits.BenefitEligibilityRule", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Benefits.BenefitPlan", "BenefitPlan")
+                        .WithMany("EligibilityRules")
+                        .HasForeignKey("BenefitPlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("BenefitPlan");
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("Department");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Benefits.BenefitEnrollment", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Benefits.BenefitPlan", "BenefitPlan")
+                        .WithMany("Enrollments")
+                        .HasForeignKey("BenefitPlanId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Benefits.BenefitPlanOption", "PlanOption")
+                        .WithMany()
+                        .HasForeignKey("BenefitPlanOptionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Benefits.OpenEnrollmentPeriod", "OpenEnrollmentPeriod")
+                        .WithMany()
+                        .HasForeignKey("OpenEnrollmentPeriodId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
+                        .WithMany()
+                        .HasForeignKey("WorkflowInstanceId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("BenefitPlan");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("OpenEnrollmentPeriod");
+
+                    b.Navigation("PlanOption");
+
+                    b.Navigation("WorkflowInstance");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Benefits.BenefitPlan", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Payroll.InsuranceProvider", "InsuranceProvider")
+                        .WithMany()
+                        .HasForeignKey("InsuranceProviderId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("InsuranceProvider");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Benefits.BenefitPlanOption", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Benefits.BenefitPlan", "BenefitPlan")
+                        .WithMany("Options")
+                        .HasForeignKey("BenefitPlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BenefitPlan");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Benefits.OpenEnrollmentPeriod", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Branch");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Branches.Branch", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Tenants.Tenant", "Tenant")
+                        .WithMany("Branches")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Branches.BranchSettingsOverride", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
+                        .WithOne()
+                        .HasForeignKey("TecAxle.Hrms.Domain.Branches.BranchSettingsOverride", "BranchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Branch");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Branches.Department", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
                         .WithMany("Departments")
                         .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Department", "ParentDepartment")
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Department", "ParentDepartment")
                         .WithMany("SubDepartments")
                         .HasForeignKey("ParentDepartmentId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -4779,9 +18748,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("ParentDepartment");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Branches.NfcTag", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Branches.NfcTag", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Branch", "Branch")
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4791,9 +18760,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("Branch");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Common.AuditChange", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Common.AuditChange", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Common.AuditLog", "AuditLog")
+                    b.HasOne("TecAxle.Hrms.Domain.Common.AuditLog", "AuditLog")
                         .WithMany("Changes")
                         .HasForeignKey("AuditLogId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -4802,24 +18771,349 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("AuditLog");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Employees.Employee", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Configuration.PolicyTemplate", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Branch", "Branch")
+                    b.HasOne("TecAxle.Hrms.Domain.Tenants.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Configuration.PolicyTemplateItem", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Configuration.PolicyTemplate", "PolicyTemplate")
+                        .WithMany("Items")
+                        .HasForeignKey("PolicyTemplateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PolicyTemplate");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Configuration.SetupStep", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Tenants.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Departments.DepartmentSettingsOverride", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Shifts.Shift", "DefaultShift")
+                        .WithMany()
+                        .HasForeignKey("DefaultShiftId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Department", "Department")
+                        .WithOne()
+                        .HasForeignKey("TecAxle.Hrms.Domain.Departments.DepartmentSettingsOverride", "DepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DefaultShift");
+
+                    b.Navigation("Department");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Documents.CompanyPolicy", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Documents.DocumentCategory", "DocumentCategory")
+                        .WithMany("Policies")
+                        .HasForeignKey("DocumentCategoryId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("DocumentCategory");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Documents.EmployeeDocument", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Documents.DocumentCategory", "DocumentCategory")
+                        .WithMany("Documents")
+                        .HasForeignKey("DocumentCategoryId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("DocumentCategory");
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Documents.LetterRequest", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Documents.LetterTemplate", "Template")
+                        .WithMany()
+                        .HasForeignKey("TemplateId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
+                        .WithMany()
+                        .HasForeignKey("WorkflowInstanceId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Template");
+
+                    b.Navigation("WorkflowInstance");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Documents.LetterTemplate", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Branch");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Documents.PolicyAcknowledgment", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Documents.CompanyPolicy", "CompanyPolicy")
+                        .WithMany("Acknowledgments")
+                        .HasForeignKey("CompanyPolicyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CompanyPolicy");
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.EmployeeRelations.CounselingRecord", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", null)
+                        .WithMany("CounselingRecords")
+                        .HasForeignKey("EmployeeId1");
+
+                    b.HasOne("TecAxle.Hrms.Domain.EmployeeRelations.DisciplinaryAction", "RelatedDisciplinaryAction")
+                        .WithMany()
+                        .HasForeignKey("RelatedDisciplinaryActionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.EmployeeRelations.Grievance", "RelatedGrievance")
+                        .WithMany()
+                        .HasForeignKey("RelatedGrievanceId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("RelatedDisciplinaryAction");
+
+                    b.Navigation("RelatedGrievance");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.EmployeeRelations.DisciplinaryAction", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", null)
+                        .WithMany("DisciplinaryActions")
+                        .HasForeignKey("EmployeeId1");
+
+                    b.HasOne("TecAxle.Hrms.Domain.EmployeeRelations.Grievance", "RelatedGrievance")
+                        .WithMany()
+                        .HasForeignKey("RelatedGrievanceId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.EmployeeRelations.Investigation", "RelatedInvestigation")
+                        .WithMany()
+                        .HasForeignKey("RelatedInvestigationId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("RelatedGrievance");
+
+                    b.Navigation("RelatedInvestigation");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.EmployeeRelations.DisciplinaryAttachment", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.EmployeeRelations.DisciplinaryAction", "DisciplinaryAction")
+                        .WithMany("DisciplinaryAttachments")
+                        .HasForeignKey("DisciplinaryActionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Common.FileAttachment", "FileAttachment")
+                        .WithMany()
+                        .HasForeignKey("FileAttachmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("DisciplinaryAction");
+
+                    b.Navigation("FileAttachment");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.EmployeeRelations.Grievance", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "AgainstEmployee")
+                        .WithMany()
+                        .HasForeignKey("AgainstEmployeeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", null)
+                        .WithMany("Grievances")
+                        .HasForeignKey("EmployeeId1");
+
+                    b.Navigation("AgainstEmployee");
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.EmployeeRelations.GrievanceAttachment", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Common.FileAttachment", "FileAttachment")
+                        .WithMany()
+                        .HasForeignKey("FileAttachmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.EmployeeRelations.Grievance", "Grievance")
+                        .WithMany("GrievanceAttachments")
+                        .HasForeignKey("GrievanceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FileAttachment");
+
+                    b.Navigation("Grievance");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.EmployeeRelations.GrievanceNote", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.EmployeeRelations.Grievance", "Grievance")
+                        .WithMany("GrievanceNotes")
+                        .HasForeignKey("GrievanceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Grievance");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.EmployeeRelations.Investigation", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.EmployeeRelations.Grievance", "RelatedGrievance")
+                        .WithMany()
+                        .HasForeignKey("RelatedGrievanceId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "SubjectEmployee")
+                        .WithMany()
+                        .HasForeignKey("SubjectEmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("RelatedGrievance");
+
+                    b.Navigation("SubjectEmployee");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.EmployeeRelations.InvestigationAttachment", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Common.FileAttachment", "FileAttachment")
+                        .WithMany()
+                        .HasForeignKey("FileAttachmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.EmployeeRelations.Investigation", "Investigation")
+                        .WithMany("InvestigationAttachments")
+                        .HasForeignKey("InvestigationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FileAttachment");
+
+                    b.Navigation("Investigation");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.EmployeeRelations.InvestigationNote", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.EmployeeRelations.Investigation", "Investigation")
+                        .WithMany("InvestigationNotes")
+                        .HasForeignKey("InvestigationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Investigation");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.EmergencyContact", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany("EmergencyContacts")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.Employee", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Department", "Department")
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Department", "Department")
                         .WithMany()
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Department", null)
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Department", null)
                         .WithMany("Employees")
                         .HasForeignKey("DepartmentId1");
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Manager")
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.JobGrade", "JobGrade")
+                        .WithMany("Employees")
+                        .HasForeignKey("JobGradeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Manager")
                         .WithMany("DirectReports")
                         .HasForeignKey("ManagerEmployeeId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -4828,18 +19122,173 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
 
                     b.Navigation("Department");
 
+                    b.Navigation("JobGrade");
+
                     b.Navigation("Manager");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Employees.EmployeeUserLink", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.EmployeeAddress", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany("Addresses")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.EmployeeBankDetail", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany("BankDetails")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.EmployeeContract", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany("Contracts")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.EmployeeContract", "PreviousContract")
+                        .WithMany()
+                        .HasForeignKey("PreviousContractId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("PreviousContract");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.EmployeeDependent", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany("Dependents")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.EmployeeEducation", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany("EducationHistory")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.EmployeeProfileChange", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany("ProfileChanges")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.EmployeePromotion", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany("Promotions")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Department", "NewDepartment")
+                        .WithMany()
+                        .HasForeignKey("NewDepartmentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Department", "OldDepartment")
+                        .WithMany()
+                        .HasForeignKey("OldDepartmentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
+                        .WithMany()
+                        .HasForeignKey("WorkflowInstanceId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("NewDepartment");
+
+                    b.Navigation("OldDepartment");
+
+                    b.Navigation("WorkflowInstance");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.EmployeeTransfer", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany("Transfers")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "FromBranch")
+                        .WithMany()
+                        .HasForeignKey("FromBranchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Department", "FromDepartment")
+                        .WithMany()
+                        .HasForeignKey("FromDepartmentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "ToBranch")
+                        .WithMany()
+                        .HasForeignKey("ToBranchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Department", "ToDepartment")
+                        .WithMany()
+                        .HasForeignKey("ToDepartmentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
+                        .WithMany()
+                        .HasForeignKey("WorkflowInstanceId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("FromBranch");
+
+                    b.Navigation("FromDepartment");
+
+                    b.Navigation("ToBranch");
+
+                    b.Navigation("ToDepartment");
+
+                    b.Navigation("WorkflowInstance");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.EmployeeUserLink", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
                         .WithOne("EmployeeUserLink")
-                        .HasForeignKey("TimeAttendanceSystem.Domain.Employees.EmployeeUserLink", "EmployeeId")
+                        .HasForeignKey("TecAxle.Hrms.Domain.Employees.EmployeeUserLink", "EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "User")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -4850,20 +19299,81 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Excuses.EmployeeExcuse", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.EmployeeVisa", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "ApprovedBy")
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany("Visas")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.EmployeeWorkExperience", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany("WorkExperienceHistory")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.SalaryAdjustment", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany("SalaryAdjustments")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.EmployeeContract", "RelatedContract")
+                        .WithMany()
+                        .HasForeignKey("RelatedContractId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.EmployeePromotion", "RelatedPromotion")
+                        .WithMany()
+                        .HasForeignKey("RelatedPromotionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.EmployeeTransfer", "RelatedTransfer")
+                        .WithMany()
+                        .HasForeignKey("RelatedTransferId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
+                        .WithMany()
+                        .HasForeignKey("WorkflowInstanceId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("RelatedContract");
+
+                    b.Navigation("RelatedPromotion");
+
+                    b.Navigation("RelatedTransfer");
+
+                    b.Navigation("WorkflowInstance");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Excuses.EmployeeExcuse", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "ApprovedBy")
                         .WithMany()
                         .HasForeignKey("ApprovedById")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
                         .WithMany()
                         .HasForeignKey("WorkflowInstanceId")
                         .OnDelete(DeleteBehavior.SetNull);
@@ -4875,9 +19385,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("WorkflowInstance");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Excuses.ExcusePolicy", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Excuses.ExcusePolicy", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Branch", "Branch")
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.SetNull);
@@ -4885,9 +19395,98 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("Branch");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.LeaveManagement.LeaveAccrualPolicy", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Expenses.ExpenseClaim", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.VacationTypes.VacationType", "VacationType")
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Expenses.ExpensePolicy", "ExpensePolicy")
+                        .WithMany()
+                        .HasForeignKey("ExpensePolicyId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
+                        .WithMany()
+                        .HasForeignKey("WorkflowInstanceId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("ExpensePolicy");
+
+                    b.Navigation("WorkflowInstance");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Expenses.ExpenseClaimItem", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Expenses.ExpenseCategory", "ExpenseCategory")
+                        .WithMany()
+                        .HasForeignKey("ExpenseCategoryId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Expenses.ExpenseClaim", "ExpenseClaim")
+                        .WithMany("Items")
+                        .HasForeignKey("ExpenseClaimId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ExpenseCategory");
+
+                    b.Navigation("ExpenseClaim");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Expenses.ExpensePolicy", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Branch");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Expenses.ExpenseReimbursement", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Expenses.ExpenseClaim", "ExpenseClaim")
+                        .WithOne("Reimbursement")
+                        .HasForeignKey("TecAxle.Hrms.Domain.Expenses.ExpenseReimbursement", "ExpenseClaimId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Payroll.PayrollRecord", "PayrollRecord")
+                        .WithMany()
+                        .HasForeignKey("PayrollRecordId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("ExpenseClaim");
+
+                    b.Navigation("PayrollRecord");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.LeaveManagement.CompensatoryOff", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Vacations.EmployeeVacation", "UsedVacation")
+                        .WithMany()
+                        .HasForeignKey("UsedVacationId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("UsedVacation");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.LeaveManagement.LeaveAccrualPolicy", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.VacationTypes.VacationType", "VacationType")
                         .WithMany()
                         .HasForeignKey("VacationTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4896,15 +19495,15 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("VacationType");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.LeaveManagement.LeaveBalance", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.LeaveManagement.LeaveBalance", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TimeAttendanceSystem.Domain.VacationTypes.VacationType", "VacationType")
+                    b.HasOne("TecAxle.Hrms.Domain.VacationTypes.VacationType", "VacationType")
                         .WithMany()
                         .HasForeignKey("VacationTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4915,15 +19514,41 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("VacationType");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.LeaveManagement.LeaveEntitlement", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.LeaveManagement.LeaveEncashment", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TimeAttendanceSystem.Domain.VacationTypes.VacationType", "VacationType")
+                    b.HasOne("TecAxle.Hrms.Domain.Payroll.PayrollRecord", "PayrollRecord")
+                        .WithMany()
+                        .HasForeignKey("PayrollRecordId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.VacationTypes.VacationType", "VacationType")
+                        .WithMany()
+                        .HasForeignKey("VacationTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("PayrollRecord");
+
+                    b.Navigation("VacationType");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.LeaveManagement.LeaveEntitlement", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.VacationTypes.VacationType", "VacationType")
                         .WithMany()
                         .HasForeignKey("VacationTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4934,9 +19559,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("VacationType");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.LeaveManagement.LeaveTransaction", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.LeaveManagement.LeaveTransaction", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.LeaveManagement.LeaveBalance", "LeaveBalance")
+                    b.HasOne("TecAxle.Hrms.Domain.LeaveManagement.LeaveBalance", "LeaveBalance")
                         .WithMany("Transactions")
                         .HasForeignKey("LeaveBalanceId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -4945,15 +19570,109 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("LeaveBalance");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Notifications.Notification", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Loans.LoanApplication", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Notifications.NotificationBroadcast", "Broadcast")
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Loans.LoanPolicy", "LoanPolicy")
+                        .WithMany()
+                        .HasForeignKey("LoanPolicyId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Loans.LoanType", "LoanType")
+                        .WithMany()
+                        .HasForeignKey("LoanTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
+                        .WithMany()
+                        .HasForeignKey("WorkflowInstanceId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("LoanPolicy");
+
+                    b.Navigation("LoanType");
+
+                    b.Navigation("WorkflowInstance");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Loans.LoanPolicy", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Loans.LoanType", "LoanType")
+                        .WithMany()
+                        .HasForeignKey("LoanTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("LoanType");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Loans.LoanRepayment", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Loans.LoanApplication", "LoanApplication")
+                        .WithMany("Repayments")
+                        .HasForeignKey("LoanApplicationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Payroll.PayrollRecord", "PayrollRecord")
+                        .WithMany()
+                        .HasForeignKey("PayrollRecordId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("LoanApplication");
+
+                    b.Navigation("PayrollRecord");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Loans.SalaryAdvance", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Payroll.PayrollRecord", "PayrollRecord")
+                        .WithMany()
+                        .HasForeignKey("PayrollRecordId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
+                        .WithMany()
+                        .HasForeignKey("WorkflowInstanceId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("PayrollRecord");
+
+                    b.Navigation("WorkflowInstance");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Notifications.Notification", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Notifications.NotificationBroadcast", "Broadcast")
                         .WithMany("Notifications")
                         .HasForeignKey("BroadcastId")
                         .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("FK_Notifications_NotificationBroadcasts");
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "User")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -4965,9 +19684,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Notifications.NotificationBroadcast", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Notifications.NotificationBroadcast", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "SentByUser")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "SentByUser")
                         .WithMany()
                         .HasForeignKey("SentByUserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4977,9 +19696,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("SentByUser");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Notifications.PushNotificationToken", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Notifications.PushNotificationToken", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "User")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -4989,40 +19708,979 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.RemoteWork.RemoteWorkPolicy", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Offboarding.ClearanceChecklist", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Branch", "Branch")
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_ClearanceChecklists_Employees");
+
+                    b.HasOne("TecAxle.Hrms.Domain.Offboarding.TerminationRecord", "TerminationRecord")
+                        .WithOne("ClearanceChecklist")
+                        .HasForeignKey("TecAxle.Hrms.Domain.Offboarding.ClearanceChecklist", "TerminationRecordId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_ClearanceChecklists_TerminationRecords");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("TerminationRecord");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Offboarding.ClearanceItem", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Offboarding.ClearanceChecklist", "ClearanceChecklist")
+                        .WithMany("Items")
+                        .HasForeignKey("ClearanceChecklistId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_ClearanceItems_ClearanceChecklists");
+
+                    b.Navigation("ClearanceChecklist");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Offboarding.EndOfServiceBenefit", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_EndOfServiceBenefits_Employees");
+
+                    b.HasOne("TecAxle.Hrms.Domain.Offboarding.TerminationRecord", "TerminationRecord")
+                        .WithOne("EndOfServiceBenefit")
+                        .HasForeignKey("TecAxle.Hrms.Domain.Offboarding.EndOfServiceBenefit", "TerminationRecordId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_EndOfServiceBenefits_TerminationRecords");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("TerminationRecord");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Offboarding.ExitInterview", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_ExitInterviews_Employees");
+
+                    b.HasOne("TecAxle.Hrms.Domain.Offboarding.TerminationRecord", "TerminationRecord")
+                        .WithOne("ExitInterview")
+                        .HasForeignKey("TecAxle.Hrms.Domain.Offboarding.ExitInterview", "TerminationRecordId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_ExitInterviews_TerminationRecords");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("TerminationRecord");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Offboarding.FinalSettlement", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_FinalSettlements_Employees");
+
+                    b.HasOne("TecAxle.Hrms.Domain.Offboarding.TerminationRecord", "TerminationRecord")
+                        .WithOne("FinalSettlement")
+                        .HasForeignKey("TecAxle.Hrms.Domain.Offboarding.FinalSettlement", "TerminationRecordId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_FinalSettlements_TerminationRecords");
+
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
+                        .WithMany()
+                        .HasForeignKey("WorkflowInstanceId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("FK_FinalSettlements_WorkflowInstances");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("TerminationRecord");
+
+                    b.Navigation("WorkflowInstance");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Offboarding.ResignationRequest", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_ResignationRequests_Employees");
+
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
+                        .WithMany()
+                        .HasForeignKey("WorkflowInstanceId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("FK_ResignationRequests_WorkflowInstances");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("WorkflowInstance");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Offboarding.TerminationRecord", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_TerminationRecords_Employees");
+
+                    b.HasOne("TecAxle.Hrms.Domain.Offboarding.ResignationRequest", "ResignationRequest")
+                        .WithMany()
+                        .HasForeignKey("ResignationRequestId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("FK_TerminationRecords_ResignationRequests");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("ResignationRequest");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Onboarding.OnboardingDocument", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Onboarding.OnboardingProcess", "OnboardingProcess")
+                        .WithMany("Documents")
+                        .HasForeignKey("OnboardingProcessId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("OnboardingProcess");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Onboarding.OnboardingProcess", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "BuddyEmployee")
+                        .WithMany()
+                        .HasForeignKey("BuddyEmployeeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "MentorEmployee")
+                        .WithMany()
+                        .HasForeignKey("MentorEmployeeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Onboarding.OnboardingTemplate", "OnboardingTemplate")
+                        .WithMany()
+                        .HasForeignKey("OnboardingTemplateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("BuddyEmployee");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("MentorEmployee");
+
+                    b.Navigation("OnboardingTemplate");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Onboarding.OnboardingTask", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "AssignedToEmployee")
+                        .WithMany()
+                        .HasForeignKey("AssignedToEmployeeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Onboarding.OnboardingProcess", "OnboardingProcess")
+                        .WithMany("Tasks")
+                        .HasForeignKey("OnboardingProcessId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Onboarding.OnboardingTemplateTask", "TemplateTask")
+                        .WithMany()
+                        .HasForeignKey("OnboardingTemplateTaskId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("AssignedToEmployee");
+
+                    b.Navigation("OnboardingProcess");
+
+                    b.Navigation("TemplateTask");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Onboarding.OnboardingTemplate", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("Department");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Onboarding.OnboardingTemplateTask", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Onboarding.OnboardingTemplate", "OnboardingTemplate")
+                        .WithMany("Tasks")
+                        .HasForeignKey("OnboardingTemplateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("OnboardingTemplate");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.AllowanceAssignment", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Payroll.AllowanceRequest", "AllowanceRequest")
+                        .WithMany("ResultingAssignments")
+                        .HasForeignKey("AllowanceRequestId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Payroll.AllowanceType", "AllowanceType")
+                        .WithMany("Assignments")
+                        .HasForeignKey("AllowanceTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AllowanceRequest");
+
+                    b.Navigation("AllowanceType");
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.AllowanceChangeLog", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Payroll.AllowanceRequest", "AllowanceRequest")
+                        .WithMany()
+                        .HasForeignKey("AllowanceRequestId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Payroll.AllowanceType", "AllowanceType")
+                        .WithMany()
+                        .HasForeignKey("AllowanceTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AllowanceRequest");
+
+                    b.Navigation("AllowanceType");
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.AllowancePolicy", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Payroll.AllowanceType", "AllowanceType")
+                        .WithMany("Policies")
+                        .HasForeignKey("AllowanceTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("AllowanceType");
+
+                    b.Navigation("Branch");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.AllowanceRequest", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Payroll.AllowancePolicy", "AllowancePolicy")
+                        .WithMany("Requests")
+                        .HasForeignKey("AllowancePolicyId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Payroll.AllowanceType", "AllowanceType")
+                        .WithMany()
+                        .HasForeignKey("AllowanceTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
+                        .WithMany()
+                        .HasForeignKey("WorkflowInstanceId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("AllowancePolicy");
+
+                    b.Navigation("AllowanceType");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("WorkflowInstance");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.AllowanceType", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Branch");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.BankTransferFile", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Payroll.PayrollPeriod", "PayrollPeriod")
+                        .WithMany("BankTransferFiles")
+                        .HasForeignKey("PayrollPeriodId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_BankTransferFiles_PayrollPeriods");
+
+                    b.Navigation("PayrollPeriod");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.EmployeeInsurance", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_EmployeeInsurances_Employees");
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", null)
+                        .WithMany("Insurances")
+                        .HasForeignKey("EmployeeId1");
+
+                    b.HasOne("TecAxle.Hrms.Domain.Payroll.InsuranceProvider", "InsuranceProvider")
+                        .WithMany("EmployeeInsurances")
+                        .HasForeignKey("InsuranceProviderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_EmployeeInsurances_InsuranceProviders");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("InsuranceProvider");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.EmployeeSalary", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_EmployeeSalaries_Employees");
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", null)
+                        .WithMany("Salaries")
+                        .HasForeignKey("EmployeeId1");
+
+                    b.HasOne("TecAxle.Hrms.Domain.Payroll.SalaryStructure", "SalaryStructure")
+                        .WithMany()
+                        .HasForeignKey("SalaryStructureId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_EmployeeSalaries_SalaryStructures");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("SalaryStructure");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.EmployeeSalaryComponent", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Payroll.EmployeeSalary", "EmployeeSalary")
+                        .WithMany("Components")
+                        .HasForeignKey("EmployeeSalaryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_EmployeeSalaryComponents_EmployeeSalaries");
+
+                    b.HasOne("TecAxle.Hrms.Domain.Payroll.SalaryComponent", "SalaryComponent")
+                        .WithMany()
+                        .HasForeignKey("SalaryComponentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_EmployeeSalaryComponents_SalaryComponents");
+
+                    b.Navigation("EmployeeSalary");
+
+                    b.Navigation("SalaryComponent");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.PayrollAdjustment", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_PayrollAdjustments_Employees");
+
+                    b.HasOne("TecAxle.Hrms.Domain.Payroll.PayrollPeriod", "PayrollPeriod")
+                        .WithMany("Adjustments")
+                        .HasForeignKey("PayrollPeriodId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_PayrollAdjustments_PayrollPeriods");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("PayrollPeriod");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.PayrollPeriod", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_PayrollPeriods_Branches");
+
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
+                        .WithMany()
+                        .HasForeignKey("WorkflowInstanceId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("FK_PayrollPeriods_WorkflowInstances");
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("WorkflowInstance");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.PayrollRecord", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_PayrollRecords_Employees");
+
+                    b.HasOne("TecAxle.Hrms.Domain.Payroll.PayrollPeriod", "PayrollPeriod")
+                        .WithMany("Records")
+                        .HasForeignKey("PayrollPeriodId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_PayrollRecords_PayrollPeriods");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("PayrollPeriod");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.PayrollRecordDetail", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Payroll.AllowanceType", "AllowanceType")
+                        .WithMany()
+                        .HasForeignKey("AllowanceTypeId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("FK_PayrollRecordDetails_AllowanceTypes");
+
+                    b.HasOne("TecAxle.Hrms.Domain.Payroll.PayrollRecord", "PayrollRecord")
+                        .WithMany("Details")
+                        .HasForeignKey("PayrollRecordId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_PayrollRecordDetails_PayrollRecords");
+
+                    b.HasOne("TecAxle.Hrms.Domain.Payroll.SalaryComponent", "SalaryComponent")
+                        .WithMany()
+                        .HasForeignKey("SalaryComponentId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("FK_PayrollRecordDetails_SalaryComponents");
+
+                    b.Navigation("AllowanceType");
+
+                    b.Navigation("PayrollRecord");
+
+                    b.Navigation("SalaryComponent");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.SalaryComponent", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Payroll.AllowanceType", "AllowanceType")
+                        .WithMany()
+                        .HasForeignKey("AllowanceTypeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Payroll.SalaryStructure", "SalaryStructure")
+                        .WithMany("Components")
+                        .HasForeignKey("SalaryStructureId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_SalaryComponents_SalaryStructures");
+
+                    b.Navigation("AllowanceType");
+
+                    b.Navigation("SalaryStructure");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.SalaryStructure", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("FK_SalaryStructures_Branches");
+
+                    b.Navigation("Branch");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.SocialInsuranceConfig", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("FK_SocialInsuranceConfigs_Branches");
+
+                    b.Navigation("Branch");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.TaxBracket", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Payroll.TaxConfiguration", "TaxConfiguration")
+                        .WithMany("Brackets")
+                        .HasForeignKey("TaxConfigurationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_TaxBrackets_TaxConfigurations");
+
+                    b.Navigation("TaxConfiguration");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.TaxConfiguration", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("FK_TaxConfigurations_Branches");
+
+                    b.Navigation("Branch");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Performance.Competency", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Performance.CompetencyFramework", "CompetencyFramework")
+                        .WithMany("Competencies")
+                        .HasForeignKey("CompetencyFrameworkId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CompetencyFramework");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Performance.CompetencyAssessment", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Performance.Competency", "Competency")
+                        .WithMany()
+                        .HasForeignKey("CompetencyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Performance.PerformanceReview", "PerformanceReview")
+                        .WithMany("CompetencyAssessments")
+                        .HasForeignKey("PerformanceReviewId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Competency");
+
+                    b.Navigation("PerformanceReview");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Performance.Feedback360Response", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Performance.FeedbackRequest360", "FeedbackRequest")
+                        .WithOne("Response")
+                        .HasForeignKey("TecAxle.Hrms.Domain.Performance.Feedback360Response", "FeedbackRequest360Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FeedbackRequest");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Performance.FeedbackRequest360", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Performance.PerformanceReview", "PerformanceReview")
+                        .WithMany("FeedbackRequests")
+                        .HasForeignKey("PerformanceReviewId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "RequestedFromEmployee")
+                        .WithMany()
+                        .HasForeignKey("RequestedFromEmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("PerformanceReview");
+
+                    b.Navigation("RequestedFromEmployee");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Performance.GoalDefinition", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Performance.PerformanceReview", "PerformanceReview")
+                        .WithMany("Goals")
+                        .HasForeignKey("PerformanceReviewId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("PerformanceReview");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Performance.PerformanceImprovementPlan", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "ManagerEmployee")
+                        .WithMany()
+                        .HasForeignKey("ManagerEmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Performance.PerformanceReview", "PerformanceReview")
+                        .WithMany()
+                        .HasForeignKey("PerformanceReviewId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
+                        .WithMany()
+                        .HasForeignKey("WorkflowInstanceId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("ManagerEmployee");
+
+                    b.Navigation("PerformanceReview");
+
+                    b.Navigation("WorkflowInstance");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Performance.PerformanceReview", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Performance.PerformanceReviewCycle", "ReviewCycle")
+                        .WithMany("Reviews")
+                        .HasForeignKey("PerformanceReviewCycleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.EmployeePromotion", "RelatedPromotion")
+                        .WithMany()
+                        .HasForeignKey("RelatedPromotionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.SalaryAdjustment", "RelatedSalaryAdjustment")
+                        .WithMany()
+                        .HasForeignKey("RelatedSalaryAdjustmentId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "ReviewerEmployee")
+                        .WithMany()
+                        .HasForeignKey("ReviewerEmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
+                        .WithMany()
+                        .HasForeignKey("WorkflowInstanceId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("RelatedPromotion");
+
+                    b.Navigation("RelatedSalaryAdjustment");
+
+                    b.Navigation("ReviewCycle");
+
+                    b.Navigation("ReviewerEmployee");
+
+                    b.Navigation("WorkflowInstance");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Performance.PerformanceReviewCycle", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Performance.CompetencyFramework", "CompetencyFramework")
+                        .WithMany()
+                        .HasForeignKey("CompetencyFrameworkId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("CompetencyFramework");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Recruitment.Candidate", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "ConvertedToEmployee")
+                        .WithMany()
+                        .HasForeignKey("ConvertedToEmployeeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "ReferredByEmployee")
+                        .WithMany()
+                        .HasForeignKey("ReferredByEmployeeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("ConvertedToEmployee");
+
+                    b.Navigation("ReferredByEmployee");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Recruitment.InterviewFeedback", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Recruitment.InterviewSchedule", "InterviewSchedule")
+                        .WithOne("Feedback")
+                        .HasForeignKey("TecAxle.Hrms.Domain.Recruitment.InterviewFeedback", "InterviewScheduleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "InterviewerEmployee")
+                        .WithMany()
+                        .HasForeignKey("InterviewerEmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("InterviewSchedule");
+
+                    b.Navigation("InterviewerEmployee");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Recruitment.InterviewSchedule", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "InterviewerEmployee")
+                        .WithMany()
+                        .HasForeignKey("InterviewerEmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Recruitment.JobApplication", "JobApplication")
+                        .WithMany("Interviews")
+                        .HasForeignKey("JobApplicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("InterviewerEmployee");
+
+                    b.Navigation("JobApplication");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Recruitment.JobApplication", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Recruitment.Candidate", "Candidate")
+                        .WithMany("Applications")
+                        .HasForeignKey("CandidateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Recruitment.JobPosting", "JobPosting")
+                        .WithMany("Applications")
+                        .HasForeignKey("JobPostingId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Candidate");
+
+                    b.Navigation("JobPosting");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Recruitment.JobPosting", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Recruitment.JobRequisition", "JobRequisition")
+                        .WithMany("Postings")
+                        .HasForeignKey("JobRequisitionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("JobRequisition");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Recruitment.JobRequisition", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.JobGrade", "JobGrade")
+                        .WithMany()
+                        .HasForeignKey("JobGradeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "ReplacingEmployee")
+                        .WithMany()
+                        .HasForeignKey("ReplacingEmployeeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "RequestedByEmployee")
+                        .WithMany()
+                        .HasForeignKey("RequestedByEmployeeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
+                        .WithMany()
+                        .HasForeignKey("WorkflowInstanceId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("Department");
+
+                    b.Navigation("JobGrade");
+
+                    b.Navigation("ReplacingEmployee");
+
+                    b.Navigation("RequestedByEmployee");
+
+                    b.Navigation("WorkflowInstance");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Recruitment.OfferLetter", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Recruitment.Candidate", "Candidate")
+                        .WithMany()
+                        .HasForeignKey("CandidateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "CreatedEmployee")
+                        .WithMany()
+                        .HasForeignKey("CreatedEmployeeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Recruitment.JobApplication", "JobApplication")
+                        .WithOne("OfferLetter")
+                        .HasForeignKey("TecAxle.Hrms.Domain.Recruitment.OfferLetter", "JobApplicationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.JobGrade", "JobGrade")
+                        .WithMany()
+                        .HasForeignKey("JobGradeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
+                        .WithMany()
+                        .HasForeignKey("WorkflowInstanceId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Candidate");
+
+                    b.Navigation("CreatedEmployee");
+
+                    b.Navigation("JobApplication");
+
+                    b.Navigation("JobGrade");
+
+                    b.Navigation("WorkflowInstance");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.RemoteWork.RemoteWorkPolicy", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId");
 
                     b.Navigation("Branch");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.RemoteWork.RemoteWorkRequest", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.RemoteWork.RemoteWorkRequest", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "ApprovedByUser")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "ApprovedByUser")
                         .WithMany()
                         .HasForeignKey("ApprovedByUserId");
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "CreatedByUser")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedByUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TimeAttendanceSystem.Domain.RemoteWork.RemoteWorkPolicy", "RemoteWorkPolicy")
+                    b.HasOne("TecAxle.Hrms.Domain.RemoteWork.RemoteWorkPolicy", "RemoteWorkPolicy")
                         .WithMany("RemoteWorkRequests")
                         .HasForeignKey("RemoteWorkPolicyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
                         .WithMany()
                         .HasForeignKey("WorkflowInstanceId");
 
@@ -5037,45 +20695,56 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("WorkflowInstance");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Settings.OffDay", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Reports.ScheduledReport", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Branch", null)
+                    b.HasOne("TecAxle.Hrms.Domain.Reports.CustomReportDefinition", "CustomReportDefinition")
+                        .WithMany("ScheduledReports")
+                        .HasForeignKey("CustomReportDefinitionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CustomReportDefinition");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Settings.OffDay", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", null)
                         .WithMany()
                         .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .HasConstraintName("FK_OffDays_Branches");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Settings.PublicHoliday", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Settings.PublicHoliday", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Branch", null)
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", null)
                         .WithMany()
                         .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .HasConstraintName("FK_PublicHolidays_Branches");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Shifts.ShiftAssignment", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Shifts.ShiftAssignment", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Branch", "Branch")
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("FK_ShiftAssignments_Branches");
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Department", "Department")
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Department", "Department")
                         .WithMany()
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("FK_ShiftAssignments_Departments");
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("FK_ShiftAssignments_Employees");
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Shifts.Shift", "Shift")
+                    b.HasOne("TecAxle.Hrms.Domain.Shifts.Shift", "Shift")
                         .WithMany()
                         .HasForeignKey("ShiftId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -5091,9 +20760,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("Shift");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Shifts.ShiftPeriod", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Shifts.ShiftPeriod", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Shifts.Shift", "Shift")
+                    b.HasOne("TecAxle.Hrms.Domain.Shifts.Shift", "Shift")
                         .WithMany("ShiftPeriods")
                         .HasForeignKey("ShiftId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -5102,9 +20771,529 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("Shift");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.BlacklistedToken", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Subscriptions.PlanFeatureFlag", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "User")
+                    b.HasOne("TecAxle.Hrms.Domain.Subscriptions.PlanModuleEntitlement", "PlanModuleEntitlement")
+                        .WithMany("FeatureFlags")
+                        .HasForeignKey("PlanModuleEntitlementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PlanModuleEntitlement");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Subscriptions.PlanLimit", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Subscriptions.SubscriptionPlan", "Plan")
+                        .WithMany("Limits")
+                        .HasForeignKey("PlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Plan");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Subscriptions.PlanModuleEntitlement", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Subscriptions.SubscriptionPlan", "Plan")
+                        .WithMany("ModuleEntitlements")
+                        .HasForeignKey("PlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Plan");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Subscriptions.TenantFeatureOverride", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Subscriptions.TenantSubscription", "Subscription")
+                        .WithMany("FeatureOverrides")
+                        .HasForeignKey("TenantSubscriptionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Subscription");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Subscriptions.TenantModuleAddOn", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Subscriptions.TenantSubscription", "Subscription")
+                        .WithMany("AddOns")
+                        .HasForeignKey("TenantSubscriptionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Subscription");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Subscriptions.TenantSubscription", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Subscriptions.SubscriptionPlan", "Plan")
+                        .WithMany("Subscriptions")
+                        .HasForeignKey("PlanId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Tenants.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Plan");
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Succession.CareerPathStep", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Succession.CareerPath", "CareerPath")
+                        .WithMany("Steps")
+                        .HasForeignKey("CareerPathId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.JobGrade", "FromJobGrade")
+                        .WithMany()
+                        .HasForeignKey("FromJobGradeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.JobGrade", "ToJobGrade")
+                        .WithMany()
+                        .HasForeignKey("ToJobGradeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CareerPath");
+
+                    b.Navigation("FromJobGrade");
+
+                    b.Navigation("ToJobGrade");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Succession.KeyPosition", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "CurrentHolder")
+                        .WithMany()
+                        .HasForeignKey("CurrentHolderId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.JobGrade", "JobGrade")
+                        .WithMany()
+                        .HasForeignKey("JobGradeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("CurrentHolder");
+
+                    b.Navigation("Department");
+
+                    b.Navigation("JobGrade");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Succession.SuccessionCandidate", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Succession.SuccessionPlan", "SuccessionPlan")
+                        .WithMany("Candidates")
+                        .HasForeignKey("SuccessionPlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Succession.TalentProfile", "TalentProfile")
+                        .WithMany()
+                        .HasForeignKey("TalentProfileId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("SuccessionPlan");
+
+                    b.Navigation("TalentProfile");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Succession.SuccessionPlan", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Succession.KeyPosition", "KeyPosition")
+                        .WithMany("SuccessionPlans")
+                        .HasForeignKey("KeyPositionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("KeyPosition");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Succession.TalentProfile", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Succession.TalentSkill", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Succession.TalentProfile", "TalentProfile")
+                        .WithMany("Skills")
+                        .HasForeignKey("TalentProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TalentProfile");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Surveys.SurveyDistribution", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Surveys.SurveyTemplate", "Template")
+                        .WithMany("Distributions")
+                        .HasForeignKey("SurveyTemplateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Template");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Surveys.SurveyParticipant", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Surveys.SurveyDistribution", "Distribution")
+                        .WithMany("Participants")
+                        .HasForeignKey("SurveyDistributionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Distribution");
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Surveys.SurveyQuestion", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Surveys.SurveyTemplate", "Template")
+                        .WithMany("Questions")
+                        .HasForeignKey("SurveyTemplateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Template");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Surveys.SurveyResponse", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Surveys.SurveyDistribution", "Distribution")
+                        .WithMany("Responses")
+                        .HasForeignKey("SurveyDistributionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Surveys.SurveyQuestion", "Question")
+                        .WithMany("Responses")
+                        .HasForeignKey("SurveyQuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Distribution");
+
+                    b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Tenants.TenantSettings", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Tenants.Tenant", "Tenant")
+                        .WithOne()
+                        .HasForeignKey("TecAxle.Hrms.Domain.Tenants.TenantSettings", "TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Timesheets.Project", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "ManagerEmployee")
+                        .WithMany()
+                        .HasForeignKey("ManagerEmployeeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("ManagerEmployee");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Timesheets.ProjectTask", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Timesheets.Project", "Project")
+                        .WithMany("Tasks")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Timesheets.Timesheet", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Timesheets.TimesheetPeriod", "TimesheetPeriod")
+                        .WithMany("Timesheets")
+                        .HasForeignKey("TimesheetPeriodId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
+                        .WithMany()
+                        .HasForeignKey("WorkflowInstanceId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("TimesheetPeriod");
+
+                    b.Navigation("WorkflowInstance");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Timesheets.TimesheetEntry", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Attendance.AttendanceRecord", "AttendanceRecord")
+                        .WithMany()
+                        .HasForeignKey("AttendanceRecordId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Timesheets.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Timesheets.ProjectTask", "ProjectTask")
+                        .WithMany()
+                        .HasForeignKey("ProjectTaskId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Timesheets.Timesheet", "Timesheet")
+                        .WithMany("Entries")
+                        .HasForeignKey("TimesheetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AttendanceRecord");
+
+                    b.Navigation("Project");
+
+                    b.Navigation("ProjectTask");
+
+                    b.Navigation("Timesheet");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Timesheets.TimesheetPeriod", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Branch");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Training.EmployeeCertification", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany("Certifications")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Training.TrainingCourse", "Course")
+                        .WithMany()
+                        .HasForeignKey("TrainingCourseId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Course");
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Training.TrainingAttendance", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Training.TrainingSession", "Session")
+                        .WithMany("Attendances")
+                        .HasForeignKey("TrainingSessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Session");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Training.TrainingBudget", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("Department");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Training.TrainingCourse", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Training.TrainingCategory", "Category")
+                        .WithMany("Courses")
+                        .HasForeignKey("TrainingCategoryId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Training.TrainingEnrollment", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany("TrainingEnrollments")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Training.TrainingProgram", "Program")
+                        .WithMany("Enrollments")
+                        .HasForeignKey("TrainingProgramId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Training.TrainingSession", "Session")
+                        .WithMany("Enrollments")
+                        .HasForeignKey("TrainingSessionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
+                        .WithMany()
+                        .HasForeignKey("WorkflowInstanceId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Program");
+
+                    b.Navigation("Session");
+
+                    b.Navigation("WorkflowInstance");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Training.TrainingEvaluation", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Training.TrainingSession", "Session")
+                        .WithMany()
+                        .HasForeignKey("TrainingSessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Session");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Training.TrainingProgramCourse", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Training.TrainingCourse", "Course")
+                        .WithMany("ProgramCourses")
+                        .HasForeignKey("TrainingCourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Training.TrainingProgram", "Program")
+                        .WithMany("ProgramCourses")
+                        .HasForeignKey("TrainingProgramId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("Program");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Training.TrainingSession", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TecAxle.Hrms.Domain.Training.TrainingCourse", "Course")
+                        .WithMany("Sessions")
+                        .HasForeignKey("TrainingCourseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecAxle.Hrms.Domain.Training.TrainingProgram", "Program")
+                        .WithMany()
+                        .HasForeignKey("TrainingProgramId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("Course");
+
+                    b.Navigation("Program");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.BlacklistedToken", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -5113,9 +21302,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.LoginAttempt", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.LoginAttempt", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "User")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "User")
                         .WithMany("LoginAttempts")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.SetNull);
@@ -5123,9 +21312,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.PasswordHistory", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.PasswordHistory", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "User")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "User")
                         .WithMany("PasswordHistory")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -5134,9 +21323,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.RefreshToken", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.RefreshToken", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "User")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "User")
                         .WithMany("RefreshTokens")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -5145,15 +21334,15 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.RolePermission", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.RolePermission", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.Permission", "Permission")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.Permission", "Permission")
                         .WithMany("RolePermissions")
                         .HasForeignKey("PermissionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.Role", "Role")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.Role", "Role")
                         .WithMany("RolePermissions")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -5164,9 +21353,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.TwoFactorBackupCode", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.TwoFactorBackupCode", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "User")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "User")
                         .WithMany("TwoFactorBackupCodes")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -5175,15 +21364,15 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.UserBranchScope", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.UserBranchScope", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Branch", "Branch")
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "User")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "User")
                         .WithMany("UserBranchScopes")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -5194,15 +21383,15 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.UserRole", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.UserRole", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.Role", "Role")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.Role", "Role")
                         .WithMany("UserRoles")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "User")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "User")
                         .WithMany("UserRoles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -5213,9 +21402,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.UserSession", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.UserSession", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "User")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "User")
                         .WithMany("UserSessions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -5224,9 +21413,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.VacationTypes.VacationType", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.VacationTypes.VacationType", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Branch", "Branch")
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -5234,23 +21423,23 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("Branch");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Vacations.EmployeeVacation", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Vacations.EmployeeVacation", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Employees.Employee", "Employee")
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK_EmployeeVacations_Employees");
 
-                    b.HasOne("TimeAttendanceSystem.Domain.VacationTypes.VacationType", "VacationType")
+                    b.HasOne("TecAxle.Hrms.Domain.VacationTypes.VacationType", "VacationType")
                         .WithMany()
                         .HasForeignKey("VacationTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK_EmployeeVacations_VacationTypes");
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
                         .WithMany()
                         .HasForeignKey("WorkflowInstanceId")
                         .OnDelete(DeleteBehavior.SetNull)
@@ -5263,16 +21452,16 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("WorkflowInstance");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Workflows.ApprovalDelegation", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Workflows.ApprovalDelegation", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "DelegateUser")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "DelegateUser")
                         .WithMany()
                         .HasForeignKey("DelegateUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK_ApprovalDelegations_DelegateUser");
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "DelegatorUser")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "DelegatorUser")
                         .WithMany()
                         .HasForeignKey("DelegatorUserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -5284,9 +21473,9 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("DelegatorUser");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Workflows.WorkflowDefinition", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Workflows.WorkflowDefinition", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Branches.Branch", "Branch")
+                    b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
                         .WithMany()
                         .HasForeignKey("BranchId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -5295,28 +21484,28 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("Branch");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Workflows.WorkflowInstance", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Workflows.WorkflowInstance", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "CompletedByUser")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "CompletedByUser")
                         .WithMany()
                         .HasForeignKey("CompletedByUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("FK_WorkflowInstances_CompletedByUser");
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Workflows.WorkflowStep", "CurrentStep")
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowStep", "CurrentStep")
                         .WithMany()
                         .HasForeignKey("CurrentStepId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("FK_WorkflowInstances_CurrentStep");
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "RequestedByUser")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "RequestedByUser")
                         .WithMany()
                         .HasForeignKey("RequestedByUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK_WorkflowInstances_RequestedByUser");
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Workflows.WorkflowDefinition", "WorkflowDefinition")
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowDefinition", "WorkflowDefinition")
                         .WithMany("Instances")
                         .HasForeignKey("WorkflowDefinitionId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -5332,27 +21521,27 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("WorkflowDefinition");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Workflows.WorkflowStep", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Workflows.WorkflowStep", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.Role", "ApproverRole")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.Role", "ApproverRole")
                         .WithMany()
                         .HasForeignKey("ApproverRoleId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("FK_WorkflowSteps_Roles");
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "ApproverUser")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "ApproverUser")
                         .WithMany()
                         .HasForeignKey("ApproverUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("FK_WorkflowSteps_Users");
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Workflows.WorkflowStep", "EscalationStep")
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowStep", "EscalationStep")
                         .WithMany()
                         .HasForeignKey("EscalationStepId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("FK_WorkflowSteps_EscalationStep");
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Workflows.WorkflowDefinition", "WorkflowDefinition")
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowDefinition", "WorkflowDefinition")
                         .WithMany("Steps")
                         .HasForeignKey("WorkflowDefinitionId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -5368,41 +21557,41 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("WorkflowDefinition");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Workflows.WorkflowStepExecution", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Workflows.WorkflowStepExecution", b =>
                 {
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "ActionTakenByUser")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "ActionTakenByUser")
                         .WithMany()
                         .HasForeignKey("ActionTakenByUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("FK_WorkflowStepExecutions_ActionTakenByUser");
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "AssignedToUser")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "AssignedToUser")
                         .WithMany()
                         .HasForeignKey("AssignedToUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK_WorkflowStepExecutions_AssignedToUser");
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Workflows.WorkflowStepExecution", "DelegatedFromExecution")
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowStepExecution", "DelegatedFromExecution")
                         .WithMany()
                         .HasForeignKey("DelegatedFromExecutionId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("FK_WorkflowStepExecutions_DelegatedFromExecution");
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Users.User", "DelegatedToUser")
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "DelegatedToUser")
                         .WithMany()
                         .HasForeignKey("DelegatedToUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("FK_WorkflowStepExecutions_DelegatedToUser");
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Workflows.WorkflowStep", "Step")
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowStep", "Step")
                         .WithMany("Executions")
                         .HasForeignKey("StepId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK_WorkflowStepExecutions_WorkflowSteps");
 
-                    b.HasOne("TimeAttendanceSystem.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
                         .WithMany("StepExecutions")
                         .HasForeignKey("WorkflowInstanceId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -5422,68 +21611,440 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("WorkflowInstance");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Attendance.AttendanceRecord", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Announcements.Announcement", b =>
+                {
+                    b.Navigation("Acknowledgments");
+
+                    b.Navigation("Attachments");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Announcements.AnnouncementCategory", b =>
+                {
+                    b.Navigation("Announcements");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Assets.Asset", b =>
+                {
+                    b.Navigation("Assignments");
+
+                    b.Navigation("MaintenanceRecords");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Assets.AssetCategory", b =>
+                {
+                    b.Navigation("Assets");
+
+                    b.Navigation("ChildCategories");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Attendance.AttendanceRecord", b =>
                 {
                     b.Navigation("Transactions");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Branches.Branch", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Benefits.BenefitEnrollment", b =>
+                {
+                    b.Navigation("Dependents");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Benefits.BenefitPlan", b =>
+                {
+                    b.Navigation("EligibilityRules");
+
+                    b.Navigation("Enrollments");
+
+                    b.Navigation("Options");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Branches.Branch", b =>
                 {
                     b.Navigation("Departments");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Branches.Department", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Branches.Department", b =>
                 {
                     b.Navigation("Employees");
 
                     b.Navigation("SubDepartments");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Common.AuditLog", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Common.AuditLog", b =>
                 {
                     b.Navigation("Changes");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Employees.Employee", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Configuration.PolicyTemplate", b =>
                 {
-                    b.Navigation("DirectReports");
-
-                    b.Navigation("EmployeeUserLink");
+                    b.Navigation("Items");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.LeaveManagement.LeaveBalance", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Documents.CompanyPolicy", b =>
+                {
+                    b.Navigation("Acknowledgments");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Documents.DocumentCategory", b =>
+                {
+                    b.Navigation("Documents");
+
+                    b.Navigation("Policies");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.EmployeeRelations.DisciplinaryAction", b =>
+                {
+                    b.Navigation("DisciplinaryAttachments");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.EmployeeRelations.Grievance", b =>
+                {
+                    b.Navigation("GrievanceAttachments");
+
+                    b.Navigation("GrievanceNotes");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.EmployeeRelations.Investigation", b =>
+                {
+                    b.Navigation("InvestigationAttachments");
+
+                    b.Navigation("InvestigationNotes");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.Employee", b =>
+                {
+                    b.Navigation("Addresses");
+
+                    b.Navigation("BankDetails");
+
+                    b.Navigation("Certifications");
+
+                    b.Navigation("Contracts");
+
+                    b.Navigation("CounselingRecords");
+
+                    b.Navigation("Dependents");
+
+                    b.Navigation("DirectReports");
+
+                    b.Navigation("DisciplinaryActions");
+
+                    b.Navigation("EducationHistory");
+
+                    b.Navigation("EmergencyContacts");
+
+                    b.Navigation("EmployeeUserLink");
+
+                    b.Navigation("Grievances");
+
+                    b.Navigation("Insurances");
+
+                    b.Navigation("ProfileChanges");
+
+                    b.Navigation("Promotions");
+
+                    b.Navigation("Salaries");
+
+                    b.Navigation("SalaryAdjustments");
+
+                    b.Navigation("TrainingEnrollments");
+
+                    b.Navigation("Transfers");
+
+                    b.Navigation("Visas");
+
+                    b.Navigation("WorkExperienceHistory");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Employees.JobGrade", b =>
+                {
+                    b.Navigation("Employees");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Expenses.ExpenseClaim", b =>
+                {
+                    b.Navigation("Items");
+
+                    b.Navigation("Reimbursement");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.LeaveManagement.LeaveBalance", b =>
                 {
                     b.Navigation("Transactions");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Notifications.NotificationBroadcast", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Loans.LoanApplication", b =>
+                {
+                    b.Navigation("Repayments");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Notifications.NotificationBroadcast", b =>
                 {
                     b.Navigation("Notifications");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.RemoteWork.RemoteWorkPolicy", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Offboarding.ClearanceChecklist", b =>
+                {
+                    b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Offboarding.TerminationRecord", b =>
+                {
+                    b.Navigation("ClearanceChecklist");
+
+                    b.Navigation("EndOfServiceBenefit");
+
+                    b.Navigation("ExitInterview");
+
+                    b.Navigation("FinalSettlement");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Onboarding.OnboardingProcess", b =>
+                {
+                    b.Navigation("Documents");
+
+                    b.Navigation("Tasks");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Onboarding.OnboardingTemplate", b =>
+                {
+                    b.Navigation("Tasks");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.AllowancePolicy", b =>
+                {
+                    b.Navigation("Requests");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.AllowanceRequest", b =>
+                {
+                    b.Navigation("ResultingAssignments");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.AllowanceType", b =>
+                {
+                    b.Navigation("Assignments");
+
+                    b.Navigation("Policies");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.EmployeeSalary", b =>
+                {
+                    b.Navigation("Components");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.InsuranceProvider", b =>
+                {
+                    b.Navigation("EmployeeInsurances");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.PayrollPeriod", b =>
+                {
+                    b.Navigation("Adjustments");
+
+                    b.Navigation("BankTransferFiles");
+
+                    b.Navigation("Records");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.PayrollRecord", b =>
+                {
+                    b.Navigation("Details");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.SalaryStructure", b =>
+                {
+                    b.Navigation("Components");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.TaxConfiguration", b =>
+                {
+                    b.Navigation("Brackets");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Performance.CompetencyFramework", b =>
+                {
+                    b.Navigation("Competencies");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Performance.FeedbackRequest360", b =>
+                {
+                    b.Navigation("Response");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Performance.PerformanceReview", b =>
+                {
+                    b.Navigation("CompetencyAssessments");
+
+                    b.Navigation("FeedbackRequests");
+
+                    b.Navigation("Goals");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Performance.PerformanceReviewCycle", b =>
+                {
+                    b.Navigation("Reviews");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Recruitment.Candidate", b =>
+                {
+                    b.Navigation("Applications");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Recruitment.InterviewSchedule", b =>
+                {
+                    b.Navigation("Feedback");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Recruitment.JobApplication", b =>
+                {
+                    b.Navigation("Interviews");
+
+                    b.Navigation("OfferLetter");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Recruitment.JobPosting", b =>
+                {
+                    b.Navigation("Applications");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Recruitment.JobRequisition", b =>
+                {
+                    b.Navigation("Postings");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.RemoteWork.RemoteWorkPolicy", b =>
                 {
                     b.Navigation("RemoteWorkRequests");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Shifts.Shift", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Reports.CustomReportDefinition", b =>
+                {
+                    b.Navigation("ScheduledReports");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Shifts.Shift", b =>
                 {
                     b.Navigation("ShiftPeriods");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.Permission", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Subscriptions.PlanModuleEntitlement", b =>
+                {
+                    b.Navigation("FeatureFlags");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Subscriptions.SubscriptionPlan", b =>
+                {
+                    b.Navigation("Limits");
+
+                    b.Navigation("ModuleEntitlements");
+
+                    b.Navigation("Subscriptions");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Subscriptions.TenantSubscription", b =>
+                {
+                    b.Navigation("AddOns");
+
+                    b.Navigation("FeatureOverrides");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Succession.CareerPath", b =>
+                {
+                    b.Navigation("Steps");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Succession.KeyPosition", b =>
+                {
+                    b.Navigation("SuccessionPlans");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Succession.SuccessionPlan", b =>
+                {
+                    b.Navigation("Candidates");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Succession.TalentProfile", b =>
+                {
+                    b.Navigation("Skills");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Surveys.SurveyDistribution", b =>
+                {
+                    b.Navigation("Participants");
+
+                    b.Navigation("Responses");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Surveys.SurveyQuestion", b =>
+                {
+                    b.Navigation("Responses");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Surveys.SurveyTemplate", b =>
+                {
+                    b.Navigation("Distributions");
+
+                    b.Navigation("Questions");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Tenants.Tenant", b =>
+                {
+                    b.Navigation("Branches");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Timesheets.Project", b =>
+                {
+                    b.Navigation("Tasks");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Timesheets.Timesheet", b =>
+                {
+                    b.Navigation("Entries");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Timesheets.TimesheetPeriod", b =>
+                {
+                    b.Navigation("Timesheets");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Training.TrainingCategory", b =>
+                {
+                    b.Navigation("Courses");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Training.TrainingCourse", b =>
+                {
+                    b.Navigation("ProgramCourses");
+
+                    b.Navigation("Sessions");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Training.TrainingProgram", b =>
+                {
+                    b.Navigation("Enrollments");
+
+                    b.Navigation("ProgramCourses");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Training.TrainingSession", b =>
+                {
+                    b.Navigation("Attendances");
+
+                    b.Navigation("Enrollments");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.Permission", b =>
                 {
                     b.Navigation("RolePermissions");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.Role", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.Role", b =>
                 {
                     b.Navigation("RolePermissions");
 
                     b.Navigation("UserRoles");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Users.User", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Users.User", b =>
                 {
                     b.Navigation("LoginAttempts");
 
@@ -5500,19 +22061,19 @@ namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("UserSessions");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Workflows.WorkflowDefinition", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Workflows.WorkflowDefinition", b =>
                 {
                     b.Navigation("Instances");
 
                     b.Navigation("Steps");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Workflows.WorkflowInstance", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Workflows.WorkflowInstance", b =>
                 {
                     b.Navigation("StepExecutions");
                 });
 
-            modelBuilder.Entity("TimeAttendanceSystem.Domain.Workflows.WorkflowStep", b =>
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Workflows.WorkflowStep", b =>
                 {
                     b.Navigation("Executions");
                 });

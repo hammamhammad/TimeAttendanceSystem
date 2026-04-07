@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Domain.Attendance;
+namespace TecAxle.Hrms.Domain.Attendance;
 
 /// <summary>
 /// Enumeration defining the types of attendance transactions that can be recorded.

@@ -1,9 +1,9 @@
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Domain.Employees;
-using TimeAttendanceSystem.Domain.VacationTypes;
-using TimeAttendanceSystem.Domain.Workflows;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Employees;
+using TecAxle.Hrms.Domain.VacationTypes;
+using TecAxle.Hrms.Domain.Workflows;
 
-namespace TimeAttendanceSystem.Domain.Vacations;
+namespace TecAxle.Hrms.Domain.Vacations;
 
 /// <summary>
 /// Domain entity representing an employee vacation period.
@@ -94,6 +94,20 @@ public class EmployeeVacation : BaseEntity
     /// </summary>
     /// <value>User ID of the request submitter</value>
     public long? SubmittedByUserId { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether this vacation is a half-day leave.
+    /// When true, HalfDayType indicates morning or afternoon.
+    /// </summary>
+    /// <value>True if this is a half-day vacation</value>
+    public bool IsHalfDay { get; set; }
+
+    /// <summary>
+    /// Gets or sets the half-day type (Morning or Afternoon).
+    /// Only applicable when IsHalfDay is true.
+    /// </summary>
+    /// <value>Half-day type indicating morning or afternoon (nullable)</value>
+    public HalfDayType? HalfDayType { get; set; }
 
     // Navigation Properties
 

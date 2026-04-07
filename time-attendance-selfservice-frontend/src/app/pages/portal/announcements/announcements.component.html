@@ -1,0 +1,131 @@
+<!-- Page Header -->
+<app-page-header [title]="i18n.t('portal.announcements.title')">
+  <div header-actions>
+    <button
+      class="btn btn-outline-primary btn-sm"
+      (click)="refresh()"
+      [disabled]="loading()"
+      type="button">
+      <i class="bi bi-arrow-clockwise" [class.spin]="loading()"></i>
+      {{ i18n.t('common.refresh') }}
+    </button>
+  </div>
+</app-page-header>
+
+<!-- Loading State -->
+@if (loading() && announcements().length === 0) {
+  <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+}
+
+<!-- Error State -->
+@if (error() && announcements().length === 0) {
+  <div class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle me-2"></i>{{ error() }}
+    <button class="btn btn-sm btn-outline-danger ms-3" (click)="refresh()" type="button">{{ i18n.t('common.retry') }}</button>
+  </div>
+}
+
+<!-- Empty State -->
+@if (!loading() && announcements().length === 0 && !error()) {
+  <app-empty-state
+    icon="bi bi-megaphone"
+    [title]="i18n.t('portal.announcements.no_announcements')">
+  </app-empty-state>
+}
+
+<!-- Content -->
+@if (announcements().length > 0) {
+  <!-- Category Filter -->
+  @if (categories().length > 2) {
+    <div class="mb-3">
+      <div class="d-flex flex-wrap gap-2">
+        @for (cat of categories(); track cat) {
+          <button
+            type="button"
+            class="btn btn-sm"
+            [class.btn-primary]="selectedCategory() === cat"
+            [class.btn-outline-secondary]="selectedCategory() !== cat"
+            (click)="onCategoryChange(cat)">
+            {{ getCategoryLabel(cat) }}
+          </button>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Announcement Cards -->
+  <div class="row g-3">
+    @for (announcement of filteredAnnouncements(); track announcement.id) {
+      <div class="col-12">
+        <div
+          class="card announcement-card"
+          [class.pinned]="announcement.isPinned"
+          (click)="viewDetail(announcement)"
+          role="button"
+          tabindex="0">
+          <div class="card-body">
+            <div class="d-flex align-items-start justify-content-between mb-2">
+              <div class="flex-grow-1">
+                <div class="d-flex align-items-center flex-wrap gap-2 mb-1">
+                  @if (announcement.isPinned) {
+                    <span class="badge bg-info-subtle text-info">
+                      <i class="bi bi-pin-angle me-1"></i>{{ i18n.t('portal.announcements.pinned') }}
+                    </span>
+                  }
+                  <span [class]="getPriorityBadgeClass(announcement.priority)">
+                    {{ getPriorityLabel(announcement.priority) }}
+                  </span>
+                  @if (announcement.category) {
+                    <span class="badge bg-light text-dark border">{{ announcement.category }}</span>
+                  }
+                </div>
+                <h5 class="card-title mb-1">{{ getLocalizedTitle(announcement) }}</h5>
+              </div>
+              <div class="ms-3 text-end flex-shrink-0">
+                @if (announcement.requiresAcknowledgment) {
+                  @if (announcement.isAcknowledged) {
+                    <span class="badge bg-success">
+                      <i class="bi bi-check-circle me-1"></i>{{ i18n.t('portal.announcements.acknowledged') }}
+                    </span>
+                  } @else {
+                    <span class="badge bg-warning text-dark">
+                      <i class="bi bi-clock me-1"></i>{{ i18n.t('portal.announcements.pending_ack') }}
+                    </span>
+                  }
+                }
+              </div>
+            </div>
+            <p class="card-text text-muted mb-2">{{ getContentPreview(announcement) }}</p>
+            <div class="d-flex align-items-center text-muted small">
+              <i class="bi bi-calendar3 me-1"></i>
+              <span>{{ formatDate(announcement.publishedDate) }}</span>
+              @if (announcement.publishedBy) {
+                <span class="mx-2">|</span>
+                <i class="bi bi-person me-1"></i>
+                <span>{{ announcement.publishedBy }}</span>
+              }
+              @if (announcement.attachments && announcement.attachments.length > 0) {
+                <span class="mx-2">|</span>
+                <i class="bi bi-paperclip me-1"></i>
+                <span>{{ announcement.attachments.length }}</span>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Info Card -->
+  <div class="card mt-3">
+    <div class="card-body">
+      <div class="d-flex align-items-start">
+        <i class="bi bi-info-circle text-info me-3 mt-1" style="font-size: 1.5rem;"></i>
+        <div>
+          <h6 class="mb-2">{{ i18n.t('portal.announcements.info_title') }}</h6>
+          <p class="text-muted mb-0 small">{{ i18n.t('portal.announcements.info_text') }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,109 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header
+    [mode]="isEditMode() ? 'edit' : 'create'"
+    [title]="isEditMode() ? i18n.t('job_requisitions.edit') : i18n.t('job_requisitions.create')"
+    moduleName="job_requisitions"
+    moduleRoute="recruitment/requisitions"
+    [entityId]="editId() || undefined" />
+
+  @if (loading() && isEditMode()) {
+    <div class="text-center py-5"><app-loading-spinner /></div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+    <app-form-section [title]="i18n.t('common.basic_info')" [variant]="'modern'">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="jobTitle" formControlName="jobTitle" placeholder="x">
+            <label for="jobTitle">{{ i18n.t('job_requisitions.title_field') }} <span class="text-danger">*</span></label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="jobTitleAr" formControlName="jobTitleAr" placeholder="x" dir="rtl">
+            <label for="jobTitleAr">{{ i18n.t('job_requisitions.title_ar') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('fields.department') }} <span class="text-danger">*</span></label>
+            <app-searchable-select [options]="departmentOptions" [placeholder]="i18n.t('common.select')" [value]="form.get('departmentId')?.value" (selectionChange)="form.get('departmentId')?.setValue($event)" />
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('fields.branch') }} <span class="text-danger">*</span></label>
+            <app-searchable-select [options]="branchOptions" [placeholder]="i18n.t('common.select')" [value]="form.get('branchId')?.value" (selectionChange)="form.get('branchId')?.setValue($event)" />
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('job_requisitions.employment_type') }} <span class="text-danger">*</span></label>
+            <app-searchable-select [options]="employmentTypeOptions()" [placeholder]="i18n.t('common.select')" [value]="form.get('employmentType')?.value" (selectionChange)="form.get('employmentType')?.setValue($event)" />
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-floating">
+            <input type="number" class="form-control" id="numberOfPositions" formControlName="numberOfPositions" placeholder="x" min="1">
+            <label for="numberOfPositions">{{ i18n.t('job_requisitions.positions_count') }} <span class="text-danger">*</span></label>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('job_requisitions.priority') }} <span class="text-danger">*</span></label>
+            <app-searchable-select [options]="priorityOptions()" [placeholder]="i18n.t('common.select')" [value]="form.get('priority')?.value" (selectionChange)="form.get('priority')?.setValue($event)" />
+          </div>
+        </div>
+      </div>
+    </app-form-section>
+
+    <app-form-section [title]="i18n.t('job_requisitions.salary_range')" [variant]="'modern'">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="number" class="form-control" id="budgetedSalaryMin" formControlName="budgetedSalaryMin" placeholder="x" min="0">
+            <label for="budgetedSalaryMin">{{ i18n.t('job_requisitions.min_salary') }}</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="number" class="form-control" id="budgetedSalaryMax" formControlName="budgetedSalaryMax" placeholder="x" min="0">
+            <label for="budgetedSalaryMax">{{ i18n.t('job_requisitions.max_salary') }}</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="targetHireDate" formControlName="targetHireDate" placeholder="x">
+            <label for="targetHireDate">{{ i18n.t('job_requisitions.target_date') }}</label>
+          </div>
+        </div>
+      </div>
+    </app-form-section>
+
+    <app-form-section [title]="i18n.t('job_requisitions.description')" [variant]="'modern'">
+      <div class="row g-3">
+        <div class="col-12">
+          <div class="form-floating">
+            <textarea class="form-control" id="description" formControlName="description" placeholder="x" style="height: 100px"></textarea>
+            <label for="description">{{ i18n.t('job_requisitions.description') }}</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-floating">
+            <textarea class="form-control" id="requiredQualifications" formControlName="requiredQualifications" placeholder="x" style="height: 100px"></textarea>
+            <label for="requiredQualifications">{{ i18n.t('job_requisitions.requirements') }}</label>
+          </div>
+        </div>
+      </div>
+    </app-form-section>
+
+    <div class="app-form-actions">
+      <button type="button" class="btn btn-secondary" routerLink="/recruitment/requisitions">{{ i18n.t('common.cancel') }}</button>
+      <button type="submit" class="btn btn-primary" [disabled]="form.invalid || submitting()">
+        @if (submitting()) { <span class="spinner-border spinner-border-sm me-1"></span> }
+        {{ i18n.t('common.save') }}
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,8 +1,10 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Attendance;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Attendance;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.AttendanceCorrections.Commands.CreateAttendanceCorrectionRequest;
+namespace TecAxle.Hrms.Application.AttendanceCorrections.Commands.CreateAttendanceCorrectionRequest;
 
 /// <summary>
 /// CQRS command for creating a new attendance correction request.
@@ -39,6 +41,7 @@ namespace TimeAttendanceSystem.Application.AttendanceCorrections.Commands.Create
 /// - Upon approval, creates AttendanceTransaction with IsManual=true
 /// - Triggers attendance recalculation for the corrected date
 /// </remarks>
+[RequiresModule(SystemModule.TimeAttendance)]
 public record CreateAttendanceCorrectionRequestCommand(
     long EmployeeId,
     DateTime CorrectionDate,

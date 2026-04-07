@@ -1,17 +1,17 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TimeAttendanceSystem.Application.AttendanceCorrections.Commands.CreateAttendanceCorrectionRequest;
-using TimeAttendanceSystem.Application.AttendanceCorrections.Commands.ApproveAttendanceCorrectionRequest;
-using TimeAttendanceSystem.Application.AttendanceCorrections.Commands.UpdateAttendanceCorrectionRequest;
-using TimeAttendanceSystem.Application.AttendanceCorrections.Commands.DeleteAttendanceCorrectionRequest;
-using TimeAttendanceSystem.Application.AttendanceCorrections.Queries.GetAttendanceCorrectionRequests;
-using TimeAttendanceSystem.Application.AttendanceCorrections.Queries.GetAttendanceCorrectionRequestById;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Attendance;
-using TimeAttendanceSystem.Domain.Excuses;
+using TecAxle.Hrms.Application.AttendanceCorrections.Commands.CreateAttendanceCorrectionRequest;
+using TecAxle.Hrms.Application.AttendanceCorrections.Commands.ApproveAttendanceCorrectionRequest;
+using TecAxle.Hrms.Application.AttendanceCorrections.Commands.UpdateAttendanceCorrectionRequest;
+using TecAxle.Hrms.Application.AttendanceCorrections.Commands.DeleteAttendanceCorrectionRequest;
+using TecAxle.Hrms.Application.AttendanceCorrections.Queries.GetAttendanceCorrectionRequests;
+using TecAxle.Hrms.Application.AttendanceCorrections.Queries.GetAttendanceCorrectionRequestById;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Attendance;
+using TecAxle.Hrms.Domain.Excuses;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 /// <summary>
 /// Request model for creating an attendance correction request.

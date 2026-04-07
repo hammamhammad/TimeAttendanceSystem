@@ -1,0 +1,64 @@
+<div class="container-fluid app-modern-view">
+  <app-form-header
+    mode="view"
+    [title]="i18n.t('employee_transfers.view_transfer')"
+    moduleName="employee_transfers"
+    moduleRoute="employee-transfers"
+    [entityId]="item()?.id"
+    [loading]="loading()"
+    [actions]="headerActions()">
+  </app-form-header>
+
+  @if (loading()) {
+    <div class="text-center py-5">
+      <app-loading-spinner [message]="i18n.t('common.loading')" [variant]="'primary'" [centered]="true" />
+    </div>
+  }
+
+  @if (error()) {
+    <div class="alert alert-danger" role="alert">
+      <i class="fas fa-exclamation-triangle me-2"></i>
+      {{ error() }}
+    </div>
+  }
+
+  @if (item() && !loading()) {
+    <div class="row g-4">
+      <!-- Status -->
+      <div class="col-12">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <span class="fw-medium">{{ i18n.t('fields.status') }}:</span>
+          <app-status-badge [status]="statusBadge().label" [variant]="statusBadge().variant" />
+        </div>
+      </div>
+
+      <!-- Employee Information -->
+      <div class="col-12">
+        <app-section-card [title]="i18n.t('employee_transfers.employee_info')">
+          <app-definition-list [items]="employeeInfoItems()" [labelWidth]="'4'" [valueWidth]="'8'" />
+        </app-section-card>
+      </div>
+
+      <!-- From -->
+      <div class="col-lg-6">
+        <app-section-card [title]="i18n.t('employee_transfers.from')">
+          <app-definition-list [items]="fromItems()" [labelWidth]="'4'" [valueWidth]="'8'" />
+        </app-section-card>
+      </div>
+
+      <!-- To -->
+      <div class="col-lg-6">
+        <app-section-card [title]="i18n.t('employee_transfers.to')">
+          <app-definition-list [items]="toItems()" [labelWidth]="'4'" [valueWidth]="'8'" />
+        </app-section-card>
+      </div>
+
+      <!-- Audit History -->
+      <div class="col-12">
+        <app-section-card [title]="i18n.t('history.title')" icon="fas fa-clock-rotate-left" headerClass="bg-light">
+          <app-audit-history [entityName]="'EmployeeTransfer'" [entityId]="item()?.id" />
+        </app-section-card>
+      </div>
+    </div>
+  }
+</div>

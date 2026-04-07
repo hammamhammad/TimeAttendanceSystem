@@ -152,7 +152,15 @@
       "Bash(Select-Object -First 5)",
       "Bash(npx tsc:*)",
       "Bash(npx playwright test:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(sed 's/[\"\"\"\" ]//g')",
+      "Bash(head -8 echo \"\" echo \"2. SeedData:\" grep -c \"GrievanceResource\\\\|DisciplinaryAction\\\\|Investigation\\\\|CounselingRecord\" d:/Work/TimeAttendanceSystem/src/Infrastructure/TimeAttendanceSystem.Infrastructure/Persistence/Common/SeedData.cs echo \"\" echo \"3. Auth policies:\" grep -c \"GrievanceRead\\\\|GrievanceManagement\\\\|DisciplinaryActionRead\\\\|DisciplinaryActionManagement\\\\|InvestigationRead\\\\|InvestigationManagement\\\\|CounselingRecordRead\\\\|CounselingRecordManagement\" d:/Work/TimeAttendanceSystem/src/Infrastructure/TimeAttendanceSystem.Infrastructure/DependencyInjection.cs echo \"\" echo \"4. Admin routes:\" grep -c \"employee-relations\" d:/Work/TimeAttendanceSystem/time-attendance-frontend/src/app/app.routes.ts echo \"\" echo \"5. Admin menu:\" grep \"grievance.read\\\\|disciplinaryAction.read\\\\|investigation.read\\\\|counselingRecord.read\" d:/Work/TimeAttendanceSystem/time-attendance-frontend/src/app/core/menu/menu.service.ts echo \"\" echo \"6. Portal endpoints:\" grep \"my-grievances\\\\|my-disciplinary\" d:/Work/TimeAttendanceSystem/src/Api/TimeAttendanceSystem.Api/Controllers/PortalController.cs)",
+      "Bash(head -5 echo \"\" echo \"7. Self-service routes:\" grep \"my-grievances\\\\|my-disciplinary\" d:/Work/TimeAttendanceSystem/time-attendance-selfservice-frontend/src/app/app.routes.ts echo \"\" echo \"8. Self-service menu:\" grep \"grievances\\\\|disciplinary\" d:/Work/TimeAttendanceSystem/time-attendance-selfservice-frontend/src/app/core/menu/menu.service.ts)",
+      "Bash(python /tmp/add_module_attr.py \"d:/Work/TimeAttendanceSystem/src/Application/TimeAttendanceSystem.Application/Shifts/Commands/CreateShift/CreateShiftCommand.cs\" \"TimeAttendance\" \"false\")",
+      "Bash(python /tmp/add_module_attr.py d:/Work/TimeAttendanceSystem/src/Application/TimeAttendanceSystem.Application/MobileAttendance/Commands/ProcessMobileTransaction/CheckLocationQuery.cs TimeAttendance true)",
+      "Bash(python -c \"import sys,json; print\\(json.dumps\\(json.load\\(sys.stdin\\), indent=2\\)[:800]\\)\")",
+      "Bash(echo \"Frontend PID: $!\")",
+      "Bash(git mv:*)"
     ],
     "deny": [],
     "ask": []

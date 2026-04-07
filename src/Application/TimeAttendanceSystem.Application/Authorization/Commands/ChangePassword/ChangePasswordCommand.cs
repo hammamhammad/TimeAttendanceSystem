@@ -1,6 +1,6 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Authorization.Commands.ChangePassword;
+namespace TecAxle.Hrms.Application.Authorization.Commands.ChangePassword;
 
 public record ChangePasswordCommand(string CurrentPassword, string NewPassword) : IRequest<Result<bool>>;

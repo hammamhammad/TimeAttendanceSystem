@@ -1,0 +1,43 @@
+<div class="app-list-page">
+  <app-page-header [title]="i18n.t('investigations.title')" />
+
+  <app-unified-filter
+    [searchPlaceholder]="i18n.t('investigations.search')"
+    [showAddButton]="true"
+    [addButtonText]="i18n.t('investigations.create')"
+    [showRefreshButton]="true"
+    [refreshButtonText]="i18n.t('common.refresh')"
+    [refreshing]="loading()"
+    (searchChange)="onSearchChange($event)"
+    (add)="navigateToCreate()"
+    (refresh)="loadData()">
+  </app-unified-filter>
+
+  <app-data-table
+    [data]="items()"
+    [columns]="tableColumns"
+    [actions]="tableActions"
+    [currentPage]="currentPage()"
+    [totalItems]="totalCount()"
+    [pageSize]="pageSize()"
+    [loading]="loading"
+    [emptyTitle]="i18n.t('investigations.no_data')"
+    [emptyMessage]="i18n.t('investigations.no_data_message')"
+    [showPagination]="true"
+    (actionClick)="onActionClick($event)"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+    <ng-template #cellTemplate let-item let-column="column">
+      @if (column.key === 'status') {
+        <app-status-badge
+          [status]="getStatusVariant(item.status)"
+          [label]="i18n.t('investigations.status_' + item.status)">
+        </app-status-badge>
+      } @else if (column.key === 'startDate') {
+        {{ formatDate(item.startDate) }}
+      } @else {
+        {{ item[column.key] || '-' }}
+      }
+    </ng-template>
+  </app-data-table>
+</div>

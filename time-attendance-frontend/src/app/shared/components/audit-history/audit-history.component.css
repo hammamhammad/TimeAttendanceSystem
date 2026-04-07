@@ -1,0 +1,6 @@
+.timeline-item .card { transition: box-shadow 0.2s; }
+.timeline-item .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important; }
+.timeline-item .badge { font-size: 0.75rem; }
+:host-context([dir="rtl"]) .me-1 { margin-right: 0 !important; margin-left: 0.25rem !important; }
+:host-context([dir="rtl"]) .me-2 { margin-right: 0 !important; margin-left: 0.5rem !important; }
+:host-context([dir="rtl"]) .ms-3 { margin-left: 0 !important; margin-right: 1rem !important; }

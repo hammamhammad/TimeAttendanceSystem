@@ -1,0 +1,250 @@
+<!-- Page Header -->
+<app-page-header [title]="i18n.t('portal.loans.title')">
+  <div header-actions>
+    @if (activeTab() === 'loans') {
+      <button class="btn btn-primary btn-sm me-2" (click)="showLoanModal.set(true)" type="button">
+        <i class="bi bi-plus me-1"></i>{{ i18n.t('portal.loans.apply') }}
+      </button>
+    }
+    @if (activeTab() === 'advances') {
+      <button class="btn btn-primary btn-sm me-2" (click)="showAdvanceModal.set(true)" type="button">
+        <i class="bi bi-plus me-1"></i>{{ i18n.t('portal.loans.request_advance') }}
+      </button>
+    }
+    <button
+      class="btn btn-outline-primary btn-sm"
+      (click)="refresh()"
+      [disabled]="loading()"
+      type="button">
+      <i class="bi bi-arrow-clockwise" [class.spin]="loading()"></i>
+      {{ i18n.t('common.refresh') }}
+    </button>
+  </div>
+</app-page-header>
+
+<!-- Tabs -->
+<ul class="nav nav-tabs mb-3">
+  <li class="nav-item">
+    <button class="nav-link" [class.active]="activeTab() === 'loans'" (click)="setTab('loans')">
+      <i class="bi bi-file-earmark-text me-1"></i>{{ i18n.t('portal.loans.my_loans') }}
+    </button>
+  </li>
+  <li class="nav-item">
+    <button class="nav-link" [class.active]="activeTab() === 'advances'" (click)="setTab('advances')">
+      <i class="bi bi-cash-stack me-1"></i>{{ i18n.t('portal.loans.salary_advances') }}
+    </button>
+  </li>
+</ul>
+
+<!-- Loans Tab -->
+@if (activeTab() === 'loans') {
+  <!-- Loading State (only when no data) -->
+  @if (loading() && loans().length === 0) {
+    <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+  }
+
+  <!-- Error State -->
+  @if (error() && loans().length === 0) {
+    <div class="alert alert-danger" role="alert">
+      <i class="bi bi-exclamation-triangle me-2"></i>{{ error() }}
+      <button class="btn btn-sm btn-outline-danger ms-3" (click)="refresh()" type="button">{{ i18n.t('common.retry') }}</button>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!loading() && loans().length === 0 && !error()) {
+    <app-empty-state
+      icon="bi bi-file-earmark-text"
+      [title]="i18n.t('portal.loans.no_loans')">
+    </app-empty-state>
+  }
+
+  <!-- Data Table -->
+  @if (loans().length > 0) {
+    <div class="card">
+      <div class="card-body">
+        <app-data-table
+          [data]="loanTableData()"
+          [columns]="loanColumns"
+          [actions]="loanActions()"
+          [loading]="loading()"
+          [paginated]="true"
+          [pageSize]="10"
+          (actionClick)="onLoanAction($event)">
+        </app-data-table>
+      </div>
+    </div>
+  }
+
+  <!-- Repayment Schedule Card -->
+  @if (selectedLoan()) {
+    <div class="card mt-3">
+      <div class="card-header d-flex justify-content-between">
+        <h6 class="mb-0">{{ i18n.t('portal.loans.repayment_schedule') }} - {{ selectedLoan()?.applicationNumber }}</h6>
+        <button class="btn btn-sm btn-outline-secondary" (click)="selectedLoan.set(null)" type="button"><i class="bi bi-x"></i></button>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-striped mb-0">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>{{ i18n.t('portal.loans.due_date') }}</th>
+                <th>{{ i18n.t('portal.loans.amount') }}</th>
+                <th>{{ i18n.t('portal.status') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of selectedLoan()?.repayments ?? []; track r.id) {
+                <tr>
+                  <td>{{ r.installmentNumber }}</td>
+                  <td>{{ r.dueDate | date }}</td>
+                  <td>{{ r.amount.toFixed(2) }}</td>
+                  <td [innerHTML]="getRepaymentStatusBadgeHtml(r.status)"></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Info Card -->
+  @if (loans().length > 0) {
+    <div class="card mt-3">
+      <div class="card-body">
+        <div class="d-flex align-items-start">
+          <i class="bi bi-info-circle text-info me-3 mt-1" style="font-size: 1.5rem;"></i>
+          <div>
+            <h6 class="mb-2">{{ i18n.t('portal.loans.info_title') }}</h6>
+            <p class="text-muted mb-0 small">{{ i18n.t('portal.loans.info_text') }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+}
+
+<!-- Advances Tab -->
+@if (activeTab() === 'advances') {
+  <!-- Loading State (only when no data) -->
+  @if (loading() && advances().length === 0) {
+    <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+  }
+
+  <!-- Error State -->
+  @if (error() && advances().length === 0) {
+    <div class="alert alert-danger" role="alert">
+      <i class="bi bi-exclamation-triangle me-2"></i>{{ error() }}
+      <button class="btn btn-sm btn-outline-danger ms-3" (click)="refresh()" type="button">{{ i18n.t('common.retry') }}</button>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!loading() && advances().length === 0 && !error()) {
+    <app-empty-state
+      icon="bi bi-cash-stack"
+      [title]="i18n.t('portal.loans.no_advances')">
+    </app-empty-state>
+  }
+
+  <!-- Data Table -->
+  @if (advances().length > 0) {
+    <div class="card">
+      <div class="card-body">
+        <app-data-table
+          [data]="advanceTableData()"
+          [columns]="advanceColumns"
+          [loading]="loading()"
+          [paginated]="true"
+          [pageSize]="10">
+        </app-data-table>
+      </div>
+    </div>
+
+    <!-- Info Card -->
+    <div class="card mt-3">
+      <div class="card-body">
+        <div class="d-flex align-items-start">
+          <i class="bi bi-info-circle text-info me-3 mt-1" style="font-size: 1.5rem;"></i>
+          <div>
+            <h6 class="mb-2">{{ i18n.t('portal.loans.info_title') }}</h6>
+            <p class="text-muted mb-0 small">{{ i18n.t('portal.loans.info_text') }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+}
+
+<!-- Loan Application Modal -->
+@if (showLoanModal()) {
+  <app-modal-wrapper [title]="i18n.t('portal.loans.apply')" [show]="showLoanModal()" (close)="showLoanModal.set(false)">
+    <div class="app-modern-form">
+      <div class="row g-3">
+        <div class="col-12">
+          <label class="form-label">{{ i18n.t('portal.loans.type') }} *</label>
+          <select class="form-select" [ngModel]="loanTypeId()" (ngModelChange)="loanTypeId.set($event)">
+            <option [ngValue]="null">{{ i18n.t('portal.loans.select_type') }}</option>
+            @for (t of loanTypes(); track t.id) { <option [ngValue]="t.id">{{ t.name }}</option> }
+          </select>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="number" class="form-control" id="loanAmt" placeholder="0" [ngModel]="loanAmount()" (ngModelChange)="loanAmount.set($event)">
+            <label for="loanAmt">{{ i18n.t('portal.loans.amount') }} *</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="number" class="form-control" id="loanTerm" placeholder="12" [ngModel]="loanTerm()" (ngModelChange)="loanTerm.set($event)">
+            <label for="loanTerm">{{ i18n.t('portal.loans.term_months') }}</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-floating">
+            <textarea class="form-control" id="loanPurpose" placeholder="Purpose" [ngModel]="loanPurpose()" (ngModelChange)="loanPurpose.set($event)"></textarea>
+            <label for="loanPurpose">{{ i18n.t('portal.loans.purpose') }}</label>
+          </div>
+        </div>
+      </div>
+      <div class="app-form-actions mt-3">
+        <button class="btn btn-secondary" (click)="showLoanModal.set(false)">{{ i18n.t('common.cancel') }}</button>
+        <button class="btn btn-primary" (click)="submitLoanApp()" [disabled]="saving()">{{ i18n.t('common.submit') }}</button>
+      </div>
+    </div>
+  </app-modal-wrapper>
+}
+
+<!-- Salary Advance Modal -->
+@if (showAdvanceModal()) {
+  <app-modal-wrapper [title]="i18n.t('portal.loans.request_advance')" [show]="showAdvanceModal()" (close)="showAdvanceModal.set(false)">
+    <div class="app-modern-form">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="number" class="form-control" id="advAmt" placeholder="0" [ngModel]="advanceAmount()" (ngModelChange)="advanceAmount.set($event)">
+            <label for="advAmt">{{ i18n.t('portal.loans.amount') }} *</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="month" class="form-control" id="advMonth" placeholder="Month" [ngModel]="advanceMonth()" (ngModelChange)="advanceMonth.set($event)">
+            <label for="advMonth">{{ i18n.t('portal.loans.deduction_month') }} *</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-floating">
+            <textarea class="form-control" id="advReason" placeholder="Reason" [ngModel]="advanceReason()" (ngModelChange)="advanceReason.set($event)"></textarea>
+            <label for="advReason">{{ i18n.t('portal.loans.reason') }}</label>
+          </div>
+        </div>
+      </div>
+      <div class="app-form-actions mt-3">
+        <button class="btn btn-secondary" (click)="showAdvanceModal.set(false)">{{ i18n.t('common.cancel') }}</button>
+        <button class="btn btn-primary" (click)="submitAdvance()" [disabled]="saving()">{{ i18n.t('common.submit') }}</button>
+      </div>
+    </div>
+  </app-modal-wrapper>
+}

@@ -37,3 +37,4 @@ export * from './searchable-select/searchable-select.component';
 export * from './unified-filter/unified-filter.component';
 export * from './search-filter/search-filter.component';
 export * from './pagination/pagination.component';
+export * from './file-upload/file-upload.component';

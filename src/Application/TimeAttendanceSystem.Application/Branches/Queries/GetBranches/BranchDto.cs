@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Application.Branches.Queries.GetBranches;
+namespace TecAxle.Hrms.Application.Branches.Queries.GetBranches;
 
 public class BranchDto
 {

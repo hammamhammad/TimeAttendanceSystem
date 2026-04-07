@@ -1,8 +1,10 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Excuses;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Excuses;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.Excuses.Commands.ApproveEmployeeExcuse;
+namespace TecAxle.Hrms.Application.Excuses.Commands.ApproveEmployeeExcuse;
 
 /// <summary>
 /// CQRS command for approving or rejecting employee excuse requests.
@@ -35,6 +37,7 @@ namespace TimeAttendanceSystem.Application.Excuses.Commands.ApproveEmployeeExcus
 /// - Audit trail maintained for compliance
 /// - Notifications sent to employee about decision
 /// </remarks>
+[RequiresModule(SystemModule.LeaveManagement)]
 public record ApproveEmployeeExcuseCommand(
     long ExcuseId,
     long ApproverId,

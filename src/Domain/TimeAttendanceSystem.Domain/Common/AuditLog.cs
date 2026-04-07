@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Domain.Common;
+namespace TecAxle.Hrms.Domain.Common;
 
 /// <summary>
 /// Represents a comprehensive audit log entry capturing data modification operations within the system.

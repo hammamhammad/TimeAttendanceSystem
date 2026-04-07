@@ -1,0 +1,114 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header [title]="isEdit() ? i18n.t('announcements.edit') : i18n.t('announcements.create')" moduleName="announcements" moduleRoute="announcements" [loading]="saving()" />
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <app-form-section [title]="i18n.t('common.basic_information')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="title" placeholder="Title" formControlName="title">
+            <label for="title">{{ i18n.t('announcements.title_field') }} *</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="titleAr" placeholder="Title AR" formControlName="titleAr">
+            <label for="titleAr">{{ i18n.t('announcements.title_ar') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('announcements.category') }} *</label>
+            <app-searchable-select [options]="categoryOptions()" [placeholder]="i18n.t('common.select')" [value]="form.get('categoryId')?.value" (selectionChange)="form.get('categoryId')?.setValue($event)" />
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('announcements.priority') }} *</label>
+            <app-searchable-select [options]="priorityOptions()" [placeholder]="i18n.t('common.select')" [value]="form.get('priority')?.value" (selectionChange)="form.get('priority')?.setValue($event)" />
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-floating">
+            <textarea class="form-control" id="content" placeholder="Content" formControlName="content" style="height:120px"></textarea>
+            <label for="content">{{ i18n.t('announcements.content') }} *</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-floating">
+            <textarea class="form-control" id="contentAr" placeholder="Content AR" formControlName="contentAr" style="height:120px"></textarea>
+            <label for="contentAr">{{ i18n.t('announcements.content_ar') }}</label>
+          </div>
+        </div>
+      </div>
+    </app-form-section>
+
+    <app-form-section [title]="i18n.t('announcements.target_audience')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('announcements.target_audience') }} *</label>
+            <app-searchable-select [options]="targetAudienceOptions()" [placeholder]="i18n.t('common.select')" [value]="form.get('targetAudience')?.value" (selectionChange)="onTargetAudienceChange($event)" />
+          </div>
+        </div>
+        @if (showTargetIds()) {
+          <div class="col-md-6">
+            <div class="app-modern-field">
+              <label class="app-modern-label">{{ i18n.t('announcements.target_ids') }}</label>
+              <app-searchable-select [options]="targetIdOptions()" [placeholder]="i18n.t('common.select')" [value]="null" (selectionChange)="onTargetIdChange($event)" />
+            </div>
+          </div>
+          @if (selectedTargetIds().length > 0) {
+            <div class="col-12">
+              <div class="d-flex flex-wrap gap-2">
+                @for (id of selectedTargetIds(); track id) {
+                  <span class="badge bg-primary d-flex align-items-center gap-1">
+                    {{ getTargetLabel(id) }}
+                    <button type="button" class="btn-close btn-close-white ms-1" style="font-size: 0.6rem" (click)="removeTargetId(id)"></button>
+                  </span>
+                }
+              </div>
+            </div>
+          }
+        }
+      </div>
+    </app-form-section>
+
+    <app-form-section [title]="i18n.t('announcements.scheduling')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="scheduledDate" placeholder="Date" formControlName="scheduledDate">
+            <label for="scheduledDate">{{ i18n.t('announcements.scheduled_date') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="expiryDate" placeholder="Date" formControlName="expiryDate">
+            <label for="expiryDate">{{ i18n.t('announcements.expiry_date') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="isPinned" formControlName="isPinned">
+            <label class="form-check-label" for="isPinned">{{ i18n.t('announcements.pinned') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="requiresAcknowledgment" formControlName="requiresAcknowledgment">
+            <label class="form-check-label" for="requiresAcknowledgment">{{ i18n.t('announcements.requires_acknowledgment') }}</label>
+          </div>
+        </div>
+      </div>
+    </app-form-section>
+
+    <div class="app-form-actions">
+      <button type="button" class="btn btn-secondary" (click)="router.navigate(['/announcements'])">{{ i18n.t('common.cancel') }}</button>
+      <button type="submit" class="btn btn-primary" [disabled]="saving()">
+        @if (saving()) { <i class="fas fa-spinner fa-spin me-1"></i> }
+        {{ i18n.t('common.save') }}
+      </button>
+    </div>
+  </form>
+</div>

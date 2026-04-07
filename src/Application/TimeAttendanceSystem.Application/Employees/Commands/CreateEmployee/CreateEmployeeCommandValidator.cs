@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace TimeAttendanceSystem.Application.Employees.Commands.CreateEmployee;
+namespace TecAxle.Hrms.Application.Employees.Commands.CreateEmployee;
 
 /// <summary>
 /// FluentValidation validator for CreateEmployeeCommand ensuring comprehensive employee data validation.

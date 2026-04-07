@@ -1,0 +1,92 @@
+<div class="container-fluid app-modern-view">
+  @if (loading()) {
+    <app-loading-spinner></app-loading-spinner>
+  }
+
+  @if (!loading() && policy()) {
+    <app-form-header
+      mode="view"
+      [title]="t('allowance_policies.view')"
+      [entityId]="entityId() ?? undefined"
+      moduleName="allowance_policies"
+      moduleRoute="settings/allowance-policies">
+    </app-form-header>
+
+    <div class="row">
+      <!-- Basic Information -->
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header bg-light">
+            <h6 class="mb-0">
+              <i class="fas fa-info-circle me-2"></i>
+              {{ t('common.basic_info') }}
+            </h6>
+          </div>
+          <div class="card-body">
+            <app-definition-list [items]="basicInfoItems()">
+              <ng-container *ngTemplateOutlet="statusBadgeTemplate"></ng-container>
+            </app-definition-list>
+          </div>
+        </div>
+      </div>
+
+      <!-- Configuration & Limits -->
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header bg-light">
+            <h6 class="mb-0">
+              <i class="fas fa-cog me-2"></i>
+              {{ t('common.configuration') }}
+            </h6>
+          </div>
+          <div class="card-body">
+            <app-definition-list [items]="configItems()"></app-definition-list>
+          </div>
+        </div>
+      </div>
+
+      <!-- Audit Information -->
+      <div class="col-12 mb-4">
+        <div class="card">
+          <div class="card-header bg-light">
+            <h6 class="mb-0">
+              <i class="fas fa-history me-2"></i>
+              {{ t('common.audit_info') }}
+            </h6>
+          </div>
+          <div class="card-body">
+            <app-definition-list [items]="auditInfoItems()" [labelWidth]="'2'" [valueWidth]="'10'"></app-definition-list>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Audit History -->
+    <div class="col-12 mb-4">
+      <app-section-card [title]="t('history.title')" icon="fas fa-clock-rotate-left" headerClass="bg-light">
+        <app-audit-history [entityName]="'AllowancePolicy'" [entityId]="entityId()" />
+      </app-section-card>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex gap-2 mt-3">
+      @if (permissionService.has(PERMISSIONS.UPDATE)) {
+        <button class="btn btn-primary" (click)="onEdit()">
+          <i class="fas fa-edit me-1"></i> {{ t('common.edit') }}
+        </button>
+      }
+      @if (permissionService.has(PERMISSIONS.DELETE)) {
+        <button class="btn btn-danger" (click)="onDelete()">
+          <i class="fas fa-trash me-1"></i> {{ t('common.delete') }}
+        </button>
+      }
+    </div>
+  }
+</div>
+
+<ng-template #statusBadgeTemplate>
+  <app-status-badge
+    [status]="statusBadge().label"
+    [variant]="statusBadge().variant">
+  </app-status-badge>
+</ng-template>

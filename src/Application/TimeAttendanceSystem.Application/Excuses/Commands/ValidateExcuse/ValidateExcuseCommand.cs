@@ -1,8 +1,10 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Excuses;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Excuses;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.Excuses.Commands.ValidateExcuse;
+namespace TecAxle.Hrms.Application.Excuses.Commands.ValidateExcuse;
 
 /// <summary>
 /// CQRS command for validating excuse creation parameters.
@@ -37,6 +39,7 @@ namespace TimeAttendanceSystem.Application.Excuses.Commands.ValidateExcuse;
 /// - Calculated duration
 /// - Approval requirement status
 /// </remarks>
+[RequiresModule(SystemModule.LeaveManagement)]
 public record ValidateExcuseCommand(
     long EmployeeId,
     DateTime ExcuseDate,

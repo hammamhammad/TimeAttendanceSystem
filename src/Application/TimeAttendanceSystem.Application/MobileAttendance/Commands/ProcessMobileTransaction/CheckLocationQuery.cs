@@ -1,11 +1,14 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.MobileAttendance.Commands.ProcessMobileTransaction;
+namespace TecAxle.Hrms.Application.MobileAttendance.Commands.ProcessMobileTransaction;
 
 /// <summary>
 /// Query to check if a location is within a branch's geofence.
 /// </summary>
+[RequiresModule(SystemModule.TimeAttendance, AllowReadWhenDisabled = true)]
 public record CheckLocationQuery(
     long BranchId,
     double Latitude,

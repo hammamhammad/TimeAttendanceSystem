@@ -1,7 +1,7 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Notifications.Queries.GetBroadcasts;
+namespace TecAxle.Hrms.Application.Notifications.Queries.GetBroadcasts;
 
 /// <summary>
 /// Query to get a paginated list of notification broadcasts.

@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TimeAttendanceSystem.Domain.VacationTypes;
+using TecAxle.Hrms.Domain.VacationTypes;
 
-namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Configurations;
+namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Configurations;
 
 /// <summary>
 /// Entity Framework configuration for VacationType entity.
@@ -61,6 +61,20 @@ public class VacationTypeConfiguration : IEntityTypeConfiguration<VacationType>
         builder.Property(vt => vt.IsActive)
             .IsRequired()
             .HasDefaultValue(true);
+
+        builder.Property(vt => vt.AllowHalfDay)
+            .IsRequired()
+            .HasDefaultValue(false)
+            .HasComment("Whether half-day leave is allowed for this vacation type");
+
+        builder.Property(vt => vt.AllowEncashment)
+            .IsRequired()
+            .HasDefaultValue(false)
+            .HasComment("Whether leave encashment is allowed for this vacation type");
+
+        builder.Property(vt => vt.EncashmentMaxDays)
+            .IsRequired(false)
+            .HasComment("Maximum number of days that can be encashed (null = no limit)");
 
         // Foreign Key Relationships
         builder.HasOne(vt => vt.Branch)

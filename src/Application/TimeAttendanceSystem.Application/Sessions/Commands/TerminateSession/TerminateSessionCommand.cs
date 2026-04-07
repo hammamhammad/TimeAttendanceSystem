@@ -1,6 +1,6 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Sessions.Commands.TerminateSession;
+namespace TecAxle.Hrms.Application.Sessions.Commands.TerminateSession;
 
 public record TerminateSessionCommand(string SessionId) : IRequest<Result<bool>>;

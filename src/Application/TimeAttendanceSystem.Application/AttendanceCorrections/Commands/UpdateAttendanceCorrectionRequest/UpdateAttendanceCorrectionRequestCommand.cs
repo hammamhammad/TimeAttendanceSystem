@@ -1,8 +1,10 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Attendance;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Attendance;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.AttendanceCorrections.Commands.UpdateAttendanceCorrectionRequest;
+namespace TecAxle.Hrms.Application.AttendanceCorrections.Commands.UpdateAttendanceCorrectionRequest;
 
 /// <summary>
 /// CQRS command for updating an existing attendance correction request.
@@ -26,6 +28,7 @@ namespace TimeAttendanceSystem.Application.AttendanceCorrections.Commands.Update
 /// - Cannot change employee ID
 /// - Correction date cannot be in the future
 /// </remarks>
+[RequiresModule(SystemModule.TimeAttendance)]
 public record UpdateAttendanceCorrectionRequestCommand(
     long Id,
     DateTime CorrectionDate,

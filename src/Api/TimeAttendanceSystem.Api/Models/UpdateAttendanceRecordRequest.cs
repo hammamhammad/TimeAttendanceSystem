@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using TimeAttendanceSystem.Domain.Attendance;
+using TecAxle.Hrms.Domain.Attendance;
 
-namespace TimeAttendanceSystem.Api.Models;
+namespace TecAxle.Hrms.Api.Models;
 
 /// <summary>
 /// Request model for updating an attendance record with manual overrides.

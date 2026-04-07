@@ -1,9 +1,9 @@
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
-namespace TimeAttendanceSystem.Infrastructure.Services;
+namespace TecAxle.Hrms.Infrastructure.Services;
 
 /// <summary>
 /// Comprehensive password security service implementing enterprise-grade password policies and cryptographic operations.

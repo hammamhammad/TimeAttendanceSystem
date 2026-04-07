@@ -1,6 +1,6 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Authorization.Commands.Logout;
+namespace TecAxle.Hrms.Application.Authorization.Commands.Logout;
 
 public record LogoutCommand(string? RefreshToken = null, bool LogoutFromAllDevices = false) : IRequest<Result<bool>>;

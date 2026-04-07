@@ -36,8 +36,6 @@ D:\Work\AI Code\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\obj\
 D:\Work\AI Code\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\obj\Debug\net9.0\TimeAttendanceSystem.Shared.pdb
 D:\Work\AI Code\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\obj\Debug\net9.0\ref\TimeAttendanceSystem.Shared.dll
 D:\Work\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\bin\Debug\net9.0\TimeAttendanceSystem.Shared.deps.json
-D:\Work\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\bin\Debug\net9.0\TimeAttendanceSystem.Shared.dll
-D:\Work\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\bin\Debug\net9.0\TimeAttendanceSystem.Shared.pdb
 D:\Work\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\bin\Debug\net9.0\ar\TimeAttendanceSystem.Shared.resources.dll
 D:\Work\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\obj\Debug\net9.0\TimeAttendanceSystem.Shared.csproj.AssemblyReference.cache
 D:\Work\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\obj\Debug\net9.0\TimeAttendanceSystem.Shared.Localization.Resources.ValidationMessages.resources
@@ -51,6 +49,24 @@ D:\Work\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\obj\Debug\ne
 D:\Work\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\obj\Debug\net9.0\ar\TimeAttendanceSystem.Shared.resources.cs
 D:\Work\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\obj\Debug\net9.0\ar\TimeAttendanceSystem.Shared.resources.dll
 D:\Work\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\obj\Debug\net9.0\TimeAttendanceSystem.Shared.dll
-D:\Work\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\obj\Debug\net9.0\refint\TimeAttendanceSystem.Shared.dll
 D:\Work\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\obj\Debug\net9.0\TimeAttendanceSystem.Shared.pdb
+D:\Work\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\bin\Debug\net9.0\TimeAttendanceSystem.Shared.pdb
+D:\Work\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\bin\Debug\net9.0\TimeAttendanceSystem.Shared.dll
+D:\Work\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\obj\Debug\net9.0\refint\TimeAttendanceSystem.Shared.dll
 D:\Work\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\obj\Debug\net9.0\ref\TimeAttendanceSystem.Shared.dll
+D:\Work\TimeAttendanceSystem\temp_build\TimeAttendanceSystem.Shared.deps.json
+D:\Work\TimeAttendanceSystem\temp_build\TimeAttendanceSystem.Shared.dll
+D:\Work\TimeAttendanceSystem\temp_build\TimeAttendanceSystem.Shared.pdb
+D:\Work\TimeAttendanceSystem\temp_build\ar\TimeAttendanceSystem.Shared.resources.dll
+d:\Work\TimeAttendanceSystem\tmp-build\TimeAttendanceSystem.Shared.deps.json
+d:\Work\TimeAttendanceSystem\tmp-build\TimeAttendanceSystem.Shared.dll
+d:\Work\TimeAttendanceSystem\tmp-build\TimeAttendanceSystem.Shared.pdb
+d:\Work\TimeAttendanceSystem\tmp-build\ar\TimeAttendanceSystem.Shared.resources.dll
+D:\Work\TimeAttendanceSystem\tmp_build\TimeAttendanceSystem.Shared.deps.json
+D:\Work\TimeAttendanceSystem\tmp_build\TimeAttendanceSystem.Shared.dll
+D:\Work\TimeAttendanceSystem\tmp_build\TimeAttendanceSystem.Shared.pdb
+D:\Work\TimeAttendanceSystem\tmp_build\ar\TimeAttendanceSystem.Shared.resources.dll
+D:\Work\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\bin\BuildCheck\TimeAttendanceSystem.Shared.deps.json
+D:\Work\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\bin\BuildCheck\TimeAttendanceSystem.Shared.dll
+D:\Work\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\bin\BuildCheck\TimeAttendanceSystem.Shared.pdb
+D:\Work\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\bin\BuildCheck\ar\TimeAttendanceSystem.Shared.resources.dll

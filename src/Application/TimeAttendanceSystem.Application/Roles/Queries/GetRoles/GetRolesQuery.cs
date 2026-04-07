@@ -1,7 +1,7 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Roles.Queries.GetRoles;
+namespace TecAxle.Hrms.Application.Roles.Queries.GetRoles;
 
 public record GetRolesQuery(
     bool IncludePermissions = false

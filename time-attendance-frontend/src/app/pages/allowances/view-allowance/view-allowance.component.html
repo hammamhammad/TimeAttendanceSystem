@@ -1,0 +1,97 @@
+<div class="container-fluid app-modern-view">
+  @if (loading()) {
+    <app-loading-spinner></app-loading-spinner>
+  }
+
+  @if (!loading() && assignment()) {
+    <app-form-header
+      mode="view"
+      [title]="t('allowance_assignments.view')"
+      [entityId]="entityId() ?? undefined"
+      moduleName="allowance_assignments"
+      moduleRoute="allowances">
+    </app-form-header>
+
+    <div class="row">
+      <!-- Employee Information -->
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header bg-light">
+            <h6 class="mb-0">
+              <i class="fas fa-user me-2"></i>
+              {{ t('common.employee') }}
+            </h6>
+          </div>
+          <div class="card-body">
+            <app-definition-list [items]="employeeInfoItems()">
+              <ng-container *ngTemplateOutlet="statusBadgeTemplate"></ng-container>
+            </app-definition-list>
+          </div>
+        </div>
+      </div>
+
+      <!-- Amount & Dates -->
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header bg-light">
+            <h6 class="mb-0">
+              <i class="fas fa-money-bill-wave me-2"></i>
+              {{ t('allowance_assignments.amount') }}
+            </h6>
+          </div>
+          <div class="card-body">
+            <app-definition-list [items]="amountInfoItems()"></app-definition-list>
+          </div>
+        </div>
+      </div>
+
+      <!-- Additional Information -->
+      <div class="col-12 mb-4">
+        <div class="card">
+          <div class="card-header bg-light">
+            <h6 class="mb-0">
+              <i class="fas fa-info-circle me-2"></i>
+              {{ t('common.additional_info') }}
+            </h6>
+          </div>
+          <div class="card-body">
+            <app-definition-list [items]="additionalInfoItems()" [labelWidth]="'2'" [valueWidth]="'10'"></app-definition-list>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Audit History -->
+    <div class="col-12 mb-4">
+      <app-section-card [title]="t('history.title')" icon="fas fa-clock-rotate-left" headerClass="bg-light">
+        <app-audit-history [entityName]="'AllowanceAssignment'" [entityId]="entityId()" />
+      </app-section-card>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex gap-2 mt-3">
+      @if (canSuspend()) {
+        <button class="btn btn-warning" (click)="onSuspend()">
+          <i class="fas fa-pause me-1"></i> {{ t('common.suspend') }}
+        </button>
+      }
+      @if (canResume()) {
+        <button class="btn btn-success" (click)="onResume()">
+          <i class="fas fa-play me-1"></i> {{ t('common.resume') }}
+        </button>
+      }
+      @if (canCancel()) {
+        <button class="btn btn-danger" (click)="onCancelAssignment()">
+          <i class="fas fa-times me-1"></i> {{ t('app.cancel') }}
+        </button>
+      }
+    </div>
+  }
+</div>
+
+<ng-template #statusBadgeTemplate>
+  <app-status-badge
+    [status]="statusBadge().label"
+    [variant]="statusBadge().variant">
+  </app-status-badge>
+</ng-template>

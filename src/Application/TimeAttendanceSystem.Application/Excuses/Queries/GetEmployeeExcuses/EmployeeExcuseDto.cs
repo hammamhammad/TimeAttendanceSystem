@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.Excuses;
+using TecAxle.Hrms.Domain.Excuses;
 
-namespace TimeAttendanceSystem.Application.Excuses.Queries.GetEmployeeExcuses;
+namespace TecAxle.Hrms.Application.Excuses.Queries.GetEmployeeExcuses;
 
 /// <summary>
 /// Data Transfer Object representing a single approval step in workflow history.

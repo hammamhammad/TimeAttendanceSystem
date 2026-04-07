@@ -1,0 +1,101 @@
+<div class="app-modern-form">
+  <app-form-header
+    [title]="isEditMode() ? i18n.t('certifications.edit') : i18n.t('certifications.create')"
+    moduleName="certifications" moduleRoute="training/certifications" [loading]="saving()">
+  </app-form-header>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <app-form-section [title]="i18n.t('certifications.basic_info')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('certifications.employee') }} *</label>
+            <app-searchable-select [options]="employeeOptions()" [placeholder]="i18n.t('common.select')"
+              [value]="form.get('employeeId')?.value" (selectionChange)="form.get('employeeId')?.setValue($event)">
+            </app-searchable-select>
+          </div>
+          @if (form.get('employeeId')?.touched && form.get('employeeId')?.hasError('required')) {
+            <div class="invalid-feedback d-block">{{ i18n.t('common.required') }}</div>
+          }
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="certificationName" formControlName="certificationName" placeholder="Name">
+            <label for="certificationName">{{ i18n.t('certifications.name') }} *</label>
+          </div>
+          @if (form.get('certificationName')?.touched && form.get('certificationName')?.hasError('required')) {
+            <div class="invalid-feedback d-block">{{ i18n.t('common.required') }}</div>
+          }
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="certificationNameAr" formControlName="certificationNameAr" placeholder="Name AR" dir="rtl">
+            <label for="certificationNameAr">{{ i18n.t('certifications.name_ar') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="issuingOrganization" formControlName="issuingOrganization" placeholder="Organization">
+            <label for="issuingOrganization">{{ i18n.t('certifications.issuing_org') }} *</label>
+          </div>
+          @if (form.get('issuingOrganization')?.touched && form.get('issuingOrganization')?.hasError('required')) {
+            <div class="invalid-feedback d-block">{{ i18n.t('common.required') }}</div>
+          }
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="credentialId" formControlName="credentialId" placeholder="Credential">
+            <label for="credentialId">{{ i18n.t('certifications.credential_id') }}</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="issueDate" formControlName="issueDate" placeholder="Issue">
+            <label for="issueDate">{{ i18n.t('certifications.issue_date') }} *</label>
+          </div>
+          @if (form.get('issueDate')?.touched && form.get('issueDate')?.hasError('required')) {
+            <div class="invalid-feedback d-block">{{ i18n.t('common.required') }}</div>
+          }
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="expiryDate" formControlName="expiryDate" placeholder="Expiry">
+            <label for="expiryDate">{{ i18n.t('certifications.expiry_date') }}</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <select class="form-select" id="status" formControlName="status">
+              @for (s of statuses; track s) {
+                <option [value]="s">{{ i18n.t('certifications.status_' + s) }}</option>
+              }
+            </select>
+            <label for="status">{{ i18n.t('common.status') }} *</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('certifications.related_course') }}</label>
+            <app-searchable-select [options]="courseOptions()" [placeholder]="i18n.t('common.select')"
+              [value]="form.get('courseId')?.value" (selectionChange)="form.get('courseId')?.setValue($event)">
+            </app-searchable-select>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-floating">
+            <textarea class="form-control" id="notes" formControlName="notes" placeholder="Notes" style="height:80px"></textarea>
+            <label for="notes">{{ i18n.t('common.notes') }}</label>
+          </div>
+        </div>
+      </div>
+    </app-form-section>
+
+    <div class="app-form-actions">
+      <button type="button" class="btn btn-secondary" routerLink="/training/certifications">{{ i18n.t('common.cancel') }}</button>
+      <button type="submit" class="btn btn-primary" [disabled]="saving()">
+        @if (saving()) { <span class="spinner-border spinner-border-sm me-2"></span> }
+        {{ i18n.t('common.save') }}
+      </button>
+    </div>
+  </form>
+</div>

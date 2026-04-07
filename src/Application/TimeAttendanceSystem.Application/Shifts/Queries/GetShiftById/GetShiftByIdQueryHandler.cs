@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Application.Shifts.Queries.GetShifts;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Shifts.Queries.GetShifts;
 
-namespace TimeAttendanceSystem.Application.Shifts.Queries.GetShiftById;
+namespace TecAxle.Hrms.Application.Shifts.Queries.GetShiftById;
 
 /// <summary>
 /// Query handler for retrieving a specific shift by its identifier.

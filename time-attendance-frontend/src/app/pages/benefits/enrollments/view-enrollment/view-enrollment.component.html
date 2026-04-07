@@ -1,0 +1,84 @@
+<div class="container-fluid app-modern-view">
+  @if (loading()) { <app-loading-spinner></app-loading-spinner> }
+
+  @if (!loading() && enrollment()) {
+    <app-form-header mode="view" [title]="t('benefits.enrollments.view')" [entityId]="entityId() ?? undefined" moduleName="benefits.enrollments" moduleRoute="benefits/enrollments"></app-form-header>
+
+    <div class="mb-3">
+      <app-status-badge [status]="statusBadge().label" [variant]="statusBadge().variant"></app-status-badge>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header bg-light"><h6 class="mb-0"><i class="fas fa-user me-2"></i>{{ t('benefits.enrollments.enrollment_info') }}</h6></div>
+          <div class="card-body"><app-definition-list [items]="enrollmentInfoItems()"></app-definition-list></div>
+        </div>
+      </div>
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header bg-light"><h6 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i>{{ t('benefits.enrollments.financial_info') }}</h6></div>
+          <div class="card-body"><app-definition-list [items]="financialInfoItems()"></app-definition-list></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dependents -->
+    <div class="card mb-4">
+      <div class="card-header bg-light"><h6 class="mb-0"><i class="fas fa-users me-2"></i>{{ t('benefits.enrollments.dependents') }} ({{ dependents().length }})</h6></div>
+      <div class="card-body">
+        @if (dependents().length === 0) {
+          <div class="text-center text-muted py-3"><p>{{ t('benefits.enrollments.no_dependents') }}</p></div>
+        } @else {
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>{{ t('common.name') }}</th>
+                  <th>{{ t('benefits.enrollments.relationship') }}</th>
+                  <th>{{ t('benefits.enrollments.date_of_birth') }}</th>
+                  <th class="text-end">{{ t('benefits.enrollments.additional_premium') }}</th>
+                  <th class="text-center">{{ t('common.status') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (dep of dependents(); track dep.id) {
+                  <tr>
+                    <td>{{ dep.firstName }} {{ dep.lastName }}</td>
+                    <td>{{ t('benefits.relationships.' + dep.relationship.toLowerCase()) }}</td>
+                    <td>{{ dep.dateOfBirth ? formatDate(dep.dateOfBirth) : '-' }}</td>
+                    <td class="text-end">{{ dep.additionalPremium?.toFixed(2) }} {{ dep.currency }}</td>
+                    <td class="text-center">
+                      <app-status-badge [status]="dep.isActive ? t('common.active') : t('common.inactive')" [variant]="dep.isActive ? 'success' : 'secondary'"></app-status-badge>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Audit History -->
+    <app-section-card [title]="t('history.title')" icon="fas fa-clock-rotate-left" headerClass="bg-light">
+      <app-audit-history [entityName]="'BenefitEnrollment'" [entityId]="entityId()" />
+    </app-section-card>
+
+    <!-- Action Buttons -->
+    @if (canApprove() || canReject()) {
+      <div class="card mt-3">
+        <div class="card-body">
+          <div class="d-flex gap-2">
+            @if (canApprove()) {
+              <button class="btn btn-success" (click)="onApprove()"><i class="fas fa-check me-1"></i> {{ t('common.approve') }}</button>
+            }
+            @if (canReject()) {
+              <button class="btn btn-danger" (click)="onReject()"><i class="fas fa-times me-1"></i> {{ t('common.reject') }}</button>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  }
+</div>

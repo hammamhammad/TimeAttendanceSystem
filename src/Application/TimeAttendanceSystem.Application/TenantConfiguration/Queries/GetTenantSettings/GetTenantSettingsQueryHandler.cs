@@ -1,0 +1,89 @@
+using Microsoft.EntityFrameworkCore;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.TenantConfiguration.Dtos;
+
+namespace TecAxle.Hrms.Application.TenantConfiguration.Queries.GetTenantSettings;
+
+public class GetTenantSettingsQueryHandler : BaseHandler<GetTenantSettingsQuery, Result<TenantSettingsDto>>
+{
+    private readonly ITenantContext _tenantContext;
+
+    public GetTenantSettingsQueryHandler(
+        IApplicationDbContext context,
+        ICurrentUser currentUser,
+        ITenantContext tenantContext)
+        : base(context, currentUser)
+    {
+        _tenantContext = tenantContext;
+    }
+
+    public override async Task<Result<TenantSettingsDto>> Handle(GetTenantSettingsQuery request, CancellationToken cancellationToken)
+    {
+        var tenantId = _tenantContext.TenantId ?? await ResolveTenantIdAsync(cancellationToken);
+        if (tenantId == null)
+            return Result.Failure<TenantSettingsDto>("Tenant context not resolved");
+
+        var settings = await Context.TenantSettings
+            .AsNoTracking()
+            .FirstOrDefaultAsync(s => s.TenantId == tenantId.Value && !s.IsDeleted, cancellationToken);
+
+        if (settings == null)
+        {
+            // Return defaults
+            return Result.Success(new TenantSettingsDto { TenantId = tenantId.Value });
+        }
+
+        var dto = new TenantSettingsDto
+        {
+            Id = settings.Id,
+            TenantId = settings.TenantId,
+            FiscalYearStartMonth = settings.FiscalYearStartMonth,
+            WeekStartDay = settings.WeekStartDay,
+            DateFormat = settings.DateFormat,
+            TimeFormat = settings.TimeFormat,
+            NumberFormat = settings.NumberFormat,
+            EnableGpsAttendance = settings.EnableGpsAttendance,
+            EnableNfcAttendance = settings.EnableNfcAttendance,
+            EnableBiometricAttendance = settings.EnableBiometricAttendance,
+            EnableManualAttendance = settings.EnableManualAttendance,
+            AutoCheckOutEnabled = settings.AutoCheckOutEnabled,
+            AutoCheckOutTime = settings.AutoCheckOutTime?.ToString("HH:mm"),
+            LateGracePeriodMinutes = settings.LateGracePeriodMinutes,
+            EarlyLeaveGracePeriodMinutes = settings.EarlyLeaveGracePeriodMinutes,
+            TrackBreakTime = settings.TrackBreakTime,
+            MinimumWorkingHoursForPresent = settings.MinimumWorkingHoursForPresent,
+            AllowNegativeLeaveBalance = settings.AllowNegativeLeaveBalance,
+            RequireAttachmentForSickLeave = settings.RequireAttachmentForSickLeave,
+            MinDaysBeforeLeaveRequest = settings.MinDaysBeforeLeaveRequest,
+            AllowHalfDayLeave = settings.AllowHalfDayLeave,
+            AllowLeaveEncashment = settings.AllowLeaveEncashment,
+            LeaveYearStart = settings.LeaveYearStart,
+            PayrollCutOffDay = settings.PayrollCutOffDay,
+            PayrollCurrency = settings.PayrollCurrency,
+            EnableEndOfServiceCalc = settings.EnableEndOfServiceCalc,
+            SalaryCalculationBasis = settings.SalaryCalculationBasis,
+            AutoApproveAfterTimeout = settings.AutoApproveAfterTimeout,
+            DefaultApprovalTimeoutHours = settings.DefaultApprovalTimeoutHours,
+            AllowSelfApproval = settings.AllowSelfApproval,
+            RequireApprovalComments = settings.RequireApprovalComments,
+            EnableEmailNotifications = settings.EnableEmailNotifications,
+            EnablePushNotifications = settings.EnablePushNotifications,
+            EnableSmsNotifications = settings.EnableSmsNotifications,
+            NotifyManagerOnLeaveRequest = settings.NotifyManagerOnLeaveRequest,
+            NotifyEmployeeOnApproval = settings.NotifyEmployeeOnApproval,
+            DailyAttendanceSummaryEnabled = settings.DailyAttendanceSummaryEnabled,
+            MobileCheckInEnabled = settings.MobileCheckInEnabled,
+            RequireNfcForMobile = settings.RequireNfcForMobile,
+            RequireGpsForMobile = settings.RequireGpsForMobile,
+            AllowMockLocation = settings.AllowMockLocation,
+            PasswordExpiryDays = settings.PasswordExpiryDays,
+            MaxLoginAttempts = settings.MaxLoginAttempts,
+            SessionTimeoutMinutes = settings.SessionTimeoutMinutes,
+            Require2FA = settings.Require2FA,
+            PasswordHistoryCount = settings.PasswordHistoryCount
+        };
+
+        return Result.Success(dto);
+    }
+}

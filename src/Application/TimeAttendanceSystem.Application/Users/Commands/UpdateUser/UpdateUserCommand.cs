@@ -1,7 +1,7 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Users.Commands.UpdateUser;
+namespace TecAxle.Hrms.Application.Users.Commands.UpdateUser;
 
 public record UpdateUserCommand : IRequest<Result<Unit>>
 {

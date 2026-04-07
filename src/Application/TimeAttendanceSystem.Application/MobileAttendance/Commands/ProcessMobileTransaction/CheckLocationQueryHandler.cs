@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.MobileAttendance.Commands.ProcessMobileTransaction;
+namespace TecAxle.Hrms.Application.MobileAttendance.Commands.ProcessMobileTransaction;
 
 /// <summary>
 /// Handler for checking if a location is within a branch's geofence.

@@ -1,0 +1,292 @@
+You are acting as a Principal Product Architect, Enterprise UX Strategist, and SaaS Platform Designer.
+
+I have built an enterprise HRMS called ClockN. It already includes broad modules such as authentication/security, organization management, time & attendance, mobile attendance, shifts, leave/excuse/remote work, approval workflows, ESS portal, notifications, recruitment, onboarding/offboarding, performance, payroll, employee lifecycle, people development, assets/expenses/loans/benefits, analytics/reporting, and system architecture. The platform is designed for Saudi Arabia / GCC, supports English and Arabic, and already uses role-based access, scoped access, workflow automation, auditability, and background jobs.
+
+Your mission is to review the business and product structure of this HRMS and produce a phased enhancement strategy that makes the system:
+
+1. commercially stronger,
+2. architecturally stronger,
+3. more configurable,
+4. easier to sell as SaaS,
+5. better in user experience,
+6. more scalable for multiple company subscriptions,
+7. easier to implement and support.
+
+The most important business goal is this:
+
+THE SYSTEM MUST BECOME CONFIGURABLE BY COMPANY SUBSCRIPTION, SO MODULES AND FEATURES CAN BE ENABLED OR DISABLED BASED ON THE COMPANY’S PLAN.
+
+I want you to think like a serious B2B SaaS architect, not just a feature improver.
+
+================================
+IMPORTANT CONTEXT
+================================
+
+The current system already has:
+- enterprise HRMS breadth,
+- modular documentation,
+- approval workflow engine,
+- branch-scoped data access,
+- ESS and manager self-service,
+- attendance and shift complexity,
+- payroll and Saudi labor compliance orientation,
+- analytics and audit logging,
+- background jobs and clean architecture.
+
+But I want the next evolution to focus on:
+- subscription plans,
+- tenant/company configurability,
+- entitlement architecture,
+- dynamic UX based on enabled modules,
+- company setup maturity,
+- feature packaging,
+- operational safety when modules are disabled,
+- stronger productization.
+
+================================
+YOUR TASK
+================================
+
+Review the HRMS from business, product, UX, and platform architecture angles, then produce the output in PHASES ORDERED BY CRITICALITY.
+
+Do NOT give generic advice.
+Do NOT just restate the documents.
+Do NOT focus on code implementation first.
+Focus on business architecture, product architecture, operational safety, tenant configuration, UX simplification, and SaaS readiness.
+
+================================
+DELIVERABLE FORMAT
+================================
+
+Structure your response exactly in the following sections:
+
+# 1. Executive Assessment
+Give a direct and honest assessment of the current HRMS:
+- what is already strong,
+- what is missing,
+- what will block scale if left unresolved,
+- what is the single most important strategic gap.
+
+# 2. Criticality-Based Phases
+Split the roadmap into phases in this exact order:
+
+## Phase 0 - Foundational Risks and Blocking Gaps
+These are issues that must be addressed before scaling or aggressive expansion.
+Focus on structural weaknesses that can create product confusion, commercial limitations, tenant inconsistency, weak UX, or unsafe module behavior.
+
+## Phase 1 - SaaS Productization and Subscription Architecture
+Focus on turning the system into a configurable SaaS product.
+This phase must include:
+- subscription plans,
+- module entitlements,
+- feature flags,
+- company-level enablement,
+- add-ons,
+- plan-based limits,
+- downgrade/upgrade behavior,
+- dependency rules between modules.
+
+## Phase 2 - Tenant Configuration and Policy Framework
+Focus on:
+- company settings,
+- branch overrides,
+- department overrides,
+- inheritance model,
+- policy templates,
+- setup completeness,
+- onboarding wizard for new companies,
+- tenant administration console.
+
+## Phase 3 - UX Simplification and Adaptive Experience
+Focus on:
+- dynamic navigation,
+- entitlement-aware dashboards,
+- persona-based UX,
+- module-aware empty states,
+- unified inbox,
+- simpler employee and manager journeys,
+- reducing cognitive overload.
+
+## Phase 4 - Operational Strength and Enterprise Readiness
+Focus on:
+- safe module deactivation,
+- job scheduling awareness by subscription,
+- audit and entitlement traceability,
+- data retention/read-only mode,
+- cross-module dependency handling,
+- implementation and supportability.
+
+## Phase 5 - Revenue Expansion and Differentiation
+Focus on:
+- packaging strategy,
+- industry templates,
+- simple vs advanced mode,
+- cross-sell opportunities,
+- premium analytics,
+- enterprise add-ons,
+- integration strategy,
+- regional expansion logic.
+
+# 3. For Each Phase, Provide These Subsections
+For every phase above, include:
+
+### Objective
+What this phase achieves.
+
+### Why It Is Critical
+Why this phase matters now.
+
+### Problems It Solves
+Concrete problems in the current HRMS/business model/UX.
+
+### Recommended Enhancements
+Specific, high-value recommendations.
+
+### Key Business Rules
+Business rules that must exist.
+
+### UX Implications
+How the user experience should change.
+
+### Platform / Architecture Implications
+What platform-level capabilities are needed.
+
+### Risks If Ignored
+What happens if we skip this phase.
+
+### Priority Level
+Use one of:
+- Critical
+- High
+- Medium
+- Strategic
+
+# 4. Subscription & Entitlement Model Proposal
+Create a concrete recommended model for:
+- base plans,
+- add-on modules,
+- feature-level entitlements,
+- usage-based limits,
+- trial features,
+- enterprise-only capabilities.
+
+Distinguish clearly between:
+- module,
+- feature,
+- configuration,
+- permission,
+- data scope.
+
+Explain how they differ and how they should work together.
+
+# 5. Tenant Configuration Framework
+Define a recommended configuration hierarchy such as:
+- platform defaults,
+- plan defaults,
+- company defaults,
+- branch overrides,
+- department overrides,
+- employee overrides where needed.
+
+Then explain how this would apply to examples such as:
+- attendance,
+- leave,
+- approvals,
+- payroll,
+- mobile attendance,
+- performance.
+
+# 6. Module Dependency Matrix
+List important module dependencies and explain rules such as:
+- required dependency,
+- optional dependency,
+- recommended dependency,
+- restricted behavior when dependency is missing.
+
+Include examples across:
+- attendance,
+- shifts,
+- mobile attendance,
+- leave,
+- approvals,
+- payroll,
+- onboarding/offboarding,
+- recruitment,
+- performance,
+- assets,
+- analytics.
+
+# 7. Safe Module Enable/Disable Strategy
+Explain exactly how the system should behave when a module is:
+- not included in a plan,
+- included but disabled,
+- disabled after having historical data,
+- re-enabled later,
+- required by another module.
+
+Address:
+- menus,
+- APIs,
+- jobs,
+- reports,
+- mobile app behavior,
+- workflow instances,
+- notifications,
+- historical data,
+- exports,
+- audit logs.
+
+# 8. Recommended New Platform-Level Modules or Documents
+Propose what new top-level business documents/modules should be created next.
+Examples may include:
+- Subscription & Entitlements
+- Tenant Configuration
+- Settings Framework
+- Billing & Packaging
+- Module Dependency Rules
+- Setup Wizard
+- Feature Flag Governance
+- Data Retention & Archiving
+- Integration Architecture
+
+For each proposed document, explain why it matters.
+
+# 9. Top 15 Highest-Impact Recommendations
+Rank the 15 best improvements across business, UX, and architecture.
+For each one provide:
+- title,
+- impact,
+- effort,
+- why it matters,
+- recommended phase.
+
+# 10. Final Recommendation
+End with:
+- the first thing I should do next,
+- the biggest mistake to avoid,
+- the strongest future-state vision for this HRMS.
+
+================================
+QUALITY BAR
+================================
+
+Your response must be:
+- opinionated,
+- structured,
+- critical where needed,
+- commercially aware,
+- UX-aware,
+- SaaS-aware,
+- enterprise-aware,
+- practical.
+
+Avoid shallow statements like “improve usability” unless followed by specific mechanisms.
+
+Push hard on the distinction between:
+- permissions vs entitlements,
+- tenant vs branch,
+- purchased capability vs enabled capability vs configured behavior.
+
+Call out any architectural assumptions that should be corrected if they weaken SaaS scalability.
+
+Treat this as a serious business-product architecture review for a platform that should become one of the strongest HRMS products in its market.

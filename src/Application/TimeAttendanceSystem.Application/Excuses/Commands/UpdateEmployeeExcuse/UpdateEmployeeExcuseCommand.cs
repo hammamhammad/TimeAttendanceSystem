@@ -1,9 +1,12 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Excuses;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Excuses;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.Excuses.Commands.UpdateEmployeeExcuse;
+namespace TecAxle.Hrms.Application.Excuses.Commands.UpdateEmployeeExcuse;
 
+[RequiresModule(SystemModule.LeaveManagement)]
 public record UpdateEmployeeExcuseCommand(
     long Id,
     DateTime ExcuseDate,

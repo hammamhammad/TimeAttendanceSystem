@@ -1,7 +1,7 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Permissions.Queries.GetPermissions;
+namespace TecAxle.Hrms.Application.Permissions.Queries.GetPermissions;
 
 public record GetPermissionsQuery(
     string? Group = null

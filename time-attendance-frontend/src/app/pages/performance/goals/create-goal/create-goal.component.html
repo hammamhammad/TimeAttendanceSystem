@@ -1,0 +1,25 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header [title]="i18n.t('goals.create')" moduleName="goals" moduleRoute="performance/goals" />
+  @if (loading()) { <div class="text-center py-5"><app-loading-spinner [message]="i18n.t('common.loading')" [variant]="'primary'" [centered]="true" /></div> }
+  @if (!loading()) {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <app-form-section [title]="i18n.t('common.basic_info')" [variant]="'modern'">
+        <div class="row g-3">
+          <div class="col-md-6"><div class="app-modern-field"><label class="app-modern-label">{{ i18n.t('fields.employee') }} <span class="text-danger">*</span></label><app-searchable-select [options]="employeeOptions" [placeholder]="i18n.t('common.select_employee')" [value]="form.get('employeeId')?.value" (selectionChange)="form.get('employeeId')?.setValue($event)" /></div></div>
+          <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" id="title" formControlName="title" placeholder="x"><label for="title">{{ i18n.t('goals.goal_title') }} <span class="text-danger">*</span></label></div></div>
+          <div class="col-md-6"><div class="app-modern-field"><label class="app-modern-label">{{ i18n.t('goals.category') }} <span class="text-danger">*</span></label><app-searchable-select [options]="goalTypeOptions()" [value]="form.get('goalType')?.value" (selectionChange)="form.get('goalType')?.setValue($event)" /></div></div>
+          <div class="col-md-6"><div class="app-modern-field"><label class="app-modern-label">{{ i18n.t('goals.priority') }} <span class="text-danger">*</span></label><app-searchable-select [options]="priorityOptions()" [value]="form.get('priority')?.value" (selectionChange)="form.get('priority')?.setValue($event)" /></div></div>
+          <div class="col-md-4"><div class="form-floating"><input type="number" class="form-control" id="weight" formControlName="weight" placeholder="x" min="1" max="100"><label for="weight">{{ i18n.t('goals.weight') }} (%) <span class="text-danger">*</span></label></div></div>
+          <div class="col-md-4"><div class="form-floating"><input type="date" class="form-control" id="dueDate" formControlName="dueDate" placeholder="x"><label for="dueDate">{{ i18n.t('goals.target_date') }}</label></div></div>
+          <div class="col-md-4"><div class="form-floating"><input type="text" class="form-control" id="targetValue" formControlName="targetValue" placeholder="x"><label for="targetValue">{{ i18n.t('goals.target_value') }}</label></div></div>
+          <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" id="unit" formControlName="unit" placeholder="x"><label for="unit">{{ i18n.t('goals.measurement_unit') }}</label></div></div>
+          <div class="col-12"><div class="form-floating"><textarea class="form-control" id="description" formControlName="description" placeholder="x" style="height: 80px"></textarea><label for="description">{{ i18n.t('goals.description') }}</label></div></div>
+        </div>
+      </app-form-section>
+      <div class="app-form-actions">
+        <button type="button" class="btn btn-secondary" routerLink="/performance/goals">{{ i18n.t('common.cancel') }}</button>
+        <button type="submit" class="btn btn-primary" [disabled]="form.invalid || submitting()">@if (submitting()) { <span class="spinner-border spinner-border-sm me-1"></span> }{{ i18n.t('common.save') }}</button>
+      </div>
+    </form>
+  }
+</div>

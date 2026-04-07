@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Users;
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Users;
+using TecAxle.Hrms.Domain.Common;
 using System.Security.Cryptography;
 
-namespace TimeAttendanceSystem.Application.Authorization.Commands.Login;
+namespace TecAxle.Hrms.Application.Authorization.Commands.Login;
 
 /// <summary>
 /// Handles user authentication requests with comprehensive security features.
@@ -170,8 +170,13 @@ public class LoginCommandHandler : BaseHandler<LoginCommand, Result<LoginRespons
         // Extract branch access scope for multi-tenant security
         var branchIds = user.UserBranchScopes.Select(ubs => ubs.BranchId).ToList();
 
+        // Resolve tenant from user's branch scope
+        var tenantId = user.UserBranchScopes
+            .Select(ubs => ubs.Branch?.TenantId)
+            .FirstOrDefault(tid => tid.HasValue && tid.Value > 0);
+
         // Generate JWT access and refresh tokens with user claims
-        var accessToken = _tokenGenerator.GenerateAccessToken(user, roles, permissions, branchIds, request.RememberMe);
+        var accessToken = _tokenGenerator.GenerateAccessToken(user, roles, permissions, branchIds, tenantId, request.RememberMe);
         var refreshToken = _tokenGenerator.GenerateRefreshToken();
         var expiresAt = _tokenGenerator.GetTokenExpiration(request.RememberMe);
 
@@ -184,7 +189,7 @@ public class LoginCommandHandler : BaseHandler<LoginCommand, Result<LoginRespons
         }
 
         // Store refresh token for secure token rotation
-        var refreshTokenEntity = new TimeAttendanceSystem.Domain.Users.RefreshToken
+        var refreshTokenEntity = new TecAxle.Hrms.Domain.Users.RefreshToken
         {
             UserId = user.Id,
             Token = refreshToken,

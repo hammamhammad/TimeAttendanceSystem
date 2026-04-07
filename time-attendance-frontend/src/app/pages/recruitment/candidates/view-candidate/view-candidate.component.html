@@ -1,0 +1,28 @@
+<div class="container-fluid app-modern-view">
+  <app-form-header mode="view" [title]="i18n.t('candidates.view')" moduleName="candidates" moduleRoute="recruitment/candidates" [entityId]="item()?.id" [loading]="loading()" />
+  @if (loading()) { <div class="text-center py-5"><app-loading-spinner [message]="i18n.t('common.loading')" [variant]="'primary'" [centered]="true" /></div> }
+  @if (error()) { <div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>{{ error() }}</div> }
+  @if (item() && !loading()) {
+    <div class="row g-4">
+      <div class="col-12"><div class="d-flex align-items-center gap-2 mb-3"><span class="fw-medium">{{ i18n.t('fields.status') }}:</span><app-status-badge [status]="statusBadge().label" [variant]="statusBadge().variant" /></div></div>
+      <div class="col-lg-6"><app-section-card [title]="i18n.t('candidates.personal_info')"><app-definition-list [items]="personalItems()" [labelWidth]="'5'" [valueWidth]="'7'" /></app-section-card></div>
+      <div class="col-lg-6">
+        <app-section-card [title]="i18n.t('files.upload_resume')">
+          <app-file-upload
+            [label]="i18n.t('files.upload_resume')"
+            [category]="'resumes'"
+            [accept]="'.pdf,.doc,.docx'"
+            [currentFileUrl]="item()?.resumeUrl"
+            [entityType]="'Candidate'"
+            [entityId]="item()?.id"
+            [fieldName]="'resumeUrl'"
+            (fileUploaded)="onResumeUploaded($event)">
+          </app-file-upload>
+        </app-section-card>
+      </div>
+      @if (item()?.skills) { <div class="col-lg-6"><app-section-card [title]="i18n.t('candidates.skills')"><p class="mb-0" style="white-space: pre-wrap;">{{ item()?.skills }}</p></app-section-card></div> }
+      @if (item()?.notes) { <div class="col-12"><app-section-card [title]="i18n.t('candidates.notes')"><p class="mb-0" style="white-space: pre-wrap;">{{ item()?.notes }}</p></app-section-card></div> }
+      <div class="col-12"><app-section-card [title]="i18n.t('history.title')" icon="fas fa-clock-rotate-left" headerClass="bg-light"><app-audit-history [entityName]="'Candidate'" [entityId]="item()?.id" /></app-section-card></div>
+    </div>
+  }
+</div>

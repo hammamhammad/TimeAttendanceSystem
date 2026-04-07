@@ -1,0 +1,70 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header [title]="isEdit() ? i18n.t('company_policies.edit') : i18n.t('company_policies.create')" moduleName="company-policies" moduleRoute="documents/company-policies" [loading]="saving()" />
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <app-form-section [title]="i18n.t('company_policies.basic_info')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="title" placeholder="Title" formControlName="title">
+            <label for="title">{{ i18n.t('company_policies.title_field') }} *</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="titleAr" placeholder="Title AR" formControlName="titleAr">
+            <label for="titleAr">{{ i18n.t('company_policies.title_ar') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('company_policies.category') }}</label>
+            <app-searchable-select [options]="categoryOptions" [placeholder]="i18n.t('common.select')" [value]="form.get('documentCategoryId')?.value" (selectionChange)="form.get('documentCategoryId')?.setValue($event)" />
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="version" placeholder="Version" formControlName="version">
+            <label for="version">{{ i18n.t('company_policies.version') }} *</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="effectiveDate" placeholder="Date" formControlName="effectiveDate">
+            <label for="effectiveDate">{{ i18n.t('company_policies.effective_date') }} *</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="expiryDate" placeholder="Date" formControlName="expiryDate">
+            <label for="expiryDate">{{ i18n.t('company_policies.expiry_date') }}</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-floating">
+            <textarea class="form-control" id="description" placeholder="Description" formControlName="description" style="height:80px"></textarea>
+            <label for="description">{{ i18n.t('common.description') }}</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="ackRequired" formControlName="requiresAcknowledgment">
+            <label class="form-check-label" for="ackRequired">{{ i18n.t('company_policies.acknowledgment_required') }}</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <label class="form-label">{{ i18n.t('company_policies.file') }}</label>
+          <app-file-upload [accept]="'.pdf,.doc,.docx'" [maxSizeMB]="10" (fileUploaded)="onFileUploaded($event)" />
+        </div>
+      </div>
+    </app-form-section>
+
+    <div class="app-form-actions">
+      <button type="button" class="btn btn-secondary" routerLink="/documents/company-policies">{{ i18n.t('common.cancel') }}</button>
+      <button type="submit" class="btn btn-primary" [disabled]="saving()">
+        @if (saving()) { <i class="fas fa-spinner fa-spin me-1"></i> }
+        {{ i18n.t('common.save') }}
+      </button>
+    </div>
+  </form>
+</div>

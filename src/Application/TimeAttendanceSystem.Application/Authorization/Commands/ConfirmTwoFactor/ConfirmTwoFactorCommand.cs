@@ -1,6 +1,6 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Authorization.Commands.ConfirmTwoFactor;
+namespace TecAxle.Hrms.Application.Authorization.Commands.ConfirmTwoFactor;
 
 public record ConfirmTwoFactorCommand(string Code) : IRequest<Result<bool>>;

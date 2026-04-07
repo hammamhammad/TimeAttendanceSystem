@@ -1,0 +1,65 @@
+<div class="app-list-page">
+  <app-page-header [title]="i18n.t('training_categories.title')" />
+  <app-unified-filter [searchPlaceholder]="i18n.t('training_categories.search')" [showRefreshButton]="true" [refreshing]="loading()"
+    [showAddButton]="true" [addButtonText]="i18n.t('training_categories.create')"
+    (add)="openCreateModal()" (searchChange)="onSearchChange($event)" (refresh)="onRefreshData()" />
+
+  <app-data-table [data]="data()" [columns]="columns" [actions]="tableActions()" [currentPage]="currentPage()"
+    [totalPages]="totalPages()" [totalItems]="totalCount()" [pageSize]="pageSize()" [loading]="loading"
+    [emptyTitle]="i18n.t('training_categories.no_data')" [showPagination]="true"
+    (actionClick)="onActionClick($event)" (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)">
+    <ng-template #cellTemplate let-item let-column="column">
+      @if (column.key === 'isActive') {
+        <span class="badge" [class.bg-success]="item.isActive" [class.bg-secondary]="!item.isActive">
+          {{ item.isActive ? i18n.t('common.active') : i18n.t('common.inactive') }}
+        </span>
+      } @else {
+        {{ item[column.key] ?? '-' }}
+      }
+    </ng-template>
+  </app-data-table>
+</div>
+
+<!-- Modal -->
+@if (showModal()) {
+  <div class="modal fade show d-block" tabindex="-1" style="background:rgba(0,0,0,0.5)">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ editingId() ? i18n.t('training_categories.edit') : i18n.t('training_categories.create') }}</h5>
+          <button type="button" class="btn-close" (click)="closeModal()"></button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="form">
+            <div class="mb-3">
+              <label class="form-label">{{ i18n.t('training_categories.name') }} *</label>
+              <input type="text" class="form-control" formControlName="name">
+              @if (form.get('name')?.touched && form.get('name')?.hasError('required')) {
+                <div class="invalid-feedback d-block">{{ i18n.t('common.required') }}</div>
+              }
+            </div>
+            <div class="mb-3">
+              <label class="form-label">{{ i18n.t('training_categories.name_ar') }}</label>
+              <input type="text" class="form-control" formControlName="nameAr" dir="rtl">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">{{ i18n.t('common.description') }}</label>
+              <textarea class="form-control" formControlName="description" rows="3"></textarea>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" formControlName="isActive" id="isActive">
+              <label class="form-check-label" for="isActive">{{ i18n.t('common.active') }}</label>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">{{ i18n.t('common.cancel') }}</button>
+          <button type="button" class="btn btn-primary" (click)="onSave()" [disabled]="saving()">
+            @if (saving()) { <span class="spinner-border spinner-border-sm me-2"></span> }
+            {{ i18n.t('common.save') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.PublicHolidays.Queries.GetPublicHolidays;
+namespace TecAxle.Hrms.Application.PublicHolidays.Queries.GetPublicHolidays;
 
 /// <summary>
 /// Query handler for retrieving paginated public holidays with comprehensive filtering.

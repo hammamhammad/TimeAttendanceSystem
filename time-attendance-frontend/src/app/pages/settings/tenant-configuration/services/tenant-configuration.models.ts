@@ -1,0 +1,159 @@
+// ── Tenant Settings ──────────────────────────────────────────
+export interface TenantSettingsDto {
+  id: number;
+  tenantId: number;
+  // General
+  fiscalYearStartMonth: string;
+  weekStartDay: string;
+  dateFormat: string;
+  timeFormat: string;
+  numberFormat: string;
+  // Attendance
+  enableGpsAttendance: boolean;
+  enableNfcAttendance: boolean;
+  enableBiometricAttendance: boolean;
+  enableManualAttendance: boolean;
+  autoCheckOutEnabled: boolean;
+  autoCheckOutTime: string | null;
+  lateGracePeriodMinutes: number;
+  earlyLeaveGracePeriodMinutes: number;
+  trackBreakTime: boolean;
+  minimumWorkingHoursForPresent: number;
+  // Leave
+  allowNegativeLeaveBalance: boolean;
+  requireAttachmentForSickLeave: boolean;
+  minDaysBeforeLeaveRequest: number;
+  allowHalfDayLeave: boolean;
+  allowLeaveEncashment: boolean;
+  leaveYearStart: string | null;
+  // Payroll
+  payrollCutOffDay: number;
+  payrollCurrency: string | null;
+  enableEndOfServiceCalc: boolean;
+  salaryCalculationBasis: string;
+  // Approval
+  autoApproveAfterTimeout: boolean;
+  defaultApprovalTimeoutHours: number;
+  allowSelfApproval: boolean;
+  requireApprovalComments: boolean;
+  // Notification
+  enableEmailNotifications: boolean;
+  enablePushNotifications: boolean;
+  enableSmsNotifications: boolean;
+  notifyManagerOnLeaveRequest: boolean;
+  notifyEmployeeOnApproval: boolean;
+  dailyAttendanceSummaryEnabled: boolean;
+  // Mobile
+  mobileCheckInEnabled: boolean;
+  requireNfcForMobile: boolean;
+  requireGpsForMobile: boolean;
+  allowMockLocation: boolean;
+  // Security
+  passwordExpiryDays: number;
+  maxLoginAttempts: number;
+  sessionTimeoutMinutes: number;
+  require2FA: boolean;
+  passwordHistoryCount: number;
+}
+
+// ── Branch Settings Override ─────────────────────────────────
+export interface BranchSettingsOverrideDto {
+  id: number;
+  branchId: number;
+  enableGpsAttendance: boolean | null;
+  enableNfcAttendance: boolean | null;
+  enableBiometricAttendance: boolean | null;
+  enableManualAttendance: boolean | null;
+  autoCheckOutEnabled: boolean | null;
+  autoCheckOutTime: string | null;
+  lateGracePeriodMinutes: number | null;
+  earlyLeaveGracePeriodMinutes: number | null;
+  trackBreakTime: boolean | null;
+  minimumWorkingHoursForPresent: number | null;
+  mobileCheckInEnabled: boolean | null;
+  requireNfcForMobile: boolean | null;
+  requireGpsForMobile: boolean | null;
+}
+
+// ── Resolved Settings ────────────────────────────────────────
+export interface ResolvedSettingsDto extends TenantSettingsDto {
+  branchId: number | null;
+  departmentId: number | null;
+  defaultShiftId: number | null;
+  sources: Record<string, string>;
+}
+
+// ── Policy Templates ─────────────────────────────────────────
+export interface PolicyTemplateDto {
+  id: number;
+  code: string;
+  name: string;
+  nameAr: string | null;
+  description: string | null;
+  descriptionAr: string | null;
+  region: string;
+  industry: string | null;
+  isSystemTemplate: boolean;
+  isActive: boolean;
+  itemCount: number;
+  items: PolicyTemplateItemDto[];
+}
+
+export interface PolicyTemplateItemDto {
+  id: number;
+  policyType: string;
+  configurationJson: string;
+  sortOrder: number;
+}
+
+export interface CreatePolicyTemplateRequest {
+  code: string;
+  name: string;
+  nameAr: string | null;
+  description: string | null;
+  descriptionAr: string | null;
+  region: string;
+  industry: string | null;
+  items: { policyType: string; configurationJson: string; sortOrder: number }[];
+}
+
+export interface UpdatePolicyTemplateRequest {
+  id: number;
+  name: string;
+  nameAr: string | null;
+  description: string | null;
+  descriptionAr: string | null;
+  region: string;
+  industry: string | null;
+  items: { policyType: string; configurationJson: string; sortOrder: number }[];
+}
+
+// ── Setup Status ─────────────────────────────────────────────
+export interface SetupStatusDto {
+  tenantId: number;
+  totalSteps: number;
+  completedSteps: number;
+  requiredSteps: number;
+  completedRequiredSteps: number;
+  completionPercentage: number;
+  nextRecommendedStep: string | null;
+  steps: SetupStepDto[];
+  categories: SetupCategoryDto[];
+}
+
+export interface SetupStepDto {
+  id: number;
+  stepKey: string;
+  category: string;
+  isCompleted: boolean;
+  completedAtUtc: string | null;
+  isRequired: boolean;
+  sortOrder: number;
+}
+
+export interface SetupCategoryDto {
+  category: string;
+  total: number;
+  completed: number;
+  percentage: number;
+}

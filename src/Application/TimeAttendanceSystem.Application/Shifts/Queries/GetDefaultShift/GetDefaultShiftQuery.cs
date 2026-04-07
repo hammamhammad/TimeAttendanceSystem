@@ -1,9 +1,12 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Shifts.Queries.GetShifts;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Shifts.Queries.GetShifts;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.Shifts.Queries.GetDefaultShift;
+namespace TecAxle.Hrms.Application.Shifts.Queries.GetDefaultShift;
 
+[RequiresModule(SystemModule.TimeAttendance, AllowReadWhenDisabled = true)]
 public class GetDefaultShiftQuery : IRequest<Result<ShiftDto?>>
 {
 }

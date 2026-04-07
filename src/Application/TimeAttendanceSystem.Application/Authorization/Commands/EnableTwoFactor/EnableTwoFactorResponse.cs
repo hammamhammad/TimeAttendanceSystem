@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Application.Authorization.Commands.EnableTwoFactor;
+namespace TecAxle.Hrms.Application.Authorization.Commands.EnableTwoFactor;
 
 public record EnableTwoFactorResponse(
     string SecretKey,

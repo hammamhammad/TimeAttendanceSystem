@@ -1,9 +1,9 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Excuses.Commands.ToggleExcusePolicyStatus;
+namespace TecAxle.Hrms.Application.Excuses.Commands.ToggleExcusePolicyStatus;
 
 /// <summary>
 /// Command handler for toggling excuse policy active status.

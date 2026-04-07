@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace TimeAttendanceSystem.Application.Employees.Commands.ToggleEmployeeStatus;
+namespace TecAxle.Hrms.Application.Employees.Commands.ToggleEmployeeStatus;
 
 /// <summary>
 /// Validator for ToggleEmployeeStatusCommand

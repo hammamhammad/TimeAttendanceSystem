@@ -1,16 +1,16 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TimeAttendanceSystem.Application.Workflows.Commands.ActivateWorkflowDefinition;
-using TimeAttendanceSystem.Application.Workflows.Commands.CreateWorkflowDefinition;
-using TimeAttendanceSystem.Application.Workflows.Commands.DeleteWorkflowDefinition;
-using TimeAttendanceSystem.Application.Workflows.Commands.UpdateWorkflowDefinition;
-using TimeAttendanceSystem.Application.Workflows.Queries.GetWorkflowDefinitionById;
-using TimeAttendanceSystem.Application.Workflows.Queries.GetWorkflowDefinitions;
-using TimeAttendanceSystem.Application.Workflows.Queries.GetWorkflowInstance;
-using TimeAttendanceSystem.Domain.Workflows.Enums;
+using TecAxle.Hrms.Application.Workflows.Commands.ActivateWorkflowDefinition;
+using TecAxle.Hrms.Application.Workflows.Commands.CreateWorkflowDefinition;
+using TecAxle.Hrms.Application.Workflows.Commands.DeleteWorkflowDefinition;
+using TecAxle.Hrms.Application.Workflows.Commands.UpdateWorkflowDefinition;
+using TecAxle.Hrms.Application.Workflows.Queries.GetWorkflowDefinitionById;
+using TecAxle.Hrms.Application.Workflows.Queries.GetWorkflowDefinitions;
+using TecAxle.Hrms.Application.Workflows.Queries.GetWorkflowInstance;
+using TecAxle.Hrms.Domain.Workflows.Enums;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 /// <summary>
 /// Controller for managing workflow definitions.

@@ -1,0 +1,129 @@
+.filters-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filter-group select {
+  min-width: 160px;
+}
+
+.filter-count {
+  font-size: 13px;
+}
+
+.templates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.template-card {
+  background: #fff;
+  border: 1px solid var(--app-gray-200, #EAECF0);
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.template-card:hover {
+  border-color: var(--app-primary, #4F6BF6);
+  box-shadow: var(--app-shadow-md, 0 4px 8px rgba(16,24,40,0.1));
+}
+
+.template-card.system {
+  border-left: 3px solid var(--app-primary, #4F6BF6);
+}
+
+.template-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.template-badges {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.badge-region {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 12px;
+  background: var(--app-gray-100, #F2F4F7);
+  color: var(--app-gray-700, #344054);
+}
+
+.badge-industry {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 10px;
+  border-radius: 12px;
+  background: var(--app-info-50, #EFF6FF);
+  color: var(--app-info, #3B82F6);
+}
+
+.badge-system {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: var(--app-primary-50, #EEF0FF);
+  color: var(--app-primary, #4F6BF6);
+  font-weight: 500;
+}
+
+.template-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--app-gray-900, #101828);
+  margin: 0 0 8px;
+}
+
+.template-desc {
+  font-size: 13px;
+  color: var(--app-gray-500, #667085);
+  margin: 0 0 12px;
+  line-height: 1.5;
+  flex: 1;
+}
+
+.template-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.meta-item {
+  font-size: 12px;
+  color: var(--app-gray-500, #667085);
+}
+
+.template-items {
+  border-top: 1px solid var(--app-gray-200, #EAECF0);
+  padding-top: 12px;
+}
+
+.template-item {
+  display: flex;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 13px;
+  color: var(--app-gray-700, #344054);
+}
+
+.template-item i {
+  width: 20px;
+  text-align: center;
+  color: var(--app-gray-400, #98A2B3);
+}
+
+.template-actions {
+  display: flex;
+  gap: 8px;
+}

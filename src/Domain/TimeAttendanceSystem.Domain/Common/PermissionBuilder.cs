@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.Users;
+using TecAxle.Hrms.Domain.Users;
 
-namespace TimeAttendanceSystem.Domain.Common;
+namespace TecAxle.Hrms.Domain.Common;
 
 public static class PermissionBuilder
 {

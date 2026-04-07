@@ -17,8 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Domain\TimeAttendanceSystem.Domain\TimeAttendanceSystem.Domain.csproj" />
-    <ProjectReference Include="..\..\Shared\TimeAttendanceSystem.Shared\TimeAttendanceSystem.Shared.csproj" />
+    <ProjectReference Include="..\..\Domain\TecAxle.Hrms.Domain\TecAxle.Hrms.Domain.csproj" />
+    <ProjectReference Include="..\..\Shared\TecAxle.Hrms.Shared\TecAxle.Hrms.Shared.csproj" />
   </ItemGroup>
 
 </Project>

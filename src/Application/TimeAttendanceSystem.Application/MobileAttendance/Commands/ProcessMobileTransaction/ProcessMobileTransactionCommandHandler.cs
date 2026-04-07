@@ -1,26 +1,31 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Attendance;
-using TimeAttendanceSystem.Domain.Branches;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.TenantConfiguration.Dtos;
+using TecAxle.Hrms.Domain.Attendance;
+using TecAxle.Hrms.Domain.Branches;
 
-namespace TimeAttendanceSystem.Application.MobileAttendance.Commands.ProcessMobileTransaction;
+namespace TecAxle.Hrms.Application.MobileAttendance.Commands.ProcessMobileTransaction;
 
 /// <summary>
 /// Handler for processing mobile attendance transactions with dual verification (GPS + NFC).
 /// Validates GPS geofence, NFC tag, and creates audit logs for all attempts.
+/// GPS and NFC requirements are configurable via TenantSettings and BranchSettingsOverride.
 /// </summary>
 public class ProcessMobileTransactionCommandHandler : BaseHandler<ProcessMobileTransactionCommand, Result<MobileTransactionResult>>
 {
     private readonly INfcTagEncryptionService _encryptionService;
+    private readonly ITenantSettingsResolver? _tenantSettingsResolver;
 
     public ProcessMobileTransactionCommandHandler(
         IApplicationDbContext context,
         ICurrentUser currentUser,
-        INfcTagEncryptionService encryptionService)
+        INfcTagEncryptionService encryptionService,
+        ITenantSettingsResolver? tenantSettingsResolver = null)
         : base(context, currentUser)
     {
         _encryptionService = encryptionService;
+        _tenantSettingsResolver = tenantSettingsResolver;
     }
 
     public override async Task<Result<MobileTransactionResult>> Handle(ProcessMobileTransactionCommand request, CancellationToken cancellationToken)
@@ -49,74 +54,99 @@ public class ProcessMobileTransactionCommandHandler : BaseHandler<ProcessMobileT
             return CreateFailureResult("Employee not found");
         }
 
-        // ==== GPS GEOFENCE VERIFICATION ====
-        double? distanceFromBranch = null;
-        if (!branch.Latitude.HasValue || !branch.Longitude.HasValue)
+        // ==== RESOLVE TENANT SETTINGS FOR MOBILE CHECK-IN ====
+        ResolvedSettingsDto? resolvedSettings = null;
+        if (_tenantSettingsResolver != null && branch.TenantId > 0)
+        {
+            try { resolvedSettings = await _tenantSettingsResolver.GetSettingsAsync(branch.TenantId, branch.Id, ct: cancellationToken); }
+            catch { /* Fall back to requiring both GPS and NFC if resolver fails */ }
+        }
+
+        var requireGps = resolvedSettings?.RequireGpsForMobile ?? true;
+        var requireNfc = resolvedSettings?.RequireNfcForMobile ?? false;
+        var mobileEnabled = resolvedSettings?.MobileCheckInEnabled ?? true;
+
+        if (!mobileEnabled)
         {
             await LogVerificationAttempt(request, attemptedAt, VerificationStatus.Failed,
                 VerificationFailureReason.BranchNotConfigured, null, cancellationToken);
-            return CreateFailureResult("Branch GPS coordinates not configured");
+            return CreateFailureResult("Mobile check-in is not enabled for this organization");
         }
 
-        distanceFromBranch = CalculateDistance(
-            request.DeviceLatitude, request.DeviceLongitude,
-            branch.Latitude.Value, branch.Longitude.Value);
-
-        if (distanceFromBranch > branch.GeofenceRadiusMeters)
+        // ==== GPS GEOFENCE VERIFICATION (if required by TenantSettings) ====
+        double? distanceFromBranch = null;
+        if (requireGps)
         {
-            await LogVerificationAttempt(request, attemptedAt, VerificationStatus.Failed,
-                VerificationFailureReason.GpsOutsideGeofence, distanceFromBranch, cancellationToken);
-            return CreateFailureResult($"You are {distanceFromBranch:F0} meters away from the branch. Maximum allowed: {branch.GeofenceRadiusMeters} meters");
+            if (!branch.Latitude.HasValue || !branch.Longitude.HasValue)
+            {
+                await LogVerificationAttempt(request, attemptedAt, VerificationStatus.Failed,
+                    VerificationFailureReason.BranchNotConfigured, null, cancellationToken);
+                return CreateFailureResult("Branch GPS coordinates not configured");
+            }
+
+            distanceFromBranch = CalculateDistance(
+                request.DeviceLatitude, request.DeviceLongitude,
+                branch.Latitude.Value, branch.Longitude.Value);
+
+            if (distanceFromBranch > branch.GeofenceRadiusMeters)
+            {
+                await LogVerificationAttempt(request, attemptedAt, VerificationStatus.Failed,
+                    VerificationFailureReason.GpsOutsideGeofence, distanceFromBranch, cancellationToken);
+                return CreateFailureResult($"You are {distanceFromBranch:F0} meters away from the branch. Maximum allowed: {branch.GeofenceRadiusMeters} meters");
+            }
         }
 
-        // ==== NFC TAG VERIFICATION ====
-        if (string.IsNullOrWhiteSpace(request.NfcTagUid))
+        // ==== NFC TAG VERIFICATION (if NFC tag UID is provided or required) ====
+        NfcTag? nfcTag = null;
+        if (requireNfc && string.IsNullOrWhiteSpace(request.NfcTagUid))
         {
             await LogVerificationAttempt(request, attemptedAt, VerificationStatus.Failed,
                 VerificationFailureReason.GpsUnavailable, distanceFromBranch, cancellationToken);
             return CreateFailureResult("NFC tag scan is required");
         }
 
-        var nfcTag = await Context.NfcTags
-            .FirstOrDefaultAsync(t => t.TagUid == request.NfcTagUid, cancellationToken);
-
-        if (nfcTag == null)
+        if (!string.IsNullOrWhiteSpace(request.NfcTagUid))
         {
-            await LogVerificationAttempt(request, attemptedAt, VerificationStatus.Failed,
-                VerificationFailureReason.NfcTagNotRegistered, distanceFromBranch, cancellationToken);
-            return CreateFailureResult("NFC tag is not registered in the system");
-        }
+            nfcTag = await Context.NfcTags
+                .FirstOrDefaultAsync(t => t.TagUid == request.NfcTagUid, cancellationToken);
 
-        if (!nfcTag.IsActive)
-        {
-            await LogVerificationAttempt(request, attemptedAt, VerificationStatus.Failed,
-                VerificationFailureReason.NfcTagInactive, distanceFromBranch, cancellationToken);
-            return CreateFailureResult("NFC tag is inactive");
-        }
-
-        if (nfcTag.BranchId != request.BranchId)
-        {
-            await LogVerificationAttempt(request, attemptedAt, VerificationStatus.Failed,
-                VerificationFailureReason.NfcTagMismatch, distanceFromBranch, cancellationToken);
-            return CreateFailureResult("NFC tag does not belong to the selected branch");
-        }
-
-        // ==== NFC PAYLOAD VERIFICATION (Encrypted Tag Binding) ====
-        if (nfcTag.EncryptedPayload != null || _encryptionService.RequirePayload)
-        {
-            // Tag has been provisioned with encrypted payload - verify it
-            if (string.IsNullOrWhiteSpace(request.NfcPayload))
+            if (nfcTag == null)
             {
                 await LogVerificationAttempt(request, attemptedAt, VerificationStatus.Failed,
-                    VerificationFailureReason.NfcPayloadInvalid, distanceFromBranch, cancellationToken);
-                return CreateFailureResult("NFC payload is required for this tag");
+                    VerificationFailureReason.NfcTagNotRegistered, distanceFromBranch, cancellationToken);
+                return CreateFailureResult("NFC tag is not registered in the system");
             }
 
-            if (!_encryptionService.VerifyPayload(request.NfcPayload, nfcTag))
+            if (!nfcTag.IsActive)
             {
                 await LogVerificationAttempt(request, attemptedAt, VerificationStatus.Failed,
-                    VerificationFailureReason.NfcPayloadTampering, distanceFromBranch, cancellationToken);
-                return CreateFailureResult("NFC tag verification failed - possible tampering detected");
+                    VerificationFailureReason.NfcTagInactive, distanceFromBranch, cancellationToken);
+                return CreateFailureResult("NFC tag is inactive");
+            }
+
+            if (nfcTag.BranchId != request.BranchId)
+            {
+                await LogVerificationAttempt(request, attemptedAt, VerificationStatus.Failed,
+                    VerificationFailureReason.NfcTagMismatch, distanceFromBranch, cancellationToken);
+                return CreateFailureResult("NFC tag does not belong to the selected branch");
+            }
+
+            // ==== NFC PAYLOAD VERIFICATION (Encrypted Tag Binding) ====
+            if (nfcTag.EncryptedPayload != null || _encryptionService.RequirePayload)
+            {
+                if (string.IsNullOrWhiteSpace(request.NfcPayload))
+                {
+                    await LogVerificationAttempt(request, attemptedAt, VerificationStatus.Failed,
+                        VerificationFailureReason.NfcPayloadInvalid, distanceFromBranch, cancellationToken);
+                    return CreateFailureResult("NFC payload is required for this tag");
+                }
+
+                if (!_encryptionService.VerifyPayload(request.NfcPayload, nfcTag))
+                {
+                    await LogVerificationAttempt(request, attemptedAt, VerificationStatus.Failed,
+                        VerificationFailureReason.NfcPayloadTampering, distanceFromBranch, cancellationToken);
+                    return CreateFailureResult("NFC tag verification failed - possible tampering detected");
+                }
             }
         }
 
@@ -125,6 +155,7 @@ public class ProcessMobileTransactionCommandHandler : BaseHandler<ProcessMobileT
 
         // Convert UTC time to branch local timezone
         var localTime = ConvertToBranchLocalTime(attemptedAt, branch.TimeZone);
+        var verificationMethod = nfcTag != null ? "GPS+NFC" : (requireGps ? "GPS" : "Mobile");
 
         var transaction = new AttendanceTransaction
         {
@@ -135,7 +166,7 @@ public class ProcessMobileTransactionCommandHandler : BaseHandler<ProcessMobileT
             AttendanceDate = localTime.Date,
             IsManual = false,
             DeviceId = request.DeviceId,
-            Notes = $"Mobile check-in via GPS+NFC verification. Distance: {distanceFromBranch:F1}m",
+            Notes = $"Mobile check-in via {verificationMethod} verification. Distance: {distanceFromBranch?.ToString("F1") ?? "N/A"}m",
             Location = $"{request.DeviceLatitude},{request.DeviceLongitude}",
             CreatedAtUtc = attemptedAt,
             CreatedBy = CurrentUser.Username ?? "Mobile"
@@ -143,9 +174,12 @@ public class ProcessMobileTransactionCommandHandler : BaseHandler<ProcessMobileT
 
         Context.AttendanceTransactions.Add(transaction);
 
-        // Update NFC tag scan tracking
-        nfcTag.ScanCount++;
-        nfcTag.LastScannedAt = attemptedAt;
+        // Update NFC tag scan tracking (only if NFC was used)
+        if (nfcTag != null)
+        {
+            nfcTag.ScanCount++;
+            nfcTag.LastScannedAt = attemptedAt;
+        }
 
         // Log successful verification
         await LogVerificationAttempt(request, attemptedAt, VerificationStatus.Success,

@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Domain.Workflows.Enums;
+namespace TecAxle.Hrms.Domain.Workflows.Enums;
 
 /// <summary>
 /// Defines the possible actions that can be taken on a workflow step.

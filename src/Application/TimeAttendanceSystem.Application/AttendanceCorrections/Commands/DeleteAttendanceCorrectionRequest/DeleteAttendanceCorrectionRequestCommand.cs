@@ -1,7 +1,9 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.AttendanceCorrections.Commands.DeleteAttendanceCorrectionRequest;
+namespace TecAxle.Hrms.Application.AttendanceCorrections.Commands.DeleteAttendanceCorrectionRequest;
 
 /// <summary>
 /// CQRS command for deleting (soft delete) an attendance correction request.
@@ -21,4 +23,5 @@ namespace TimeAttendanceSystem.Application.AttendanceCorrections.Commands.Delete
 /// - Approved requests deletion requires recalculation
 /// - Rejected requests cannot be modified
 /// </remarks>
+[RequiresModule(SystemModule.TimeAttendance)]
 public record DeleteAttendanceCorrectionRequestCommand(long Id) : IRequest<Result<bool>>;

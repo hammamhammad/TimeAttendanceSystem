@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Application.Extensions;
+namespace TecAxle.Hrms.Application.Extensions;
 
 /// <summary>
 /// Extension methods for DateTime to handle PostgreSQL timestamp with time zone requirements.

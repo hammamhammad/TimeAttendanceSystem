@@ -1,0 +1,32 @@
+:host {
+  display: block;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cursor-pointer:hover {
+  border-color: var(--app-primary, #4F6BF6) !important;
+}
+
+.nav-tabs .nav-link {
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--app-gray-500, #667085);
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 10px 16px;
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--app-primary, #4F6BF6);
+  border-bottom-color: var(--app-primary, #4F6BF6);
+  background: transparent;
+}
+
+.nav-tabs .nav-link:hover:not(.active) {
+  color: var(--app-gray-700, #344054);
+  border-bottom-color: var(--app-gray-300, #D0D5DD);
+}

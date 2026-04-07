@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.RemoteWork;
+using TecAxle.Hrms.Domain.RemoteWork;
 
-namespace TimeAttendanceSystem.Application.Features.RemoteWorkRequests.Queries;
+namespace TecAxle.Hrms.Application.Features.RemoteWorkRequests.Queries;
 
 /// <summary>
 /// DTO for remote work request information.

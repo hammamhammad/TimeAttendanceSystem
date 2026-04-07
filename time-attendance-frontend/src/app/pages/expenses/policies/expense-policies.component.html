@@ -1,0 +1,23 @@
+<div class="app-list-page">
+  <app-page-header [title]="i18n.t('expense_policies.title')" />
+  <app-unified-filter [searchPlaceholder]="i18n.t('expense_policies.search')" [showAddButton]="true"
+    [addButtonText]="i18n.t('expense_policies.create')" [showRefreshButton]="true" [refreshing]="loading()"
+    (searchChange)="onSearchChange($event)" (add)="onAdd()" (refresh)="onRefreshData()" />
+
+  <app-data-table [data]="data()" [columns]="columns" [actions]="tableActions()" [currentPage]="currentPage()"
+    [totalPages]="totalPages()" [totalItems]="totalCount()" [pageSize]="pageSize()" [loading]="loading"
+    [emptyTitle]="i18n.t('expense_policies.no_data')" [showPagination]="true"
+    (actionClick)="onActionClick($event)" (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)">
+    <ng-template #cellTemplate let-item let-column="column">
+      @if (column.key === 'isActive') {
+        <span class="badge" [class.bg-success]="item.isActive" [class.bg-secondary]="!item.isActive">
+          {{ item.isActive ? i18n.t('common.active') : i18n.t('common.inactive') }}
+        </span>
+      } @else if (column.key === 'maxClaimAmount' || column.key === 'maxMonthlyAmount') {
+        {{ item[column.key]?.toFixed(2) ?? '-' }}
+      } @else {
+        {{ item[column.key] ?? '-' }}
+      }
+    </ng-template>
+  </app-data-table>
+</div>

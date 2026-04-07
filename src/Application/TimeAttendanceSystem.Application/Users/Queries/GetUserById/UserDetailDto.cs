@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.Users;
+using TecAxle.Hrms.Domain.Users;
 
-namespace TimeAttendanceSystem.Application.Users.Queries.GetUserById;
+namespace TecAxle.Hrms.Application.Users.Queries.GetUserById;
 
 public class UserDetailDto
 {

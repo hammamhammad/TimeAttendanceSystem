@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Domain.Attendance;
+namespace TecAxle.Hrms.Domain.Attendance;
 
 /// <summary>
 /// Enumeration defining the possible attendance status values for employees.

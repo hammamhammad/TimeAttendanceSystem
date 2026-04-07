@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Application.Sessions.Commands.TerminateSession;
+namespace TecAxle.Hrms.Application.Sessions.Commands.TerminateSession;
 
 public class TerminateSessionCommandHandler : BaseHandler<TerminateSessionCommand, Result<bool>>
 {

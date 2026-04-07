@@ -1,0 +1,106 @@
+@if (loading()) {
+  <app-loading-spinner />
+} @else if (templates().length === 0) {
+  <app-empty-state
+    icon="fa-solid fa-file-lines"
+    [title]="t('tenant_configuration.templates.empty_title')"
+    [message]="t('tenant_configuration.templates.empty_message')">
+  </app-empty-state>
+} @else {
+  <div class="templates-page">
+    <h4 class="mb-1">{{ t('tenant_configuration.templates.title') }}</h4>
+    <p class="text-muted mb-3">{{ t('tenant_configuration.templates.description') }}</p>
+
+    <!-- Filters -->
+    <div class="filters-row mb-4">
+      <div class="filter-group">
+        <select class="form-select form-select-sm" [ngModel]="regionFilter()" (ngModelChange)="regionFilter.set($event)">
+          <option value="">{{ t('tenant_configuration.templates.all_regions') }}</option>
+          @for (r of regions(); track r) {
+            <option [value]="r">{{ getRegionLabel(r) }}</option>
+          }
+        </select>
+      </div>
+      <div class="filter-group">
+        <select class="form-select form-select-sm" [ngModel]="industryFilter()" (ngModelChange)="industryFilter.set($event)">
+          <option value="">{{ t('tenant_configuration.templates.all_industries') }}</option>
+          @for (ind of industries(); track ind) {
+            <option [value]="ind">{{ ind }}</option>
+          }
+        </select>
+      </div>
+      @if (regionFilter() || industryFilter()) {
+        <button class="btn btn-sm btn-link" (click)="clearFilters()">
+          <i class="fa-solid fa-xmark me-1"></i>{{ t('common.clear') }}
+        </button>
+      }
+      <span class="text-muted ms-auto filter-count">
+        {{ filteredTemplates().length }} {{ t('tenant_configuration.templates.templates_count') }}
+      </span>
+    </div>
+
+    <div class="templates-grid">
+      @for (tpl of filteredTemplates(); track tpl.id) {
+        <div class="template-card" [class.system]="tpl.isSystemTemplate" [class.expanded]="isExpanded(tpl.id)">
+          <div class="template-header">
+            <div class="template-badges">
+              <span class="badge-region">{{ tpl.region }}</span>
+              @if (tpl.industry) {
+                <span class="badge-industry">{{ tpl.industry }}</span>
+              }
+            </div>
+            @if (tpl.isSystemTemplate) {
+              <span class="badge-system">{{ t('tenant_configuration.templates.system') }}</span>
+            }
+          </div>
+          <h5 class="template-name">{{ getLocalizedName(tpl) }}</h5>
+          <p class="template-desc">{{ getLocalizedDesc(tpl) }}</p>
+          <div class="template-meta">
+            <span class="meta-item">
+              <i class="fa-solid fa-layer-group me-1"></i>
+              {{ tpl.itemCount }} {{ t('tenant_configuration.templates.policies') }}
+            </span>
+            <button class="btn btn-sm btn-link p-0 ms-auto" (click)="toggleExpand(tpl.id)">
+              <i class="fa-solid" [class.fa-chevron-down]="!isExpanded(tpl.id)" [class.fa-chevron-up]="isExpanded(tpl.id)"></i>
+            </button>
+          </div>
+
+          <!-- Expanded Items -->
+          @if (isExpanded(tpl.id)) {
+            <div class="template-items mt-3">
+              @for (item of tpl.items; track item.id) {
+                <div class="template-item">
+                  <i class="fa-solid {{ getPolicyTypeIcon(item.policyType) }} me-2"></i>
+                  <span class="item-type">{{ getItemDisplayName(item) }}</span>
+                </div>
+              }
+            </div>
+          }
+
+          <div class="template-actions mt-3">
+            <button class="btn btn-primary btn-sm flex-fill"
+                    (click)="applyTemplate(tpl)"
+                    [disabled]="applying() === tpl.id">
+              @if (applying() === tpl.id) {
+                <span class="spinner-border spinner-border-sm me-1"></span>
+              }
+              <i class="fa-solid fa-wand-magic-sparkles me-1"></i>
+              {{ t('tenant_configuration.templates.apply') }}
+            </button>
+            @if (!tpl.isSystemTemplate) {
+              <button class="btn btn-outline-danger btn-sm"
+                      (click)="deleteTemplate(tpl)"
+                      [disabled]="deleting() === tpl.id">
+                @if (deleting() === tpl.id) {
+                  <span class="spinner-border spinner-border-sm"></span>
+                } @else {
+                  <i class="fa-solid fa-trash"></i>
+                }
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}

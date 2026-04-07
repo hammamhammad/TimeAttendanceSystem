@@ -1,0 +1,196 @@
+<div class="headcount-page">
+  <app-page-header
+    [title]="i18n.t('analytics.headcount_title')"
+    [showBackButton]="true"
+    backRoute="/analytics">
+  </app-page-header>
+
+  <!-- Filters -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label">{{ i18n.t('analytics.start_date') }}</label>
+          <input type="date" class="form-control" [ngModel]="startDate()" (ngModelChange)="startDate.set($event)">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">{{ i18n.t('analytics.end_date') }}</label>
+          <input type="date" class="form-control" [ngModel]="endDate()" (ngModelChange)="endDate.set($event)">
+        </div>
+        <div class="col-md-3">
+          <button class="btn btn-primary" (click)="onFilter()">
+            <i class="fa-solid fa-filter me-1"></i>
+            {{ i18n.t('analytics.apply_filter') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <app-loading-spinner></app-loading-spinner>
+  } @else if (data()) {
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="card stat-card h-100">
+          <div class="card-body text-center">
+            <div class="stat-icon bg-primary-subtle mb-2">
+              <i class="fa-solid fa-users text-primary"></i>
+            </div>
+            <h3 class="mb-1">{{ data()!.total }}</h3>
+            <p class="text-muted mb-0">{{ i18n.t('analytics.total_headcount') }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card stat-card h-100">
+          <div class="card-body text-center">
+            <div class="stat-icon bg-success-subtle mb-2">
+              <i class="fa-solid fa-user-check text-success"></i>
+            </div>
+            <h3 class="mb-1">{{ data()!.totalActive }}</h3>
+            <p class="text-muted mb-0">{{ i18n.t('analytics.active_employees') }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card stat-card h-100">
+          <div class="card-body text-center">
+            <div class="stat-icon bg-secondary-subtle mb-2">
+              <i class="fa-solid fa-user-xmark text-secondary"></i>
+            </div>
+            <h3 class="mb-1">{{ data()!.totalInactive }}</h3>
+            <p class="text-muted mb-0">{{ i18n.t('analytics.inactive_employees') }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card stat-card h-100">
+          <div class="card-body text-center">
+            <div class="stat-icon bg-info-subtle mb-2">
+              <i class="fa-solid fa-user-plus text-info"></i>
+            </div>
+            <h3 class="mb-1">{{ getTotalHires() }}</h3>
+            <p class="text-muted mb-0">{{ i18n.t('analytics.new_hires') }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+      <!-- Branch Breakdown -->
+      <div class="col-lg-7">
+        <div class="card h-100">
+          <div class="card-header">
+            <h5 class="card-title mb-0">{{ i18n.t('analytics.by_branch') }}</h5>
+          </div>
+          <div class="card-body">
+            @if ((data()!.byBranch ?? []).length > 0) {
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>{{ i18n.t('analytics.branch') }}</th>
+                      <th>{{ i18n.t('analytics.headcount_label') }}</th>
+                      <th>{{ i18n.t('analytics.distribution') }}</th>
+                      <th class="text-end">{{ i18n.t('analytics.percentage') }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (branch of data()!.byBranch; track branch.branchId) {
+                      <tr>
+                        <td class="fw-medium">{{ branch.branchName }}</td>
+                        <td>{{ branch.count }}</td>
+                        <td style="min-width: 150px;">
+                          <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-primary"
+                              [style.width.%]="(branch.count / getMaxBranchCount()) * 100">
+                            </div>
+                          </div>
+                        </td>
+                        <td class="text-end">{{ data()!.totalActive > 0 ? ((branch.count / data()!.totalActive) * 100).toFixed(1) : '0.0' }}%</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            } @else {
+              <p class="text-muted text-center mb-0">{{ i18n.t('common.no_data') }}</p>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Demographics -->
+      <div class="col-lg-5">
+        @if (demographics()) {
+          <!-- Gender Distribution -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="card-title mb-0">{{ i18n.t('analytics.gender_distribution') }}</h5>
+            </div>
+            <div class="card-body">
+              @for (seg of demographics()!.byGender ?? []; track seg.gender) {
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span>{{ seg.gender }}</span>
+                  <span class="badge bg-primary-subtle text-primary">{{ seg.count }} ({{ getGenderTotal() > 0 ? ((seg.count / getGenderTotal()) * 100).toFixed(1) : '0.0' }}%)</span>
+                </div>
+                <div class="progress mb-3" style="height: 8px;">
+                  <div class="progress-bar bg-primary" [style.width.%]="getGenderTotal() > 0 ? (seg.count / getGenderTotal()) * 100 : 0"></div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Age Distribution -->
+          <div class="card">
+            <div class="card-header">
+              <h5 class="card-title mb-0">{{ i18n.t('analytics.age_distribution') }}</h5>
+            </div>
+            <div class="card-body">
+              @for (seg of demographics()!.byAgeGroup ?? []; track seg.ageGroup) {
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span>{{ seg.ageGroup }}</span>
+                  <span class="badge bg-info-subtle text-info">{{ seg.count }} ({{ getAgeGroupTotal() > 0 ? ((seg.count / getAgeGroupTotal()) * 100).toFixed(1) : '0.0' }}%)</span>
+                </div>
+                <div class="progress mb-3" style="height: 8px;">
+                  <div class="progress-bar bg-info" [style.width.%]="getAgeGroupTotal() > 0 ? (seg.count / getAgeGroupTotal()) * 100 : 0"></div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Hires By Month -->
+    @if ((data()!.hiresByMonth ?? []).length > 0) {
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">{{ i18n.t('analytics.hires_by_month') }}</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>{{ i18n.t('analytics.month') }}</th>
+                  <th class="text-end">{{ i18n.t('analytics.new_hires') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of data()!.hiresByMonth; track row.year + '-' + row.month) {
+                  <tr>
+                    <td class="fw-medium">{{ getMonthLabel(row.year, row.month) }}</td>
+                    <td class="text-end">{{ row.count }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    }
+  }
+</div>

@@ -1,13 +1,13 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Application.Workflows.Services;
-using TimeAttendanceSystem.Domain.Attendance;
-using TimeAttendanceSystem.Domain.Employees;
-using TimeAttendanceSystem.Domain.Workflows.Enums;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Workflows.Services;
+using TecAxle.Hrms.Domain.Attendance;
+using TecAxle.Hrms.Domain.Employees;
+using TecAxle.Hrms.Domain.Workflows.Enums;
 
-namespace TimeAttendanceSystem.Application.Features.Portal.ManagerDashboard.Queries;
+namespace TecAxle.Hrms.Application.Features.Portal.ManagerDashboard.Queries;
 
 /// <summary>
 /// Query to get manager dashboard data for self-service portal

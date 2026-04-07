@@ -1,8 +1,11 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.Attendance.Queries.GetMonthlyReport;
+namespace TecAxle.Hrms.Application.Attendance.Queries.GetMonthlyReport;
 
+[RequiresModule(SystemModule.TimeAttendance, AllowReadWhenDisabled = true)]
 public record GetMonthlyReportQuery(
     int Month,
     int Year,

@@ -1,11 +1,11 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Application.EmployeeVacations.Queries.Common;
-using TimeAttendanceSystem.Domain.Workflows.Enums;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.EmployeeVacations.Queries.Common;
+using TecAxle.Hrms.Domain.Workflows.Enums;
 
-namespace TimeAttendanceSystem.Application.EmployeeVacations.Queries.GetEmployeeVacations;
+namespace TecAxle.Hrms.Application.EmployeeVacations.Queries.GetEmployeeVacations;
 
 /// <summary>
 /// Query handler for retrieving employee vacation records with filtering and pagination.
@@ -115,7 +115,9 @@ public class GetEmployeeVacationsQueryHandler : IRequestHandler<GetEmployeeVacat
                 ev.CreatedAtUtc,
                 ev.CreatedBy,
                 ev.ModifiedAtUtc,
-                ev.ModifiedBy
+                ev.ModifiedBy,
+                ev.IsHalfDay,
+                ev.HalfDayType
             })
             .ToListAsync(cancellationToken);
 
@@ -191,7 +193,10 @@ public class GetEmployeeVacationsQueryHandler : IRequestHandler<GetEmployeeVacat
                 approverRole,
                 currentStep?.StepOrder,
                 totalSteps > 0 ? totalSteps : null,
-                approvalHistory
+                approvalHistory,
+                IsHalfDay: ev.IsHalfDay,
+                HalfDayType: ev.HalfDayType?.ToString(),
+                HalfDayTypeName: ev.HalfDayType?.ToString()
             );
         }).ToList();
 

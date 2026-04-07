@@ -1,0 +1,115 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header
+    [title]="isEditMode() ? i18n.t('job_grades.edit') : i18n.t('job_grades.create')"
+    moduleName="job_grades"
+    moduleRoute="job-grades">
+  </app-form-header>
+
+  @if (loading()) {
+    <div class="text-center py-5">
+      <app-loading-spinner [message]="i18n.t('common.loading')" [variant]="'primary'" [centered]="true" />
+    </div>
+  }
+
+  @if (!loading()) {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <app-form-section [title]="i18n.t('common.basic_info')" [variant]="'modern'">
+        <div class="row g-3">
+          <!-- Code -->
+          <div class="col-md-4">
+            <div class="form-floating">
+              <input type="text" class="form-control" id="code" formControlName="code" placeholder="x">
+              <label for="code">{{ i18n.t('job_grades.code') }} <span class="text-danger">*</span></label>
+            </div>
+          </div>
+
+          <!-- Name -->
+          <div class="col-md-4">
+            <div class="form-floating">
+              <input type="text" class="form-control" id="name" formControlName="name" placeholder="x">
+              <label for="name">{{ i18n.t('job_grades.name') }} <span class="text-danger">*</span></label>
+            </div>
+          </div>
+
+          <!-- Name (Arabic) -->
+          <div class="col-md-4">
+            <div class="form-floating">
+              <input type="text" class="form-control" id="nameAr" formControlName="nameAr" placeholder="x" dir="rtl">
+              <label for="nameAr">{{ i18n.t('job_grades.name_ar') }}</label>
+            </div>
+          </div>
+
+          <!-- Level -->
+          <div class="col-md-4">
+            <div class="form-floating">
+              <input type="number" class="form-control" id="level" formControlName="level" placeholder="x" min="1">
+              <label for="level">{{ i18n.t('job_grades.level') }} <span class="text-danger">*</span></label>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="col-md-4">
+            <div class="form-floating">
+              <textarea class="form-control" id="description" formControlName="description" placeholder="x" style="height: 80px"></textarea>
+              <label for="description">{{ i18n.t('job_grades.description') }}</label>
+            </div>
+          </div>
+
+          <!-- Description (Arabic) -->
+          <div class="col-md-4">
+            <div class="form-floating">
+              <textarea class="form-control" id="descriptionAr" formControlName="descriptionAr" placeholder="x" style="height: 80px" dir="rtl"></textarea>
+              <label for="descriptionAr">{{ i18n.t('job_grades.description_ar') }}</label>
+            </div>
+          </div>
+        </div>
+      </app-form-section>
+
+      <app-form-section [title]="i18n.t('job_grades.salary_range')" [variant]="'modern'">
+        <div class="row g-3">
+          <!-- Min Salary -->
+          <div class="col-md-4">
+            <div class="form-floating">
+              <input type="number" class="form-control" id="minSalary" formControlName="minSalary" placeholder="x" min="0">
+              <label for="minSalary">{{ i18n.t('job_grades.min_salary') }} <span class="text-danger">*</span></label>
+            </div>
+          </div>
+
+          <!-- Mid Salary -->
+          <div class="col-md-4">
+            <div class="form-floating">
+              <input type="number" class="form-control" id="midSalary" formControlName="midSalary" placeholder="x" min="0">
+              <label for="midSalary">{{ i18n.t('job_grades.mid_salary') }} <span class="text-danger">*</span></label>
+            </div>
+          </div>
+
+          <!-- Max Salary -->
+          <div class="col-md-4">
+            <div class="form-floating">
+              <input type="number" class="form-control" id="maxSalary" formControlName="maxSalary" placeholder="x" min="0">
+              <label for="maxSalary">{{ i18n.t('job_grades.max_salary') }} <span class="text-danger">*</span></label>
+            </div>
+          </div>
+
+          <!-- Active -->
+          <div class="col-md-4">
+            <div class="form-check mt-3">
+              <input type="checkbox" class="form-check-input" id="isActive" formControlName="isActive">
+              <label class="form-check-label" for="isActive">{{ i18n.t('common.active') }}</label>
+            </div>
+          </div>
+        </div>
+      </app-form-section>
+
+      <div class="app-form-actions">
+        <button type="button" class="btn btn-secondary" routerLink="/job-grades">{{ i18n.t('common.cancel') }}</button>
+        <button type="submit" class="btn btn-primary" [disabled]="form.invalid || submitting()">
+          @if (submitting()) {
+            <span class="spinner-border spinner-border-sm me-1"></span>
+          }
+          {{ i18n.t('common.save') }}
+        </button>
+      </div>
+    </form>
+  }
+</div>

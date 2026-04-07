@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Domain.LeaveManagement;
+namespace TecAxle.Hrms.Domain.LeaveManagement;
 
 /// <summary>
 /// Types of leave balance transactions.

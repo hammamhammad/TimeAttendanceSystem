@@ -1,10 +1,10 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Excuses;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Excuses;
 
-namespace TimeAttendanceSystem.Application.Attendance.Queries.GetLeaveExcuseDetails;
+namespace TecAxle.Hrms.Application.Attendance.Queries.GetLeaveExcuseDetails;
 
 /// <summary>
 /// Query handler for retrieving leave, excuse, and remote work details for a specific employee and date.

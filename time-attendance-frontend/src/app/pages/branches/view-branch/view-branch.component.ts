@@ -9,6 +9,8 @@ import { DetailCardComponent, DetailField } from '../../../shared/components/det
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 import { StatCardComponent } from '../../../shared/components/stat-card/stat-card.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
+import { AuditHistoryComponent } from '../../../shared/components/audit-history/audit-history.component';
+import { SectionCardComponent } from '../../../shared/components/section-card/section-card.component';
 
 @Component({
   selector: 'app-view-branch',
@@ -19,7 +21,9 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
     DetailCardComponent,
     StatusBadgeComponent,
     StatCardComponent,
-    LoadingSpinnerComponent
+    LoadingSpinnerComponent,
+    AuditHistoryComponent,
+    SectionCardComponent
 ],
   template: `
     <div class="app-view-page app-modern-view">
@@ -109,6 +113,13 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
               </app-stat-card>
             </div>
           </div>
+        </div>
+
+        <!-- Audit History -->
+        <div class="mt-4">
+          <app-section-card [title]="i18n.t('history.title')" icon="fas fa-clock-rotate-left" headerClass="bg-light">
+            <app-audit-history [entityName]="'Branch'" [entityId]="branch()?.id" />
+          </app-section-card>
         </div>
       } @else {
         <div class="alert alert-danger">

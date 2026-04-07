@@ -1,6 +1,6 @@
 using MediatR;
 
-namespace TimeAttendanceSystem.Application.Common;
+namespace TecAxle.Hrms.Application.Common;
 
 /// <summary>
 /// Marker interface for CQRS commands that modify system state.

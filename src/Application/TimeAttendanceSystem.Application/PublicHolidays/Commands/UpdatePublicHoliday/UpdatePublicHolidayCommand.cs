@@ -1,9 +1,11 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Settings;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Settings;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.PublicHolidays.Commands.UpdatePublicHoliday;
+namespace TecAxle.Hrms.Application.PublicHolidays.Commands.UpdatePublicHoliday;
 
 /// <summary>
 /// Command for updating an existing public holiday in the system.
@@ -67,6 +69,7 @@ namespace TimeAttendanceSystem.Application.PublicHolidays.Commands.UpdatePublicH
 /// - Integration with attendance recalculation if needed
 /// - Notification system for affected overtime calculations
 /// </remarks>
+[RequiresModule(SystemModule.TimeAttendance)]
 public record UpdatePublicHolidayCommand(
     long Id,
     string Name,

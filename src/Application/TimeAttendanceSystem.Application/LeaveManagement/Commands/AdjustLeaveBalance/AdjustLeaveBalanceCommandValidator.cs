@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace TimeAttendanceSystem.Application.LeaveManagement.Commands.AdjustLeaveBalance;
+namespace TecAxle.Hrms.Application.LeaveManagement.Commands.AdjustLeaveBalance;
 
 /// <summary>
 /// FluentValidation validator for AdjustLeaveBalanceCommand ensuring valid balance adjustment parameters.

@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Branches.Commands.UpdateBranchCoordinates;
+namespace TecAxle.Hrms.Application.Branches.Commands.UpdateBranchCoordinates;
 
 /// <summary>
 /// Command to update the GPS coordinates and geofence radius for a branch.

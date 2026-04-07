@@ -1,6 +1,6 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Authorization.Commands.VerifyEmail;
+namespace TecAxle.Hrms.Application.Authorization.Commands.VerifyEmail;
 
 public record VerifyEmailCommand(string Email, string Token) : IRequest<Result<bool>>;

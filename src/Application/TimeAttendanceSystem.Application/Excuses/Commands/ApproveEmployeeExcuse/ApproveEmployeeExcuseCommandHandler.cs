@@ -1,12 +1,12 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Application.Extensions;
-using TimeAttendanceSystem.Domain.Excuses;
-using TimeAttendanceSystem.Domain.Attendance;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Extensions;
+using TecAxle.Hrms.Domain.Excuses;
+using TecAxle.Hrms.Domain.Attendance;
 
-namespace TimeAttendanceSystem.Application.Excuses.Commands.ApproveEmployeeExcuse;
+namespace TecAxle.Hrms.Application.Excuses.Commands.ApproveEmployeeExcuse;
 
 /// <summary>
 /// Command handler for approving or rejecting employee excuse requests.

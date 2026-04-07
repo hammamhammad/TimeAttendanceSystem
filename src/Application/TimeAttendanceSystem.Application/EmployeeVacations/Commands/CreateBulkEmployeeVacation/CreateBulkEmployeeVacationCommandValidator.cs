@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace TimeAttendanceSystem.Application.EmployeeVacations.Commands.CreateBulkEmployeeVacation;
+namespace TecAxle.Hrms.Application.EmployeeVacations.Commands.CreateBulkEmployeeVacation;
 
 /// <summary>
 /// Validator for CreateBulkEmployeeVacationCommand.

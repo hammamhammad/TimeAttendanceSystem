@@ -1,0 +1,127 @@
+<div class="engagement-analytics-page">
+  <app-page-header
+    [title]="i18n.t('analytics.engagement_title')"
+    [showBackButton]="true"
+    backRoute="/analytics">
+  </app-page-header>
+
+  <!-- Filters -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label">{{ i18n.t('analytics.start_date') }}</label>
+          <input type="date" class="form-control" [ngModel]="startDate()" (ngModelChange)="startDate.set($event)">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">{{ i18n.t('analytics.end_date') }}</label>
+          <input type="date" class="form-control" [ngModel]="endDate()" (ngModelChange)="endDate.set($event)">
+        </div>
+        <div class="col-md-3">
+          <button class="btn btn-primary" (click)="onFilter()">
+            <i class="fa-solid fa-filter me-1"></i>
+            {{ i18n.t('analytics.apply_filter') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <app-loading-spinner></app-loading-spinner>
+  } @else if (data()) {
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-6 col-lg-4">
+        <div class="card stat-card h-100">
+          <div class="card-body text-center">
+            <div class="stat-icon bg-primary-subtle mb-2">
+              <i class="fa-solid fa-clipboard-list text-primary"></i>
+            </div>
+            <h3 class="mb-1">{{ data()!.totalSurveys }}</h3>
+            <p class="text-muted mb-0">{{ i18n.t('analytics.total_surveys') }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="card stat-card h-100">
+          <div class="card-body text-center">
+            <div class="stat-icon bg-success-subtle mb-2">
+              <i class="fa-solid fa-heart text-success"></i>
+            </div>
+            <h3 class="mb-1">{{ getLatestAvgScore().toFixed(1) }}</h3>
+            <p class="text-muted mb-0">{{ i18n.t('analytics.latest_avg_score') }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="card stat-card h-100">
+          <div class="card-body text-center">
+            <div class="stat-icon bg-info-subtle mb-2">
+              <i class="fa-solid fa-chart-line text-info"></i>
+            </div>
+            <h3 class="mb-1">{{ getAvgParticipationRate() }}%</h3>
+            <p class="text-muted mb-0">{{ i18n.t('analytics.avg_participation') }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Survey Results Table -->
+    @if ((data()!.surveys ?? []).length > 0) {
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">{{ i18n.t('analytics.survey_results') }}</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>{{ i18n.t('analytics.survey_title') }}</th>
+                  <th class="text-center">{{ i18n.t('analytics.survey_type') }}</th>
+                  <th class="text-center">{{ i18n.t('analytics.avg_score') }}</th>
+                  <th class="text-center">{{ i18n.t('analytics.responses') }}</th>
+                  <th class="text-center">{{ i18n.t('analytics.total_recipients') }}</th>
+                  <th class="text-end">{{ i18n.t('analytics.participation_rate') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (survey of data()!.surveys; track survey.distributionId) {
+                  <tr>
+                    <td class="fw-medium">{{ survey.title }}</td>
+                    <td class="text-center">
+                      <span class="badge bg-primary-subtle text-primary">{{ survey.surveyType }}</span>
+                    </td>
+                    <td class="text-center">
+                      <span class="badge" [class]="survey.avgScore >= 4 ? 'bg-success-subtle text-success' : survey.avgScore >= 3 ? 'bg-warning-subtle text-warning' : 'bg-danger-subtle text-danger'">
+                        {{ survey.avgScore.toFixed(1) }}
+                      </span>
+                    </td>
+                    <td class="text-center">{{ survey.responseCount }}</td>
+                    <td class="text-center">{{ survey.totalRecipients }}</td>
+                    <td class="text-end">
+                      <div class="d-flex align-items-center justify-content-end gap-2">
+                        <div class="progress flex-grow-1" style="height: 6px; max-width: 80px;">
+                          <div class="progress-bar bg-info" [style.width.%]="survey.participationRate"></div>
+                        </div>
+                        <span class="small">{{ survey.participationRate }}%</span>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    } @else {
+      <div class="card">
+        <div class="card-body text-center py-5">
+          <i class="fa-solid fa-clipboard-list text-muted fs-1 mb-3"></i>
+          <p class="text-muted mb-0">{{ i18n.t('analytics.no_surveys') }}</p>
+        </div>
+      </div>
+    }
+  }
+</div>

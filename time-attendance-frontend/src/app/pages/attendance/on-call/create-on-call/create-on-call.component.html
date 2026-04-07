@@ -1,0 +1,71 @@
+<div class="app-modern-form">
+  <div class="d-flex align-items-center mb-4">
+    <button class="btn btn-outline-secondary me-3" (click)="onCancel()">
+      <i class="fa-solid fa-arrow-left"></i>
+    </button>
+    <h4 class="mb-0">{{ isEditMode() ? i18n.t('onCall.edit') : i18n.t('onCall.create') }}</h4>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <app-form-section [title]="i18n.t('common.basic_info')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('onCall.employee') }}</label>
+            <app-searchable-select
+              [options]="employeeOptions"
+              [value]="form.get('employeeId')?.value"
+              [placeholder]="i18n.t('common.select_employee')"
+              (selectionChange)="form.get('employeeId')?.setValue($event)" />
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <select class="form-select" id="onCallType" formControlName="onCallType">
+              @for (type of onCallTypes; track type.value) {
+                <option [value]="type.value">{{ i18n.t('onCall.types.' + type.value) }}</option>
+              }
+            </select>
+            <label for="onCallType">{{ i18n.t('onCall.on_call_type') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="startDate" formControlName="startDate" placeholder=" ">
+            <label for="startDate">{{ i18n.t('onCall.start_date') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="endDate" formControlName="endDate" placeholder=" ">
+            <label for="endDate">{{ i18n.t('onCall.end_date') }}</label>
+          </div>
+        </div>
+        <div class="col-md-12">
+          <div class="form-floating">
+            <textarea class="form-control" id="notes" formControlName="notes" placeholder=" " style="height: 80px"></textarea>
+            <label for="notes">{{ i18n.t('onCall.notes') }}</label>
+          </div>
+        </div>
+        @if (isEditMode()) {
+          <div class="col-md-6">
+            <div class="form-check form-switch mt-3">
+              <input class="form-check-input" type="checkbox" id="isActive" formControlName="isActive">
+              <label class="form-check-label" for="isActive">{{ i18n.t('onCall.is_active') }}</label>
+            </div>
+          </div>
+        }
+      </div>
+    </app-form-section>
+
+    <div class="app-form-actions">
+      <button type="button" class="btn btn-secondary" (click)="onCancel()">{{ i18n.t('common.cancel') }}</button>
+      <button type="submit" class="btn btn-primary" [disabled]="form.invalid || submitting()">
+        @if (submitting()) {
+          <span class="spinner-border spinner-border-sm me-1"></span>
+        }
+        {{ isEditMode() ? i18n.t('common.save') : i18n.t('common.create') }}
+      </button>
+    </div>
+  </form>
+</div>

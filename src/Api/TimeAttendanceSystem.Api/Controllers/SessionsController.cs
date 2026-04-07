@@ -1,10 +1,10 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TimeAttendanceSystem.Application.Sessions.Commands.TerminateSession;
-using TimeAttendanceSystem.Application.Sessions.Queries.GetUserSessions;
+using TecAxle.Hrms.Application.Sessions.Commands.TerminateSession;
+using TecAxle.Hrms.Application.Sessions.Queries.GetUserSessions;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 /// <summary>
 /// API controller for managing user authentication sessions.

@@ -1,7 +1,7 @@
-using TimeAttendanceSystem.Domain.Workflows;
-using TimeAttendanceSystem.Domain.Workflows.Enums;
+using TecAxle.Hrms.Domain.Workflows;
+using TecAxle.Hrms.Domain.Workflows.Enums;
 
-namespace TimeAttendanceSystem.Application.Workflows.Services;
+namespace TecAxle.Hrms.Application.Workflows.Services;
 
 /// <summary>
 /// Service interface for managing workflow execution and approval processes.

@@ -1,7 +1,9 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.LeaveManagement.Queries.GetLeaveBalanceSummary;
+namespace TecAxle.Hrms.Application.LeaveManagement.Queries.GetLeaveBalanceSummary;
 
 /// <summary>
 /// CQRS query for retrieving comprehensive leave balance summary for an employee.
@@ -9,6 +11,7 @@ namespace TimeAttendanceSystem.Application.LeaveManagement.Queries.GetLeaveBalan
 /// </summary>
 /// <param name="EmployeeId">ID of the employee (required)</param>
 /// <param name="Year">Calendar year for the balance summary (required)</param>
+[RequiresModule(SystemModule.LeaveManagement, AllowReadWhenDisabled = true)]
 public record GetLeaveBalanceSummaryQuery(
     long EmployeeId,
     int Year

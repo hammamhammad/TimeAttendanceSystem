@@ -1,0 +1,70 @@
+<div class="container-fluid app-modern-view">
+  <app-form-header [title]="i18n.t('loan_applications.view')" moduleName="loan-applications" moduleRoute="loans/applications" [loading]="loading()" />
+
+  @if (loading()) { <app-loading-spinner [message]="i18n.t('common.loading')" [centered]="true" /> }
+  @if (error()) { <div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>{{ error() }}</div> }
+  @if (app() && !loading()) {
+    <div class="row">
+      <div class="col-lg-8">
+        <div class="card mb-3">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">{{ i18n.t('loan_applications.application_details') }}</h5>
+            <app-status-badge [status]="statusBadge().label" [variant]="statusBadge().variant" />
+          </div>
+          <div class="card-body">
+            <app-definition-list [items]="detailItems()" [labelWidth]="'4'" [valueWidth]="'8'" />
+          </div>
+        </div>
+
+        <!-- Repayment Schedule -->
+        @if (app()?.repayments?.length) {
+          <div class="card">
+            <div class="card-header"><h5 class="card-title mb-0">{{ i18n.t('loan_applications.repayment_schedule') }}</h5></div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-striped mb-0">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>{{ i18n.t('loan_applications.due_date') }}</th>
+                      <th>{{ i18n.t('loan_applications.amount') }}</th>
+                      <th>{{ i18n.t('loan_applications.principal') }}</th>
+                      <th>{{ i18n.t('loan_applications.interest') }}</th>
+                      <th>{{ i18n.t('common.status') }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (r of app()?.repayments ?? []; track r.id) {
+                      <tr>
+                        <td>{{ r.installmentNumber }}</td>
+                        <td>{{ r.dueDate | date }}</td>
+                        <td>{{ r.amount.toFixed(2) }}</td>
+                        <td>{{ r.principalAmount.toFixed(2) }}</td>
+                        <td>{{ r.interestAmount.toFixed(2) }}</td>
+                        <td>
+                          <span class="badge" [class.bg-warning]="r.status === 'Pending'" [class.bg-success]="r.status === 'Paid'"
+                            [class.bg-danger]="r.status === 'Overdue'" [class.bg-secondary]="r.status === 'Waived'">
+                            {{ i18n.t('loan_applications.repayment_status_' + r.status) }}
+                          </span>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Audit History -->
+    <div class="row mt-3">
+      <div class="col-12">
+        <app-section-card [title]="i18n.t('history.title')" icon="fas fa-clock-rotate-left" headerClass="bg-light">
+          <app-audit-history [entityName]="'LoanApplication'" [entityId]="app()?.id" />
+        </app-section-card>
+      </div>
+    </div>
+  }
+</div>

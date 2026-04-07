@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace TimeAttendanceSystem.Application.AttendanceCorrections.Commands.DeleteAttendanceCorrectionRequest;
+namespace TecAxle.Hrms.Application.AttendanceCorrections.Commands.DeleteAttendanceCorrectionRequest;
 
 /// <summary>
 /// Fluent Validation rules for DeleteAttendanceCorrectionRequestCommand.

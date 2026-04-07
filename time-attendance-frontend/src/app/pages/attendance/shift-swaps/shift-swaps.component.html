@@ -1,0 +1,32 @@
+<div class="shift-swaps-page">
+  <!-- Page Header -->
+  <app-page-header [title]="i18n.t('shiftSwaps.title')">
+  </app-page-header>
+
+  <!-- Filters -->
+  <app-unified-filter
+    moduleName="shift-swaps"
+    [showAddButton]="false"
+    [refreshing]="loading()"
+    [searchPlaceholder]="i18n.t('shiftSwaps.search_placeholder')"
+    (searchChange)="onSearchChange($event)"
+    (refresh)="onRefreshData()">
+  </app-unified-filter>
+
+  <!-- Data Table -->
+  <app-data-table
+    [data]="shiftSwaps() || []"
+    [columns]="tableColumns"
+    [actions]="tableActions"
+    [loading]="loading"
+    [totalItems]="totalCount()"
+    [currentPage]="currentPage()"
+    [pageSize]="pageSize()"
+    [pageSizeOptions]="[10, 25, 50, 100]"
+    [emptyMessage]="i18n.t('shiftSwaps.no_records')"
+    [emptyTitle]="i18n.t('shiftSwaps.no_records_title')"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)"
+    (actionClick)="onTableAction($event)">
+  </app-data-table>
+</div>

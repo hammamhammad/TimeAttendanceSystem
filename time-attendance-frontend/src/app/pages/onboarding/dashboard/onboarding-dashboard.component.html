@@ -1,0 +1,62 @@
+<div class="onboarding-dashboard-page">
+  <app-page-header [title]="i18n.t('onboarding_processes.dashboard')" />
+
+  @if (loading()) { <div class="text-center py-5"><app-loading-spinner [message]="i18n.t('common.loading')" [variant]="'primary'" [centered]="true" /></div> }
+
+  @if (stats() && !loading()) {
+    <div class="row g-4 mb-4">
+      <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body text-center">
+            <div class="fs-1 fw-bold text-primary">{{ stats()!.activeProcesses }}</div>
+            <div class="text-muted">{{ i18n.t('onboarding_processes.active') }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body text-center">
+            <div class="fs-1 fw-bold text-success">{{ stats()!.completedThisMonth }}</div>
+            <div class="text-muted">{{ i18n.t('onboarding_processes.completed_month') }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body text-center">
+            <div class="fs-1 fw-bold text-danger">{{ stats()!.overdueProcesses }}</div>
+            <div class="text-muted">{{ i18n.t('onboarding_processes.overdue') }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body text-center">
+            <div class="fs-1 fw-bold text-info">{{ stats()!.averageCompletionDays }}</div>
+            <div class="text-muted">{{ i18n.t('onboarding_processes.avg_days') }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    @if (stats()?.recentProcesses?.length) {
+      <app-section-card [title]="i18n.t('onboarding_processes.recent')">
+        <div class="table-responsive">
+          <table class="table table-sm table-hover mb-0">
+            <thead><tr><th>{{ i18n.t('fields.employee') }}</th><th>{{ i18n.t('onboarding_processes.template') }}</th><th>{{ i18n.t('onboarding_processes.progress') }}</th><th>{{ i18n.t('fields.status') }}</th></tr></thead>
+            <tbody>
+              @for (p of stats()!.recentProcesses; track p.id) {
+                <tr class="cursor-pointer" (click)="navigateToProcesses()">
+                  <td>{{ p.employeeName }}</td>
+                  <td>{{ p.templateName }}</td>
+                  <td><div class="progress" style="height: 16px; width: 100px;"><div class="progress-bar" [style.width.%]="p.progress">{{ p.progress }}%</div></div></td>
+                  <td><span class="badge bg-{{ p.status === 'Completed' ? 'success' : p.status === 'Overdue' ? 'danger' : 'info' }}">{{ p.status }}</span></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </app-section-card>
+    }
+  }
+</div>

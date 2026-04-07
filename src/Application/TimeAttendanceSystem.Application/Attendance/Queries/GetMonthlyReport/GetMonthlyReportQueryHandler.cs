@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Attendance;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Attendance;
 
-namespace TimeAttendanceSystem.Application.Attendance.Queries.GetMonthlyReport;
+namespace TecAxle.Hrms.Application.Attendance.Queries.GetMonthlyReport;
 
 public class GetMonthlyReportQueryHandler : BaseHandler<GetMonthlyReportQuery, Result<MonthlyReportResponse>>
 {

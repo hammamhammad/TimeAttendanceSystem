@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Application.EmployeeVacations.Queries.Common;
+namespace TecAxle.Hrms.Application.EmployeeVacations.Queries.Common;
 
 /// <summary>
 /// Data Transfer Object representing an employee vacation record.
@@ -62,7 +62,11 @@ public record EmployeeVacationDto(
     // Approval history
     List<ApprovalStepDto>? ApprovalHistory,
     // Workflow instance ID for approval actions
-    long? WorkflowInstanceId = null
+    long? WorkflowInstanceId = null,
+    // Half-day leave information
+    bool IsHalfDay = false,
+    string? HalfDayType = null,
+    string? HalfDayTypeName = null
 );
 
 /// <summary>
@@ -111,7 +115,9 @@ public record CreateEmployeeVacationDto(
     DateTime StartDate,
     DateTime EndDate,
     bool IsApproved = true,
-    string? Notes = null
+    string? Notes = null,
+    bool IsHalfDay = false,
+    string? HalfDayType = null
 );
 
 /// <summary>
@@ -136,7 +142,9 @@ public record UpdateEmployeeVacationDto(
     DateTime StartDate,
     DateTime EndDate,
     bool IsApproved,
-    string? Notes = null
+    string? Notes = null,
+    bool IsHalfDay = false,
+    string? HalfDayType = null
 );
 
 /// <summary>

@@ -1,0 +1,23 @@
+<div class="app-list-page">
+  <app-page-header [title]="i18n.t('training_courses.title')" />
+  <app-unified-filter [searchPlaceholder]="i18n.t('training_courses.search')" [showRefreshButton]="true" [refreshing]="loading()"
+    [showAddButton]="true" [addButtonText]="i18n.t('training_courses.create')"
+    (add)="navigateToCreate()" (searchChange)="onSearchChange($event)" (refresh)="onRefreshData()" />
+
+  <app-data-table [data]="data()" [columns]="columns" [actions]="tableActions()" [currentPage]="currentPage()"
+    [totalPages]="totalPages()" [totalItems]="totalCount()" [pageSize]="pageSize()" [loading]="loading"
+    [emptyTitle]="i18n.t('training_courses.no_data')" [showPagination]="true"
+    (actionClick)="onActionClick($event)" (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)">
+    <ng-template #cellTemplate let-item let-column="column">
+      @if (column.key === 'isActive') {
+        <span class="badge" [class.bg-success]="item.isActive" [class.bg-secondary]="!item.isActive">
+          {{ item.isActive ? i18n.t('common.active') : i18n.t('common.inactive') }}
+        </span>
+      } @else if (column.key === 'deliveryMethod') {
+        {{ i18n.t('training_courses.method_' + item.deliveryMethod) }}
+      } @else {
+        {{ item[column.key] ?? '-' }}
+      }
+    </ng-template>
+  </app-data-table>
+</div>

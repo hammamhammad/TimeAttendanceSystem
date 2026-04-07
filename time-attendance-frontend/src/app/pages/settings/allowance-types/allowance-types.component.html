@@ -1,0 +1,32 @@
+<div class="container-fluid">
+  <!-- Page Header -->
+  <app-page-header
+    [title]="t('allowance_types.title')">
+  </app-page-header>
+
+  <!-- Unified Filter Component -->
+  <app-unified-filter
+    moduleName="allowance_types"
+    [refreshing]="loading()"
+    (filtersChange)="onFiltersChange($event)"
+    (add)="onCreateAllowanceType()"
+    (refresh)="onRefreshData()">
+  </app-unified-filter>
+
+  <!-- Data Table -->
+  <app-data-table
+    [columns]="tableColumns()"
+    [data]="tableData() || []"
+    [actions]="tableActions()"
+    [currentPage]="currentPage()"
+    [pageSize]="pageSize()"
+    [totalItems]="totalCount()"
+    [totalPages]="totalPages()"
+    [loading]="loading"
+    [emptyTitle]="t('allowance_types.no_records_title')"
+    [emptyMessage]="hasActiveFilters() ? t('common.try_different_filters') : t('allowance_types.no_records')"
+    (actionClick)="onActionClick($event)"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+  </app-data-table>
+</div>

@@ -1,0 +1,122 @@
+<div class="payroll-analytics-page">
+  <app-page-header
+    [title]="i18n.t('analytics.payroll_title')"
+    [showBackButton]="true"
+    backRoute="/analytics">
+  </app-page-header>
+
+  <!-- Filters -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label">{{ i18n.t('analytics.start_date') }}</label>
+          <input type="date" class="form-control" [ngModel]="startDate()" (ngModelChange)="startDate.set($event)">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">{{ i18n.t('analytics.end_date') }}</label>
+          <input type="date" class="form-control" [ngModel]="endDate()" (ngModelChange)="endDate.set($event)">
+        </div>
+        <div class="col-md-3">
+          <button class="btn btn-primary" (click)="onFilter()">
+            <i class="fa-solid fa-filter me-1"></i>
+            {{ i18n.t('analytics.apply_filter') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <app-loading-spinner></app-loading-spinner>
+  } @else if (data()) {
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="card stat-card h-100">
+          <div class="card-body text-center">
+            <div class="stat-icon bg-primary-subtle mb-2">
+              <i class="fa-solid fa-money-check-alt text-primary"></i>
+            </div>
+            <h3 class="mb-1">{{ formatCurrency(data()!.totalGross) }}</h3>
+            <p class="text-muted mb-0">{{ i18n.t('analytics.total_gross') }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card stat-card h-100">
+          <div class="card-body text-center">
+            <div class="stat-icon bg-success-subtle mb-2">
+              <i class="fa-solid fa-chart-bar text-success"></i>
+            </div>
+            <h3 class="mb-1">{{ formatCurrency(data()!.totalNet) }}</h3>
+            <p class="text-muted mb-0">{{ i18n.t('analytics.total_net') }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card stat-card h-100">
+          <div class="card-body text-center">
+            <div class="stat-icon bg-danger-subtle mb-2">
+              <i class="fa-solid fa-minus-circle text-danger"></i>
+            </div>
+            <h3 class="mb-1">{{ formatCurrency(data()!.totalDeductions) }}</h3>
+            <p class="text-muted mb-0">{{ i18n.t('analytics.total_deductions') }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card stat-card h-100">
+          <div class="card-body text-center">
+            <div class="stat-icon bg-info-subtle mb-2">
+              <i class="fa-solid fa-calculator text-info"></i>
+            </div>
+            <h3 class="mb-1">{{ formatCurrency(data()!.avgNetSalary) }}</h3>
+            <p class="text-muted mb-0">{{ i18n.t('analytics.avg_net_salary') }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payroll Periods Table -->
+    @if ((data()!.periods ?? []).length > 0) {
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">{{ i18n.t('analytics.payroll_periods') }}</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>{{ i18n.t('analytics.period_name') }}</th>
+                  <th class="text-center">{{ i18n.t('analytics.status') }}</th>
+                  <th class="text-center">{{ i18n.t('analytics.employees') }}</th>
+                  <th class="text-center">{{ i18n.t('analytics.total_gross') }}</th>
+                  <th class="text-center">{{ i18n.t('analytics.total_deductions') }}</th>
+                  <th class="text-end">{{ i18n.t('analytics.total_net') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (period of data()!.periods; track period.periodName) {
+                  <tr>
+                    <td class="fw-medium">{{ period.periodName }}</td>
+                    <td class="text-center">
+                      <span class="badge" [class]="period.status === 'Paid' ? 'bg-success-subtle text-success' : period.status === 'Approved' ? 'bg-info-subtle text-info' : 'bg-warning-subtle text-warning'">
+                        {{ period.status }}
+                      </span>
+                    </td>
+                    <td class="text-center">{{ period.employeeCount }}</td>
+                    <td class="text-center">{{ formatCurrency(period.totalGross) }}</td>
+                    <td class="text-center">{{ formatCurrency(period.totalDeductions) }}</td>
+                    <td class="text-end">{{ formatCurrency(period.totalNet) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    }
+  }
+</div>

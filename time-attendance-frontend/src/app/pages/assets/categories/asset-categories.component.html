@@ -1,0 +1,98 @@
+<div class="app-list-page">
+  <app-page-header [title]="i18n.t('assets.categories.title')"></app-page-header>
+
+  <app-unified-filter
+    moduleName="asset-categories"
+    [refreshing]="loading()"
+    [showAddButton]="true"
+    [addButtonText]="i18n.t('assets.categories.create')"
+    (searchChange)="onSearchChange($event)"
+    (add)="openCreate()"
+    (refresh)="onRefresh()">
+  </app-unified-filter>
+
+  <app-data-table
+    [data]="filteredCategories()"
+    [columns]="tableColumns"
+    [actions]="tableActions()"
+    [loading]="loading"
+    [emptyTitle]="i18n.t('assets.categories.no_categories')"
+    [emptyMessage]="i18n.t('assets.categories.no_categories_message')"
+    [paginated]="true"
+    [pageSize]="10"
+    (actionClick)="onActionClick($event)">
+
+    <ng-template #cellTemplate let-item let-column="column">
+      @if (column.key === 'isActive') {
+        <app-status-badge
+          [status]="item.isActive ? i18n.t('common.active') : i18n.t('common.inactive')"
+          [variant]="item.isActive ? 'success' : 'secondary'">
+        </app-status-badge>
+      } @else if (column.key === 'parentCategoryName') {
+        {{ item.parentCategoryName || '-' }}
+      } @else if (column.key === 'nameAr') {
+        {{ item.nameAr || '-' }}
+      } @else {
+        {{ item[column.key] }}
+      }
+    </ng-template>
+  </app-data-table>
+</div>
+
+<!-- Create/Edit Modal -->
+@if (showModal()) {
+  <app-modal-wrapper [title]="modalTitle" [show]="showModal()" (close)="showModal.set(false)">
+    <div class="app-modern-form">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="categoryName" placeholder="Name"
+              [ngModel]="formName()" (ngModelChange)="formName.set($event)">
+            <label for="categoryName">{{ i18n.t('assets.categories.name') }} <span class="text-danger">*</span></label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="categoryNameAr" placeholder="Name (Arabic)"
+              [ngModel]="formNameAr()" (ngModelChange)="formNameAr.set($event)">
+            <label for="categoryNameAr">{{ i18n.t('assets.categories.name_ar') }}</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-floating">
+            <textarea class="form-control" id="categoryDescription" placeholder="Description"
+              style="height: 80px"
+              [ngModel]="formDescription()" (ngModelChange)="formDescription.set($event)"></textarea>
+            <label for="categoryDescription">{{ i18n.t('common.description') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">{{ i18n.t('assets.categories.parent_category') }}</label>
+          <select class="form-select"
+            [ngModel]="formParentCategoryId()" (ngModelChange)="formParentCategoryId.set($event)">
+            <option [ngValue]="null">{{ i18n.t('common.select') }}</option>
+            @for (opt of parentOptions(); track opt.id) {
+              <option [ngValue]="opt.id">{{ opt.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="col-md-6 d-flex align-items-end">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="categoryActive"
+              [ngModel]="formIsActive()" (ngModelChange)="formIsActive.set($event)">
+            <label class="form-check-label" for="categoryActive">{{ i18n.t('common.active') }}</label>
+          </div>
+        </div>
+      </div>
+      <div class="app-form-actions mt-3">
+        <button class="btn btn-secondary" (click)="showModal.set(false)">{{ i18n.t('common.cancel') }}</button>
+        <button class="btn btn-primary" (click)="saveCategory()" [disabled]="saving() || !formName()">
+          @if (saving()) {
+            <span class="spinner-border spinner-border-sm me-1"></span>
+          }
+          {{ i18n.t('common.save') }}
+        </button>
+      </div>
+    </div>
+  </app-modal-wrapper>
+}

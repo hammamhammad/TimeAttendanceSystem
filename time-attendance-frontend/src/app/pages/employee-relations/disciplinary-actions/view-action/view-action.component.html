@@ -1,0 +1,33 @@
+<div class="app-view-page app-modern-view">
+  <app-form-header
+    mode="view"
+    [title]="i18n.t('disciplinary_actions.view_details')"
+    moduleName="disciplinary_actions"
+    moduleRoute="employee-relations/disciplinary-actions"
+    [entityId]="action()?.id"
+    [loading]="loading()"
+    [actions]="headerActions()">
+  </app-form-header>
+
+  @if (loading()) {
+    <div class="text-center py-5">
+      <app-loading-spinner [message]="i18n.t('common.loading')" [variant]="'primary'" [centered]="true"></app-loading-spinner>
+    </div>
+  }
+
+  @if (action() && !loading()) {
+    <app-section-card [title]="i18n.t('disciplinary_actions.details')" icon="fas fa-gavel" headerClass="bg-light" class="mb-4">
+      <app-definition-list [items]="basicInfoItems()" [labelWidth]="'4'" [valueWidth]="'8'"></app-definition-list>
+    </app-section-card>
+
+    @if (appealInfoItems().length > 0) {
+      <app-section-card [title]="i18n.t('disciplinary_actions.appeal_section')" icon="fas fa-balance-scale" headerClass="bg-light" class="mb-4">
+        <app-definition-list [items]="appealInfoItems()" [labelWidth]="'4'" [valueWidth]="'8'"></app-definition-list>
+      </app-section-card>
+    }
+
+    <app-section-card [title]="i18n.t('history.title')" icon="fas fa-clock-rotate-left" headerClass="bg-light" class="mb-4">
+      <app-audit-history [entityName]="'DisciplinaryAction'" [entityId]="action()?.id" />
+    </app-section-card>
+  }
+</div>

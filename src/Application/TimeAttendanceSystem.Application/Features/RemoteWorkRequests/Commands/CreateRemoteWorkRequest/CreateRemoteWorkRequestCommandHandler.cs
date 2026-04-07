@@ -1,13 +1,13 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Application.Workflows.Services;
-using TimeAttendanceSystem.Domain.RemoteWork;
-using TimeAttendanceSystem.Domain.Workflows.Enums;
-using TimeAttendanceSystem.Shared.Common.Exceptions;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Workflows.Services;
+using TecAxle.Hrms.Domain.RemoteWork;
+using TecAxle.Hrms.Domain.Workflows.Enums;
+using TecAxle.Hrms.Shared.Common.Exceptions;
 
-namespace TimeAttendanceSystem.Application.Features.RemoteWorkRequests.Commands.CreateRemoteWorkRequest;
+namespace TecAxle.Hrms.Application.Features.RemoteWorkRequests.Commands.CreateRemoteWorkRequest;
 
 /// <summary>
 /// Handler for creating remote work requests for employees.

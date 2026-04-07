@@ -1,7 +1,7 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Workflows.Commands.ApproveStep;
+namespace TecAxle.Hrms.Application.Workflows.Commands.ApproveStep;
 
 /// <summary>
 /// CQRS command for approving a workflow step.

@@ -1,7 +1,9 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.EmployeeVacations.Commands.CreateBulkEmployeeVacation;
+namespace TecAxle.Hrms.Application.EmployeeVacations.Commands.CreateBulkEmployeeVacation;
 
 /// <summary>
 /// CQRS command for creating bulk employee vacation records.
@@ -41,6 +43,7 @@ namespace TimeAttendanceSystem.Application.EmployeeVacations.Commands.CreateBulk
 /// - Individual vacation records created for proper audit trail and management
 /// - Bulk operation maintains transactional integrity
 /// </remarks>
+[RequiresModule(SystemModule.LeaveManagement)]
 public record CreateBulkEmployeeVacationCommand(
     long VacationTypeId,
     DateTime StartDate,

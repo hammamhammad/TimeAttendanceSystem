@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Application.AuditLogs.Queries.GetAuditLogs;
+namespace TecAxle.Hrms.Application.AuditLogs.Queries.GetAuditLogs;
 
 public record GetAuditLogsResponse(
     List<AuditLogDto> AuditLogs,

@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Notifications.Queries.GetBroadcasts;
+namespace TecAxle.Hrms.Application.Notifications.Queries.GetBroadcasts;
 
 /// <summary>
 /// Handler for getting paginated notification broadcasts.

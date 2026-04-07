@@ -1,0 +1,136 @@
+<div class="app-modern-form">
+  <app-form-header
+    [title]="i18n.t('expense_claims.create')"
+    moduleName="expense_claims"
+    moduleRoute="expenses/claims">
+  </app-form-header>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <app-form-section [title]="i18n.t('expense_claims.claim_details')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="app-modern-field">
+            <label class="app-modern-label">{{ i18n.t('expense_claims.employee') }} *</label>
+            <app-searchable-select
+              [options]="employeeOptions()"
+              [placeholder]="i18n.t('common.select')"
+              [value]="form.get('employeeId')?.value"
+              (selectionChange)="form.get('employeeId')?.setValue($event)">
+            </app-searchable-select>
+          </div>
+          @if (form.get('employeeId')?.touched && form.get('employeeId')?.hasError('required')) {
+            <div class="invalid-feedback d-block">{{ i18n.t('common.required') }}</div>
+          }
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <select class="form-select" id="currency" formControlName="currency">
+              <option value="SAR">SAR - Saudi Riyal</option>
+              <option value="USD">USD - US Dollar</option>
+              <option value="EUR">EUR - Euro</option>
+              <option value="GBP">GBP - British Pound</option>
+              <option value="AED">AED - UAE Dirham</option>
+              <option value="KWD">KWD - Kuwaiti Dinar</option>
+              <option value="QAR">QAR - Qatari Riyal</option>
+              <option value="BHD">BHD - Bahraini Dinar</option>
+              <option value="OMR">OMR - Omani Rial</option>
+              <option value="EGP">EGP - Egyptian Pound</option>
+              <option value="JOD">JOD - Jordanian Dinar</option>
+            </select>
+            <label for="currency">{{ i18n.t('expense_claims.currency') }}</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-floating">
+            <textarea class="form-control" id="description" formControlName="description" placeholder="Description" style="height: 80px"></textarea>
+            <label for="description">{{ i18n.t('common.description') }}</label>
+          </div>
+        </div>
+      </div>
+    </app-form-section>
+
+    <app-form-section [title]="i18n.t('expense_claims.items')" variant="modern">
+      <div formArrayName="items">
+        @for (item of items.controls; track $index; let i = $index) {
+          <div class="card mb-3" [formGroupName]="i">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="mb-0">{{ i18n.t('expense_claims.item') }} #{{ i + 1 }}</h6>
+                @if (items.length > 1) {
+                  <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeItem(i)">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                }
+              </div>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <div class="app-modern-field">
+                    <label class="app-modern-label">{{ i18n.t('expense_claims.item_category') }}</label>
+                    <app-searchable-select
+                      [options]="categoryOptions()"
+                      [placeholder]="i18n.t('common.select')"
+                      [value]="item.get('expenseCategoryId')?.value"
+                      (selectionChange)="item.get('expenseCategoryId')?.setValue($event)">
+                    </app-searchable-select>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-floating">
+                    <input type="number" class="form-control" [id]="'amount_' + i" formControlName="amount" placeholder="0" step="0.01">
+                    <label [for]="'amount_' + i">{{ i18n.t('expense_claims.item_amount') }} *</label>
+                  </div>
+                  @if (item.get('amount')?.touched && item.get('amount')?.invalid) {
+                    <div class="invalid-feedback d-block">{{ i18n.t('common.required') }}</div>
+                  }
+                </div>
+                <div class="col-md-4">
+                  <div class="form-floating">
+                    <input type="date" class="form-control" [id]="'expenseDate_' + i" formControlName="expenseDate" placeholder="Date">
+                    <label [for]="'expenseDate_' + i">{{ i18n.t('expense_claims.item_date') }} *</label>
+                  </div>
+                  @if (item.get('expenseDate')?.touched && item.get('expenseDate')?.hasError('required')) {
+                    <div class="invalid-feedback d-block">{{ i18n.t('common.required') }}</div>
+                  }
+                </div>
+                <div class="col-md-6">
+                  <div class="form-floating">
+                    <input type="text" class="form-control" [id]="'desc_' + i" formControlName="description" placeholder="Description">
+                    <label [for]="'desc_' + i">{{ i18n.t('common.description') }} *</label>
+                  </div>
+                  @if (item.get('description')?.touched && item.get('description')?.hasError('required')) {
+                    <div class="invalid-feedback d-block">{{ i18n.t('common.required') }}</div>
+                  }
+                </div>
+                <div class="col-md-6">
+                  <div class="form-floating">
+                    <input type="text" class="form-control" [id]="'notes_' + i" formControlName="notes" placeholder="Notes">
+                    <label [for]="'notes_' + i">{{ i18n.t('expense_claims.notes') }}</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mt-3">
+        <button type="button" class="btn btn-outline-primary" (click)="addItem()">
+          <i class="fa-solid fa-plus me-2"></i>{{ i18n.t('expense_claims.add_item') }}
+        </button>
+        <div class="fw-bold">
+          {{ i18n.t('expense_claims.total_amount') }}: {{ totalAmount().toFixed(2) }}
+        </div>
+      </div>
+    </app-form-section>
+
+    <div class="app-form-actions">
+      <button type="button" class="btn btn-secondary" routerLink="/expenses/claims">{{ i18n.t('common.cancel') }}</button>
+      <button type="submit" class="btn btn-primary" [disabled]="saving()">
+        @if (saving()) {
+          <span class="spinner-border spinner-border-sm me-2"></span>
+        }
+        {{ i18n.t('common.save') }}
+      </button>
+    </div>
+  </form>
+</div>

@@ -69,6 +69,16 @@
           </button>
         </li>
       }
+      <li class="nav-item">
+        <button
+          type="button"
+          class="nav-link"
+          [class.active]="activeTab() === 'history'"
+          (click)="activeTab.set('history')">
+          <i class="fa-solid fa-clock-rotate-left me-2"></i>
+          {{ t('history.title') }}
+        </button>
+      </li>
     </ul>
 
     <!-- Tab Content -->
@@ -279,6 +289,13 @@
           </div>
         </div>
       </div>
+    }
+
+    <!-- History Tab -->
+    @if (activeTab() === 'history') {
+      <app-section-card [title]="t('history.title')" icon="fas fa-clock-rotate-left" headerClass="bg-light">
+        <app-audit-history [entityName]="'Employee'" [entityId]="employee()?.id" />
+      </app-section-card>
     }
   } @else {
     <div class="alert alert-danger">

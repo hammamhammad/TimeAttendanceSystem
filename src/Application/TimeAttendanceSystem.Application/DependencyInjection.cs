@@ -2,11 +2,12 @@ using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Services;
-using TimeAttendanceSystem.Application.Workflows.Services;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Application.Services;
+using TecAxle.Hrms.Application.Workflows.Services;
 
-namespace TimeAttendanceSystem.Application;
+namespace TecAxle.Hrms.Application;
 
 public static class DependencyInjection
 {
@@ -14,6 +15,10 @@ public static class DependencyInjection
     {
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+
+        // Register entitlement pipeline behaviors
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ModuleEntitlementBehavior<,>));
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UsageLimitBehavior<,>));
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
         // Register attendance services

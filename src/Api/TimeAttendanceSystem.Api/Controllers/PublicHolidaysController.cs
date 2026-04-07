@@ -1,20 +1,20 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TimeAttendanceSystem.Application.PublicHolidays.Commands.CreatePublicHoliday;
-using TimeAttendanceSystem.Application.PublicHolidays.Commands.UpdatePublicHoliday;
-using TimeAttendanceSystem.Application.PublicHolidays.Commands.DeletePublicHoliday;
-using TimeAttendanceSystem.Application.PublicHolidays.Queries.GetPublicHolidays;
-using TimeAttendanceSystem.Application.PublicHolidays.Queries.GetPublicHolidayById;
-using TimeAttendanceSystem.Application.PublicHolidays.Queries.GetHolidayCalendar;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Domain.Settings;
+using TecAxle.Hrms.Application.PublicHolidays.Commands.CreatePublicHoliday;
+using TecAxle.Hrms.Application.PublicHolidays.Commands.UpdatePublicHoliday;
+using TecAxle.Hrms.Application.PublicHolidays.Commands.DeletePublicHoliday;
+using TecAxle.Hrms.Application.PublicHolidays.Queries.GetPublicHolidays;
+using TecAxle.Hrms.Application.PublicHolidays.Queries.GetPublicHolidayById;
+using TecAxle.Hrms.Application.PublicHolidays.Queries.GetHolidayCalendar;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Domain.Settings;
 using System.Linq;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using TimeAttendanceSystem.Api.Converters;
+using TecAxle.Hrms.Api.Converters;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 /// <summary>
 /// API controller for managing public holidays.

@@ -1,0 +1,117 @@
+<!-- Page Header -->
+<app-page-header [title]="i18n.t('portal.documents.title')">
+  <div header-actions>
+    <button
+      class="btn btn-outline-primary btn-sm"
+      (click)="refresh()"
+      [disabled]="loading()"
+      type="button">
+      <i class="bi bi-arrow-clockwise" [class.spin]="loading()"></i>
+      {{ i18n.t('common.refresh') }}
+    </button>
+  </div>
+</app-page-header>
+
+<!-- Tabs -->
+<ul class="nav nav-tabs mb-3">
+  <li class="nav-item">
+    <button class="nav-link" [class.active]="activeTab() === 'documents'" (click)="setTab('documents')">
+      <i class="bi bi-file-earmark-text me-1"></i>{{ i18n.t('portal.documents.my_documents') }}
+    </button>
+  </li>
+  <li class="nav-item">
+    <button class="nav-link" [class.active]="activeTab() === 'policies'" (click)="setTab('policies')">
+      <i class="bi bi-shield-check me-1"></i>{{ i18n.t('portal.documents.company_policies') }}
+    </button>
+  </li>
+</ul>
+
+<!-- Loading State (only when no data) -->
+@if (loading() && documents().length === 0 && activeTab() === 'documents') {
+  <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+}
+@if (loading() && policies().length === 0 && activeTab() === 'policies') {
+  <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+}
+
+<!-- Error State -->
+@if (error() && ((activeTab() === 'documents' && documents().length === 0) || (activeTab() === 'policies' && policies().length === 0))) {
+  <div class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle me-2"></i>{{ error() }}
+    <button class="btn btn-sm btn-outline-danger ms-3" (click)="refresh()" type="button">{{ i18n.t('common.retry') }}</button>
+  </div>
+}
+
+<!-- Documents Tab -->
+@if (activeTab() === 'documents') {
+  <!-- Empty State -->
+  @if (!loading() && documents().length === 0 && !error()) {
+    <app-empty-state
+      icon="bi bi-file-earmark-text"
+      [title]="i18n.t('portal.documents.no_documents')">
+    </app-empty-state>
+  }
+
+  <!-- Data Table -->
+  @if (documents().length > 0) {
+    <div class="card">
+      <div class="card-body">
+        <app-data-table
+          [data]="tableData()"
+          [columns]="docColumns"
+          [actions]="docActions()"
+          [loading]="loading()"
+          [paginated]="true"
+          [pageSize]="10"
+          (actionClick)="onDocAction($event)">
+        </app-data-table>
+      </div>
+    </div>
+
+    <!-- Info Card -->
+    <div class="card mt-3">
+      <div class="card-body">
+        <div class="d-flex align-items-start">
+          <i class="bi bi-info-circle text-info me-3 mt-1" style="font-size: 1.5rem;"></i>
+          <div>
+            <h6 class="mb-2">{{ i18n.t('portal.documents.info_title') }}</h6>
+            <p class="text-muted mb-0 small">{{ i18n.t('portal.documents.info_text') }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+}
+
+<!-- Policies Tab -->
+@if (activeTab() === 'policies') {
+  @if (!loading() && policies().length === 0 && !error()) {
+    <app-empty-state
+      icon="bi bi-shield-check"
+      [title]="i18n.t('portal.documents.no_policies')">
+    </app-empty-state>
+  }
+
+  @if (policies().length > 0) {
+    <div class="row g-3">
+      @for (policy of policies(); track policy.id) {
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <h6 class="card-title">{{ policy.title }}</h6>
+              <p class="text-muted small mb-2">{{ policy.category }} - v{{ policy.version }}</p>
+              <p class="small mb-2">{{ i18n.t('portal.documents.effective') }}: {{ policy.effectiveDate | date }}</p>
+              @if (policy.acknowledged) {
+                <span class="badge bg-success"><i class="bi bi-check me-1"></i>{{ i18n.t('portal.documents.acknowledged') }}</span>
+              } @else {
+                <button class="btn btn-sm btn-primary" (click)="acknowledgePolicy(policy)">
+                  <i class="bi bi-check me-1"></i>{{ i18n.t('portal.documents.acknowledge') }}
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+}

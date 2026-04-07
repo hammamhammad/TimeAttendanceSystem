@@ -1,12 +1,36 @@
-/* Modal wrapper styles */
+/* Modal wrapper styles - ERP Design System */
 .modal {
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(16, 24, 40, 0.6);
+  z-index: 1050;
 }
 
 .modal-backdrop {
   z-index: 1040;
 }
 
-.modal {
-  z-index: 1050;
+.modal-content {
+  border: none;
+  border-radius: var(--app-border-radius-xl, 16px);
+  box-shadow: var(--app-shadow-xl);
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--app-gray-200, #EAECF0);
+}
+
+.modal-header .modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--app-gray-900, #101828);
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--app-gray-200, #EAECF0);
 }

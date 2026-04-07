@@ -1,7 +1,10 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.EmployeeVacations.Commands.CreateEmployeeVacation;
+namespace TecAxle.Hrms.Application.EmployeeVacations.Commands.CreateEmployeeVacation;
 
 /// <summary>
 /// CQRS command for creating a new employee vacation record.
@@ -40,6 +43,7 @@ namespace TimeAttendanceSystem.Application.EmployeeVacations.Commands.CreateEmpl
 /// - Historical attendance records updated if vacation is in past
 /// - Future attendance processing considers vacation periods
 /// </remarks>
+[RequiresModule(SystemModule.LeaveManagement)]
 public record CreateEmployeeVacationCommand(
     long EmployeeId,
     long VacationTypeId,
@@ -47,5 +51,7 @@ public record CreateEmployeeVacationCommand(
     DateTime EndDate,
     bool IsApproved = true,
     string? Notes = null,
-    long? OnBehalfOfEmployeeId = null
+    long? OnBehalfOfEmployeeId = null,
+    bool IsHalfDay = false,
+    HalfDayType? HalfDayType = null
 ) : IRequest<Result<long>>;

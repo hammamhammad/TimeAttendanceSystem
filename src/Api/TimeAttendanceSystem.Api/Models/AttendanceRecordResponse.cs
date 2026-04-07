@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.Attendance;
+using TecAxle.Hrms.Domain.Attendance;
 
-namespace TimeAttendanceSystem.Api.Models;
+namespace TecAxle.Hrms.Api.Models;
 
 /// <summary>
 /// Response model for attendance record information.

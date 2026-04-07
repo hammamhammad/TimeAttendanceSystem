@@ -1,9 +1,9 @@
-using TimeAttendanceSystem.Domain.Branches;
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Domain.Employees;
+using TecAxle.Hrms.Domain.Branches;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Employees;
 using Microsoft.EntityFrameworkCore;
 
-namespace TimeAttendanceSystem.Infrastructure.Persistence;
+namespace TecAxle.Hrms.Infrastructure.Persistence;
 
 /// <summary>
 /// Comprehensive test data seeder for system functionality testing.

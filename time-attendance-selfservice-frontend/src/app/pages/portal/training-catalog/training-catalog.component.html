@@ -1,0 +1,172 @@
+<!-- Page Header -->
+<app-page-header [title]="i18n.t('portal.training.catalog')">
+  <div header-actions>
+    <button
+      class="btn btn-outline-primary btn-sm"
+      (click)="refresh()"
+      [disabled]="loading()"
+      type="button">
+      <i class="bi bi-arrow-clockwise" [class.spin]="loading()"></i>
+      {{ i18n.t('common.refresh') }}
+    </button>
+  </div>
+</app-page-header>
+
+<!-- Filters -->
+<div class="card mb-3">
+  <div class="card-body">
+    <div class="row g-2 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label small text-muted">{{ i18n.t('common.search') }}</label>
+        <div class="input-group input-group-sm">
+          <span class="input-group-text"><i class="bi bi-search"></i></span>
+          <input
+            type="text"
+            class="form-control"
+            [placeholder]="i18n.t('portal.training.search_courses')"
+            [ngModel]="searchTerm()"
+            (ngModelChange)="searchTerm.set($event)">
+        </div>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small text-muted">{{ i18n.t('common.category') }}</label>
+        <select class="form-select form-select-sm" [ngModel]="selectedCategory()" (ngModelChange)="selectedCategory.set($event)">
+          <option value="">{{ i18n.t('common.all') }}</option>
+          @for (cat of categories(); track cat) {
+            <option [value]="cat">{{ cat }}</option>
+          }
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading State -->
+@if (loading() && sessions().length === 0) {
+  <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+}
+
+<!-- Error State -->
+@if (error() && sessions().length === 0) {
+  <div class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle me-2"></i>{{ error() }}
+    <button class="btn btn-sm btn-outline-danger ms-3" (click)="refresh()" type="button">{{ i18n.t('common.retry') }}</button>
+  </div>
+}
+
+<!-- Empty State -->
+@if (!loading() && filteredSessions().length === 0 && !error()) {
+  <app-empty-state
+    icon="bi bi-grid"
+    [title]="i18n.t('portal.training.no_catalog')">
+  </app-empty-state>
+}
+
+<!-- Catalog Cards -->
+@if (filteredSessions().length > 0) {
+  <div class="row g-3">
+    @for (session of filteredSessions(); track session.id) {
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 catalog-card">
+          <div class="card-body d-flex flex-column">
+            <!-- Category Badge -->
+            <div class="mb-2">
+              <span class="badge bg-light text-dark border">{{ getCategoryLabel(session) }}</span>
+              <span class="badge ms-1" [class]="session.deliveryMethod === 'Online' ? 'bg-info' : session.deliveryMethod === 'InPerson' ? 'bg-primary' : 'bg-secondary'">
+                {{ getDeliveryLabel(session.deliveryMethod) }}
+              </span>
+            </div>
+
+            <!-- Title -->
+            <h6 class="card-title mb-2">{{ getTitle(session) }}</h6>
+
+            <!-- Description -->
+            @if (getDescription(session)) {
+              <p class="text-muted small mb-2 flex-grow-1 description-clamp">{{ getDescription(session) }}</p>
+            }
+
+            <!-- Details -->
+            <div class="small text-muted mb-3">
+              <div class="d-flex align-items-center mb-1">
+                <i class="bi bi-calendar3 me-2"></i>
+                <span>{{ formatDate(session.startDate) }} - {{ formatDate(session.endDate) }}</span>
+              </div>
+              @if (session.location) {
+                <div class="d-flex align-items-center mb-1">
+                  <i class="bi bi-geo-alt me-2"></i>
+                  <span>{{ session.location }}</span>
+                </div>
+              }
+              @if (session.instructorName) {
+                <div class="d-flex align-items-center mb-1">
+                  <i class="bi bi-person me-2"></i>
+                  <span>{{ session.instructorName }}</span>
+                </div>
+              }
+              <div class="d-flex align-items-center">
+                <i class="bi bi-people me-2"></i>
+                <span>{{ session.enrolledCount }}/{{ session.maxParticipants }} {{ i18n.t('portal.training.enrolled') }}</span>
+              </div>
+            </div>
+
+            <!-- Spots indicator -->
+            @if (session.availableSpots > 0 && session.availableSpots <= 5) {
+              <div class="text-warning small mb-2">
+                <i class="bi bi-exclamation-triangle me-1"></i>
+                {{ i18n.t('portal.training.few_spots_left') }}
+              </div>
+            }
+            @if (session.availableSpots === 0) {
+              <div class="text-danger small mb-2">
+                <i class="bi bi-x-circle me-1"></i>
+                {{ i18n.t('portal.training.no_spots') }}
+              </div>
+            }
+
+            <!-- Actions -->
+            <div class="d-flex gap-2 mt-auto">
+              <button
+                class="btn btn-sm btn-outline-info flex-grow-1"
+                (click)="viewDetails(session)"
+                type="button">
+                <i class="bi bi-eye me-1"></i>{{ i18n.t('common.view_details') }}
+              </button>
+              @if (!session.isEnrolled && session.availableSpots > 0) {
+                <button
+                  class="btn btn-sm btn-primary flex-grow-1"
+                  (click)="enroll(session)"
+                  [disabled]="enrollingId() === session.id"
+                  type="button">
+                  @if (enrollingId() === session.id) {
+                    <span class="spinner-border spinner-border-sm me-1"></span>
+                  } @else {
+                    <i class="bi bi-plus-circle me-1"></i>
+                  }
+                  {{ i18n.t('portal.training.enroll') }}
+                </button>
+              }
+              @if (session.isEnrolled) {
+                <span class="btn btn-sm btn-success flex-grow-1 disabled">
+                  <i class="bi bi-check-circle me-1"></i>{{ i18n.t('portal.training.already_enrolled') }}
+                </span>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Info Card -->
+  <div class="card mt-3">
+    <div class="card-body">
+      <div class="d-flex align-items-start">
+        <i class="bi bi-info-circle text-info me-3 mt-1" style="font-size: 1.5rem;"></i>
+        <div>
+          <h6 class="mb-2">{{ i18n.t('portal.training.catalog_info_title') }}</h6>
+          <p class="text-muted mb-0 small">{{ i18n.t('portal.training.catalog_info_text') }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+}

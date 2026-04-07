@@ -1,11 +1,14 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.MobileAttendance.Commands.ProcessMobileTransaction;
+namespace TecAxle.Hrms.Application.MobileAttendance.Commands.ProcessMobileTransaction;
 
 /// <summary>
 /// Command to process a mobile attendance transaction with GPS + NFC dual verification.
 /// </summary>
+[RequiresModule(SystemModule.TimeAttendance)]
 public record ProcessMobileTransactionCommand(
     long EmployeeId,
     long BranchId,

@@ -1,9 +1,11 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Settings;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Settings;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.PublicHolidays.Commands.CreatePublicHoliday;
+namespace TecAxle.Hrms.Application.PublicHolidays.Commands.CreatePublicHoliday;
 
 /// <summary>
 /// Command for creating a new public holiday in the system.
@@ -61,6 +63,7 @@ namespace TimeAttendanceSystem.Application.PublicHolidays.Commands.CreatePublicH
 /// - Regional OneTime: Company Anniversary (SpecificDate=2024-03-15, BranchId=123)
 /// - Monthly Recurring: First Monday Safety Meeting (DayOfWeek=Monday, WeekOccurrence=1)
 /// </remarks>
+[RequiresModule(SystemModule.TimeAttendance)]
 public record CreatePublicHolidayCommand(
     string Name,
     string? NameAr,

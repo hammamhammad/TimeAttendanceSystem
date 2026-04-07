@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Application.Excuses.Queries.GetExcusePolicies;
+namespace TecAxle.Hrms.Application.Excuses.Queries.GetExcusePolicies;
 
 /// <summary>
 /// Data Transfer Object for excuse policy information.

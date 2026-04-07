@@ -1,7 +1,7 @@
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Domain.Users;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Users;
 
-namespace TimeAttendanceSystem.Domain.Notifications;
+namespace TecAxle.Hrms.Domain.Notifications;
 
 /// <summary>
 /// Domain entity representing a registered device token for push notifications.

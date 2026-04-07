@@ -1,0 +1,38 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header [title]="i18n.t(isEditMode() ? 'performance_cycles.edit' : 'performance_cycles.create')" moduleName="performance_cycles" moduleRoute="performance/cycles" />
+  @if (loadingData()) {
+    <div class="text-center py-5"><app-loading-spinner [message]="i18n.t('common.loading')" [variant]="'primary'" [centered]="true" /></div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <app-form-section [title]="i18n.t('common.basic_info')" [variant]="'modern'">
+        <div class="row g-3">
+          <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" id="name" formControlName="name" placeholder="x"><label for="name">{{ i18n.t('performance_cycles.name') }} <span class="text-danger">*</span></label></div></div>
+          <div class="col-md-6"><div class="form-floating"><input type="text" class="form-control" id="nameAr" formControlName="nameAr" placeholder="x" dir="rtl"><label for="nameAr">{{ i18n.t('performance_cycles.name_ar') }}</label></div></div>
+          <div class="col-md-6">
+            <div class="form-floating">
+              <select class="form-select" id="cycleType" formControlName="cycleType">
+                <option value="Annual">{{ i18n.t('performance_cycles.type_annual') }}</option>
+                <option value="SemiAnnual">{{ i18n.t('performance_cycles.type_semi_annual') }}</option>
+                <option value="Quarterly">{{ i18n.t('performance_cycles.type_quarterly') }}</option>
+                <option value="Monthly">{{ i18n.t('performance_cycles.type_monthly') }}</option>
+                <option value="Probation">{{ i18n.t('performance_cycles.type_probation') }}</option>
+                <option value="AdHoc">{{ i18n.t('performance_cycles.type_adhoc') }}</option>
+              </select>
+              <label for="cycleType">{{ i18n.t('performance_cycles.cycle_type') }} <span class="text-danger">*</span></label>
+            </div>
+          </div>
+          <div class="col-md-6"></div>
+          <div class="col-md-6"><div class="form-floating"><input type="date" class="form-control" id="startDate" formControlName="startDate" placeholder="x"><label for="startDate">{{ i18n.t('fields.start_date') }} <span class="text-danger">*</span></label></div></div>
+          <div class="col-md-6"><div class="form-floating"><input type="date" class="form-control" id="endDate" formControlName="endDate" placeholder="x"><label for="endDate">{{ i18n.t('fields.end_date') }} <span class="text-danger">*</span></label></div></div>
+          <div class="col-md-6"><div class="form-floating"><input type="date" class="form-control" id="selfAssessmentDeadline" formControlName="selfAssessmentDeadline" placeholder="x"><label for="selfAssessmentDeadline">{{ i18n.t('performance_cycles.self_review_deadline') }}</label></div></div>
+          <div class="col-md-6"><div class="form-floating"><input type="date" class="form-control" id="managerAssessmentDeadline" formControlName="managerAssessmentDeadline" placeholder="x"><label for="managerAssessmentDeadline">{{ i18n.t('performance_cycles.manager_review_deadline') }}</label></div></div>
+          <div class="col-12"><div class="form-floating"><textarea class="form-control" id="description" formControlName="description" placeholder="x" style="height: 80px"></textarea><label for="description">{{ i18n.t('performance_cycles.description') }}</label></div></div>
+        </div>
+      </app-form-section>
+      <div class="app-form-actions">
+        <button type="button" class="btn btn-secondary" routerLink="/performance/cycles">{{ i18n.t('common.cancel') }}</button>
+        <button type="submit" class="btn btn-primary" [disabled]="form.invalid || submitting()">@if (submitting()) { <span class="spinner-border spinner-border-sm me-1"></span> }{{ i18n.t('common.save') }}</button>
+      </div>
+    </form>
+  }
+</div>

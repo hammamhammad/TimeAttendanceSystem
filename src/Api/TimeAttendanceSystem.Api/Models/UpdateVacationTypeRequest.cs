@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Api.Models;
+namespace TecAxle.Hrms.Api.Models;
 
 /// <summary>
 /// Simplified request model for updating an existing vacation type.
@@ -33,4 +33,22 @@ public class UpdateVacationTypeRequest
     /// Provides localization for Arabic-speaking organizations.
     /// </summary>
     public string? NameAr { get; set; }
+
+    /// <summary>
+    /// Whether this vacation type allows half-day leave requests.
+    /// When true, employees can request morning or afternoon half-day leaves.
+    /// </summary>
+    public bool AllowHalfDay { get; set; }
+
+    /// <summary>
+    /// Whether this vacation type allows leave encashment.
+    /// When true, employees can convert unused leave balance to cash.
+    /// </summary>
+    public bool AllowEncashment { get; set; }
+
+    /// <summary>
+    /// Maximum number of days that can be encashed.
+    /// Only applicable when AllowEncashment is true. Null means no limit.
+    /// </summary>
+    public int? EncashmentMaxDays { get; set; }
 }

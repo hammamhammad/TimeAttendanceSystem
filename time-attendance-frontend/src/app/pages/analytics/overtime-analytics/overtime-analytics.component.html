@@ -1,0 +1,112 @@
+<div class="overtime-analytics-page">
+  <app-page-header
+    [title]="i18n.t('analytics.overtime_title')"
+    [showBackButton]="true"
+    backRoute="/analytics">
+  </app-page-header>
+
+  <!-- Filters -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label">{{ i18n.t('analytics.start_date') }}</label>
+          <input type="date" class="form-control" [ngModel]="startDate()" (ngModelChange)="startDate.set($event)">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">{{ i18n.t('analytics.end_date') }}</label>
+          <input type="date" class="form-control" [ngModel]="endDate()" (ngModelChange)="endDate.set($event)">
+        </div>
+        <div class="col-md-3">
+          <button class="btn btn-primary" (click)="onFilter()">
+            <i class="fa-solid fa-filter me-1"></i>
+            {{ i18n.t('analytics.apply_filter') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <app-loading-spinner></app-loading-spinner>
+  } @else if (data()) {
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="card stat-card h-100">
+          <div class="card-body text-center">
+            <div class="stat-icon bg-warning-subtle mb-2">
+              <i class="fa-solid fa-clock text-warning"></i>
+            </div>
+            <h3 class="mb-1">{{ data()!.totalOvertimeHours }}</h3>
+            <p class="text-muted mb-0">{{ i18n.t('analytics.total_overtime_hours') }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card stat-card h-100">
+          <div class="card-body text-center">
+            <div class="stat-icon bg-info-subtle mb-2">
+              <i class="fa-solid fa-file-lines text-info"></i>
+            </div>
+            <h3 class="mb-1">{{ data()!.totalRecordsWithOvertime }}</h3>
+            <p class="text-muted mb-0">{{ i18n.t('analytics.records_with_overtime') }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card stat-card h-100">
+          <div class="card-body text-center">
+            <div class="stat-icon bg-primary-subtle mb-2">
+              <i class="fa-solid fa-user-clock text-primary"></i>
+            </div>
+            <h3 class="mb-1">{{ data()!.avgOvertimePerEmployee }}</h3>
+            <p class="text-muted mb-0">{{ i18n.t('analytics.avg_hours_per_employee') }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card stat-card h-100">
+          <div class="card-body text-center">
+            <div class="stat-icon bg-success-subtle mb-2">
+              <i class="fa-solid fa-users text-success"></i>
+            </div>
+            <h3 class="mb-1">{{ data()!.distinctEmployeesWithOvertime }}</h3>
+            <p class="text-muted mb-0">{{ i18n.t('analytics.employees_with_overtime') }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Monthly Trend -->
+    @if ((data()!.byMonth ?? []).length > 0) {
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">{{ i18n.t('analytics.monthly_trend') }}</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>{{ i18n.t('analytics.month') }}</th>
+                  <th class="text-center">{{ i18n.t('analytics.hours') }}</th>
+                  <th class="text-end">{{ i18n.t('analytics.employees') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of data()!.byMonth; track row.year + '-' + row.month) {
+                  <tr>
+                    <td class="fw-medium">{{ getMonthLabel(row.year, row.month) }}</td>
+                    <td class="text-center">{{ row.totalHours }}</td>
+                    <td class="text-end">{{ row.employeeCount }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    }
+  }
+</div>

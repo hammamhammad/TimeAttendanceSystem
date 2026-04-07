@@ -1,8 +1,8 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Application.Employees.Commands.CreateEmployee;
+namespace TecAxle.Hrms.Application.Employees.Commands.CreateEmployee;
 
 /// <summary>
 /// CQRS command for creating a new employee record in the Time Attendance System.

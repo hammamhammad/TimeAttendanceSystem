@@ -1,7 +1,9 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.Excuses.Commands.UpdateExcusePolicy;
+namespace TecAxle.Hrms.Application.Excuses.Commands.UpdateExcusePolicy;
 
 /// <summary>
 /// CQRS command for updating an existing excuse policy configuration.
@@ -39,6 +41,7 @@ namespace TimeAttendanceSystem.Application.Excuses.Commands.UpdateExcusePolicy;
 /// - Branch-scoped access control for multi-tenant environments
 /// - Audit trail maintained for compliance
 /// </remarks>
+[RequiresModule(SystemModule.LeaveManagement)]
 public record UpdateExcusePolicyCommand(
     long Id,
     long? BranchId,

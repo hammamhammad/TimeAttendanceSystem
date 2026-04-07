@@ -1,6 +1,7 @@
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Tenants;
 
-namespace TimeAttendanceSystem.Domain.Branches;
+namespace TecAxle.Hrms.Domain.Branches;
 
 /// <summary>
 /// Domain entity representing an organizational branch or location within the multi-tenant time attendance system.
@@ -58,6 +59,16 @@ namespace TimeAttendanceSystem.Domain.Branches;
 /// </remarks>
 public class Branch : BaseEntity
 {
+    /// <summary>
+    /// Gets or sets the tenant (company) that owns this branch.
+    /// </summary>
+    public long TenantId { get; set; }
+
+    /// <summary>
+    /// Navigation property to the owning tenant.
+    /// </summary>
+    public Tenant Tenant { get; set; } = null!;
+
     /// <summary>
     /// Gets or sets the unique branch code for organizational identification and integration.
     /// Serves as a business identifier for external system integration and user-friendly reference.

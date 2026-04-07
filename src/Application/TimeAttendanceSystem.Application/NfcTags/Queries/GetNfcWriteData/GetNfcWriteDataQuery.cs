@@ -1,12 +1,15 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.NfcTags.Queries.GetNfcWriteData;
+namespace TecAxle.Hrms.Application.NfcTags.Queries.GetNfcWriteData;
 
 /// <summary>
 /// Query to generate an HMAC-signed payload for provisioning an NFC tag.
 /// The payload is written to the tag's NDEF memory during the provisioning step.
 /// </summary>
+[RequiresModule(SystemModule.TimeAttendance, AllowReadWhenDisabled = true)]
 public record GetNfcWriteDataQuery(long TagId) : IRequest<Result<NfcWriteDataDto>>;
 
 /// <summary>

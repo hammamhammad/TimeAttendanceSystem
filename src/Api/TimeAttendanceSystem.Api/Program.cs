@@ -1,16 +1,16 @@
 using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Coravel;
-using TimeAttendanceSystem.Api.Configuration;
-using TimeAttendanceSystem.Api.Filters;
-using TimeAttendanceSystem.Api.Hubs;
-using TimeAttendanceSystem.Api.Middleware;
-using TimeAttendanceSystem.Application;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Infrastructure;
-using TimeAttendanceSystem.Infrastructure.BackgroundJobs;
-using TimeAttendanceSystem.Infrastructure.Persistence;
-using TimeAttendanceSystem.Shared.Localization;
+using TecAxle.Hrms.Api.Configuration;
+using TecAxle.Hrms.Api.Filters;
+using TecAxle.Hrms.Api.Hubs;
+using TecAxle.Hrms.Api.Middleware;
+using TecAxle.Hrms.Application;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Infrastructure;
+using TecAxle.Hrms.Infrastructure.BackgroundJobs;
+using TecAxle.Hrms.Infrastructure.Persistence;
+using TecAxle.Hrms.Shared.Localization;
 using System.Globalization;
 
 // Enable legacy timestamp behavior so Npgsql accepts DateTime with Kind=Unspecified for timestamptz columns
@@ -186,6 +186,134 @@ app.Services.UseScheduler(scheduler =>
     // Schedule workflow timeout processing to run every hour
     scheduler.Schedule<WorkflowTimeoutProcessingJob>()
         .Hourly(); // Check for timed out workflow steps every hour
+
+    // Clean up frozen workflows that have been frozen for over 90 days
+    scheduler.Schedule<FrozenWorkflowCleanupJob>()
+        .DailyAtHour(3); // Run at 3:00 AM daily
+
+    // Schedule temporary allowance expiration to run daily at 2 AM
+    scheduler.Schedule<ExpireTemporaryAllowancesJob>()
+        .DailyAtHour(2); // Expire temporary allowances at 2:00 AM daily
+
+    // Schedule contract expiry alerts to run daily at 3 AM
+    scheduler.Schedule<ContractExpiryAlertJob>()
+        .DailyAtHour(3); // Check for expiring contracts at 3:00 AM daily
+
+    // Schedule visa expiry alerts to run daily at 4 AM
+    scheduler.Schedule<VisaExpiryAlertJob>()
+        .DailyAtHour(4); // Check for expiring visas at 4:00 AM daily
+
+    // Schedule profile change application to run daily at 1 AM
+    scheduler.Schedule<ApplyScheduledProfileChangesJob>()
+        .DailyAt(1, 0); // Apply scheduled profile changes at 1:00 AM daily
+
+    // Schedule onboarding task overdue check to run daily at 5 AM
+    scheduler.Schedule<OnboardingTaskOverdueJob>()
+        .DailyAtHour(5); // Mark overdue onboarding tasks and notify at 5:00 AM daily
+
+    // Schedule PIP expiry check to run daily at 6 AM
+    scheduler.Schedule<PIPExpiryCheckJob>()
+        .DailyAtHour(6); // Check for expired PIPs and notify managers at 6:00 AM daily
+
+    // Schedule review cycle reminder to run daily at 7 AM
+    scheduler.Schedule<ReviewCycleReminderJob>()
+        .DailyAtHour(7); // Send performance review deadline reminders at 7:00 AM daily
+
+    // Schedule document expiry alerts to run daily at 8 AM
+    scheduler.Schedule<DocumentExpiryAlertJob>()
+        .DailyAtHour(8); // Check for expiring documents at 8:00 AM daily
+
+    // Schedule loan repayment reminders to run daily at 9 AM
+    scheduler.Schedule<LoanRepaymentReminderJob>()
+        .DailyAtHour(9); // Check for overdue/upcoming loan repayments at 9:00 AM daily
+
+    // Schedule certification expiry alerts to run daily at 10 AM
+    scheduler.Schedule<CertificationExpiryAlertJob>()
+        .DailyAtHour(10); // Check for expiring certifications at 10:00 AM daily
+
+    // Schedule training session reminders to run daily at 11 AM
+    scheduler.Schedule<TrainingSessionReminderJob>()
+        .DailyAtHour(11); // Remind enrolled employees of upcoming sessions at 11:00 AM daily
+
+    // Schedule grievance SLA alerts to run daily at 12 PM
+    scheduler.Schedule<GrievanceSlaAlertJob>()
+        .DailyAtHour(12); // Check for overdue/approaching grievance SLAs at 12:00 PM daily
+
+    // Schedule counseling follow-up reminders to run daily at 1 PM
+    scheduler.Schedule<CounselingFollowUpReminderJob>()
+        .DailyAtHour(13); // Remind counselors of pending follow-ups at 1:00 PM daily
+
+    // Schedule asset warranty expiry alerts to run daily at 2 PM
+    scheduler.Schedule<AssetWarrantyExpiryAlertJob>()
+        .DailyAtHour(14); // Check for expiring asset warranties at 2:00 PM daily
+
+    // Schedule overdue asset return alerts to run daily at 3 PM
+    scheduler.Schedule<OverdueAssetReturnAlertJob>()
+        .DailyAtHour(15); // Check for overdue asset returns at 3:00 PM daily
+
+    // Schedule survey distribution activator to run hourly
+    scheduler.Schedule<SurveyDistributionActivatorJob>()
+        .Hourly(); // Activate scheduled survey distributions every hour
+
+    // Schedule survey reminders to run daily at 9 AM
+    scheduler.Schedule<SurveyReminderJob>()
+        .DailyAtHour(9); // Remind pending survey participants at 9:00 AM daily
+
+    // Schedule survey expiry to run hourly
+    scheduler.Schedule<SurveyExpiryJob>()
+        .Hourly(); // Close expired survey distributions every hour
+
+    // Schedule analytics snapshot job to run daily at 1 AM
+    scheduler.Schedule<AnalyticsSnapshotJob>()
+        .DailyAt(1, 0); // Pre-compute daily analytics snapshots at 1:00 AM
+
+    // Schedule monthly analytics rollup to run on 1st of each month at 2 AM
+    scheduler.Schedule<MonthlyAnalyticsRollupJob>()
+        .Monthly()
+        .Zoned(TimeZoneInfo.Utc); // Aggregate daily snapshots into monthly on the 1st
+
+    // Schedule timesheet period generation to run daily at 3 AM
+    scheduler.Schedule<TimesheetPeriodGenerationJob>()
+        .DailyAtHour(3); // Auto-create next period when current one is nearing end
+
+    // Schedule timesheet submission reminders to run daily at 8 AM
+    scheduler.Schedule<TimesheetSubmissionReminderJob>()
+        .DailyAtHour(8); // Remind employees to submit timesheets near deadline
+
+    // Schedule timesheet period closure to run daily at 1 AM
+    scheduler.Schedule<TimesheetPeriodClosureJob>()
+        .DailyAt(1, 30); // Auto-close periods past their submission deadline
+
+    // Schedule talent profile sync to run monthly on 1st at 4 AM
+    scheduler.Schedule<TalentProfileSyncJob>()
+        .Monthly()
+        .Zoned(TimeZoneInfo.Utc); // Sync performance ratings from reviews on 1st of month
+
+    // Schedule succession plan review reminders to run monthly on 1st at 5 AM
+    scheduler.Schedule<SuccessionPlanReviewReminderJob>()
+        .Monthly()
+        .Zoned(TimeZoneInfo.Utc); // Remind HR of plans due for review on 1st of month
+
+    // Schedule open enrollment period activator to run daily at 12 AM
+    scheduler.Schedule<OpenEnrollmentPeriodActivatorJob>()
+        .DailyAt(0, 5); // Open/close enrollment periods based on dates at 12:05 AM daily
+
+    // Schedule benefit enrollment expiry to run daily at 1 AM
+    scheduler.Schedule<BenefitEnrollmentExpiryJob>()
+        .DailyAt(1, 15); // Terminate expired benefit enrollments at 1:15 AM daily
+
+    // Schedule benefit deduction sync to run monthly on 1st at 3 AM
+    scheduler.Schedule<BenefitDeductionSyncJob>()
+        .Monthly()
+        .Zoned(TimeZoneInfo.Utc); // Sync benefit deductions to payroll on 1st of month
+
+    // Schedule compensatory off expiry to run daily at 2:30 AM
+    scheduler.Schedule<CompensatoryOffExpiryJob>()
+        .DailyAt(2, 30); // Expire compensatory offs past their expiry date at 2:30 AM daily
+
+    // Schedule report execution to run hourly
+    scheduler.Schedule<ScheduledReportExecutionJob>()
+        .Hourly(); // Process due scheduled reports every hour
 });
 
 // Configure the HTTP request pipeline.
@@ -208,9 +336,11 @@ app.UseCors(corsSettings.PolicyName);
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 app.UseRouting();
+app.UseWebSockets();
 app.UseMiddleware<RateLimitingMiddleware>(app.Services.GetRequiredService<RateLimitOptions>());
 app.UseMiddleware<LocalizationMiddleware>();
 app.UseAuthentication();
+app.UseMiddleware<TenantResolutionMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 

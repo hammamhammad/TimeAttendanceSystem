@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Users;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Users;
 using System.Security.Cryptography;
 
-namespace TimeAttendanceSystem.Application.Users.Commands.CreateUser;
+namespace TecAxle.Hrms.Application.Users.Commands.CreateUser;
 
 /// <summary>
 /// Command handler for creating new user accounts with comprehensive validation and security features.
@@ -204,7 +204,7 @@ public class CreateUserCommandHandler : BaseHandler<CreateUserCommand, Result<lo
         // Create employee-user link (if employee is provided)
         if (request.EmployeeId.HasValue)
         {
-            var employeeUserLink = new TimeAttendanceSystem.Domain.Employees.EmployeeUserLink
+            var employeeUserLink = new TecAxle.Hrms.Domain.Employees.EmployeeUserLink
             {
                 EmployeeId = request.EmployeeId.Value,
                 UserId = user.Id

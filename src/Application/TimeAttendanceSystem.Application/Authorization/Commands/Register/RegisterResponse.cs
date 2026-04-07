@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Application.Authorization.Commands.Register;
+namespace TecAxle.Hrms.Application.Authorization.Commands.Register;
 
 public record RegisterResponse(
     long UserId,

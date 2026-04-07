@@ -1,0 +1,128 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header [title]="isEdit() ? i18n.t('timesheets.projects.edit') : i18n.t('timesheets.projects.create')"
+    moduleName="projects" moduleRoute="timesheets/projects" [loading]="saving()" />
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <app-form-section [title]="i18n.t('timesheets.projects.basic_info')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="code" formControlName="code" placeholder="Code">
+            <label for="code">{{ i18n.t('timesheets.projects.code') }} *</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="name" formControlName="name" placeholder="Name">
+            <label for="name">{{ i18n.t('timesheets.projects.name') }} *</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="nameAr" formControlName="nameAr" placeholder="Name Ar">
+            <label for="nameAr">{{ i18n.t('timesheets.projects.name_ar') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="clientName" formControlName="clientName" placeholder="Client">
+            <label for="clientName">{{ i18n.t('timesheets.projects.client_name') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="clientNameAr" formControlName="clientNameAr" placeholder="Client Ar">
+            <label for="clientNameAr">{{ i18n.t('timesheets.projects.client_name_ar') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <select class="form-select" id="branchId" formControlName="branchId">
+              <option [ngValue]="null">{{ i18n.t('common.select') }}</option>
+              @for (b of branches(); track b.id) { <option [ngValue]="b.id">{{ b.name }}</option> }
+            </select>
+            <label for="branchId">{{ i18n.t('timesheets.projects.branch') }} *</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <select class="form-select" id="managerEmployeeId" formControlName="managerEmployeeId">
+              <option [ngValue]="null">{{ i18n.t('common.select') }}</option>
+              @for (e of employees(); track e.id) { <option [ngValue]="e.id">{{ e.name }}</option> }
+            </select>
+            <label for="managerEmployeeId">{{ i18n.t('timesheets.projects.manager') }}</label>
+          </div>
+        </div>
+      </div>
+    </app-form-section>
+
+    <app-form-section [title]="i18n.t('timesheets.projects.schedule_budget')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="startDate" formControlName="startDate" placeholder="Start">
+            <label for="startDate">{{ i18n.t('timesheets.projects.start_date') }}</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="endDate" formControlName="endDate" placeholder="End">
+            <label for="endDate">{{ i18n.t('timesheets.projects.end_date') }}</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="number" class="form-control" id="budgetHours" formControlName="budgetHours" placeholder="Budget">
+            <label for="budgetHours">{{ i18n.t('timesheets.projects.budget_hours') }}</label>
+          </div>
+        </div>
+      </div>
+    </app-form-section>
+
+    <app-form-section [title]="i18n.t('timesheets.projects.settings')" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="form-floating">
+            <select class="form-select" id="status" formControlName="status">
+              <option value="Active">{{ i18n.t('timesheets.projects.status_active') }}</option>
+              <option value="OnHold">{{ i18n.t('timesheets.projects.status_onhold') }}</option>
+              <option value="Completed">{{ i18n.t('timesheets.projects.status_completed') }}</option>
+              <option value="Cancelled">{{ i18n.t('timesheets.projects.status_cancelled') }}</option>
+              <option value="Archived">{{ i18n.t('timesheets.projects.status_archived') }}</option>
+            </select>
+            <label for="status">{{ i18n.t('common.status') }}</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <textarea class="form-control" id="description" formControlName="description" placeholder="Desc" style="height: 80px"></textarea>
+            <label for="description">{{ i18n.t('common.description') }}</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <textarea class="form-control" id="descriptionAr" formControlName="descriptionAr" placeholder="Desc Ar" style="height: 80px"></textarea>
+            <label for="descriptionAr">{{ i18n.t('common.description_ar') }}</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-check form-switch mt-2">
+            <input class="form-check-input" type="checkbox" id="isActive" formControlName="isActive">
+            <label class="form-check-label" for="isActive">{{ i18n.t('common.active') }}</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-check form-switch mt-2">
+            <input class="form-check-input" type="checkbox" id="isChargeable" formControlName="isChargeable">
+            <label class="form-check-label" for="isChargeable">{{ i18n.t('timesheets.projects.is_chargeable') }}</label>
+          </div>
+        </div>
+      </div>
+    </app-form-section>
+
+    <div class="app-form-actions">
+      <button type="button" class="btn btn-secondary" (click)="router.navigate(['/timesheets/projects'])">{{ i18n.t('common.cancel') }}</button>
+      <button type="submit" class="btn btn-primary" [disabled]="saving()">{{ i18n.t('common.save') }}</button>
+    </div>
+  </form>
+</div>

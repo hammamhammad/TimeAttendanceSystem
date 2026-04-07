@@ -1,0 +1,5 @@
+<div class="job-postings-page">
+  <app-page-header [title]="i18n.t('job_postings.title')" />
+  <app-unified-filter moduleName="job_postings" [showAddButton]="true" [addButtonText]="i18n.t('job_postings.create')" [showRefreshButton]="true" [refreshing]="loading()" (searchChange)="onSearchChange($event)" (add)="navigateToCreate()" (refresh)="onRefreshData()" />
+  <app-data-table [data]="displayData()" [columns]="tableColumns" [actions]="tableActions" [loading]="loading" [totalItems]="totalCount()" [currentPage]="currentPage()" [pageSize]="pageSize()" [pageSizeOptions]="[10, 25, 50]" [emptyTitle]="i18n.t('job_postings.no_records_title')" [emptyMessage]="i18n.t('job_postings.no_records')" (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)" (actionClick)="onTableAction($event)" />
+</div>

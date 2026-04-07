@@ -2,11 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
-using TimeAttendanceSystem.Infrastructure.Persistence;
+using TecAxle.Hrms.Infrastructure.Persistence;
 
 #nullable disable
 
-namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
+namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
 {
     [DbContext(typeof(TimeAttendanceDbContext))]
     [Migration("20251231100000_AddTimeoutActionToWorkflowStep")]

@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Notifications;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Notifications;
 
-namespace TimeAttendanceSystem.Application.Notifications.Commands.RegisterPushToken;
+namespace TecAxle.Hrms.Application.Notifications.Commands.RegisterPushToken;
 
 /// <summary>
 /// Handler for registering/updating push notification tokens.

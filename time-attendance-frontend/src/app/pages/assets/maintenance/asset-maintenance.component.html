@@ -1,0 +1,157 @@
+<div class="app-list-page">
+  <app-page-header [title]="i18n.t('assets.maintenance.title')"></app-page-header>
+
+  <app-unified-filter
+    moduleName="asset-maintenance"
+    [refreshing]="loading()"
+    [showAddButton]="true"
+    [addButtonText]="i18n.t('assets.maintenance.create')"
+    [showRefreshButton]="true"
+    [refreshButtonText]="i18n.t('common.refresh')"
+    (searchChange)="onSearchChange($event)"
+    (add)="openCreate()"
+    (refresh)="onRefresh()">
+  </app-unified-filter>
+
+  <app-data-table
+    [data]="records()"
+    [columns]="tableColumns"
+    [actions]="tableActions()"
+    [currentPage]="currentPage()"
+    [totalPages]="totalPages()"
+    [totalItems]="totalItems()"
+    [pageSize]="pageSize()"
+    [loading]="loading"
+    [emptyTitle]="i18n.t('assets.maintenance.no_records')"
+    [emptyMessage]="i18n.t('assets.maintenance.no_records_message')"
+    [showPagination]="true"
+    [responsiveMode]="'auto'"
+    (actionClick)="onActionClick($event)"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+
+    <ng-template #cellTemplate let-item let-column="column">
+      @if (column.key === 'status') {
+        <app-status-badge
+          [status]="i18n.t('assets.maintenance.status_' + item.status)"
+          [variant]="getMaintenanceStatusVariant(item.status)">
+        </app-status-badge>
+      } @else if (column.key === 'maintenanceType') {
+        {{ i18n.t('assets.maintenance.type_' + item.maintenanceType) }}
+      } @else if (column.key === 'scheduledDate') {
+        {{ formatDate(item.scheduledDate) }}
+      } @else if (column.key === 'cost') {
+        {{ item.cost ? (item.cost + ' ' + (item.currency || '')) : '-' }}
+      } @else {
+        {{ item[column.key] || '-' }}
+      }
+    </ng-template>
+  </app-data-table>
+</div>
+
+<!-- Create/Edit Modal -->
+@if (showModal()) {
+  <app-modal-wrapper [title]="modalTitle" [show]="showModal()" (close)="showModal.set(false)">
+    <div class="app-modern-form">
+      <div class="row g-3">
+        @if (!editingRecord()) {
+          <div class="col-12">
+            <div class="app-modern-field">
+              <label class="app-modern-label">{{ i18n.t('assets.maintenance.asset') }} <span class="text-danger">*</span></label>
+              <app-searchable-select
+                [options]="assetOptions"
+                [placeholder]="i18n.t('assets.assignments.select_asset')"
+                [value]="formAssetId()"
+                (selectionChange)="formAssetId.set($event)">
+              </app-searchable-select>
+            </div>
+          </div>
+        }
+        <div class="col-md-6">
+          <div class="form-floating">
+            <select class="form-select" id="maintType"
+              [ngModel]="formMaintenanceType()" (ngModelChange)="formMaintenanceType.set($event)">
+              @for (opt of typeOptions; track opt.value) {
+                <option [value]="opt.value">{{ i18n.t(opt.label) }}</option>
+              }
+            </select>
+            <label for="maintType">{{ i18n.t('assets.maintenance.type') }}</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <select class="form-select" id="maintStatus"
+              [ngModel]="formStatus()" (ngModelChange)="formStatus.set($event)">
+              @for (opt of statusOptions; track opt.value) {
+                <option [value]="opt.value">{{ i18n.t(opt.label) }}</option>
+              }
+            </select>
+            <label for="maintStatus">{{ i18n.t('common.status') }}</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-floating">
+            <textarea class="form-control" id="maintDesc" placeholder="Description" style="height: 80px"
+              [ngModel]="formDescription()" (ngModelChange)="formDescription.set($event)"></textarea>
+            <label for="maintDesc">{{ i18n.t('common.description') }} <span class="text-danger">*</span></label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="scheduledDate" placeholder="Scheduled Date"
+              [ngModel]="formScheduledDate()" (ngModelChange)="formScheduledDate.set($event)">
+            <label for="scheduledDate">{{ i18n.t('assets.maintenance.scheduled_date') }} <span class="text-danger">*</span></label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <input type="date" class="form-control" id="completedDate" placeholder="Completed Date"
+              [ngModel]="formCompletedDate()" (ngModelChange)="formCompletedDate.set($event)">
+            <label for="completedDate">{{ i18n.t('assets.maintenance.completed_date') }}</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="number" class="form-control" id="maintCost" placeholder="Cost" step="0.01"
+              [ngModel]="formCost()" (ngModelChange)="formCost.set($event)">
+            <label for="maintCost">{{ i18n.t('assets.maintenance.cost') }}</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <select class="form-select" id="maintCurrency"
+              [ngModel]="formCurrency()" (ngModelChange)="formCurrency.set($event)">
+              @for (c of currencyOptions; track c) {
+                <option [value]="c">{{ c }}</option>
+              }
+            </select>
+            <label for="maintCurrency">{{ i18n.t('assets.currency') }}</label>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="maintVendor" placeholder="Vendor"
+              [ngModel]="formVendor()" (ngModelChange)="formVendor.set($event)">
+            <label for="maintVendor">{{ i18n.t('assets.maintenance.vendor') }}</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="form-floating">
+            <textarea class="form-control" id="maintNotes" placeholder="Notes" style="height: 80px"
+              [ngModel]="formNotes()" (ngModelChange)="formNotes.set($event)"></textarea>
+            <label for="maintNotes">{{ i18n.t('common.notes') }}</label>
+          </div>
+        </div>
+      </div>
+      <div class="app-form-actions mt-3">
+        <button class="btn btn-secondary" (click)="showModal.set(false)">{{ i18n.t('common.cancel') }}</button>
+        <button class="btn btn-primary" (click)="saveRecord()" [disabled]="saving() || !isFormValid">
+          @if (saving()) {
+            <span class="spinner-border spinner-border-sm me-1"></span>
+          }
+          {{ i18n.t('common.save') }}
+        </button>
+      </div>
+    </div>
+  </app-modal-wrapper>
+}

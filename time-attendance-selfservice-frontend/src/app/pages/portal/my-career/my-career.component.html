@@ -1,0 +1,207 @@
+<div class="my-career-page">
+  <app-page-header [title]="i18n.t('portal.my_career.title')" />
+
+  @if (loading()) {
+    <div class="text-center py-5"><app-loading-spinner [message]="i18n.t('common.loading')" [variant]="'primary'" [centered]="true" /></div>
+  } @else if (!hasProfile()) {
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center py-5">
+        <i class="bi bi-person-badge fs-1 text-muted mb-3 d-block"></i>
+        <h5>{{ i18n.t('portal.my_career.no_profile_title') }}</h5>
+        <p class="text-muted">{{ i18n.t('portal.my_career.no_profile_message') }}</p>
+      </div>
+    </div>
+  } @else {
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-4">
+      <li class="nav-item">
+        <button class="nav-link" [class.active]="activeTab() === 'profile'" (click)="setTab('profile')">
+          <i class="bi bi-person-circle me-1"></i>{{ i18n.t('portal.my_career.tab_profile') }}
+        </button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" [class.active]="activeTab() === 'paths'" (click)="setTab('paths')">
+          <i class="bi bi-signpost-2 me-1"></i>{{ i18n.t('portal.my_career.tab_career_paths') }}
+        </button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" [class.active]="activeTab() === 'development'" (click)="setTab('development')">
+          <i class="bi bi-graph-up me-1"></i>{{ i18n.t('portal.my_career.tab_development') }}
+        </button>
+      </li>
+    </ul>
+
+    <!-- Profile Tab -->
+    @if (activeTab() === 'profile') {
+      <div class="row g-4">
+        @if (profile()?.isHighPotential) {
+          <div class="col-12">
+            <div class="alert alert-success d-flex align-items-center">
+              <i class="bi bi-star-fill me-2"></i>
+              <span>{{ i18n.t('portal.my_career.high_potential_badge') }}</span>
+            </div>
+          </div>
+        }
+        <div class="col-lg-6">
+          <app-section-card [title]="i18n.t('portal.my_career.ratings_section')">
+            <app-definition-list [items]="profileItems()" [labelWidth]="'5'" [valueWidth]="'7'" />
+          </app-section-card>
+        </div>
+        <div class="col-lg-6">
+          <app-section-card [title]="i18n.t('portal.my_career.development_section')">
+            <app-definition-list [items]="developmentItems()" [labelWidth]="'5'" [valueWidth]="'7'" />
+          </app-section-card>
+        </div>
+
+        @if (profile()?.skills && profile()!.skills.length > 0) {
+          <div class="col-12">
+            <app-section-card [title]="i18n.t('portal.my_career.skills_section')">
+              <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead><tr>
+                    <th>{{ i18n.t('portal.my_career.skill_name') }}</th>
+                    <th>{{ i18n.t('portal.my_career.proficiency') }}</th>
+                    <th>{{ i18n.t('portal.my_career.years_exp') }}</th>
+                    <th>{{ i18n.t('portal.my_career.verified') }}</th>
+                  </tr></thead>
+                  <tbody>
+                    @for (skill of profile()!.skills; track skill.id) {
+                      <tr>
+                        <td>{{ i18n.locale() === 'ar' && skill.skillNameAr ? skill.skillNameAr : skill.skillName }}</td>
+                        <td><span class="badge bg-{{ getProficiencyColor(skill.proficiencyLevel) }}">{{ i18n.t('portal.my_career.enum.' + skill.proficiencyLevel) }}</span></td>
+                        <td>{{ skill.yearsOfExperience || '-' }}</td>
+                        <td>
+                          @if (skill.isVerified) { <i class="bi bi-check-circle-fill text-success"></i> }
+                          @else { <i class="bi bi-dash-circle text-muted"></i> }
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </app-section-card>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Career Paths Tab -->
+    @if (activeTab() === 'paths') {
+      @if (careerPaths().length === 0) {
+        <div class="card border-0 shadow-sm">
+          <div class="card-body text-center py-4">
+            <i class="bi bi-signpost-2 fs-1 text-muted mb-3 d-block"></i>
+            <p class="text-muted">{{ i18n.t('portal.my_career.no_career_paths') }}</p>
+          </div>
+        </div>
+      } @else {
+        @for (path of careerPaths(); track path.id) {
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white">
+              <h6 class="mb-0"><i class="bi bi-signpost-2 me-2 text-primary"></i>{{ i18n.locale() === 'ar' && path.nameAr ? path.nameAr : path.name }}</h6>
+              @if (path.description) {
+                <small class="text-muted">{{ i18n.locale() === 'ar' && path.descriptionAr ? path.descriptionAr : path.description }}</small>
+              }
+            </div>
+            <div class="card-body">
+              @if (path.steps.length > 0) {
+                <div class="career-path-steps">
+                  @for (step of path.steps; track step.id) {
+                    <div class="path-step">
+                      <div class="step-indicator">{{ step.stepOrder }}</div>
+                      <div class="step-details">
+                        <strong>{{ i18n.locale() === 'ar' && step.jobTitleAr ? step.jobTitleAr : step.jobTitle }}</strong>
+                        <div class="small text-muted">
+                          @if (step.toJobGradeName) { <span class="me-3"><i class="bi bi-layers me-1"></i>{{ step.toJobGradeName }}</span> }
+                          @if (step.typicalDurationMonths) { <span><i class="bi bi-clock me-1"></i>{{ step.typicalDurationMonths }} {{ i18n.t('portal.my_career.months') }}</span> }
+                        </div>
+                        @if (step.requiredCompetencies) { <div class="small text-muted mt-1">{{ step.requiredCompetencies }}</div> }
+                      </div>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <p class="text-muted text-center mb-0">{{ i18n.t('portal.my_career.no_steps') }}</p>
+              }
+            </div>
+          </div>
+        }
+      }
+    }
+
+    <!-- Development Tab -->
+    @if (activeTab() === 'development') {
+      <div class="row g-4">
+        @if (suggestions()?.skillGaps && suggestions()!.skillGaps!.length > 0) {
+          <div class="col-12">
+            <app-section-card [title]="i18n.t('portal.my_career.skill_gaps')">
+              <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead><tr>
+                    <th>{{ i18n.t('portal.my_career.skill_name') }}</th>
+                    <th>{{ i18n.t('portal.my_career.current_level') }}</th>
+                    <th>{{ i18n.t('portal.my_career.years_exp') }}</th>
+                  </tr></thead>
+                  <tbody>
+                    @for (gap of suggestions()!.skillGaps; track gap.skillName) {
+                      <tr>
+                        <td>{{ i18n.locale() === 'ar' && gap.skillNameAr ? gap.skillNameAr : gap.skillName }}</td>
+                        <td><span class="badge bg-warning">{{ i18n.t('portal.my_career.enum.' + gap.currentLevel) }}</span></td>
+                        <td>{{ gap.yearsOfExperience || '-' }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </app-section-card>
+          </div>
+        }
+
+        @if (suggestions()?.successionCandidacies && suggestions()!.successionCandidacies!.length > 0) {
+          <div class="col-12">
+            <app-section-card [title]="i18n.t('portal.my_career.succession_candidacies')">
+              @for (candidacy of suggestions()!.successionCandidacies; track candidacy.id) {
+                <div class="card mb-3 border">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap">
+                      <div>
+                        <h6 class="mb-1">{{ i18n.locale() === 'ar' && candidacy.keyPositionTitleAr ? candidacy.keyPositionTitleAr : candidacy.keyPositionTitle }}</h6>
+                        <small class="text-muted">{{ i18n.locale() === 'ar' && candidacy.successionPlanNameAr ? candidacy.successionPlanNameAr : candidacy.successionPlanName }}</small>
+                      </div>
+                      <div class="d-flex gap-2">
+                        <app-status-badge [status]="getReadinessBadge(candidacy.readinessLevel).label" [variant]="getReadinessBadge(candidacy.readinessLevel).variant" />
+                        <span class="badge bg-secondary">{{ i18n.t('portal.my_career.enum.' + candidacy.readinessTimeline) }}</span>
+                      </div>
+                    </div>
+                    @if (candidacy.developmentPlan) {
+                      <div class="mt-2 small">
+                        <strong>{{ i18n.t('portal.my_career.development_plan') }}:</strong>
+                        {{ i18n.locale() === 'ar' && candidacy.developmentPlanAr ? candidacy.developmentPlanAr : candidacy.developmentPlan }}
+                      </div>
+                    }
+                    @if (candidacy.gapAnalysis) {
+                      <div class="mt-1 small">
+                        <strong>{{ i18n.t('portal.my_career.gap_analysis') }}:</strong> {{ candidacy.gapAnalysis }}
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </app-section-card>
+          </div>
+        }
+
+        @if (!suggestions()?.skillGaps?.length && !suggestions()?.successionCandidacies?.length) {
+          <div class="col-12">
+            <div class="card border-0 shadow-sm">
+              <div class="card-body text-center py-4">
+                <i class="bi bi-graph-up fs-1 text-muted mb-3 d-block"></i>
+                <p class="text-muted">{{ i18n.t('portal.my_career.no_suggestions') }}</p>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

@@ -1,0 +1,24 @@
+<div class="app-list-page">
+  <app-page-header [title]="i18n.t('certifications.title')" />
+  <app-unified-filter [searchPlaceholder]="i18n.t('certifications.search')" [showRefreshButton]="true" [refreshing]="loading()"
+    [showAddButton]="true" [addButtonText]="i18n.t('certifications.create')"
+    (add)="navigateToCreate()" (searchChange)="onSearchChange($event)" (refresh)="onRefreshData()" />
+
+  <app-data-table [data]="data()" [columns]="columns" [actions]="tableActions()" [currentPage]="currentPage()"
+    [totalPages]="totalPages()" [totalItems]="totalCount()" [pageSize]="pageSize()" [loading]="loading"
+    [emptyTitle]="i18n.t('certifications.no_data')" [showPagination]="true"
+    (actionClick)="onActionClick($event)" (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)">
+    <ng-template #cellTemplate let-item let-column="column">
+      @if (column.key === 'status') {
+        <span class="badge" [class.bg-success]="item.status === 'Active'" [class.bg-danger]="item.status === 'Expired'"
+          [class.bg-warning]="item.status === 'Revoked'" [class.bg-secondary]="item.status === 'Pending'">
+          {{ i18n.t('certifications.status_' + item.status) }}
+        </span>
+      } @else if (column.key === 'issueDate' || column.key === 'expiryDate') {
+        {{ item[column.key] ? (item[column.key] | date) : '-' }}
+      } @else {
+        {{ item[column.key] ?? '-' }}
+      }
+    </ng-template>
+  </app-data-table>
+</div>

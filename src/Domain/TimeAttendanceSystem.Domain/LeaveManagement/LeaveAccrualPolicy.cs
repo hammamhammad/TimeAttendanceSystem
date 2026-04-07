@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.VacationTypes;
+using TecAxle.Hrms.Domain.VacationTypes;
 
-namespace TimeAttendanceSystem.Domain.LeaveManagement;
+namespace TecAxle.Hrms.Domain.LeaveManagement;
 
 /// <summary>
 /// Defines accrual rules for a vacation type.

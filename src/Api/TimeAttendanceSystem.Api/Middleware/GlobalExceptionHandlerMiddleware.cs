@@ -1,8 +1,8 @@
 using System.Net;
 using System.Text.Json;
-using TimeAttendanceSystem.Shared.Common.Exceptions;
+using TecAxle.Hrms.Shared.Common.Exceptions;
 
-namespace TimeAttendanceSystem.Api.Middleware;
+namespace TecAxle.Hrms.Api.Middleware;
 
 /// <summary>
 /// Global exception handler middleware that catches all unhandled exceptions and returns

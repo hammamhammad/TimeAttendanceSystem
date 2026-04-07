@@ -181,5 +181,56 @@
         </div>
       </div>
     </div>
+
+    <!-- Recent Announcements Section -->
+    @if (entitlementService.isModuleEnabled('Announcements') && recentAnnouncements().length > 0) {
+      <div class="row g-4 mt-1">
+        <div class="col-12">
+          <div class="card announcements-card">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+              <h5 class="card-title mb-0">
+                <i class="bi bi-megaphone me-2 text-info"></i>
+                {{ i18n.t('portal.announcements.recent') }}
+              </h5>
+              <a class="btn btn-sm btn-outline-info" routerLink="/announcements">
+                {{ i18n.t('portal.announcements.view_all') }}
+                <i class="bi bi-arrow-right ms-1"></i>
+              </a>
+            </div>
+            <div class="card-body p-0">
+              @for (ann of recentAnnouncements(); track ann.id) {
+                <div class="announcement-item" role="button" (click)="navigateToAnnouncement(ann.id)">
+                  <div class="d-flex align-items-start">
+                    <div class="announcement-icon-wrapper bg-info-subtle me-3">
+                      <i class="bi bi-megaphone text-info"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                      <div class="d-flex align-items-center flex-wrap gap-2 mb-1">
+                        <h6 class="mb-0">{{ getAnnouncementTitle(ann) }}</h6>
+                        @if (ann.isPinned) {
+                          <span class="badge bg-info-subtle text-info" style="font-size: 0.7rem;">
+                            <i class="bi bi-pin-angle"></i>
+                          </span>
+                        }
+                        @if (ann.requiresAcknowledgment && !ann.isAcknowledged) {
+                          <span class="badge bg-warning text-dark" style="font-size: 0.7rem;">
+                            {{ i18n.t('portal.announcements.pending_ack') }}
+                          </span>
+                        }
+                      </div>
+                      <small class="text-muted">
+                        <i class="bi bi-calendar3 me-1"></i>
+                        {{ formatAnnouncementDate(ann.publishedDate) }}
+                      </small>
+                    </div>
+                    <i class="bi bi-chevron-right text-muted ms-2"></i>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    }
   </div>
 }

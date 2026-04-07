@@ -1,7 +1,7 @@
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Domain.Employees;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Employees;
 
-namespace TimeAttendanceSystem.Domain.Branches;
+namespace TecAxle.Hrms.Domain.Branches;
 
 public class Department : BaseEntity
 {

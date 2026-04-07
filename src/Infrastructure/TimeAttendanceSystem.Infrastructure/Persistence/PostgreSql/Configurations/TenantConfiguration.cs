@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TimeAttendanceSystem.Domain.Tenants;
+using TecAxle.Hrms.Domain.Tenants;
 
-namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Configurations;
+namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Configurations;
 
 /// <summary>
 /// Entity Framework configuration for the Tenant entity.
@@ -56,6 +56,61 @@ public class TenantConfiguration : IEntityTypeConfiguration<Tenant>
         builder.Property(t => t.DatabaseIdentifier)
             .HasMaxLength(200)
             .HasComment("Database connection identifier for tenant isolation");
+
+        // Company Information
+        builder.Property(t => t.CompanyRegistrationNumber)
+            .HasMaxLength(100);
+
+        builder.Property(t => t.TaxIdentificationNumber)
+            .HasMaxLength(100);
+
+        builder.Property(t => t.Industry)
+            .HasMaxLength(100);
+
+        builder.Property(t => t.Country)
+            .HasMaxLength(10)
+            .HasDefaultValue("SA");
+
+        builder.Property(t => t.City)
+            .HasMaxLength(100);
+
+        builder.Property(t => t.Address)
+            .HasMaxLength(500);
+
+        builder.Property(t => t.Phone)
+            .HasMaxLength(50);
+
+        builder.Property(t => t.Email)
+            .HasMaxLength(200);
+
+        builder.Property(t => t.Website)
+            .HasMaxLength(500);
+
+        // Regional Defaults
+        builder.Property(t => t.DefaultTimezone)
+            .IsRequired()
+            .HasMaxLength(100)
+            .HasDefaultValue("Asia/Riyadh");
+
+        builder.Property(t => t.DefaultLanguage)
+            .IsRequired()
+            .HasMaxLength(10)
+            .HasDefaultValue("en");
+
+        builder.Property(t => t.DefaultCurrency)
+            .IsRequired()
+            .HasMaxLength(10)
+            .HasDefaultValue("SAR");
+
+        // SaaS Lifecycle
+        builder.Property(t => t.Status)
+            .IsRequired()
+            .HasDefaultValue(Domain.Tenants.TenantStatus.Active)
+            .HasConversion<string>()
+            .HasMaxLength(50);
+
+        builder.Property(t => t.TrialStartDate);
+        builder.Property(t => t.TrialEndDate);
 
         // Indexes
         builder.HasIndex(t => t.Subdomain)

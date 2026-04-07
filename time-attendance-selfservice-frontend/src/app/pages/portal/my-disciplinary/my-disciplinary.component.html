@@ -1,0 +1,85 @@
+<!-- Page Header -->
+<app-page-header [title]="i18n.t('portal.disciplinary.title')">
+  <div header-actions>
+    <button
+      class="btn btn-outline-primary btn-sm"
+      (click)="refresh()"
+      [disabled]="loading()"
+      type="button">
+      <i class="bi bi-arrow-clockwise" [class.spin]="loading()"></i>
+      {{ i18n.t('common.refresh') }}
+    </button>
+  </div>
+</app-page-header>
+
+<!-- Loading State (only when no data) -->
+@if (loading() && actions().length === 0) {
+  <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+}
+
+<!-- Error State -->
+@if (error() && actions().length === 0) {
+  <div class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle me-2"></i>{{ error() }}
+    <button class="btn btn-sm btn-outline-danger ms-3" (click)="refresh()" type="button">{{ i18n.t('common.retry') }}</button>
+  </div>
+}
+
+<!-- Empty State -->
+@if (!loading() && actions().length === 0 && !error()) {
+  <app-empty-state
+    icon="bi bi-shield-check"
+    [title]="i18n.t('portal.disciplinary.no_actions')">
+  </app-empty-state>
+}
+
+<!-- Data Table -->
+@if (actions().length > 0) {
+  <div class="card">
+    <div class="card-body">
+      <app-data-table
+        [data]="tableData()"
+        [columns]="columns"
+        [actions]="tableActions()"
+        [loading]="loading()"
+        [paginated]="true"
+        [pageSize]="10"
+        (actionClick)="onAction($event)">
+      </app-data-table>
+    </div>
+  </div>
+
+  <!-- Info Card -->
+  <div class="card mt-3">
+    <div class="card-body">
+      <div class="d-flex align-items-start">
+        <i class="bi bi-info-circle text-info me-3 mt-1" style="font-size: 1.5rem;"></i>
+        <div>
+          <h6 class="mb-2">{{ i18n.t('portal.disciplinary.info_title') }}</h6>
+          <p class="text-muted mb-0 small">{{ i18n.t('portal.disciplinary.info_text') }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Appeal Modal -->
+@if (showAppealModal()) {
+  <app-modal-wrapper [title]="i18n.t('portal.disciplinary.appeal')" [show]="showAppealModal()" (close)="showAppealModal.set(false)">
+    <div class="app-modern-form">
+      <div class="row g-3">
+        <div class="col-12">
+          <div class="form-floating">
+            <textarea class="form-control" id="appealNotes" placeholder="Appeal Notes" style="height: 120px" [ngModel]="appealNotes()" (ngModelChange)="appealNotes.set($event)"></textarea>
+            <label for="appealNotes">{{ i18n.t('portal.disciplinary.appeal_notes') }} *</label>
+          </div>
+          <div class="form-text">{{ i18n.t('portal.disciplinary.appeal_hint') }}</div>
+        </div>
+      </div>
+      <div class="app-form-actions mt-3">
+        <button class="btn btn-secondary" (click)="showAppealModal.set(false)">{{ i18n.t('common.cancel') }}</button>
+        <button class="btn btn-warning" (click)="submitAppeal()" [disabled]="saving() || !appealNotes().trim()">{{ i18n.t('portal.disciplinary.submit_appeal') }}</button>
+      </div>
+    </div>
+  </app-modal-wrapper>
+}

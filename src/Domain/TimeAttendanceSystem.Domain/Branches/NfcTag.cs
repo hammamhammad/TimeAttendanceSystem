@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Domain.Branches;
+namespace TecAxle.Hrms.Domain.Branches;
 
 /// <summary>
 /// Domain entity representing an NFC tag registered for branch check-in/out verification.

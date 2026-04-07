@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace TimeAttendanceSystem.Application.Users.Commands.UpdateUser;
+namespace TecAxle.Hrms.Application.Users.Commands.UpdateUser;
 
 public class UpdateUserCommandValidator : AbstractValidator<UpdateUserCommand>
 {

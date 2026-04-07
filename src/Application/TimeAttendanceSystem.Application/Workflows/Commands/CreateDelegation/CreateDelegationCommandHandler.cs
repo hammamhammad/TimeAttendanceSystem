@@ -1,10 +1,10 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Workflows;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Workflows;
 
-namespace TimeAttendanceSystem.Application.Workflows.Commands.CreateDelegation;
+namespace TecAxle.Hrms.Application.Workflows.Commands.CreateDelegation;
 
 /// <summary>
 /// Handler for CreateDelegationCommand.

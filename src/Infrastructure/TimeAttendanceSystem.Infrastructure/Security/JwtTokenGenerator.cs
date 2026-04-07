@@ -4,10 +4,10 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Domain.Users;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Domain.Users;
 
-namespace TimeAttendanceSystem.Infrastructure.Security;
+namespace TecAxle.Hrms.Infrastructure.Security;
 
 /// <summary>
 /// JWT token generator implementing secure token creation and management for authentication and authorization.
@@ -135,7 +135,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
     /// - Data isolation enforcement through JWT claims validation
     /// - Scalable multi-tenant architecture with performance optimization
     /// </remarks>
-    public string GenerateAccessToken(User user, IReadOnlyList<string> roles, IReadOnlyList<string> permissions, IReadOnlyList<long> branchIds, bool rememberMe = false)
+    public string GenerateAccessToken(User user, IReadOnlyList<string> roles, IReadOnlyList<string> permissions, IReadOnlyList<long> branchIds, long? tenantId = null, bool rememberMe = false)
     {
         var signingCredentials = new SigningCredentials(
             new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"]!)),
@@ -151,6 +151,12 @@ public class JwtTokenGenerator : IJwtTokenGenerator
             new(ClaimTypes.Email, user.Email),
             new("preferred_language", user.PreferredLanguage),
         };
+
+        // Add tenant ID
+        if (tenantId.HasValue)
+        {
+            claims.Add(new Claim("tenant_id", tenantId.Value.ToString()));
+        }
 
         // Add roles
         foreach (var role in roles)

@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Domain.Common;
+namespace TecAxle.Hrms.Domain.Common;
 
 /// <summary>
 /// Represents a single field-level change within an audit log entry.

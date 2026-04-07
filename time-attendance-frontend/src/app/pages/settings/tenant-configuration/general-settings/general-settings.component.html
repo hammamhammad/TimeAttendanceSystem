@@ -1,0 +1,71 @@
+@if (loading()) {
+  <app-loading-spinner />
+} @else {
+  <div class="app-modern-form">
+    <app-form-section [title]="t('tenant_configuration.general.title')" icon="fa-solid fa-gear" variant="modern">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="form-floating">
+            <select class="form-select" id="fiscalYear"
+                    [ngModel]="fiscalYearStartMonth()"
+                    (ngModelChange)="fiscalYearStartMonth.set($event)">
+              @for (m of months; track m) {
+                <option [value]="m">{{ m }}</option>
+              }
+            </select>
+            <label for="fiscalYear">{{ t('tenant_configuration.general.fiscal_year_start') }}</label>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="form-floating">
+            <select class="form-select" id="weekStartDay"
+                    [ngModel]="weekStartDay()"
+                    (ngModelChange)="weekStartDay.set($event)">
+              @for (day of weekDays; track day) {
+                <option [value]="day">{{ day }}</option>
+              }
+            </select>
+            <label for="weekStartDay">{{ t('tenant_configuration.general.week_start_day') }}</label>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="form-floating">
+            <select class="form-select" id="dateFormat"
+                    [ngModel]="dateFormat()"
+                    (ngModelChange)="dateFormat.set($event)">
+              @for (fmt of dateFormats; track fmt) {
+                <option [value]="fmt">{{ fmt }}</option>
+              }
+            </select>
+            <label for="dateFormat">{{ t('tenant_configuration.general.date_format') }}</label>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="form-floating">
+            <select class="form-select" id="timeFormat"
+                    [ngModel]="timeFormat()"
+                    (ngModelChange)="timeFormat.set($event)">
+              @for (fmt of timeFormats; track fmt) {
+                <option [value]="fmt">{{ fmt }}</option>
+              }
+            </select>
+            <label for="timeFormat">{{ t('tenant_configuration.general.time_format') }}</label>
+          </div>
+        </div>
+      </div>
+    </app-form-section>
+
+    <div class="app-form-actions">
+      <button class="btn btn-primary" (click)="save()" [disabled]="saving()">
+        @if (saving()) {
+          <span class="spinner-border spinner-border-sm me-2"></span>
+        }
+        <i class="fa-solid fa-save me-1"></i>
+        {{ t('common.save') }}
+      </button>
+    </div>
+  </div>
+}

@@ -1,0 +1,112 @@
+<div class="app-modern-form">
+  <app-form-header
+    [mode]="isEditMode() ? 'edit' : 'create'"
+    [title]="i18n.t(isEditMode() ? 'interviews.edit' : 'interviews.create')"
+    moduleName="interviews"
+    moduleRoute="recruitment/interviews"
+    [loading]="loadingData()">
+  </app-form-header>
+
+  @if (loadingData()) {
+    <div class="text-center py-5">
+      <app-loading-spinner [message]="i18n.t('common.loading')" [variant]="'primary'" [centered]="true"></app-loading-spinner>
+    </div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <app-form-section [title]="i18n.t('interviews.schedule')" icon="fas fa-calendar-check" variant="modern">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="app-modern-field">
+              <label class="app-modern-label">{{ i18n.t('interviews.application') }} *</label>
+              <app-searchable-select
+                [options]="applicationOptions()"
+                [value]="form.get('jobApplicationId')?.value"
+                [placeholder]="i18n.t('interviews.select_application')"
+                (selectionChange)="form.get('jobApplicationId')?.setValue($event)">
+              </app-searchable-select>
+              @if (isInvalid('jobApplicationId')) {
+                <div class="invalid-feedback d-block">{{ i18n.t('common.required') }}</div>
+              }
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-floating">
+              <select class="form-select" id="interviewType" formControlName="interviewType">
+                @for (opt of interviewTypeOptions; track opt.value) {
+                  <option [value]="opt.value">{{ opt.label }}</option>
+                }
+              </select>
+              <label for="interviewType">{{ i18n.t('interviews.type') }} *</label>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="app-modern-field">
+              <label class="app-modern-label">{{ i18n.t('interviews.interviewer') }} *</label>
+              <app-searchable-select
+                [options]="employeeOptions()"
+                [value]="form.get('interviewerEmployeeId')?.value"
+                [placeholder]="i18n.t('interviews.select_interviewer')"
+                (selectionChange)="form.get('interviewerEmployeeId')?.setValue($event)">
+              </app-searchable-select>
+              @if (isInvalid('interviewerEmployeeId')) {
+                <div class="invalid-feedback d-block">{{ i18n.t('common.required') }}</div>
+              }
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input type="datetime-local" class="form-control" id="scheduledDate" formControlName="scheduledDate" placeholder="Date">
+              <label for="scheduledDate">{{ i18n.t('interviews.scheduled_date') }} *</label>
+              @if (isInvalid('scheduledDate')) {
+                <div class="invalid-feedback d-block">{{ i18n.t('common.required') }}</div>
+              }
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-floating">
+              <input type="number" class="form-control" id="durationMinutes" formControlName="durationMinutes" placeholder="Duration" min="15">
+              <label for="durationMinutes">{{ i18n.t('interviews.duration') }} *</label>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-floating">
+              <input type="text" class="form-control" id="location" formControlName="location" placeholder="Location">
+              <label for="location">{{ i18n.t('interviews.location') }}</label>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-floating">
+              <input type="url" class="form-control" id="meetingLink" formControlName="meetingLink" placeholder="Meeting Link">
+              <label for="meetingLink">{{ i18n.t('interviews.meeting_link') }}</label>
+            </div>
+          </div>
+
+          <div class="col-md-12">
+            <div class="form-floating">
+              <textarea class="form-control" id="notes" formControlName="notes" placeholder="Notes" style="height: 80px"></textarea>
+              <label for="notes">{{ i18n.t('interviews.notes') }}</label>
+            </div>
+          </div>
+        </div>
+      </app-form-section>
+
+      <div class="app-form-actions">
+        <button type="submit" class="btn btn-primary" [disabled]="submitting()">
+          @if (submitting()) {
+            <span class="spinner-border spinner-border-sm me-2"></span>
+          }
+          <i class="fa-solid fa-save me-2"></i>{{ i18n.t(isEditMode() ? 'common.update' : 'common.save') }}
+        </button>
+        <a [routerLink]="['/recruitment/interviews']" class="btn btn-secondary">
+          {{ i18n.t('common.cancel') }}
+        </a>
+      </div>
+    </form>
+  }
+</div>

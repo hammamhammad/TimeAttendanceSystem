@@ -1,6 +1,7 @@
 import { Component, signal, computed, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { PortalService } from '../services/portal.service';
@@ -8,6 +9,18 @@ import { PageHeaderComponent } from '../../../shared/components/page-header/page
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
 import { StatsCard, Activity, QuickAction } from '../models/employee-dashboard.model';
+import { EntitlementService } from '../../../core/services/entitlement.service';
+import { environment } from '../../../../environments/environment';
+
+interface DashboardAnnouncement {
+  id: number;
+  title: string;
+  titleAr?: string;
+  isPinned: boolean;
+  requiresAcknowledgment: boolean;
+  isAcknowledged: boolean;
+  publishedDate: string;
+}
 
 /**
  * Employee Dashboard Component
@@ -31,18 +44,48 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
   private readonly portalService = inject(PortalService);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly http = inject(HttpClient);
   readonly i18n = inject(I18nService);
+  readonly entitlementService = inject(EntitlementService);
 
   // Dashboard state from service
   dashboard = this.portalService.dashboard;
   loading = this.portalService.dashboardLoading;
   error = this.portalService.dashboardError;
 
-  // Computed stats cards
-  statsCards = this.portalService.statsCards;
+  // Map stats card IDs to module entitlement names
+  private readonly statsModuleMap: Record<string, string> = {
+    'attendance': 'TimeAttendance',
+    'working-hours': 'TimeAttendance',
+    'overtime': 'TimeAttendance',
+    'vacation': 'LeaveManagement'
+  };
 
-  // Computed quick actions
-  quickActions = this.portalService.quickActions;
+  // Map quick action IDs to module entitlement names
+  private readonly actionModuleMap: Record<string, string> = {
+    'request-vacation': 'LeaveManagement',
+    'request-excuse': 'LeaveManagement',
+    'view-attendance': 'TimeAttendance',
+    'attendance-correction': 'TimeAttendance'
+  };
+
+  // Computed stats cards filtered by module entitlements
+  statsCards = computed(() => {
+    const cards = this.portalService.statsCards();
+    return cards.filter(card => {
+      const module = this.statsModuleMap[card.id];
+      return !module || this.entitlementService.isModuleEnabled(module);
+    });
+  });
+
+  // Computed quick actions filtered by module entitlements
+  quickActions = computed(() => {
+    const actions = this.portalService.quickActions();
+    return actions.filter(action => {
+      const module = this.actionModuleMap[action.id];
+      return !module || this.entitlementService.isModuleEnabled(module);
+    });
+  });
 
   // Current user
   currentUser = computed(() => this.authService.currentUser());
@@ -88,12 +131,16 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
     return dash ? dash.pendingRequestsCount : 0;
   });
 
+  // Recent announcements
+  recentAnnouncements = signal<DashboardAnnouncement[]>([]);
+
   // Auto-refresh interval
   private refreshInterval: any;
 
   ngOnInit(): void {
     // Load dashboard data on init
     this.loadDashboard();
+    this.loadRecentAnnouncements();
 
     // Auto-refresh every 5 minutes
     this.refreshInterval = setInterval(() => {
@@ -374,5 +421,52 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
   formatTrend(trend: number): string {
     const sign = trend >= 0 ? '+' : '';
     return `${sign}${trend.toFixed(1)}%`;
+  }
+
+  /**
+   * Loads recent announcements for the dashboard widget
+   */
+  loadRecentAnnouncements(): void {
+    this.http.get<{ data: DashboardAnnouncement[]; totalCount: number }>(
+      `${environment.apiUrl}/api/v1/portal/announcements`
+    ).subscribe({
+      next: (res) => {
+        const items = res.data || [];
+        // Sort pinned first, then by date, take first 3
+        const sorted = items.sort((a, b) => {
+          if (a.isPinned && !b.isPinned) return -1;
+          if (!a.isPinned && b.isPinned) return 1;
+          return new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime();
+        });
+        this.recentAnnouncements.set(sorted.slice(0, 3));
+      },
+      error: () => {
+        // Silently fail - announcements widget is non-critical
+        this.recentAnnouncements.set([]);
+      }
+    });
+  }
+
+  /**
+   * Formats announcement date string for display
+   */
+  formatAnnouncementDate(dateStr: string): string {
+    if (!dateStr) return '-';
+    return this.formatDate(new Date(dateStr));
+  }
+
+  /**
+   * Gets localized announcement title
+   */
+  getAnnouncementTitle(ann: DashboardAnnouncement): string {
+    if (this.i18n.locale() === 'ar' && ann.titleAr) return ann.titleAr;
+    return ann.title;
+  }
+
+  /**
+   * Navigates to announcement detail
+   */
+  navigateToAnnouncement(id: number): void {
+    this.router.navigate(['/announcements', id]);
   }
 }

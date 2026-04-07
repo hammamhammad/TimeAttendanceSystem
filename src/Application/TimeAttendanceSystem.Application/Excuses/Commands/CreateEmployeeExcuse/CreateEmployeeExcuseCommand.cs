@@ -1,8 +1,10 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Excuses;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Excuses;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.Excuses.Commands.CreateEmployeeExcuse;
+namespace TecAxle.Hrms.Application.Excuses.Commands.CreateEmployeeExcuse;
 
 /// <summary>
 /// CQRS command for creating a new employee excuse request.
@@ -47,6 +49,7 @@ namespace TimeAttendanceSystem.Application.Excuses.Commands.CreateEmployeeExcuse
 /// - Attendance calculation integration for approved excuses
 /// - Approval workflow based on policy configuration
 /// </remarks>
+[RequiresModule(SystemModule.LeaveManagement)]
 public record CreateEmployeeExcuseCommand(
     long EmployeeId,
     DateTime ExcuseDate,

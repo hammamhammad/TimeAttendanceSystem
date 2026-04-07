@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Shared.Common.Exceptions;
+namespace TecAxle.Hrms.Shared.Common.Exceptions;
 
 /// <summary>
 /// Exception thrown when validation fails.

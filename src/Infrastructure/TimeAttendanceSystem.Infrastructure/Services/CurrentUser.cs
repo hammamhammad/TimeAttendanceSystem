@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
-using TimeAttendanceSystem.Application.Abstractions;
+using TecAxle.Hrms.Application.Abstractions;
 
-namespace TimeAttendanceSystem.Infrastructure.Services;
+namespace TecAxle.Hrms.Infrastructure.Services;
 
 public class CurrentUser : ICurrentUser
 {
@@ -11,6 +11,15 @@ public class CurrentUser : ICurrentUser
     public CurrentUser(IHttpContextAccessor httpContextAccessor)
     {
         _httpContextAccessor = httpContextAccessor;
+    }
+
+    public long? TenantId
+    {
+        get
+        {
+            var tenantClaim = _httpContextAccessor.HttpContext?.User?.FindFirst("tenant_id")?.Value;
+            return long.TryParse(tenantClaim, out var tenantId) ? tenantId : null;
+        }
     }
 
     public long? UserId

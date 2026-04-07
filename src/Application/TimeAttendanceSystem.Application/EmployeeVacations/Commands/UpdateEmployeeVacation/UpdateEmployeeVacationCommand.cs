@@ -1,7 +1,10 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.EmployeeVacations.Commands.UpdateEmployeeVacation;
+namespace TecAxle.Hrms.Application.EmployeeVacations.Commands.UpdateEmployeeVacation;
 
 /// <summary>
 /// CQRS command for updating an existing employee vacation record.
@@ -35,11 +38,14 @@ namespace TimeAttendanceSystem.Application.EmployeeVacations.Commands.UpdateEmpl
 /// - Previous attendance records reverted if vacation dates change
 /// - New attendance records created for new vacation dates
 /// </remarks>
+[RequiresModule(SystemModule.LeaveManagement)]
 public record UpdateEmployeeVacationCommand(
     long Id,
     long VacationTypeId,
     DateTime StartDate,
     DateTime EndDate,
     bool IsApproved,
-    string? Notes = null
+    string? Notes = null,
+    bool IsHalfDay = false,
+    HalfDayType? HalfDayType = null
 ) : IRequest<Result>;

@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Api.Configuration;
+namespace TecAxle.Hrms.Api.Configuration;
 
 public class CorsSettings
 {

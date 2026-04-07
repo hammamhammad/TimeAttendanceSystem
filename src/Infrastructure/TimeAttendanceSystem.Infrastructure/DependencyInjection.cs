@@ -7,15 +7,15 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Coravel;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Services;
-using TimeAttendanceSystem.Infrastructure.BackgroundJobs;
-using TimeAttendanceSystem.Infrastructure.Persistence;
-using TimeAttendanceSystem.Infrastructure.Persistence.Repositories;
-using TimeAttendanceSystem.Infrastructure.Security;
-using TimeAttendanceSystem.Infrastructure.Services;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Services;
+using TecAxle.Hrms.Infrastructure.BackgroundJobs;
+using TecAxle.Hrms.Infrastructure.Persistence;
+using TecAxle.Hrms.Infrastructure.Persistence.Repositories;
+using TecAxle.Hrms.Infrastructure.Security;
+using TecAxle.Hrms.Infrastructure.Services;
 
-namespace TimeAttendanceSystem.Infrastructure;
+namespace TecAxle.Hrms.Infrastructure;
 
 public static class DependencyInjection
 {
@@ -28,6 +28,11 @@ public static class DependencyInjection
         services.AddScoped<IApplicationDbContext, ApplicationDbContextAdapter>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<ICurrentUser, CurrentUser>();
+        services.AddScoped<TenantContext>();
+        services.AddScoped<ITenantContext>(sp => sp.GetRequiredService<TenantContext>());
+        services.AddScoped<IEntitlementService, EntitlementService>();
+        services.AddScoped<IModuleDeactivationService, ModuleDeactivationService>();
+        services.AddScoped<ITenantSettingsResolver, TenantSettingsResolver>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IPasswordService, PasswordService>();
         services.AddScoped<ITwoFactorService, TwoFactorService>();
@@ -38,6 +43,7 @@ public static class DependencyInjection
         services.AddScoped<ISettingsRepository, SettingsRepository>();
         services.AddScoped<IInAppNotificationService, InAppNotificationService>();
         services.AddScoped<INfcTagEncryptionService, NfcTagEncryptionService>();
+        services.AddScoped<IFileStorageService, LocalDiskFileStorageService>();
 
         // Add Coravel for background jobs
         services.AddScheduler();
@@ -45,6 +51,39 @@ public static class DependencyInjection
         services.AddTransient<EndOfDayAttendanceFinalizationJob>();
         services.AddTransient<MonthlyLeaveAccrualJob>();
         services.AddTransient<WorkflowTimeoutProcessingJob>();
+        services.AddTransient<FrozenWorkflowCleanupJob>();
+        services.AddTransient<ExpireTemporaryAllowancesJob>();
+        services.AddTransient<ContractExpiryAlertJob>();
+        services.AddTransient<VisaExpiryAlertJob>();
+        services.AddTransient<ApplyScheduledProfileChangesJob>();
+        services.AddTransient<OnboardingTaskOverdueJob>();
+        services.AddTransient<ReviewCycleReminderJob>();
+        services.AddTransient<PIPExpiryCheckJob>();
+        services.AddTransient<DocumentExpiryAlertJob>();
+        services.AddTransient<LoanRepaymentReminderJob>();
+        services.AddTransient<AnnouncementSchedulerJob>();
+        services.AddTransient<AnnouncementExpiryJob>();
+        services.AddTransient<CertificationExpiryAlertJob>();
+        services.AddTransient<TrainingSessionReminderJob>();
+        services.AddTransient<GrievanceSlaAlertJob>();
+        services.AddTransient<CounselingFollowUpReminderJob>();
+        services.AddTransient<AssetWarrantyExpiryAlertJob>();
+        services.AddTransient<OverdueAssetReturnAlertJob>();
+        services.AddTransient<SurveyDistributionActivatorJob>();
+        services.AddTransient<SurveyReminderJob>();
+        services.AddTransient<SurveyExpiryJob>();
+        services.AddTransient<AnalyticsSnapshotJob>();
+        services.AddTransient<MonthlyAnalyticsRollupJob>();
+        services.AddTransient<TimesheetPeriodGenerationJob>();
+        services.AddTransient<TimesheetSubmissionReminderJob>();
+        services.AddTransient<TimesheetPeriodClosureJob>();
+        services.AddTransient<TalentProfileSyncJob>();
+        services.AddTransient<SuccessionPlanReviewReminderJob>();
+        services.AddTransient<OpenEnrollmentPeriodActivatorJob>();
+        services.AddTransient<BenefitEnrollmentExpiryJob>();
+        services.AddTransient<BenefitDeductionSyncJob>();
+        services.AddTransient<CompensatoryOffExpiryJob>();
+        services.AddTransient<ScheduledReportExecutionJob>();
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
@@ -538,6 +577,1244 @@ public static class DependencyInjection
                     context.User.IsInRole("Admin") ||
                     context.User.IsInRole("Manager") ||
                     context.User.HasClaim("permission", "nfcTag.read")));
+
+            // Phase 1: Employee Lifecycle policies
+            options.AddPolicy("ContractRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.HasClaim("permission", "contract.read")));
+
+            options.AddPolicy("ContractManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "contract.manage")));
+
+            options.AddPolicy("TransferRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.HasClaim("permission", "transfer.read")));
+
+            options.AddPolicy("TransferManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "transfer.manage")));
+
+            options.AddPolicy("PromotionRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.HasClaim("permission", "promotion.read")));
+
+            options.AddPolicy("PromotionManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "promotion.manage")));
+
+            options.AddPolicy("SalaryAdjustmentRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "salaryAdjustment.read")));
+
+            options.AddPolicy("SalaryAdjustmentManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "salaryAdjustment.manage")));
+
+            // Phase 1: Payroll policies
+            options.AddPolicy("PayrollRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "payroll.read")));
+
+            options.AddPolicy("PayrollManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "payroll.manage")));
+
+            options.AddPolicy("SalaryStructureRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "salaryStructure.read")));
+
+            options.AddPolicy("SalaryStructureManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "salaryStructure.manage")));
+
+            options.AddPolicy("TaxConfigurationManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.HasClaim("permission", "taxConfiguration.manage")));
+
+            options.AddPolicy("SocialInsuranceManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.HasClaim("permission", "socialInsurance.manage")));
+
+            options.AddPolicy("InsuranceManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "insurance.manage")));
+
+            // Phase 1: Offboarding policies
+            options.AddPolicy("ResignationRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.HasClaim("permission", "resignation.read")));
+
+            options.AddPolicy("ResignationManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "resignation.manage")));
+
+            options.AddPolicy("TerminationRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "termination.read")));
+
+            options.AddPolicy("TerminationManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "termination.manage")));
+
+            options.AddPolicy("ClearanceRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.HasClaim("permission", "clearance.read")));
+
+            options.AddPolicy("ClearanceManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.HasClaim("permission", "clearance.manage")));
+
+            options.AddPolicy("EndOfServiceRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "endOfService.read")));
+
+            options.AddPolicy("EndOfServiceManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "endOfService.manage")));
+
+            options.AddPolicy("FinalSettlementRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "finalSettlement.read")));
+
+            options.AddPolicy("FinalSettlementManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "finalSettlement.manage")));
+
+            options.AddPolicy("ExitInterviewRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "exitInterview.read")));
+
+            options.AddPolicy("ExitInterviewManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "exitInterview.manage")));
+
+            // Allowance Management policies
+            options.AddPolicy("AllowanceTypeRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "allowanceType.read")));
+
+            options.AddPolicy("AllowanceTypeManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "allowanceType.manage")));
+
+            options.AddPolicy("AllowancePolicyRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "allowancePolicy.read")));
+
+            options.AddPolicy("AllowancePolicyManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "allowancePolicy.manage")));
+
+            options.AddPolicy("AllowanceAssignmentRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "allowanceAssignment.read")));
+
+            options.AddPolicy("AllowanceAssignmentManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "allowanceAssignment.manage")));
+
+            options.AddPolicy("AllowanceRequestRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "allowanceRequest.read")));
+
+            options.AddPolicy("AllowanceRequestManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "allowanceRequest.manage")));
+
+            // ===== PHASE 2: RECRUITMENT POLICIES =====
+
+            options.AddPolicy("JobRequisitionRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.HasClaim("permission", "jobRequisition.read")));
+
+            options.AddPolicy("JobRequisitionManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "jobRequisition.manage")));
+
+            options.AddPolicy("JobPostingRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "jobPosting.read")));
+
+            options.AddPolicy("JobPostingManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "jobPosting.manage")));
+
+            options.AddPolicy("CandidateRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "candidate.read")));
+
+            options.AddPolicy("CandidateManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "candidate.manage")));
+
+            options.AddPolicy("JobApplicationRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "jobApplication.read")));
+
+            options.AddPolicy("JobApplicationManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "jobApplication.manage")));
+
+            options.AddPolicy("InterviewRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.HasClaim("permission", "interview.read")));
+
+            options.AddPolicy("InterviewManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "interview.manage")));
+
+            options.AddPolicy("OfferLetterRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "offerLetter.read")));
+
+            options.AddPolicy("OfferLetterManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "offerLetter.manage")));
+
+            // ===== PHASE 2: ONBOARDING POLICIES =====
+
+            options.AddPolicy("OnboardingTemplateRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "onboardingTemplate.read")));
+
+            options.AddPolicy("OnboardingTemplateManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "onboardingTemplate.manage")));
+
+            options.AddPolicy("OnboardingRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.HasClaim("permission", "onboarding.read")));
+
+            options.AddPolicy("OnboardingManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "onboarding.manage")));
+
+            // ===== PHASE 2: PERFORMANCE POLICIES =====
+
+            options.AddPolicy("PerformanceReviewCycleRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "performanceReviewCycle.read")));
+
+            options.AddPolicy("PerformanceReviewCycleManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "performanceReviewCycle.manage")));
+
+            options.AddPolicy("PerformanceReviewRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.HasClaim("permission", "performanceReview.read")));
+
+            options.AddPolicy("PerformanceReviewManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "performanceReview.manage")));
+
+            options.AddPolicy("GoalRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.HasClaim("permission", "goal.read")));
+
+            options.AddPolicy("GoalManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "goal.manage")));
+
+            options.AddPolicy("CompetencyFrameworkRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "competencyFramework.read")));
+
+            options.AddPolicy("CompetencyFrameworkManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "competencyFramework.manage")));
+
+            options.AddPolicy("PipRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.HasClaim("permission", "pip.read")));
+
+            options.AddPolicy("PipManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "pip.manage")));
+
+            options.AddPolicy("Feedback360Read", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.HasClaim("permission", "feedback360.read")));
+
+            options.AddPolicy("Feedback360Management", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "feedback360.manage")));
+
+            // ===== PHASE 3: DOCUMENTS & LETTERS POLICIES =====
+
+            options.AddPolicy("DocumentCategoryRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "documentCategory.read")));
+
+            options.AddPolicy("DocumentCategoryManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "documentCategory.manage")));
+
+            options.AddPolicy("EmployeeDocumentRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.HasClaim("permission", "employeeDocument.read")));
+
+            options.AddPolicy("EmployeeDocumentManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "employeeDocument.manage")));
+
+            options.AddPolicy("CompanyPolicyRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.IsInRole("Employee") ||
+                    context.User.HasClaim("permission", "companyPolicy.read")));
+
+            options.AddPolicy("CompanyPolicyManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "companyPolicy.manage")));
+
+            options.AddPolicy("LetterTemplateRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "letterTemplate.read")));
+
+            options.AddPolicy("LetterTemplateManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "letterTemplate.manage")));
+
+            options.AddPolicy("LetterRequestRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.HasClaim("permission", "letterRequest.read")));
+
+            options.AddPolicy("LetterRequestManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "letterRequest.manage")));
+
+            // ===== PHASE 3: EXPENSE POLICIES =====
+
+            options.AddPolicy("ExpenseCategoryRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "expenseCategory.read")));
+
+            options.AddPolicy("ExpenseCategoryManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "expenseCategory.manage")));
+
+            options.AddPolicy("ExpensePolicyRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "expensePolicy.read")));
+
+            options.AddPolicy("ExpensePolicyManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "expensePolicy.manage")));
+
+            options.AddPolicy("ExpenseClaimRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.HasClaim("permission", "expenseClaim.read")));
+
+            options.AddPolicy("ExpenseClaimManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "expenseClaim.manage")));
+
+            // ===== PHASE 3: LOAN POLICIES =====
+
+            options.AddPolicy("LoanTypeRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "loanType.read")));
+
+            options.AddPolicy("LoanTypeManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "loanType.manage")));
+
+            options.AddPolicy("LoanPolicyRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "loanPolicy.read")));
+
+            options.AddPolicy("LoanPolicyManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "loanPolicy.manage")));
+
+            options.AddPolicy("LoanApplicationRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.HasClaim("permission", "loanApplication.read")));
+
+            options.AddPolicy("LoanApplicationManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "loanApplication.manage")));
+
+            options.AddPolicy("SalaryAdvanceRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.HasClaim("permission", "salaryAdvance.read")));
+
+            options.AddPolicy("SalaryAdvanceManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "salaryAdvance.manage")));
+
+            // ===== PHASE 4: ANNOUNCEMENT POLICIES =====
+
+            options.AddPolicy("AnnouncementCategoryRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "announcementCategory.read")));
+
+            options.AddPolicy("AnnouncementCategoryManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "announcementCategory.manage")));
+
+            options.AddPolicy("AnnouncementRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "announcement.read")));
+
+            options.AddPolicy("AnnouncementManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "announcement.manage")));
+
+            // ===== PHASE 4: TRAINING & DEVELOPMENT POLICIES =====
+
+            options.AddPolicy("TrainingCategoryRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "trainingCategory.read")));
+
+            options.AddPolicy("TrainingCategoryManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "trainingCategory.manage")));
+
+            options.AddPolicy("TrainingCourseRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "trainingCourse.read")));
+
+            options.AddPolicy("TrainingCourseManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "trainingCourse.manage")));
+
+            options.AddPolicy("TrainingProgramRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "trainingProgram.read")));
+
+            options.AddPolicy("TrainingProgramManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "trainingProgram.manage")));
+
+            options.AddPolicy("TrainingSessionRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "trainingSession.read")));
+
+            options.AddPolicy("TrainingSessionManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "trainingSession.manage")));
+
+            options.AddPolicy("TrainingEnrollmentRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "trainingEnrollment.read")));
+
+            options.AddPolicy("TrainingEnrollmentManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "trainingEnrollment.manage")));
+
+            options.AddPolicy("TrainingEvaluationRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "trainingEvaluation.read")));
+
+            options.AddPolicy("TrainingEvaluationManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "trainingEvaluation.manage")));
+
+            options.AddPolicy("EmployeeCertificationRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "employeeCertification.read")));
+
+            options.AddPolicy("EmployeeCertificationManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "employeeCertification.manage")));
+
+            options.AddPolicy("TrainingBudgetRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "trainingBudget.read")));
+
+            options.AddPolicy("TrainingBudgetManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "trainingBudget.manage")));
+            // ===== PHASE 4: EMPLOYEE RELATIONS POLICIES =====
+
+            options.AddPolicy("GrievanceRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "grievance.read")));
+
+            options.AddPolicy("GrievanceManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "grievance.manage")));
+
+            options.AddPolicy("DisciplinaryActionRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "disciplinaryAction.read")));
+
+            options.AddPolicy("DisciplinaryActionManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "disciplinaryAction.manage")));
+
+            options.AddPolicy("InvestigationRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "investigation.read")));
+
+            options.AddPolicy("InvestigationManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "investigation.manage")));
+
+            options.AddPolicy("CounselingRecordRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "counselingRecord.read")));
+
+            options.AddPolicy("CounselingRecordManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "counselingRecord.manage")));
+
+            // ===== PHASE 5: ASSET MANAGEMENT POLICIES =====
+
+            options.AddPolicy("AssetCategoryRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "assetCategory.read")));
+
+            options.AddPolicy("AssetCategoryManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "assetCategory.manage")));
+
+            options.AddPolicy("AssetRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "asset.read")));
+
+            options.AddPolicy("AssetManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "asset.manage")));
+
+            options.AddPolicy("AssetAssignmentRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "assetAssignment.read")));
+
+            options.AddPolicy("AssetAssignmentManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "assetAssignment.manage")));
+
+            options.AddPolicy("AssetMaintenanceRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "assetMaintenance.read")));
+
+            options.AddPolicy("AssetMaintenanceManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "assetMaintenance.manage")));
+
+            // ===== PHASE 5: EMPLOYEE ENGAGEMENT & SURVEYS POLICIES =====
+
+            options.AddPolicy("SurveyTemplateRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "surveyTemplate.read")));
+
+            options.AddPolicy("SurveyTemplateManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "surveyTemplate.manage")));
+
+            options.AddPolicy("SurveyDistributionRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "surveyDistribution.read")));
+
+            options.AddPolicy("SurveyDistributionManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "surveyDistribution.manage")));
+
+            options.AddPolicy("SurveyResponseRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "surveyResponse.read")));
+
+            options.AddPolicy("SurveyResponseManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "surveyResponse.manage")));
+
+            // ===== PHASE 5: ADVANCED ANALYTICS POLICIES =====
+
+            options.AddPolicy("AnalyticsRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "analytics.read")));
+
+            options.AddPolicy("AnalyticsManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "analytics.manage")));
+
+            options.AddPolicy("SavedDashboardRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "savedDashboard.read")));
+
+            options.AddPolicy("SavedDashboardManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "savedDashboard.manage")));
+
+            // ===== PHASE 6: TIMESHEET MANAGEMENT POLICIES =====
+
+            options.AddPolicy("ProjectRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.HasClaim("permission", "project.read")));
+
+            options.AddPolicy("ProjectManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "project.manage")));
+
+            options.AddPolicy("ProjectTaskRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.HasClaim("permission", "projectTask.read")));
+
+            options.AddPolicy("ProjectTaskManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "projectTask.manage")));
+
+            options.AddPolicy("TimesheetPeriodRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.HasClaim("permission", "timesheetPeriod.read")));
+
+            options.AddPolicy("TimesheetPeriodManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "timesheetPeriod.manage")));
+
+            options.AddPolicy("TimesheetRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.IsInRole("Manager") ||
+                    context.User.HasClaim("permission", "timesheet.read")));
+
+            options.AddPolicy("TimesheetManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "timesheet.manage")));
+
+            // Phase 6: Succession Planning & Talent Management
+            options.AddPolicy("KeyPositionRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "keyPosition.read")));
+
+            options.AddPolicy("KeyPositionManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "keyPosition.manage")));
+
+            options.AddPolicy("TalentProfileRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "talentProfile.read")));
+
+            options.AddPolicy("TalentProfileManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "talentProfile.manage")));
+
+            options.AddPolicy("SuccessionPlanRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "successionPlan.read")));
+
+            options.AddPolicy("SuccessionPlanManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "successionPlan.manage")));
+
+            options.AddPolicy("CareerPathRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "careerPath.read")));
+
+            options.AddPolicy("CareerPathManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "careerPath.manage")));
+
+            // ===== PHASE 6: BENEFITS ADMINISTRATION POLICIES =====
+
+            options.AddPolicy("BenefitPlanRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "benefitPlan.read")));
+
+            options.AddPolicy("BenefitPlanManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "benefitPlan.manage")));
+
+            options.AddPolicy("BenefitEnrollmentRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "benefitEnrollment.read")));
+
+            options.AddPolicy("BenefitEnrollmentManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "benefitEnrollment.manage")));
+
+            options.AddPolicy("OpenEnrollmentPeriodRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "openEnrollmentPeriod.read")));
+
+            options.AddPolicy("OpenEnrollmentPeriodManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "openEnrollmentPeriod.manage")));
+
+            options.AddPolicy("BenefitClaimRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "benefitClaim.read")));
+
+            options.AddPolicy("BenefitClaimManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "benefitClaim.manage")));
+
+            // Phase 7: Enhancements
+            options.AddPolicy("ShiftSwapRequestRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "shiftSwapRequest.read")));
+
+            options.AddPolicy("ShiftSwapRequestManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "shiftSwapRequest.manage")));
+
+            options.AddPolicy("OnCallScheduleRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "onCallSchedule.read")));
+
+            options.AddPolicy("OnCallScheduleManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "onCallSchedule.manage")));
+
+            options.AddPolicy("CompensatoryOffRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "compensatoryOff.read")));
+
+            options.AddPolicy("CompensatoryOffManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "compensatoryOff.manage")));
+
+            options.AddPolicy("LeaveEncashmentRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "leaveEncashment.read")));
+
+            options.AddPolicy("LeaveEncashmentManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "leaveEncashment.manage")));
+
+            options.AddPolicy("CustomReportRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "customReport.read")));
+
+            options.AddPolicy("CustomReportManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "customReport.manage")));
+
+            options.AddPolicy("ScheduledReportRead", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "scheduledReport.read")));
+
+            options.AddPolicy("ScheduledReportManagement", policy =>
+                policy.RequireAssertion(context =>
+                    context.User.IsInRole("SystemAdmin") ||
+                    context.User.IsInRole("Admin") ||
+                    context.User.IsInRole("HR") ||
+                    context.User.HasClaim("permission", "scheduledReport.manage")));
         });
         services.AddHttpContextAccessor();
 

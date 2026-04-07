@@ -1,0 +1,31 @@
+<div class="app-list-page">
+  <app-page-header [title]="i18n.t('surveys.templates_title')" />
+  <app-unified-filter [searchPlaceholder]="i18n.t('surveys.search_templates')" [showAddButton]="true"
+    [addButtonText]="i18n.t('surveys.create_template')" [showRefreshButton]="true" [refreshing]="loading()"
+    (searchChange)="onSearchChange($event)" (add)="onAdd()" (refresh)="onRefreshData()" />
+
+  <!-- Filters -->
+  <div class="row mb-3 g-2">
+    <div class="col-md-3">
+      <select class="form-select form-select-sm" [ngModel]="typeFilter()" (ngModelChange)="onTypeChange($event)">
+        <option value="">{{ i18n.t('common.all') }} - {{ i18n.t('surveys.type') }}</option>
+        @for (t of typeOptions; track t) {
+          <option [value]="t">{{ i18n.t('surveys.type_' + t) }}</option>
+        }
+      </select>
+    </div>
+    <div class="col-md-3">
+      <select class="form-select form-select-sm" [ngModel]="activeFilter()" (ngModelChange)="onActiveChange($event)">
+        <option value="">{{ i18n.t('common.all') }} - {{ i18n.t('common.status') }}</option>
+        <option value="true">{{ i18n.t('common.active') }}</option>
+        <option value="false">{{ i18n.t('common.inactive') }}</option>
+      </select>
+    </div>
+  </div>
+
+  <app-data-table [data]="tableData()" [columns]="columns" [actions]="tableActions()" [currentPage]="currentPage()"
+    [totalPages]="totalPages()" [totalItems]="totalCount()" [pageSize]="pageSize()" [loading]="loading"
+    [emptyTitle]="i18n.t('surveys.no_templates')" [showPagination]="true"
+    (actionClick)="onActionClick($event)" (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)">
+  </app-data-table>
+</div>

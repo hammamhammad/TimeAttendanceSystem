@@ -17,11 +17,13 @@ import { EmptyStateComponent } from '../../../shared/components/empty-state/empt
 import { DefinitionListComponent, DefinitionItem } from '../../../shared/components/definition-list/definition-list.component';
 import { LeaveBalanceSummaryComponent } from '../../../shared/components/leave-balance-summary/leave-balance-summary.component';
 import { LeaveTransactionHistoryComponent } from '../../../shared/components/leave-transaction-history/leave-transaction-history.component';
+import { AuditHistoryComponent } from '../../../shared/components/audit-history/audit-history.component';
+import { SectionCardComponent } from '../../../shared/components/section-card/section-card.component';
 
 @Component({
   selector: 'app-view-employee',
   standalone: true,
-  imports: [FormsModule, HasPermissionDirective, FormHeaderComponent, LoadingSpinnerComponent, StatusBadgeComponent, EmptyStateComponent, DefinitionListComponent, LeaveBalanceSummaryComponent, LeaveTransactionHistoryComponent],
+  imports: [FormsModule, HasPermissionDirective, FormHeaderComponent, LoadingSpinnerComponent, StatusBadgeComponent, EmptyStateComponent, DefinitionListComponent, LeaveBalanceSummaryComponent, LeaveTransactionHistoryComponent, AuditHistoryComponent, SectionCardComponent],
   templateUrl: './view-employee.component.html',
   styleUrls: ['./view-employee.component.css']
 })
@@ -48,7 +50,7 @@ export class ViewEmployeeComponent implements OnInit {
   };
 
   // Tab state for employee details
-  activeTab = signal<'info' | 'leave-balance'>('info');
+  activeTab = signal<'info' | 'leave-balance' | 'history'>('info');
 
   ngOnInit() {
     this.employeeId = +this.route.snapshot.params['id'];

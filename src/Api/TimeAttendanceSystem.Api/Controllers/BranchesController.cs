@@ -1,14 +1,14 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TimeAttendanceSystem.Application.Branches.Queries.GetBranches;
-using TimeAttendanceSystem.Application.Branches.Queries.GetBranchById;
-using TimeAttendanceSystem.Application.Branches.Commands.CreateBranch;
-using TimeAttendanceSystem.Application.Branches.Commands.UpdateBranch;
-using TimeAttendanceSystem.Application.Branches.Commands.UpdateBranchCoordinates;
-using TimeAttendanceSystem.Application.Branches.Commands.DeleteBranch;
+using TecAxle.Hrms.Application.Branches.Queries.GetBranches;
+using TecAxle.Hrms.Application.Branches.Queries.GetBranchById;
+using TecAxle.Hrms.Application.Branches.Commands.CreateBranch;
+using TecAxle.Hrms.Application.Branches.Commands.UpdateBranch;
+using TecAxle.Hrms.Application.Branches.Commands.UpdateBranchCoordinates;
+using TecAxle.Hrms.Application.Branches.Commands.DeleteBranch;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/branches")]

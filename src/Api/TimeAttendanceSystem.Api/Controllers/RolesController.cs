@@ -1,15 +1,15 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TimeAttendanceSystem.Application.Roles.Queries.GetRoles;
-using TimeAttendanceSystem.Application.Roles.Commands.AssignPermissionToRole;
-using TimeAttendanceSystem.Application.Roles.Commands.RemovePermissionFromRole;
-using TimeAttendanceSystem.Application.Roles.Commands.CreateRole;
-using TimeAttendanceSystem.Application.Roles.Commands.UpdateRole;
-using TimeAttendanceSystem.Application.Roles.Commands.DeleteRole;
-using TimeAttendanceSystem.Application.Roles.Queries.GetRoleById;
+using TecAxle.Hrms.Application.Roles.Queries.GetRoles;
+using TecAxle.Hrms.Application.Roles.Commands.AssignPermissionToRole;
+using TecAxle.Hrms.Application.Roles.Commands.RemovePermissionFromRole;
+using TecAxle.Hrms.Application.Roles.Commands.CreateRole;
+using TecAxle.Hrms.Application.Roles.Commands.UpdateRole;
+using TecAxle.Hrms.Application.Roles.Commands.DeleteRole;
+using TecAxle.Hrms.Application.Roles.Queries.GetRoleById;
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/roles")]

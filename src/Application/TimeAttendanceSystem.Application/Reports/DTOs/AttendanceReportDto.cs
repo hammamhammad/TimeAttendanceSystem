@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Application.Reports.Queries;
+using TecAxle.Hrms.Application.Reports.Queries;
 
-namespace TimeAttendanceSystem.Application.Reports.DTOs;
+namespace TecAxle.Hrms.Application.Reports.DTOs;
 
 public class AttendanceReportItem
 {

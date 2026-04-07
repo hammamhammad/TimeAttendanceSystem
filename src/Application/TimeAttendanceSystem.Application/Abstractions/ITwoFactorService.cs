@@ -1,11 +1,11 @@
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Abstractions;
+namespace TecAxle.Hrms.Application.Abstractions;
 
 public interface ITwoFactorService
 {
     string GenerateSecretKey();
-    string GenerateQrCodeUri(string email, string secretKey, string issuer = "TimeAttendanceSystem");
+    string GenerateQrCodeUri(string email, string secretKey, string issuer = "TecAxle.Hrms");
     Result<bool> ValidateCode(string secretKey, string code);
     string GenerateBackupCodes();
 }

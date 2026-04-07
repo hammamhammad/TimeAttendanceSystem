@@ -1,6 +1,6 @@
-using TimeAttendanceSystem.Domain.Settings;
+using TecAxle.Hrms.Domain.Settings;
 
-namespace TimeAttendanceSystem.Application.Settings.Queries.GetOvertimeConfigurations;
+namespace TecAxle.Hrms.Application.Settings.Queries.GetOvertimeConfigurations;
 
 /// <summary>
 /// Data Transfer Object representing overtime configuration information for list views and display operations.

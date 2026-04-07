@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Domain.Common;
+namespace TecAxle.Hrms.Domain.Common;
 
 /// <summary>
 /// Abstract base entity providing common properties and behavior for all domain entities in the system.

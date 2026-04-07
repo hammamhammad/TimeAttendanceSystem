@@ -1,11 +1,11 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Domain.Users;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Users;
 
-namespace TimeAttendanceSystem.Application.Roles.Commands.DeleteRole;
+namespace TecAxle.Hrms.Application.Roles.Commands.DeleteRole;
 
 public class DeleteRoleCommandHandler : BaseHandler<DeleteRoleCommand, Result>
 {

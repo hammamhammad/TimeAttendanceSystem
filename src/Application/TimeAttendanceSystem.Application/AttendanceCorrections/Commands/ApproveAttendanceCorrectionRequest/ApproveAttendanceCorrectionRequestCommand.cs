@@ -1,8 +1,10 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Excuses;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Excuses;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.AttendanceCorrections.Commands.ApproveAttendanceCorrectionRequest;
+namespace TecAxle.Hrms.Application.AttendanceCorrections.Commands.ApproveAttendanceCorrectionRequest;
 
 /// <summary>
 /// CQRS command for approving or rejecting attendance correction requests.
@@ -37,6 +39,7 @@ namespace TimeAttendanceSystem.Application.AttendanceCorrections.Commands.Approv
 /// - Links created transaction to correction request
 /// - Notifications sent to employee about decision
 /// </remarks>
+[RequiresModule(SystemModule.TimeAttendance)]
 public record ApproveAttendanceCorrectionRequestCommand(
     long CorrectionRequestId,
     long ApproverId,

@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.LeaveManagement.Commands.ProcessMonthlyAccrual;
+namespace TecAxle.Hrms.Application.LeaveManagement.Commands.ProcessMonthlyAccrual;
 
 /// <summary>
 /// Command handler for processing monthly leave accrual for employees.

@@ -1,0 +1,93 @@
+<div class="container-fluid app-modern-form">
+  <app-form-header
+    [title]="i18n.t('compensatory_offs.grant')"
+    moduleName="compensatory_offs"
+    moduleRoute="leave-management/compensatory-offs">
+  </app-form-header>
+
+  @if (loading()) {
+    <div class="text-center py-5">
+      <app-loading-spinner [message]="i18n.t('common.loading')" [variant]="'primary'" [centered]="true" />
+    </div>
+  }
+
+  @if (!loading()) {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <app-form-section [title]="i18n.t('common.basic_info')" [variant]="'modern'">
+        <div class="row g-3">
+          <!-- Employee -->
+          <div class="col-md-6">
+            <div class="app-modern-field">
+              <label class="app-modern-label">{{ i18n.t('fields.employee') }} <span class="text-danger">*</span></label>
+              <app-searchable-select
+                [options]="employeeOptions"
+                [placeholder]="i18n.t('common.select_employee')"
+                [value]="form.get('employeeId')?.value"
+                [disabled]="submitting()"
+                (selectionChange)="form.get('employeeId')?.setValue($event)">
+              </app-searchable-select>
+            </div>
+          </div>
+
+          <!-- Hours Worked -->
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input type="number" class="form-control" id="hoursWorked" formControlName="hoursWorked" placeholder="x" min="0.5" step="0.5">
+              <label for="hoursWorked">{{ i18n.t('compensatory_offs.hours_worked') }} <span class="text-danger">*</span></label>
+            </div>
+          </div>
+
+          <!-- Earned Date -->
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input type="date" class="form-control" id="earnedDate" formControlName="earnedDate" placeholder="x">
+              <label for="earnedDate">{{ i18n.t('compensatory_offs.earned_date') }} <span class="text-danger">*</span></label>
+            </div>
+          </div>
+
+          <!-- Expiry Date -->
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input type="date" class="form-control" id="expiryDate" formControlName="expiryDate" placeholder="x">
+              <label for="expiryDate">{{ i18n.t('compensatory_offs.expiry_date') }} <span class="text-danger">*</span></label>
+            </div>
+          </div>
+
+          <!-- Reason -->
+          <div class="col-md-6">
+            <div class="form-floating">
+              <textarea class="form-control" id="reason" formControlName="reason" placeholder="x" style="height: 100px"></textarea>
+              <label for="reason">{{ i18n.t('fields.reason') }} <span class="text-danger">*</span></label>
+            </div>
+          </div>
+
+          <!-- Reason (Arabic) -->
+          <div class="col-md-6">
+            <div class="form-floating">
+              <textarea class="form-control" id="reasonAr" formControlName="reasonAr" placeholder="x" style="height: 100px" dir="rtl"></textarea>
+              <label for="reasonAr">{{ i18n.t('fields.reason_ar') }}</label>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div class="col-12">
+            <div class="form-floating">
+              <textarea class="form-control" id="notes" formControlName="notes" placeholder="x" style="height: 100px"></textarea>
+              <label for="notes">{{ i18n.t('common.notes') }}</label>
+            </div>
+          </div>
+        </div>
+      </app-form-section>
+
+      <div class="app-form-actions">
+        <button type="button" class="btn btn-secondary" routerLink="/leave-management/compensatory-offs">{{ i18n.t('common.cancel') }}</button>
+        <button type="submit" class="btn btn-primary" [disabled]="form.invalid || submitting()">
+          @if (submitting()) {
+            <span class="spinner-border spinner-border-sm me-1"></span>
+          }
+          {{ i18n.t('common.save') }}
+        </button>
+      </div>
+    </form>
+  }
+</div>

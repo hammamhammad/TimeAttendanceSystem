@@ -1,0 +1,123 @@
+<!-- Page Header -->
+<app-page-header
+  [title]="i18n.t('portal.allowances.title')">
+  <div header-actions>
+    <button
+      class="btn btn-outline-primary btn-sm"
+      (click)="refresh()"
+      [disabled]="loading()"
+      type="button">
+      <i class="bi bi-arrow-clockwise" [class.spin]="loading()"></i>
+      {{ i18n.t('common.refresh') }}
+    </button>
+  </div>
+</app-page-header>
+
+<!-- Loading State -->
+@if (loading() && !hasAllowances()) {
+  <app-loading-spinner [message]="i18n.t('common.loading')"></app-loading-spinner>
+}
+
+<!-- Error State -->
+@if (error() && !hasAllowances()) {
+  <div class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    {{ error() }}
+    <button class="btn btn-sm btn-outline-danger ms-3" (click)="refresh()" type="button">
+      {{ i18n.t('common.retry') }}
+    </button>
+  </div>
+}
+
+<!-- Empty State -->
+@if (!loading() && !hasAllowances() && !error()) {
+  <app-empty-state
+    icon="bi bi-cash-coin"
+    [title]="i18n.t('portal.allowances.no_allowances')"
+    [message]="i18n.t('portal.allowances.no_allowances_message')">
+  </app-empty-state>
+}
+
+<!-- Allowances Content -->
+@if (!loading() && hasAllowances()) {
+  <!-- Summary Card -->
+  <div class="summary-card mb-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center py-4">
+        <p class="text-muted mb-1 small text-uppercase fw-semibold">{{ i18n.t('portal.allowances.total_monthly') }}</p>
+        <h2 class="display-5 fw-bold text-primary mb-1">
+          {{ formatCurrency(totalAllowances()) }}
+          <small class="fs-5 text-muted">{{ currency() }}</small>
+        </h2>
+        <p class="text-muted small mb-0">{{ i18n.t('portal.allowances.description') }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Allowances Table -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-header bg-light">
+      <h6 class="mb-0">
+        <i class="bi bi-cash-coin text-primary me-2"></i>
+        {{ i18n.t('portal.allowances.active_allowances') }}
+        <span class="badge bg-primary ms-2">{{ allowances().length }}</span>
+      </h6>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>{{ i18n.t('portal.allowances.type') }}</th>
+              <th class="text-end">{{ i18n.t('portal.allowances.amount') }}</th>
+              <th>{{ i18n.t('portal.allowances.effective_from') }}</th>
+              <th>{{ i18n.t('portal.allowances.effective_to') }}</th>
+              <th>{{ i18n.t('portal.allowances.status') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of allowances(); track item.id) {
+              <tr>
+                <td class="fw-medium">{{ getAllowanceName(item) }}</td>
+                <td class="text-end fw-bold text-success">{{ formatCurrency(item.amount) }} {{ item.currency }}</td>
+                <td>{{ formatDate(item.effectiveFromDate) }}</td>
+                <td>
+                  @if (item.effectiveToDate) {
+                    {{ formatDate(item.effectiveToDate) }}
+                  } @else {
+                    <span class="badge bg-info bg-opacity-10 text-info">{{ i18n.t('portal.allowances.permanent') }}</span>
+                  }
+                </td>
+                <td>
+                  <span class="badge bg-success bg-opacity-10 text-success">{{ item.status }}</span>
+                </td>
+              </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr class="table-light fw-bold">
+              <td>{{ i18n.t('portal.allowances.total_monthly') }}</td>
+              <td class="text-end text-primary fw-bold">{{ formatCurrency(totalAllowances()) }} {{ currency() }}</td>
+              <td colspan="3"></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info Card -->
+  <div class="card mt-3">
+    <div class="card-body">
+      <div class="d-flex align-items-start">
+        <i class="bi bi-info-circle text-info me-3 mt-1 fs-4"></i>
+        <div>
+          <h6 class="mb-2">{{ i18n.t('portal.allowances.info_title') }}</h6>
+          <p class="text-muted mb-0 small">
+            {{ i18n.t('portal.allowances.info_text') }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+}

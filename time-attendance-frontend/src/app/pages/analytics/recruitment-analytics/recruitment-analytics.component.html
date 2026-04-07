@@ -1,0 +1,142 @@
+<div class="recruitment-analytics-page">
+  <app-page-header
+    [title]="i18n.t('analytics.recruitment_title')"
+    [showBackButton]="true"
+    backRoute="/analytics">
+  </app-page-header>
+
+  <!-- Filters -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label">{{ i18n.t('analytics.start_date') }}</label>
+          <input type="date" class="form-control" [ngModel]="startDate()" (ngModelChange)="startDate.set($event)">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">{{ i18n.t('analytics.end_date') }}</label>
+          <input type="date" class="form-control" [ngModel]="endDate()" (ngModelChange)="endDate.set($event)">
+        </div>
+        <div class="col-md-3">
+          <button class="btn btn-primary" (click)="onFilter()">
+            <i class="fa-solid fa-filter me-1"></i>
+            {{ i18n.t('analytics.apply_filter') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <app-loading-spinner></app-loading-spinner>
+  } @else if (data()) {
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="card stat-card h-100">
+          <div class="card-body text-center">
+            <div class="stat-icon bg-primary-subtle mb-2">
+              <i class="fa-solid fa-file-lines text-primary"></i>
+            </div>
+            <h3 class="mb-1">{{ data()!.totalRequisitions }}</h3>
+            <p class="text-muted mb-0">{{ i18n.t('analytics.total_requisitions') }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card stat-card h-100">
+          <div class="card-body text-center">
+            <div class="stat-icon bg-info-subtle mb-2">
+              <i class="fa-solid fa-clock text-info"></i>
+            </div>
+            <h3 class="mb-1">{{ data()!.avgTimeToFillDays | number:'1.0-1' }}</h3>
+            <p class="text-muted mb-0">{{ i18n.t('analytics.avg_time_to_fill') }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card stat-card h-100">
+          <div class="card-body text-center">
+            <div class="stat-icon bg-success-subtle mb-2">
+              <i class="fa-solid fa-user-check text-success"></i>
+            </div>
+            <h3 class="mb-1">{{ data()!.hiredCount }}</h3>
+            <p class="text-muted mb-0">{{ i18n.t('analytics.total_hires') }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card stat-card h-100">
+          <div class="card-body text-center">
+            <div class="stat-icon bg-warning-subtle mb-2">
+              <i class="fa-solid fa-briefcase text-warning"></i>
+            </div>
+            <h3 class="mb-1">{{ data()!.openRequisitions }}</h3>
+            <p class="text-muted mb-0">{{ i18n.t('analytics.open_positions') }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+      <!-- Applications by Status Pipeline -->
+      <div class="col-lg-6">
+        <div class="card h-100">
+          <div class="card-header">
+            <h5 class="card-title mb-0">{{ i18n.t('analytics.application_pipeline') }}</h5>
+          </div>
+          <div class="card-body">
+            @for (stage of data()!.applicationsByStatus ?? []; track stage.status) {
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-medium">{{ stage.status }}</span>
+                <span class="badge bg-primary-subtle text-primary">{{ stage.count }}</span>
+              </div>
+              <div class="progress mb-3" style="height: 10px;">
+                <div class="progress-bar bg-primary"
+                  [style.width.%]="(stage.count / getMaxStatusCount()) * 100">
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Budget & Metrics -->
+      <div class="col-lg-6">
+        <div class="card h-100">
+          <div class="card-header">
+            <h5 class="card-title mb-0">{{ i18n.t('analytics.recruitment_metrics') }}</h5>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-6">
+                <div class="p-3 rounded bg-light text-center">
+                  <p class="text-muted mb-1 small">{{ i18n.t('analytics.total_applications') }}</p>
+                  <h4 class="mb-0">{{ data()!.totalApplications }}</h4>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="p-3 rounded bg-light text-center">
+                  <p class="text-muted mb-1 small">{{ i18n.t('analytics.filled_requisitions') }}</p>
+                  <h4 class="mb-0">{{ data()!.filledRequisitions }}</h4>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="p-3 rounded bg-light text-center">
+                  <p class="text-muted mb-1 small">{{ i18n.t('analytics.avg_budget_min') }}</p>
+                  <h4 class="mb-0">{{ (data()!.avgBudgetRange?.min ?? 0) | number:'1.0-0' }}</h4>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="p-3 rounded bg-light text-center">
+                  <p class="text-muted mb-1 small">{{ i18n.t('analytics.avg_budget_max') }}</p>
+                  <h4 class="mb-0">{{ (data()!.avgBudgetRange?.max ?? 0) | number:'1.0-0' }}</h4>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace TimeAttendanceSystem.Infrastructure.Persistence.PostgreSql.Migrations
+namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
 {
     /// <inheritdoc />
     public partial class AddLeaveBalancePermissions : Migration

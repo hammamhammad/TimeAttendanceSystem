@@ -1,4 +1,4 @@
-namespace TimeAttendanceSystem.Domain.Common;
+namespace TecAxle.Hrms.Domain.Common;
 
 public abstract class ValueObject
 {

@@ -1,7 +1,9 @@
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
 
-namespace TimeAttendanceSystem.Application.VacationTypes.Commands.ToggleVacationTypeStatus;
+namespace TecAxle.Hrms.Application.VacationTypes.Commands.ToggleVacationTypeStatus;
 
 /// <summary>
 /// CQRS command for toggling the active status of a vacation type in the Time Attendance System.
@@ -44,4 +46,5 @@ namespace TimeAttendanceSystem.Application.VacationTypes.Commands.ToggleVacation
 /// - Includes current status after successful toggle operation
 /// - Supports localized error messages based on user language preferences
 /// </remarks>
+[RequiresModule(SystemModule.LeaveManagement)]
 public record ToggleVacationTypeStatusCommand(long Id) : IRequest<Result<bool>>;

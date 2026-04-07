@@ -1,7 +1,7 @@
 using System.Globalization;
-using TimeAttendanceSystem.Shared.Localization;
+using TecAxle.Hrms.Shared.Localization;
 
-namespace TimeAttendanceSystem.Api.Middleware;
+namespace TecAxle.Hrms.Api.Middleware;
 
 /// <summary>
 /// ASP.NET Core middleware for automatic localization and culture management in multi-language applications.

@@ -1,0 +1,28 @@
+<div class="feedback-requests-page">
+  <app-page-header [title]="i18n.t('feedback_360.title')" />
+  <app-unified-filter
+    [searchPlaceholder]="i18n.t('common.search')"
+    [showAddButton]="true"
+    [addButtonText]="i18n.t('feedback_360.create')"
+    [showRefreshButton]="true"
+    [refreshButtonText]="i18n.t('common.refresh')"
+    [refreshing]="loading()"
+    (searchChange)="onSearchChange($event)"
+    (add)="navigateToCreate()"
+    (refresh)="onRefreshData()">
+  </app-unified-filter>
+  <app-data-table
+    [data]="displayData()"
+    [columns]="tableColumns"
+    [actions]="tableActions"
+    [loading]="loading"
+    [totalItems]="totalCount()"
+    [currentPage]="currentPage()"
+    [pageSize]="pageSize()"
+    [pageSizeOptions]="[10, 25, 50]"
+    [emptyTitle]="i18n.t('feedback_360.no_records_title')"
+    [emptyMessage]="i18n.t('feedback_360.no_records')"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)"
+    (actionClick)="onTableAction($event)" />
+</div>
