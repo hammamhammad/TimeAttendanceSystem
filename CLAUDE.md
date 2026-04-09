@@ -1,9 +1,10 @@
-# Development Guidelines for Time Attendance System
+# Development Guidelines for TecAxle HRMS
 
 ## System Overview
 
-The Time Attendance System (ClockN) is a comprehensive enterprise-grade multi-tenant SaaS workforce management solution that provides:
-- **Multi-Tenant SaaS Architecture**: Tenant isolation, subscription plans, module entitlements, and usage limits
+TecAxle HRMS is a comprehensive enterprise-grade **per-tenant database** SaaS workforce management platform owned and operated by **TecAxle**. The system uses a single shared backend, frontend, and mobile application to serve all tenants, with complete data isolation via dedicated databases:
+- **Per-Tenant Database Architecture**: A master database (`tecaxle_master`) stores the tenant registry, subscription plans, and platform users. Each tenant gets a dedicated PostgreSQL database (`ta_tenant_{id}`) containing all of its business data (employees, attendance, leaves, etc.). Email-based login resolves the tenant from the master DB, then authenticates against the tenant's own database.
+- **Platform Administration (TecAxle Admin)**: Platform-level users (TecAxle Admin / TecAxle Support) manage all tenants, provision new databases, assign subscription plans, and monitor platform health from a unified admin portal.
 - **Subscription & Entitlements**: Configurable plans (Starter/Professional/Enterprise), per-tenant module enable/disable, feature flags, and usage limits
 - **Time & Attendance Tracking**: Automated attendance recording, overtime calculation, and reporting
 - **Leave Management**: Vacation requests, leave balances, accruals, and approvals
@@ -28,31 +29,44 @@ The Time Attendance System (ClockN) is a comprehensive enterprise-grade multi-te
 ### Core Modules
 
 #### 1. Authentication & Authorization
+- **Unified email-based login**: Single `/api/v1/auth/login` endpoint for both tenant users and platform admins
+  - Step 1: Query `TenantUserEmails` table in master DB to resolve tenant from email
+  - Step 2: If found, connect to the tenant's dedicated database and authenticate the user
+  - Step 3: If not found in tenants, check `PlatformUsers` table in master DB and authenticate as platform admin
 - JWT-based authentication with refresh tokens
+- **JWT claims**: Tenant users get `tenant_id` claim; platform admins get `platform_role` + `is_platform_user` claims
 - Two-factor authentication (2FA) with backup codes
 - Role-based access control (RBAC)
 - Permission-based authorization
 - Branch-scoped access control (multi-tenancy)
-- Tenant-scoped access via `tenant_id` JWT claim
 - Session management and blacklisted tokens
 - Password policies and history tracking
 - Login attempt tracking and lockout
 
-#### 1b. Multi-Tenant SaaS & Subscription Architecture
-- **Tenant Entity**: Each company/organization is a Tenant with subdomain, branding, company info, and regional defaults
-- **Tenant-Branch Relationship**: Branches belong to a Tenant via `TenantId` FK — all data isolation flows through this
-- **Tenant Context Pipeline**: `tenant_id` claim in JWT, `TenantResolutionMiddleware`, `ITenantContext` scoped service
+#### 1b. Multi-Tenant SaaS & Subscription Architecture (Per-Tenant Database Model)
+- **Per-Tenant Database Isolation**: Each tenant gets a dedicated PostgreSQL database (`ta_tenant_{id}`). No `TenantId` FK filtering needed — all data in a tenant DB belongs to that tenant.
+- **Master Database** (`tecaxle_master`): Stores `Tenants`, `PlatformUsers`, `TenantUserEmails`, `SubscriptionPlans`, `TenantSubscriptions`, `EntitlementChangeLogs`, and other platform-level entities. Accessed via `MasterDbContext`.
+- **Tenant Database**: Stores all business data (employees, branches, departments, attendance, leaves, etc.). Accessed via `TecAxleDbContext` (renamed from `TimeAttendanceDbContext`).
+- **Tenant Entity**: Each company/organization is a Tenant with subdomain, branding, company info, regional defaults, plus new fields: `EncryptedConnectionString`, `DatabaseName`, `DatabaseCreatedAt`, `DatabaseMigrationVersion`
+- **TenantConnectionResolver** (`ITenantConnectionResolver`): Dynamically resolves tenant DB connection string from master DB. Decrypts `EncryptedConnectionString` using AES-256 via `ConnectionStringEncryption`.
+- **MultiTenancyOptions**: Configuration with modes: `SharedDatabase`, `Hybrid`, `PerTenantDatabase`. Current mode: `PerTenantDatabase`.
+- **TenantProvisioningService**: Auto-creates tenant database on tenant creation — creates DB, applies EF Core migrations, seeds a SystemAdmin user (`tecaxleadmin@{company_email_domain}`), and assigns the subscription plan. If a `tecaxleadmin` user already exists from seed data, updates its email and password to match the provisioning credentials.
+- **ConnectionStringEncryption**: AES-256 encryption/decryption for tenant connection strings stored in master DB.
+- **Tenant Context Pipeline**: `tenant_id` claim in JWT, `TenantResolutionMiddleware`, `ITenantContext` scoped service — resolves which tenant DB to connect to for the current request.
 - **Module Registry**: 26 system modules defined in `SystemModule` enum with metadata, permission mappings, dependency rules, and background job associations
-- **Subscription Plans**: `SubscriptionPlan` entity with tiers (Starter/Professional/Enterprise/Custom), pricing, module entitlements, feature flags, and usage limits
-- **Tenant Subscriptions**: `TenantSubscription` links tenant to plan with billing cycle, status, period tracking
+- **Subscription Plans**: `SubscriptionPlan` entity (in master DB) with tiers (Starter/Professional/Enterprise/Custom), pricing, module entitlements, feature flags, and usage limits. Full CRUD via `POST/PUT/DELETE /api/v1/subscription-plans`.
+- **Tenant Subscriptions**: `TenantSubscription` (in master DB) links tenant to plan with billing cycle, status, period tracking
 - **Module Add-Ons**: `TenantModuleAddOn` for optional modules purchased on top of base plan
 - **Feature Overrides**: `TenantFeatureOverride` for per-tenant feature flag overrides (sales/beta access)
 - **Entitlement Service**: `IEntitlementService` with per-tenant caching (5-min TTL), checks modules/features/limits
 - **MediatR Pipeline Behaviors**: `[RequiresModule]` attribute + `ModuleEntitlementBehavior` for automatic module enforcement; `[RequiresLimit]` + `UsageLimitBehavior` for usage limit enforcement. **173 commands/queries decorated** across all non-Core modules with two-tier access: commands fully blocked, queries allow read-only historical access via `AllowReadWhenDisabled = true`
-- **Module-Aware Background Jobs**: `ModuleAwareJob` abstract base class — iterates tenants, skips those without required module
+- **Tenant-Iterating Background Jobs**: `TenantIteratingJob` abstract base class — iterates all active tenants from master DB, connects to each tenant's database, and runs the job. Replaces the old `ModuleAwareJob` pattern. Can optionally skip tenants without a required module.
 - **Frontend Entitlement Service**: Signal-based `EntitlementService` with `isModuleEnabled()` and `isModuleReadOnly()`, `moduleGuard` on 201 routes (strict mode for create/edit, read-only for list/view), module-tagged navigation items, `ModuleStatusBannerComponent` for read-only warning
 - **Default Plans**: Starter (5 modules, 50 employees), Professional (13 modules, 500 employees), Enterprise (all 26 modules, unlimited)
-- **Tenant Management UI**: Admin pages for CRUD tenants, view/assign/change/cancel subscriptions, subscription plan cards
+- **Subscription Plan Management UI**: Full plan CRUD at `/subscription-plans` — create, edit, delete plans with module entitlements, feature flags, and usage limits
+- **Tenant Management UI**: Admin pages for CRUD tenants (with auto-provisioning), view/assign/change/cancel subscriptions. Create tenant form includes: Basic Info (with logo upload) + Company Info + Plan Selection + Default Settings. On creation, the system auto-provisions the tenant DB, seeds SystemAdmin, and assigns the selected plan. **Email domain uniqueness enforced** — each tenant must use a unique email domain to prevent `TenantUserEmails` conflicts.
+- **Platform Entities**: `PlatformUser` (in master DB) with `PlatformRole` enum (`TecAxleAdmin`, `TecAxleSupport`). `TenantUserEmail` (in master DB) maps user emails to tenant IDs for login resolution.
+- **C# Namespaces**: All backend namespaces are `TecAxle.Hrms.*` (project directories still named `TimeAttendanceSystem.*` with `RootNamespace`/`AssemblyName` overrides set in `.csproj` files).
 
 #### 1d. Operational Strength & Module Lifecycle (Phase 4)
 - **Module Entitlement Enforcement**: All 173 non-Core commands/queries decorated with `[RequiresModule(SystemModule.X)]`. Commands are fully blocked when module disabled; queries allow historical data access via `AllowReadWhenDisabled = true`. SystemAdmin bypasses all checks.
@@ -91,8 +105,8 @@ The Time Attendance System (ClockN) is a comprehensive enterprise-grade multi-te
 - **Frontend Service**: `TenantConfigurationService` in `time-attendance-frontend/src/app/pages/settings/tenant-configuration/services/`
 
 #### 2. Organization Structure
-- **Tenants**: Top-level company/organization entity — owns branches, has subscription plan, company info, and regional defaults
-- **Branches**: Multi-branch organization support with branch-scoped data, GPS geofencing (latitude, longitude, radius). Each branch belongs to a Tenant via `TenantId`.
+- **Tenants**: Top-level company/organization entity (stored in master DB) — owns a dedicated database, has subscription plan, company info, and regional defaults
+- **Branches**: Multi-branch organization support with branch-scoped data, GPS geofencing (latitude, longitude, radius) with interactive map-based location picker (Leaflet + OpenStreetMap). Stored in tenant DB (no TenantId FK needed — the database itself provides isolation).
 - **Departments**: Hierarchical department structure (parent-child relationships)
 - **Employees**: Complete employee lifecycle management
 - **Users**: User accounts with role and branch assignments
@@ -337,9 +351,13 @@ The Time Attendance System (ClockN) is a comprehensive enterprise-grade multi-te
 ### Backend Development
 - Use **Coravel package** for all background jobs
 - **Database Setup for Development**:
-  - First time: Database will be created automatically on first run with essential seed data (systemadmin user, roles, permissions)
-  - After database creation: Run `scripts/sample-data-with-users.sql` to populate with sample data (50 employees, 5 branches, 20 departments)
+  - **Master DB** (`tecaxle_master`): Created automatically on first run with platform seed data (subscription plans, system modules)
+  - **Tenant DBs** (`ta_tenant_{id}`): Auto-provisioned when a tenant is created via the admin UI or API. Each tenant DB gets EF Core migrations applied and a SystemAdmin user seeded.
+  - After tenant DB creation: Run `scripts/sample-data-with-users.sql` against a tenant DB to populate with sample data (50 employees, 5 branches, 20 departments)
   - Sample data includes login credentials - Default password: `Emp@123!` (users must change on first login)
+  - **Connection strings** in `appsettings.json`: `MasterDatabase` for the master DB, `PostgreSqlConnection` as template for tenant DBs, `MultiTenancy` section for mode configuration
+- **C# Namespaces**: All namespaces are `TecAxle.Hrms.*` (project directories remain `TimeAttendanceSystem.*` with `RootNamespace`/`AssemblyName` set in `.csproj`)
+- **DbContext**: `TecAxleDbContext` for tenant DBs (renamed from `TimeAttendanceDbContext`), `MasterDbContext` for master DB
 - When applying database migrations, ensure that all existing data in the database is preserved
 - Always run the backend on **http://localhost:5099**
 - Follow Clean Architecture layers: Domain → Application → Infrastructure → API
@@ -453,6 +471,7 @@ When creating form pages, **always use**:
 - `SearchableSelectComponent` for dropdowns with search
 - `DateRangePickerComponent` for date ranges
 - `TimeRangeInputComponent` for time ranges
+- `LocationPickerComponent` for GPS coordinate selection with map (Leaflet + OpenStreetMap)
 
 ### Modal Standards
 - Use `ModalWrapperComponent` for all custom modals
@@ -524,7 +543,10 @@ styles/erp-tokens.css   → ERP color/shadow/typography overrides (THE source of
 styles/utilities.css    → Utility classes
 styles/components.css   → Component patterns (buttons, cards, forms, badges, views)
 styles/patterns.css     → Complex UI patterns
++ Leaflet fix           → Bootstrap img override for Leaflet map tiles (in styles.css)
 ```
+
+**Leaflet Map Integration**: `leaflet` + `@types/leaflet` installed. Leaflet CSS loaded globally in `angular.json`. Bootstrap's `img { max-width: 100% }` breaks Leaflet tiles — override is in `styles.css` (`.leaflet-container img { max-width: none !important }`). Marker icons copied to `assets/leaflet/` via angular.json asset glob.
 
 **Color Palette** (ERP Indigo Blue):
 
@@ -744,7 +766,7 @@ All shared components are documented in `SHARED_COMPONENTS_QUICK_REFERENCE.md` w
 ## Employee Self-Service Portal (Separate Application)
 
 ### Overview
-The Time Attendance System includes a **separate Angular application** specifically designed for employee self-service. This is a standalone frontend application that runs independently from the admin portal.
+The TecAxle HRMS includes a **separate Angular application** specifically designed for employee self-service. This is a standalone frontend application that runs independently from the admin portal.
 
 **Application Location**: `time-attendance-selfservice-frontend/`
 
@@ -975,18 +997,21 @@ async approveRequest(requestId: number, requestType: string) {
 
 ### API Endpoints for Tenant & Subscription Management
 
-#### Tenant Management (Base: `/api/v1/tenants`) — SystemAdmin only
+#### Tenant Management (Base: `/api/v1/tenants`) — Platform Admin only
 - `GET /` - List tenants (paginated, search, filter by status/isActive)
 - `GET /{id}` - Get tenant by ID with subscription details
-- `POST /` - Create tenant
+- `POST /` - Create tenant (validates email domain uniqueness, auto-provisions dedicated database, seeds SystemAdmin, assigns plan)
 - `PUT /{id}` - Update tenant
 - `POST /{id}/activate` - Activate tenant
 - `POST /{id}/suspend` - Suspend tenant
 - `GET /discover` - Tenant discovery for mobile apps (public, no auth)
 
-#### Subscription Plans (Base: `/api/v1/subscription-plans`) — SystemAdmin only
+#### Subscription Plans (Base: `/api/v1/subscription-plans`) — Platform Admin only
 - `GET /` - List all subscription plans with module entitlements and limits
 - `GET /{id}` - Get plan by ID with full details
+- `POST /` - Create a new subscription plan
+- `PUT /{id}` - Update an existing subscription plan
+- `DELETE /{id}` - Delete a subscription plan
 
 #### Tenant Subscriptions (Base: `/api/v1/tenants/{tenantId}/subscription`) — SystemAdmin only
 - `GET /` - Get active subscription for a tenant
@@ -1119,7 +1144,7 @@ npm run build
 ## Mobile Application (Flutter)
 
 ### Overview
-The Time Attendance System includes a **Flutter mobile application** for employee self-service on iOS and Android devices. This native mobile app provides GPS+NFC verified attendance with biometric authentication.
+The TecAxle HRMS includes a **Flutter mobile application** for employee self-service on iOS and Android devices. This native mobile app provides GPS+NFC verified attendance with biometric authentication.
 
 **Application Location**: `ess_mobile_app/`
 **Platforms**: iOS, Android, Windows, Web
@@ -1276,7 +1301,7 @@ The AndroidManifest.xml includes comprehensive permissions for:
 - **Vibration**: `android.permission.VIBRATE` - Haptic feedback
 - **Internet**: `android.permission.INTERNET` - API communication
 
-**App Label**: `ClockN ESS` (configured in AndroidManifest.xml)
+**App Label**: `TecAxle HRMS` (configured in AndroidManifest.xml)
 
 ### Theme Customization
 
@@ -1284,9 +1309,9 @@ Colors and theme are defined in `lib/core/theme/app_theme.dart`:
 
 ```dart
 class AppColors {
-  static const Color primary = Color(0xFFA8A4CE);      // ClockN Lavender Purple
-  static const Color secondary = Color(0xFF5C6670);   // ClockN Blue-Gray
-  static const Color accent = Color(0xFFE5DD7A);      // ClockN Soft Gold
+  static const Color primary = Color(0xFFA8A4CE);      // TecAxle HRMS Lavender Purple
+  static const Color secondary = Color(0xFF5C6670);   // TecAxle HRMS Blue-Gray
+  static const Color accent = Color(0xFFE5DD7A);      // TecAxle HRMS Soft Gold
   // ... additional colors
 }
 ```
@@ -1348,8 +1373,9 @@ The admin frontend (`time-attendance-frontend`) is the full-featured management 
 
 **Branches** (`pages/branches/`)
 - Branch list with filters
-- Create/edit branch
-- View branch details
+- Create branch (full page at `/branches/create` with map location picker)
+- Edit branch (full page at `/branches/:id/edit` with map location picker)
+- View branch details (with readonly map showing geofence)
 - Branch table component
 
 **Departments** (`pages/departments/`)
@@ -1454,10 +1480,10 @@ The admin frontend (`time-attendance-frontend`) is the full-featured management 
 
 #### Platform Management (`pages/tenants/`, `pages/subscription-plans/`)
 - **Tenants List** (`tenants/`) - Paginated table with search, status filter, CRUD actions
-- **Create Tenant** (`tenants/create-tenant/`) - Modern form with Basic Info, Company Info, Default Settings sections
+- **Create Tenant** (`tenants/create-tenant/`) - Modern form with Basic Info (including logo upload) + Company Info + Plan Selection + Default Settings. On submit, validates email domain uniqueness, auto-provisions dedicated DB, seeds SystemAdmin (`tecaxleadmin@{company_email_domain}`, password: `TecAxle@Sys2026!`), and assigns selected plan. Plan assignment is non-fatal — if it fails, tenant is still created Active and plan can be assigned later from the view page.
 - **Edit Tenant** (`tenants/edit-tenant/`) - Pre-populated form (subdomain read-only)
 - **View Tenant** (`tenants/view-tenant/`) - Overview tab (DefinitionList) + Subscription tab (plan details, enabled modules, limits, assign/change/cancel actions)
-- **Subscription Plans** (`subscription-plans/`) - Card-based pricing page showing Starter/Professional/Enterprise plans with modules and limits
+- **Subscription Plans** (`subscription-plans/`) - Full plan management UI with CRUD (create, edit, delete) + card-based pricing page showing plans with modules and limits
 
 #### Entitlement Infrastructure (`core/services/`, `core/auth/guards/`)
 - **EntitlementService** (`core/services/entitlement.service.ts`) - Signal-based service that loads tenant entitlements on login, provides `isModuleEnabled()`, `isFeatureEnabled()`, `getLimit()`, `getCurrentUsage()`
@@ -1633,8 +1659,10 @@ time-attendance-frontend/
 
 ### Domain Entities
 
-#### Multi-Tenant & Subscription
-- Tenant, TenantStatus (enum)
+#### Multi-Tenant & Subscription (Master DB)
+- Tenant (with `EncryptedConnectionString`, `DatabaseName`, `DatabaseCreatedAt`, `DatabaseMigrationVersion`), TenantStatus (enum)
+- PlatformUser (`src/Domain/.../Platform/`), PlatformRole (enum: TecAxleAdmin, TecAxleSupport)
+- TenantUserEmail (`src/Domain/.../Tenants/`) — maps user emails to tenant IDs for login resolution
 - SubscriptionPlan, PlanTier (enum), PlanModuleEntitlement, PlanFeatureFlag, PlanLimit, LimitType (enum)
 - TenantSubscription, SubscriptionStatus (enum), BillingCycle (enum), TenantModuleAddOn, TenantFeatureOverride
 - EntitlementChangeLog, EntitlementChangeType (enum - 9 types: PlanAssigned, PlanChanged, SubscriptionCancelled, etc.)
@@ -1647,8 +1675,8 @@ time-attendance-frontend/
 - PolicyTemplate (Code, Region, Industry, IsSystemTemplate, TenantId), PolicyTemplateItem (PolicyType, ConfigurationJson, SortOrder)
 - SetupStep (per-tenant onboarding tracking)
 
-#### Organization
-- Branch (with TenantId FK), Department, Employee, EmployeeUserLink
+#### Organization (Tenant DB)
+- Branch, Department, Employee, EmployeeUserLink
 
 #### Authentication & Security
 - User, Role, Permission, RolePermission, UserRole
@@ -1722,9 +1750,14 @@ time-attendance-frontend/
 #### Multi-Tenant & Entitlement Services
 - **EntitlementService** (`IEntitlementService`) - Cached per-tenant entitlement checking (modules, features, limits). 5-minute TTL. Call `InvalidateCache(tenantId)` after subscription changes.
 - **TenantContext** (`ITenantContext`) - Scoped service holding resolved tenant ID. Populated by `TenantResolutionMiddleware`.
+- **TenantConnectionResolver** (`ITenantConnectionResolver`) - Resolves and decrypts tenant DB connection strings from master DB. Used by middleware and background jobs.
+- **TenantProvisioningService** - Creates tenant database (with regex-validated name), applies migrations, seeds or updates SystemAdmin user on tenant creation. Database name validated against `^[a-z0-9_]+$` pattern. If `tecaxleadmin` user exists from seed data, updates email + password to match provisioning credentials.
+- **ConnectionStringEncryption** - AES-256 encryption/decryption for tenant connection strings.
+- **MasterDbContext** - EF Core DbContext for the master database (`tecaxle_master`). Contains Tenants, PlatformUsers, TenantUserEmails, SubscriptionPlans, etc.
+- **TecAxleDbContext** - EF Core DbContext for tenant databases (renamed from `TimeAttendanceDbContext`). Contains all business entities.
 - **ModuleEntitlementBehavior** - MediatR `IPipelineBehavior` that checks `[RequiresModule]` attribute on requests. Supports `AllowReadWhenDisabled` for read-only historical access. 173 commands/queries decorated.
 - **UsageLimitBehavior** - MediatR `IPipelineBehavior` that checks `[RequiresLimit]` attribute on creation commands
-- **ModuleAwareJob** - Abstract base class for background jobs that skip tenants without required module
+- **TenantIteratingJob** - Abstract base class for background jobs that iterate all tenants from master DB, connect to each tenant's database, and execute. Replaces the old `ModuleAwareJob`.
 - **ModuleDeactivationService** (`IModuleDeactivationService`) - Orchestrates safe module deactivation/reactivation: freezes/unfreezes in-flight workflows, logs entitlement changes, invalidates caches
 
 ### Background Jobs (Coravel)
@@ -1743,11 +1776,13 @@ time-attendance-frontend/
 
 ### Middleware Pipeline
 - CORS → Global Exception Handler → Rate Limiting → Localization → Authentication → **Tenant Resolution** → Authorization → Routing → SignalR Hub
-- **Tenant Resolution Middleware**: `src/Api/TimeAttendanceSystem.Api/Middleware/TenantResolutionMiddleware.cs`
+- **Tenant Resolution Middleware**: `src/Api/TecAxle.Hrms.Api/Middleware/TenantResolutionMiddleware.cs`
   - Resolves tenant from JWT `tenant_id` claim (authenticated) or `X-Tenant-Id` header (pre-auth)
-  - Sets `ITenantContext.TenantId` for the request scope
+  - Uses `ITenantConnectionResolver` to look up and decrypt the tenant's connection string from master DB
+  - Sets `ITenantContext.TenantId` and configures `TecAxleDbContext` to connect to the correct tenant database for the request scope
+  - Platform admin requests (with `is_platform_user` claim) can operate cross-tenant
   - Unauthenticated endpoints (login, discovery) proceed without tenant context
-- **Global Exception Handler**: `src/Api/TimeAttendanceSystem.Api/Middleware/GlobalExceptionHandlerMiddleware.cs`
+- **Global Exception Handler**: `src/Api/TecAxle.Hrms.Api/Middleware/GlobalExceptionHandlerMiddleware.cs`
   - Maps `ValidationException` → 400, `UnauthorizedAccessException` → 401, `NotFoundException` → 404, others → 500
   - Returns JSON: `{ statusCode, message, traceId, detail?, stackTrace? }` (detail/stackTrace only in Development)
 
@@ -1769,7 +1804,7 @@ When working with attendance:
 ### Mobile Attendance Verification Features
 When working with mobile GPS+NFC attendance:
 - **Dual Verification**: GPS geofence check AND NFC tag validation required
-- **Geofence Calculation**: Uses Haversine formula to calculate distance from branch coordinates
+- **Geofence Calculation**: Uses Haversine formula to calculate distance from branch coordinates (branch GPS coordinates are configured via the interactive map picker in Branch create/edit pages)
 - **NFC Tag Validation**: Verify tag UID is registered and active for the branch
 - **HMAC Payload Verification**: Validate HMAC-SHA256 signed payload if `RequirePayload` is enabled
 - **Audit Every Attempt**: Log all verification attempts (success and failure) to `AttendanceVerificationLogs`
@@ -1855,14 +1890,14 @@ When creating reports:
 
 ### Clean Architecture Layers
 
-1. **Domain Layer** (`TimeAttendanceSystem.Domain`)
+1. **Domain Layer** (`TecAxle.Hrms.Domain`)
    - Entities with business logic
    - Enums for constants
    - Domain events (if applicable)
    - No dependencies on other layers
    - Contains: Employee, Attendance, Shift, Vacation, etc.
 
-2. **Application Layer** (`TimeAttendanceSystem.Application`)
+2. **Application Layer** (`TecAxle.Hrms.Application`)
    - DTOs (Request/Response models)
    - Service interfaces and implementations
    - Business logic and validations
@@ -1870,14 +1905,14 @@ When creating reports:
    - CQRS commands and queries (MediatR)
    - Depends only on Domain layer
 
-3. **Infrastructure Layer** (`TimeAttendanceSystem.Infrastructure`)
+3. **Infrastructure Layer** (`TecAxle.Hrms.Infrastructure`)
    - Database context (EF Core)
    - Repository implementations
    - External service integrations
    - Background job implementations (Coravel)
    - Depends on Domain and Application layers
 
-4. **API Layer** (`TimeAttendanceSystem.Api`)
+4. **API Layer** (`TecAxle.Hrms.Api`)
    - Controllers for HTTP endpoints
    - SignalR hubs for real-time communication
    - Authentication/authorization middleware
@@ -1941,11 +1976,14 @@ public class EmployeeDto
 
 ### Authentication & Authorization
 - Always use JWT tokens for API authentication
+- **Email-based login** resolves tenant from master DB `TenantUserEmails` table, then authenticates against tenant DB
+- **Platform admin fallback**: If email not found in tenants, check `PlatformUsers` in master DB
 - Implement token refresh mechanism
 - Support 2FA for sensitive accounts
 - Track login attempts and implement lockout
 - Use role-based and permission-based authorization
 - Implement branch-scoped data access
+- **Tenant connection strings** are AES-256 encrypted in master DB via `ConnectionStringEncryption`
 
 ### NFC Tag Security
 - HMAC-SHA256 signed payloads for tamper detection on NFC tags
@@ -2007,6 +2045,7 @@ public class EmployeeDto
 - Batch operations when appropriate
 - Monitor query performance
 - Use connection pooling
+- **Per-tenant DB**: Each tenant has its own database — no need for TenantId filtering in queries. Background jobs iterate tenants via `TenantIteratingJob` and connect to each DB sequentially.
 
 ---
 
@@ -2054,7 +2093,8 @@ public class EmployeeDto
 - Backend: http://localhost:5099
 - Admin Frontend: http://localhost:4200
 - Self-Service Frontend: http://localhost:4201
-- Database: PostgreSQL (local or container)
+- **Master Database**: PostgreSQL — `tecaxle_master` (local or container)
+- **Tenant Databases**: PostgreSQL — `ta_tenant_{id}` (one per tenant, auto-provisioned)
 - Use Coravel for background jobs
 - **See "Running the Complete System" section for detailed startup instructions**
 
@@ -2151,7 +2191,7 @@ The project includes .NET console tools for managing sample data without requiri
 #### 1. Sample Data Loader (`tools/RunSampleData.csproj`)
 **Purpose**: Loads sample data into the database by executing the SQL script.
 
-**Location**: `d:\Work\TimeAttendanceSystem\tools\RunSampleData.cs`
+**Location**: `d:\Work\TecAxle.Hrms\tools\RunSampleData.cs`
 
 **Usage**:
 ```bash
@@ -2178,7 +2218,7 @@ Default password for all employees: Emp@123!
 #### 2. Sample Data Verifier (`tools/verify/`)
 **Purpose**: Verifies that sample data was loaded correctly.
 
-**Location**: `d:\Work\TimeAttendanceSystem\tools\verify\Program.cs`
+**Location**: `d:\Work\TecAxle.Hrms\tools\verify\Program.cs`
 
 **Usage**:
 ```bash
@@ -2215,7 +2255,10 @@ All sample data verified successfully!
 Both tools use the same connection string from `appsettings.json`:
 
 ```csharp
-string connectionString = "Host=localhost;Port=5432;Database=TimeAttendanceSystem;Username=postgres;Password=P@ssw0rd@3213;Include Error Detail=true";
+// Master DB connection:
+string masterConnectionString = "Host=localhost;Port=5432;Database=tecaxle_master;Username=postgres;Password=P@ssw0rd@3213;Include Error Detail=true";
+// Tenant DB connection (sample data is loaded into a specific tenant DB):
+string tenantConnectionString = "Host=localhost;Port=5432;Database=ta_tenant_{id};Username=postgres;Password=P@ssw0rd@3213;Include Error Detail=true";
 ```
 
 **Important**: Update the connection string in both tools if your database credentials differ.
@@ -2293,7 +2336,7 @@ tools/
 #### Backend
 ```bash
 # Run backend
-cd src/Api/TimeAttendanceSystem.Api
+cd src/Api/TecAxle.Hrms.Api
 dotnet run
 
 # Load sample data (first time only, after database creation)
@@ -2302,20 +2345,20 @@ cd tools
 dotnet run --project RunSampleData.csproj
 
 # Option 2: Using PostgreSQL command line
-psql -U your_username -d TimeAttendanceDb -f scripts/sample-data-with-users.sql
+psql -U your_username -d TecAxleHRMS -f scripts/sample-data-with-users.sql
 
 # Verify sample data was loaded correctly
 cd tools/verify
 dotnet run
 
 # Create migration
-dotnet ef migrations add MigrationName --project src/Infrastructure/TimeAttendanceSystem.Infrastructure --startup-project src/Api/TimeAttendanceSystem.Api
+dotnet ef migrations add MigrationName --project src/Infrastructure/TecAxle.Hrms.Infrastructure --startup-project src/Api/TecAxle.Hrms.Api
 
 # Update database
-dotnet ef database update --project src/Infrastructure/TimeAttendanceSystem.Infrastructure --startup-project src/Api/TimeAttendanceSystem.Api
+dotnet ef database update --project src/Infrastructure/TecAxle.Hrms.Infrastructure --startup-project src/Api/TecAxle.Hrms.Api
 
 # Drop database (use with caution - will lose all data)
-dotnet ef database drop --project src/Infrastructure/TimeAttendanceSystem.Infrastructure --startup-project src/Api/TimeAttendanceSystem.Api
+dotnet ef database drop --project src/Infrastructure/TecAxle.Hrms.Infrastructure --startup-project src/Api/TecAxle.Hrms.Api
 ```
 
 #### Frontend (Admin)
@@ -2362,7 +2405,7 @@ flutter build apk --release
 
 ### Running the Complete System
 
-To run and test the entire Time Attendance System, you need to start all three applications:
+To run and test the entire TecAxle HRMS, you need to start all three applications:
 
 #### Prerequisites
 - Ensure PostgreSQL is running
@@ -2373,12 +2416,13 @@ To run and test the entire Time Attendance System, you need to start all three a
 
 **1. Start the Backend API** (Terminal 1)
 ```bash
-cd src/Api/TimeAttendanceSystem.Api
+cd src/Api/TecAxle.Hrms.Api
 dotnet run
 ```
 - Backend will run on: **http://localhost:5099**
 - Wait for "Application started" message
-- Database will be created automatically on first run with essential seed data (systemadmin user, default shift, roles, permissions)
+- Master database (`tecaxle_master`) will be created automatically on first run with platform seed data (subscription plans, system modules)
+- Tenant databases (`ta_tenant_{id}`) are auto-provisioned when tenants are created via the admin UI
 
 **1a. Load Sample Data** (First Time Only - After Backend Starts)
 ```bash
@@ -2389,7 +2433,7 @@ cd tools
 dotnet run --project RunSampleData.csproj
 
 # Option 2: Using PostgreSQL command line
-# psql -U your_username -d TimeAttendanceDb -f scripts/sample-data-with-users.sql
+# psql -U your_username -d TecAxleHRMS -f scripts/sample-data-with-users.sql
 
 # Verify the data was loaded successfully
 cd tools/verify
@@ -2435,24 +2479,28 @@ npm start
 
 #### Default Login Credentials
 
-**System Administrator:**
-- **Username**: `systemadmin`
+**Platform Admin (TecAxle Admin):**
+- **Email**: Check the platform user seeder in master DB initialization
+- **Role**: `TecAxleAdmin` — has full cross-tenant management access
+
+**Tenant SystemAdmin** (auto-seeded per tenant on provisioning):
+- **Email**: `tecaxleadmin@{subdomain}.clockn.net`
 - **Password**: Check the seeder class in `Infrastructure/Data/ApplicationDbContextSeed.cs`
 
-**Sample Employee Accounts** (after running sample data script):
-- **Username**: Email prefix (e.g., `ahmed.rashid` for ahmed.rashid@company.com)
+**Sample Employee Accounts** (after running sample data script against a tenant DB):
+- **Email**: Full email address (e.g., `ahmed.rashid@company.com`) — login uses email, not username
 - **Password**: `Emp@123!` (all users must change password on first login)
 - **Examples**:
-  - Branch Manager: `ahmed.rashid` / `Emp@123!` (Employee ID: 1001)
-  - Department Manager: `sara.fahad` / `Emp@123!` (Employee ID: 1006)
-  - Regular Employee: `salma.khaldi` / `Emp@123!` (Employee ID: 1026)
+  - Branch Manager: `ahmed.rashid@company.com` / `Emp@123!` (Employee ID: 1001)
+  - Department Manager: `sara.fahad@company.com` / `Emp@123!` (Employee ID: 1006)
+  - Regular Employee: `salma.khaldi@company.com` / `Emp@123!` (Employee ID: 1026)
 - **Total**: 50 employees across 5 branches and 20 departments
 
 #### Quick Testing Checklist
 Once all applications are running:
 - [ ] Backend: Visit http://localhost:5099/swagger to see API documentation
-- [ ] Admin Portal: Log in at http://localhost:4200 with systemadmin credentials
-- [ ] Self-Service Portal: Log in at http://localhost:4201 with employee credentials (e.g., `salma.khaldi` / `Emp@123!`)
+- [ ] Admin Portal: Log in at http://localhost:4200 with platform admin or tenant SystemAdmin credentials
+- [ ] Self-Service Portal: Log in at http://localhost:4201 with employee email credentials (e.g., `salma.khaldi@company.com` / `Emp@123!`)
 - [ ] Change password on first login (required for all sample employee accounts)
 - [ ] Verify API calls work (check browser console)
 - [ ] Test employee features: Create a vacation request in self-service portal
@@ -2468,52 +2516,65 @@ Once all applications are running:
 - **API connection errors**: Verify backend is running and CORS is configured correctly
 - **Self-Service shows different port**: Port is configured in `angular.json` under `serve.options.port`
 - **No employees to test with**: Make sure you ran the sample data script `scripts/sample-data-with-users.sql` after first run
-- **Can't login with employee account**: Verify you're using the correct username format (email prefix) and default password `Emp@123!`
+- **Can't login with employee account**: Verify you're using the full email address (not just the username prefix) and default password `Emp@123!`. The system resolves the tenant from the email via the master DB.
 - **SignalR not connecting**: Check browser console for WebSocket errors, verify JWT token is being sent
 
 ### Key File Locations
 
 #### Backend
-- Controllers: `src/Api/TimeAttendanceSystem.Api/Controllers/`
-- SignalR Hubs: `src/Api/TimeAttendanceSystem.Api/Hubs/`
-- Services: `src/Application/TimeAttendanceSystem.Application/Services/`
-- Entities: `src/Domain/TimeAttendanceSystem.Domain/`
-- Module Registry: `src/Domain/TimeAttendanceSystem.Domain/Modules/` (SystemModule, ModuleMetadata, ModuleDependencyRules)
-- Subscription Entities: `src/Domain/TimeAttendanceSystem.Domain/Subscriptions/` (SubscriptionPlan, TenantSubscription, etc.)
-- Tenant Entity: `src/Domain/TimeAttendanceSystem.Domain/Tenants/` (Tenant, TenantStatus, TenantSettings)
-- Tenant Configuration Entities: `src/Domain/TimeAttendanceSystem.Domain/Configuration/` (PolicyTemplate, PolicyTemplateItem, SetupStep)
-- Branch Settings Override: `src/Domain/TimeAttendanceSystem.Domain/Branches/BranchSettingsOverride.cs`
-- Department Settings Override: `src/Domain/TimeAttendanceSystem.Domain/Departments/DepartmentSettingsOverride.cs`
-- Tenant Configuration CQRS: `src/Application/TimeAttendanceSystem.Application/TenantConfiguration/` (Commands, Queries, Dtos)
-- Policy Templates CQRS: `src/Application/TimeAttendanceSystem.Application/PolicyTemplates/` (Commands: Apply, Create, Update, Delete; Queries: GetAll, GetById; Dtos)
-- Setup Tracking CQRS: `src/Application/TimeAttendanceSystem.Application/SetupTracking/` (Commands, Queries, Dtos)
-- Settings Resolver: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/Services/TenantSettingsResolver.cs`
-- Settings Resolver Interface: `src/Application/TimeAttendanceSystem.Application/Abstractions/ITenantSettingsResolver.cs`
-- Repositories: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/Repositories/`
-- DTOs: `src/Application/TimeAttendanceSystem.Application/` (within feature folders)
-- Tenant CQRS: `src/Application/TimeAttendanceSystem.Application/Tenants/` (Commands, Queries, Dtos)
-- Subscription CQRS: `src/Application/TimeAttendanceSystem.Application/Subscriptions/` (Commands, Queries, Dtos)
-- MediatR Behaviors: `src/Application/TimeAttendanceSystem.Application/Common/Behaviors/` (RequiresModuleAttribute with AllowReadWhenDisabled, ModuleEntitlementBehavior, UsageLimitBehavior)
-- Entitlement Service: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/Services/EntitlementService.cs`
-- Module Deactivation Service: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/Services/ModuleDeactivationService.cs`
-- Tenant Context: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/Services/TenantContext.cs`
-- Background Jobs: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/BackgroundJobs/`
-- Module-Aware Job Base: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/BackgroundJobs/ModuleAwareJob.cs`
-- Frozen Workflow Cleanup: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/BackgroundJobs/FrozenWorkflowCleanupJob.cs`
-- Entitlement Change Log: `src/Domain/TimeAttendanceSystem.Domain/Subscriptions/EntitlementChangeLog.cs`
-- Middleware: `src/Api/TimeAttendanceSystem.Api/Middleware/` (GlobalExceptionHandler, TenantResolution, RateLimiting, Localization)
+- Controllers: `src/Api/TecAxle.Hrms.Api/Controllers/`
+- SignalR Hubs: `src/Api/TecAxle.Hrms.Api/Hubs/`
+- Services: `src/Application/TecAxle.Hrms.Application/Services/`
+- Entities: `src/Domain/TecAxle.Hrms.Domain/`
+- Module Registry: `src/Domain/TecAxle.Hrms.Domain/Modules/` (SystemModule, ModuleMetadata, ModuleDependencyRules)
+- Subscription Entities: `src/Domain/TecAxle.Hrms.Domain/Subscriptions/` (SubscriptionPlan, TenantSubscription, etc.)
+- Tenant Entity: `src/Domain/TecAxle.Hrms.Domain/Tenants/` (Tenant, TenantStatus, TenantSettings)
+- Tenant Configuration Entities: `src/Domain/TecAxle.Hrms.Domain/Configuration/` (PolicyTemplate, PolicyTemplateItem, SetupStep)
+- Branch Settings Override: `src/Domain/TecAxle.Hrms.Domain/Branches/BranchSettingsOverride.cs`
+- Department Settings Override: `src/Domain/TecAxle.Hrms.Domain/Departments/DepartmentSettingsOverride.cs`
+- Tenant Configuration CQRS: `src/Application/TecAxle.Hrms.Application/TenantConfiguration/` (Commands, Queries, Dtos)
+- Policy Templates CQRS: `src/Application/TecAxle.Hrms.Application/PolicyTemplates/` (Commands: Apply, Create, Update, Delete; Queries: GetAll, GetById; Dtos)
+- Setup Tracking CQRS: `src/Application/TecAxle.Hrms.Application/SetupTracking/` (Commands, Queries, Dtos)
+- Settings Resolver: `src/Infrastructure/TecAxle.Hrms.Infrastructure/Services/TenantSettingsResolver.cs`
+- Settings Resolver Interface: `src/Application/TecAxle.Hrms.Application/Abstractions/ITenantSettingsResolver.cs`
+- Repositories: `src/Infrastructure/TecAxle.Hrms.Infrastructure/Repositories/`
+- DTOs: `src/Application/TecAxle.Hrms.Application/` (within feature folders)
+- Tenant CQRS: `src/Application/TecAxle.Hrms.Application/Tenants/` (Commands, Queries, Dtos). `CreateTenantCommand` has FluentValidation validator (`CreateTenantCommandValidator`) with rules for name, subdomain format, email, phone, website, max lengths, language/currency values, and billing cycle. Email domain uniqueness validated in handler against `TenantUserEmails` table.
+- Subscription CQRS: `src/Application/TecAxle.Hrms.Application/Subscriptions/` (Commands, Queries, Dtos)
+- MediatR Behaviors: `src/Application/TecAxle.Hrms.Application/Common/Behaviors/` (RequiresModuleAttribute with AllowReadWhenDisabled, ModuleEntitlementBehavior, UsageLimitBehavior)
+- Entitlement Service: `src/Infrastructure/TecAxle.Hrms.Infrastructure/Services/EntitlementService.cs`
+- Module Deactivation Service: `src/Infrastructure/TecAxle.Hrms.Infrastructure/Services/ModuleDeactivationService.cs`
+- Tenant Context: `src/Infrastructure/TecAxle.Hrms.Infrastructure/Services/TenantContext.cs`
+- Background Jobs: `src/Infrastructure/TecAxle.Hrms.Infrastructure/BackgroundJobs/`
+- Tenant-Iterating Job Base: `src/Infrastructure/TecAxle.Hrms.Infrastructure/BackgroundJobs/TenantIteratingJob.cs`
+- Frozen Workflow Cleanup: `src/Infrastructure/TecAxle.Hrms.Infrastructure/BackgroundJobs/FrozenWorkflowCleanupJob.cs`
+- Entitlement Change Log: `src/Domain/TecAxle.Hrms.Domain/Subscriptions/EntitlementChangeLog.cs`
+- **Master DbContext**: `src/Infrastructure/TecAxle.Hrms.Infrastructure/Persistence/Master/MasterDbContext.cs`
+- **Tenant Connection Resolver**: `src/Infrastructure/TecAxle.Hrms.Infrastructure/MultiTenancy/TenantConnectionResolver.cs`
+- **Tenant Provisioning Service**: `src/Infrastructure/TecAxle.Hrms.Infrastructure/MultiTenancy/TenantProvisioningService.cs`
+- **Connection String Encryption**: `src/Infrastructure/TecAxle.Hrms.Infrastructure/MultiTenancy/ConnectionStringEncryption.cs`
+- **Multi-Tenancy Options**: `src/Infrastructure/TecAxle.Hrms.Infrastructure/MultiTenancy/MultiTenancyOptions.cs`
+- **ITenantConnectionResolver**: `src/Application/TecAxle.Hrms.Application/Abstractions/ITenantConnectionResolver.cs`
+- **ITenantDbContextFactory**: `src/Application/TecAxle.Hrms.Application/Abstractions/ITenantDbContextFactory.cs`
+- **IMasterDbContext**: `src/Application/TecAxle.Hrms.Application/Abstractions/IMasterDbContext.cs`
+- **Platform User Entity**: `src/Domain/TecAxle.Hrms.Domain/Platform/PlatformUser.cs`
+- **Platform Role Enum**: `src/Domain/TecAxle.Hrms.Domain/Platform/PlatformRole.cs`
+- **Tenant User Email Entity**: `src/Domain/TecAxle.Hrms.Domain/Tenants/TenantUserEmail.cs`
+- Middleware: `src/Api/TecAxle.Hrms.Api/Middleware/` (GlobalExceptionHandler, TenantResolution, RateLimiting, Localization)
 
 #### Frontend (Admin)
 - Pages: `time-attendance-frontend/src/app/pages/`
 - Tenant Pages: `time-attendance-frontend/src/app/pages/tenants/` (list, create, edit, view with subscription management)
 - Subscription Plans Page: `time-attendance-frontend/src/app/pages/subscription-plans/`
-- Shared Components: `time-attendance-frontend/src/app/shared/components/` (29 components)
+- Shared Components: `time-attendance-frontend/src/app/shared/components/` (30 components, includes `location-picker` for map-based GPS coordinate selection)
 - Core Services: `time-attendance-frontend/src/app/core/services/`
 - Entitlement Service: `time-attendance-frontend/src/app/core/services/entitlement.service.ts` (isModuleEnabled, isModuleReadOnly, isLoaded)
 - Entitlement Models: `time-attendance-frontend/src/app/shared/models/entitlement.model.ts`
 - Module Guard: `time-attendance-frontend/src/app/core/auth/guards/module.guard.ts` (read-only default, moduleStrict for create/edit routes)
 - Module Status Banner: `time-attendance-frontend/src/app/shared/components/module-status-banner/module-status-banner.component.ts`
 - i18n Translations: `time-attendance-frontend/src/app/core/i18n/translations/` (en.json, ar.json)
+- Location Picker: `time-attendance-frontend/src/app/shared/components/location-picker/` (Leaflet map for GPS coordinate selection, used in branch create/edit/view)
+- Branch Pages: `time-attendance-frontend/src/app/pages/branches/` (list, create-branch, edit-branch, view-branch, branch-table)
 - CSS Design System: `time-attendance-frontend/src/styles/` (variables.css, components.css, utilities.css, patterns.css)
 - Layout Components: `time-attendance-frontend/src/app/layout/` (sidenav with module-aware filtering, topbar, layout)
 - Menu Service: `time-attendance-frontend/src/app/core/menu/menu.service.ts` (module-tagged menu items)
@@ -2568,5 +2629,5 @@ Once all applications are running:
 
 ---
 
-**Last Updated**: April 7, 2026
-**Version**: 10.0 - Phase 5B Industry Templates & Regional Expansion: 8 seeded policy templates (Saudi Standard with 12 Saudi Labor Law items, UAE Standard with 11 Decree-Law 33/2021 items, 6 SA industry templates: Healthcare/Construction/Technology/Retail/Government/Education), full template CRUD (create/update/delete custom templates, system templates read-only), ApplyPolicyTemplateCommandHandler extended with Shift/OffDay/OvertimeConfiguration support, region+industry filtering, expand/collapse item preview with names from ConfigurationJson, user-friendly duplicate error handling, IApplicationDbContext extended with OvertimeConfigurations and OffDays DbSets
+**Last Updated**: April 9, 2026
+**Version**: 11.1 - Map-Based Location Picker & Branch Form Refactor: Added Leaflet + OpenStreetMap interactive map component (`LocationPickerComponent`) for GPS coordinate selection with geofence radius visualization, search-by-location, draggable marker, expand/collapse, and readonly mode. Branch create/edit forms refactored from modal popup to full pages (`/branches/create`, `/branches/:id/edit`) with modern form design (FormSection, SearchableSelect, floating labels). View branch page shows readonly map with geofence circle. Bootstrap + Leaflet CSS fix applied globally in `styles.css`. Previous: v11.0 Per-Tenant Database Architecture.

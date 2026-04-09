@@ -48,14 +48,15 @@ public class EntitlementService : IEntitlementService
 
     public async Task<int> GetCurrentUsageAsync(long tenantId, LimitType limitType, CancellationToken ct = default)
     {
+        // In per-tenant DB model, all data in the DB belongs to this tenant
         return limitType switch
         {
             LimitType.MaxEmployees => await _context.Employees
-                .CountAsync(e => e.Branch.TenantId == tenantId && !e.IsDeleted, ct),
+                .CountAsync(e => !e.IsDeleted, ct),
             LimitType.MaxBranches => await _context.Branches
-                .CountAsync(b => b.TenantId == tenantId && !b.IsDeleted, ct),
+                .CountAsync(b => !b.IsDeleted, ct),
             LimitType.MaxUsers => await _context.Users
-                .CountAsync(u => u.UserBranchScopes.Any(ubs => ubs.Branch.TenantId == tenantId) && !u.IsDeleted, ct),
+                .CountAsync(u => !u.IsDeleted, ct),
             _ => 0
         };
     }

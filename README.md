@@ -1,4 +1,4 @@
-# Time Attendance System
+# TecAxle HRMS
 
 **Version**: 4.0  
 **Status**: Active Development  
@@ -6,7 +6,7 @@
 
 ## 📖 Overview
 
-The **Time Attendance System** is a comprehensive enterprise-grade workforce management solution that provides:
+The **TecAxle HRMS** is a comprehensive enterprise-grade workforce management solution that provides:
 
 - 🕐 **Time & Attendance Tracking** - Automated attendance recording, overtime calculation, and reporting
 - 🏖️ **Leave Management** - Vacation requests, leave balances, accruals, and approvals
@@ -270,7 +270,7 @@ A Flutter-based mobile application for employee self-service with dual-verificat
 
 ### Step 1: Start the Backend API
 ```bash
-cd src/Api/TimeAttendanceSystem.Api
+cd src/Api/TecAxle.Hrms.Api
 dotnet run
 # Server starts on http://localhost:5099
 # Swagger UI: http://localhost:5099/swagger
@@ -345,14 +345,14 @@ npm start
 **Backend:**
 ```bash
 # Run backend
-cd src/Api/TimeAttendanceSystem.Api
+cd src/Api/TecAxle.Hrms.Api
 dotnet run
 
 # Create migration
-dotnet ef migrations add MigrationName --project src/Infrastructure/TimeAttendanceSystem.Infrastructure --startup-project src/Api/TimeAttendanceSystem.Api
+dotnet ef migrations add MigrationName --project src/Infrastructure/TecAxle.Hrms.Infrastructure --startup-project src/Api/TecAxle.Hrms.Api
 
 # Update database
-dotnet ef database update --project src/Infrastructure/TimeAttendanceSystem.Infrastructure --startup-project src/Api/TimeAttendanceSystem.Api
+dotnet ef database update --project src/Infrastructure/TecAxle.Hrms.Infrastructure --startup-project src/Api/TecAxle.Hrms.Api
 ```
 
 **Frontend:**
@@ -391,12 +391,12 @@ Verifies all sample data was loaded correctly
 ## 📁 Key File Locations
 
 ### Backend
-- Controllers: `src/Api/TimeAttendanceSystem.Api/Controllers/`
-- SignalR Hubs: `src/Api/TimeAttendanceSystem.Api/Hubs/`
-- Services: `src/Application/TimeAttendanceSystem.Application/Services/`
-- Entities: `src/Domain/TimeAttendanceSystem.Domain/`
-- Repositories: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/Repositories/`
-- Background Jobs: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/BackgroundJobs/`
+- Controllers: `src/Api/TecAxle.Hrms.Api/Controllers/`
+- SignalR Hubs: `src/Api/TecAxle.Hrms.Api/Hubs/`
+- Services: `src/Application/TecAxle.Hrms.Application/Services/`
+- Entities: `src/Domain/TecAxle.Hrms.Domain/`
+- Repositories: `src/Infrastructure/TecAxle.Hrms.Infrastructure/Repositories/`
+- Background Jobs: `src/Infrastructure/TecAxle.Hrms.Infrastructure/BackgroundJobs/`
 
 ### Frontend (Admin)
 - Pages: `time-attendance-frontend/src/app/pages/`
@@ -462,8 +462,8 @@ A local Flutter SDK is installed in `flutter/`.
    ../flutter/bin/flutter run
    ```
 
-**Note**: The Flutter SDK is installed locally in `d:\Work\TimeAttendanceSystem\flutter` to avoid conflicts with global installations.
+**Note**: The Flutter SDK is installed locally in `d:\Work\TecAxle.Hrms\flutter` to avoid conflicts with global installations.
 
 ---
 
-*Generated for Time Attendance System - Enterprise Workforce Management Solution*
+*Generated for TecAxle HRMS - Enterprise Workforce Management Solution*

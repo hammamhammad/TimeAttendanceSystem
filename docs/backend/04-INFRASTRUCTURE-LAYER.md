@@ -1,4 +1,4 @@
-# Time Attendance System - Infrastructure Layer Documentation
+# TecAxle HRMS - Infrastructure Layer Documentation
 
 **Version**: 1.0
 **Last Updated**: November 3, 2025
@@ -28,7 +28,7 @@
 
 ### 1.1 Purpose
 
-The Infrastructure Layer implements the **persistence**, **external services**, and **cross-cutting concerns** for the Time Attendance System. It provides concrete implementations of the abstractions defined in the Application Layer.
+The Infrastructure Layer implements the **persistence**, **external services**, and **cross-cutting concerns** for the TecAxle HRMS. It provides concrete implementations of the abstractions defined in the Application Layer.
 
 ### 1.2 Key Technologies
 
@@ -74,10 +74,10 @@ The Infrastructure Layer implements the **persistence**, **external services**, 
 
 ### 2.1 Folder Organization
 
-**Location**: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/`
+**Location**: `src/Infrastructure/TecAxle.Hrms.Infrastructure/`
 
 ```
-TimeAttendanceSystem.Infrastructure/
+TecAxle.Hrms.Infrastructure/
 │
 ├── BackgroundJobs/                           # Scheduled background jobs
 │   └── DailyAttendanceGenerationJob.cs       # Daily attendance record generation
@@ -85,7 +85,7 @@ TimeAttendanceSystem.Infrastructure/
 ├── Persistence/                              # Data access layer
 │   ├── Common/                               # Shared database components
 │   │   ├── ApplicationDbContextAdapter.cs    # IApplicationDbContext adapter
-│   │   ├── TimeAttendanceDbContext.cs        # Main DbContext
+│   │   ├── TecAxleDbContext.cs        # Main DbContext
 │   │   ├── SeedData.cs                       # Database seeding
 │   │   └── TestDataSeeder.cs                 # Test data generation
 │   │
@@ -128,20 +128,20 @@ TimeAttendanceSystem.Infrastructure/
 
 ## 3. Entity Framework Core
 
-### 3.1 TimeAttendanceDbContext
+### 3.1 TecAxleDbContext
 
-**Location**: [Persistence/Common/TimeAttendanceDbContext.cs](../../../src/Infrastructure/TimeAttendanceSystem.Infrastructure/Persistence/Common/TimeAttendanceDbContext.cs)
+**Location**: [Persistence/Common/TecAxleDbContext.cs](../../../src/Infrastructure/TecAxle.Hrms.Infrastructure/Persistence/Common/TecAxleDbContext.cs)
 
 #### Core Features
 
 ```csharp
-public class TimeAttendanceDbContext : DbContext
+public class TecAxleDbContext : DbContext
 {
     private readonly ICurrentUser? _currentUser;
     private readonly ChangeTrackingService? _changeTrackingService;
 
-    public TimeAttendanceDbContext(
-        DbContextOptions<TimeAttendanceDbContext> options,
+    public TecAxleDbContext(
+        DbContextOptions<TecAxleDbContext> options,
         ICurrentUser? currentUser = null,
         ChangeTrackingService? changeTrackingService = null)
         : base(options)
@@ -252,7 +252,7 @@ All 47 entities have dedicated Fluent API configurations.
 
 #### Configuration Pattern (Example: Employee)
 
-**Location**: [EmployeeConfiguration.cs](../../../src/Infrastructure/TimeAttendanceSystem.Infrastructure/Persistence/PostgreSql/Configurations/EmployeeConfiguration.cs)
+**Location**: [EmployeeConfiguration.cs](../../../src/Infrastructure/TecAxle.Hrms.Infrastructure/Persistence/PostgreSql/Configurations/EmployeeConfiguration.cs)
 
 ```csharp
 public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
@@ -374,23 +374,23 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
 **Create Migration**:
 ```bash
 dotnet ef migrations add MigrationName \
-    --startup-project ../../Api/TimeAttendanceSystem.Api \
-    --context TimeAttendanceDbContext \
+    --startup-project ../../Api/TecAxle.Hrms.Api \
+    --context TecAxleDbContext \
     --output-dir Persistence/PostgreSql/Migrations
 ```
 
 **Update Database**:
 ```bash
 dotnet ef database update \
-    --startup-project ../../Api/TimeAttendanceSystem.Api \
-    --context TimeAttendanceDbContext
+    --startup-project ../../Api/TecAxle.Hrms.Api \
+    --context TecAxleDbContext
 ```
 
 **Drop Database** (Development):
 ```bash
 dotnet ef database drop \
-    --startup-project ../../Api/TimeAttendanceSystem.Api \
-    --context TimeAttendanceDbContext
+    --startup-project ../../Api/TecAxle.Hrms.Api \
+    --context TecAxleDbContext
 ```
 
 ---
@@ -399,7 +399,7 @@ dotnet ef database drop \
 
 ### 4.1 JwtTokenGenerator
 
-**Location**: [Security/JwtTokenGenerator.cs](../../../src/Infrastructure/TimeAttendanceSystem.Infrastructure/Security/JwtTokenGenerator.cs)
+**Location**: [Security/JwtTokenGenerator.cs](../../../src/Infrastructure/TecAxle.Hrms.Infrastructure/Security/JwtTokenGenerator.cs)
 
 #### Purpose
 Generates and validates JWT (JSON Web Tokens) for authentication.
@@ -516,8 +516,8 @@ public class JwtTokenGenerator : IJwtTokenGenerator
   "permission": ["employee.read", "employee.create"],
   "branch_scope": ["1", "2", "3"],
   "exp": 1699564800,
-  "iss": "TimeAttendanceSystem",
-  "aud": "TimeAttendanceSystemClient"
+  "iss": "TecAxle.Hrms",
+  "aud": "TecAxle.HrmsClient"
 }
 ```
 
@@ -532,7 +532,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
 
 ### 4.2 PasswordService
 
-**Location**: [Services/PasswordService.cs](../../../src/Infrastructure/TimeAttendanceSystem.Infrastructure/Services/PasswordService.cs)
+**Location**: [Services/PasswordService.cs](../../../src/Infrastructure/TecAxle.Hrms.Infrastructure/Services/PasswordService.cs)
 
 #### Purpose
 Handles secure password hashing and verification using PBKDF2-SHA256.
@@ -668,7 +668,7 @@ public class PasswordService : IPasswordService
 
 ### 4.3 TwoFactorService
 
-**Location**: [Services/TwoFactorService.cs](../../../src/Infrastructure/TimeAttendanceSystem.Infrastructure/Services/TwoFactorService.cs)
+**Location**: [Services/TwoFactorService.cs](../../../src/Infrastructure/TecAxle.Hrms.Infrastructure/Services/TwoFactorService.cs)
 
 #### Purpose
 Implements TOTP (Time-based One-Time Password) for two-factor authentication.
@@ -776,7 +776,7 @@ Compatible with:
 
 ### 4.4 DeviceService
 
-**Location**: [Services/DeviceService.cs](../../../src/Infrastructure/TimeAttendanceSystem.Infrastructure/Services/DeviceService.cs)
+**Location**: [Services/DeviceService.cs](../../../src/Infrastructure/TecAxle.Hrms.Infrastructure/Services/DeviceService.cs)
 
 #### Purpose
 Manages user sessions and device fingerprinting for security.
@@ -887,7 +887,7 @@ public class DeviceService : IDeviceService
 
 ### 4.5 EmailService
 
-**Location**: [Services/EmailService.cs](../../../src/Infrastructure/TimeAttendanceSystem.Infrastructure/Services/EmailService.cs)
+**Location**: [Services/EmailService.cs](../../../src/Infrastructure/TecAxle.Hrms.Infrastructure/Services/EmailService.cs)
 
 #### Purpose
 Sends email notifications (currently logging-based for development).
@@ -961,7 +961,7 @@ await client.SendEmailAsync(msg);
 
 ### 5.1 AttendanceRepository
 
-**Location**: [Persistence/Repositories/AttendanceRepository.cs](../../../src/Infrastructure/TimeAttendanceSystem.Infrastructure/Persistence/Repositories/AttendanceRepository.cs)
+**Location**: [Persistence/Repositories/AttendanceRepository.cs](../../../src/Infrastructure/TecAxle.Hrms.Infrastructure/Persistence/Repositories/AttendanceRepository.cs)
 
 #### Purpose
 Comprehensive attendance record queries with eager loading and filtering.
@@ -1036,7 +1036,7 @@ public class AttendanceStatistics
 
 ### 5.2 AttendanceTransactionRepository
 
-**Location**: [Persistence/Repositories/AttendanceTransactionRepository.cs](../../../src/Infrastructure/TimeAttendanceSystem.Infrastructure/Persistence/Repositories/AttendanceTransactionRepository.cs)
+**Location**: [Persistence/Repositories/AttendanceTransactionRepository.cs](../../../src/Infrastructure/TecAxle.Hrms.Infrastructure/Persistence/Repositories/AttendanceTransactionRepository.cs)
 
 #### Purpose
 Manage individual time clock events (check-in, check-out, breaks).
@@ -1106,7 +1106,7 @@ public async Task<TransactionValidationResult> ValidateTransactionSequenceAsync(
 
 ### 5.3 SettingsRepository (with Caching)
 
-**Location**: [Persistence/Repositories/SettingsRepository.cs](../../../src/Infrastructure/TimeAttendanceSystem.Infrastructure/Persistence/Repositories/SettingsRepository.cs)
+**Location**: [Persistence/Repositories/SettingsRepository.cs](../../../src/Infrastructure/TecAxle.Hrms.Infrastructure/Persistence/Repositories/SettingsRepository.cs)
 
 #### Purpose
 Manage system settings with memory caching for performance.
@@ -1198,7 +1198,7 @@ public async Task ActivateOvertimeConfigurationAsync(
 
 ### 6.1 DailyAttendanceGenerationJob
 
-**Location**: [BackgroundJobs/DailyAttendanceGenerationJob.cs](../../../src/Infrastructure/TimeAttendanceSystem.Infrastructure/BackgroundJobs/DailyAttendanceGenerationJob.cs)
+**Location**: [BackgroundJobs/DailyAttendanceGenerationJob.cs](../../../src/Infrastructure/TecAxle.Hrms.Infrastructure/BackgroundJobs/DailyAttendanceGenerationJob.cs)
 
 #### Purpose
 Generates daily attendance records for all active employees.
@@ -1303,7 +1303,7 @@ app.Services.UseScheduler(scheduler =>
 
 ### 7.1 Service Registration
 
-**Location**: [DependencyInjection.cs](../../../src/Infrastructure/TimeAttendanceSystem.Infrastructure/DependencyInjection.cs)
+**Location**: [DependencyInjection.cs](../../../src/Infrastructure/TecAxle.Hrms.Infrastructure/DependencyInjection.cs)
 
 ```csharp
 public static class DependencyInjection
@@ -1319,7 +1319,7 @@ public static class DependencyInjection
             ?? configuration.GetConnectionString("DefaultConnection")
             ?? throw new InvalidOperationException("Connection string not found");
 
-        services.AddDbContext<TimeAttendanceDbContext>(options =>
+        services.AddDbContext<TecAxleDbContext>(options =>
         {
             options.UseNpgsql(connectionString, npgsqlOptions =>
             {
@@ -1330,7 +1330,7 @@ public static class DependencyInjection
 
                 npgsqlOptions.CommandTimeout(30);
                 npgsqlOptions.MigrationsAssembly(
-                    typeof(TimeAttendanceDbContext).Assembly.FullName);
+                    typeof(TecAxleDbContext).Assembly.FullName);
             });
 
             // PostgreSQL DateTime handling
@@ -1462,14 +1462,14 @@ public static class DependencyInjection
 
 ### 8.1 SeedData Class
 
-**Location**: [Persistence/Common/SeedData.cs](../../../src/Infrastructure/TimeAttendanceSystem.Infrastructure/Persistence/Common/SeedData.cs)
+**Location**: [Persistence/Common/SeedData.cs](../../../src/Infrastructure/TecAxle.Hrms.Infrastructure/Persistence/Common/SeedData.cs)
 
 #### Seeding Strategy
 
 ```csharp
 public static class SeedData
 {
-    public static async Task SeedAsync(TimeAttendanceDbContext context)
+    public static async Task SeedAsync(TecAxleDbContext context)
     {
         // ──────────────────────────────────────────────────────────
         // 1. SEED PERMISSIONS (ALWAYS - ENSURES UP-TO-DATE)
@@ -1521,7 +1521,7 @@ public static class SeedData
 #### Permission Seeding (150+ Permissions)
 
 ```csharp
-private static async Task SeedPermissionsAsync(TimeAttendanceDbContext context)
+private static async Task SeedPermissionsAsync(TecAxleDbContext context)
 {
     var permissions = new List<Permission>();
 
@@ -1565,7 +1565,7 @@ private static async Task SeedPermissionsAsync(TimeAttendanceDbContext context)
 #### Default User Seeding
 
 ```csharp
-private static async Task SeedUsersAsync(TimeAttendanceDbContext context)
+private static async Task SeedUsersAsync(TecAxleDbContext context)
 {
     var passwordService = new PasswordService();
     var (hash, salt) = passwordService.HashPassword("TempP@ssw0rd123!");
@@ -1694,8 +1694,8 @@ SHA256(UserAgent + IPAddress)
   },
   "Jwt": {
     "Secret": "your-secret-key-minimum-32-characters-long",
-    "Issuer": "TimeAttendanceSystem",
-    "Audience": "TimeAttendanceSystemClient",
+    "Issuer": "TecAxle.Hrms",
+    "Audience": "TecAxle.HrmsClient",
     "ExpiryMinutes": 15,
     "RememberMeDays": 7
   },

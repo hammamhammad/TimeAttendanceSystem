@@ -11,9 +11,9 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.Repositories;
 /// </summary>
 public class AttendanceRepository : IAttendanceRepository
 {
-    private readonly TimeAttendanceDbContext _context;
+    private readonly TecAxleDbContext _context;
 
-    public AttendanceRepository(TimeAttendanceDbContext context)
+    public AttendanceRepository(TecAxleDbContext context)
     {
         _context = context;
     }

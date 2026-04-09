@@ -28,7 +28,7 @@ public WorkflowInstance? WorkflowInstance { get; set; }
 
 ## 1. New Enums
 
-**File: `src/Domain/TimeAttendanceSystem.Domain/Common/Enums.cs`** - add:
+**File: `src/Domain/TecAxle.Hrms.Domain/Common/Enums.cs`** - add:
 
 ```csharp
 public enum ContractType
@@ -81,7 +81,7 @@ public enum PromotionStatus
 // SalaryRevisionType removed - replaced by SalaryAdjustmentType (see SalaryAdjustment entity)
 ```
 
-**File: `src/Domain/TimeAttendanceSystem.Domain/Common/Enums.cs`** - extend EmploymentStatus:
+**File: `src/Domain/TecAxle.Hrms.Domain/Common/Enums.cs`** - extend EmploymentStatus:
 ```csharp
 // Add to existing EmploymentStatus enum:
 Suspended = 9,
@@ -89,7 +89,7 @@ OnProbation = 10,
 Resigned = 11
 ```
 
-**File: `src/Domain/TimeAttendanceSystem.Domain/Workflows/Enums/WorkflowEntityType.cs`** - add:
+**File: `src/Domain/TecAxle.Hrms.Domain/Workflows/Enums/WorkflowEntityType.cs`** - add:
 ```csharp
 Transfer = 7,
 Promotion = 8
@@ -98,7 +98,7 @@ Promotion = 8
 ## 2. New Domain Entities
 
 ### EmployeeContract
-**File: `src/Domain/TimeAttendanceSystem.Domain/Employees/EmployeeContract.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Employees/EmployeeContract.cs`**
 
 ```csharp
 public class EmployeeContract : BaseEntity
@@ -132,7 +132,7 @@ public class EmployeeContract : BaseEntity
 ```
 
 ### EmployeeTransfer
-**File: `src/Domain/TimeAttendanceSystem.Domain/Employees/EmployeeTransfer.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Employees/EmployeeTransfer.cs`**
 
 ```csharp
 public class EmployeeTransfer : BaseEntity
@@ -172,7 +172,7 @@ public class EmployeeTransfer : BaseEntity
 ```
 
 ### EmployeePromotion
-**File: `src/Domain/TimeAttendanceSystem.Domain/Employees/EmployeePromotion.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Employees/EmployeePromotion.cs`**
 
 ```csharp
 public class EmployeePromotion : BaseEntity
@@ -211,7 +211,7 @@ public class EmployeePromotion : BaseEntity
 ```
 
 ### SalaryAdjustment (Request + Approval + History)
-**File: `src/Domain/TimeAttendanceSystem.Domain/Employees/SalaryAdjustment.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Employees/SalaryAdjustment.cs`**
 
 This entity serves dual purpose: it's both the **request** (with workflow approval) and the **record** of the change. This is the proper way to adjust employee salary - through a controlled, auditable flow.
 
@@ -384,7 +384,7 @@ public const string SalaryAdjustment = "salaryAdjustment";
 The current Employee entity only tracks basic info. A strong HRMS needs rich employee profiles with:
 
 ### EmployeeBankDetail
-**File: `src/Domain/TimeAttendanceSystem.Domain/Employees/EmployeeBankDetail.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Employees/EmployeeBankDetail.cs`**
 ```csharp
 public class EmployeeBankDetail : BaseEntity
 {
@@ -405,7 +405,7 @@ public class EmployeeBankDetail : BaseEntity
 ```
 
 ### EmployeeDependent
-**File: `src/Domain/TimeAttendanceSystem.Domain/Employees/EmployeeDependent.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Employees/EmployeeDependent.cs`**
 ```csharp
 public class EmployeeDependent : BaseEntity
 {
@@ -428,7 +428,7 @@ public class EmployeeDependent : BaseEntity
 ```
 
 ### EmergencyContact
-**File: `src/Domain/TimeAttendanceSystem.Domain/Employees/EmergencyContact.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Employees/EmergencyContact.cs`**
 ```csharp
 public class EmergencyContact : BaseEntity
 {
@@ -448,7 +448,7 @@ public class EmergencyContact : BaseEntity
 ```
 
 ### EmployeeAddress
-**File: `src/Domain/TimeAttendanceSystem.Domain/Employees/EmployeeAddress.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Employees/EmployeeAddress.cs`**
 ```csharp
 public class EmployeeAddress : BaseEntity
 {
@@ -470,7 +470,7 @@ public class EmployeeAddress : BaseEntity
 ```
 
 ### EmployeeEducation
-**File: `src/Domain/TimeAttendanceSystem.Domain/Employees/EmployeeEducation.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Employees/EmployeeEducation.cs`**
 ```csharp
 public class EmployeeEducation : BaseEntity
 {
@@ -494,7 +494,7 @@ public class EmployeeEducation : BaseEntity
 ```
 
 ### EmployeeWorkExperience
-**File: `src/Domain/TimeAttendanceSystem.Domain/Employees/EmployeeWorkExperience.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Employees/EmployeeWorkExperience.cs`**
 ```csharp
 public class EmployeeWorkExperience : BaseEntity
 {
@@ -517,7 +517,7 @@ public class EmployeeWorkExperience : BaseEntity
 ```
 
 ### EmployeeVisa (Critical for Middle East HRMS)
-**File: `src/Domain/TimeAttendanceSystem.Domain/Employees/EmployeeVisa.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Employees/EmployeeVisa.cs`**
 ```csharp
 public class EmployeeVisa : BaseEntity
 {
@@ -537,7 +537,7 @@ public class EmployeeVisa : BaseEntity
 ```
 
 ### JobGrade (System-wide grade definitions)
-**File: `src/Domain/TimeAttendanceSystem.Domain/Employees/JobGrade.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Employees/JobGrade.cs`**
 ```csharp
 public class JobGrade : BaseEntity
 {
@@ -652,7 +652,7 @@ GET    /api/v1/job-grades/dropdown                                  [SettingsRea
 
 ## 3. Employee Entity Enhancements
 
-**File: `src/Domain/TimeAttendanceSystem.Domain/Employees/Employee.cs`** - add properties:
+**File: `src/Domain/TecAxle.Hrms.Domain/Employees/Employee.cs`** - add properties:
 ```csharp
 // Personal info enhancements
 public string? MiddleName { get; set; }
@@ -703,7 +703,7 @@ Employee profile updates (department, manager, job title, work location, etc.) c
 
 This is a **general-purpose effective-dated change log** for the Employee entity. Specific high-impact changes (transfers, promotions, salary revisions) have their own dedicated entities with richer data and workflow support, but ALL changes (including corrections) are also logged here for a complete timeline.
 
-**File: `src/Domain/TimeAttendanceSystem.Domain/Employees/EmployeeProfileChange.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Employees/EmployeeProfileChange.cs`**
 
 ```csharp
 public class EmployeeProfileChange : BaseEntity
@@ -811,7 +811,7 @@ GET    /api/v1/employee-profile-changes/pending           [EmployeeRead]  (all p
 
 ## 4. PermissionResources
 
-**File: `src/Domain/TimeAttendanceSystem.Domain/Common/PermissionResources.cs`** - add:
+**File: `src/Domain/TecAxle.Hrms.Domain/Common/PermissionResources.cs`** - add:
 ```csharp
 public const string Contract = "contract";
 public const string Transfer = "transfer";
@@ -892,7 +892,7 @@ See full endpoint list under the SalaryAdjustment entity section above (Section 
 2. Create 4 domain entities (EmployeeContract, EmployeeTransfer, EmployeePromotion, SalaryRevision)
 3. Add new properties to Employee entity
 4. Add PermissionResources
-5. Add DbSets to `IApplicationDbContext.cs` and `TimeAttendanceDbContext.cs`
+5. Add DbSets to `IApplicationDbContext.cs` and `TecAxleDbContext.cs`
 6. Add EF configurations
 7. Create CQRS commands/queries for each entity
 8. Create API controllers
@@ -909,7 +909,7 @@ See full endpoint list under the SalaryAdjustment entity section above (Section 
 
 ## 1. New Enums
 
-**File: `src/Domain/TimeAttendanceSystem.Domain/Common/Enums.cs`** - add:
+**File: `src/Domain/TecAxle.Hrms.Domain/Common/Enums.cs`** - add:
 
 ```csharp
 public enum SalaryComponentType
@@ -975,7 +975,7 @@ Payroll = 9
 ## 2. New Domain Entities
 
 ### SalaryStructure
-**File: `src/Domain/TimeAttendanceSystem.Domain/Payroll/SalaryStructure.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Payroll/SalaryStructure.cs`**
 ```csharp
 public class SalaryStructure : BaseEntity
 {
@@ -993,7 +993,7 @@ public class SalaryStructure : BaseEntity
 ```
 
 ### SalaryComponent
-**File: `src/Domain/TimeAttendanceSystem.Domain/Payroll/SalaryComponent.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Payroll/SalaryComponent.cs`**
 ```csharp
 public class SalaryComponent : BaseEntity
 {
@@ -1015,7 +1015,7 @@ public class SalaryComponent : BaseEntity
 ```
 
 ### EmployeeSalary
-**File: `src/Domain/TimeAttendanceSystem.Domain/Payroll/EmployeeSalary.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Payroll/EmployeeSalary.cs`**
 ```csharp
 public class EmployeeSalary : BaseEntity
 {
@@ -1037,7 +1037,7 @@ public class EmployeeSalary : BaseEntity
 ```
 
 ### EmployeeSalaryComponent
-**File: `src/Domain/TimeAttendanceSystem.Domain/Payroll/EmployeeSalaryComponent.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Payroll/EmployeeSalaryComponent.cs`**
 ```csharp
 public class EmployeeSalaryComponent : BaseEntity
 {
@@ -1053,7 +1053,7 @@ public class EmployeeSalaryComponent : BaseEntity
 ```
 
 ### PayrollPeriod
-**File: `src/Domain/TimeAttendanceSystem.Domain/Payroll/PayrollPeriod.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Payroll/PayrollPeriod.cs`**
 ```csharp
 public class PayrollPeriod : BaseEntity
 {
@@ -1087,7 +1087,7 @@ public class PayrollPeriod : BaseEntity
 ```
 
 ### PayrollRecord
-**File: `src/Domain/TimeAttendanceSystem.Domain/Payroll/PayrollRecord.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Payroll/PayrollRecord.cs`**
 ```csharp
 public class PayrollRecord : BaseEntity
 {
@@ -1121,7 +1121,7 @@ public class PayrollRecord : BaseEntity
 ```
 
 ### PayrollRecordDetail
-**File: `src/Domain/TimeAttendanceSystem.Domain/Payroll/PayrollRecordDetail.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Payroll/PayrollRecordDetail.cs`**
 ```csharp
 public class PayrollRecordDetail : BaseEntity
 {
@@ -1140,7 +1140,7 @@ public class PayrollRecordDetail : BaseEntity
 ```
 
 ### TaxConfiguration + TaxBracket
-**File: `src/Domain/TimeAttendanceSystem.Domain/Payroll/TaxConfiguration.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Payroll/TaxConfiguration.cs`**
 ```csharp
 public class TaxConfiguration : BaseEntity
 {
@@ -1167,7 +1167,7 @@ public class TaxBracket : BaseEntity
 ```
 
 ### SocialInsuranceConfig
-**File: `src/Domain/TimeAttendanceSystem.Domain/Payroll/SocialInsuranceConfig.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Payroll/SocialInsuranceConfig.cs`**
 ```csharp
 public class SocialInsuranceConfig : BaseEntity
 {
@@ -1185,7 +1185,7 @@ public class SocialInsuranceConfig : BaseEntity
 ```
 
 ### BankTransferFile
-**File: `src/Domain/TimeAttendanceSystem.Domain/Payroll/BankTransferFile.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Payroll/BankTransferFile.cs`**
 ```csharp
 public class BankTransferFile : BaseEntity
 {
@@ -1203,7 +1203,7 @@ public class BankTransferFile : BaseEntity
 ```
 
 ### PayrollAdjustment (One-time additions/deductions for a specific payroll period)
-**File: `src/Domain/TimeAttendanceSystem.Domain/Payroll/PayrollAdjustment.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Payroll/PayrollAdjustment.cs`**
 ```csharp
 public class PayrollAdjustment : BaseEntity
 {
@@ -1241,7 +1241,7 @@ public enum PayrollAdjustmentType
 ```
 
 ### Employee Insurance/Benefits Tracking
-**File: `src/Domain/TimeAttendanceSystem.Domain/Payroll/EmployeeInsurance.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Payroll/EmployeeInsurance.cs`**
 ```csharp
 public class InsuranceProvider : BaseEntity
 {
@@ -1463,7 +1463,7 @@ FinalSettlement = 11
 ## 2. New Domain Entities
 
 ### ResignationRequest
-**File: `src/Domain/TimeAttendanceSystem.Domain/Offboarding/ResignationRequest.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Offboarding/ResignationRequest.cs`**
 ```csharp
 public class ResignationRequest : BaseEntity
 {
@@ -1491,7 +1491,7 @@ public class ResignationRequest : BaseEntity
 ```
 
 ### TerminationRecord
-**File: `src/Domain/TimeAttendanceSystem.Domain/Offboarding/TerminationRecord.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Offboarding/TerminationRecord.cs`**
 ```csharp
 public class TerminationRecord : BaseEntity
 {
@@ -1516,7 +1516,7 @@ public class TerminationRecord : BaseEntity
 ```
 
 ### ClearanceChecklist + ClearanceItem
-**File: `src/Domain/TimeAttendanceSystem.Domain/Offboarding/ClearanceChecklist.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Offboarding/ClearanceChecklist.cs`**
 ```csharp
 public class ClearanceChecklist : BaseEntity
 {
@@ -1548,7 +1548,7 @@ public class ClearanceItem : BaseEntity
 ```
 
 ### EndOfServiceBenefit
-**File: `src/Domain/TimeAttendanceSystem.Domain/Offboarding/EndOfServiceBenefit.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Offboarding/EndOfServiceBenefit.cs`**
 ```csharp
 public class EndOfServiceBenefit : BaseEntity
 {
@@ -1572,7 +1572,7 @@ public class EndOfServiceBenefit : BaseEntity
 ```
 
 ### FinalSettlement
-**File: `src/Domain/TimeAttendanceSystem.Domain/Offboarding/FinalSettlement.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Offboarding/FinalSettlement.cs`**
 ```csharp
 public class FinalSettlement : BaseEntity
 {
@@ -1609,7 +1609,7 @@ public class FinalSettlement : BaseEntity
 ```
 
 ### ExitInterview
-**File: `src/Domain/TimeAttendanceSystem.Domain/Offboarding/ExitInterview.cs`**
+**File: `src/Domain/TecAxle.Hrms.Domain/Offboarding/ExitInterview.cs`**
 ```csharp
 public class ExitInterview : BaseEntity
 {
@@ -1735,8 +1735,8 @@ GET    /api/v1/portal/my-clearance                        // clearance progress
 After all three modules are coded, create ONE migration:
 ```bash
 dotnet ef migrations add AddEmployeeLifecyclePayrollOffboarding \
-  --project src/Infrastructure/TimeAttendanceSystem.Infrastructure \
-  --startup-project src/Api/TimeAttendanceSystem.Api
+  --project src/Infrastructure/TecAxle.Hrms.Infrastructure \
+  --startup-project src/Api/TecAxle.Hrms.Api
 ```
 
 New tables (~35):
@@ -1772,7 +1772,7 @@ Step 3b: Module 1.1 domain entities - Sub-entities (BankDetail, Dependent, Emerg
 Step 4:  Module 1.2 domain entities (Payroll entities + PayrollAdjustment + InsuranceProvider + EmployeeInsurance)
 Step 5:  Module 1.3 domain entities (all Offboarding entities)
 Step 6:  PermissionResources for all 3 modules
-Step 7:  DbSets in IApplicationDbContext + TimeAttendanceDbContext
+Step 7:  DbSets in IApplicationDbContext + TecAxleDbContext
 Step 8:  EF Configurations for all new entities
 Step 9:  Create database migration
 Step 10: Module 1.1 CQRS commands/queries + controller

@@ -4,18 +4,18 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
   
-  // Primary colors - ClockN Brand
-  static const Color primary = Color(0xFF9D99EA);       // ClockN Purple
+  // Primary colors - TecAxle Brand
+  static const Color primary = Color(0xFF9D99EA);       // TecAxle Purple
   static const Color primaryLight = Color(0xFFB5B2EF);
   static const Color primaryDark = Color(0xFF7B76D2);
 
-  // Secondary colors - ClockN Brand
-  static const Color secondary = Color(0xFF747A90);     // ClockN Blue-Gray
+  // Secondary colors - TecAxle Brand
+  static const Color secondary = Color(0xFF747A90);     // TecAxle Blue-Gray
   static const Color secondaryLight = Color(0xFF8E94A8);
   static const Color secondaryDark = Color(0xFF5A5F72);
 
-  // Accent color - ClockN Brand
-  static const Color accent = Color(0xFFE1DD8B);        // ClockN Soft Gold
+  // Accent color - TecAxle Brand
+  static const Color accent = Color(0xFFE1DD8B);        // TecAxle Soft Gold
   static const Color accentLight = Color(0xFFEAE7A5);
   static const Color accentDark = Color(0xFFD4CF6D);
   

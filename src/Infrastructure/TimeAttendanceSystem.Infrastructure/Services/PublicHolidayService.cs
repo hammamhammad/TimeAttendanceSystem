@@ -818,7 +818,7 @@ public class PublicHolidayService : IPublicHolidayService
         var ical = new System.Text.StringBuilder();
         ical.AppendLine("BEGIN:VCALENDAR");
         ical.AppendLine("VERSION:2.0");
-        ical.AppendLine("PRODID:-//Time Attendance System//Public Holidays//EN");
+        ical.AppendLine("PRODID:-//TecAxle HRMS//Public Holidays//EN");
 
         foreach (var holiday in holidays)
         {

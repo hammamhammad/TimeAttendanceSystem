@@ -2,7 +2,7 @@
 
 ## 29.1 Overview
 
-ClockN uses Coravel, a .NET background job scheduler, to automate recurring tasks across all modules. These jobs handle attendance generation, leave accruals, notification reminders, expiry alerts, analytics snapshots, and various housekeeping tasks.
+TecAxle HRMS uses Coravel, a .NET background job scheduler, to automate recurring tasks across all modules. These jobs handle attendance generation, leave accruals, notification reminders, expiry alerts, analytics snapshots, and various housekeeping tasks.
 
 ## 29.2 Complete Job Inventory
 

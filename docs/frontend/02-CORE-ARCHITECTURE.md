@@ -1,6 +1,6 @@
 # Frontend Core Architecture
 
-**Time Attendance System - Frontend**
+**TecAxle HRMS - Frontend**
 **Framework**: Angular 17+
 **Architecture**: Standalone Components + Signals + Modern Angular Patterns
 
@@ -918,7 +918,7 @@ dist/time-attendance-frontend/browser/
 export const environment = {
   production: false,
   apiUrl: 'http://localhost:5099',
-  appName: 'Time Attendance System',
+  appName: 'TecAxle HRMS',
   version: '1.0.0'
 };
 ```
@@ -928,7 +928,7 @@ export const environment = {
 export const environment = {
   production: true,
   apiUrl: 'https://api.timeattendance.com',
-  appName: 'Time Attendance System',
+  appName: 'TecAxle HRMS',
   version: '1.0.0'
 };
 ```

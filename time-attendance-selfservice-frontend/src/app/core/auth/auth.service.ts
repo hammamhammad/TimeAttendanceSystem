@@ -112,7 +112,7 @@ export class AuthService {
    */
   login(credentials: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${API_CONFIG.baseUrl}${API_CONFIG.endpoints.auth.login}`, {
-      username: credentials.username,
+      email: credentials.email,
       password: credentials.password,
       deviceInfo: credentials.deviceInfo,
       rememberMe: credentials.rememberMe || false
@@ -123,6 +123,41 @@ export class AuthService {
         }),
         catchError(error => {
           console.error('Login failed:', error);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  /**
+   * Resolves tenants associated with the given email address.
+   * Used in the login flow to determine which tenant(s) a user belongs to
+   * before performing actual authentication.
+   *
+   * @param email - The user's email address to resolve tenants for
+   * @returns Observable with the list of tenants associated with the email
+   *
+   * @remarks
+   * Tenant Resolution Flow:
+   * 1. User enters their email address on the login page
+   * 2. Frontend calls this method to discover associated tenants
+   * 3. Backend returns list of tenants the email is linked to
+   * 4. If single tenant: proceed to password entry automatically
+   * 5. If multiple tenants: user selects which tenant to log into
+   * 6. Selected tenant context is used for the actual login request
+   *
+   * @example
+   * ```typescript
+   * this.authService.resolveTenants('user@company.com').subscribe({
+   *   next: (response) => console.log('Tenants found:', response),
+   *   error: (error) => console.error('Resolution failed', error)
+   * });
+   * ```
+   */
+  resolveTenants(email: string): Observable<any> {
+    return this.http.post<any>(`${API_CONFIG.baseUrl}${API_CONFIG.endpoints.auth.resolveTenants}`, { email })
+      .pipe(
+        catchError(error => {
+          console.error('Tenant resolution failed:', error);
           return throwError(() => error);
         })
       );

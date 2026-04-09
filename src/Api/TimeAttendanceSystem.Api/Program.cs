@@ -10,6 +10,7 @@ using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Infrastructure;
 using TecAxle.Hrms.Infrastructure.BackgroundJobs;
 using TecAxle.Hrms.Infrastructure.Persistence;
+using TecAxle.Hrms.Infrastructure.Persistence.Master;
 using TecAxle.Hrms.Shared.Localization;
 using System.Globalization;
 
@@ -108,7 +109,7 @@ builder.Services.AddOpenApi();
 // Configure Swagger to use JWT
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Time Attendance System API", Version = "v1" });
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "TecAxle HRMS API", Version = "v1" });
 
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -149,13 +150,11 @@ try
 {
     using (var scope = app.Services.CreateScope())
     {
-        var context = scope.ServiceProvider.GetRequiredService<TimeAttendanceDbContext>();
-
-        // Apply any pending migrations
-        await context.Database.MigrateAsync();
-
-        // Seed initial data
-        await SeedData.SeedAsync(context);
+        // Only migrate the master database at startup.
+        // Tenant databases are migrated during provisioning (TenantProvisioningService).
+        var masterContext = scope.ServiceProvider.GetRequiredService<MasterDbContext>();
+        await masterContext.Database.MigrateAsync();
+        await MasterSeedData.SeedAsync(masterContext);
     }
 }
 catch (Exception ex)
@@ -323,7 +322,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Time Attendance System API V1");
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "TecAxle HRMS API V1");
     });
 }
 

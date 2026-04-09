@@ -6,7 +6,7 @@ using TecAxle.Hrms.Domain.Modules;
 namespace TecAxle.Hrms.Application.VacationTypes.Commands.UpdateVacationType;
 
 /// <summary>
-/// Simplified CQRS command for updating an existing vacation type in the Time Attendance System.
+/// Simplified CQRS command for updating an existing vacation type in the TecAxle HRMS.
 /// Contains only essential fields: name (bilingual), branch association.
 /// </summary>
 /// <param name="Id">Unique identifier of the vacation type to update</param>

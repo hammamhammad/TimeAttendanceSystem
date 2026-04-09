@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Application.Tenants.Commands.ActivateTenant;
 using TecAxle.Hrms.Application.Tenants.Commands.CreateTenant;
 using TecAxle.Hrms.Application.Tenants.Commands.SuspendTenant;
@@ -20,10 +21,59 @@ namespace TecAxle.Hrms.Api.Controllers;
 public class TenantsController : ControllerBase
 {
     private readonly IMediator _mediator;
+    private readonly ITenantProvisioningService _provisioningService;
 
-    public TenantsController(IMediator mediator)
+    public TenantsController(IMediator mediator, ITenantProvisioningService provisioningService)
     {
         _mediator = mediator;
+        _provisioningService = provisioningService;
+    }
+
+    // ── Provisioning Endpoints (SystemAdmin) ─────────────────────────
+
+    /// <summary>
+    /// Provisions a dedicated database for a tenant.
+    /// Creates the database, applies migrations, and stores the encrypted connection string.
+    /// </summary>
+    [HttpPost("{id}/provision")]
+    [Authorize(Roles = "SystemAdmin")]
+    public async Task<IActionResult> ProvisionTenantDatabase(long id)
+    {
+        var result = await _provisioningService.ProvisionTenantAsync(id);
+        if (!result.Success)
+            return BadRequest(new { error = result.ErrorMessage });
+
+        return Ok(new
+        {
+            message = $"Database '{result.DatabaseName}' provisioned successfully.",
+            databaseName = result.DatabaseName,
+            tenantAdminEmail = "tecaxleadmin@{subdomain}.clockn.net"
+        });
+    }
+
+    /// <summary>
+    /// Applies pending EF Core migrations to a tenant's dedicated database.
+    /// </summary>
+    [HttpPost("{id}/migrate")]
+    [Authorize(Roles = "SystemAdmin")]
+    public async Task<IActionResult> MigrateTenantDatabase(long id)
+    {
+        var success = await _provisioningService.ApplyMigrationsAsync(id);
+        if (!success)
+            return BadRequest(new { error = "Migration failed. Tenant may not have a dedicated database." });
+
+        return Ok(new { message = "Migrations applied successfully." });
+    }
+
+    /// <summary>
+    /// Validates that a tenant's dedicated database is accessible.
+    /// </summary>
+    [HttpGet("{id}/validate-db")]
+    [Authorize(Roles = "SystemAdmin")]
+    public async Task<IActionResult> ValidateTenantDatabase(long id)
+    {
+        var valid = await _provisioningService.ValidateTenantDatabaseAsync(id);
+        return Ok(new { tenantId = id, databaseValid = valid });
     }
 
     // ── Discovery Endpoints (Public) ─────────────────────────────────
@@ -56,8 +106,7 @@ public class TenantsController : ControllerBase
             subdomain = tenant.Subdomain,
             name = tenant.Name,
             nameAr = tenant.NameAr,
-            logoUrl = tenant.LogoUrl,
-            apiBaseUrl = tenant.ApiBaseUrl
+            logoUrl = tenant.LogoUrl
         });
     }
 
@@ -135,14 +184,11 @@ public class TenantsController : ControllerBase
     public async Task<IActionResult> CreateTenant([FromBody] CreateTenantRequest request)
     {
         var command = new CreateTenantCommand(
-            request.Subdomain,
+            request.Subdomain,  // optional — auto-generated from Name if null
             request.Name,
             request.NameAr,
             request.LogoUrl,
-            request.ApiBaseUrl,
-            request.CustomDomain,
             request.IsActive,
-            request.DatabaseIdentifier,
             request.CompanyRegistrationNumber,
             request.TaxIdentificationNumber,
             request.Industry,
@@ -155,7 +201,8 @@ public class TenantsController : ControllerBase
             request.DefaultTimezone ?? "Asia/Riyadh",
             request.DefaultLanguage ?? "en",
             request.DefaultCurrency ?? "SAR",
-            request.Status
+            request.PlanId,
+            request.BillingCycle
         );
 
         var result = await _mediator.Send(command);
@@ -165,7 +212,8 @@ public class TenantsController : ControllerBase
             return BadRequest(new { error = result.Error });
         }
 
-        return CreatedAtAction(nameof(GetTenantById), new { id = result.Value }, new { id = result.Value });
+        var response = new { id = result.Value.Id, warning = result.Value.Warning };
+        return CreatedAtAction(nameof(GetTenantById), new { id = result.Value.Id }, response);
     }
 
     /// <summary>
@@ -177,14 +225,10 @@ public class TenantsController : ControllerBase
     {
         var command = new UpdateTenantCommand(
             id,
-            request.Subdomain,
             request.Name,
             request.NameAr,
             request.LogoUrl,
-            request.ApiBaseUrl,
-            request.CustomDomain,
             request.IsActive,
-            request.DatabaseIdentifier,
             request.CompanyRegistrationNumber,
             request.TaxIdentificationNumber,
             request.Industry,
@@ -249,14 +293,11 @@ public class TenantsController : ControllerBase
 // ── Request Models ───────────────────────────────────────────────────
 
 public record CreateTenantRequest(
-    string Subdomain,
     string Name,
+    string? Subdomain = null,
     string? NameAr = null,
     string? LogoUrl = null,
-    string ApiBaseUrl = "",
-    string? CustomDomain = null,
     bool IsActive = true,
-    string? DatabaseIdentifier = null,
     string? CompanyRegistrationNumber = null,
     string? TaxIdentificationNumber = null,
     string? Industry = null,
@@ -269,18 +310,15 @@ public record CreateTenantRequest(
     string? DefaultTimezone = "Asia/Riyadh",
     string? DefaultLanguage = "en",
     string? DefaultCurrency = "SAR",
-    string? Status = null
+    long? PlanId = null,
+    string? BillingCycle = "Monthly"
 );
 
 public record UpdateTenantRequest(
-    string Subdomain,
     string Name,
     string? NameAr = null,
     string? LogoUrl = null,
-    string ApiBaseUrl = "",
-    string? CustomDomain = null,
     bool IsActive = true,
-    string? DatabaseIdentifier = null,
     string? CompanyRegistrationNumber = null,
     string? TaxIdentificationNumber = null,
     string? Industry = null,
@@ -294,3 +332,4 @@ public record UpdateTenantRequest(
     string? DefaultLanguage = "en",
     string? DefaultCurrency = "SAR"
 );
+

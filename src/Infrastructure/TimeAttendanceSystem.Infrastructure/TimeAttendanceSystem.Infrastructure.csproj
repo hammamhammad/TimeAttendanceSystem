@@ -4,6 +4,8 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RootNamespace>TecAxle.Hrms.Infrastructure</RootNamespace>
+    <AssemblyName>TecAxle.Hrms.Infrastructure</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,8 +24,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Domain\TecAxle.Hrms.Domain\TecAxle.Hrms.Domain.csproj" />
-    <ProjectReference Include="..\..\Application\TecAxle.Hrms.Application\TecAxle.Hrms.Application.csproj" />
+    <ProjectReference Include="..\..\Domain\TimeAttendanceSystem.Domain\TimeAttendanceSystem.Domain.csproj" />
+    <ProjectReference Include="..\..\Application\TimeAttendanceSystem.Application\TimeAttendanceSystem.Application.csproj" />
   </ItemGroup>
 
 </Project>

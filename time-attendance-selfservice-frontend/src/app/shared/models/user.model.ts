@@ -95,7 +95,7 @@ export interface PagedResult<T> {
 }
 
 export interface LoginRequest {
-  username: string;
+  email: string;
   password: string;
   deviceInfo?: string;
   rememberMe?: boolean;

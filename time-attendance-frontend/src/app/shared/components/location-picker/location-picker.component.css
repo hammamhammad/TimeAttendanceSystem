@@ -1,0 +1,260 @@
+.location-picker-container {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--app-gray-200, #EAECF0);
+  box-shadow: var(--app-shadow-sm, 0 1px 3px rgba(16, 24, 40, 0.1));
+}
+
+.location-picker-map {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+}
+
+/* Fix: Bootstrap sets img { max-width: 100%; height: auto; } globally,
+   which breaks Leaflet tile positioning. Override for map tiles. */
+:host ::ng-deep .leaflet-container img {
+  max-width: none !important;
+  max-height: none !important;
+}
+
+:host ::ng-deep .leaflet-tile-pane {
+  will-change: auto !important;
+}
+
+/* Search bar */
+.map-search-bar {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 100px;
+  z-index: 1000;
+}
+
+.map-search-input-wrapper {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(16, 24, 40, 0.12);
+  overflow: hidden;
+  border: 1px solid var(--app-gray-200, #EAECF0);
+  max-width: 400px;
+}
+
+.map-search-icon {
+  padding: 0 0 0 12px;
+  color: var(--app-gray-400, #98A2B3);
+  font-size: 13px;
+}
+
+.map-search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 9px 10px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--app-gray-700, #344054);
+  background: transparent;
+  min-width: 0;
+}
+
+.map-search-input::placeholder {
+  color: var(--app-gray-400, #98A2B3);
+}
+
+.map-search-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: var(--app-primary, #4F6BF6);
+  color: white;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.map-search-btn:hover:not(:disabled) {
+  background: var(--app-primary-600, #3D56D4);
+}
+
+.map-search-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Toolbar buttons */
+.map-toolbar {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.map-tool-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--app-gray-200, #EAECF0);
+  background: white;
+  color: var(--app-gray-600, #475467);
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(16, 24, 40, 0.1);
+  transition: all 0.15s;
+  font-size: 13px;
+}
+
+.map-tool-btn:hover {
+  background: var(--app-gray-50, #F9FAFB);
+  color: var(--app-primary, #4F6BF6);
+  border-color: var(--app-primary-200, #C7D2FE);
+}
+
+/* Hint overlay */
+.location-picker-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 401;
+}
+
+.location-picker-hint {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--app-gray-600, #475467);
+  box-shadow: 0 2px 12px rgba(16, 24, 40, 0.1);
+  backdrop-filter: blur(4px);
+}
+
+/* Coordinates badge */
+.map-coords-badge {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0.8);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: var(--app-font-family-mono, 'JetBrains Mono', monospace);
+  backdrop-filter: blur(4px);
+  letter-spacing: 0.3px;
+}
+
+/* Custom marker */
+:host ::ng-deep .custom-map-marker {
+  background: none;
+  border: none;
+}
+
+:host ::ng-deep .marker-pin {
+  width: 36px;
+  height: 44px;
+  position: relative;
+}
+
+:host ::ng-deep .marker-pin::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 32px;
+  background: var(--app-primary, #4F6BF6);
+  border-radius: 50% 50% 50% 0;
+  transform: translateX(-50%) rotate(-45deg);
+  box-shadow: 0 2px 8px rgba(79, 107, 246, 0.4);
+}
+
+:host ::ng-deep .marker-pin::after {
+  content: '';
+  position: absolute;
+  top: 7px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 12px;
+  background: white;
+  border-radius: 50%;
+}
+
+/* Hide default leaflet zoom control styling conflict */
+:host ::ng-deep .leaflet-control-zoom {
+  margin-top: 56px !important;
+  border: 1px solid var(--app-gray-200, #EAECF0) !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(16, 24, 40, 0.1) !important;
+}
+
+:host ::ng-deep .leaflet-control-zoom a {
+  width: 34px !important;
+  height: 34px !important;
+  line-height: 34px !important;
+  font-size: 16px !important;
+  color: var(--app-gray-600, #475467) !important;
+  border-color: var(--app-gray-200, #EAECF0) !important;
+}
+
+:host ::ng-deep .leaflet-control-zoom a:hover {
+  background: var(--app-gray-50, #F9FAFB) !important;
+  color: var(--app-primary, #4F6BF6) !important;
+}
+
+/* Attribution styling */
+:host ::ng-deep .leaflet-control-attribution {
+  font-size: 10px;
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(4px);
+  border-radius: 4px 0 0 0;
+}
+
+/* RTL support */
+:host-context([dir="rtl"]) .map-search-bar {
+  left: 100px;
+  right: 12px;
+}
+
+:host-context([dir="rtl"]) .map-toolbar {
+  left: 12px;
+  right: auto;
+}
+
+:host-context([dir="rtl"]) .map-search-icon {
+  padding: 0 12px 0 0;
+}
+
+:host-context([dir="rtl"]) .map-coords-badge {
+  left: auto;
+  right: 8px;
+}
+
+:host-context([dir="rtl"]) .leaflet-control-zoom {
+  margin-left: 0 !important;
+}

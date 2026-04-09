@@ -3,6 +3,7 @@ import { Component, Input, signal, inject } from '@angular/core';
 import { RouterModule, Router } from '@angular/router';
 import { MenuService, MenuItem } from '../../core/menu/menu.service';
 import { I18nService } from '../../core/i18n/i18n.service';
+import { AuthService } from '../../core/auth/auth.service';
 import { PermissionService } from '../../core/auth/permission.service';
 import { EntitlementService } from '../../core/services/entitlement.service';
 
@@ -19,11 +20,15 @@ export class SidenavComponent {
 
   private menuService = inject(MenuService);
   private router = inject(Router);
+  private authService = inject(AuthService);
   public i18n = inject(I18nService);
   public permissionService = inject(PermissionService);
   private entitlementService = inject(EntitlementService);
 
   menuItems = this.menuService.getMenuItems$();
+
+  // Platform-only paths — only these are shown when logged in as platform admin
+  private platformPaths = new Set(['/platform', '/tenants', '/subscription-plans']);
 
   // Track which submenus are open - updated for debugging
   private openSubmenus = signal<Set<string>>(new Set());
@@ -58,6 +63,11 @@ export class SidenavComponent {
 
   // Special permission check for parent menus that should show with any related permission
   hasParentMenuPermission(item: MenuItem): boolean {
+    // Platform admin: only show platform-level menu items
+    if (this.authService.isPlatformUser()) {
+      return this.platformPaths.has(item.path);
+    }
+
     // Check module entitlement first
     if (item.module && !this.entitlementService.isModuleEnabled(item.module)) {
       return false;

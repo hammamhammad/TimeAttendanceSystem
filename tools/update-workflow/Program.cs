@@ -1,7 +1,7 @@
 using Npgsql;
 
 // Update the "Default Fingerprint Request Approval" workflow to "Default Attendance Correction Approval"
-string connectionString = "Host=localhost;Port=5432;Database=TimeAttendanceSystem;Username=postgres;Password=P@ssw0rd@3213;Include Error Detail=true";
+string connectionString = "Host=localhost;Port=5432;Database=TecAxleHRMS;Username=postgres;Password=P@ssw0rd@3213;Include Error Detail=true";
 
 string updateSql = @"
 UPDATE ""WorkflowDefinitions""

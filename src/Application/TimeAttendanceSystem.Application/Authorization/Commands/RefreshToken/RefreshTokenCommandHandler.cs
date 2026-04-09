@@ -110,10 +110,8 @@ public class RefreshTokenCommandHandler : BaseHandler<RefreshTokenCommand, Resul
 
         var branchIds = user.UserBranchScopes.Select(ubs => ubs.BranchId).ToList();
 
-        // Resolve tenant from user's branch scope
-        var tenantId = user.UserBranchScopes
-            .Select(ubs => ubs.Branch?.TenantId)
-            .FirstOrDefault(tid => tid.HasValue && tid.Value > 0);
+        // In per-tenant DB, tenantId comes from the request context, not from branch entity
+        var tenantId = CurrentUser.TenantId;
 
         // Fetch linked employee for full name and employee context
         string? employeeFullName = null;

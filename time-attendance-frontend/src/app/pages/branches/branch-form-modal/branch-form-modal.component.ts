@@ -6,11 +6,12 @@ import { TIMEZONE_OPTIONS } from '../../../shared/constants/timezone.constants';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { SearchableSelectComponent, SearchableSelectOption } from '../../../shared/components/searchable-select/searchable-select.component';
 import { ModalWrapperComponent } from '../../../shared/components/modal-wrapper/modal-wrapper.component';
+import { LocationPickerComponent } from '../../../shared/components/location-picker/location-picker.component';
 
 @Component({
   selector: 'app-branch-form-modal',
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule, SearchableSelectComponent, ModalWrapperComponent],
+  imports: [FormsModule, ReactiveFormsModule, SearchableSelectComponent, ModalWrapperComponent, LocationPickerComponent],
   template: `
     <app-modal-wrapper
       [show]="show"
@@ -115,6 +116,16 @@ import { ModalWrapperComponent } from '../../../shared/components/modal-wrapper/
             </h6>
           </div>
           <div class="card-body">
+            <div class="mb-3">
+              <app-location-picker
+                [latitude]="branchForm.get('latitude')?.value"
+                [longitude]="branchForm.get('longitude')?.value"
+                [radiusMeters]="branchForm.get('geofenceRadiusMeters')?.value || 100"
+                [height]="'250px'"
+                [placeholder]="i18n.t('branches.map_click_hint')"
+                (locationChange)="onLocationChange($event)">
+              </app-location-picker>
+            </div>
             <div class="row">
               <div class="col-md-6 mb-3">
                 <div class="form-floating">
@@ -291,6 +302,13 @@ export class BranchFormModalComponent implements OnInit {
 
   onTimezoneChange(timezone: string) {
     this.branchForm.patchValue({ timeZone: timezone });
+  }
+
+  onLocationChange(event: { latitude: number; longitude: number }) {
+    this.branchForm.patchValue({
+      latitude: event.latitude,
+      longitude: event.longitude
+    });
   }
 
   onSubmit() {

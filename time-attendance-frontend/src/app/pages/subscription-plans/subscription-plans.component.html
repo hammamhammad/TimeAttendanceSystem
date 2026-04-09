@@ -1,9 +1,22 @@
-<div class="app-view-page">
+<div class="subscription-plans-page">
   <!-- Page Header -->
   <app-page-header
     [title]="'Subscription Plans'"
-    [subtitle]="'Available subscription plans and pricing'">
+    [subtitle]="'Manage subscription plans and pricing'">
   </app-page-header>
+
+  <!-- Unified Filter -->
+  <app-unified-filter
+    [searchPlaceholder]="'Search plans by name, code, or tier...'"
+    [showAddButton]="true"
+    [addButtonText]="'Create Plan'"
+    [showRefreshButton]="true"
+    [refreshButtonText]="'Refresh'"
+    [refreshing]="loading()"
+    (searchChange)="onSearchChange($event)"
+    (add)="navigateToCreate()"
+    (refresh)="loadPlans()">
+  </app-unified-filter>
 
   @if (loading()) {
     <div class="d-flex justify-content-center py-5">
@@ -12,15 +25,15 @@
         [centered]="true">
       </app-loading-spinner>
     </div>
-  } @else if (plans().length === 0) {
+  } @else if (filteredPlans().length === 0) {
     <app-empty-state
       icon="fa-solid fa-credit-card"
-      [title]="'No Plans Available'"
-      [message]="'No subscription plans have been configured yet.'">
+      [title]="'No Plans Found'"
+      [message]="searchTerm() ? 'No plans match your search criteria.' : 'No subscription plans have been configured yet.'">
     </app-empty-state>
   } @else {
     <div class="row g-4">
-      @for (plan of plans(); track plan.id) {
+      @for (plan of filteredPlans(); track plan.id) {
         <div class="col-lg-4 col-md-6">
           <div
             class="card h-100 plan-card"
@@ -109,6 +122,24 @@
                 } @else {
                   <span class="badge bg-secondary-subtle text-secondary ms-1">Private</span>
                 }
+              </div>
+
+              <!-- Card Actions -->
+              <div class="plan-card-actions mt-3 pt-3">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-secondary"
+                  (click)="navigateToEdit(plan)">
+                  <i class="fa-solid fa-edit me-1"></i>
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-danger"
+                  (click)="deletePlan(plan)">
+                  <i class="fa-solid fa-trash me-1"></i>
+                  Delete
+                </button>
               </div>
             </div>
           </div>

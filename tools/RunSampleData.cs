@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        string connectionString = "Host=localhost;Port=5432;Database=TimeAttendanceSystem;Username=postgres;Password=P@ssw0rd@3213;Include Error Detail=true";
+        string connectionString = "Host=localhost;Port=5432;Database=TecAxleHRMS;Username=postgres;Password=P@ssw0rd@3213;Include Error Detail=true";
         string sqlFilePath = "../scripts/sample-data-with-users.sql";
 
         try

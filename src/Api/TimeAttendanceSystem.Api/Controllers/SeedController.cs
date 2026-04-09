@@ -8,10 +8,10 @@ namespace TecAxle.Hrms.Api.Controllers;
 [ApiController]
 public class SeedController : ControllerBase
 {
-    private readonly TimeAttendanceDbContext _context;
+    private readonly TecAxleDbContext _context;
     private readonly IWebHostEnvironment _environment;
 
-    public SeedController(TimeAttendanceDbContext context, IWebHostEnvironment environment)
+    public SeedController(TecAxleDbContext context, IWebHostEnvironment environment)
     {
         _context = context;
         _environment = environment;

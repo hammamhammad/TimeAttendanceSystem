@@ -2,7 +2,7 @@
 
 ## Overview
 
-Build a **multi-tenant Flutter mobile application** for Employee Self-Service (ESS) that integrates with the existing Time Attendance System backend. The app enforces **dual-verification check-in/out** using GPS geofencing and NFC tag validation.
+Build a **multi-tenant Flutter mobile application** for Employee Self-Service (ESS) that integrates with the existing TecAxle HRMS backend. The app enforces **dual-verification check-in/out** using GPS geofencing and NFC tag validation.
 
 ```mermaid
 flowchart LR
@@ -105,7 +105,7 @@ sequenceDiagram
 
 ---
 
-#### [MODIFY] [Branch.cs](file:///d:/Work/TimeAttendanceSystem/src/Domain/TimeAttendanceSystem.Domain/Entities/Branch.cs)
+#### [MODIFY] [Branch.cs](file:///d:/Work/TecAxle.Hrms/src/Domain/TecAxle.Hrms.Domain/Entities/Branch.cs)
 
 Add GPS coordinates and geofence configuration:
 ```diff
@@ -281,7 +281,7 @@ GET  /api/v1/tenants/discover?url={companyUrl}
 
 ---
 
-#### [MODIFY] [BranchesController.cs](file:///d:/Work/TimeAttendanceSystem/src/Api/TimeAttendanceSystem.Api/Controllers/BranchesController.cs)
+#### [MODIFY] [BranchesController.cs](file:///d:/Work/TecAxle.Hrms/src/Api/TecAxle.Hrms.Api/Controllers/BranchesController.cs)
 
 Add GPS management endpoints:
 ```
@@ -338,7 +338,7 @@ DELETE /api/v1/notifications/unregister-device/{deviceId}
 
 ---
 
-#### [MODIFY] [AttendanceController.cs](file:///d:/Work/TimeAttendanceSystem/src/Api/TimeAttendanceSystem.Api/Controllers/AttendanceController.cs)
+#### [MODIFY] [AttendanceController.cs](file:///d:/Work/TecAxle.Hrms/src/Api/TecAxle.Hrms.Api/Controllers/AttendanceController.cs)
 
 Add mobile check-in endpoint with dual verification:
 ```

@@ -1,4 +1,4 @@
-# Time Attendance System - Application Layer Documentation
+# TecAxle HRMS - Application Layer Documentation
 
 **Version**: 1.0
 **Last Updated**: November 3, 2025
@@ -84,10 +84,10 @@ The Application Layer orchestrates business workflows and use cases using **CQRS
 
 ### 2.1 Folder Organization
 
-**Location**: `src/Application/TimeAttendanceSystem.Application/`
+**Location**: `src/Application/TecAxle.Hrms.Application/`
 
 ```
-TimeAttendanceSystem.Application/
+TecAxle.Hrms.Application/
 │
 ├── Abstractions/                           # Interface definitions
 │   ├── IApplicationDbContext.cs            # Database context abstraction
@@ -191,10 +191,10 @@ TimeAttendanceSystem.Application/
 
 ```csharp
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Enums;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Enums;
 
-namespace TimeAttendanceSystem.Application.Employees.Commands.CreateEmployee;
+namespace TecAxle.Hrms.Application.Employees.Commands.CreateEmployee;
 
 /// <summary>
 /// Command to create a new employee in the system.
@@ -248,11 +248,11 @@ public record CreateEmployeeCommand(
 ```csharp
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Employees;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Employees;
 
-namespace TimeAttendanceSystem.Application.Employees.Commands.CreateEmployee;
+namespace TecAxle.Hrms.Application.Employees.Commands.CreateEmployee;
 
 /// <summary>
 /// Handler for CreateEmployeeCommand.
@@ -403,7 +403,7 @@ public class CreateEmployeeCommandHandler : BaseHandler<CreateEmployeeCommand, R
 ```csharp
 using FluentValidation;
 
-namespace TimeAttendanceSystem.Application.Employees.Commands.CreateEmployee;
+namespace TecAxle.Hrms.Application.Employees.Commands.CreateEmployee;
 
 /// <summary>
 /// Validates CreateEmployeeCommand input before handler execution.
@@ -517,9 +517,9 @@ public class CreateEmployeeCommandValidator : AbstractValidator<CreateEmployeeCo
 
 ```csharp
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Employees.Queries.GetEmployees;
+namespace TecAxle.Hrms.Application.Employees.Queries.GetEmployees;
 
 /// <summary>
 /// Query to retrieve paginated list of employees with filtering.
@@ -549,10 +549,10 @@ public record GetEmployeesQuery(
 ```csharp
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Abstractions;
-using TimeAttendanceSystem.Application.Common;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
 
-namespace TimeAttendanceSystem.Application.Employees.Queries.GetEmployees;
+namespace TecAxle.Hrms.Application.Employees.Queries.GetEmployees;
 
 /// <summary>
 /// Handler for GetEmployeesQuery.
@@ -730,7 +730,7 @@ public class GetEmployeesQueryHandler
 **Location**: `[Feature]/Queries/Get[Entity]s/[Entity]Dto.cs`
 
 ```csharp
-namespace TimeAttendanceSystem.Application.Employees.Queries.GetEmployees;
+namespace TecAxle.Hrms.Application.Employees.Queries.GetEmployees;
 
 /// <summary>
 /// Data Transfer Object for employee list view.
@@ -813,7 +813,7 @@ using System.Reflection;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace TimeAttendanceSystem.Application;
+namespace TecAxle.Hrms.Application;
 
 /// <summary>
 /// Extension methods for registering application layer services.
@@ -933,7 +933,7 @@ public class CreateEmployeeCommandHandler
 **Location**: `Common/Result.cs`
 
 ```csharp
-namespace TimeAttendanceSystem.Application.Common;
+namespace TecAxle.Hrms.Application.Common;
 
 /// <summary>
 /// Represents the result of an operation without a return value.
@@ -1063,7 +1063,7 @@ public async Task<IActionResult> GetEmployees([FromQuery] GetEmployeesQuery quer
 **Location**: `Common/PagedResult.cs`
 
 ```csharp
-namespace TimeAttendanceSystem.Application.Common;
+namespace TecAxle.Hrms.Application.Common;
 
 /// <summary>
 /// Represents a paginated result set.
@@ -1124,9 +1124,9 @@ var pagedResult = new PagedResult<EmployeeDto>(
 
 ```csharp
 using MediatR;
-using TimeAttendanceSystem.Application.Abstractions;
+using TecAxle.Hrms.Application.Abstractions;
 
-namespace TimeAttendanceSystem.Application.Common;
+namespace TecAxle.Hrms.Application.Common;
 
 /// <summary>
 /// Base class for all command and query handlers.
@@ -1198,11 +1198,11 @@ public class CreateEmployeeCommandHandler
 
 ```csharp
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Domain.Employees;
-using TimeAttendanceSystem.Domain.Users;
+using TecAxle.Hrms.Domain.Employees;
+using TecAxle.Hrms.Domain.Users;
 // ... other entity namespaces
 
-namespace TimeAttendanceSystem.Application.Abstractions;
+namespace TecAxle.Hrms.Application.Abstractions;
 
 /// <summary>
 /// Database context abstraction providing access to all entities.
@@ -1300,7 +1300,7 @@ public interface IApplicationDbContext
 **Location**: `Abstractions/ICurrentUser.cs`
 
 ```csharp
-namespace TimeAttendanceSystem.Application.Abstractions;
+namespace TecAxle.Hrms.Application.Abstractions;
 
 /// <summary>
 /// Provides information about the currently authenticated user.

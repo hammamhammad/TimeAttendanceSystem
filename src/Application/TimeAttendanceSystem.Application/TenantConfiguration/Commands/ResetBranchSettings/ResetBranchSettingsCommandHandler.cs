@@ -19,12 +19,8 @@ public class ResetBranchSettingsCommandHandler : BaseHandler<ResetBranchSettings
 
     public override async Task<Result> Handle(ResetBranchSettingsCommand request, CancellationToken cancellationToken)
     {
-        var tenantId = _tenantContext.TenantId ?? await ResolveTenantIdAsync(cancellationToken);
-        if (tenantId == null)
-            return Result.Failure("Tenant context not resolved");
-
         var branch = await Context.Branches
-            .FirstOrDefaultAsync(b => b.Id == request.BranchId && b.TenantId == tenantId.Value && !b.IsDeleted, cancellationToken);
+            .FirstOrDefaultAsync(b => b.Id == request.BranchId && !b.IsDeleted, cancellationToken);
 
         if (branch == null)
             return Result.Failure("Branch not found");

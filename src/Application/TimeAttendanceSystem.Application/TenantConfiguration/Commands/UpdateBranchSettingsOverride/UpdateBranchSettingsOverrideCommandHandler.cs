@@ -20,13 +20,8 @@ public class UpdateBranchSettingsOverrideCommandHandler : BaseHandler<UpdateBran
 
     public override async Task<Result> Handle(UpdateBranchSettingsOverrideCommand request, CancellationToken cancellationToken)
     {
-        var tenantId = _tenantContext.TenantId ?? await ResolveTenantIdAsync(cancellationToken);
-        if (tenantId == null)
-            return Result.Failure("Tenant context not resolved");
-
-        // Verify branch belongs to tenant
         var branch = await Context.Branches
-            .FirstOrDefaultAsync(b => b.Id == request.BranchId && b.TenantId == tenantId.Value && !b.IsDeleted, cancellationToken);
+            .FirstOrDefaultAsync(b => b.Id == request.BranchId && !b.IsDeleted, cancellationToken);
 
         if (branch == null)
             return Result.Failure("Branch not found");

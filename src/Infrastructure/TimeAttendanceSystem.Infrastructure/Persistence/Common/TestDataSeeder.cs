@@ -11,7 +11,7 @@ namespace TecAxle.Hrms.Infrastructure.Persistence;
 /// </summary>
 public static class TestDataSeeder
 {
-    public static async Task SeedTestDataAsync(TimeAttendanceDbContext context)
+    public static async Task SeedTestDataAsync(TecAxleDbContext context)
     {
         // Skip clearing to avoid foreign key constraint issues
         // await ClearTestDataAsync(context);
@@ -26,7 +26,7 @@ public static class TestDataSeeder
         Console.WriteLine("📊 Created: 10 branches, 20 departments, 50 employees");
     }
 
-    private static async Task ClearTestDataAsync(TimeAttendanceDbContext context)
+    private static async Task ClearTestDataAsync(TecAxleDbContext context)
     {
         // Delete in proper order to respect foreign key constraints - only TestDataSeeder data
         context.Employees.RemoveRange(context.Employees.Where(e => e.CreatedBy == "TestDataSeeder"));
@@ -37,7 +37,7 @@ public static class TestDataSeeder
         Console.WriteLine("🧹 Existing TestDataSeeder data cleared");
     }
 
-    private static async Task SeedBranchesAsync(TimeAttendanceDbContext context)
+    private static async Task SeedBranchesAsync(TecAxleDbContext context)
     {
         // Check existing branch codes to avoid duplicates
         var existingCodes = await context.Branches
@@ -97,7 +97,7 @@ public static class TestDataSeeder
         }
     }
 
-    private static async Task SeedDepartmentsAsync(TimeAttendanceDbContext context)
+    private static async Task SeedDepartmentsAsync(TecAxleDbContext context)
     {
         // Use all available branches, prioritizing TestDataSeeder branches first
         var allBranches = await context.Branches.Where(b => !b.IsDeleted).OrderByDescending(b => b.CreatedBy == "TestDataSeeder").ToListAsync();
@@ -163,7 +163,7 @@ public static class TestDataSeeder
         }
     }
 
-    private static async Task SeedEmployeesAsync(TimeAttendanceDbContext context)
+    private static async Task SeedEmployeesAsync(TecAxleDbContext context)
     {
         // Use available branches and departments
         var branches = await context.Branches.Where(b => !b.IsDeleted).OrderByDescending(b => b.CreatedBy == "TestDataSeeder").Take(5).ToListAsync();

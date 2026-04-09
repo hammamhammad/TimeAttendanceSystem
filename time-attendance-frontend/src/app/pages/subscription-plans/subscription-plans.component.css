@@ -84,6 +84,13 @@
   border-bottom: none;
 }
 
+.plan-card-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  border-top: 1px solid var(--app-gray-200, #EAECF0);
+}
+
 :host-context([dir="rtl"]) .plan-modules-list {
   padding-right: 0;
 }

@@ -127,7 +127,8 @@ export class MenuService {
           path: '/attendance/on-call',
           titleKey: 'nav.onCallSchedules',
           icon: 'fa-solid fa-phone-volume',
-          permission: 'onCallSchedule.read'
+          permission: 'onCallSchedule.read',
+          module: 'ShiftSwaps'
         }
       ]
     },
@@ -205,13 +206,15 @@ export class MenuService {
           path: '/settings/overtime',
           titleKey: 'settings.overtime.title',
           icon: 'fa-solid fa-clock',
-          permission: 'settings.overtime.read'
+          permission: 'settings.overtime.read',
+          module: 'TimeAttendance'
         },
         {
           path: '/settings/public-holidays',
           titleKey: 'settings.holidays.title',
           icon: 'fa-solid fa-calendar-check',
-          permission: 'publicHoliday.read'
+          permission: 'publicHoliday.read',
+          module: 'TimeAttendance'
         },
         {
           path: '/vacation-types',

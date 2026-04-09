@@ -1491,7 +1491,7 @@
           "buildTransitive/net6.0/_._": {}
         }
       },
-      "TimeAttendanceSystem.Application/1.0.0": {
+      "TecAxle.Hrms.Application/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v9.0",
         "dependencies": {
@@ -1502,27 +1502,27 @@
           "Microsoft.EntityFrameworkCore": "9.0.0",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.0",
           "System.IdentityModel.Tokens.Jwt": "8.14.0",
-          "TimeAttendanceSystem.Domain": "1.0.0",
-          "TimeAttendanceSystem.Shared": "1.0.0"
+          "TecAxle.Hrms.Domain": "1.0.0",
+          "TecAxle.Hrms.Shared": "1.0.0"
         },
         "compile": {
-          "bin/placeholder/TimeAttendanceSystem.Application.dll": {}
+          "bin/placeholder/TecAxle.Hrms.Application.dll": {}
         },
         "runtime": {
-          "bin/placeholder/TimeAttendanceSystem.Application.dll": {}
+          "bin/placeholder/TecAxle.Hrms.Application.dll": {}
         }
       },
-      "TimeAttendanceSystem.Domain/1.0.0": {
+      "TecAxle.Hrms.Domain/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v9.0",
         "compile": {
-          "bin/placeholder/TimeAttendanceSystem.Domain.dll": {}
+          "bin/placeholder/TecAxle.Hrms.Domain.dll": {}
         },
         "runtime": {
-          "bin/placeholder/TimeAttendanceSystem.Domain.dll": {}
+          "bin/placeholder/TecAxle.Hrms.Domain.dll": {}
         }
       },
-      "TimeAttendanceSystem.Infrastructure/1.0.0": {
+      "TecAxle.Hrms.Infrastructure/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v9.0",
         "dependencies": {
@@ -1538,27 +1538,27 @@
           "Serilog": "4.1.0",
           "Serilog.Extensions.Hosting": "8.0.0",
           "System.IdentityModel.Tokens.Jwt": "8.14.0",
-          "TimeAttendanceSystem.Application": "1.0.0",
-          "TimeAttendanceSystem.Domain": "1.0.0"
+          "TecAxle.Hrms.Application": "1.0.0",
+          "TecAxle.Hrms.Domain": "1.0.0"
         },
         "compile": {
-          "bin/placeholder/TimeAttendanceSystem.Infrastructure.dll": {}
+          "bin/placeholder/TecAxle.Hrms.Infrastructure.dll": {}
         },
         "runtime": {
-          "bin/placeholder/TimeAttendanceSystem.Infrastructure.dll": {}
+          "bin/placeholder/TecAxle.Hrms.Infrastructure.dll": {}
         }
       },
-      "TimeAttendanceSystem.Shared/1.0.0": {
+      "TecAxle.Hrms.Shared/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v9.0",
         "dependencies": {
           "Microsoft.Extensions.Localization.Abstractions": "9.0.0"
         },
         "compile": {
-          "bin/placeholder/TimeAttendanceSystem.Shared.dll": {}
+          "bin/placeholder/TecAxle.Hrms.Shared.dll": {}
         },
         "runtime": {
-          "bin/placeholder/TimeAttendanceSystem.Shared.dll": {}
+          "bin/placeholder/TecAxle.Hrms.Shared.dll": {}
         }
       }
     }
@@ -4401,22 +4401,22 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "TimeAttendanceSystem.Application/1.0.0": {
+    "TecAxle.Hrms.Application/1.0.0": {
       "type": "project",
       "path": "../../Application/TimeAttendanceSystem.Application/TimeAttendanceSystem.Application.csproj",
       "msbuildProject": "../../Application/TimeAttendanceSystem.Application/TimeAttendanceSystem.Application.csproj"
     },
-    "TimeAttendanceSystem.Domain/1.0.0": {
+    "TecAxle.Hrms.Domain/1.0.0": {
       "type": "project",
       "path": "../../Domain/TimeAttendanceSystem.Domain/TimeAttendanceSystem.Domain.csproj",
       "msbuildProject": "../../Domain/TimeAttendanceSystem.Domain/TimeAttendanceSystem.Domain.csproj"
     },
-    "TimeAttendanceSystem.Infrastructure/1.0.0": {
+    "TecAxle.Hrms.Infrastructure/1.0.0": {
       "type": "project",
       "path": "../../Infrastructure/TimeAttendanceSystem.Infrastructure/TimeAttendanceSystem.Infrastructure.csproj",
       "msbuildProject": "../../Infrastructure/TimeAttendanceSystem.Infrastructure/TimeAttendanceSystem.Infrastructure.csproj"
     },
-    "TimeAttendanceSystem.Shared/1.0.0": {
+    "TecAxle.Hrms.Shared/1.0.0": {
       "type": "project",
       "path": "../../Shared/TimeAttendanceSystem.Shared/TimeAttendanceSystem.Shared.csproj",
       "msbuildProject": "../../Shared/TimeAttendanceSystem.Shared/TimeAttendanceSystem.Shared.csproj"
@@ -4428,9 +4428,9 @@
       "Microsoft.AspNetCore.OpenApi >= 9.0.9",
       "Microsoft.EntityFrameworkCore.Design >= 9.0.0",
       "Swashbuckle.AspNetCore >= 7.2.0",
-      "TimeAttendanceSystem.Application >= 1.0.0",
-      "TimeAttendanceSystem.Infrastructure >= 1.0.0",
-      "TimeAttendanceSystem.Shared >= 1.0.0"
+      "TecAxle.Hrms.Application >= 1.0.0",
+      "TecAxle.Hrms.Infrastructure >= 1.0.0",
+      "TecAxle.Hrms.Shared >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -4440,7 +4440,7 @@
     "version": "1.0.0",
     "restore": {
       "projectUniqueName": "D:\\Work\\TimeAttendanceSystem\\src\\Api\\TimeAttendanceSystem.Api\\TimeAttendanceSystem.Api.csproj",
-      "projectName": "TimeAttendanceSystem.Api",
+      "projectName": "TecAxle.Hrms.Api",
       "projectPath": "D:\\Work\\TimeAttendanceSystem\\src\\Api\\TimeAttendanceSystem.Api\\TimeAttendanceSystem.Api.csproj",
       "packagesPath": "C:\\Users\\Hammam\\.nuget\\packages\\",
       "outputPath": "D:\\Work\\TimeAttendanceSystem\\src\\Api\\TimeAttendanceSystem.Api\\obj\\",

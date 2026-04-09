@@ -935,7 +935,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 context: context,
                 applicationName: 'ESS Mobile',
                 applicationVersion: '1.0.0',
-                applicationLegalese: '\u00a9 2026 Time Attendance System',
+                applicationLegalese: '\u00a9 2026 TecAxle',
               );
             },
           ),

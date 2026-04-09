@@ -1,0 +1,63 @@
+<div class="location-picker-wrapper" [class.is-expanded]="isExpanded">
+  <div class="location-picker-container" [style.height]="isExpanded ? '600px' : height">
+    <!-- Search bar (non-readonly mode) -->
+    @if (!readonly) {
+      <div class="map-search-bar">
+        <div class="map-search-input-wrapper">
+          <i class="fa-solid fa-magnifying-glass map-search-icon"></i>
+          <input
+            type="text"
+            class="map-search-input"
+            [(ngModel)]="searchQuery"
+            (keydown)="onSearchKeydown($event)"
+            placeholder="Search for a location..."
+            [disabled]="searching">
+          <button
+            type="button"
+            class="map-search-btn"
+            (click)="onSearch()"
+            [disabled]="searching || !searchQuery.trim()">
+            @if (searching) {
+              <span class="spinner-border spinner-border-sm"></span>
+            } @else {
+              <i class="fa-solid fa-arrow-right"></i>
+            }
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Map toolbar -->
+    <div class="map-toolbar" [style.top]="readonly ? '12px' : '12px'">
+      @if (hasLocation) {
+        <button type="button" class="map-tool-btn" (click)="centerOnLocation()" title="Center on location">
+          <i class="fa-solid fa-crosshairs"></i>
+        </button>
+      }
+      <button type="button" class="map-tool-btn" (click)="toggleExpand()" [title]="isExpanded ? 'Collapse' : 'Expand'">
+        <i class="fa-solid" [class.fa-compress]="isExpanded" [class.fa-expand]="!isExpanded"></i>
+      </button>
+    </div>
+
+    <!-- Map element - uses absolute positioning to fill container -->
+    <div #mapContainer class="location-picker-map"></div>
+
+    <!-- Overlay hint -->
+    @if (!hasLocation && !readonly) {
+      <div class="location-picker-overlay">
+        <div class="location-picker-hint">
+          <i class="fa-solid fa-location-dot me-2"></i>
+          <span>{{ placeholder }}</span>
+        </div>
+      </div>
+    }
+
+    <!-- Coordinates badge (when location is set) -->
+    @if (hasLocation) {
+      <div class="map-coords-badge">
+        <i class="fa-solid fa-location-dot me-1"></i>
+        {{ latitude?.toFixed(6) }}, {{ longitude?.toFixed(6) }}
+      </div>
+    }
+  </div>
+</div>

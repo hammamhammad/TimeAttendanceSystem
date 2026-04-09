@@ -11,7 +11,6 @@ D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\RunSampleData.GeneratedMSBui
 D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\RunSampleData.AssemblyInfoInputs.cache
 D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\RunSampleData.AssemblyInfo.cs
 D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\RunSampleData.csproj.CoreCompileInputs.cache
-D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\RunSampleData.sourcelink.json
 D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\RunSampl.74645FA0.Up2Date
 D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\RunSampleData.dll
 D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\refint\RunSampleData.dll

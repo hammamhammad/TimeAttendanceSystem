@@ -67,8 +67,9 @@ public class GetTenantsQueryHandler : BaseHandler<GetTenantsQuery, Result<PagedR
                 t.DefaultLanguage,
                 t.DefaultCurrency,
                 t.CreatedAtUtc,
-                BranchCount = Context.Branches.Count(b => b.TenantId == t.Id && !b.IsDeleted),
-                EmployeeCount = Context.Employees.Count(e => Context.Branches.Any(b => b.Id == e.BranchId && b.TenantId == t.Id && !b.IsDeleted) && !e.IsDeleted),
+                // Cross-tenant DB counts require connecting to each tenant's DB — not available in master context
+                BranchCount = 0,
+                EmployeeCount = 0,
                 ActiveSubscription = Context.TenantSubscriptions
                     .Where(s => s.TenantId == t.Id && (s.Status == SubscriptionStatus.Active || s.Status == SubscriptionStatus.Trial))
                     .Select(s => new { s.Plan.Name, s.Status })

@@ -1,15 +1,14 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TecAxle.Hrms.Application.Subscriptions.Commands.CreatePlan;
+using TecAxle.Hrms.Application.Subscriptions.Commands.UpdatePlan;
+using TecAxle.Hrms.Application.Subscriptions.Commands.DeletePlan;
 using TecAxle.Hrms.Application.Subscriptions.Queries.GetSubscriptionPlanById;
 using TecAxle.Hrms.Application.Subscriptions.Queries.GetSubscriptionPlans;
 
 namespace TecAxle.Hrms.Api.Controllers;
 
-/// <summary>
-/// Controller for managing subscription plans.
-/// All endpoints require SystemAdmin role.
-/// </summary>
 [ApiController]
 [Route("api/v1/subscription-plans")]
 [Authorize(Roles = "SystemAdmin")]
@@ -22,37 +21,68 @@ public class SubscriptionPlansController : ControllerBase
         _mediator = mediator;
     }
 
-    /// <summary>
-    /// List all subscription plans with module entitlements and limits.
-    /// </summary>
     [HttpGet]
     public async Task<IActionResult> GetSubscriptionPlans()
     {
-        var query = new GetSubscriptionPlansQuery();
-        var result = await _mediator.Send(query);
-
-        if (result.IsFailure)
-        {
-            return BadRequest(new { error = result.Error });
-        }
-
-        return Ok(result.Value);
+        var result = await _mediator.Send(new GetSubscriptionPlansQuery());
+        return result.IsFailure ? BadRequest(new { error = result.Error }) : Ok(result.Value);
     }
 
-    /// <summary>
-    /// Get a subscription plan by ID with full details.
-    /// </summary>
     [HttpGet("{id}")]
     public async Task<IActionResult> GetSubscriptionPlanById(long id)
     {
-        var query = new GetSubscriptionPlanByIdQuery(id);
-        var result = await _mediator.Send(query);
+        var result = await _mediator.Send(new GetSubscriptionPlanByIdQuery(id));
+        return result.IsFailure ? NotFound(new { error = result.Error }) : Ok(result.Value);
+    }
 
-        if (result.IsFailure)
-        {
-            return NotFound(new { error = result.Error });
-        }
+    [HttpPost]
+    public async Task<IActionResult> CreateSubscriptionPlan([FromBody] CreatePlanRequest request)
+    {
+        var command = new CreateSubscriptionPlanCommand(
+            request.Code, request.Name, request.NameAr,
+            request.Description, request.DescriptionAr, request.Tier,
+            request.MonthlyPriceUsd, request.AnnualPriceUsd, request.Currency ?? "USD",
+            request.Modules ?? new(), request.Limits ?? new(),
+            request.IsPublic, request.IsActive, request.SortOrder);
 
-        return Ok(result.Value);
+        var result = await _mediator.Send(command);
+        return result.IsFailure
+            ? BadRequest(new { error = result.Error })
+            : CreatedAtAction(nameof(GetSubscriptionPlanById), new { id = result.Value }, new { id = result.Value });
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateSubscriptionPlan(long id, [FromBody] UpdatePlanRequest request)
+    {
+        var command = new UpdateSubscriptionPlanCommand(
+            id, request.Name, request.NameAr,
+            request.Description, request.DescriptionAr, request.Tier,
+            request.MonthlyPriceUsd, request.AnnualPriceUsd, request.Currency ?? "USD",
+            request.Modules ?? new(), request.Limits ?? new(),
+            request.IsPublic, request.IsActive, request.SortOrder);
+
+        var result = await _mediator.Send(command);
+        return result.IsFailure ? BadRequest(new { error = result.Error }) : Ok(new { message = "Plan updated." });
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteSubscriptionPlan(long id)
+    {
+        var result = await _mediator.Send(new DeleteSubscriptionPlanCommand(id));
+        return result.IsFailure ? BadRequest(new { error = result.Error }) : Ok(new { message = "Plan deleted." });
     }
 }
+
+public record CreatePlanRequest(
+    string Code, string Name, string? NameAr,
+    string? Description, string? DescriptionAr, string Tier,
+    decimal MonthlyPriceUsd, decimal AnnualPriceUsd, string? Currency,
+    List<string>? Modules, Dictionary<string, int>? Limits,
+    bool IsPublic = true, bool IsActive = true, int SortOrder = 0);
+
+public record UpdatePlanRequest(
+    string Name, string? NameAr,
+    string? Description, string? DescriptionAr, string Tier,
+    decimal MonthlyPriceUsd, decimal AnnualPriceUsd, string? Currency,
+    List<string>? Modules, Dictionary<string, int>? Limits,
+    bool IsPublic = true, bool IsActive = true, int SortOrder = 0);

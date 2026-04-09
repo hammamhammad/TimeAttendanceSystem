@@ -7,7 +7,7 @@ using TecAxle.Hrms.Domain.Modules;
 namespace TecAxle.Hrms.Application.VacationTypes.Commands.CreateVacationType;
 
 /// <summary>
-/// Simplified CQRS command for creating a new vacation type in the Time Attendance System.
+/// Simplified CQRS command for creating a new vacation type in the TecAxle HRMS.
 /// Contains only essential fields: name (bilingual), branch association.
 /// </summary>
 /// <param name="BranchId">ID of the branch where the vacation type will be configured (null for all branches)</param>

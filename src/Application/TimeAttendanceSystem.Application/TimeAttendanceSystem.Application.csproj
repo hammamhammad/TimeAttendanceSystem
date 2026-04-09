@@ -4,6 +4,8 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RootNamespace>TecAxle.Hrms.Application</RootNamespace>
+    <AssemblyName>TecAxle.Hrms.Application</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,8 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Domain\TecAxle.Hrms.Domain\TecAxle.Hrms.Domain.csproj" />
-    <ProjectReference Include="..\..\Shared\TecAxle.Hrms.Shared\TecAxle.Hrms.Shared.csproj" />
+    <ProjectReference Include="..\..\Domain\TimeAttendanceSystem.Domain\TimeAttendanceSystem.Domain.csproj" />
+    <ProjectReference Include="..\..\Shared\TimeAttendanceSystem.Shared\TimeAttendanceSystem.Shared.csproj" />
   </ItemGroup>
 
 </Project>

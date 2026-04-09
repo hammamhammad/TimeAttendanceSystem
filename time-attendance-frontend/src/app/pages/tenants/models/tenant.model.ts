@@ -30,6 +30,8 @@ export interface TenantDetailDto extends TenantDto {
   website: string | null;
   trialStartDate: string | null;
   trialEndDate: string | null;
+  databaseName: string | null;
+  databaseCreatedAt: string | null;
   subscription: TenantSubscriptionDto | null;
 }
 
@@ -75,10 +77,11 @@ export interface SubscriptionPlanDto {
 }
 
 export interface CreateTenantRequest {
-  subdomain: string;
+  subdomain?: string;
   name: string;
   nameAr?: string;
-  apiBaseUrl: string;
+  logoUrl?: string;
+  apiBaseUrl?: string;
   customDomain?: string;
   companyRegistrationNumber?: string;
   taxIdentificationNumber?: string;
@@ -92,12 +95,15 @@ export interface CreateTenantRequest {
   defaultTimezone: string;
   defaultLanguage: string;
   defaultCurrency: string;
+  planId?: number | null;
+  billingCycle?: string;
 }
 
 export interface UpdateTenantRequest {
   name: string;
   nameAr?: string;
-  apiBaseUrl: string;
+  logoUrl?: string;
+  apiBaseUrl?: string;
   customDomain?: string;
   companyRegistrationNumber?: string;
   taxIdentificationNumber?: string;

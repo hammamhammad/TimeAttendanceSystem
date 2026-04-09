@@ -2,7 +2,7 @@
 
 ## 1.1 System Overview
 
-**ClockN** is a comprehensive enterprise-grade Human Resource Management System (HRMS) that combines workforce management, time & attendance tracking, payroll processing, talent management, and employee self-service into a unified platform.
+**TecAxle HRMS** is a comprehensive enterprise-grade Human Resource Management System (HRMS) that combines workforce management, time & attendance tracking, payroll processing, talent management, and employee self-service into a unified platform.
 
 The system is designed for organizations operating in the Kingdom of Saudi Arabia and the broader GCC region, with full compliance to Saudi labor law, bilingual support (English/Arabic), and RTL interface capabilities.
 
@@ -21,7 +21,7 @@ The system is designed for organizations operating in the Kingdom of Saudi Arabi
 
 ```
 +----------------------------------------------------------+
-|                    ClockN Platform                         |
+|                    TecAxle HRMS Platform                         |
 +----------------------------------------------------------+
 |                                                            |
 |  +----------------+  +------------------+  +-----------+  |

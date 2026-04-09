@@ -7,6 +7,20 @@
 @import './styles/components.css';
 @import './styles/patterns.css';
 
+/* ===== Leaflet + Bootstrap Fix =====
+   Bootstrap sets `img { max-width: 100%; height: auto; }` globally
+   which breaks Leaflet map tile rendering (tiles get constrained,
+   creating gaps). Override for all Leaflet containers. */
+.leaflet-container img {
+  max-width: none !important;
+  max-height: none !important;
+  height: auto;
+}
+.leaflet-container .leaflet-tile {
+  width: 256px !important;
+  height: 256px !important;
+}
+
 /* Bootstrap variable sync (must match ERP palette) */
 :root {
   --bs-primary: #4F6BF6;

@@ -6,7 +6,7 @@ using TecAxle.Hrms.Domain.Modules;
 namespace TecAxle.Hrms.Application.VacationTypes.Commands.DeleteVacationType;
 
 /// <summary>
-/// CQRS command for soft-deleting a vacation type in the Time Attendance System.
+/// CQRS command for soft-deleting a vacation type in the TecAxle HRMS.
 /// Implements safe deletion with business rule validation to prevent data integrity issues
 /// while maintaining referential integrity for existing vacation records and audit trails.
 /// </summary>

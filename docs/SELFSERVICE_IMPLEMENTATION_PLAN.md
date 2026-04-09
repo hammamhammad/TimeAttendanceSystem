@@ -70,7 +70,7 @@ This document outlines the implementation plan for completing the self-service p
 ### Phase 0: Backend Configuration & Portal Controller - COMPLETED
 
 #### 0.1 Add Portal Controller to Main Project
-**File created:** `src/Api/TimeAttendanceSystem.Api/Controllers/PortalController.cs`
+**File created:** `src/Api/TecAxle.Hrms.Api/Controllers/PortalController.cs`
 
 **Endpoints implemented:**
 - `GET /api/v1/portal/employee-dashboard` - Employee dashboard with stats, activity, attendance
@@ -100,7 +100,7 @@ Policy already exists in `DependencyInjection.cs` - no changes needed.
 ### Phase 1: Add Fingerprint Requests to Main Project - COMPLETED
 
 #### 1.1 Add Fingerprint Domain Entity
-**File created:** `src/Domain/TimeAttendanceSystem.Domain/FingerprintRequests/FingerprintRequest.cs`
+**File created:** `src/Domain/TecAxle.Hrms.Domain/FingerprintRequests/FingerprintRequest.cs`
 
 **Entity includes:**
 - FingerprintRequestType enum (NewEnrollment, ReEnrollment, UpdateFingers, TechnicalIssue)
@@ -117,7 +117,7 @@ Policy already exists in `DependencyInjection.cs` - no changes needed.
 - `src/Application/.../Features/Portal/FingerprintRequests/Commands/CompleteFingerprintRequestCommand.cs`
 
 #### 1.3 Add Fingerprint Controller
-**File created:** `src/Api/TimeAttendanceSystem.Api/Controllers/FingerprintRequestsController.cs`
+**File created:** `src/Api/TecAxle.Hrms.Api/Controllers/FingerprintRequestsController.cs`
 
 **Endpoints:**
 - `GET /api/v1/fingerprint-requests` - List with filtering and pagination
@@ -131,7 +131,7 @@ Policy already exists in `DependencyInjection.cs` - no changes needed.
 
 **Files modified:**
 - `IApplicationDbContext.cs` - Added FingerprintRequests DbSet
-- `TimeAttendanceDbContext.cs` - Added FingerprintRequests DbSet
+- `TecAxleDbContext.cs` - Added FingerprintRequests DbSet
 - `ApplicationDbContextAdapter.cs` - Added FingerprintRequests DbSet
 
 ---
@@ -341,11 +341,11 @@ Delete: src-selfservice/ (entire folder)
 
 ### Backend Files to Create (in src/)
 ```
-src/Api/TimeAttendanceSystem.Api/Controllers/
+src/Api/TecAxle.Hrms.Api/Controllers/
   - PortalController.cs
   - FingerprintRequestsController.cs
 
-src/Application/TimeAttendanceSystem.Application/Features/Portal/
+src/Application/TecAxle.Hrms.Application/Features/Portal/
   EmployeeDashboard/Queries/
     - GetEmployeeDashboardQuery.cs
     - GetEmployeeDashboardQueryHandler.cs
@@ -363,11 +363,11 @@ src/Application/TimeAttendanceSystem.Application/Features/Portal/
     - GetPendingApprovalsQueryHandler.cs
     - PendingApprovalDto.cs
 
-src/Application/TimeAttendanceSystem.Application/Features/FingerprintRequests/
+src/Application/TecAxle.Hrms.Application/Features/FingerprintRequests/
   - Commands/ (Create, Update, Complete, Cancel)
   - Queries/ (GetById, GetList)
 
-src/Domain/TimeAttendanceSystem.Domain/FingerprintRequests/
+src/Domain/TecAxle.Hrms.Domain/FingerprintRequests/
   - FingerprintRequest.cs
 
 src/Infrastructure/.../Configurations/
@@ -376,9 +376,9 @@ src/Infrastructure/.../Configurations/
 
 ### Backend Files to Modify (in src/)
 ```
-src/Infrastructure/TimeAttendanceSystem.Infrastructure/DependencyInjection.cs (add ManagerAccess policy)
-src/Application/TimeAttendanceSystem.Application/Abstractions/IApplicationDbContext.cs (add FingerprintRequests DbSet)
-src/Infrastructure/.../TimeAttendanceDbContext.cs (add FingerprintRequests DbSet)
+src/Infrastructure/TecAxle.Hrms.Infrastructure/DependencyInjection.cs (add ManagerAccess policy)
+src/Application/TecAxle.Hrms.Application/Abstractions/IApplicationDbContext.cs (add FingerprintRequests DbSet)
+src/Infrastructure/.../TecAxleDbContext.cs (add FingerprintRequests DbSet)
 src/Application/.../EmployeeVacations/Commands/CreateEmployeeVacation/*.cs (on-behalf + auto-approve)
 src/Application/.../Excuses/Commands/CreateEmployeeExcuse/*.cs (on-behalf + auto-approve)
 src/Application/.../RemoteWorkRequests/Commands/CreateRemoteWorkRequest/*.cs (on-behalf + auto-approve)

@@ -16,7 +16,7 @@ namespace TecAxle.Hrms.Application.Authorization.Commands.Login;
 /// - Early validation prevents unnecessary processing of invalid requests
 /// 
 /// Authentication Security:
-/// - Username validation ensures proper credential format
+/// - Email validation ensures proper credential format
 /// - Password validation prevents empty or oversized password attacks
 /// - Device information validation for session tracking security
 /// - Length restrictions prevent buffer overflow and memory exhaustion
@@ -37,7 +37,7 @@ namespace TecAxle.Hrms.Application.Authorization.Commands.Login;
 /// - Standardized validation failure handling and reporting
 /// 
 /// Validation Rules Applied:
-/// - Username: Required, maximum 100 characters for reasonable user identification
+/// - Email: Required, maximum 100 characters for reasonable user identification
 /// - Password: Required, maximum 500 characters to prevent oversized attacks
 /// - DeviceInfo: Optional, maximum 500 characters for session tracking data
 /// - All rules designed to balance security, usability, and system performance
@@ -50,7 +50,7 @@ public class LoginCommandValidator : AbstractValidator<LoginCommand>
     /// </summary>
     /// <remarks>
     /// Validation Rule Configuration:
-    /// - Username validation: Required field with length restriction
+    /// - Email validation: Required field with length restriction
     /// - Password validation: Required field with security-focused length limit
     /// - DeviceInfo validation: Optional field with reasonable size restriction
     /// - All validations designed to prevent common security vulnerabilities
@@ -63,12 +63,12 @@ public class LoginCommandValidator : AbstractValidator<LoginCommand>
     /// </remarks>
     public LoginCommandValidator()
     {
-        // Username validation: Required for authentication, reasonable length limit
-        RuleFor(x => x.Username)
+        // Email validation: Required for authentication, reasonable length limit
+        RuleFor(x => x.Email)
             .NotEmpty()
-            .WithMessage("Username is required for authentication")
+            .WithMessage("Email is required for authentication")
             .MaximumLength(100)
-            .WithMessage("Username cannot exceed 100 characters");
+            .WithMessage("Email cannot exceed 100 characters");
 
         // Password validation: Required for authentication, prevent oversized attacks
         RuleFor(x => x.Password)

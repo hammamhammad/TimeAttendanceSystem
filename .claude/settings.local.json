@@ -160,7 +160,18 @@
       "Bash(python /tmp/add_module_attr.py d:/Work/TimeAttendanceSystem/src/Application/TimeAttendanceSystem.Application/MobileAttendance/Commands/ProcessMobileTransaction/CheckLocationQuery.cs TimeAttendance true)",
       "Bash(python -c \"import sys,json; print\\(json.dumps\\(json.load\\(sys.stdin\\), indent=2\\)[:800]\\)\")",
       "Bash(echo \"Frontend PID: $!\")",
-      "Bash(git mv:*)"
+      "Bash(git mv:*)",
+      "Bash(sed -i 's/TimeAttendanceSystem/TecAxle.Hrms/g' \"d:/Work/TimeAttendanceSystem/CLAUDE.md\")",
+      "Bash(sed -i 's/Time Attendance System/TecAxle HRMS/g' \"d:/Work/TimeAttendanceSystem/CLAUDE.md\")",
+      "Bash(sed -i 's/ClockN ESS/TecAxle HRMS/g' \"d:/Work/TimeAttendanceSystem/CLAUDE.md\")",
+      "Bash(PGPASSWORD='P@ssw0rd@3213' psql -U postgres -h localhost -p 5432 -c \"SELECT datname FROM pg_database WHERE datname LIKE '%Attendance%' OR datname LIKE '%TecAxle%'\")",
+      "Read(//tmp/**)",
+      "Bash(PGPASSWORD='P@ssw0rd@3213' \"/c/Program Files/PostgreSQL/18/bin/psql.exe\" -U postgres -h localhost -p 5432 -c \"SELECT pg_terminate_backend\\(pid\\) FROM pg_stat_activity WHERE datname = 'tecaxle_master' AND pid <> pg_backend_pid\\(\\);\")",
+      "Bash(PGPASSWORD='P@ssw0rd@3213' \"/c/Program Files/PostgreSQL/18/bin/psql.exe\" -U postgres -h localhost -p 5432 -c \"DROP DATABASE tecaxle_master; CREATE DATABASE tecaxle_master;\")",
+      "Bash(PGPASSWORD='P@ssw0rd@3213' \"/c/Program Files/PostgreSQL/18/bin/psql.exe\" -U postgres -h localhost -p 5432 -c \"DROP DATABASE tecaxle_master;\")",
+      "Bash(PGPASSWORD='P@ssw0rd@3213' \"/c/Program Files/PostgreSQL/18/bin/psql.exe\" -U postgres -h localhost -p 5432 -c \"CREATE DATABASE tecaxle_master;\")",
+      "Bash(PGPASSWORD='P@ssw0rd@3213' \"/c/Program Files/PostgreSQL/18/bin/psql.exe\" -U postgres -h localhost -p 5432 -d tecaxle_master -c \"SELECT \\\\\"Id\\\\\", \\\\\"Email\\\\\", \\\\\"Name\\\\\", \\\\\"Subdomain\\\\\" FROM \\\\\"Tenants\\\\\";\")",
+      "Bash(PGPASSWORD='P@ssw0rd@3213' \"/c/Program Files/PostgreSQL/18/bin/psql.exe\" -U postgres -h localhost -p 5432 -c \"SELECT datname FROM pg_database WHERE datname LIKE 'ta_%' ORDER BY datname;\")"
     ],
     "deny": [],
     "ask": []

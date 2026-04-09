@@ -13,7 +13,7 @@ using TecAxle.Hrms.Application.Users.Queries.GetUserById;
 namespace TecAxle.Hrms.Api.Controllers;
 
 /// <summary>
-/// API controller for user management operations in the Time Attendance System.
+/// API controller for user management operations in the TecAxle HRMS.
 /// Provides comprehensive CRUD operations, role management, and access control
 /// with enterprise-grade security and authorization features.
 /// </summary>

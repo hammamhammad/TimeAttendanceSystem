@@ -295,7 +295,7 @@ export const routes: Routes = [
       {
         path: 'my-on-call',
         loadComponent: () => import('./pages/portal/my-on-call/my-on-call.component').then(m => m.MyOnCallComponent),
-        data: { title: 'portal.on_call.title', module: 'TimeAttendance' },
+        data: { title: 'portal.on_call.title', module: 'ShiftSwaps' },
         canMatch: [authGuard, moduleGuard]
       },
       // Compensatory Offs

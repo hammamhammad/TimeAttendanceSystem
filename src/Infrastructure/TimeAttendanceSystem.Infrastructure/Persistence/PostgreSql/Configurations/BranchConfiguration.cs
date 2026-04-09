@@ -36,19 +36,10 @@ public class BranchConfiguration : IEntityTypeConfiguration<Branch>
             .IsRequired()
             .HasDefaultValue(new byte[] { 1 });
 
-        // Tenant relationship
-        builder.HasOne(x => x.Tenant)
-            .WithMany(t => t.Branches)
-            .HasForeignKey(x => x.TenantId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasIndex(x => x.TenantId)
-            .HasDatabaseName("IX_Branches_TenantId");
-
-        // Unique code per tenant (not globally unique)
-        builder.HasIndex(x => new { x.TenantId, x.Code })
+        // Unique code per tenant database (each tenant has its own DB)
+        builder.HasIndex(x => x.Code)
             .IsUnique()
-            .HasDatabaseName("IX_Branches_TenantId_Code")
+            .HasDatabaseName("IX_Branches_Code")
             .HasFilter("\"IsDeleted\" = false");
 
         builder.HasQueryFilter(x => !x.IsDeleted);

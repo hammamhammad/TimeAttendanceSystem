@@ -38,7 +38,7 @@ class AppConfig {
   /// Push notification channel
   static const String pushNotificationChannelId = 'ess_notifications';
   static const String pushNotificationChannelName = 'ESS Notifications';
-  static const String pushNotificationChannelDesc = 'Notifications from Time Attendance System';
+  static const String pushNotificationChannelDesc = 'Notifications from TecAxle HRMS';
 }
 
 /// Tenant configuration model for multi-tenant support.

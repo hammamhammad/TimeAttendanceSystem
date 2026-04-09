@@ -1,11 +1,11 @@
 {
-    "name": "ClockN ESS",
-    "short_name": "ClockN ESS",
+    "name": "TecAxle HRMS",
+    "short_name": "TecAxle HRMS",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#FFFFFF",
     "theme_color": "#9D99EA",
-    "description": "ClockN Employee Self-Service",
+    "description": "TecAxle HRMS Employee Self-Service",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

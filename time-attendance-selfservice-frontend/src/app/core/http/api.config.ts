@@ -8,7 +8,8 @@ export const API_CONFIG = {
       refresh: '/api/v1/auth/refresh',
       logout: '/api/v1/auth/logout',
       profile: '/api/v1/auth/profile',
-      changePassword: '/api/v1/auth/change-password'
+      changePassword: '/api/v1/auth/change-password',
+      resolveTenants: '/api/v1/auth/resolve-tenants'
     },
     users: {
       list: '/api/users',

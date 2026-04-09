@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using TecAxle.Hrms.Domain.Branches;
 using TecAxle.Hrms.Domain.Common;
 using TecAxle.Hrms.Domain.Employees;
+using TecAxle.Hrms.Domain.Platform;
 using TecAxle.Hrms.Domain.Users;
 using TecAxle.Hrms.Domain.Shifts;
 using TecAxle.Hrms.Domain.Attendance;
@@ -39,7 +40,7 @@ using TecAxle.Hrms.Domain.Departments;
 namespace TecAxle.Hrms.Application.Abstractions;
 
 /// <summary>
-/// Database context abstraction for the Time Attendance System Application layer.
+/// Database context abstraction for the TecAxle HRMS Application layer.
 /// Provides access to all domain entities through Entity Framework DbSets
 /// while maintaining clean architecture separation between Application and Infrastructure layers.
 /// </summary>
@@ -710,6 +711,8 @@ public interface IApplicationDbContext
     /// </summary>
     /// <value>DbSet for querying and managing Tenant entities</value>
     DbSet<Tenant> Tenants { get; }
+    DbSet<TenantUserEmail> TenantUserEmails { get; }
+    DbSet<PlatformUser> PlatformUsers { get; }
 
     // Subscription & Entitlements
     DbSet<SubscriptionPlan> SubscriptionPlans { get; }

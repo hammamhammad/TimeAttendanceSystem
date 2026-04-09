@@ -2,7 +2,7 @@
 
 ## 4.1 Overview
 
-The Time & Attendance module is the core of the ClockN system. It automates daily attendance record generation, tracks employee check-in/check-out transactions, calculates working hours, overtime, late minutes, and early departures, and integrates with shifts, holidays, and leave management.
+The Time & Attendance module is the core of the TecAxle HRMS system. It automates daily attendance record generation, tracks employee check-in/check-out transactions, calculates working hours, overtime, late minutes, and early departures, and integrates with shifts, holidays, and leave management.
 
 ## 4.2 Features
 

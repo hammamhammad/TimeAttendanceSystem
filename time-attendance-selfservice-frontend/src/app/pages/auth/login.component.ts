@@ -39,7 +39,7 @@ import { FormFieldComponent } from '../../shared/ui/form-field/form-field.compon
  * {
  *   path: 'login',
  *   component: LoginComponent,
- *   title: 'Login - Time Attendance System'
+ *   title: 'Login - TecAxle HRMS'
  * }
  * ```
  */
@@ -77,7 +77,7 @@ export class LoginComponent {
   ) {
     // Initialize reactive form with validation rules
     this.loginForm = this.fb.group({
-      username: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
       rememberMe: [false]
     });
@@ -167,35 +167,27 @@ export class LoginComponent {
         console.error('Login failed:', error);
         this.notificationService.error(
           this.t('auth.invalid_credentials'),
-          'Please check your username and password'
+          'Please check your email and password'
         );
       }
     });
   }
 
   /**
-   * Gets strongly-typed reference to username form control.
+   * Gets strongly-typed reference to email form control.
    * Provides type safety and convenient access for validation and value binding.
-   * 
-   * @returns FormControl instance for username input
-   * 
+   *
+   * @returns FormControl instance for email input
+   *
    * @remarks
    * Used for:
    * - Template binding and validation display
    * - Accessing control state (valid, invalid, touched, dirty)
    * - Getting current value and validation errors
    * - Programmatic control manipulation if needed
-   * 
-   * @example
-   * ```html
-   * <input [formControl]="usernameControl" />
-   * <div *ngIf="usernameControl.invalid && usernameControl.touched">
-   *   Username is required
-   * </div>
-   * ```
    */
-  get usernameControl(): FormControl {
-    return this.loginForm.get('username') as FormControl;
+  get emailControl(): FormControl {
+    return this.loginForm.get('email') as FormControl;
   }
 
   /**

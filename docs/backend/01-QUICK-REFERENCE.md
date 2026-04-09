@@ -1,6 +1,6 @@
 # Backend Quick Reference Guide
 
-**Time Attendance System - Developer Cheat Sheet**
+**TecAxle HRMS - Developer Cheat Sheet**
 
 This is a condensed quick reference for developers who need immediate access to common patterns, code snippets, and frequently used commands.
 
@@ -11,7 +11,7 @@ This is a condensed quick reference for developers who need immediate access to 
 ### Running the Backend
 ```bash
 # Navigate to API project
-cd src/Api/TimeAttendanceSystem.Api
+cd src/Api/TecAxle.Hrms.Api
 
 # Run the application
 dotnet run
@@ -24,16 +24,16 @@ dotnet watch run
 ### Database Operations
 ```bash
 # Create a new migration
-dotnet ef migrations add MigrationName --startup-project "../../Api/TimeAttendanceSystem.Api" --context TimeAttendanceDbContext --output-dir Persistence/PostgreSql/Migrations
+dotnet ef migrations add MigrationName --startup-project "../../Api/TecAxle.Hrms.Api" --context TecAxleDbContext --output-dir Persistence/PostgreSql/Migrations
 
 # Apply migrations
-dotnet ef database update --startup-project "../../Api/TimeAttendanceSystem.Api" --context TimeAttendanceDbContext
+dotnet ef database update --startup-project "../../Api/TecAxle.Hrms.Api" --context TecAxleDbContext
 
 # Drop database (development only)
-dotnet ef database drop --startup-project "../../Api/TimeAttendanceSystem.Api" --context TimeAttendanceDbContext --force
+dotnet ef database drop --startup-project "../../Api/TecAxle.Hrms.Api" --context TecAxleDbContext --force
 
 # Generate SQL script from migrations
-dotnet ef migrations script --startup-project "../../Api/TimeAttendanceSystem.Api" --context TimeAttendanceDbContext --output migration.sql
+dotnet ef migrations script --startup-project "../../Api/TecAxle.Hrms.Api" --context TecAxleDbContext --output migration.sql
 ```
 
 ### Build & Test
@@ -42,7 +42,7 @@ dotnet ef migrations script --startup-project "../../Api/TimeAttendanceSystem.Ap
 dotnet build
 
 # Build specific project
-dotnet build src/Api/TimeAttendanceSystem.Api
+dotnet build src/Api/TecAxle.Hrms.Api
 
 # Run tests
 dotnet test
@@ -61,9 +61,9 @@ dotnet clean
 
 ```csharp
 using MediatR;
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Application.{Feature}.Commands.{Action}{Entity};
+namespace TecAxle.Hrms.Application.{Feature}.Commands.{Action}{Entity};
 
 public record {Action}{Entity}Command(
     // Required parameters
@@ -87,11 +87,11 @@ public record CreateEmployeeCommand(
 
 ```csharp
 using MediatR;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Common;
-using TimeAttendanceSystem.Domain.{Entity};
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.{Entity};
 
-namespace TimeAttendanceSystem.Application.{Feature}.Commands.{Action}{Entity};
+namespace TecAxle.Hrms.Application.{Feature}.Commands.{Action}{Entity};
 
 public class {Action}{Entity}CommandHandler : BaseHandler<{Action}{Entity}Command, Result<long>>
 {
@@ -140,7 +140,7 @@ public class {Action}{Entity}CommandHandler : BaseHandler<{Action}{Entity}Comman
 ```csharp
 using FluentValidation;
 
-namespace TimeAttendanceSystem.Application.{Feature}.Commands.{Action}{Entity};
+namespace TecAxle.Hrms.Application.{Feature}.Commands.{Action}{Entity};
 
 public class {Action}{Entity}CommandValidator : AbstractValidator<{Action}{Entity}Command>
 {
@@ -179,9 +179,9 @@ public class {Action}{Entity}CommandValidator : AbstractValidator<{Action}{Entit
 
 ```csharp
 using MediatR;
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Application.{Feature}.Queries.Get{Entity}By{Criteria};
+namespace TecAxle.Hrms.Application.{Feature}.Queries.Get{Entity}By{Criteria};
 
 public record Get{Entity}By{Criteria}Query(
     long Id
@@ -198,10 +198,10 @@ public record GetEmployeeByIdQuery(long Id) : IRequest<Result<EmployeeDto>>;
 ```csharp
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TimeAttendanceSystem.Application.Common;
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Application.{Feature}.Queries.Get{Entity}By{Criteria};
+namespace TecAxle.Hrms.Application.{Feature}.Queries.Get{Entity}By{Criteria};
 
 public class Get{Entity}By{Criteria}QueryHandler : BaseHandler<Get{Entity}By{Criteria}Query, Result<{Entity}Dto>>
 {
@@ -242,7 +242,7 @@ public class Get{Entity}By{Criteria}QueryHandler : BaseHandler<Get{Entity}By{Cri
 **File**: `Application/{Feature}/Queries/Get{Entity}By{Criteria}/{Entity}Dto.cs`
 
 ```csharp
-namespace TimeAttendanceSystem.Application.{Feature}.Queries.Get{Entity}By{Criteria};
+namespace TecAxle.Hrms.Application.{Feature}.Queries.Get{Entity}By{Criteria};
 
 public class {Entity}Dto
 {
@@ -273,10 +273,10 @@ public class BranchDto
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TimeAttendanceSystem.Application.{Feature}.Commands.{Action}{Entity};
-using TimeAttendanceSystem.Application.{Feature}.Queries.Get{Entity}By{Criteria};
+using TecAxle.Hrms.Application.{Feature}.Commands.{Action}{Entity};
+using TecAxle.Hrms.Application.{Feature}.Queries.Get{Entity}By{Criteria};
 
-namespace TimeAttendanceSystem.Api.Controllers;
+namespace TecAxle.Hrms.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -364,9 +364,9 @@ public class {Entities}Controller : ControllerBase
 **File**: `Domain/{Entities}/{Entity}.cs`
 
 ```csharp
-using TimeAttendanceSystem.Domain.Common;
+using TecAxle.Hrms.Domain.Common;
 
-namespace TimeAttendanceSystem.Domain.{Entities};
+namespace TecAxle.Hrms.Domain.{Entities};
 
 public class {Entity} : BaseEntity
 {
@@ -402,9 +402,9 @@ public class {Entity} : BaseEntity
 ```csharp
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TimeAttendanceSystem.Domain.{Entities};
+using TecAxle.Hrms.Domain.{Entities};
 
-namespace TimeAttendanceSystem.Infrastructure.Persistence.EntityConfigurations;
+namespace TecAxle.Hrms.Infrastructure.Persistence.EntityConfigurations;
 
 public class {Entity}Configuration : IEntityTypeConfiguration<{Entity}>
 {

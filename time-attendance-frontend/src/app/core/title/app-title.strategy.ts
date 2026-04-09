@@ -16,10 +16,10 @@ export class AppTitleStrategy extends TitleStrategy {
     if (title) {
       // If title is a translation key, translate it
       const translatedTitle = this.i18n.t(title);
-      const finalTitle = `${translatedTitle} | Time Attendance System`;
+      const finalTitle = `${translatedTitle} | TecAxle HRMS`;
       this.title.setTitle(finalTitle);
     } else {
-      this.title.setTitle('Time Attendance System');
+      this.title.setTitle('TecAxle HRMS');
     }
   }
 }

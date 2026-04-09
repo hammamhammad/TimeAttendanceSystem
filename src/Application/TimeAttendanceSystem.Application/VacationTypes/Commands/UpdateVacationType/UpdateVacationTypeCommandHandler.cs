@@ -8,7 +8,7 @@ using TecAxle.Hrms.Application.Abstractions;
 namespace TecAxle.Hrms.Application.VacationTypes.Commands.UpdateVacationType;
 
 /// <summary>
-/// Command handler for updating existing vacation types in the Time Attendance System.
+/// Command handler for updating existing vacation types in the TecAxle HRMS.
 /// Implements comprehensive validation, business rule enforcement, and multi-tenant data isolation
 /// for enterprise-grade vacation policy updates with audit trail generation and concurrency control.
 /// </summary>

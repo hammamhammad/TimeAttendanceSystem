@@ -1,58 +1,86 @@
+using System.Text.RegularExpressions;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Application.Common;
-using TecAxle.Hrms.Domain.Configuration;
+using TecAxle.Hrms.Application.Subscriptions.Commands.AssignPlan;
 using TecAxle.Hrms.Domain.Tenants;
+using MediatR;
 
 namespace TecAxle.Hrms.Application.Tenants.Commands.CreateTenant;
 
-public class CreateTenantCommandHandler : BaseHandler<CreateTenantCommand, Result<long>>
+public class CreateTenantCommandHandler : BaseHandler<CreateTenantCommand, Result<TenantCreationResult>>
 {
-    public CreateTenantCommandHandler(IApplicationDbContext context, ICurrentUser currentUser)
+    private readonly ITenantProvisioningService _provisioningService;
+    private readonly IMediator _mediator;
+    private readonly IValidator<CreateTenantCommand> _validator;
+    private readonly ILogger<CreateTenantCommandHandler> _logger;
+
+    public CreateTenantCommandHandler(
+        IApplicationDbContext context,
+        ICurrentUser currentUser,
+        ITenantProvisioningService provisioningService,
+        IMediator mediator,
+        IValidator<CreateTenantCommand> validator,
+        ILogger<CreateTenantCommandHandler> logger)
         : base(context, currentUser)
     {
+        _provisioningService = provisioningService;
+        _mediator = mediator;
+        _validator = validator;
+        _logger = logger;
     }
 
-    public override async Task<Result<long>> Handle(CreateTenantCommand request, CancellationToken cancellationToken)
+    public override async Task<Result<TenantCreationResult>> Handle(CreateTenantCommand request, CancellationToken cancellationToken)
     {
-        // Validate subdomain uniqueness
-        var subdomainExists = await Context.Tenants
-            .AnyAsync(t => t.Subdomain.ToLower() == request.Subdomain.ToLower() && !t.IsDeleted, cancellationToken);
-
-        if (subdomainExists)
+        // Validate input
+        var validationResult = await _validator.ValidateAsync(request, cancellationToken);
+        if (!validationResult.IsValid)
         {
-            return Result.Failure<long>("A tenant with this subdomain already exists");
+            var errorMessages = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage));
+            return Result.Failure<TenantCreationResult>($"Validation failed: {errorMessages}");
         }
 
-        // Validate custom domain uniqueness if provided
-        if (!string.IsNullOrWhiteSpace(request.CustomDomain))
+        // Resolve subdomain: use provided value or auto-generate from tenant name
+        string subdomain;
+        if (!string.IsNullOrWhiteSpace(request.Subdomain))
         {
-            var domainExists = await Context.Tenants
-                .AnyAsync(t => t.CustomDomain != null && t.CustomDomain.ToLower() == request.CustomDomain.ToLower() && !t.IsDeleted, cancellationToken);
+            subdomain = request.Subdomain.ToLower().Trim();
 
-            if (domainExists)
-            {
-                return Result.Failure<long>("A tenant with this custom domain already exists");
-            }
+            // Validate uniqueness for explicitly provided subdomain
+            var subdomainExists = await Context.Tenants
+                .AnyAsync(t => t.Subdomain.ToLower() == subdomain && !t.IsDeleted, cancellationToken);
+            if (subdomainExists)
+                return Result.Failure<TenantCreationResult>("A tenant with this subdomain already exists");
+        }
+        else
+        {
+            subdomain = await GenerateUniqueSubdomainAsync(request.Name, cancellationToken);
         }
 
-        // Parse status
-        var tenantStatus = TenantStatus.PendingSetup;
-        if (!string.IsNullOrWhiteSpace(request.Status) && Enum.TryParse<TenantStatus>(request.Status, true, out var parsedStatus))
+        // Validate email domain uniqueness to prevent conflicts in TenantUserEmails
+        if (!string.IsNullOrWhiteSpace(request.Email) && request.Email.Contains('@'))
         {
-            tenantStatus = parsedStatus;
+            var emailDomain = request.Email.Split('@')[1].ToLower();
+            var adminEmail = $"tecaxleadmin@{emailDomain}";
+
+            // Check if this admin email already exists in TenantUserEmails (direct conflict)
+            var emailMappingExists = await Context.TenantUserEmails
+                .AnyAsync(tue => tue.Email.ToLower() == adminEmail, cancellationToken);
+            if (emailMappingExists)
+                return Result.Failure<TenantCreationResult>($"A tenant with the email domain '{emailDomain}' already exists. Each tenant must use a unique email domain.");
         }
 
+        // 1. Create tenant record in master DB
         var tenant = new Tenant
         {
-            Subdomain = request.Subdomain.ToLower().Trim(),
+            Subdomain = subdomain,
             Name = request.Name,
             NameAr = request.NameAr,
             LogoUrl = request.LogoUrl,
-            ApiBaseUrl = request.ApiBaseUrl,
-            CustomDomain = request.CustomDomain,
+            ApiBaseUrl = string.Empty,
             IsActive = request.IsActive,
-            DatabaseIdentifier = request.DatabaseIdentifier,
             CompanyRegistrationNumber = request.CompanyRegistrationNumber,
             TaxIdentificationNumber = request.TaxIdentificationNumber,
             Industry = request.Industry,
@@ -65,46 +93,98 @@ public class CreateTenantCommandHandler : BaseHandler<CreateTenantCommand, Resul
             DefaultTimezone = request.DefaultTimezone,
             DefaultLanguage = request.DefaultLanguage,
             DefaultCurrency = request.DefaultCurrency,
-            Status = tenantStatus,
+            Status = TenantStatus.PendingSetup,
             CreatedAtUtc = DateTime.UtcNow,
             CreatedBy = CurrentUser.Username ?? "SYSTEM"
         };
 
-        // If status is Trial, set trial dates
-        if (tenantStatus == TenantStatus.Trial)
-        {
-            tenant.TrialStartDate = DateTime.UtcNow;
-            tenant.TrialEndDate = DateTime.UtcNow.AddDays(14);
-        }
-
         Context.Tenants.Add(tenant);
         await Context.SaveChangesAsync(cancellationToken);
 
-        // Auto-create default TenantSettings
-        var settings = new TenantSettings
-        {
-            TenantId = tenant.Id,
-            CreatedBy = CurrentUser.Username ?? "SYSTEM"
-        };
-        Context.TenantSettings.Add(settings);
+        // 2. Auto-provision dedicated database (creates DB, applies migrations, seeds admin user)
+        var provisionResult = await _provisioningService.ProvisionTenantAsync(tenant.Id, cancellationToken);
+        if (!provisionResult.Success)
+            return Result.Failure<TenantCreationResult>($"Tenant created but provisioning failed: {provisionResult.ErrorMessage}");
 
-        // Initialize setup tracking steps
-        var setupSteps = new List<SetupStep>
-        {
-            new() { TenantId = tenant.Id, StepKey = "company_info", Category = "Organization", IsRequired = true, SortOrder = 1, CreatedBy = "SYSTEM" },
-            new() { TenantId = tenant.Id, StepKey = "branches", Category = "Organization", IsRequired = true, SortOrder = 2, CreatedBy = "SYSTEM" },
-            new() { TenantId = tenant.Id, StepKey = "departments", Category = "Organization", IsRequired = true, SortOrder = 3, CreatedBy = "SYSTEM" },
-            new() { TenantId = tenant.Id, StepKey = "shifts", Category = "TimeAttendance", IsRequired = true, SortOrder = 4, CreatedBy = "SYSTEM" },
-            new() { TenantId = tenant.Id, StepKey = "vacation_types", Category = "Leave", IsRequired = true, SortOrder = 5, CreatedBy = "SYSTEM" },
-            new() { TenantId = tenant.Id, StepKey = "excuse_policies", Category = "Leave", IsRequired = false, SortOrder = 6, CreatedBy = "SYSTEM" },
-            new() { TenantId = tenant.Id, StepKey = "workflows", Category = "TimeAttendance", IsRequired = true, SortOrder = 7, CreatedBy = "SYSTEM" },
-            new() { TenantId = tenant.Id, StepKey = "employees", Category = "Organization", IsRequired = true, SortOrder = 8, CreatedBy = "SYSTEM" },
-            new() { TenantId = tenant.Id, StepKey = "payroll", Category = "Payroll", IsRequired = false, SortOrder = 9, CreatedBy = "SYSTEM" },
-        };
-        Context.SetupSteps.AddRange(setupSteps);
-
+        // 3. Update status to Active — tenant is provisioned and usable
+        tenant.Status = TenantStatus.Active;
         await Context.SaveChangesAsync(cancellationToken);
 
-        return Result.Success(tenant.Id);
+        // 4. Auto-assign subscription plan if specified (non-fatal — tenant is already provisioned)
+        string? planWarning = null;
+        if (request.PlanId.HasValue)
+        {
+            var billingCycle = request.BillingCycle ?? "Monthly";
+            try
+            {
+                var assignResult = await _mediator.Send(
+                    new AssignPlanCommand(tenant.Id, request.PlanId.Value, billingCycle, "Auto-assigned during tenant creation"),
+                    cancellationToken);
+
+                if (assignResult.IsFailure)
+                {
+                    planWarning = $"Plan assignment failed: {assignResult.Error}";
+                    _logger.LogWarning("Tenant {TenantId} provisioned but plan assignment failed: {Error}", tenant.Id, assignResult.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                planWarning = $"Plan assignment failed: {ex.Message}";
+                _logger.LogWarning(ex, "Tenant {TenantId} provisioned but plan assignment threw exception", tenant.Id);
+            }
+        }
+
+        return Result.Success(new TenantCreationResult(tenant.Id, planWarning));
+    }
+
+    private async Task<string> GenerateUniqueSubdomainAsync(string tenantName, CancellationToken cancellationToken)
+    {
+        var slug = GenerateSlug(tenantName);
+
+        // Check if base slug is available
+        var exists = await Context.Tenants
+            .AnyAsync(t => t.Subdomain == slug && !t.IsDeleted, cancellationToken);
+        if (!exists)
+            return slug;
+
+        // Append numeric suffix to resolve collision
+        for (int i = 2; i <= 100; i++)
+        {
+            var candidate = $"{slug}-{i}";
+            exists = await Context.Tenants
+                .AnyAsync(t => t.Subdomain == candidate && !t.IsDeleted, cancellationToken);
+            if (!exists)
+                return candidate;
+        }
+
+        // Fallback: use slug with timestamp
+        return $"{slug}-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+    }
+
+    private static string GenerateSlug(string name)
+    {
+        // Lowercase and replace spaces/underscores with hyphens
+        var slug = name.ToLowerInvariant()
+            .Replace(' ', '-')
+            .Replace('_', '-');
+
+        // Remove all characters that are not lowercase letters, digits, or hyphens
+        slug = Regex.Replace(slug, @"[^a-z0-9-]", "");
+
+        // Collapse consecutive hyphens
+        slug = Regex.Replace(slug, @"-{2,}", "-");
+
+        // Trim leading/trailing hyphens
+        slug = slug.Trim('-');
+
+        // Handle empty result (e.g., purely non-ASCII name like Arabic)
+        if (string.IsNullOrEmpty(slug) || slug.Length < 3)
+            slug = "tenant";
+
+        // Truncate to 50 characters
+        if (slug.Length > 50)
+            slug = slug[..50].TrimEnd('-');
+
+        return slug;
     }
 }

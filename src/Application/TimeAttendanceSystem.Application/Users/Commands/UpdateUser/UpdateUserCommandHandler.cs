@@ -25,10 +25,10 @@ public class UpdateUserCommandHandler : BaseHandler<UpdateUserCommand, Result<Un
             return Result.Failure<Unit>("User not found");
         }
 
-        // Prevent modification of the systemadmin user only
-        if (user.Username.Equals("systemadmin", StringComparison.OrdinalIgnoreCase))
+        // Prevent modification of system-provisioned users (tecaxleadmin)
+        if (user.IsSystemUser)
         {
-            return Result.Failure<Unit>("Cannot modify the systemadmin user");
+            return Result.Failure<Unit>("Cannot modify a system-provisioned user");
         }
 
         // Check if email is already taken by another user

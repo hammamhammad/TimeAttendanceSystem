@@ -31,6 +31,9 @@ public class CreateBranchCommandHandler : BaseHandler<CreateBranchCommand, Resul
             Name = request.Name,
             TimeZone = request.TimeZone,
             IsActive = request.IsActive,
+            Latitude = request.Latitude,
+            Longitude = request.Longitude,
+            GeofenceRadiusMeters = request.GeofenceRadiusMeters,
             CreatedAtUtc = DateTime.UtcNow,
             CreatedBy = CurrentUser.Username
         };

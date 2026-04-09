@@ -12,7 +12,7 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.Repositories;
 /// </summary>
 public class SettingsRepository : ISettingsRepository
 {
-    private readonly TimeAttendanceDbContext _context;
+    private readonly TecAxleDbContext _context;
     private readonly IMemoryCache _cache;
     private readonly ILogger<SettingsRepository> _logger;
 
@@ -22,7 +22,7 @@ public class SettingsRepository : ISettingsRepository
     private const int CACHE_EXPIRY_MINUTES = 30;
 
     public SettingsRepository(
-        TimeAttendanceDbContext context,
+        TecAxleDbContext context,
         IMemoryCache cache,
         ILogger<SettingsRepository> logger)
     {

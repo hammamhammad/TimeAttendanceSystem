@@ -114,7 +114,7 @@ time-attendance-frontend/src/app/pages/approvals/
 **Files to Modify:**
 ```
 Backend:
-src/Application/TimeAttendanceSystem.Application/Vacations/
+src/Application/TecAxle.Hrms.Application/Vacations/
 ├── Commands/CreateEmployeeVacation/CreateEmployeeVacationCommandHandler.cs
 ├── Commands/UpdateEmployeeVacation/UpdateEmployeeVacationCommandHandler.cs
 └── EventHandlers/WorkflowCompletedEventHandler.cs (NEW)
@@ -148,7 +148,7 @@ time-attendance-frontend/src/app/pages/employee-vacations/
 **Files to Modify:**
 ```
 Backend:
-src/Application/TimeAttendanceSystem.Application/Excuses/
+src/Application/TecAxle.Hrms.Application/Excuses/
 ├── Commands/CreateEmployeeExcuse/CreateEmployeeExcuseCommandHandler.cs
 └── Commands/UpdateEmployeeExcuse/UpdateEmployeeExcuseCommandHandler.cs
 
@@ -179,7 +179,7 @@ time-attendance-frontend/src/app/pages/employee-excuses/
 **Files to Modify:**
 ```
 Backend:
-src/Application/TimeAttendanceSystem.Application/RemoteWork/
+src/Application/TecAxle.Hrms.Application/RemoteWork/
 ├── Commands/CreateRemoteWorkRequest/CreateRemoteWorkRequestCommandHandler.cs
 └── Commands/ApproveRemoteWorkRequest/ApproveRemoteWorkRequestCommandHandler.cs (may need refactor)
 
@@ -218,7 +218,7 @@ time-attendance-frontend/src/app/pages/remote-work/
 **Files to Modify/Create:**
 ```
 Backend:
-src/Application/TimeAttendanceSystem.Application/Workflows/
+src/Application/TecAxle.Hrms.Application/Workflows/
 ├── Services/WorkflowEngine.cs (enhance)
 ├── Events/WorkflowStartedEvent.cs (NEW)
 ├── Events/StepAssignedEvent.cs (NEW)

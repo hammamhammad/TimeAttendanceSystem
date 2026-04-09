@@ -3,7 +3,7 @@ using System.Text.Json;
 using Npgsql;
 
 var baseUrl = "http://localhost:5099/api/v1";
-var connStr = "Host=localhost;Port=5432;Database=TimeAttendanceSystem;Username=postgres;Password=P@ssw0rd@3213";
+var connStr = "Host=localhost;Port=5432;Database=TecAxleHRMS;Username=postgres;Password=P@ssw0rd@3213";
 
 Console.WriteLine("Testing different date formats for attendance generation");
 Console.WriteLine();

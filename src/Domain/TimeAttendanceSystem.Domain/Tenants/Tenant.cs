@@ -1,4 +1,3 @@
-using TecAxle.Hrms.Domain.Branches;
 using TecAxle.Hrms.Domain.Common;
 
 namespace TecAxle.Hrms.Domain.Tenants;
@@ -51,6 +50,26 @@ public class Tenant : BaseEntity
     /// Database connection string or identifier for database-per-tenant isolation.
     /// </summary>
     public string? DatabaseIdentifier { get; set; }
+
+    /// <summary>
+    /// AES-256 encrypted connection string for this tenant's dedicated database.
+    /// </summary>
+    public string? EncryptedConnectionString { get; set; }
+
+    /// <summary>
+    /// Name of the tenant's dedicated database (e.g., "ta_tenant_42").
+    /// </summary>
+    public string? DatabaseName { get; set; }
+
+    /// <summary>
+    /// When the tenant's dedicated database was created.
+    /// </summary>
+    public DateTime? DatabaseCreatedAt { get; set; }
+
+    /// <summary>
+    /// The last EF Core migration version applied to this tenant's database.
+    /// </summary>
+    public string? DatabaseMigrationVersion { get; set; }
 
     // ── Company Information ───────────────────────────────────────
 
@@ -133,10 +152,4 @@ public class Tenant : BaseEntity
     /// </summary>
     public DateTime? TrialEndDate { get; set; }
 
-    // ── Navigation Properties ─────────────────────────────────────
-
-    /// <summary>
-    /// Branches belonging to this tenant.
-    /// </summary>
-    public ICollection<Branch> Branches { get; set; } = new List<Branch>();
 }

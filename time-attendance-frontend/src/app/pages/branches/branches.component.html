@@ -30,13 +30,4 @@
     (selectionChange)="onSelectionChange($event)"
     (sortChange)="onSortChange($event)">
   </app-branch-table>
-
-  <!-- Branch Form Modal Component -->
-  <app-branch-form-modal
-    #branchFormModal
-    [show]="showBranchForm()"
-    [branch]="selectedBranch()"
-    (close)="onCloseBranchForm()"
-    (save)="onBranchSave($event)">
-  </app-branch-form-modal>
 </div>

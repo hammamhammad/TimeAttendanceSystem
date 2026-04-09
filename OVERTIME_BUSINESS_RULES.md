@@ -1,7 +1,7 @@
 # Overtime Configuration Business Rules
 
 ## Overview
-This document outlines the business rules and field descriptions for the overtime configuration system in the Time Attendance System. These rules define how overtime calculations are performed and what each configuration parameter controls.
+This document outlines the business rules and field descriptions for the overtime configuration system in the TecAxle HRMS. These rules define how overtime calculations are performed and what each configuration parameter controls.
 
 ## Configuration Fields and Business Rules
 

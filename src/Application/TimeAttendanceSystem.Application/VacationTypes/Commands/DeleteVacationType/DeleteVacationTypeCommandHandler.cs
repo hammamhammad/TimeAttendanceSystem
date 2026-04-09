@@ -6,7 +6,7 @@ using TecAxle.Hrms.Application.Abstractions;
 namespace TecAxle.Hrms.Application.VacationTypes.Commands.DeleteVacationType;
 
 /// <summary>
-/// Command handler for soft-deleting vacation types in the Time Attendance System.
+/// Command handler for soft-deleting vacation types in the TecAxle HRMS.
 /// Implements comprehensive validation, business rule enforcement, and referential integrity checks
 /// for safe vacation type deletion with audit trail generation and data preservation.
 /// </summary>

@@ -11,7 +11,7 @@ using TecAxle.Hrms.Infrastructure.Persistence;
 
 namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
 {
-    [DbContext(typeof(TimeAttendanceDbContext))]
+    [DbContext(typeof(TecAxleDbContext))]
     [Migration("20251102171735_AddIsActiveToEmployee")]
     partial class AddIsActiveToEmployee
     {

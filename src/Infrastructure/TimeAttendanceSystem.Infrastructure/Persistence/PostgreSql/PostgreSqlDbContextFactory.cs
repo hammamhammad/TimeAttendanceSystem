@@ -17,20 +17,20 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql;
 /// dotnet ef migrations add MigrationName --project src/Infrastructure/TecAxle.Hrms.Infrastructure --startup-project src/Api/TecAxle.Hrms.Api --output-dir Persistence/PostgreSql/Migrations
 /// dotnet ef database update --project src/Infrastructure/TecAxle.Hrms.Infrastructure --startup-project src/Api/TecAxle.Hrms.Api
 /// </remarks>
-public class PostgreSqlDbContextFactory : IDesignTimeDbContextFactory<TimeAttendanceDbContext>
+public class PostgreSqlDbContextFactory : IDesignTimeDbContextFactory<TecAxleDbContext>
 {
-    public TimeAttendanceDbContext CreateDbContext(string[] args)
+    public TecAxleDbContext CreateDbContext(string[] args)
     {
         // Build configuration to read connection string
         var configuration = new ConfigurationBuilder()
-            .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../../Api/TecAxle.Hrms.Api"))
+            .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../../Api/TimeAttendanceSystem.Api"))
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
             .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
             .AddEnvironmentVariables()
             .Build();
 
         // Configure DbContext options for PostgreSQL
-        var optionsBuilder = new DbContextOptionsBuilder<TimeAttendanceDbContext>();
+        var optionsBuilder = new DbContextOptionsBuilder<TecAxleDbContext>();
 
         var connectionString = configuration.GetConnectionString("PostgreSqlConnection")
             ?? configuration.GetConnectionString("DefaultConnection");
@@ -44,10 +44,10 @@ public class PostgreSqlDbContextFactory : IDesignTimeDbContextFactory<TimeAttend
 
         optionsBuilder.UseNpgsql(connectionString, npgsqlOptions =>
         {
-            npgsqlOptions.MigrationsAssembly(typeof(TimeAttendanceDbContext).Assembly.FullName);
+            npgsqlOptions.MigrationsAssembly(typeof(TecAxleDbContext).Assembly.FullName);
             npgsqlOptions.MigrationsHistoryTable("__EFMigrationsHistory");
         });
 
-        return new TimeAttendanceDbContext(optionsBuilder.Options);
+        return new TecAxleDbContext(optionsBuilder.Options);
     }
 }

@@ -6,7 +6,7 @@ using TecAxle.Hrms.Domain.Modules;
 namespace TecAxle.Hrms.Application.VacationTypes.Commands.ToggleVacationTypeStatus;
 
 /// <summary>
-/// CQRS command for toggling the active status of a vacation type in the Time Attendance System.
+/// CQRS command for toggling the active status of a vacation type in the TecAxle HRMS.
 /// Enables administrators to activate or deactivate vacation types based on organizational needs
 /// while maintaining data integrity and ensuring proper business rule enforcement.
 /// </summary>

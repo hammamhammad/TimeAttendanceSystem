@@ -49,7 +49,7 @@ export class MenuService {
         { path: '/my-attendance', titleKey: 'portal.my_attendance', icon: 'bi bi-calendar-check', module: 'TimeAttendance' },
         { path: '/attendance-corrections', titleKey: 'portal.attendance_corrections', icon: 'bi bi-pencil-square', module: 'TimeAttendance' },
         { path: '/shift-swap-requests', titleKey: 'portal.shift_swaps.title', icon: 'bi bi-arrow-left-right', module: 'ShiftSwaps' },
-        { path: '/my-on-call', titleKey: 'portal.on_call.title', icon: 'bi bi-telephone', module: 'TimeAttendance' },
+        { path: '/my-on-call', titleKey: 'portal.on_call.title', icon: 'bi bi-telephone', module: 'ShiftSwaps' },
         { path: '/my-timesheets', titleKey: 'portal.timesheets.title', icon: 'bi bi-clock-history', module: 'Timesheets' }
       ]
     },

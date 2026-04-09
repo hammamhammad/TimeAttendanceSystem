@@ -3,6 +3,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { TenantService } from '../services/tenant.service';
 import { TenantDetailDto, SubscriptionPlanDto, TenantSubscriptionDto } from '../models/tenant.model';
+import { environment } from '../../../../environments/environment';
 import { NotificationService } from '../../../core/notifications/notification.service';
 import { ConfirmationService } from '../../../core/confirmation/confirmation.service';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
@@ -71,13 +72,22 @@ export class ViewTenantComponent implements OnInit {
     const t = this.tenant();
     if (!t) return [];
     return [
-      { label: 'Subdomain', value: t.subdomain, copyable: true },
       { label: 'Company Name', value: t.name },
       { label: 'Company Name (Arabic)', value: t.nameAr || '-' },
-      { label: 'API Base URL', value: t.apiBaseUrl, copyable: true },
-      { label: 'Custom Domain', value: t.customDomain || '-' },
       { label: 'Status', value: t.status, type: 'badge', badgeVariant: this.getStatusBadgeVariant(t.status) },
+      { label: 'Tenant Admin Email', value: t.email && t.email.includes('@') ? `tecaxleadmin@${t.email.split('@')[1]}` : '-', copyable: true },
       { label: 'Created', value: t.createdAtUtc, type: 'date' }
+    ];
+  });
+
+  // Database status info
+  databaseInfoItems = computed<DefinitionItem[]>(() => {
+    const t = this.tenant();
+    if (!t) return [];
+    return [
+      { label: 'Database Name', value: t.databaseName || '-', copyable: !!t.databaseName },
+      { label: 'Database Created At', value: t.databaseCreatedAt || '-', type: t.databaseCreatedAt ? 'date' as const : 'text' as const },
+      { label: 'Provisioning Status', value: t.databaseName ? 'Provisioned' : 'Pending', type: 'badge', badgeVariant: t.databaseName ? 'success' as const : 'warning' as const }
     ];
   });
 
@@ -388,5 +398,19 @@ export class ViewTenantComponent implements OnInit {
 
   formatLimitKey(key: string): string {
     return key.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase()).trim();
+  }
+
+  getLogoUrl(url: string): string {
+    if (url.startsWith('http')) return url;
+    return `${environment.apiUrl}${url}`;
+  }
+
+  onLogoError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.style.display = 'none';
+    const placeholder = img.parentElement?.querySelector('.tenant-logo-placeholder');
+    if (placeholder) {
+      (placeholder as HTMLElement).style.display = 'flex';
+    }
   }
 }

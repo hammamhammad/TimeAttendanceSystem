@@ -1,6 +1,8 @@
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Common.Behaviors;
 using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.Settings.Commands.ActivateOvertimeConfiguration;
 
@@ -9,6 +11,7 @@ namespace TecAxle.Hrms.Application.Settings.Commands.ActivateOvertimeConfigurati
 /// Makes the specified configuration the active one and deactivates others.
 /// </summary>
 /// <param name="Id">Unique identifier of the overtime configuration to activate</param>
+[RequiresModule(SystemModule.TimeAttendance)]
 public record ActivateOvertimeConfigurationCommand(long Id);
 
 /// <summary>

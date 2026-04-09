@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "Time Attendance System",
+    "title": "TecAxle HRMS",
     "loading": "Loading...",
     "save": "Save",
     "cancel": "Cancel",
@@ -44,7 +44,7 @@
     "email": "Email",
     "remember_me": "Remember me",
     "forgot_password": "Forgot password?",
-    "invalid_credentials": "Invalid username or password",
+    "invalid_credentials": "Invalid email or password",
     "login_success": "Login successful",
     "logout_success": "Logout successful",
     "session_expired": "Your session has expired. Please login again.",

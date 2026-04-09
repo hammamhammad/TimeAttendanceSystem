@@ -4,10 +4,10 @@
 
 The system follows Clean Architecture with MediatR CQRS. Key patterns discovered:
 
-- **Domain Layer**: Entities in `src/Domain/TimeAttendanceSystem.Domain/{Module}/` inheriting `BaseEntity` (Id, CreatedAtUtc, CreatedBy, ModifiedAtUtc, ModifiedBy, IsDeleted, RowVersion)
-- **Application Layer**: Feature folders at `src/Application/TimeAttendanceSystem.Application/{Feature}/Commands/{Action}/` and `Queries/{Action}/` with `ICommand<Result<T>>` records and `BaseHandler<TRequest, TResponse>` handler classes
-- **API Layer**: Controllers at `src/Api/TimeAttendanceSystem.Api/Controllers/` using MediatR injection, `[ApiController]`, `[Route("api/v1/{resource}")]`, `[Authorize]`
-- **Infrastructure**: EF configurations at `src/Infrastructure/TimeAttendanceSystem.Infrastructure/Persistence/PostgreSql/Configurations/`, background jobs via Coravel `IInvocable` at `BackgroundJobs/`
+- **Domain Layer**: Entities in `src/Domain/TecAxle.Hrms.Domain/{Module}/` inheriting `BaseEntity` (Id, CreatedAtUtc, CreatedBy, ModifiedAtUtc, ModifiedBy, IsDeleted, RowVersion)
+- **Application Layer**: Feature folders at `src/Application/TecAxle.Hrms.Application/{Feature}/Commands/{Action}/` and `Queries/{Action}/` with `ICommand<Result<T>>` records and `BaseHandler<TRequest, TResponse>` handler classes
+- **API Layer**: Controllers at `src/Api/TecAxle.Hrms.Api/Controllers/` using MediatR injection, `[ApiController]`, `[Route("api/v1/{resource}")]`, `[Authorize]`
+- **Infrastructure**: EF configurations at `src/Infrastructure/TecAxle.Hrms.Infrastructure/Persistence/PostgreSql/Configurations/`, background jobs via Coravel `IInvocable` at `BackgroundJobs/`
 - **Workflow Integration**: Entities carry `long? WorkflowInstanceId` and `long? SubmittedByUserId`; enum `WorkflowEntityType` provides routing
 - **Notification**: Uses `IInAppNotificationService.SendNotificationAsync(CreateNotificationRequest)` with bilingual TitleEn/TitleAr/MessageEn/MessageAr
 - **Permissions**: `PermissionResources` static class with const strings; `ResourceDescriptions` and `ResourceIcons` dictionaries
@@ -17,7 +17,7 @@ The system follows Clean Architecture with MediatR CQRS. Key patterns discovered
 
 ---
 
-## 1. NEW ENUMS (in `src/Domain/TimeAttendanceSystem.Domain/Common/Enums.cs`)
+## 1. NEW ENUMS (in `src/Domain/TecAxle.Hrms.Domain/Common/Enums.cs`)
 
 ```csharp
 // ============================================================
@@ -291,12 +291,12 @@ public const string Feedback360 = "feedback360";
 
 ### Module 2.1: Recruitment & Hiring
 
-All entities go in `src/Domain/TimeAttendanceSystem.Domain/Recruitment/`.
+All entities go in `src/Domain/TecAxle.Hrms.Domain/Recruitment/`.
 
 #### 4.1.1 JobRequisition
 
 ```csharp
-namespace TimeAttendanceSystem.Domain.Recruitment;
+namespace TecAxle.Hrms.Domain.Recruitment;
 
 public class JobRequisition : BaseEntity
 {
@@ -545,12 +545,12 @@ public class OfferLetter : BaseEntity
 
 ### Module 2.2: Onboarding
 
-All entities go in `src/Domain/TimeAttendanceSystem.Domain/Onboarding/`.
+All entities go in `src/Domain/TecAxle.Hrms.Domain/Onboarding/`.
 
 #### 4.2.1 OnboardingTemplate
 
 ```csharp
-namespace TimeAttendanceSystem.Domain.Onboarding;
+namespace TecAxle.Hrms.Domain.Onboarding;
 
 public class OnboardingTemplate : BaseEntity
 {
@@ -681,12 +681,12 @@ public class OnboardingDocument : BaseEntity
 
 ### Module 2.3: Performance Management
 
-All entities go in `src/Domain/TimeAttendanceSystem.Domain/Performance/`.
+All entities go in `src/Domain/TecAxle.Hrms.Domain/Performance/`.
 
 #### 4.3.1 PerformanceReviewCycle
 
 ```csharp
-namespace TimeAttendanceSystem.Domain.Performance;
+namespace TecAxle.Hrms.Domain.Performance;
 
 public class PerformanceReviewCycle : BaseEntity
 {
@@ -937,7 +937,7 @@ public class Feedback360Response : BaseEntity
 
 ### 5.1 IApplicationDbContext additions
 
-Add to `src/Application/TimeAttendanceSystem.Application/Abstractions/IApplicationDbContext.cs`:
+Add to `src/Application/TecAxle.Hrms.Application/Abstractions/IApplicationDbContext.cs`:
 
 ```csharp
 // Phase 2: Recruitment
@@ -990,13 +990,13 @@ public ICollection<PerformanceImprovementPlan> ImprovementPlans { get; set; } = 
 
 Migration name: `AddRecruitmentOnboardingPerformance`
 
-Command: `dotnet ef migrations add AddRecruitmentOnboardingPerformance --project src/Infrastructure/TimeAttendanceSystem.Infrastructure --startup-project src/Api/TimeAttendanceSystem.Api`
+Command: `dotnet ef migrations add AddRecruitmentOnboardingPerformance --project src/Infrastructure/TecAxle.Hrms.Infrastructure --startup-project src/Api/TecAxle.Hrms.Api`
 
 ---
 
 ## 6. EF CONFIGURATIONS
 
-Create one configuration file per entity in `src/Infrastructure/TimeAttendanceSystem.Infrastructure/Persistence/PostgreSql/Configurations/`. Follow the exact pattern from `EmployeeAddressConfiguration.cs`:
+Create one configuration file per entity in `src/Infrastructure/TecAxle.Hrms.Infrastructure/Persistence/PostgreSql/Configurations/`. Follow the exact pattern from `EmployeeAddressConfiguration.cs`:
 
 - `builder.ToTable("TableName")`
 - `builder.HasKey(x => x.Id)`
@@ -1293,25 +1293,25 @@ When PIP completes unsuccessfully:
 
 ### 9.1 InterviewReminderJob
 
-File: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/BackgroundJobs/InterviewReminderJob.cs`
+File: `src/Infrastructure/TecAxle.Hrms.Infrastructure/BackgroundJobs/InterviewReminderJob.cs`
 
 Runs daily at 6:00 AM. Checks for interviews scheduled in next 24 hours. Sends notifications to interviewer(s) and candidate email.
 
 ### 9.2 OfferExpiryJob
 
-File: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/BackgroundJobs/OfferExpiryJob.cs`
+File: `src/Infrastructure/TecAxle.Hrms.Infrastructure/BackgroundJobs/OfferExpiryJob.cs`
 
 Runs daily at 5:00 AM. Checks for offers with `Status = Sent` and `ExpiryDate <= today`. Sets status to `Expired`. Notifies HR.
 
 ### 9.3 OnboardingOverdueTaskJob
 
-File: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/BackgroundJobs/OnboardingOverdueTaskJob.cs`
+File: `src/Infrastructure/TecAxle.Hrms.Infrastructure/BackgroundJobs/OnboardingOverdueTaskJob.cs`
 
 Runs daily at 7:00 AM. Checks for OnboardingTasks with `DueDate < today` and `Status = Pending/InProgress`. Sets status to `Overdue`. Notifies task assignee and HR.
 
 ### 9.4 PerformanceReviewDeadlineJob
 
-File: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/BackgroundJobs/PerformanceReviewDeadlineJob.cs`
+File: `src/Infrastructure/TecAxle.Hrms.Infrastructure/BackgroundJobs/PerformanceReviewDeadlineJob.cs`
 
 Runs daily at 8:00 AM. Checks for:
 - Self-assessment deadlines approaching (7 days, 3 days, 1 day)
@@ -1320,7 +1320,7 @@ Sends reminder notifications.
 
 ### 9.5 Feedback360ExpiryJob
 
-File: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/BackgroundJobs/Feedback360ExpiryJob.cs`
+File: `src/Infrastructure/TecAxle.Hrms.Infrastructure/BackgroundJobs/Feedback360ExpiryJob.cs`
 
 Runs daily at 9:00 AM. Expires feedback requests past deadline. Notifies requesting manager.
 
@@ -1523,8 +1523,8 @@ The `AcceptOfferLetterCommandHandler` is the most complex handler as it orchestr
 ---
 
 ### Critical Files for Implementation
-- `d:/Work/TimeAttendanceSystem/src/Domain/TimeAttendanceSystem.Domain/Common/Enums.cs`
-- `d:/Work/TimeAttendanceSystem/src/Application/TimeAttendanceSystem.Application/Abstractions/IApplicationDbContext.cs`
-- `d:/Work/TimeAttendanceSystem/src/Domain/TimeAttendanceSystem.Domain/Workflows/Enums/WorkflowEntityType.cs`
-- `d:/Work/TimeAttendanceSystem/src/Domain/TimeAttendanceSystem.Domain/Common/PermissionResources.cs`
-- `d:/Work/TimeAttendanceSystem/src/Domain/TimeAttendanceSystem.Domain/Employees/Employee.cs`
+- `d:/Work/TecAxle.Hrms/src/Domain/TecAxle.Hrms.Domain/Common/Enums.cs`
+- `d:/Work/TecAxle.Hrms/src/Application/TecAxle.Hrms.Application/Abstractions/IApplicationDbContext.cs`
+- `d:/Work/TecAxle.Hrms/src/Domain/TecAxle.Hrms.Domain/Workflows/Enums/WorkflowEntityType.cs`
+- `d:/Work/TecAxle.Hrms/src/Domain/TecAxle.Hrms.Domain/Common/PermissionResources.cs`
+- `d:/Work/TecAxle.Hrms/src/Domain/TecAxle.Hrms.Domain/Employees/Employee.cs`

@@ -20,12 +20,12 @@ public class OfferLettersController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
     private readonly ICurrentUser _currentUser;
-    private readonly TimeAttendanceDbContext _dbContext;
+    private readonly TecAxleDbContext _dbContext;
 
     public OfferLettersController(
         IApplicationDbContext context,
         ICurrentUser currentUser,
-        TimeAttendanceDbContext dbContext)
+        TecAxleDbContext dbContext)
     {
         _context = context;
         _currentUser = currentUser;

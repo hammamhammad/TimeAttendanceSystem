@@ -10,7 +10,7 @@ import '../../../core/network/api_client.dart';
 import '../../../shared/providers/auth_provider.dart';
 
 /// Tenant discovery screen - first screen the user sees.
-/// Connects to the ClockN API and navigates to login.
+/// Connects to the TecAxle API and navigates to login.
 class TenantDiscoveryScreen extends ConsumerStatefulWidget {
   const TenantDiscoveryScreen({super.key});
 

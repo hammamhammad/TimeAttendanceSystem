@@ -20,13 +20,9 @@ public class GetBranchSettingsOverrideQueryHandler : BaseHandler<GetBranchSettin
 
     public override async Task<Result<BranchSettingsOverrideDto>> Handle(GetBranchSettingsOverrideQuery request, CancellationToken cancellationToken)
     {
-        var tenantId = _tenantContext.TenantId ?? await ResolveTenantIdAsync(cancellationToken);
-        if (tenantId == null)
-            return Result.Failure<BranchSettingsOverrideDto>("Tenant context not resolved");
-
         var branch = await Context.Branches
             .AsNoTracking()
-            .FirstOrDefaultAsync(b => b.Id == request.BranchId && b.TenantId == tenantId.Value && !b.IsDeleted, cancellationToken);
+            .FirstOrDefaultAsync(b => b.Id == request.BranchId && !b.IsDeleted, cancellationToken);
 
         if (branch == null)
             return Result.Failure<BranchSettingsOverrideDto>("Branch not found");

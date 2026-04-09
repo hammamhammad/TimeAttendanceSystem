@@ -2,7 +2,7 @@
 
 ## Context
 
-The Time Attendance System is a mature, well-architected workforce management solution with 44 domain entities, 34 controllers, 150+ API endpoints, and three frontends (Admin Angular, Self-Service Angular, Flutter Mobile). It currently covers **time & attendance, leave management, excuse management, remote work, shift management, overtime, approval workflows, notifications, and comprehensive security/audit**.
+The TecAxle HRMS is a mature, well-architected workforce management solution with 44 domain entities, 34 controllers, 150+ API endpoints, and three frontends (Admin Angular, Self-Service Angular, Flutter Mobile). It currently covers **time & attendance, leave management, excuse management, remote work, shift management, overtime, approval workflows, notifications, and comprehensive security/audit**.
 
 The goal is to expand this into a **complete HR Management System (HRMS)** by adding the missing HR modules while preserving the existing codebase and following established architectural patterns.
 
@@ -487,9 +487,9 @@ The goal is to expand this into a **complete HR Management System (HRMS)** by ad
 Every new module must include:
 
 **Backend:**
-- [ ] Domain entities in `src/Domain/TimeAttendanceSystem.Domain/{Module}/`
+- [ ] Domain entities in `src/Domain/TecAxle.Hrms.Domain/{Module}/`
 - [ ] Enums in domain
-- [ ] `DbSet<T>` in `IApplicationDbContext.cs` and `TimeAttendanceDbContext.cs`
+- [ ] `DbSet<T>` in `IApplicationDbContext.cs` and `TecAxleDbContext.cs`
 - [ ] EF Core configurations in `Infrastructure/Persistence/PostgreSql/Configurations/`
 - [ ] CQRS Commands + Handlers + Validators in `Application/{Module}/Commands/`
 - [ ] CQRS Queries + Handlers + DTOs in `Application/{Module}/Queries/`
@@ -530,12 +530,12 @@ These files are the integration backbone - every module touches them:
 
 | File | Purpose |
 |------|---------|
-| `src/Domain/TimeAttendanceSystem.Domain/Common/PermissionResources.cs` | New permission resources |
-| `src/Domain/TimeAttendanceSystem.Domain/Workflows/Enums/WorkflowEntityType.cs` | New workflow entity types |
-| `src/Application/TimeAttendanceSystem.Application/Abstractions/IApplicationDbContext.cs` | New DbSet properties |
-| `src/Infrastructure/TimeAttendanceSystem.Infrastructure/Persistence/Common/TimeAttendanceDbContext.cs` | New DbSet properties |
-| `src/Infrastructure/TimeAttendanceSystem.Infrastructure/DependencyInjection.cs` | Auth policies, service registration |
-| `src/Application/TimeAttendanceSystem.Application/DependencyInjection.cs` | Service registration |
+| `src/Domain/TecAxle.Hrms.Domain/Common/PermissionResources.cs` | New permission resources |
+| `src/Domain/TecAxle.Hrms.Domain/Workflows/Enums/WorkflowEntityType.cs` | New workflow entity types |
+| `src/Application/TecAxle.Hrms.Application/Abstractions/IApplicationDbContext.cs` | New DbSet properties |
+| `src/Infrastructure/TecAxle.Hrms.Infrastructure/Persistence/Common/TecAxleDbContext.cs` | New DbSet properties |
+| `src/Infrastructure/TecAxle.Hrms.Infrastructure/DependencyInjection.cs` | Auth policies, service registration |
+| `src/Application/TecAxle.Hrms.Application/DependencyInjection.cs` | Service registration |
 | `time-attendance-frontend/src/app/app.routes.ts` | Admin routes |
 | `time-attendance-frontend/src/app/core/i18n/translations/en.json` | English translations |
 | `time-attendance-frontend/src/app/core/i18n/translations/ar.json` | Arabic translations |

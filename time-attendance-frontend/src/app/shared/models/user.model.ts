@@ -92,7 +92,7 @@ export interface PagedResult<T> {
 }
 
 export interface LoginRequest {
-  username: string;
+  email: string;
   password: string;
   deviceInfo?: string;
   rememberMe?: boolean;
@@ -104,6 +104,7 @@ export interface LoginResponse {
   expiresAt: string;
   mustChangePassword: boolean;
   user: User;
+  isPlatformUser?: boolean;
 }
 
 export interface RefreshTokenRequest {
@@ -116,4 +117,16 @@ export interface RefreshTokenResponse {
   expiresAt: string;
   mustChangePassword: boolean;
   user: User;
+}
+
+export interface TenantOption {
+  tenantId: number;
+  name: string;
+  nameAr?: string;
+  logoUrl?: string;
+}
+
+export interface ResolveTenantsResponse {
+  requiresTenantSelection: boolean;
+  tenants: TenantOption[];
 }

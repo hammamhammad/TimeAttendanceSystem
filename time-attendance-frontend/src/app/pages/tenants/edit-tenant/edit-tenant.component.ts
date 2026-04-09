@@ -8,6 +8,7 @@ import { NotificationService } from '../../../core/notifications/notification.se
 import { FormHeaderComponent } from '../../../shared/components/form-header/form-header.component';
 import { FormSectionComponent } from '../../../shared/components/form-section/form-section.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
+import { FileUploadComponent, FileUploadedEvent } from '../../../shared/components/file-upload/file-upload.component';
 
 @Component({
   selector: 'app-edit-tenant',
@@ -17,7 +18,8 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
     RouterModule,
     FormHeaderComponent,
     FormSectionComponent,
-    LoadingSpinnerComponent
+    LoadingSpinnerComponent,
+    FileUploadComponent
   ],
   templateUrl: './edit-tenant.component.html',
   styleUrls: ['./edit-tenant.component.css']
@@ -38,8 +40,7 @@ export class EditTenantComponent implements OnInit {
   form: FormGroup = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(200)]],
     nameAr: ['', [Validators.maxLength(200)]],
-    apiBaseUrl: ['', [Validators.required, Validators.maxLength(500)]],
-    customDomain: ['', [Validators.maxLength(500)]],
+    logoUrl: ['', [Validators.maxLength(500)]],
     companyRegistrationNumber: ['', [Validators.maxLength(100)]],
     taxIdentificationNumber: ['', [Validators.maxLength(100)]],
     industry: ['', [Validators.maxLength(100)]],
@@ -98,8 +99,7 @@ export class EditTenantComponent implements OnInit {
         this.form.patchValue({
           name: tenant.name,
           nameAr: tenant.nameAr || '',
-          apiBaseUrl: tenant.apiBaseUrl,
-          customDomain: tenant.customDomain || '',
+          logoUrl: tenant.logoUrl || '',
           companyRegistrationNumber: tenant.companyRegistrationNumber || '',
           taxIdentificationNumber: tenant.taxIdentificationNumber || '',
           industry: tenant.industry || '',
@@ -146,6 +146,10 @@ export class EditTenantComponent implements OnInit {
         this.notificationService.error('Error', message);
       }
     });
+  }
+
+  onLogoUploaded(event: FileUploadedEvent): void {
+    this.form.patchValue({ logoUrl: event.fileUrl });
   }
 
   hasError(field: string): boolean {

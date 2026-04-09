@@ -1,6 +1,6 @@
 # ESS Mobile App
 
-A Flutter-based Employee Self-Service mobile application for the Time Attendance System.
+A Flutter-based Employee Self-Service mobile application for the TecAxle HRMS.
 
 ## Features
 
@@ -78,7 +78,7 @@ This app follows **Clean Architecture** with **Riverpod** for state management:
 
 ## API Integration
 
-The app connects to the Time Attendance System backend API:
+The app connects to the TecAxle HRMS backend API:
 
 | Feature | Endpoint |
 |---------|----------|
@@ -95,4 +95,4 @@ The app connects to the Time Attendance System backend API:
 
 ## License
 
-Proprietary - Time Attendance System
+Proprietary - TecAxle HRMS

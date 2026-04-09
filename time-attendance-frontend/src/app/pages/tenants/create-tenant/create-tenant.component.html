@@ -2,38 +2,18 @@
   <!-- Header -->
   <app-form-header
     mode="create"
-    [title]="'Create Tenant'"
+    [title]="i18n.t('tenants.create_tenant')"
     moduleName="tenants"
     moduleRoute="tenants"
     [loading]="submitting()">
   </app-form-header>
 
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <!-- Basic Information -->
-    <app-form-section [title]="'Basic Information'" variant="modern">
-      <div class="row g-3">
-        <!-- Subdomain -->
-        <div class="col-md-6">
-          <div class="form-floating">
-            <input
-              type="text"
-              class="form-control"
-              id="subdomain"
-              formControlName="subdomain"
-              [class.is-invalid]="hasError('subdomain')"
-              placeholder="Subdomain">
-            <label for="subdomain">
-              Subdomain
-              <span class="text-danger">*</span>
-            </label>
-          </div>
-          @if (hasError('subdomain')) {
-            <div class="invalid-feedback d-block">{{ getError('subdomain') }}</div>
-          }
-          <div class="form-text">Lowercase letters, numbers, and hyphens only (e.g., acme-corp)</div>
-        </div>
 
-        <!-- Name -->
+    <!-- Section 1: Basic Information -->
+    <app-form-section [title]="i18n.t('tenants.basic_information')" icon="fa-solid fa-building" variant="modern">
+      <div class="row g-3">
+        <!-- Company Name / Company Name (Arabic) — side by side -->
         <div class="col-md-6">
           <div class="form-floating">
             <input
@@ -42,9 +22,9 @@
               id="name"
               formControlName="name"
               [class.is-invalid]="hasError('name')"
-              placeholder="Company Name">
+              [placeholder]="i18n.t('tenants.company_name')">
             <label for="name">
-              Company Name
+              {{ i18n.t('tenants.company_name') }}
               <span class="text-danger">*</span>
             </label>
           </div>
@@ -53,7 +33,6 @@
           }
         </div>
 
-        <!-- Name (Arabic) -->
         <div class="col-md-6">
           <div class="form-floating">
             <input
@@ -62,58 +41,43 @@
               id="nameAr"
               formControlName="nameAr"
               [class.is-invalid]="hasError('nameAr')"
-              placeholder="Company Name (Arabic)">
-            <label for="nameAr">Company Name (Arabic)</label>
+              [placeholder]="i18n.t('tenants.company_name_ar')">
+            <label for="nameAr">{{ i18n.t('tenants.company_name_ar') }}</label>
           </div>
           @if (hasError('nameAr')) {
             <div class="invalid-feedback d-block">{{ getError('nameAr') }}</div>
           }
         </div>
 
-        <!-- API Base URL -->
-        <div class="col-md-6">
-          <div class="form-floating">
-            <input
-              type="text"
-              class="form-control"
-              id="apiBaseUrl"
-              formControlName="apiBaseUrl"
-              [class.is-invalid]="hasError('apiBaseUrl')"
-              placeholder="API Base URL">
-            <label for="apiBaseUrl">
-              API Base URL
-              <span class="text-danger">*</span>
-            </label>
+        <!-- Logo Upload -->
+        <div class="col-12">
+          <div class="logo-upload-section">
+            <label class="app-modern-label mb-2">{{ i18n.t('tenants.company_logo') }}</label>
+            <div class="d-flex align-items-start gap-4">
+              <app-file-upload
+                [label]="i18n.t('tenants.upload_logo')"
+                accept=".jpg,.jpeg,.png,.svg"
+                [maxSizeMB]="5"
+                entityType="Tenant"
+                fieldName="logo"
+                (fileUploaded)="onLogoUploaded($event)"
+                (fileRemoved)="onLogoRemoved()">
+              </app-file-upload>
+              @if (logoPreviewUrl()) {
+                <div class="logo-preview">
+                  <img [src]="logoPreviewUrl()" [alt]="i18n.t('tenants.company_logo')" class="logo-preview-img">
+                </div>
+              }
+            </div>
           </div>
-          @if (hasError('apiBaseUrl')) {
-            <div class="invalid-feedback d-block">{{ getError('apiBaseUrl') }}</div>
-          }
-          <div class="form-text">e.g., https://acme-corp.clockn.net</div>
-        </div>
-
-        <!-- Custom Domain -->
-        <div class="col-md-6">
-          <div class="form-floating">
-            <input
-              type="text"
-              class="form-control"
-              id="customDomain"
-              formControlName="customDomain"
-              [class.is-invalid]="hasError('customDomain')"
-              placeholder="Custom Domain">
-            <label for="customDomain">Custom Domain</label>
-          </div>
-          @if (hasError('customDomain')) {
-            <div class="invalid-feedback d-block">{{ getError('customDomain') }}</div>
-          }
         </div>
       </div>
     </app-form-section>
 
-    <!-- Company Information -->
-    <app-form-section [title]="'Company Information'" variant="modern">
+    <!-- Section 2: Company Information -->
+    <app-form-section [title]="i18n.t('tenants.company_information')" icon="fa-solid fa-info-circle" variant="modern">
       <div class="row g-3">
-        <!-- Registration Number -->
+        <!-- Registration Number / Tax ID -->
         <div class="col-md-6">
           <div class="form-floating">
             <input
@@ -122,12 +86,11 @@
               id="companyRegistrationNumber"
               formControlName="companyRegistrationNumber"
               [class.is-invalid]="hasError('companyRegistrationNumber')"
-              placeholder="Registration Number">
-            <label for="companyRegistrationNumber">Registration Number</label>
+              [placeholder]="i18n.t('tenants.registration_number')">
+            <label for="companyRegistrationNumber">{{ i18n.t('tenants.registration_number') }}</label>
           </div>
         </div>
 
-        <!-- Tax ID -->
         <div class="col-md-6">
           <div class="form-floating">
             <input
@@ -136,12 +99,12 @@
               id="taxIdentificationNumber"
               formControlName="taxIdentificationNumber"
               [class.is-invalid]="hasError('taxIdentificationNumber')"
-              placeholder="Tax Identification Number">
-            <label for="taxIdentificationNumber">Tax Identification Number</label>
+              [placeholder]="i18n.t('tenants.tax_id')">
+            <label for="taxIdentificationNumber">{{ i18n.t('tenants.tax_id') }}</label>
           </div>
         </div>
 
-        <!-- Industry -->
+        <!-- Industry / Country -->
         <div class="col-md-6">
           <div class="form-floating">
             <input
@@ -150,12 +113,11 @@
               id="industry"
               formControlName="industry"
               [class.is-invalid]="hasError('industry')"
-              placeholder="Industry">
-            <label for="industry">Industry</label>
+              [placeholder]="i18n.t('tenants.industry')">
+            <label for="industry">{{ i18n.t('tenants.industry') }}</label>
           </div>
         </div>
 
-        <!-- Country -->
         <div class="col-md-6">
           <div class="form-floating">
             <input
@@ -164,12 +126,12 @@
               id="country"
               formControlName="country"
               [class.is-invalid]="hasError('country')"
-              placeholder="Country">
-            <label for="country">Country</label>
+              [placeholder]="i18n.t('tenants.country')">
+            <label for="country">{{ i18n.t('tenants.country') }}</label>
           </div>
         </div>
 
-        <!-- City -->
+        <!-- City / Address -->
         <div class="col-md-6">
           <div class="form-floating">
             <input
@@ -178,12 +140,11 @@
               id="city"
               formControlName="city"
               [class.is-invalid]="hasError('city')"
-              placeholder="City">
-            <label for="city">City</label>
+              [placeholder]="i18n.t('tenants.city')">
+            <label for="city">{{ i18n.t('tenants.city') }}</label>
           </div>
         </div>
 
-        <!-- Address -->
         <div class="col-md-6">
           <div class="form-floating">
             <input
@@ -192,12 +153,12 @@
               id="address"
               formControlName="address"
               [class.is-invalid]="hasError('address')"
-              placeholder="Address">
-            <label for="address">Address</label>
+              [placeholder]="i18n.t('tenants.address')">
+            <label for="address">{{ i18n.t('tenants.address') }}</label>
           </div>
         </div>
 
-        <!-- Phone -->
+        <!-- Phone / Email -->
         <div class="col-md-6">
           <div class="form-floating">
             <input
@@ -206,12 +167,11 @@
               id="phone"
               formControlName="phone"
               [class.is-invalid]="hasError('phone')"
-              placeholder="Phone">
-            <label for="phone">Phone</label>
+              [placeholder]="i18n.t('tenants.phone')">
+            <label for="phone">{{ i18n.t('tenants.phone') }}</label>
           </div>
         </div>
 
-        <!-- Email -->
         <div class="col-md-6">
           <div class="form-floating">
             <input
@@ -220,16 +180,16 @@
               id="email"
               formControlName="email"
               [class.is-invalid]="hasError('email')"
-              placeholder="Email">
-            <label for="email">Email</label>
+              [placeholder]="i18n.t('tenants.email')">
+            <label for="email">{{ i18n.t('tenants.email') }} <span class="text-danger">*</span></label>
           </div>
           @if (hasError('email')) {
             <div class="invalid-feedback d-block">{{ getError('email') }}</div>
           }
         </div>
 
-        <!-- Website -->
-        <div class="col-md-6">
+        <!-- Website (full width) -->
+        <div class="col-12">
           <div class="form-floating">
             <input
               type="url"
@@ -237,15 +197,121 @@
               id="website"
               formControlName="website"
               [class.is-invalid]="hasError('website')"
-              placeholder="Website">
-            <label for="website">Website</label>
+              [placeholder]="i18n.t('tenants.website')">
+            <label for="website">{{ i18n.t('tenants.website') }}</label>
           </div>
         </div>
       </div>
     </app-form-section>
 
-    <!-- Default Settings -->
-    <app-form-section [title]="'Default Settings'" variant="modern">
+    <!-- Section 3: Subscription Plan -->
+    <app-form-section [title]="i18n.t('tenants.subscription_plan')" icon="fa-solid fa-credit-card" variant="modern">
+      <!-- Billing Cycle Toggle -->
+      <div class="billing-cycle-toggle mb-4">
+        <div class="btn-group" role="group" aria-label="Billing cycle">
+          <button type="button"
+                  class="btn"
+                  [class.btn-primary]="selectedBillingCycle() === 'Monthly'"
+                  [class.btn-secondary]="selectedBillingCycle() !== 'Monthly'"
+                  (click)="setBillingCycle('Monthly')">
+            {{ i18n.t('tenants.billing_monthly') }}
+          </button>
+          <button type="button"
+                  class="btn"
+                  [class.btn-primary]="selectedBillingCycle() === 'Annual'"
+                  [class.btn-secondary]="selectedBillingCycle() !== 'Annual'"
+                  (click)="setBillingCycle('Annual')">
+            {{ i18n.t('tenants.billing_annual') }}
+            <span class="annual-discount-badge">{{ i18n.t('tenants.save_annual') }}</span>
+          </button>
+        </div>
+      </div>
+
+      @if (plansLoading()) {
+        <div class="text-center py-4">
+          <app-loading-spinner />
+        </div>
+      } @else if (plans().length === 0) {
+        <div class="text-center text-muted py-4">
+          <i class="fa-solid fa-exclamation-circle me-2"></i>
+          {{ i18n.t('tenants.no_plans_available') }}
+        </div>
+      } @else {
+        <div class="row g-3 plan-cards-row">
+          @for (plan of plans(); track plan.id) {
+            <div class="col-md-4">
+              <div class="plan-card"
+                   [class.plan-card-selected]="selectedPlanId() === plan.id"
+                   [class.tier-free]="plan.tier === 'Free'"
+                   [class.tier-starter]="plan.tier === 'Starter'"
+                   [class.tier-professional]="plan.tier === 'Professional'"
+                   [class.tier-enterprise]="plan.tier === 'Enterprise'"
+                   [class.tier-custom]="plan.tier === 'Custom'"
+                   (click)="selectPlan(plan.id)">
+
+                <!-- Plan Header -->
+                <div class="plan-card-header">
+                  <div class="plan-tier-badge">
+                    <i [class]="getTierIcon(plan.tier)"></i>
+                    {{ plan.tier }}
+                  </div>
+                  <h4 class="plan-name">{{ plan.name }}</h4>
+                  @if (plan.description) {
+                    <p class="plan-description">{{ plan.description }}</p>
+                  }
+                </div>
+
+                <!-- Plan Price -->
+                <div class="plan-price-section">
+                  <span class="plan-price-currency">$</span>
+                  <span class="plan-price-amount">{{ getPlanPrice(plan) | number:'1.0-0' }}</span>
+                  <span class="plan-price-period">{{ getPlanPriceLabel(plan) }}</span>
+                </div>
+
+                <!-- Plan Modules -->
+                <div class="plan-modules">
+                  <div class="plan-modules-header">
+                    <strong>{{ plan.modules.length }} {{ i18n.t('tenants.modules_included') }}</strong>
+                  </div>
+                  <ul class="plan-module-list">
+                    @for (mod of plan.modules; track mod) {
+                      <li>
+                        <i class="fa-solid fa-check text-success"></i>
+                        {{ mod }}
+                      </li>
+                    }
+                  </ul>
+                </div>
+
+                <!-- Plan Limits -->
+                @if (getLimitEntries(plan.limits).length > 0) {
+                  <div class="plan-limits">
+                    @for (limit of getLimitEntries(plan.limits); track limit.key) {
+                      <div class="plan-limit-item">
+                        <span class="plan-limit-label">{{ limit.key }}</span>
+                        <span class="plan-limit-value">{{ limit.value }}</span>
+                      </div>
+                    }
+                  </div>
+                }
+
+                <!-- Selection Indicator -->
+                <div class="plan-select-indicator">
+                  @if (selectedPlanId() === plan.id) {
+                    <i class="fa-solid fa-check-circle"></i> {{ i18n.t('tenants.selected') }}
+                  } @else {
+                    {{ i18n.t('tenants.select_plan') }}
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </app-form-section>
+
+    <!-- Section 4: Default Settings -->
+    <app-form-section [title]="i18n.t('tenants.default_settings')" icon="fa-solid fa-cog" variant="modern">
       <div class="row g-3">
         <!-- Timezone -->
         <div class="col-md-4">
@@ -260,7 +326,7 @@
               }
             </select>
             <label for="defaultTimezone">
-              Timezone
+              {{ i18n.t('tenants.timezone') }}
               <span class="text-danger">*</span>
             </label>
           </div>
@@ -279,7 +345,7 @@
               }
             </select>
             <label for="defaultLanguage">
-              Language
+              {{ i18n.t('tenants.language') }}
               <span class="text-danger">*</span>
             </label>
           </div>
@@ -298,7 +364,7 @@
               }
             </select>
             <label for="defaultCurrency">
-              Currency
+              {{ i18n.t('tenants.currency') }}
               <span class="text-danger">*</span>
             </label>
           </div>
@@ -309,13 +375,16 @@
     <!-- Form Actions -->
     <div class="app-form-actions">
       <button type="button" class="btn btn-secondary" routerLink="/tenants">
-        Cancel
+        {{ i18n.t('app.cancel') }}
       </button>
-      <button type="submit" class="btn btn-primary" [disabled]="submitting()">
+      <button type="submit" class="btn btn-primary btn-lg" [disabled]="submitting()">
         @if (submitting()) {
-          <span class="spinner-border spinner-border-sm me-1"></span>
+          <span class="spinner-border spinner-border-sm me-2"></span>
+          {{ i18n.t('tenants.provisioning') }}
+        } @else {
+          <i class="fa-solid fa-server me-2"></i>
+          {{ i18n.t('tenants.create_provision') }}
         }
-        Create Tenant
       </button>
     </div>
   </form>

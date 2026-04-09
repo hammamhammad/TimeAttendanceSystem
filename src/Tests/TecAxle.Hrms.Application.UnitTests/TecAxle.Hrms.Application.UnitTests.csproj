@@ -22,8 +22,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Application\TecAxle.Hrms.Application\TecAxle.Hrms.Application.csproj" />
-    <ProjectReference Include="..\..\Domain\TecAxle.Hrms.Domain\TecAxle.Hrms.Domain.csproj" />
+    <ProjectReference Include="..\..\Application\TimeAttendanceSystem.Application\TimeAttendanceSystem.Application.csproj" />
+    <ProjectReference Include="..\..\Domain\TimeAttendanceSystem.Domain\TimeAttendanceSystem.Domain.csproj" />
   </ItemGroup>
 
 </Project>

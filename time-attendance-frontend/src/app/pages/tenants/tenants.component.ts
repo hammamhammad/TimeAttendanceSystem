@@ -51,12 +51,6 @@ export class TenantsComponent implements OnInit {
       renderHtml: true
     },
     {
-      key: 'subdomain',
-      label: 'Subdomain',
-      sortable: true,
-      priority: 'medium'
-    },
-    {
       key: 'status',
       label: 'Status',
       sortable: false,

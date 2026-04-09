@@ -2,7 +2,7 @@
 
 **Version**: 1.0
 **Last Updated**: March 29, 2026
-**Applies To**: Time Attendance System -- Phase 1 HR Expansion
+**Applies To**: TecAxle HRMS -- Phase 1 HR Expansion
 
 ---
 
@@ -49,7 +49,7 @@
 
 ### What Is New in Phase 1
 
-Phase 1 of the HRMS expansion adds three major modules to the Time Attendance System, transforming it from a time-tracking solution into a comprehensive human-resource management platform:
+Phase 1 of the HRMS expansion adds three major modules to the TecAxle HRMS, transforming it from a time-tracking solution into a comprehensive human-resource management platform:
 
 | Module | Description | Key Features |
 |--------|-------------|--------------|

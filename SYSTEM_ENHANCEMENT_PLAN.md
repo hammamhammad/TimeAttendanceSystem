@@ -1,4 +1,4 @@
-# Time Attendance System - Complete Enhancement Plan
+# TecAxle HRMS - Complete Enhancement Plan
 
 **Created**: December 14, 2025
 **Last Updated**: January 30, 2026
@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-Transform the Time Attendance System into a complete enterprise-ready standalone solution with:
+Transform the TecAxle HRMS into a complete enterprise-ready standalone solution with:
 1. Dynamic configurable approval workflows
 2. Missing essential features
 3. Advanced enterprise features
@@ -627,7 +627,7 @@ Settings → Approval Workflows
 
 **Backend Implementation:**
 ```
-src/Domain/TimeAttendanceSystem.Domain/Workflows/
+src/Domain/TecAxle.Hrms.Domain/Workflows/
 ├── WorkflowDefinition.cs
 ├── WorkflowStep.cs
 ├── WorkflowInstance.cs
@@ -639,7 +639,7 @@ src/Domain/TimeAttendanceSystem.Domain/Workflows/
     ├── WorkflowStatus.cs (Pending, InProgress, Completed, Cancelled)
     └── ApprovalAction.cs (Approved, Rejected, Delegated, TimedOut)
 
-src/Application/TimeAttendanceSystem.Application/Workflows/
+src/Application/TecAxle.Hrms.Application/Workflows/
 ├── Commands/
 │   ├── CreateWorkflowDefinition/
 │   ├── UpdateWorkflowDefinition/
@@ -700,7 +700,7 @@ time-attendance-frontend/src/app/pages/
 
 **Backend Implementation:**
 ```
-src/Domain/TimeAttendanceSystem.Domain/LeaveManagement/
+src/Domain/TecAxle.Hrms.Domain/LeaveManagement/
 ├── LeaveEntitlement.cs        # Annual allocation per employee per vacation type
 ├── LeaveBalance.cs            # Current balance tracking
 ├── LeaveTransaction.cs        # Accrual/Usage/Adjustment transactions
@@ -1175,7 +1175,7 @@ DELETE /api/v1/branches/{id}                 - Delete branch
 
 #### Domain Layer
 ```
-src/Domain/TimeAttendanceSystem.Domain/
+src/Domain/TecAxle.Hrms.Domain/
 ├── Workflows/
 │   ├── WorkflowDefinition.cs
 │   ├── WorkflowStep.cs
@@ -1202,7 +1202,7 @@ src/Domain/TimeAttendanceSystem.Domain/
 
 #### Application Layer
 ```
-src/Application/TimeAttendanceSystem.Application/
+src/Application/TecAxle.Hrms.Application/
 ├── Workflows/
 │   ├── Commands/
 │   │   ├── CreateWorkflowDefinition/
@@ -1234,7 +1234,7 @@ src/Application/TimeAttendanceSystem.Application/
 
 #### API Layer
 ```
-src/Api/TimeAttendanceSystem.Api/Controllers/
+src/Api/TecAxle.Hrms.Api/Controllers/
 ├── WorkflowsController.cs
 ├── ApprovalsController.cs
 ├── LeaveBalancesController.cs
@@ -1280,7 +1280,7 @@ time-attendance-frontend/src/app/pages/
 - `src/Domain/Vacations/EmployeeVacation.cs` - Add WorkflowInstanceId
 - `src/Domain/Excuses/EmployeeExcuse.cs` - Add WorkflowInstanceId
 - `src/Domain/RemoteWork/RemoteWorkRequest.cs` - Add WorkflowInstanceId
-- `src/Infrastructure/Persistence/TimeAttendanceDbContext.cs` - Add new DbSets
+- `src/Infrastructure/Persistence/TecAxleDbContext.cs` - Add new DbSets
 - `src/Api/Program.cs` - Register new services
 
 #### Frontend

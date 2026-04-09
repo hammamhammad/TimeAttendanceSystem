@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Domain\TecAxle.Hrms.Domain\TecAxle.Hrms.Domain.csproj" />
+    <ProjectReference Include="..\..\Domain\TimeAttendanceSystem.Domain\TimeAttendanceSystem.Domain.csproj" />
   </ItemGroup>
 
 </Project>

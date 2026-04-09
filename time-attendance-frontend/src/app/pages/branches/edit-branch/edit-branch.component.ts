@@ -1,43 +1,34 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
-
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BranchesService } from '../branches.service';
 import { Branch } from '../../../shared/models/branch.model';
 import { I18nService } from '../../../core/i18n/i18n.service';
-// import { TIMEZONE_LIST } from '../../../shared/constants/timezone.constants';
+import { NotificationService } from '../../../core/notifications/notification.service';
+import { LocationPickerComponent } from '../../../shared/components/location-picker/location-picker.component';
+import { SearchableSelectComponent, SearchableSelectOption } from '../../../shared/components/searchable-select/searchable-select.component';
+import { TIMEZONE_OPTIONS } from '../../../shared/constants/timezone.constants';
+import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+import { FormSectionComponent } from '../../../shared/components/form-section/form-section.component';
 
 @Component({
   selector: 'app-edit-branch',
   standalone: true,
-  imports: [RouterModule, ReactiveFormsModule],
+  imports: [
+    RouterModule,
+    ReactiveFormsModule,
+    LocationPickerComponent,
+    SearchableSelectComponent,
+    PageHeaderComponent,
+    FormSectionComponent
+  ],
   template: `
-    <div class="container-fluid">
-      <!-- Header -->
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          <h2>{{ i18n.t('branches.edit_branch') }}</h2>
-          <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-              <li class="breadcrumb-item">
-                <a routerLink="/dashboard">{{ i18n.t('dashboard.title') }}</a>
-              </li>
-              <li class="breadcrumb-item">
-                <a routerLink="/branches">{{ i18n.t('branches.title') }}</a>
-              </li>
-              <li class="breadcrumb-item active">{{ i18n.t('branches.edit_branch') }}</li>
-            </ol>
-          </nav>
-        </div>
-        <button 
-          type="button" 
-          class="btn btn-outline-secondary"
-          (click)="onCancel()"
-          [disabled]="saving()">
-          <i class="fa-solid fa-arrow-left me-2"></i>
-          {{ i18n.t('common.back') }}
-        </button>
-      </div>
+    <div class="container-fluid app-modern-form">
+      <app-page-header
+        [title]="i18n.t('branches.edit_branch')"
+        [showBackButton]="true"
+        [backRoute]="branch() ? '/branches/' + branch()!.id + '/view' : '/branches'">
+      </app-page-header>
 
       @if (loading()) {
         <div class="d-flex justify-content-center py-5">
@@ -46,7 +37,6 @@ import { I18nService } from '../../../core/i18n/i18n.service';
           </div>
         </div>
       } @else if (branch()) {
-        <!-- Main Form Card -->
         <div class="card">
           <div class="card-header">
             <h5 class="card-title mb-0">
@@ -64,156 +54,139 @@ import { I18nService } from '../../../core/i18n/i18n.service';
               }
 
               <!-- Basic Information Section -->
-              <div class="mb-4">
-                <h6 class="text-primary mb-3">
-                  <i class="fa-solid fa-info-circle me-2"></i>
-                  {{ i18n.t('branches.basic_information') }}
-                </h6>
+              <app-form-section
+                [title]="i18n.t('branches.basic_information')"
+                icon="fa-solid fa-info-circle"
+                variant="modern">
                 <div class="row g-3">
-                  <!-- Branch Name -->
                   <div class="col-md-6">
-                    <label class="form-label">
-                      {{ i18n.t('branches.name') }}
-                      <span class="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      formControlName="name"
-                      [class.is-invalid]="isFieldInvalid('name')"
-                      [placeholder]="i18n.t('branches.name_placeholder')"
-                    />
-                    @if (isFieldInvalid('name')) {
-                      <div class="invalid-feedback">{{ getFieldError('name') }}</div>
-                    }
-                  </div>
-
-                  <!-- Branch Code -->
-                  <div class="col-md-6">
-                    <label class="form-label">
-                      {{ i18n.t('branches.code') }}
-                      <span class="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      formControlName="code"
-                      [class.is-invalid]="isFieldInvalid('code')"
-                      [placeholder]="i18n.t('branches.code_placeholder')"
-                      style="text-transform: uppercase;"
-                    />
+                    <div class="form-floating">
+                      <input type="text"
+                        id="code"
+                        class="form-control"
+                        formControlName="code"
+                        [class.is-invalid]="isFieldInvalid('code')"
+                        placeholder="{{ i18n.t('branches.code') }}"
+                        style="text-transform: uppercase;">
+                      <label for="code">{{ i18n.t('branches.code') }} <span class="text-danger">*</span></label>
+                    </div>
                     @if (isFieldInvalid('code')) {
-                      <div class="invalid-feedback">{{ getFieldError('code') }}</div>
+                      <div class="invalid-feedback d-block">{{ getFieldError('code') }}</div>
                     }
                     <div class="form-text">{{ i18n.t('branches.code_hint') }}</div>
                   </div>
 
-                  <!-- Timezone -->
                   <div class="col-md-6">
-                    <label class="form-label">
-                      {{ i18n.t('branches.timezone') }}
-                      <span class="text-danger">*</span>
-                    </label>
-                    <select
-                      class="form-select"
-                      formControlName="timezone"
-                      [class.is-invalid]="isFieldInvalid('timezone')"
-                    >
-                      <option value="">{{ i18n.t('branches.select_timezone') }}</option>
-                      @for (timezone of timezones; track timezone.value) {
-                        <option [value]="timezone.value">{{ timezone.label }}</option>
-                      }
-                    </select>
-                    @if (isFieldInvalid('timezone')) {
-                      <div class="invalid-feedback">{{ getFieldError('timezone') }}</div>
+                    <div class="form-floating">
+                      <input type="text"
+                        id="name"
+                        class="form-control"
+                        formControlName="name"
+                        [class.is-invalid]="isFieldInvalid('name')"
+                        placeholder="{{ i18n.t('branches.name') }}">
+                      <label for="name">{{ i18n.t('branches.name') }} <span class="text-danger">*</span></label>
+                    </div>
+                    @if (isFieldInvalid('name')) {
+                      <div class="invalid-feedback d-block">{{ getFieldError('name') }}</div>
                     }
                   </div>
 
-                  <!-- Status -->
+                  <div class="col-md-6">
+                    <div class="app-modern-field">
+                      <label class="app-modern-label">{{ i18n.t('branches.timezone') }} <span class="text-danger">*</span></label>
+                      <app-searchable-select
+                        [options]="timezoneOptions"
+                        [value]="branchForm.get('timezone')?.value || ''"
+                        (selectionChange)="onTimezoneChange($event)"
+                        [placeholder]="i18n.t('branches.select_timezone')"
+                        [searchable]="true"
+                        [clearable]="false">
+                      </app-searchable-select>
+                    </div>
+                    @if (branchForm.get('timezone')?.invalid && branchForm.get('timezone')?.touched) {
+                      <div class="invalid-feedback d-block">{{ i18n.t('validation.required') }}</div>
+                    }
+                  </div>
+
                   <div class="col-md-6">
                     <label class="form-label">{{ i18n.t('common.status') }}</label>
                     <div class="form-check form-switch mt-2">
-                      <input
-                        class="form-check-input"
+                      <input class="form-check-input"
                         type="checkbox"
                         role="switch"
                         id="isActiveSwitch"
-                        formControlName="isActive"
-                      />
-                      <label class="form-check-label" for="isActiveSwitch">
-                        {{ i18n.t('common.active') }}
-                      </label>
+                        formControlName="isActive">
+                      <label class="form-check-label" for="isActiveSwitch">{{ i18n.t('common.active') }}</label>
                     </div>
                   </div>
                 </div>
-              </div>
+              </app-form-section>
 
-              <hr>
-
-              <!-- GPS Location Section (for Mobile Check-in) -->
-              <div class="mb-4">
-                <h6 class="text-success mb-3">
-                  <i class="fa-solid fa-location-dot me-2"></i>
-                  {{ i18n.t('branches.gps_settings') }}
-                </h6>
+              <!-- GPS Location Section -->
+              <app-form-section
+                [title]="i18n.t('branches.gps_settings')"
+                icon="fa-solid fa-location-dot"
+                variant="modern">
                 <div class="alert alert-info mb-3">
                   <i class="fa-solid fa-info-circle me-2"></i>
                   {{ i18n.t('branches.gps_settings_hint') }}
                 </div>
+                <div class="mb-3">
+                  <app-location-picker
+                    [latitude]="branchForm.get('latitude')?.value"
+                    [longitude]="branchForm.get('longitude')?.value"
+                    [radiusMeters]="branchForm.get('geofenceRadiusMeters')?.value || 100"
+                    [height]="'350px'"
+                    [placeholder]="i18n.t('branches.map_click_hint')"
+                    (locationChange)="onLocationChange($event)">
+                  </app-location-picker>
+                </div>
                 <div class="row g-3">
-                  <!-- Latitude -->
                   <div class="col-md-4">
-                    <label class="form-label">
-                      {{ i18n.t('branches.latitude') }}
-                    </label>
-                    <input
-                      type="number"
-                      step="0.000001"
-                      class="form-control"
-                      formControlName="latitude"
-                      [class.is-invalid]="isFieldInvalid('latitude')"
-                      placeholder="-90 to 90"
-                    />
+                    <div class="form-floating">
+                      <input type="number"
+                        id="latitude"
+                        class="form-control"
+                        formControlName="latitude"
+                        [class.is-invalid]="isFieldInvalid('latitude')"
+                        placeholder="{{ i18n.t('branches.latitude') }}"
+                        step="0.000001">
+                      <label for="latitude">{{ i18n.t('branches.latitude') }}</label>
+                    </div>
                     @if (isFieldInvalid('latitude')) {
-                      <div class="invalid-feedback">{{ getFieldError('latitude') }}</div>
+                      <div class="invalid-feedback d-block">{{ getFieldError('latitude') }}</div>
                     }
                     <div class="form-text">{{ i18n.t('branches.latitude_hint') }}</div>
                   </div>
 
-                  <!-- Longitude -->
                   <div class="col-md-4">
-                    <label class="form-label">
-                      {{ i18n.t('branches.longitude') }}
-                    </label>
-                    <input
-                      type="number"
-                      step="0.000001"
-                      class="form-control"
-                      formControlName="longitude"
-                      [class.is-invalid]="isFieldInvalid('longitude')"
-                      placeholder="-180 to 180"
-                    />
+                    <div class="form-floating">
+                      <input type="number"
+                        id="longitude"
+                        class="form-control"
+                        formControlName="longitude"
+                        [class.is-invalid]="isFieldInvalid('longitude')"
+                        placeholder="{{ i18n.t('branches.longitude') }}"
+                        step="0.000001">
+                      <label for="longitude">{{ i18n.t('branches.longitude') }}</label>
+                    </div>
                     @if (isFieldInvalid('longitude')) {
-                      <div class="invalid-feedback">{{ getFieldError('longitude') }}</div>
+                      <div class="invalid-feedback d-block">{{ getFieldError('longitude') }}</div>
                     }
                     <div class="form-text">{{ i18n.t('branches.longitude_hint') }}</div>
                   </div>
 
-                  <!-- Geofence Radius -->
                   <div class="col-md-4">
-                    <label class="form-label">
-                      {{ i18n.t('branches.geofence_radius') }}
-                    </label>
-                    <div class="input-group">
-                      <input
-                        type="number"
-                        min="10"
-                        max="1000"
+                    <div class="form-floating">
+                      <input type="number"
+                        id="geofenceRadiusMeters"
                         class="form-control"
                         formControlName="geofenceRadiusMeters"
                         [class.is-invalid]="isFieldInvalid('geofenceRadiusMeters')"
-                      />
-                      <span class="input-group-text">{{ i18n.t('common.meters') }}</span>
+                        placeholder="{{ i18n.t('branches.geofence_radius') }}"
+                        min="10"
+                        max="5000">
+                      <label for="geofenceRadiusMeters">{{ i18n.t('branches.geofence_radius') }} ({{ i18n.t('common.meters') }})</label>
                     </div>
                     @if (isFieldInvalid('geofenceRadiusMeters')) {
                       <div class="invalid-feedback d-block">{{ getFieldError('geofenceRadiusMeters') }}</div>
@@ -221,107 +194,87 @@ import { I18nService } from '../../../core/i18n/i18n.service';
                     <div class="form-text">{{ i18n.t('branches.geofence_radius_hint') }}</div>
                   </div>
                 </div>
-              </div>
-
-              <hr>
+              </app-form-section>
 
               <!-- Contact Information Section -->
-              <div class="mb-4">
-                <h6 class="text-secondary mb-3">
-                  <i class="fa-solid fa-address-book me-2"></i>
-                  {{ i18n.t('branches.contact_information') }}
-                </h6>
+              <app-form-section
+                [title]="i18n.t('branches.contact_information')"
+                icon="fa-solid fa-address-book"
+                variant="modern">
                 <div class="row g-3">
-                  <!-- Phone -->
                   <div class="col-md-6">
-                    <label class="form-label">{{ i18n.t('common.phone') }}</label>
-                    <input
-                      type="tel"
-                      class="form-control"
-                      formControlName="phone"
-                      [class.is-invalid]="isFieldInvalid('phone')"
-                      [placeholder]="i18n.t('common.phone_placeholder')"
-                    />
+                    <div class="form-floating">
+                      <input type="tel"
+                        id="phone"
+                        class="form-control"
+                        formControlName="phone"
+                        [class.is-invalid]="isFieldInvalid('phone')"
+                        placeholder="{{ i18n.t('common.phone') }}">
+                      <label for="phone">{{ i18n.t('common.phone') }}</label>
+                    </div>
                     @if (isFieldInvalid('phone')) {
-                      <div class="invalid-feedback">{{ getFieldError('phone') }}</div>
+                      <div class="invalid-feedback d-block">{{ getFieldError('phone') }}</div>
                     }
                   </div>
 
-                  <!-- Email -->
                   <div class="col-md-6">
-                    <label class="form-label">{{ i18n.t('common.email') }}</label>
-                    <input
-                      type="email"
-                      class="form-control"
-                      formControlName="email"
-                      [class.is-invalid]="isFieldInvalid('email')"
-                      [placeholder]="i18n.t('common.email_placeholder')"
-                    />
+                    <div class="form-floating">
+                      <input type="email"
+                        id="email"
+                        class="form-control"
+                        formControlName="email"
+                        [class.is-invalid]="isFieldInvalid('email')"
+                        placeholder="{{ i18n.t('common.email') }}">
+                      <label for="email">{{ i18n.t('common.email') }}</label>
+                    </div>
                     @if (isFieldInvalid('email')) {
-                      <div class="invalid-feedback">{{ getFieldError('email') }}</div>
+                      <div class="invalid-feedback d-block">{{ getFieldError('email') }}</div>
                     }
                   </div>
 
-                  <!-- Address -->
                   <div class="col-12">
-                    <label class="form-label">{{ i18n.t('branches.address') }}</label>
-                    <textarea
-                      class="form-control"
-                      formControlName="address"
-                      [class.is-invalid]="isFieldInvalid('address')"
-                      [placeholder]="i18n.t('branches.address_placeholder')"
-                      rows="3"
-                    ></textarea>
+                    <div class="form-floating">
+                      <textarea
+                        id="address"
+                        class="form-control"
+                        formControlName="address"
+                        [class.is-invalid]="isFieldInvalid('address')"
+                        placeholder="{{ i18n.t('branches.address') }}"
+                        style="height: 80px"></textarea>
+                      <label for="address">{{ i18n.t('branches.address') }}</label>
+                    </div>
                     @if (isFieldInvalid('address')) {
-                      <div class="invalid-feedback">{{ getFieldError('address') }}</div>
+                      <div class="invalid-feedback d-block">{{ getFieldError('address') }}</div>
                     }
                   </div>
 
-                  <!-- Description -->
                   <div class="col-12">
-                    <label class="form-label">{{ i18n.t('common.description') }}</label>
-                    <textarea
-                      class="form-control"
-                      formControlName="description"
-                      [class.is-invalid]="isFieldInvalid('description')"
-                      [placeholder]="i18n.t('branches.description_placeholder')"
-                      rows="3"
-                    ></textarea>
+                    <div class="form-floating">
+                      <textarea
+                        id="description"
+                        class="form-control"
+                        formControlName="description"
+                        [class.is-invalid]="isFieldInvalid('description')"
+                        placeholder="{{ i18n.t('common.description') }}"
+                        style="height: 80px"></textarea>
+                      <label for="description">{{ i18n.t('common.description') }}</label>
+                    </div>
                     @if (isFieldInvalid('description')) {
-                      <div class="invalid-feedback">{{ getFieldError('description') }}</div>
+                      <div class="invalid-feedback d-block">{{ getFieldError('description') }}</div>
                     }
                   </div>
                 </div>
-              </div>
-
-              <!-- Validation Info -->
-              <div class="alert alert-info">
-                <h6 class="alert-heading">
-                  <i class="fa-solid fa-info-circle me-2"></i>
-                  {{ i18n.t('branches.validation_rules.title') }}
-                </h6>
-                <ul class="mb-0">
-                  <li>{{ i18n.t('branches.validation_rules.name') }}</li>
-                  <li>{{ i18n.t('branches.validation_rules.code') }}</li>
-                  <li>{{ i18n.t('branches.validation_rules.timezone') }}</li>
-                  <li>{{ i18n.t('branches.validation_rules.email') }}</li>
-                  <li>{{ i18n.t('branches.validation_rules.phone') }}</li>
-                </ul>
-              </div>
+              </app-form-section>
 
               <!-- Form Actions -->
-              <div class="d-flex justify-content-end gap-2 mt-4">
-                <button type="button" class="btn btn-outline-secondary" (click)="onCancel()" [disabled]="saving()">
+              <div class="app-form-actions">
+                <button type="button" class="btn btn-secondary" (click)="onCancel()" [disabled]="saving()">
                   <i class="fa-solid fa-times me-2"></i>
                   {{ i18n.t('common.cancel') }}
                 </button>
-                <button 
-                  type="submit" 
-                  class="btn btn-primary" 
-                  [disabled]="branchForm.invalid || saving()"
-                >
+                <button type="submit" class="btn btn-primary" [disabled]="branchForm.invalid || saving()">
                   @if (saving()) {
-                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
                   } @else {
                     <i class="fa-solid fa-save me-2"></i>
                   }
@@ -345,29 +298,25 @@ export class EditBranchComponent implements OnInit {
   private router = inject(Router);
   private branchesService = inject(BranchesService);
   private fb = inject(FormBuilder);
+  private notificationService = inject(NotificationService);
   public i18n = inject(I18nService);
 
   branch = signal<Branch | null>(null);
   loading = signal(true);
   saving = signal(false);
   error = signal('');
-  timezones = [
-    { value: 'UTC', label: 'UTC' },
-    { value: 'America/New_York', label: 'Eastern Time' },
-    { value: 'America/Chicago', label: 'Central Time' },
-    { value: 'America/Denver', label: 'Mountain Time' },
-    { value: 'America/Los_Angeles', label: 'Pacific Time' },
-    { value: 'Europe/London', label: 'London' },
-    { value: 'Europe/Paris', label: 'Paris' },
-    { value: 'Asia/Tokyo', label: 'Tokyo' },
-    { value: 'Asia/Dubai', label: 'Dubai' }
-  ];
+
+  timezoneOptions: SearchableSelectOption[] = TIMEZONE_OPTIONS.map(tz => ({
+    value: tz.value,
+    label: tz.label,
+    subLabel: tz.offset
+  }));
 
   branchForm!: FormGroup;
 
   ngOnInit(): void {
     this.initializeForm();
-    
+
     const branchId = this.route.snapshot.paramMap.get('id');
     if (branchId) {
       this.loadBranch(branchId);
@@ -379,18 +328,17 @@ export class EditBranchComponent implements OnInit {
 
   initializeForm(): void {
     this.branchForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(2)]],
-      code: ['', [Validators.required, Validators.minLength(2)]],
+      name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
+      code: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(10)]],
       timezone: ['', Validators.required],
       phone: [''],
       email: ['', Validators.email],
       address: [''],
       description: [''],
       isActive: [true],
-      // GPS Coordinates
       latitude: [null, [Validators.min(-90), Validators.max(90)]],
       longitude: [null, [Validators.min(-180), Validators.max(180)]],
-      geofenceRadiusMeters: [100, [Validators.required, Validators.min(10), Validators.max(1000)]]
+      geofenceRadiusMeters: [100, [Validators.required, Validators.min(10), Validators.max(5000)]]
     });
   }
 
@@ -418,10 +366,20 @@ export class EditBranchComponent implements OnInit {
       address: '',
       description: '',
       isActive: branch.isActive,
-      // GPS Coordinates
       latitude: branch.latitude,
       longitude: branch.longitude,
       geofenceRadiusMeters: branch.geofenceRadiusMeters || 100
+    });
+  }
+
+  onTimezoneChange(timezone: string): void {
+    this.branchForm.patchValue({ timezone });
+  }
+
+  onLocationChange(event: { latitude: number; longitude: number }): void {
+    this.branchForm.patchValue({
+      latitude: event.latitude,
+      longitude: event.longitude
     });
   }
 
@@ -450,13 +408,15 @@ export class EditBranchComponent implements OnInit {
       geofenceRadiusMeters: formValue.geofenceRadiusMeters
     };
 
-    // Update branch info first, then coordinates
     this.branchesService.updateBranch(branchId, updateRequest).subscribe({
       next: () => {
-        // Now update coordinates
         this.branchesService.updateBranchCoordinates(branchId, coordinatesRequest).subscribe({
           next: () => {
             this.saving.set(false);
+            this.notificationService.success(
+              this.i18n.t('app.success'),
+              this.i18n.t('branches.branch_updated')
+            );
             this.router.navigate(['/branches', branchId, 'view']);
           },
           error: (err) => {
@@ -480,32 +440,27 @@ export class EditBranchComponent implements OnInit {
     }
   }
 
-  // Form field helpers
-  getFieldError(fieldName: string): string {
-    const field = this.branchForm.get(fieldName);
-    if (field?.errors && field.touched) {
-      if (field.errors['required']) {
-        return this.i18n.t('validation.required');
-      }
-      if (field.errors['email']) {
-        return this.i18n.t('validation.email');
-      }
-      if (field.errors['minlength']) {
-        return this.i18n.t('validation.minlength').replace('{{min}}', field.errors['minlength'].requiredLength);
-      }
-    }
-    return '';
-  }
-
   isFieldInvalid(fieldName: string): boolean {
     const field = this.branchForm.get(fieldName);
     return !!(field?.errors && field.touched);
   }
 
-  private getErrorMessage(error: any): string {
-    if (error?.error?.error) {
-      return error.error.error;
+  getFieldError(fieldName: string): string {
+    const field = this.branchForm.get(fieldName);
+    if (field?.errors && field.touched) {
+      if (field.errors['required']) return this.i18n.t('validation.required');
+      if (field.errors['email']) return this.i18n.t('validation.email');
+      if (field.errors['minlength']) return this.i18n.t('validation.minlength').replace('{{min}}', field.errors['minlength'].requiredLength);
+      if (field.errors['maxlength']) return this.i18n.t('validation.maxlength').replace('{{max}}', field.errors['maxlength'].requiredLength);
+      if (field.errors['min']) return this.i18n.t('validation.min').replace('{{min}}', field.errors['min'].min);
+      if (field.errors['max']) return this.i18n.t('validation.max').replace('{{max}}', field.errors['max'].max);
     }
+    return '';
+  }
+
+  private getErrorMessage(error: any): string {
+    if (error?.error?.error) return error.error.error;
+    if (error?.error?.message) return error.error.message;
     return this.i18n.t('errors.unknown');
   }
 }

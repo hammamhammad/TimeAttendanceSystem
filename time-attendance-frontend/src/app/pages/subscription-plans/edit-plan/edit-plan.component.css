@@ -1,0 +1,54 @@
+:host {
+  display: block;
+}
+
+.module-checkbox-item {
+  padding: 10px 14px;
+  border: 1px solid var(--app-gray-200, #EAECF0);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: var(--app-white, #fff);
+}
+
+.module-checkbox-item:hover {
+  border-color: var(--app-primary, #4F6BF6);
+  background: var(--app-primary-50, #EEF0FF);
+}
+
+.module-checkbox-item.module-selected {
+  border-color: var(--app-primary, #4F6BF6);
+  background: var(--app-primary-50, #EEF0FF);
+}
+
+.module-checkbox-item .form-check {
+  margin-bottom: 0;
+}
+
+.module-checkbox-item .form-check-label {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--app-gray-700, #344054);
+}
+
+.module-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.unlimited-toggle {
+  min-width: 100px;
+  padding-top: 8px;
+}
+
+.unlimited-toggle .form-check-label {
+  white-space: nowrap;
+}
+
+:host-context([dir="rtl"]) .module-actions .ms-3 {
+  margin-right: 1rem !important;
+  margin-left: 0 !important;
+}

@@ -1,6 +1,6 @@
 You are acting as a Principal Product Architect, Enterprise UX Strategist, and SaaS Platform Designer.
 
-I have built an enterprise HRMS called ClockN. It already includes broad modules such as authentication/security, organization management, time & attendance, mobile attendance, shifts, leave/excuse/remote work, approval workflows, ESS portal, notifications, recruitment, onboarding/offboarding, performance, payroll, employee lifecycle, people development, assets/expenses/loans/benefits, analytics/reporting, and system architecture. The platform is designed for Saudi Arabia / GCC, supports English and Arabic, and already uses role-based access, scoped access, workflow automation, auditability, and background jobs.
+I have built an enterprise HRMS called TecAxle HRMS. It already includes broad modules such as authentication/security, organization management, time & attendance, mobile attendance, shifts, leave/excuse/remote work, approval workflows, ESS portal, notifications, recruitment, onboarding/offboarding, performance, payroll, employee lifecycle, people development, assets/expenses/loans/benefits, analytics/reporting, and system architecture. The platform is designed for Saudi Arabia / GCC, supports English and Arabic, and already uses role-based access, scoped access, workflow automation, auditability, and background jobs.
 
 Your mission is to review the business and product structure of this HRMS and produce a phased enhancement strategy that makes the system:
 

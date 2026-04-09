@@ -50,7 +50,7 @@
     "version": "1.0.0",
     "restore": {
       "projectUniqueName": "D:\\Work\\TimeAttendanceSystem\\src\\Shared\\TimeAttendanceSystem.Shared\\TimeAttendanceSystem.Shared.csproj",
-      "projectName": "TimeAttendanceSystem.Shared",
+      "projectName": "TecAxle.Hrms.Shared",
       "projectPath": "D:\\Work\\TimeAttendanceSystem\\src\\Shared\\TimeAttendanceSystem.Shared\\TimeAttendanceSystem.Shared.csproj",
       "packagesPath": "C:\\Users\\Hammam\\.nuget\\packages\\",
       "outputPath": "D:\\Work\\TimeAttendanceSystem\\src\\Shared\\TimeAttendanceSystem.Shared\\obj\\",

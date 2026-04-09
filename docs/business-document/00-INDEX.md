@@ -1,9 +1,9 @@
-# ClockN - Time & Attendance System
+# TecAxle HRMS - Time & Attendance System
 ## Business Document Index
 
 **Version**: 7.0  
 **Last Updated**: April 2026  
-**System Name**: ClockN Time & Attendance System  
+**System Name**: TecAxle HRMS Time & Attendance System  
 **Document Type**: Business Requirements & Process Flows
 
 ---

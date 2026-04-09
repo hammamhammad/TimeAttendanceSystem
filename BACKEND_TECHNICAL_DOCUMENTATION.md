@@ -1,4 +1,4 @@
-# Time Attendance System - Backend Technical Documentation
+# TecAxle HRMS - Backend Technical Documentation
 
 **Version**: 1.0
 **Date**: November 3, 2025
@@ -9,7 +9,7 @@
 
 ## 📖 Welcome to the Backend Documentation
 
-This is the master entry point for the Time Attendance System backend documentation. The documentation is organized into comprehensive guides covering all aspects of the .NET backend architecture.
+This is the master entry point for the TecAxle HRMS backend documentation. The documentation is organized into comprehensive guides covering all aspects of the .NET backend architecture.
 
 ---
 
@@ -240,20 +240,20 @@ For complete examples, see **[Quick Reference](./docs/backend/01-QUICK-REFERENCE
 
 ### Running the Backend
 ```bash
-cd src/Api/TimeAttendanceSystem.Api
+cd src/Api/TecAxle.Hrms.Api
 dotnet run  # Runs on http://localhost:5099
 ```
 
 ### Database Operations
 ```bash
 # Create migration
-dotnet ef migrations add MigrationName --startup-project "../../Api/TimeAttendanceSystem.Api"
+dotnet ef migrations add MigrationName --startup-project "../../Api/TecAxle.Hrms.Api"
 
 # Apply migrations
-dotnet ef database update --startup-project "../../Api/TimeAttendanceSystem.Api"
+dotnet ef database update --startup-project "../../Api/TecAxle.Hrms.Api"
 
 # Drop database (dev only)
-dotnet ef database drop --startup-project "../../Api/TimeAttendanceSystem.Api" --force
+dotnet ef database drop --startup-project "../../Api/TecAxle.Hrms.Api" --force
 ```
 
 For more commands, see **[Quick Reference](./docs/backend/01-QUICK-REFERENCE.md)**.
@@ -379,10 +379,10 @@ All documents are cross-referenced:
 - **Health Check**: http://localhost:5099/health
 
 ### Source Code
-- **Domain**: `src/Domain/TimeAttendanceSystem.Domain/`
-- **Application**: `src/Application/TimeAttendanceSystem.Application/`
-- **Infrastructure**: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/`
-- **API**: `src/Api/TimeAttendanceSystem.Api/`
+- **Domain**: `src/Domain/TecAxle.Hrms.Domain/`
+- **Application**: `src/Application/TecAxle.Hrms.Application/`
+- **Infrastructure**: `src/Infrastructure/TecAxle.Hrms.Infrastructure/`
+- **API**: `src/Api/TecAxle.Hrms.Api/`
 
 ---
 

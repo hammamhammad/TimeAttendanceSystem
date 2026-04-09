@@ -8,7 +8,7 @@ using TecAxle.Hrms.Domain.VacationTypes;
 namespace TecAxle.Hrms.Application.VacationTypes.Commands.CreateVacationType;
 
 /// <summary>
-/// Command handler for creating new vacation types in the Time Attendance System.
+/// Command handler for creating new vacation types in the TecAxle HRMS.
 /// Implements comprehensive validation, business rule enforcement, and multi-tenant data isolation
 /// for enterprise-grade vacation policy management with audit trail generation.
 /// </summary>

@@ -17,39 +17,13 @@ public class UpdateTenantCommandHandler : BaseHandler<UpdateTenantCommand, Resul
             .FirstOrDefaultAsync(t => t.Id == request.Id && !t.IsDeleted, cancellationToken);
 
         if (tenant == null)
-        {
             return Result.Failure("Tenant not found");
-        }
 
-        // Validate subdomain uniqueness (excluding current tenant)
-        var subdomainExists = await Context.Tenants
-            .AnyAsync(t => t.Id != request.Id && t.Subdomain.ToLower() == request.Subdomain.ToLower() && !t.IsDeleted, cancellationToken);
-
-        if (subdomainExists)
-        {
-            return Result.Failure("A tenant with this subdomain already exists");
-        }
-
-        // Validate custom domain uniqueness if provided
-        if (!string.IsNullOrWhiteSpace(request.CustomDomain))
-        {
-            var domainExists = await Context.Tenants
-                .AnyAsync(t => t.Id != request.Id && t.CustomDomain != null && t.CustomDomain.ToLower() == request.CustomDomain.ToLower() && !t.IsDeleted, cancellationToken);
-
-            if (domainExists)
-            {
-                return Result.Failure("A tenant with this custom domain already exists");
-            }
-        }
-
-        tenant.Subdomain = request.Subdomain.ToLower().Trim();
+        // Subdomain is immutable after creation — don't update it
         tenant.Name = request.Name;
         tenant.NameAr = request.NameAr;
         tenant.LogoUrl = request.LogoUrl;
-        tenant.ApiBaseUrl = request.ApiBaseUrl;
-        tenant.CustomDomain = request.CustomDomain;
         tenant.IsActive = request.IsActive;
-        tenant.DatabaseIdentifier = request.DatabaseIdentifier;
         tenant.CompanyRegistrationNumber = request.CompanyRegistrationNumber;
         tenant.TaxIdentificationNumber = request.TaxIdentificationNumber;
         tenant.Industry = request.Industry;

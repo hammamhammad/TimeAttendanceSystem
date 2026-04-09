@@ -1,3 +1,4 @@
+using TecAxle.Hrms.Domain.Platform;
 using TecAxle.Hrms.Domain.Users;
 
 namespace TecAxle.Hrms.Application.Abstractions;
@@ -160,4 +161,10 @@ public interface IJwtTokenGenerator
     /// Typical Values: 15 minutes (high security) to 60 minutes (balanced)
     /// </remarks>
     DateTime GetTokenExpiration(bool rememberMe = false);
+
+    /// <summary>
+    /// Generates a JWT access token for a platform admin user with platform_role claim.
+    /// Platform users have no tenant_id — they can switch between tenants via X-Tenant-Id header.
+    /// </summary>
+    string GeneratePlatformAccessToken(PlatformUser user, IReadOnlyList<string> roles, IReadOnlyList<string> permissions, bool rememberMe = false);
 }

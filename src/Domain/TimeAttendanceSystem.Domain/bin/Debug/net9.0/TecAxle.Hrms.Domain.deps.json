@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v9.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v9.0": {
+      "TecAxle.Hrms.Domain/1.0.0": {
+        "runtime": {
+          "TecAxle.Hrms.Domain.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "TecAxle.Hrms.Domain/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

@@ -25,11 +25,14 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
     catchError((error: HttpErrorResponse) => {
       // Handle 401 unauthorized responses
       if (error.status === 401 && !req.url.includes('/auth/refresh')) {
-        // Try to refresh token
+        // Platform users don't have refresh tokens — just return the error, don't logout
+        if (authService.isPlatformUser()) {
+          return throwError(() => error);
+        }
+        // Try to refresh token for tenant users
         if (authService.getRefreshToken()) {
           return authService.refreshToken().pipe(
             switchMap(() => {
-              // Retry original request with new token
               const newToken = authService.getAccessToken();
               const retryReq = req.clone({
                 headers: req.headers.set('Authorization', `Bearer ${newToken}`)
@@ -37,17 +40,15 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, ne
               return next(retryReq);
             }),
             catchError((refreshError) => {
-              // If refresh fails, logout user
               authService.logout();
               return throwError(() => refreshError);
             })
           );
         } else {
-          // No refresh token, logout user
           authService.logout();
         }
       }
-      
+
       return throwError(() => error);
     })
   );

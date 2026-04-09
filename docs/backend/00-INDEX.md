@@ -1,6 +1,6 @@
 # Backend Technical Documentation - Master Index
 
-**Time Attendance System**
+**TecAxle HRMS**
 **Version**: 1.0
 **Date**: November 3, 2025
 **Framework**: .NET 9.0 (C# 13)
@@ -381,8 +381,8 @@ Request → ValidationBehavior → Handler → Response
 
 2. **Apply Migrations**
    ```bash
-   cd src/Api/TimeAttendanceSystem.Api
-   dotnet ef database update --context TimeAttendanceDbContext
+   cd src/Api/TecAxle.Hrms.Api
+   dotnet ef database update --context TecAxleDbContext
    ```
 
 3. **Run Application**
@@ -489,10 +489,10 @@ public class AssetsController : ControllerBase
 - API endpoint tests (controller actions)
 
 ### Test Projects
-- `TimeAttendanceSystem.Domain.Tests`
-- `TimeAttendanceSystem.Application.Tests`
-- `TimeAttendanceSystem.Infrastructure.Tests`
-- `TimeAttendanceSystem.Api.Tests`
+- `TecAxle.Hrms.Domain.Tests`
+- `TecAxle.Hrms.Application.Tests`
+- `TecAxle.Hrms.Infrastructure.Tests`
+- `TecAxle.Hrms.Api.Tests`
 
 ---
 
@@ -592,4 +592,4 @@ For questions or clarifications about this documentation:
 
 ---
 
-*This documentation is auto-generated and maintained as part of the Time Attendance System project. Last updated: November 3, 2025*
+*This documentation is auto-generated and maintained as part of the TecAxle HRMS project. Last updated: November 3, 2025*

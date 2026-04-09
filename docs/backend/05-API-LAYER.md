@@ -1,4 +1,4 @@
-# Time Attendance System - API Layer Documentation
+# TecAxle HRMS - API Layer Documentation
 
 **Version**: 1.0
 **Last Updated**: November 3, 2025
@@ -28,7 +28,7 @@
 
 ### 1.1 Purpose
 
-The API Layer provides **RESTful HTTP endpoints** for the Time Attendance System. It handles HTTP requests/responses, authentication, authorization, and delegates business logic to the Application Layer via MediatR.
+The API Layer provides **RESTful HTTP endpoints** for the TecAxle HRMS. It handles HTTP requests/responses, authentication, authorization, and delegates business logic to the Application Layer via MediatR.
 
 ### 1.2 Architecture
 
@@ -80,10 +80,10 @@ The API Layer provides **RESTful HTTP endpoints** for the Time Attendance System
 
 ### 2.1 Folder Organization
 
-**Location**: `src/Api/TimeAttendanceSystem.Api/`
+**Location**: `src/Api/TecAxle.Hrms.Api/`
 
 ```
-TimeAttendanceSystem.Api/
+TecAxle.Hrms.Api/
 │
 ├── Controllers/                    # 24 API controllers
 │   ├── AuthController.cs           # Authentication
@@ -210,7 +210,7 @@ public class ExampleController : ControllerBase
 
 ### 3.3 Authentication Controller
 
-**Location**: [Controllers/AuthController.cs](../../../src/Api/TimeAttendanceSystem.Api/Controllers/AuthController.cs)
+**Location**: [Controllers/AuthController.cs](../../../src/Api/TecAxle.Hrms.Api/Controllers/AuthController.cs)
 
 #### Endpoints
 
@@ -357,7 +357,7 @@ public async Task<IActionResult> RequestPasswordReset([FromBody] RequestPassword
 
 ### 3.4 Employees Controller
 
-**Location**: [Controllers/EmployeesController.cs](../../../src/Api/TimeAttendanceSystem.Api/Controllers/EmployeesController.cs)
+**Location**: [Controllers/EmployeesController.cs](../../../src/Api/TecAxle.Hrms.Api/Controllers/EmployeesController.cs)
 
 ```csharp
 [ApiController]
@@ -435,7 +435,7 @@ public class EmployeesController : ControllerBase
 
 ### 4.1 Execution Order
 
-**Location**: [Program.cs](../../../src/Api/TimeAttendanceSystem.Api/Program.cs)
+**Location**: [Program.cs](../../../src/Api/TecAxle.Hrms.Api/Program.cs)
 
 ```csharp
 // ══════════════════════════════════════════════════════════
@@ -461,7 +461,7 @@ app.Run();
 
 ### 4.2 Rate Limiting Middleware
 
-**Location**: [Middleware/RateLimitingMiddleware.cs](../../../src/Api/TimeAttendanceSystem.Api/Middleware/RateLimitingMiddleware.cs)
+**Location**: [Middleware/RateLimitingMiddleware.cs](../../../src/Api/TecAxle.Hrms.Api/Middleware/RateLimitingMiddleware.cs)
 
 ```csharp
 public class RateLimitingMiddleware
@@ -536,7 +536,7 @@ public class RateLimitingMiddleware
 
 ### 4.3 Localization Middleware
 
-**Location**: [Middleware/LocalizationMiddleware.cs](../../../src/Api/TimeAttendanceSystem.Api/Middleware/LocalizationMiddleware.cs)
+**Location**: [Middleware/LocalizationMiddleware.cs](../../../src/Api/TecAxle.Hrms.Api/Middleware/LocalizationMiddleware.cs)
 
 ```csharp
 public class LocalizationMiddleware
@@ -659,7 +659,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ## 6. CORS Configuration
 
-**Location**: [Program.cs](../../../src/Api/TimeAttendanceSystem.Api/Program.cs)
+**Location**: [Program.cs](../../../src/Api/TecAxle.Hrms.Api/Program.cs)
 
 ```csharp
 builder.Services.AddCors(options =>
@@ -803,14 +803,14 @@ Content-Type: application/json; charset=utf-8
 
 ### 10.1 Configuration
 
-**Location**: [Program.cs](../../../src/Api/TimeAttendanceSystem.Api/Program.cs)
+**Location**: [Program.cs](../../../src/Api/TecAxle.Hrms.Api/Program.cs)
 
 ```csharp
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "Time Attendance System API",
+        Title = "TecAxle HRMS API",
         Version = "v1",
         Description = "RESTful API for Time Attendance Management",
         Contact = new OpenApiContact
@@ -864,7 +864,7 @@ builder.Services.AddSwaggerGen(options =>
 
 ### 11.1 Security Headers
 
-**Location**: [Filters/SecurityHeadersFilter.cs](../../../src/Api/TimeAttendanceSystem.Api/Filters/SecurityHeadersFilter.cs)
+**Location**: [Filters/SecurityHeadersFilter.cs](../../../src/Api/TecAxle.Hrms.Api/Filters/SecurityHeadersFilter.cs)
 
 ```csharp
 public class SecurityHeadersFilter : IActionFilter
@@ -911,7 +911,7 @@ public class SecurityHeadersFilter : IActionFilter
 
 ### 11.3 Audit Logging
 
-**Location**: [Filters/AuditActionFilter.cs](../../../src/Api/TimeAttendanceSystem.Api/Filters/AuditActionFilter.cs)
+**Location**: [Filters/AuditActionFilter.cs](../../../src/Api/TecAxle.Hrms.Api/Filters/AuditActionFilter.cs)
 
 ```csharp
 public class AuditActionFilter : IAsyncActionFilter
@@ -995,7 +995,7 @@ public class MyEntityController : ControllerBase
 
 **Development**:
 ```bash
-dotnet run --project src/Api/TimeAttendanceSystem.Api
+dotnet run --project src/Api/TecAxle.Hrms.Api
 ```
 
 **Access Points**:

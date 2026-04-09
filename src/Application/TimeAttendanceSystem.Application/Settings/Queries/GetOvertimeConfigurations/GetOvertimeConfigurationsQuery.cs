@@ -1,3 +1,6 @@
+using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Domain.Modules;
+
 namespace TecAxle.Hrms.Application.Settings.Queries.GetOvertimeConfigurations;
 
 /// <summary>
@@ -44,6 +47,7 @@ namespace TecAxle.Hrms.Application.Settings.Queries.GetOvertimeConfigurations;
 /// - Role-based filtering applied automatically
 /// - Branch-level access restrictions enforced
 /// </remarks>
+[RequiresModule(SystemModule.TimeAttendance, AllowReadWhenDisabled = true)]
 public record GetOvertimeConfigurationsQuery(
     int Page = 1,
     int PageSize = 10,

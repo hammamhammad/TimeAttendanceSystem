@@ -18,21 +18,37 @@
     <div class="card mb-4">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
-          <div>
-            <h4 class="mb-1">{{ tenant()!.name }}</h4>
-            @if (tenant()!.nameAr) {
-              <p class="text-muted mb-1">{{ tenant()!.nameAr }}</p>
-            }
-            <div class="d-flex align-items-center gap-2 mt-2">
-              <app-status-badge
-                [label]="statusBadge().label"
-                [variant]="statusBadge().variant">
-              </app-status-badge>
-              @if (tenant()!.subscriptionPlanName) {
-                <span class="badge bg-primary-subtle text-primary">
-                  {{ tenant()!.subscriptionPlanName }}
-                </span>
+          <div class="d-flex align-items-start gap-3">
+            <!-- Tenant Logo -->
+            <div class="tenant-logo-container">
+              @if (tenant()!.logoUrl) {
+                <img
+                  [src]="getLogoUrl(tenant()!.logoUrl!)"
+                  [alt]="tenant()!.name"
+                  class="tenant-logo"
+                  (error)="onLogoError($event)">
+              } @else {
+                <div class="tenant-logo-placeholder">
+                  <i class="fa-solid fa-building"></i>
+                </div>
               }
+            </div>
+            <div>
+              <h4 class="mb-1">{{ tenant()!.name }}</h4>
+              @if (tenant()!.nameAr) {
+                <p class="text-muted mb-1">{{ tenant()!.nameAr }}</p>
+              }
+              <div class="d-flex align-items-center gap-2 mt-2">
+                <app-status-badge
+                  [label]="statusBadge().label"
+                  [variant]="statusBadge().variant">
+                </app-status-badge>
+                @if (tenant()!.subscriptionPlanName) {
+                  <span class="badge bg-primary-subtle text-primary">
+                    {{ tenant()!.subscriptionPlanName }}
+                  </span>
+                }
+              </div>
             </div>
           </div>
           <div class="d-flex gap-2 flex-wrap">
@@ -130,6 +146,17 @@
           <app-section-card [title]="'Default Settings'" icon="fas fa-cog" headerClass="bg-light">
             <app-definition-list
               [items]="defaultsItems()"
+              layout="single"
+              [striped]="true">
+            </app-definition-list>
+          </app-section-card>
+        </div>
+
+        <!-- Database Status -->
+        <div class="mt-4">
+          <app-section-card [title]="'Database Status'" icon="fas fa-database" headerClass="bg-light">
+            <app-definition-list
+              [items]="databaseInfoItems()"
               layout="single"
               [striped]="true">
             </app-definition-list>

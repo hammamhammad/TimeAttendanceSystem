@@ -48,8 +48,8 @@ export class TenantService {
     return this.http.get<TenantDetailDto>(`${this.baseUrl}/${id}`);
   }
 
-  createTenant(request: CreateTenantRequest): Observable<{ id: number }> {
-    return this.http.post<{ id: number }>(this.baseUrl, request);
+  createTenant(request: CreateTenantRequest): Observable<{ id: number; warning?: string }> {
+    return this.http.post<{ id: number; warning?: string }>(this.baseUrl, request);
   }
 
   updateTenant(id: number, request: UpdateTenantRequest): Observable<void> {
@@ -72,6 +72,18 @@ export class TenantService {
 
   getSubscriptionPlanById(id: number): Observable<SubscriptionPlanDto> {
     return this.http.get<SubscriptionPlanDto>(`${this.plansUrl}/${id}`);
+  }
+
+  createSubscriptionPlan(data: any): Observable<{ id: number }> {
+    return this.http.post<{ id: number }>(this.plansUrl, data);
+  }
+
+  updateSubscriptionPlan(id: number, data: any): Observable<any> {
+    return this.http.put<any>(`${this.plansUrl}/${id}`, data);
+  }
+
+  deleteSubscriptionPlan(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.plansUrl}/${id}`);
   }
 
   // --- Tenant Subscription ---

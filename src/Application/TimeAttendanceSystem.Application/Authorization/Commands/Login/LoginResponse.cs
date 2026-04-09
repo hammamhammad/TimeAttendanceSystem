@@ -51,7 +51,8 @@ public record LoginResponse(
     string RefreshToken,
     DateTime ExpiresAt,
     bool MustChangePassword,
-    UserInfo User
+    UserInfo User,
+    bool IsPlatformUser = false
 );
 
 /// <summary>

@@ -11,6 +11,7 @@ import { StatCardComponent } from '../../../shared/components/stat-card/stat-car
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { AuditHistoryComponent } from '../../../shared/components/audit-history/audit-history.component';
 import { SectionCardComponent } from '../../../shared/components/section-card/section-card.component';
+import { LocationPickerComponent } from '../../../shared/components/location-picker/location-picker.component';
 
 @Component({
   selector: 'app-view-branch',
@@ -23,7 +24,8 @@ import { SectionCardComponent } from '../../../shared/components/section-card/se
     StatCardComponent,
     LoadingSpinnerComponent,
     AuditHistoryComponent,
-    SectionCardComponent
+    SectionCardComponent,
+    LocationPickerComponent
 ],
   template: `
     <div class="app-view-page app-modern-view">
@@ -114,6 +116,21 @@ import { SectionCardComponent } from '../../../shared/components/section-card/se
             </div>
           </div>
         </div>
+
+        <!-- Map Location -->
+        @if (branch()?.latitude != null && branch()?.longitude != null) {
+          <div class="mt-4">
+            <app-section-card [title]="i18n.t('branches.gps_settings')" icon="fas fa-map-location-dot">
+              <app-location-picker
+                [latitude]="branch()?.latitude ?? null"
+                [longitude]="branch()?.longitude ?? null"
+                [radiusMeters]="branch()?.geofenceRadiusMeters || 100"
+                [readonly]="true"
+                [height]="'400px'">
+              </app-location-picker>
+            </app-section-card>
+          </div>
+        }
 
         <!-- Audit History -->
         <div class="mt-4">

@@ -56,10 +56,14 @@ public class ProcessMobileTransactionCommandHandler : BaseHandler<ProcessMobileT
 
         // ==== RESOLVE TENANT SETTINGS FOR MOBILE CHECK-IN ====
         ResolvedSettingsDto? resolvedSettings = null;
-        if (_tenantSettingsResolver != null && branch.TenantId > 0)
+        if (_tenantSettingsResolver != null)
         {
-            try { resolvedSettings = await _tenantSettingsResolver.GetSettingsAsync(branch.TenantId, branch.Id, ct: cancellationToken); }
-            catch { /* Fall back to requiring both GPS and NFC if resolver fails */ }
+            var tenantId = await ResolveTenantIdAsync(cancellationToken);
+            if (tenantId.HasValue)
+            {
+                try { resolvedSettings = await _tenantSettingsResolver.GetSettingsAsync(tenantId.Value, branch.Id, ct: cancellationToken); }
+                catch { /* Fall back to requiring both GPS and NFC if resolver fails */ }
+            }
         }
 
         var requireGps = resolvedSettings?.RequireGpsForMobile ?? true;

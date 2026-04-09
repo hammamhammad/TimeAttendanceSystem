@@ -11,7 +11,7 @@ using TecAxle.Hrms.Infrastructure.Persistence;
 
 namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
 {
-    [DbContext(typeof(TimeAttendanceDbContext))]
+    [DbContext(typeof(TecAxleDbContext))]
     [Migration("20260402111239_AddPhase6TimesheetManagement")]
     partial class AddPhase6TimesheetManagement
     {

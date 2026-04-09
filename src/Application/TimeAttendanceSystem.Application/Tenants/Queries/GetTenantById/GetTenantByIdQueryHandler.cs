@@ -26,11 +26,9 @@ public class GetTenantByIdQueryHandler : BaseHandler<GetTenantByIdQuery, Result<
             return Result.Failure<TenantDetailDto>("Tenant not found");
         }
 
-        var branchCount = await Context.Branches
-            .CountAsync(b => b.TenantId == tenant.Id && !b.IsDeleted, cancellationToken);
-
-        var employeeCount = await Context.Employees
-            .CountAsync(e => Context.Branches.Any(b => b.Id == e.BranchId && b.TenantId == tenant.Id && !b.IsDeleted) && !e.IsDeleted, cancellationToken);
+        // Cross-tenant DB counts require connecting to each tenant's DB — not available in master context
+        var branchCount = 0;
+        var employeeCount = 0;
 
         // Load active subscription with plan, add-ons, and module entitlements
         var subscription = await Context.TenantSubscriptions
@@ -77,6 +75,8 @@ public class GetTenantByIdQueryHandler : BaseHandler<GetTenantByIdQuery, Result<
             CreatedAtUtc = tenant.CreatedAtUtc,
             BranchCount = branchCount,
             EmployeeCount = employeeCount,
+            DatabaseName = tenant.DatabaseName,
+            DatabaseCreatedAt = tenant.DatabaseCreatedAt,
             Subscription = subscriptionDto
         };
 

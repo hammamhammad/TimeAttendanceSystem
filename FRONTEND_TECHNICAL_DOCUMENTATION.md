@@ -1,4 +1,4 @@
-# Time Attendance System - Frontend Technical Documentation
+# TecAxle HRMS - Frontend Technical Documentation
 
 **Version**: 1.0
 **Date**: November 3, 2025
@@ -9,7 +9,7 @@
 
 ## 📖 Welcome to the Frontend Documentation
 
-This is the master entry point for the Time Attendance System frontend documentation. The frontend is built with Angular 17+ using modern patterns including standalone components, signals API, and the new control flow syntax.
+This is the master entry point for the TecAxle HRMS frontend documentation. The frontend is built with Angular 17+ using modern patterns including standalone components, signals API, and the new control flow syntax.
 
 ---
 

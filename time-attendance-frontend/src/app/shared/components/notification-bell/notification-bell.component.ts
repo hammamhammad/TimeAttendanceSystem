@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { NotificationBellService } from '../../../core/services/notification-bell.service';
 import { I18nService } from '../../../core/i18n/i18n.service';
+import { AuthService } from '../../../core/auth/auth.service';
 import { Notification, NotificationType } from '../../models/notification.model';
 
 @Component({
@@ -14,6 +15,7 @@ import { Notification, NotificationType } from '../../models/notification.model'
 })
 export class NotificationBellComponent implements OnInit, OnDestroy {
   private readonly notificationService = inject(NotificationBellService);
+  private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   readonly i18n = inject(I18nService);
 
@@ -36,7 +38,10 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
   currentLang = computed(() => this.i18n.locale());
 
   ngOnInit(): void {
-    this.notificationService.initialize();
+    // Platform admin has no tenant context — skip notification loading
+    if (!this.authService.isPlatformUser()) {
+      this.notificationService.initialize();
+    }
   }
 
   ngOnDestroy(): void {

@@ -1,7 +1,7 @@
 // Quick tool to add excuse policy to database
 using Npgsql;
 
-string connectionString = "Host=localhost;Port=5432;Database=TimeAttendanceSystem;Username=postgres;Password=P@ssw0rd@3213;Include Error Detail=true";
+string connectionString = "Host=localhost;Port=5432;Database=TecAxleHRMS;Username=postgres;Password=P@ssw0rd@3213;Include Error Detail=true";
 
 string sql = @"
 DO $$

@@ -1,4 +1,4 @@
-# Time Attendance System - Domain Layer Documentation
+# TecAxle HRMS - Domain Layer Documentation
 
 **Version**: 1.0
 **Last Updated**: November 3, 2025
@@ -67,7 +67,7 @@ The Domain Layer is the **heart of the application** and contains:
 ### 1.3 Project Structure
 
 ```
-src/Domain/TimeAttendanceSystem.Domain/
+src/Domain/TecAxle.Hrms.Domain/
 ├── Common/
 │   ├── BaseEntity.cs                    # Base class for all entities
 │   ├── ValueObject.cs                   # Base for value objects
@@ -132,7 +132,7 @@ src/Domain/TimeAttendanceSystem.Domain/
 
 ### 2.1 BaseEntity
 
-**Location**: [Common/BaseEntity.cs](../../src/Domain/TimeAttendanceSystem.Domain/Common/BaseEntity.cs)
+**Location**: [Common/BaseEntity.cs](../../src/Domain/TecAxle.Hrms.Domain/Common/BaseEntity.cs)
 
 **Purpose**: Foundation for all domain entities providing:
 - Unique identification
@@ -196,7 +196,7 @@ var user = dbContext.Users
 
 ### 2.2 ValueObject
 
-**Location**: [Common/ValueObject.cs](../../src/Domain/TimeAttendanceSystem.Domain/Common/ValueObject.cs)
+**Location**: [Common/ValueObject.cs](../../src/Domain/TecAxle.Hrms.Domain/Common/ValueObject.cs)
 
 **Purpose**: Base class for value objects following DDD patterns.
 
@@ -267,7 +267,7 @@ public class TimeRange : ValueObject
 
 #### 3.1.1 User (Aggregate Root)
 
-**Location**: [Users/User.cs](../../src/Domain/TimeAttendanceSystem.Domain/Users/User.cs)
+**Location**: [Users/User.cs](../../src/Domain/TecAxle.Hrms.Domain/Users/User.cs)
 
 **Core Properties**:
 
@@ -358,7 +358,7 @@ public class User : BaseEntity
 
 #### 3.1.2 Role
 
-**Location**: [Users/Role.cs](../../src/Domain/TimeAttendanceSystem.Domain/Users/Role.cs)
+**Location**: [Users/Role.cs](../../src/Domain/TecAxle.Hrms.Domain/Users/Role.cs)
 
 **Properties**:
 
@@ -391,7 +391,7 @@ public class Role : BaseEntity
 
 #### 3.1.3 Permission
 
-**Location**: [Users/Permission.cs](../../src/Domain/TimeAttendanceSystem.Domain/Users/Permission.cs)
+**Location**: [Users/Permission.cs](../../src/Domain/TecAxle.Hrms.Domain/Users/Permission.cs)
 
 **Properties**:
 
@@ -420,14 +420,14 @@ attendance.approve    - Approve attendance records
 shift.assign          - Assign shifts to employees
 ```
 
-**Resources** (see [PermissionResources.cs](../../src/Domain/TimeAttendanceSystem.Domain/Common/PermissionResources.cs)):
+**Resources** (see [PermissionResources.cs](../../src/Domain/TecAxle.Hrms.Domain/Common/PermissionResources.cs)):
 ```
 user, role, employee, branch, department, shift, attendance, schedule,
 report, settings, dashboard, permission, audit, notification, system,
 publicHoliday, vacationType, vacation, excusePolicy, excuse, session
 ```
 
-**Actions** (see [PermissionActions.cs](../../src/Domain/TimeAttendanceSystem.Domain/Common/PermissionActions.cs)):
+**Actions** (see [PermissionActions.cs](../../src/Domain/TecAxle.Hrms.Domain/Common/PermissionActions.cs)):
 ```
 read, create, update, delete, export, import, approve, reject, lock, unlock,
 resetPassword, assignRole, removeRole, assignPermission, removePermission,
@@ -439,7 +439,7 @@ unassign, manage, configure, bulkCreate
 
 #### 3.1.4 Supporting Entities
 
-**RefreshToken** - [Users/RefreshToken.cs](../../src/Domain/TimeAttendanceSystem.Domain/Users/RefreshToken.cs)
+**RefreshToken** - [Users/RefreshToken.cs](../../src/Domain/TecAxle.Hrms.Domain/Users/RefreshToken.cs)
 
 ```csharp
 public class RefreshToken : BaseEntity
@@ -460,7 +460,7 @@ public class RefreshToken : BaseEntity
 }
 ```
 
-**LoginAttempt** - [Users/LoginAttempt.cs](../../src/Domain/TimeAttendanceSystem.Domain/Users/LoginAttempt.cs)
+**LoginAttempt** - [Users/LoginAttempt.cs](../../src/Domain/TecAxle.Hrms.Domain/Users/LoginAttempt.cs)
 
 ```csharp
 public class LoginAttempt : BaseEntity
@@ -477,7 +477,7 @@ public class LoginAttempt : BaseEntity
 }
 ```
 
-**PasswordHistory** - [Users/PasswordHistory.cs](../../src/Domain/TimeAttendanceSystem.Domain/Users/PasswordHistory.cs)
+**PasswordHistory** - [Users/PasswordHistory.cs](../../src/Domain/TecAxle.Hrms.Domain/Users/PasswordHistory.cs)
 
 ```csharp
 public class PasswordHistory : BaseEntity
@@ -492,7 +492,7 @@ public class PasswordHistory : BaseEntity
 }
 ```
 
-**UserSession** - [Users/UserSession.cs](../../src/Domain/TimeAttendanceSystem.Domain/Users/UserSession.cs)
+**UserSession** - [Users/UserSession.cs](../../src/Domain/TecAxle.Hrms.Domain/Users/UserSession.cs)
 
 ```csharp
 public class UserSession : BaseEntity
@@ -514,7 +514,7 @@ public class UserSession : BaseEntity
 }
 ```
 
-**TwoFactorBackupCode** - [Users/TwoFactorBackupCode.cs](../../src/Domain/TimeAttendanceSystem.Domain/Users/TwoFactorBackupCode.cs)
+**TwoFactorBackupCode** - [Users/TwoFactorBackupCode.cs](../../src/Domain/TecAxle.Hrms.Domain/Users/TwoFactorBackupCode.cs)
 
 ```csharp
 public class TwoFactorBackupCode : BaseEntity
@@ -539,7 +539,7 @@ public class TwoFactorBackupCode : BaseEntity
 
 #### 3.2.1 Employee (Aggregate Root)
 
-**Location**: [Employees/Employee.cs](../../src/Domain/TimeAttendanceSystem.Domain/Employees/Employee.cs)
+**Location**: [Employees/Employee.cs](../../src/Domain/TecAxle.Hrms.Domain/Employees/Employee.cs)
 
 **Core Properties**:
 
@@ -646,7 +646,7 @@ public enum WorkLocationType
 
 #### 3.2.2 EmployeeUserLink
 
-**Location**: [Employees/EmployeeUserLink.cs](../../src/Domain/TimeAttendanceSystem.Domain/Employees/EmployeeUserLink.cs)
+**Location**: [Employees/EmployeeUserLink.cs](../../src/Domain/TecAxle.Hrms.Domain/Employees/EmployeeUserLink.cs)
 
 **Purpose**: One-to-one link between Employee and User account.
 
@@ -677,7 +677,7 @@ public class EmployeeUserLink : BaseEntity
 
 #### 3.3.1 Branch (Aggregate Root)
 
-**Location**: [Branches/Branch.cs](../../src/Domain/TimeAttendanceSystem.Domain/Branches/Branch.cs)
+**Location**: [Branches/Branch.cs](../../src/Domain/TecAxle.Hrms.Domain/Branches/Branch.cs)
 
 ```csharp
 public class Branch : BaseEntity
@@ -712,7 +712,7 @@ public class Branch : BaseEntity
 
 #### 3.3.2 Department
 
-**Location**: [Branches/Department.cs](../../src/Domain/TimeAttendanceSystem.Domain/Branches/Department.cs)
+**Location**: [Branches/Department.cs](../../src/Domain/TecAxle.Hrms.Domain/Branches/Department.cs)
 
 ```csharp
 public class Department : BaseEntity
@@ -787,7 +787,7 @@ public class Department : BaseEntity
 
 #### 3.4.1 Shift (Aggregate Root)
 
-**Location**: [Shifts/Shift.cs](../../src/Domain/TimeAttendanceSystem.Domain/Shifts/Shift.cs)
+**Location**: [Shifts/Shift.cs](../../src/Domain/TecAxle.Hrms.Domain/Shifts/Shift.cs)
 
 **Core Properties**:
 
@@ -981,7 +981,7 @@ public decimal CalculateCoreHours()
 
 #### 3.4.2 ShiftPeriod
 
-**Location**: [Shifts/ShiftPeriod.cs](../../src/Domain/TimeAttendanceSystem.Domain/Shifts/ShiftPeriod.cs)
+**Location**: [Shifts/ShiftPeriod.cs](../../src/Domain/TecAxle.Hrms.Domain/Shifts/ShiftPeriod.cs)
 
 ```csharp
 public class ShiftPeriod : BaseEntity
@@ -1044,7 +1044,7 @@ public (bool IsValid, string? ErrorMessage) ValidatePeriod()
 
 #### 3.4.3 ShiftAssignment
 
-**Location**: [Shifts/ShiftAssignment.cs](../../src/Domain/TimeAttendanceSystem.Domain/Shifts/ShiftAssignment.cs)
+**Location**: [Shifts/ShiftAssignment.cs](../../src/Domain/TecAxle.Hrms.Domain/Shifts/ShiftAssignment.cs)
 
 **Purpose**: Assign shifts to employees, departments, or branches with priority-based override.
 
@@ -1191,7 +1191,7 @@ If both removed, he gets "9-5 Standard"
 
 #### 3.5.1 AttendanceRecord (Aggregate Root)
 
-**Location**: [Attendance/AttendanceRecord.cs](../../src/Domain/TimeAttendanceSystem.Domain/Attendance/AttendanceRecord.cs)
+**Location**: [Attendance/AttendanceRecord.cs](../../src/Domain/TecAxle.Hrms.Domain/Attendance/AttendanceRecord.cs)
 
 **This is the most complex entity in the domain** - handles all attendance logic.
 
@@ -1450,7 +1450,7 @@ public decimal CalculateCompletionPercentage()
 
 #### 3.5.2 AttendanceTransaction
 
-**Location**: [Attendance/AttendanceTransaction.cs](../../src/Domain/TimeAttendanceSystem.Domain/Attendance/AttendanceTransaction.cs)
+**Location**: [Attendance/AttendanceTransaction.cs](../../src/Domain/TecAxle.Hrms.Domain/Attendance/AttendanceTransaction.cs)
 
 **Purpose**: Individual time clock events (check-in, check-out, breaks).
 
@@ -1568,7 +1568,7 @@ Net Working Time: 7 hours 15 minutes
 
 #### 3.5.3 WorkingDay
 
-**Location**: [Attendance/WorkingDay.cs](../../src/Domain/TimeAttendanceSystem.Domain/Attendance/WorkingDay.cs)
+**Location**: [Attendance/WorkingDay.cs](../../src/Domain/TecAxle.Hrms.Domain/Attendance/WorkingDay.cs)
 
 **Purpose**: Detailed time period analysis for payroll and reporting.
 
@@ -1685,7 +1685,7 @@ public bool IsPerfectAttendanceDay()
 
 #### 3.6.1 OvertimeConfiguration
 
-**Location**: [Settings/OvertimeConfiguration.cs](../../src/Domain/TimeAttendanceSystem.Domain/Settings/OvertimeConfiguration.cs)
+**Location**: [Settings/OvertimeConfiguration.cs](../../src/Domain/TecAxle.Hrms.Domain/Settings/OvertimeConfiguration.cs)
 
 **Purpose**: Organization-wide overtime calculation rules.
 
@@ -1817,7 +1817,7 @@ var config = new OvertimeConfiguration
 
 #### 3.6.2 PublicHoliday
 
-**Location**: [Settings/PublicHoliday.cs](../../src/Domain/TimeAttendanceSystem.Domain/Settings/PublicHoliday.cs)
+**Location**: [Settings/PublicHoliday.cs](../../src/Domain/TecAxle.Hrms.Domain/Settings/PublicHoliday.cs)
 
 **Purpose**: Holiday calendar with flexible recurrence patterns.
 
@@ -2045,7 +2045,7 @@ new PublicHoliday
 
 #### 3.6.3 OffDay
 
-**Location**: [Settings/OffDay.cs](../../src/Domain/TimeAttendanceSystem.Domain/Settings/OffDay.cs)
+**Location**: [Settings/OffDay.cs](../../src/Domain/TecAxle.Hrms.Domain/Settings/OffDay.cs)
 
 **Purpose**: Weekend/off-day configuration (highest overtime rate).
 
@@ -2268,7 +2268,7 @@ new OffDay
 
 #### 3.7.1 VacationType
 
-**Location**: [VacationTypes/VacationType.cs](../../src/Domain/TimeAttendanceSystem.Domain/VacationTypes/VacationType.cs)
+**Location**: [VacationTypes/VacationType.cs](../../src/Domain/TecAxle.Hrms.Domain/VacationTypes/VacationType.cs)
 
 **Purpose**: Simplified vacation type categorization.
 
@@ -2308,7 +2308,7 @@ public class VacationType : BaseEntity
 
 #### 3.7.2 EmployeeVacation
 
-**Location**: [Vacations/EmployeeVacation.cs](../../src/Domain/TimeAttendanceSystem.Domain/Vacations/EmployeeVacation.cs)
+**Location**: [Vacations/EmployeeVacation.cs](../../src/Domain/TecAxle.Hrms.Domain/Vacations/EmployeeVacation.cs)
 
 **Purpose**: Employee vacation period tracking.
 
@@ -2457,7 +2457,7 @@ public void UpdateApprovalStatus(bool approved, string? notes)
 
 #### 3.8.1 ExcusePolicy
 
-**Location**: [Excuses/ExcusePolicy.cs](../../src/Domain/TimeAttendanceSystem.Domain/Excuses/ExcusePolicy.cs)
+**Location**: [Excuses/ExcusePolicy.cs](../../src/Domain/TecAxle.Hrms.Domain/Excuses/ExcusePolicy.cs)
 
 **Purpose**: Organizational policy for personal excuses and official duties.
 
@@ -2561,7 +2561,7 @@ public string GetPolicySummary()
 
 #### 3.8.2 EmployeeExcuse
 
-**Location**: [Excuses/EmployeeExcuse.cs](../../src/Domain/TimeAttendanceSystem.Domain/Excuses/EmployeeExcuse.cs)
+**Location**: [Excuses/EmployeeExcuse.cs](../../src/Domain/TecAxle.Hrms.Domain/Excuses/EmployeeExcuse.cs)
 
 **Purpose**: Employee excuse request (partial day time-off).
 
@@ -2727,7 +2727,7 @@ public void UpdateTimes(TimeOnly start, TimeOnly end)
 
 #### 3.9.1 RemoteWorkPolicy
 
-**Location**: [RemoteWork/RemoteWorkPolicy.cs](../../src/Domain/TimeAttendanceSystem.Domain/RemoteWork/RemoteWorkPolicy.cs)
+**Location**: [RemoteWork/RemoteWorkPolicy.cs](../../src/Domain/TecAxle.Hrms.Domain/RemoteWork/RemoteWorkPolicy.cs)
 
 **Purpose**: Remote work quota and rules management.
 
@@ -2825,7 +2825,7 @@ public enum QuotaPeriod
 
 #### 3.9.2 RemoteWorkRequest
 
-**Location**: [RemoteWork/RemoteWorkRequest.cs](../../src/Domain/TimeAttendanceSystem.Domain/RemoteWork/RemoteWorkRequest.cs)
+**Location**: [RemoteWork/RemoteWorkRequest.cs](../../src/Domain/TecAxle.Hrms.Domain/RemoteWork/RemoteWorkRequest.cs)
 
 **Purpose**: Employee remote work request (date range based).
 
@@ -2954,7 +2954,7 @@ public int GetTotalDays()
 
 #### 3.10.1 FingerprintRequest
 
-**Location**: [FingerprintRequests/FingerprintRequest.cs](../../src/Domain/TimeAttendanceSystem.Domain/FingerprintRequests/FingerprintRequest.cs)
+**Location**: [FingerprintRequests/FingerprintRequest.cs](../../src/Domain/TecAxle.Hrms.Domain/FingerprintRequests/FingerprintRequest.cs)
 
 **Purpose**: Employee fingerprint enrollment/update request management.
 

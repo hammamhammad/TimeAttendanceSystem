@@ -6,7 +6,7 @@ using TecAxle.Hrms.Application.Abstractions;
 namespace TecAxle.Hrms.Application.VacationTypes.Commands.ToggleVacationTypeStatus;
 
 /// <summary>
-/// Command handler for toggling vacation type status in the Time Attendance System.
+/// Command handler for toggling vacation type status in the TecAxle HRMS.
 /// Implements comprehensive validation, business rule enforcement, and impact assessment
 /// for safe vacation type status changes with audit trail generation and operational continuity.
 /// </summary>

@@ -3,7 +3,7 @@ using TecAxle.Hrms.Domain.Common;
 namespace TecAxle.Hrms.Domain.Users;
 
 /// <summary>
-/// Represents a user account in the Time Attendance System.
+/// Represents a user account in the TecAxle HRMS.
 /// This aggregate root encapsulates user identity, authentication credentials,
 /// security settings, and relationships with roles and branches.
 /// 
@@ -187,6 +187,12 @@ public class User : BaseEntity
     /// Can be reactivated by administrators if needed.
     /// </remarks>
     public bool IsActive { get; set; } = true;
+
+    /// <summary>
+    /// Indicates this is a system-provisioned user that cannot be edited or deleted.
+    /// Set to true for the tecaxleadmin user created during tenant provisioning.
+    /// </summary>
+    public bool IsSystemUser { get; set; }
 
     // Navigation Properties - Define relationships with other entities
 

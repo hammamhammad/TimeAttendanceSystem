@@ -1,6 +1,6 @@
 using Npgsql;
 
-var connStr = "Host=localhost;Port=5432;Database=TimeAttendanceSystem;Username=postgres;Password=P@ssw0rd@3213";
+var connStr = "Host=localhost;Port=5432;Database=TecAxleHRMS;Username=postgres;Password=P@ssw0rd@3213";
 using var conn = new NpgsqlConnection(connStr);
 conn.Open();
 

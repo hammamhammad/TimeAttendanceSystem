@@ -25,10 +25,10 @@ public class DeleteUserCommandHandler : BaseHandler<DeleteUserCommand, Result<Un
             return Result.Failure<Unit>("User not found");
         }
 
-        // Prevent deletion of the systemadmin user only
-        if (user.Username.Equals("systemadmin", StringComparison.OrdinalIgnoreCase))
+        // Prevent deletion of system-provisioned users (tecaxleadmin)
+        if (user.IsSystemUser)
         {
-            return Result.Failure<Unit>("Cannot delete the systemadmin user");
+            return Result.Failure<Unit>("Cannot delete a system-provisioned user");
         }
 
         // Check if user is linked to any employees

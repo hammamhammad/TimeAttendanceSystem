@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Domain.Branches;
+using TecAxle.Hrms.Domain.Platform;
 using TecAxle.Hrms.Domain.Common;
 using TecAxle.Hrms.Domain.Employees;
 using TecAxle.Hrms.Domain.Users;
@@ -41,9 +42,9 @@ namespace TecAxle.Hrms.Infrastructure.Persistence;
 
 public class ApplicationDbContextAdapter : IApplicationDbContext
 {
-    private readonly TimeAttendanceDbContext _context;
+    private readonly TecAxleDbContext _context;
 
-    public ApplicationDbContextAdapter(TimeAttendanceDbContext context)
+    public ApplicationDbContextAdapter(TecAxleDbContext context)
     {
         _context = context;
     }
@@ -107,6 +108,10 @@ public class ApplicationDbContextAdapter : IApplicationDbContext
 
     // Multi-tenant entities
     public DbSet<Tenant> Tenants => _context.Tenants;
+    public DbSet<TenantUserEmail> TenantUserEmails => _context.TenantUserEmails;
+
+    // Platform entities
+    public DbSet<PlatformUser> PlatformUsers => _context.PlatformUsers;
 
     // Subscription & Entitlements
     public DbSet<SubscriptionPlan> SubscriptionPlans => _context.SubscriptionPlans;

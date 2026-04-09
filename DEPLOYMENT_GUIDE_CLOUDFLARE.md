@@ -237,7 +237,7 @@ sudo -u postgres psql
 ALTER USER postgres WITH PASSWORD 'YourStrongPassword!@#2026';
 
 -- Create the database
-CREATE DATABASE "TimeAttendanceSystem" OWNER postgres;
+CREATE DATABASE "TecAxle.Hrms" OWNER postgres;
 
 -- Verify
 \l
@@ -314,10 +314,10 @@ chown -R timeattendance:timeattendance /opt/timeattendance
 Open a terminal on your local Windows machine:
 
 ```powershell
-cd D:\Work\TimeAttendanceSystem
+cd D:\Work\TecAxle.Hrms
 
 # Publish the backend for Linux
-dotnet publish src/Api/TimeAttendanceSystem.Api/TimeAttendanceSystem.Api.csproj `
+dotnet publish src/Api/TecAxle.Hrms.Api/TecAxle.Hrms.Api.csproj `
   --configuration Release `
   --runtime linux-x64 `
   --self-contained false `
@@ -352,13 +352,13 @@ Paste the following (replace passwords and secrets):
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Port=5432;Database=TimeAttendanceSystem;Username=postgres;Password=YourStrongPassword!@#2026;Include Error Detail=false",
-    "PostgreSqlConnection": "Host=localhost;Port=5432;Database=TimeAttendanceSystem;Username=postgres;Password=YourStrongPassword!@#2026;Include Error Detail=false"
+    "DefaultConnection": "Host=localhost;Port=5432;Database=TecAxle.Hrms;Username=postgres;Password=YourStrongPassword!@#2026;Include Error Detail=false",
+    "PostgreSqlConnection": "Host=localhost;Port=5432;Database=TecAxle.Hrms;Username=postgres;Password=YourStrongPassword!@#2026;Include Error Detail=false"
   },
   "Jwt": {
     "Secret": "REPLACE_WITH_GENERATED_SECRET_SEE_BELOW",
-    "Issuer": "TimeAttendanceSystem",
-    "Audience": "TimeAttendanceSystem-Client",
+    "Issuer": "TecAxle.Hrms",
+    "Audience": "TecAxle.Hrms-Client",
     "ExpiryMinutes": 1440,
     "RememberMeDays": 7
   },
@@ -435,13 +435,13 @@ Update the connection string in `appsettings.Production.json` on your local mach
 ssh -L 5433:localhost:5432 deployer@76.13.184.116
 
 # In another terminal, run migrations using the tunnel
-cd D:\Work\TimeAttendanceSystem
+cd D:\Work\TecAxle.Hrms
 $env:ASPNETCORE_ENVIRONMENT="Production"
 
 # Temporarily update connection string to use port 5433 (the tunnel)
 dotnet ef database update `
-  --project src/Infrastructure/TimeAttendanceSystem.Infrastructure `
-  --startup-project src/Api/TimeAttendanceSystem.Api
+  --project src/Infrastructure/TecAxle.Hrms.Infrastructure `
+  --startup-project src/Api/TecAxle.Hrms.Api
 ```
 
 **Option B — Install SDK temporarily on server**:
@@ -455,8 +455,8 @@ git clone YOUR_REPO_URL timeattendance-temp
 cd timeattendance-temp
 
 dotnet ef database update \
-  --project src/Infrastructure/TimeAttendanceSystem.Infrastructure \
-  --startup-project src/Api/TimeAttendanceSystem.Api \
+  --project src/Infrastructure/TecAxle.Hrms.Infrastructure \
+  --startup-project src/Api/TecAxle.Hrms.Api \
   --configuration Release
 
 # Clean up
@@ -483,7 +483,7 @@ dotnet run --project RunSampleData.csproj
 ```bash
 sudo cat > /etc/systemd/system/timeattendance.service << 'EOF'
 [Unit]
-Description=Time Attendance System API
+Description=TecAxle HRMS API
 After=network.target postgresql.service
 Wants=postgresql.service
 
@@ -492,7 +492,7 @@ Type=exec
 User=timeattendance
 Group=timeattendance
 WorkingDirectory=/opt/timeattendance/publish
-ExecStart=/usr/bin/dotnet /opt/timeattendance/publish/TimeAttendanceSystem.Api.dll
+ExecStart=/usr/bin/dotnet /opt/timeattendance/publish/TecAxle.Hrms.Api.dll
 Environment=ASPNETCORE_ENVIRONMENT=Production
 Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
 
@@ -684,7 +684,7 @@ Both Angular frontends are deployed as static sites on Cloudflare Pages — **fr
 ### Step 7.1 — Build Frontends Locally (on your Windows machine)
 
 ```powershell
-cd D:\Work\TimeAttendanceSystem
+cd D:\Work\TecAxle.Hrms
 
 # Build admin frontend
 cd time-attendance-frontend
@@ -822,7 +822,7 @@ RETENTION_DAYS=7
 
 mkdir -p "$BACKUP_DIR"
 
-sudo -u postgres pg_dump TimeAttendanceSystem | gzip > "$BACKUP_FILE"
+sudo -u postgres pg_dump TecAxle.Hrms | gzip > "$BACKUP_FILE"
 
 if [ $? -eq 0 ]; then
     echo "$(date): Backup OK — $BACKUP_FILE ($(du -h $BACKUP_FILE | cut -f1))"
@@ -901,10 +901,10 @@ sudo crontab -e
 ### Backend Redeployment (from your Windows machine)
 
 ```powershell
-cd D:\Work\TimeAttendanceSystem
+cd D:\Work\TecAxle.Hrms
 
 # 1. Build
-dotnet publish src/Api/TimeAttendanceSystem.Api/TimeAttendanceSystem.Api.csproj `
+dotnet publish src/Api/TecAxle.Hrms.Api/TecAxle.Hrms.Api.csproj `
   --configuration Release `
   --runtime linux-x64 `
   --self-contained false `
@@ -998,7 +998,7 @@ sudo systemctl restart nginx
 sudo /opt/timeattendance/backup-database.sh
 
 # Restore from backup
-gunzip -c /opt/timeattendance/backups/db_backup_XXXXXX.sql.gz | sudo -u postgres psql TimeAttendanceSystem
+gunzip -c /opt/timeattendance/backups/db_backup_XXXXXX.sql.gz | sudo -u postgres psql TecAxle.Hrms
 
 # Check ports
 ss -tlnp | grep -E '5099|5432|80|443'
@@ -1007,7 +1007,7 @@ ss -tlnp | grep -E '5099|5432|80|443'
 sudo nginx -t
 
 # PostgreSQL shell
-sudo -u postgres psql TimeAttendanceSystem
+sudo -u postgres psql TecAxle.Hrms
 
 # Check disk & memory
 df -h && free -h

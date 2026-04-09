@@ -64,6 +64,10 @@ export class FilterRegistryService {
   }
 
   private initializeCommonData(): void {
+    // Platform admin has no tenant context — skip tenant-only data loading
+    if (this.authService.isPlatformUser()) {
+      return;
+    }
     this.loadBranches();
     this.initShiftsData();
     this.initRolesData();

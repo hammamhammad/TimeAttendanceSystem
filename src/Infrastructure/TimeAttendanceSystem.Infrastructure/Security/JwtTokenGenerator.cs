@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Domain.Platform;
 using TecAxle.Hrms.Domain.Users;
 
 namespace TecAxle.Hrms.Infrastructure.Security;
@@ -260,5 +261,40 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         // Default short expiration for regular login
         var expiryMinutes = _configuration.GetValue<int>("Jwt:ExpiryMinutes", 15);
         return DateTime.UtcNow.AddMinutes(expiryMinutes);
+    }
+
+    public string GeneratePlatformAccessToken(PlatformUser user, IReadOnlyList<string> roles, IReadOnlyList<string> permissions, bool rememberMe = false)
+    {
+        var signingCredentials = new SigningCredentials(
+            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"]!)),
+            SecurityAlgorithms.HmacSha256);
+
+        var claims = new List<Claim>
+        {
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new(JwtRegisteredClaimNames.Sub, $"p_{user.Id}"),
+            new(JwtRegisteredClaimNames.Email, user.Email),
+            new(ClaimTypes.NameIdentifier, $"p_{user.Id}"),
+            new(ClaimTypes.Name, user.Username),
+            new(ClaimTypes.Email, user.Email),
+            new("preferred_language", user.PreferredLanguage),
+            new("platform_role", user.Role.ToString()),
+            new("is_platform_user", "true"),
+        };
+
+        foreach (var role in roles)
+            claims.Add(new Claim(ClaimTypes.Role, role));
+
+        foreach (var permission in permissions)
+            claims.Add(new Claim("permission", permission));
+
+        var securityToken = new JwtSecurityToken(
+            issuer: _configuration["Jwt:Issuer"],
+            audience: _configuration["Jwt:Audience"],
+            expires: GetTokenExpiration(rememberMe),
+            claims: claims,
+            signingCredentials: signingCredentials);
+
+        return new JwtSecurityTokenHandler().WriteToken(securityToken);
     }
 }

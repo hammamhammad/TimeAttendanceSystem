@@ -138,13 +138,13 @@ public class RecalculateSetupCompletionCommandHandler : BaseHandler<RecalculateS
 
     private async Task DetectBranches(List<SetupStep> steps, long tenantId, string username, CancellationToken ct)
     {
-        var hasBranches = await Context.Branches.AnyAsync(b => b.TenantId == tenantId && b.IsActive && !b.IsDeleted, ct);
+        var hasBranches = await Context.Branches.AnyAsync(b => b.IsActive && !b.IsDeleted, ct);
         MarkStep(steps, "branches", hasBranches, username);
     }
 
     private async Task DetectDepartments(List<SetupStep> steps, long tenantId, string username, CancellationToken ct)
     {
-        var hasDepts = await Context.Departments.AnyAsync(d => d.Branch.TenantId == tenantId && d.IsActive && !d.IsDeleted, ct);
+        var hasDepts = await Context.Departments.AnyAsync(d => d.IsActive && !d.IsDeleted, ct);
         MarkStep(steps, "departments", hasDepts, username);
     }
 
@@ -174,7 +174,7 @@ public class RecalculateSetupCompletionCommandHandler : BaseHandler<RecalculateS
 
     private async Task DetectEmployees(List<SetupStep> steps, long tenantId, string username, CancellationToken ct)
     {
-        var has = await Context.Employees.AnyAsync(e => e.Branch.TenantId == tenantId && !e.IsDeleted, ct);
+        var has = await Context.Employees.AnyAsync(e => !e.IsDeleted, ct);
         MarkStep(steps, "employees", has, username);
     }
 }

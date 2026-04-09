@@ -8,7 +8,7 @@
       "version": "1.0.0",
       "restore": {
         "projectUniqueName": "D:\\Work\\TimeAttendanceSystem\\src\\Api\\TimeAttendanceSystem.Api\\TimeAttendanceSystem.Api.csproj",
-        "projectName": "TimeAttendanceSystem.Api",
+        "projectName": "TecAxle.Hrms.Api",
         "projectPath": "D:\\Work\\TimeAttendanceSystem\\src\\Api\\TimeAttendanceSystem.Api\\TimeAttendanceSystem.Api.csproj",
         "packagesPath": "C:\\Users\\Hammam\\.nuget\\packages\\",
         "outputPath": "D:\\Work\\TimeAttendanceSystem\\src\\Api\\TimeAttendanceSystem.Api\\obj\\",
@@ -100,7 +100,7 @@
       "version": "1.0.0",
       "restore": {
         "projectUniqueName": "D:\\Work\\TimeAttendanceSystem\\src\\Application\\TimeAttendanceSystem.Application\\TimeAttendanceSystem.Application.csproj",
-        "projectName": "TimeAttendanceSystem.Application",
+        "projectName": "TecAxle.Hrms.Application",
         "projectPath": "D:\\Work\\TimeAttendanceSystem\\src\\Application\\TimeAttendanceSystem.Application\\TimeAttendanceSystem.Application.csproj",
         "packagesPath": "C:\\Users\\Hammam\\.nuget\\packages\\",
         "outputPath": "D:\\Work\\TimeAttendanceSystem\\src\\Application\\TimeAttendanceSystem.Application\\obj\\",
@@ -196,7 +196,7 @@
       "version": "1.0.0",
       "restore": {
         "projectUniqueName": "D:\\Work\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj",
-        "projectName": "TimeAttendanceSystem.Domain",
+        "projectName": "TecAxle.Hrms.Domain",
         "projectPath": "D:\\Work\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj",
         "packagesPath": "C:\\Users\\Hammam\\.nuget\\packages\\",
         "outputPath": "D:\\Work\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\obj\\",
@@ -255,7 +255,7 @@
       "version": "1.0.0",
       "restore": {
         "projectUniqueName": "D:\\Work\\TimeAttendanceSystem\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure\\TimeAttendanceSystem.Infrastructure.csproj",
-        "projectName": "TimeAttendanceSystem.Infrastructure",
+        "projectName": "TecAxle.Hrms.Infrastructure",
         "projectPath": "D:\\Work\\TimeAttendanceSystem\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure\\TimeAttendanceSystem.Infrastructure.csproj",
         "packagesPath": "C:\\Users\\Hammam\\.nuget\\packages\\",
         "outputPath": "D:\\Work\\TimeAttendanceSystem\\src\\Infrastructure\\TimeAttendanceSystem.Infrastructure\\obj\\",
@@ -371,7 +371,7 @@
       "version": "1.0.0",
       "restore": {
         "projectUniqueName": "D:\\Work\\TimeAttendanceSystem\\src\\Shared\\TimeAttendanceSystem.Shared\\TimeAttendanceSystem.Shared.csproj",
-        "projectName": "TimeAttendanceSystem.Shared",
+        "projectName": "TecAxle.Hrms.Shared",
         "projectPath": "D:\\Work\\TimeAttendanceSystem\\src\\Shared\\TimeAttendanceSystem.Shared\\TimeAttendanceSystem.Shared.csproj",
         "packagesPath": "C:\\Users\\Hammam\\.nuget\\packages\\",
         "outputPath": "D:\\Work\\TimeAttendanceSystem\\src\\Shared\\TimeAttendanceSystem.Shared\\obj\\",

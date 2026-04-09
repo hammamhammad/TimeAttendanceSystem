@@ -5,7 +5,7 @@ using TecAxle.Hrms.Domain.Common;
 namespace TecAxle.Hrms.Application.Employees.Commands.CreateEmployee;
 
 /// <summary>
-/// CQRS command for creating a new employee record in the Time Attendance System.
+/// CQRS command for creating a new employee record in the TecAxle HRMS.
 /// Encapsulates all necessary employee information and organizational relationships
 /// with comprehensive validation and multi-tenant security support.
 /// </summary>

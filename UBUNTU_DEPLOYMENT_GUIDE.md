@@ -1,4 +1,4 @@
-# Deployment Guide - Time Attendance System (ClockN)
+# Deployment Guide - TecAxle HRMS (TecAxle HRMS)
 
 ## Architecture
 
@@ -62,7 +62,7 @@ systemctl start postgresql
 
 # Set postgres password and create database
 sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'P@ssw0rd@3213';"
-sudo -u postgres psql -c "CREATE DATABASE \"TimeAttendanceSystem\";"
+sudo -u postgres psql -c "CREATE DATABASE \"TecAxle.Hrms\";"
 
 # Enable password authentication
 PG_HBA=$(find /etc/postgresql -name pg_hba.conf | head -1)
@@ -87,13 +87,13 @@ chown -R timeattendance:timeattendance /var/log/timeattendance
 ```bash
 cat > /etc/systemd/system/timeattendance-api.service << 'EOF'
 [Unit]
-Description=Time Attendance System API
+Description=TecAxle HRMS API
 After=network.target postgresql.service
 Requires=postgresql.service
 
 [Service]
 WorkingDirectory=/var/www/timeattendance-api
-ExecStart=/usr/bin/dotnet /var/www/timeattendance-api/TimeAttendanceSystem.Api.dll
+ExecStart=/usr/bin/dotnet /var/www/timeattendance-api/TecAxle.Hrms.Api.dll
 Restart=always
 RestartSec=10
 SyslogIdentifier=timeattendance-api
@@ -175,8 +175,8 @@ certbot --nginx -d api.clockn.net --non-interactive --agree-tos -m admin@clockn.
 
 ```bash
 # 1. Publish the API
-cd d:/Work/TimeAttendanceSystem
-dotnet publish src/Api/TimeAttendanceSystem.Api/TimeAttendanceSystem.Api.csproj -c Release -o publish/
+cd d:/Work/TecAxle.Hrms
+dotnet publish src/Api/TecAxle.Hrms.Api/TecAxle.Hrms.Api.csproj -c Release -o publish/
 
 # 2. Upload to server
 scp -r publish/* root@76.13.184.116:/var/www/timeattendance-api/
@@ -204,14 +204,14 @@ journalctl -u timeattendance-api -f --no-pager -n 50
 
 ```bash
 # On server - connect to PostgreSQL and run sample data
-sudo -u postgres psql -d TimeAttendanceSystem < /var/www/timeattendance-api/scripts/sample-data-with-users.sql
+sudo -u postgres psql -d TecAxle.Hrms < /var/www/timeattendance-api/scripts/sample-data-with-users.sql
 ```
 
 Or from local machine:
 ```bash
 # Upload and run sample data script
 scp scripts/sample-data-with-users.sql root@76.13.184.116:/tmp/
-ssh root@76.13.184.116 "sudo -u postgres psql -d TimeAttendanceSystem < /tmp/sample-data-with-users.sql"
+ssh root@76.13.184.116 "sudo -u postgres psql -d TecAxle.Hrms < /tmp/sample-data-with-users.sql"
 ```
 
 ---
@@ -227,7 +227,7 @@ ssh root@76.13.184.116 "sudo -u postgres psql -d TimeAttendanceSystem < /tmp/sam
 ### Admin Frontend → www.clockn.net
 
 ```bash
-cd d:/Work/TimeAttendanceSystem/time-attendance-frontend
+cd d:/Work/TecAxle.Hrms/time-attendance-frontend
 
 # Build for production
 npx ng build --configuration production
@@ -249,7 +249,7 @@ npx wrangler pages deploy dist/time-attendance-frontend/browser --project-name=c
 ### Self-Service Portal → portal.clockn.net
 
 ```bash
-cd d:/Work/TimeAttendanceSystem/time-attendance-selfservice-frontend
+cd d:/Work/TecAxle.Hrms/time-attendance-selfservice-frontend
 
 # Build for production
 npx ng build --configuration production
@@ -286,8 +286,8 @@ npx wrangler pages deploy dist/time-attendance-selfservice-frontend/browser --pr
 
 ```bash
 # Build and upload
-cd d:/Work/TimeAttendanceSystem
-dotnet publish src/Api/TimeAttendanceSystem.Api/TimeAttendanceSystem.Api.csproj -c Release -o publish/
+cd d:/Work/TecAxle.Hrms
+dotnet publish src/Api/TecAxle.Hrms.Api/TecAxle.Hrms.Api.csproj -c Release -o publish/
 scp -r publish/* root@76.13.184.116:/var/www/timeattendance-api/
 ssh root@76.13.184.116 "chown -R timeattendance:timeattendance /var/www/timeattendance-api && systemctl restart timeattendance-api"
 ```
@@ -295,7 +295,7 @@ ssh root@76.13.184.116 "chown -R timeattendance:timeattendance /var/www/timeatte
 ### Update Admin Frontend Only
 
 ```bash
-cd d:/Work/TimeAttendanceSystem/time-attendance-frontend
+cd d:/Work/TecAxle.Hrms/time-attendance-frontend
 npx ng build --configuration production
 npx wrangler pages deploy dist/time-attendance-frontend/browser --project-name=clockn-admin
 ```
@@ -303,7 +303,7 @@ npx wrangler pages deploy dist/time-attendance-frontend/browser --project-name=c
 ### Update Self-Service Portal Only
 
 ```bash
-cd d:/Work/TimeAttendanceSystem/time-attendance-selfservice-frontend
+cd d:/Work/TecAxle.Hrms/time-attendance-selfservice-frontend
 npx ng build --configuration production
 npx wrangler pages deploy dist/time-attendance-selfservice-frontend/browser --project-name=clockn-portal
 ```
@@ -343,7 +343,7 @@ tail -f /var/log/nginx/error.log
 
 ```bash
 # On server
-sudo -u postgres pg_dump TimeAttendanceSystem > /tmp/backup_$(date +%Y%m%d).sql
+sudo -u postgres pg_dump TecAxle.Hrms > /tmp/backup_$(date +%Y%m%d).sql
 
 # Download backup
 scp root@76.13.184.116:/tmp/backup_*.sql ./backups/
@@ -352,7 +352,7 @@ scp root@76.13.184.116:/tmp/backup_*.sql ./backups/
 ### Restore Database
 
 ```bash
-sudo -u postgres psql -d TimeAttendanceSystem < backup_file.sql
+sudo -u postgres psql -d TecAxle.Hrms < backup_file.sql
 ```
 
 ---

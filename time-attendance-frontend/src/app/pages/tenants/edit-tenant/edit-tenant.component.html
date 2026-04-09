@@ -18,25 +18,6 @@
     </div>
   } @else {
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
-      <!-- Subdomain (read-only) -->
-      <app-form-section [title]="'Tenant Identity'" variant="modern">
-        <div class="row g-3">
-          <div class="col-md-6">
-            <div class="form-floating">
-              <input
-                type="text"
-                class="form-control"
-                id="subdomain"
-                [value]="tenant()?.subdomain"
-                disabled
-                placeholder="Subdomain">
-              <label for="subdomain">Subdomain</label>
-            </div>
-            <div class="form-text">Subdomain cannot be changed after creation</div>
-          </div>
-        </div>
-      </app-form-section>
-
       <!-- Basic Information -->
       <app-form-section [title]="'Basic Information'" variant="modern">
         <div class="row g-3">
@@ -74,37 +55,18 @@
             </div>
           </div>
 
-          <!-- API Base URL -->
+          <!-- Company Logo -->
           <div class="col-md-6">
-            <div class="form-floating">
-              <input
-                type="text"
-                class="form-control"
-                id="apiBaseUrl"
-                formControlName="apiBaseUrl"
-                [class.is-invalid]="hasError('apiBaseUrl')"
-                placeholder="API Base URL">
-              <label for="apiBaseUrl">
-                API Base URL
-                <span class="text-danger">*</span>
-              </label>
-            </div>
-            @if (hasError('apiBaseUrl')) {
-              <div class="invalid-feedback d-block">{{ getError('apiBaseUrl') }}</div>
-            }
-          </div>
-
-          <!-- Custom Domain -->
-          <div class="col-md-6">
-            <div class="form-floating">
-              <input
-                type="text"
-                class="form-control"
-                id="customDomain"
-                formControlName="customDomain"
-                [class.is-invalid]="hasError('customDomain')"
-                placeholder="Custom Domain">
-              <label for="customDomain">Custom Domain</label>
+            <div class="app-modern-field">
+              <label class="app-modern-label">Company Logo</label>
+              <app-file-upload
+                [accept]="'.jpg,.jpeg,.png,.svg'"
+                [label]="'Upload company logo'"
+                [maxSizeMB]="5"
+                [currentFileUrl]="form.get('logoUrl')?.value"
+                (fileUploaded)="onLogoUploaded($event)"
+                (fileRemoved)="form.patchValue({logoUrl: ''})">
+              </app-file-upload>
             </div>
           </div>
         </div>

@@ -14,7 +14,7 @@
     "version": "1.0.0",
     "restore": {
       "projectUniqueName": "D:\\Work\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj",
-      "projectName": "TimeAttendanceSystem.Domain",
+      "projectName": "TecAxle.Hrms.Domain",
       "projectPath": "D:\\Work\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\TimeAttendanceSystem.Domain.csproj",
       "packagesPath": "C:\\Users\\Hammam\\.nuget\\packages\\",
       "outputPath": "D:\\Work\\TimeAttendanceSystem\\src\\Domain\\TimeAttendanceSystem.Domain\\obj\\",

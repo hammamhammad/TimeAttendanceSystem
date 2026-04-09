@@ -64,7 +64,10 @@ public class BranchesController : ControllerBase
             request.Code,
             request.Name,
             request.TimeZone,
-            request.IsActive
+            request.IsActive,
+            request.Latitude,
+            request.Longitude,
+            request.GeofenceRadiusMeters
         );
 
         var result = await _mediator.Send(command);
@@ -160,7 +163,10 @@ public record CreateBranchRequest(
     string Code,
     string Name,
     string TimeZone,
-    bool IsActive = true
+    bool IsActive = true,
+    double? Latitude = null,
+    double? Longitude = null,
+    int GeofenceRadiusMeters = 100
 );
 
 public record UpdateBranchRequest(

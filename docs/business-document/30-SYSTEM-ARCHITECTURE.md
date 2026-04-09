@@ -2,7 +2,7 @@
 
 ## 30.1 Overview
 
-ClockN is built on a Clean Architecture foundation with .NET 9.0 backend, Angular 20 frontends, Flutter mobile app, and PostgreSQL database. This document describes the technical architecture, deployment topology, integration patterns, and system capabilities.
+TecAxle HRMS is built on a Clean Architecture foundation with .NET 9.0 backend, Angular 20 frontends, Flutter mobile app, and PostgreSQL database. This document describes the technical architecture, deployment topology, integration patterns, and system capabilities.
 
 ## 30.2 Architecture Diagram
 
@@ -64,7 +64,7 @@ ClockN is built on a Clean Architecture foundation with .NET 9.0 backend, Angula
 
 ### Layer 1: Domain (Innermost)
 ```
-TimeAttendanceSystem.Domain/
+TecAxle.Hrms.Domain/
 ├── Entities/          # 150+ domain entities
 │   ├── Attendance/    # AttendanceRecord, Transaction, etc.
 │   ├── Employees/     # Employee, Contract, Promotion, etc.
@@ -82,7 +82,7 @@ TimeAttendanceSystem.Domain/
 
 ### Layer 2: Application
 ```
-TimeAttendanceSystem.Application/
+TecAxle.Hrms.Application/
 ├── Services/          # Business logic services
 │   ├── AttendanceCalculationService
 │   ├── LeaveAccrualService
@@ -106,7 +106,7 @@ TimeAttendanceSystem.Application/
 
 ### Layer 3: Infrastructure
 ```
-TimeAttendanceSystem.Infrastructure/
+TecAxle.Hrms.Infrastructure/
 ├── Persistence/
 │   ├── ApplicationDbContext.cs
 │   ├── Configurations/     # EF Core entity configurations
@@ -122,7 +122,7 @@ TimeAttendanceSystem.Infrastructure/
 
 ### Layer 4: API (Outermost)
 ```
-TimeAttendanceSystem.Api/
+TecAxle.Hrms.Api/
 ├── Controllers/       # 108+ REST API controllers
 ├── Hubs/             # SignalR notification hub
 ├── Middleware/        # Exception, Rate Limiting, Localization
@@ -254,7 +254,7 @@ Production Environment:
 ## 30.8 Database Schema Overview
 
 ```
-Database: TimeAttendanceSystem (PostgreSQL)
+Database: TecAxle.Hrms (PostgreSQL)
 Total Tables: 150+
 Domain Modules: 30
 

@@ -33,5 +33,10 @@ public class TenantDetailDto
     public DateTime CreatedAtUtc { get; set; }
     public int BranchCount { get; set; }
     public int EmployeeCount { get; set; }
+
+    // Database provisioning info
+    public string? DatabaseName { get; set; }
+    public DateTime? DatabaseCreatedAt { get; set; }
+
     public TenantSubscriptionDto? Subscription { get; set; }
 }

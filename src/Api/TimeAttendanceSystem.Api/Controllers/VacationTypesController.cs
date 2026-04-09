@@ -12,7 +12,7 @@ using TecAxle.Hrms.Application.VacationTypes.Queries.GetVacationTypeById;
 namespace TecAxle.Hrms.Api.Controllers;
 
 /// <summary>
-/// API controller for vacation type management operations in the Time Attendance System.
+/// API controller for vacation type management operations in the TecAxle HRMS.
 /// Provides basic CRUD operations and status management with enterprise-grade security,
 /// authorization, and multi-tenant support.
 /// </summary>

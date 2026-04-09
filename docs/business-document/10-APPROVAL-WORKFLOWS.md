@@ -2,7 +2,7 @@
 
 ## 10.1 Overview
 
-The approval workflow engine is the backbone of all request processing in ClockN. It provides a configurable, multi-step approval system that supports different approver types, delegation, timeout escalation, conditional logic, and both parallel and sequential approval patterns. It is used by vacations, excuses, remote work, attendance corrections, salary adjustments, and many other modules.
+The approval workflow engine is the backbone of all request processing in TecAxle HRMS. It provides a configurable, multi-step approval system that supports different approver types, delegation, timeout escalation, conditional logic, and both parallel and sequential approval patterns. It is used by vacations, excuses, remote work, attendance corrections, salary adjustments, and many other modules.
 
 ## 10.2 Features
 

@@ -5,7 +5,7 @@ using TecAxle.Hrms.Domain.Workflows.Enums;
 namespace TecAxle.Hrms.Application.Workflows.Commands.CreateWorkflowDefinition;
 
 /// <summary>
-/// CQRS command for creating a new workflow definition in the Time Attendance System.
+/// CQRS command for creating a new workflow definition in the TecAxle HRMS.
 /// Defines approval workflow configuration for various entity types (Vacation, Excuse, RemoteWork, etc.).
 /// </summary>
 public record CreateWorkflowDefinitionCommand(
