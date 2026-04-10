@@ -8,16 +8,21 @@ namespace TecAxle.Hrms.Application.SetupTracking.Commands.RecalculateSetupComple
 
 public class RecalculateSetupCompletionCommandHandler : BaseHandler<RecalculateSetupCompletionCommand, Result<SetupStatusDto>>
 {
+    private readonly IMasterDbContext _masterContext;
     private readonly ITenantContext _tenantContext;
 
     public RecalculateSetupCompletionCommandHandler(
         IApplicationDbContext context,
         ICurrentUser currentUser,
+        IMasterDbContext masterContext,
         ITenantContext tenantContext)
         : base(context, currentUser)
     {
+        _masterContext = masterContext;
         _tenantContext = tenantContext;
     }
+
+    protected override IMasterDbContext? GetMasterContext() => _masterContext;
 
     public override async Task<Result<SetupStatusDto>> Handle(RecalculateSetupCompletionCommand request, CancellationToken cancellationToken)
     {
@@ -127,7 +132,7 @@ public class RecalculateSetupCompletionCommandHandler : BaseHandler<RecalculateS
 
     private async Task DetectCompanyInfo(List<SetupStep> steps, long tenantId, string username, CancellationToken ct)
     {
-        var tenant = await Context.Tenants.AsNoTracking()
+        var tenant = await _masterContext.Tenants.AsNoTracking()
             .FirstOrDefaultAsync(t => t.Id == tenantId && !t.IsDeleted, ct);
         var completed = tenant != null
             && !string.IsNullOrWhiteSpace(tenant.CompanyRegistrationNumber)

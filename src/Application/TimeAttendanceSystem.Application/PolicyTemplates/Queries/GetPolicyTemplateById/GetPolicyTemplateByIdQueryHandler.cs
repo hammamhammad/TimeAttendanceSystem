@@ -7,22 +7,27 @@ namespace TecAxle.Hrms.Application.PolicyTemplates.Queries.GetPolicyTemplateById
 
 public class GetPolicyTemplateByIdQueryHandler : BaseHandler<GetPolicyTemplateByIdQuery, Result<PolicyTemplateDto>>
 {
+    private readonly IMasterDbContext _masterContext;
     private readonly ITenantContext _tenantContext;
 
     public GetPolicyTemplateByIdQueryHandler(
         IApplicationDbContext context,
         ICurrentUser currentUser,
+        IMasterDbContext masterContext,
         ITenantContext tenantContext)
         : base(context, currentUser)
     {
+        _masterContext = masterContext;
         _tenantContext = tenantContext;
     }
+
+    protected override IMasterDbContext? GetMasterContext() => _masterContext;
 
     public override async Task<Result<PolicyTemplateDto>> Handle(GetPolicyTemplateByIdQuery request, CancellationToken cancellationToken)
     {
         var tenantId = _tenantContext.TenantId ?? await ResolveTenantIdAsync(cancellationToken);
 
-        var template = await Context.PolicyTemplates
+        var template = await _masterContext.PolicyTemplates
             .AsNoTracking()
             .Include(t => t.Items.Where(i => !i.IsDeleted))
             .FirstOrDefaultAsync(t => t.Id == request.Id && !t.IsDeleted, cancellationToken);

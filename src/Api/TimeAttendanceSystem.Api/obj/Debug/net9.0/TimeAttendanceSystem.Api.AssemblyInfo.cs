@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TecAxle.Hrms.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a366db570f538ad8279ce67ebc838d19fb02988e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8379f12cd906e9378a99368984bc769cb7e191ee")]
 [assembly: System.Reflection.AssemblyProductAttribute("TecAxle.Hrms.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TecAxle.Hrms.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -8,15 +8,18 @@ namespace TecAxle.Hrms.Application.Subscriptions.Queries.GetTenantSubscription;
 
 public class GetTenantSubscriptionQueryHandler : BaseHandler<GetTenantSubscriptionQuery, Result<TenantSubscriptionDto>>
 {
-    public GetTenantSubscriptionQueryHandler(IApplicationDbContext context, ICurrentUser currentUser)
+    private readonly IMasterDbContext _masterContext;
+
+    public GetTenantSubscriptionQueryHandler(IApplicationDbContext context, ICurrentUser currentUser, IMasterDbContext masterContext)
         : base(context, currentUser)
     {
+        _masterContext = masterContext;
     }
 
     public override async Task<Result<TenantSubscriptionDto>> Handle(GetTenantSubscriptionQuery request, CancellationToken cancellationToken)
     {
         // Verify tenant exists
-        var tenantExists = await Context.Tenants
+        var tenantExists = await _masterContext.Tenants
             .AnyAsync(t => t.Id == request.TenantId && !t.IsDeleted, cancellationToken);
 
         if (!tenantExists)
@@ -24,7 +27,7 @@ public class GetTenantSubscriptionQueryHandler : BaseHandler<GetTenantSubscripti
             return Result.Failure<TenantSubscriptionDto>("Tenant not found");
         }
 
-        var subscription = await Context.TenantSubscriptions
+        var subscription = await _masterContext.TenantSubscriptions
             .AsNoTracking()
             .Include(s => s.Plan)
                 .ThenInclude(p => p.ModuleEntitlements)

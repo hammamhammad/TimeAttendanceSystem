@@ -15,15 +15,18 @@ namespace TecAxle.Hrms.Infrastructure.Services;
 public class ModuleDeactivationService : IModuleDeactivationService
 {
     private readonly IApplicationDbContext _context;
+    private readonly IMasterDbContext _masterContext;
     private readonly IEntitlementService _entitlementService;
     private readonly ILogger<ModuleDeactivationService> _logger;
 
     public ModuleDeactivationService(
         IApplicationDbContext context,
+        IMasterDbContext masterContext,
         IEntitlementService entitlementService,
         ILogger<ModuleDeactivationService> logger)
     {
         _context = context;
+        _masterContext = masterContext;
         _entitlementService = entitlementService;
         _logger = logger;
     }
@@ -80,7 +83,7 @@ public class ModuleDeactivationService : IModuleDeactivationService
         }
 
         // 2. Log entitlement change
-        _context.EntitlementChangeLogs.Add(new EntitlementChangeLog
+        _masterContext.EntitlementChangeLogs.Add(new EntitlementChangeLog
         {
             TenantId = tenantId,
             ChangeType = EntitlementChangeType.ModuleAddOnRemoved,
@@ -93,6 +96,7 @@ public class ModuleDeactivationService : IModuleDeactivationService
         });
 
         await _context.SaveChangesAsync(ct);
+        await _masterContext.SaveChangesAsync(ct);
 
         // 3. Invalidate cache
         _entitlementService.InvalidateCache(tenantId);
@@ -163,7 +167,7 @@ public class ModuleDeactivationService : IModuleDeactivationService
         }
 
         // 2. Log entitlement change
-        _context.EntitlementChangeLogs.Add(new EntitlementChangeLog
+        _masterContext.EntitlementChangeLogs.Add(new EntitlementChangeLog
         {
             TenantId = tenantId,
             ChangeType = EntitlementChangeType.ModuleAddOnAdded,
@@ -176,6 +180,7 @@ public class ModuleDeactivationService : IModuleDeactivationService
         });
 
         await _context.SaveChangesAsync(ct);
+        await _masterContext.SaveChangesAsync(ct);
 
         // 3. Invalidate cache
         _entitlementService.InvalidateCache(tenantId);

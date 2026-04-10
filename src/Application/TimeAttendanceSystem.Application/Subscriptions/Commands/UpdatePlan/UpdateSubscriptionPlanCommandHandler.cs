@@ -8,12 +8,17 @@ namespace TecAxle.Hrms.Application.Subscriptions.Commands.UpdatePlan;
 
 public class UpdateSubscriptionPlanCommandHandler : BaseHandler<UpdateSubscriptionPlanCommand, Result>
 {
-    public UpdateSubscriptionPlanCommandHandler(IApplicationDbContext context, ICurrentUser currentUser)
-        : base(context, currentUser) { }
+    private readonly IMasterDbContext _masterContext;
+
+    public UpdateSubscriptionPlanCommandHandler(IApplicationDbContext context, ICurrentUser currentUser, IMasterDbContext masterContext)
+        : base(context, currentUser)
+    {
+        _masterContext = masterContext;
+    }
 
     public override async Task<Result> Handle(UpdateSubscriptionPlanCommand request, CancellationToken cancellationToken)
     {
-        var plan = await Context.SubscriptionPlans
+        var plan = await _masterContext.SubscriptionPlans
             .FirstOrDefaultAsync(p => p.Id == request.Id && !p.IsDeleted, cancellationToken);
         if (plan == null)
             return Result.Failure("Plan not found.");
@@ -36,7 +41,7 @@ public class UpdateSubscriptionPlanCommandHandler : BaseHandler<UpdateSubscripti
         plan.ModifiedBy = CurrentUser.Username;
 
         // Replace module entitlements
-        var existingModules = await Context.PlanModuleEntitlements
+        var existingModules = await _masterContext.PlanModuleEntitlements
             .Where(m => m.PlanId == plan.Id).ToListAsync(cancellationToken);
         foreach (var m in existingModules)
             m.IsDeleted = true;
@@ -53,7 +58,7 @@ public class UpdateSubscriptionPlanCommandHandler : BaseHandler<UpdateSubscripti
                 }
                 else
                 {
-                    Context.PlanModuleEntitlements.Add(new PlanModuleEntitlement
+                    _masterContext.PlanModuleEntitlements.Add(new PlanModuleEntitlement
                     {
                         PlanId = plan.Id, Module = module, IsIncluded = true,
                         CreatedAtUtc = DateTime.UtcNow, CreatedBy = CurrentUser.Username ?? "SYSTEM"
@@ -63,7 +68,7 @@ public class UpdateSubscriptionPlanCommandHandler : BaseHandler<UpdateSubscripti
         }
 
         // Replace limits
-        var existingLimits = await Context.PlanLimits
+        var existingLimits = await _masterContext.PlanLimits
             .Where(l => l.PlanId == plan.Id).ToListAsync(cancellationToken);
         foreach (var l in existingLimits)
             l.IsDeleted = true;
@@ -80,7 +85,7 @@ public class UpdateSubscriptionPlanCommandHandler : BaseHandler<UpdateSubscripti
                 }
                 else
                 {
-                    Context.PlanLimits.Add(new PlanLimit
+                    _masterContext.PlanLimits.Add(new PlanLimit
                     {
                         PlanId = plan.Id, LimitType = limitType, LimitValue = value,
                         CreatedAtUtc = DateTime.UtcNow, CreatedBy = CurrentUser.Username ?? "SYSTEM"
@@ -89,7 +94,7 @@ public class UpdateSubscriptionPlanCommandHandler : BaseHandler<UpdateSubscripti
             }
         }
 
-        await Context.SaveChangesAsync(cancellationToken);
+        await _masterContext.SaveChangesAsync(cancellationToken);
         return Result.Success();
     }
 }

@@ -7,16 +7,21 @@ namespace TecAxle.Hrms.Application.PolicyTemplates.Commands.UpdatePolicyTemplate
 
 public class UpdatePolicyTemplateCommandHandler : BaseHandler<UpdatePolicyTemplateCommand, Result>
 {
+    private readonly IMasterDbContext _masterContext;
     private readonly ITenantContext _tenantContext;
 
     public UpdatePolicyTemplateCommandHandler(
         IApplicationDbContext context,
         ICurrentUser currentUser,
+        IMasterDbContext masterContext,
         ITenantContext tenantContext)
         : base(context, currentUser)
     {
+        _masterContext = masterContext;
         _tenantContext = tenantContext;
     }
+
+    protected override IMasterDbContext? GetMasterContext() => _masterContext;
 
     public override async Task<Result> Handle(UpdatePolicyTemplateCommand request, CancellationToken cancellationToken)
     {
@@ -24,7 +29,7 @@ public class UpdatePolicyTemplateCommandHandler : BaseHandler<UpdatePolicyTempla
         if (tenantId == null)
             return Result.Failure("Tenant context not resolved");
 
-        var template = await Context.PolicyTemplates
+        var template = await _masterContext.PolicyTemplates
             .Include(t => t.Items.Where(i => !i.IsDeleted))
             .FirstOrDefaultAsync(t => t.Id == request.Id && !t.IsDeleted, cancellationToken);
 
@@ -79,7 +84,7 @@ public class UpdatePolicyTemplateCommandHandler : BaseHandler<UpdatePolicyTempla
             }
         }
 
-        await Context.SaveChangesAsync(cancellationToken);
+        await _masterContext.SaveChangesAsync(cancellationToken);
         return Result.Success();
     }
 }

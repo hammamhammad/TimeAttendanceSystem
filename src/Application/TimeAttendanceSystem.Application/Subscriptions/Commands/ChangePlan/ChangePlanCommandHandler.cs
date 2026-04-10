@@ -9,16 +9,19 @@ namespace TecAxle.Hrms.Application.Subscriptions.Commands.ChangePlan;
 
 public class ChangePlanCommandHandler : BaseHandler<ChangePlanCommand, Result>
 {
+    private readonly IMasterDbContext _masterContext;
     private readonly IEntitlementService _entitlementService;
     private readonly IModuleDeactivationService _moduleDeactivationService;
 
     public ChangePlanCommandHandler(
         IApplicationDbContext context,
         ICurrentUser currentUser,
+        IMasterDbContext masterContext,
         IEntitlementService entitlementService,
         IModuleDeactivationService moduleDeactivationService)
         : base(context, currentUser)
     {
+        _masterContext = masterContext;
         _entitlementService = entitlementService;
         _moduleDeactivationService = moduleDeactivationService;
     }
@@ -26,7 +29,7 @@ public class ChangePlanCommandHandler : BaseHandler<ChangePlanCommand, Result>
     public override async Task<Result> Handle(ChangePlanCommand request, CancellationToken cancellationToken)
     {
         // Verify tenant exists
-        var tenantExists = await Context.Tenants
+        var tenantExists = await _masterContext.Tenants
             .AnyAsync(t => t.Id == request.TenantId && !t.IsDeleted, cancellationToken);
 
         if (!tenantExists)
@@ -35,7 +38,7 @@ public class ChangePlanCommandHandler : BaseHandler<ChangePlanCommand, Result>
         }
 
         // Verify new plan exists and is active
-        var newPlan = await Context.SubscriptionPlans
+        var newPlan = await _masterContext.SubscriptionPlans
             .Include(p => p.ModuleEntitlements)
             .FirstOrDefaultAsync(p => p.Id == request.NewPlanId && p.IsActive && !p.IsDeleted, cancellationToken);
 
@@ -45,7 +48,7 @@ public class ChangePlanCommandHandler : BaseHandler<ChangePlanCommand, Result>
         }
 
         // Find active subscription with current plan's module entitlements
-        var subscription = await Context.TenantSubscriptions
+        var subscription = await _masterContext.TenantSubscriptions
             .Include(s => s.Plan)
                 .ThenInclude(p => p.ModuleEntitlements)
             .FirstOrDefaultAsync(s => s.TenantId == request.TenantId &&
@@ -89,7 +92,7 @@ public class ChangePlanCommandHandler : BaseHandler<ChangePlanCommand, Result>
         var addedModules = newModules.Except(oldModules).ToList();
 
         // Log entitlement change
-        Context.EntitlementChangeLogs.Add(new EntitlementChangeLog
+        _masterContext.EntitlementChangeLogs.Add(new EntitlementChangeLog
         {
             TenantId = request.TenantId,
             ChangeType = EntitlementChangeType.PlanChanged,
@@ -127,7 +130,7 @@ public class ChangePlanCommandHandler : BaseHandler<ChangePlanCommand, Result>
         subscription.ModifiedAtUtc = now;
         subscription.ModifiedBy = CurrentUser.Username;
 
-        await Context.SaveChangesAsync(cancellationToken);
+        await _masterContext.SaveChangesAsync(cancellationToken);
 
         // Invalidate entitlement cache
         _entitlementService.InvalidateCache(request.TenantId);

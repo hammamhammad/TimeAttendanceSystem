@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using TecAxle.Hrms.Domain.Branches;
 using TecAxle.Hrms.Domain.Common;
 using TecAxle.Hrms.Domain.Employees;
-using TecAxle.Hrms.Domain.Platform;
 using TecAxle.Hrms.Domain.Users;
 using TecAxle.Hrms.Domain.Shifts;
 using TecAxle.Hrms.Domain.Attendance;
@@ -15,7 +14,6 @@ using TecAxle.Hrms.Domain.Workflows;
 using TecAxle.Hrms.Domain.LeaveManagement;
 using TecAxle.Hrms.Domain.Notifications;
 using TecAxle.Hrms.Domain.Tenants;
-using TecAxle.Hrms.Domain.Subscriptions;
 using TecAxle.Hrms.Domain.Payroll;
 using TecAxle.Hrms.Domain.Offboarding;
 using TecAxle.Hrms.Domain.Recruitment;
@@ -705,24 +703,7 @@ public interface IApplicationDbContext
     /// <value>DbSet for querying and managing AttendanceVerificationLog entities</value>
     DbSet<AttendanceVerificationLog> AttendanceVerificationLogs { get; }
 
-    /// <summary>
-    /// Gets the database set for Tenant entities for multi-tenant SaaS support.
-    /// Enables tenant discovery, configuration, and isolation.
-    /// </summary>
-    /// <value>DbSet for querying and managing Tenant entities</value>
-    DbSet<Tenant> Tenants { get; }
-    DbSet<TenantUserEmail> TenantUserEmails { get; }
-    DbSet<PlatformUser> PlatformUsers { get; }
-
-    // Subscription & Entitlements
-    DbSet<SubscriptionPlan> SubscriptionPlans { get; }
-    DbSet<PlanModuleEntitlement> PlanModuleEntitlements { get; }
-    DbSet<PlanFeatureFlag> PlanFeatureFlags { get; }
-    DbSet<PlanLimit> PlanLimits { get; }
-    DbSet<TenantSubscription> TenantSubscriptions { get; }
-    DbSet<TenantModuleAddOn> TenantModuleAddOns { get; }
-    DbSet<TenantFeatureOverride> TenantFeatureOverrides { get; }
-    DbSet<EntitlementChangeLog> EntitlementChangeLogs { get; }
+    // Platform entities (Tenants, Subscriptions, etc.) are in IMasterDbContext only
 
     // Phase 1: Employee Lifecycle
     DbSet<EmployeeContract> EmployeeContracts { get; }
@@ -910,8 +891,7 @@ public interface IApplicationDbContext
     DbSet<TenantSettings> TenantSettings { get; }
     DbSet<BranchSettingsOverride> BranchSettingsOverrides { get; }
     DbSet<DepartmentSettingsOverride> DepartmentSettingsOverrides { get; }
-    DbSet<PolicyTemplate> PolicyTemplates { get; }
-    DbSet<PolicyTemplateItem> PolicyTemplateItems { get; }
+    // PolicyTemplates and PolicyTemplateItems are in IMasterDbContext only
     DbSet<SetupStep> SetupSteps { get; }
 
     /// <summary>

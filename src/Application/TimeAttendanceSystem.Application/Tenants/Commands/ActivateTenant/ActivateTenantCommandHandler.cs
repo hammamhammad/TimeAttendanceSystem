@@ -7,14 +7,17 @@ namespace TecAxle.Hrms.Application.Tenants.Commands.ActivateTenant;
 
 public class ActivateTenantCommandHandler : BaseHandler<ActivateTenantCommand, Result>
 {
-    public ActivateTenantCommandHandler(IApplicationDbContext context, ICurrentUser currentUser)
+    private readonly IMasterDbContext _masterContext;
+
+    public ActivateTenantCommandHandler(IApplicationDbContext context, ICurrentUser currentUser, IMasterDbContext masterContext)
         : base(context, currentUser)
     {
+        _masterContext = masterContext;
     }
 
     public override async Task<Result> Handle(ActivateTenantCommand request, CancellationToken cancellationToken)
     {
-        var tenant = await Context.Tenants
+        var tenant = await _masterContext.Tenants
             .FirstOrDefaultAsync(t => t.Id == request.Id && !t.IsDeleted, cancellationToken);
 
         if (tenant == null)
@@ -32,7 +35,7 @@ public class ActivateTenantCommandHandler : BaseHandler<ActivateTenantCommand, R
         tenant.ModifiedAtUtc = DateTime.UtcNow;
         tenant.ModifiedBy = CurrentUser.Username;
 
-        await Context.SaveChangesAsync(cancellationToken);
+        await _masterContext.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }

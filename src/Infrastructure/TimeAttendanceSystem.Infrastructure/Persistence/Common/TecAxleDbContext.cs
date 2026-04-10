@@ -165,22 +165,7 @@ public class TecAxleDbContext : DbContext, IApplicationDbContext
     public DbSet<NotificationBroadcast> NotificationBroadcasts => Set<NotificationBroadcast>();
     public DbSet<PushNotificationToken> PushNotificationTokens => Set<PushNotificationToken>();
 
-    // Multi-tenant entities
-    public DbSet<Tenant> Tenants => Set<Tenant>();
-    public DbSet<TenantUserEmail> TenantUserEmails => Set<TenantUserEmail>();
-
-    // Platform entities
-    public DbSet<PlatformUser> PlatformUsers => Set<PlatformUser>();
-
-    // Subscription & Entitlements
-    public DbSet<SubscriptionPlan> SubscriptionPlans => Set<SubscriptionPlan>();
-    public DbSet<PlanModuleEntitlement> PlanModuleEntitlements => Set<PlanModuleEntitlement>();
-    public DbSet<PlanFeatureFlag> PlanFeatureFlags => Set<PlanFeatureFlag>();
-    public DbSet<PlanLimit> PlanLimits => Set<PlanLimit>();
-    public DbSet<TenantSubscription> TenantSubscriptions => Set<TenantSubscription>();
-    public DbSet<TenantModuleAddOn> TenantModuleAddOns => Set<TenantModuleAddOn>();
-    public DbSet<TenantFeatureOverride> TenantFeatureOverrides => Set<TenantFeatureOverride>();
-    public DbSet<EntitlementChangeLog> EntitlementChangeLogs => Set<EntitlementChangeLog>();
+    // Platform entities (Tenants, Subscriptions, etc.) are in MasterDbContext only
 
     // Phase 1: Employee Lifecycle
     public DbSet<EmployeeContract> EmployeeContracts => Set<EmployeeContract>();
@@ -364,8 +349,7 @@ public class TecAxleDbContext : DbContext, IApplicationDbContext
     public DbSet<TenantSettings> TenantSettings => Set<TenantSettings>();
     public DbSet<BranchSettingsOverride> BranchSettingsOverrides => Set<BranchSettingsOverride>();
     public DbSet<DepartmentSettingsOverride> DepartmentSettingsOverrides => Set<DepartmentSettingsOverride>();
-    public DbSet<PolicyTemplate> PolicyTemplates => Set<PolicyTemplate>();
-    public DbSet<PolicyTemplateItem> PolicyTemplateItems => Set<PolicyTemplateItem>();
+    // PolicyTemplates and PolicyTemplateItems are in MasterDbContext only
     public DbSet<SetupStep> SetupSteps => Set<SetupStep>();
 
     /// <summary>
@@ -392,9 +376,21 @@ public class TecAxleDbContext : DbContext, IApplicationDbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // Apply PostgreSQL specific configurations
+        // Platform entity configurations are in MasterDbContext only — exclude them here
+        // TenantConfiguration stays — Tenants table is kept in tenant DB for FK on TenantSettings/SetupSteps
+        var platformConfigTypes = new HashSet<string>
+        {
+            "TenantUserEmailConfiguration", "PlatformUserConfiguration",
+            "SubscriptionPlanConfiguration", "PlanModuleEntitlementConfiguration",
+            "PlanFeatureFlagConfiguration", "PlanLimitConfiguration",
+            "TenantSubscriptionConfiguration", "TenantModuleAddOnConfiguration",
+            "TenantFeatureOverrideConfiguration", "EntitlementChangeLogConfiguration",
+            "PolicyTemplateConfiguration", "PolicyTemplateItemConfiguration"
+        };
         modelBuilder.ApplyConfigurationsFromAssembly(
             typeof(TecAxleDbContext).Assembly,
             type => type.Namespace?.Contains("Persistence.PostgreSql.Configurations") == true
+                    && !platformConfigTypes.Contains(type.Name)
         );
 
         base.OnModelCreating(modelBuilder);

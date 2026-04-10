@@ -10,9 +10,12 @@ namespace TecAxle.Hrms.Application.Tenants.Queries.DiscoverTenant;
 /// </summary>
 public class DiscoverTenantQueryHandler : BaseHandler<DiscoverTenantQuery, Result<TenantDiscoveryResult>>
 {
-    public DiscoverTenantQueryHandler(IApplicationDbContext context, ICurrentUser currentUser) 
+    private readonly IMasterDbContext _masterContext;
+
+    public DiscoverTenantQueryHandler(IApplicationDbContext context, ICurrentUser currentUser, IMasterDbContext masterContext)
         : base(context, currentUser)
     {
+        _masterContext = masterContext;
     }
 
     public override async Task<Result<TenantDiscoveryResult>> Handle(DiscoverTenantQuery request, CancellationToken cancellationToken)
@@ -28,19 +31,19 @@ public class DiscoverTenantQueryHandler : BaseHandler<DiscoverTenantQuery, Resul
         var subdomain = ExtractSubdomain(domain);
 
         // First, check by subdomain
-        var tenant = await Context.Tenants
-            .FirstOrDefaultAsync(t => 
-                t.Subdomain.ToLower() == subdomain && t.IsActive, 
+        var tenant = await _masterContext.Tenants
+            .FirstOrDefaultAsync(t =>
+                t.Subdomain.ToLower() == subdomain && t.IsActive,
                 cancellationToken);
 
         // If not found, check by custom domain
         if (tenant == null)
         {
-            tenant = await Context.Tenants
-                .FirstOrDefaultAsync(t => 
-                    t.CustomDomain != null && 
-                    t.CustomDomain.ToLower() == domain && 
-                    t.IsActive, 
+            tenant = await _masterContext.Tenants
+                .FirstOrDefaultAsync(t =>
+                    t.CustomDomain != null &&
+                    t.CustomDomain.ToLower() == domain &&
+                    t.IsActive,
                     cancellationToken);
         }
 

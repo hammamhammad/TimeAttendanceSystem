@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Domain.Modules;
+using TecAxle.Hrms.Infrastructure.Persistence.Master;
 using TecAxle.Hrms.Infrastructure.Services;
 
 namespace TecAxle.Hrms.Infrastructure.BackgroundJobs;
@@ -32,12 +33,12 @@ public abstract class ModuleAwareJob : IInvocable
     public async Task Invoke()
     {
         using var scope = _serviceProvider.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<IApplicationDbContext>();
+        var masterContext = scope.ServiceProvider.GetRequiredService<MasterDbContext>();
         var entitlementService = scope.ServiceProvider.GetRequiredService<IEntitlementService>();
         var tenantContext = scope.ServiceProvider.GetRequiredService<TenantContext>();
 
-        // Get all active tenant IDs
-        var tenantIds = await context.Tenants
+        // Get all active tenant IDs from master database
+        var tenantIds = await masterContext.Tenants
             .Where(t => !t.IsDeleted && t.IsActive)
             .Select(t => t.Id)
             .ToListAsync();

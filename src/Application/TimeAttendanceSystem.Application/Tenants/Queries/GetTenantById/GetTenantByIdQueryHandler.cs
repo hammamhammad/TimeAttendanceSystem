@@ -9,14 +9,17 @@ namespace TecAxle.Hrms.Application.Tenants.Queries.GetTenantById;
 
 public class GetTenantByIdQueryHandler : BaseHandler<GetTenantByIdQuery, Result<TenantDetailDto>>
 {
-    public GetTenantByIdQueryHandler(IApplicationDbContext context, ICurrentUser currentUser)
+    private readonly IMasterDbContext _masterContext;
+
+    public GetTenantByIdQueryHandler(IApplicationDbContext context, ICurrentUser currentUser, IMasterDbContext masterContext)
         : base(context, currentUser)
     {
+        _masterContext = masterContext;
     }
 
     public override async Task<Result<TenantDetailDto>> Handle(GetTenantByIdQuery request, CancellationToken cancellationToken)
     {
-        var tenant = await Context.Tenants
+        var tenant = await _masterContext.Tenants
             .AsNoTracking()
             .Where(t => t.Id == request.Id && !t.IsDeleted)
             .FirstOrDefaultAsync(cancellationToken);
@@ -31,7 +34,7 @@ public class GetTenantByIdQueryHandler : BaseHandler<GetTenantByIdQuery, Result<
         var employeeCount = 0;
 
         // Load active subscription with plan, add-ons, and module entitlements
-        var subscription = await Context.TenantSubscriptions
+        var subscription = await _masterContext.TenantSubscriptions
             .AsNoTracking()
             .Include(s => s.Plan)
                 .ThenInclude(p => p.ModuleEntitlements)

@@ -9,14 +9,17 @@ namespace TecAxle.Hrms.Application.Tenants.Queries.GetTenants;
 
 public class GetTenantsQueryHandler : BaseHandler<GetTenantsQuery, Result<PagedResult<TenantDto>>>
 {
-    public GetTenantsQueryHandler(IApplicationDbContext context, ICurrentUser currentUser)
+    private readonly IMasterDbContext _masterContext;
+
+    public GetTenantsQueryHandler(IApplicationDbContext context, ICurrentUser currentUser, IMasterDbContext masterContext)
         : base(context, currentUser)
     {
+        _masterContext = masterContext;
     }
 
     public override async Task<Result<PagedResult<TenantDto>>> Handle(GetTenantsQuery request, CancellationToken cancellationToken)
     {
-        var query = Context.Tenants.AsNoTracking().Where(t => !t.IsDeleted);
+        var query = _masterContext.Tenants.AsNoTracking().Where(t => !t.IsDeleted);
 
         // Apply search filter
         if (!string.IsNullOrWhiteSpace(request.Search))
@@ -70,7 +73,7 @@ public class GetTenantsQueryHandler : BaseHandler<GetTenantsQuery, Result<PagedR
                 // Cross-tenant DB counts require connecting to each tenant's DB — not available in master context
                 BranchCount = 0,
                 EmployeeCount = 0,
-                ActiveSubscription = Context.TenantSubscriptions
+                ActiveSubscription = _masterContext.TenantSubscriptions
                     .Where(s => s.TenantId == t.Id && (s.Status == SubscriptionStatus.Active || s.Status == SubscriptionStatus.Trial))
                     .Select(s => new { s.Plan.Name, s.Status })
                     .FirstOrDefault()

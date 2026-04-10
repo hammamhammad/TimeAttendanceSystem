@@ -7,21 +7,24 @@ namespace TecAxle.Hrms.Application.Subscriptions.Commands.AssignPlan;
 
 public class AssignPlanCommandHandler : BaseHandler<AssignPlanCommand, Result<long>>
 {
+    private readonly IMasterDbContext _masterContext;
     private readonly IEntitlementService _entitlementService;
 
     public AssignPlanCommandHandler(
         IApplicationDbContext context,
         ICurrentUser currentUser,
+        IMasterDbContext masterContext,
         IEntitlementService entitlementService)
         : base(context, currentUser)
     {
+        _masterContext = masterContext;
         _entitlementService = entitlementService;
     }
 
     public override async Task<Result<long>> Handle(AssignPlanCommand request, CancellationToken cancellationToken)
     {
         // Verify tenant exists
-        var tenant = await Context.Tenants
+        var tenant = await _masterContext.Tenants
             .FirstOrDefaultAsync(t => t.Id == request.TenantId && !t.IsDeleted, cancellationToken);
 
         if (tenant == null)
@@ -30,7 +33,7 @@ public class AssignPlanCommandHandler : BaseHandler<AssignPlanCommand, Result<lo
         }
 
         // Verify plan exists and is active
-        var plan = await Context.SubscriptionPlans
+        var plan = await _masterContext.SubscriptionPlans
             .FirstOrDefaultAsync(p => p.Id == request.PlanId && p.IsActive && !p.IsDeleted, cancellationToken);
 
         if (plan == null)
@@ -45,7 +48,7 @@ public class AssignPlanCommandHandler : BaseHandler<AssignPlanCommand, Result<lo
         }
 
         // Check for existing active subscription
-        var existingSubscription = await Context.TenantSubscriptions
+        var existingSubscription = await _masterContext.TenantSubscriptions
             .FirstOrDefaultAsync(s => s.TenantId == request.TenantId &&
                                       (s.Status == SubscriptionStatus.Active || s.Status == SubscriptionStatus.Trial),
                                  cancellationToken);
@@ -80,8 +83,8 @@ public class AssignPlanCommandHandler : BaseHandler<AssignPlanCommand, Result<lo
             CreatedBy = CurrentUser.Username ?? "SYSTEM"
         };
 
-        Context.TenantSubscriptions.Add(subscription);
-        await Context.SaveChangesAsync(cancellationToken);
+        _masterContext.TenantSubscriptions.Add(subscription);
+        await _masterContext.SaveChangesAsync(cancellationToken);
 
         // Invalidate entitlement cache
         _entitlementService.InvalidateCache(request.TenantId);

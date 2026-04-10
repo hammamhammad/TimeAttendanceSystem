@@ -14,18 +14,18 @@ public class TenantProvisioningService : ITenantProvisioningService
     private const string TenantAdminUsername = "tecaxleadmin";
     private const string TenantAdminPassword = "TecAxle@Sys2026!";
 
-    private readonly IApplicationDbContext _context;
+    private readonly IMasterDbContext _masterContext;
     private readonly IConnectionStringEncryption _encryption;
     private readonly MultiTenancyOptions _options;
     private readonly ILogger<TenantProvisioningService> _logger;
 
     public TenantProvisioningService(
-        IApplicationDbContext context,
+        IMasterDbContext masterContext,
         IConnectionStringEncryption encryption,
         IOptions<MultiTenancyOptions> options,
         ILogger<TenantProvisioningService> logger)
     {
-        _context = context;
+        _masterContext = masterContext;
         _encryption = encryption;
         _options = options.Value;
         _logger = logger;
@@ -33,7 +33,7 @@ public class TenantProvisioningService : ITenantProvisioningService
 
     public async Task<ProvisioningResult> ProvisionTenantAsync(long tenantId, CancellationToken ct = default)
     {
-        var tenant = await _context.Tenants.FirstOrDefaultAsync(t => t.Id == tenantId, ct);
+        var tenant = await _masterContext.Tenants.FirstOrDefaultAsync(t => t.Id == tenantId, ct);
         if (tenant == null)
             return new ProvisioningResult(false, null, $"Tenant {tenantId} not found.");
 
@@ -93,7 +93,7 @@ public class TenantProvisioningService : ITenantProvisioningService
 
                 // 2b. Ensure a Tenant record exists in tenant DB (needed for FK on TenantSettings/SetupSteps)
                 // Use the first existing tenant or create one — in per-tenant DB there's typically one
-                var localTenant = await tenantDb.Tenants.IgnoreQueryFilters().FirstOrDefaultAsync(ct);
+                var localTenant = await tenantDb.Set<Domain.Tenants.Tenant>().IgnoreQueryFilters().FirstOrDefaultAsync(ct);
                 if (localTenant == null)
                 {
                     localTenant = new Domain.Tenants.Tenant
@@ -112,7 +112,7 @@ public class TenantProvisioningService : ITenantProvisioningService
                         CreatedAtUtc = DateTime.UtcNow,
                         CreatedBy = "SYSTEM"
                     };
-                    tenantDb.Tenants.Add(localTenant);
+                    tenantDb.Set<Domain.Tenants.Tenant>().Add(localTenant);
                     await tenantDb.SaveChangesAsync(ct);
                 }
                 var localTenantId = localTenant.Id;
@@ -250,11 +250,11 @@ public class TenantProvisioningService : ITenantProvisioningService
             var adminEmails = new[] { $"tecaxleadmin@{mappingDomain}", $"systemadmin@{mappingDomain}" };
             foreach (var adminEmail in adminEmails)
             {
-                var emailExists = await _context.TenantUserEmails.AnyAsync(
+                var emailExists = await _masterContext.TenantUserEmails.AnyAsync(
                     tue => tue.Email == adminEmail && tue.TenantId == tenantId, ct);
                 if (!emailExists)
                 {
-                    _context.TenantUserEmails.Add(new Domain.Tenants.TenantUserEmail
+                    _masterContext.TenantUserEmails.Add(new Domain.Tenants.TenantUserEmail
                     {
                         Email = adminEmail,
                         TenantId = tenantId,
@@ -265,7 +265,7 @@ public class TenantProvisioningService : ITenantProvisioningService
                 }
             }
 
-            await _context.SaveChangesAsync(ct);
+            await _masterContext.SaveChangesAsync(ct);
             _logger.LogInformation("Provisioning complete: tenant {TenantId} → {DatabaseName}", tenantId, databaseName);
             return new ProvisioningResult(true, databaseName, null);
         }
@@ -282,7 +282,7 @@ public class TenantProvisioningService : ITenantProvisioningService
 
     public async Task<bool> ApplyMigrationsAsync(long tenantId, CancellationToken ct = default)
     {
-        var tenant = await _context.Tenants.AsNoTracking()
+        var tenant = await _masterContext.Tenants.AsNoTracking()
             .FirstOrDefaultAsync(t => t.Id == tenantId && !t.IsDeleted, ct);
         if (tenant?.EncryptedConnectionString == null) return false;
 
@@ -298,7 +298,7 @@ public class TenantProvisioningService : ITenantProvisioningService
 
     public async Task<bool> ValidateTenantDatabaseAsync(long tenantId, CancellationToken ct = default)
     {
-        var tenant = await _context.Tenants.AsNoTracking()
+        var tenant = await _masterContext.Tenants.AsNoTracking()
             .FirstOrDefaultAsync(t => t.Id == tenantId && !t.IsDeleted, ct);
         if (tenant?.EncryptedConnectionString == null) return false;
         try

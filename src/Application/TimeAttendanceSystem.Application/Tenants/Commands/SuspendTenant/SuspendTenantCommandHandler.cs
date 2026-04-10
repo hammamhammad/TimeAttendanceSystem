@@ -7,14 +7,17 @@ namespace TecAxle.Hrms.Application.Tenants.Commands.SuspendTenant;
 
 public class SuspendTenantCommandHandler : BaseHandler<SuspendTenantCommand, Result>
 {
-    public SuspendTenantCommandHandler(IApplicationDbContext context, ICurrentUser currentUser)
+    private readonly IMasterDbContext _masterContext;
+
+    public SuspendTenantCommandHandler(IApplicationDbContext context, ICurrentUser currentUser, IMasterDbContext masterContext)
         : base(context, currentUser)
     {
+        _masterContext = masterContext;
     }
 
     public override async Task<Result> Handle(SuspendTenantCommand request, CancellationToken cancellationToken)
     {
-        var tenant = await Context.Tenants
+        var tenant = await _masterContext.Tenants
             .FirstOrDefaultAsync(t => t.Id == request.Id && !t.IsDeleted, cancellationToken);
 
         if (tenant == null)
@@ -32,7 +35,7 @@ public class SuspendTenantCommandHandler : BaseHandler<SuspendTenantCommand, Res
         tenant.ModifiedAtUtc = DateTime.UtcNow;
         tenant.ModifiedBy = CurrentUser.Username;
 
-        await Context.SaveChangesAsync(cancellationToken);
+        await _masterContext.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }

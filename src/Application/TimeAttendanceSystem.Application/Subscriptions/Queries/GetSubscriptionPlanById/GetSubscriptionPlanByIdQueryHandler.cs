@@ -7,14 +7,17 @@ namespace TecAxle.Hrms.Application.Subscriptions.Queries.GetSubscriptionPlanById
 
 public class GetSubscriptionPlanByIdQueryHandler : BaseHandler<GetSubscriptionPlanByIdQuery, Result<SubscriptionPlanDto>>
 {
-    public GetSubscriptionPlanByIdQueryHandler(IApplicationDbContext context, ICurrentUser currentUser)
+    private readonly IMasterDbContext _masterContext;
+
+    public GetSubscriptionPlanByIdQueryHandler(IApplicationDbContext context, ICurrentUser currentUser, IMasterDbContext masterContext)
         : base(context, currentUser)
     {
+        _masterContext = masterContext;
     }
 
     public override async Task<Result<SubscriptionPlanDto>> Handle(GetSubscriptionPlanByIdQuery request, CancellationToken cancellationToken)
     {
-        var plan = await Context.SubscriptionPlans
+        var plan = await _masterContext.SubscriptionPlans
             .AsNoTracking()
             .Include(p => p.ModuleEntitlements)
             .Include(p => p.Limits)

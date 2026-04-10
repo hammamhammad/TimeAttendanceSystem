@@ -8,12 +8,17 @@ namespace TecAxle.Hrms.Application.Subscriptions.Commands.CreatePlan;
 
 public class CreateSubscriptionPlanCommandHandler : BaseHandler<CreateSubscriptionPlanCommand, Result<long>>
 {
-    public CreateSubscriptionPlanCommandHandler(IApplicationDbContext context, ICurrentUser currentUser)
-        : base(context, currentUser) { }
+    private readonly IMasterDbContext _masterContext;
+
+    public CreateSubscriptionPlanCommandHandler(IApplicationDbContext context, ICurrentUser currentUser, IMasterDbContext masterContext)
+        : base(context, currentUser)
+    {
+        _masterContext = masterContext;
+    }
 
     public override async Task<Result<long>> Handle(CreateSubscriptionPlanCommand request, CancellationToken cancellationToken)
     {
-        var codeExists = await Context.SubscriptionPlans
+        var codeExists = await _masterContext.SubscriptionPlans
             .AnyAsync(p => p.Code == request.Code.ToLower().Trim() && !p.IsDeleted, cancellationToken);
         if (codeExists)
             return Result.Failure<long>("A plan with this code already exists.");
@@ -39,15 +44,15 @@ public class CreateSubscriptionPlanCommandHandler : BaseHandler<CreateSubscripti
             CreatedBy = CurrentUser.Username ?? "SYSTEM"
         };
 
-        Context.SubscriptionPlans.Add(plan);
-        await Context.SaveChangesAsync(cancellationToken);
+        _masterContext.SubscriptionPlans.Add(plan);
+        await _masterContext.SaveChangesAsync(cancellationToken);
 
         // Add module entitlements
         foreach (var moduleName in request.Modules)
         {
             if (Enum.TryParse<SystemModule>(moduleName, true, out var module))
             {
-                Context.PlanModuleEntitlements.Add(new PlanModuleEntitlement
+                _masterContext.PlanModuleEntitlements.Add(new PlanModuleEntitlement
                 {
                     PlanId = plan.Id,
                     Module = module,
@@ -63,7 +68,7 @@ public class CreateSubscriptionPlanCommandHandler : BaseHandler<CreateSubscripti
         {
             if (Enum.TryParse<LimitType>(key, true, out var limitType))
             {
-                Context.PlanLimits.Add(new PlanLimit
+                _masterContext.PlanLimits.Add(new PlanLimit
                 {
                     PlanId = plan.Id,
                     LimitType = limitType,
@@ -74,7 +79,7 @@ public class CreateSubscriptionPlanCommandHandler : BaseHandler<CreateSubscripti
             }
         }
 
-        await Context.SaveChangesAsync(cancellationToken);
+        await _masterContext.SaveChangesAsync(cancellationToken);
         return Result.Success(plan.Id);
     }
 }

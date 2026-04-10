@@ -106,22 +106,7 @@ public class ApplicationDbContextAdapter : IApplicationDbContext
     public DbSet<NfcTag> NfcTags => _context.NfcTags;
     public DbSet<AttendanceVerificationLog> AttendanceVerificationLogs => _context.AttendanceVerificationLogs;
 
-    // Multi-tenant entities
-    public DbSet<Tenant> Tenants => _context.Tenants;
-    public DbSet<TenantUserEmail> TenantUserEmails => _context.TenantUserEmails;
-
-    // Platform entities
-    public DbSet<PlatformUser> PlatformUsers => _context.PlatformUsers;
-
-    // Subscription & Entitlements
-    public DbSet<SubscriptionPlan> SubscriptionPlans => _context.SubscriptionPlans;
-    public DbSet<PlanModuleEntitlement> PlanModuleEntitlements => _context.PlanModuleEntitlements;
-    public DbSet<PlanFeatureFlag> PlanFeatureFlags => _context.PlanFeatureFlags;
-    public DbSet<PlanLimit> PlanLimits => _context.PlanLimits;
-    public DbSet<TenantSubscription> TenantSubscriptions => _context.TenantSubscriptions;
-    public DbSet<TenantModuleAddOn> TenantModuleAddOns => _context.TenantModuleAddOns;
-    public DbSet<TenantFeatureOverride> TenantFeatureOverrides => _context.TenantFeatureOverrides;
-    public DbSet<EntitlementChangeLog> EntitlementChangeLogs => _context.EntitlementChangeLogs;
+    // Platform entities (Tenants, Subscriptions, etc.) are in MasterDbContext only
 
     // Phase 1: Employee Lifecycle
     public DbSet<EmployeeContract> EmployeeContracts => _context.EmployeeContracts;
@@ -309,8 +294,7 @@ public class ApplicationDbContextAdapter : IApplicationDbContext
     public DbSet<TenantSettings> TenantSettings => _context.TenantSettings;
     public DbSet<BranchSettingsOverride> BranchSettingsOverrides => _context.BranchSettingsOverrides;
     public DbSet<DepartmentSettingsOverride> DepartmentSettingsOverrides => _context.DepartmentSettingsOverrides;
-    public DbSet<PolicyTemplate> PolicyTemplates => _context.PolicyTemplates;
-    public DbSet<PolicyTemplateItem> PolicyTemplateItems => _context.PolicyTemplateItems;
+    // PolicyTemplates and PolicyTemplateItems are in IMasterDbContext only
     public DbSet<SetupStep> SetupSteps => _context.SetupSteps;
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

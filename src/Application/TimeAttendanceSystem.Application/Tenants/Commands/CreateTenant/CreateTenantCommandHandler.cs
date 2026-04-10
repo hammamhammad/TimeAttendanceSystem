@@ -12,6 +12,7 @@ namespace TecAxle.Hrms.Application.Tenants.Commands.CreateTenant;
 
 public class CreateTenantCommandHandler : BaseHandler<CreateTenantCommand, Result<TenantCreationResult>>
 {
+    private readonly IMasterDbContext _masterContext;
     private readonly ITenantProvisioningService _provisioningService;
     private readonly IMediator _mediator;
     private readonly IValidator<CreateTenantCommand> _validator;
@@ -20,12 +21,14 @@ public class CreateTenantCommandHandler : BaseHandler<CreateTenantCommand, Resul
     public CreateTenantCommandHandler(
         IApplicationDbContext context,
         ICurrentUser currentUser,
+        IMasterDbContext masterContext,
         ITenantProvisioningService provisioningService,
         IMediator mediator,
         IValidator<CreateTenantCommand> validator,
         ILogger<CreateTenantCommandHandler> logger)
         : base(context, currentUser)
     {
+        _masterContext = masterContext;
         _provisioningService = provisioningService;
         _mediator = mediator;
         _validator = validator;
@@ -49,7 +52,7 @@ public class CreateTenantCommandHandler : BaseHandler<CreateTenantCommand, Resul
             subdomain = request.Subdomain.ToLower().Trim();
 
             // Validate uniqueness for explicitly provided subdomain
-            var subdomainExists = await Context.Tenants
+            var subdomainExists = await _masterContext.Tenants
                 .AnyAsync(t => t.Subdomain.ToLower() == subdomain && !t.IsDeleted, cancellationToken);
             if (subdomainExists)
                 return Result.Failure<TenantCreationResult>("A tenant with this subdomain already exists");
@@ -66,7 +69,7 @@ public class CreateTenantCommandHandler : BaseHandler<CreateTenantCommand, Resul
             var adminEmail = $"tecaxleadmin@{emailDomain}";
 
             // Check if this admin email already exists in TenantUserEmails (direct conflict)
-            var emailMappingExists = await Context.TenantUserEmails
+            var emailMappingExists = await _masterContext.TenantUserEmails
                 .AnyAsync(tue => tue.Email.ToLower() == adminEmail, cancellationToken);
             if (emailMappingExists)
                 return Result.Failure<TenantCreationResult>($"A tenant with the email domain '{emailDomain}' already exists. Each tenant must use a unique email domain.");
@@ -98,8 +101,8 @@ public class CreateTenantCommandHandler : BaseHandler<CreateTenantCommand, Resul
             CreatedBy = CurrentUser.Username ?? "SYSTEM"
         };
 
-        Context.Tenants.Add(tenant);
-        await Context.SaveChangesAsync(cancellationToken);
+        _masterContext.Tenants.Add(tenant);
+        await _masterContext.SaveChangesAsync(cancellationToken);
 
         // 2. Auto-provision dedicated database (creates DB, applies migrations, seeds admin user)
         var provisionResult = await _provisioningService.ProvisionTenantAsync(tenant.Id, cancellationToken);
@@ -108,7 +111,7 @@ public class CreateTenantCommandHandler : BaseHandler<CreateTenantCommand, Resul
 
         // 3. Update status to Active — tenant is provisioned and usable
         tenant.Status = TenantStatus.Active;
-        await Context.SaveChangesAsync(cancellationToken);
+        await _masterContext.SaveChangesAsync(cancellationToken);
 
         // 4. Auto-assign subscription plan if specified (non-fatal — tenant is already provisioned)
         string? planWarning = null;
@@ -142,7 +145,7 @@ public class CreateTenantCommandHandler : BaseHandler<CreateTenantCommand, Resul
         var slug = GenerateSlug(tenantName);
 
         // Check if base slug is available
-        var exists = await Context.Tenants
+        var exists = await _masterContext.Tenants
             .AnyAsync(t => t.Subdomain == slug && !t.IsDeleted, cancellationToken);
         if (!exists)
             return slug;
@@ -151,7 +154,7 @@ public class CreateTenantCommandHandler : BaseHandler<CreateTenantCommand, Resul
         for (int i = 2; i <= 100; i++)
         {
             var candidate = $"{slug}-{i}";
-            exists = await Context.Tenants
+            exists = await _masterContext.Tenants
                 .AnyAsync(t => t.Subdomain == candidate && !t.IsDeleted, cancellationToken);
             if (!exists)
                 return candidate;

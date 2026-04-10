@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TecAxle.Hrms.Shared")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4bb535f089410597d4d332816f22e3babe7c8d11")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8379f12cd906e9378a99368984bc769cb7e191ee")]
 [assembly: System.Reflection.AssemblyProductAttribute("TecAxle.Hrms.Shared")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TecAxle.Hrms.Shared")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

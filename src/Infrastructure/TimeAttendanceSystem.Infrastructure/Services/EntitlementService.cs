@@ -10,16 +10,19 @@ namespace TecAxle.Hrms.Infrastructure.Services;
 public class EntitlementService : IEntitlementService
 {
     private readonly IApplicationDbContext _context;
+    private readonly IMasterDbContext _masterContext;
     private readonly IMemoryCache _cache;
     private readonly ILogger<EntitlementService> _logger;
     private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(5);
 
     public EntitlementService(
         IApplicationDbContext context,
+        IMasterDbContext masterContext,
         IMemoryCache cache,
         ILogger<EntitlementService> logger)
     {
         _context = context;
+        _masterContext = masterContext;
         _cache = cache;
         _logger = logger;
     }
@@ -97,7 +100,7 @@ public class EntitlementService : IEntitlementService
     private async Task<TenantEntitlementSummary> BuildEntitlementSummaryAsync(long tenantId, CancellationToken ct)
     {
         // Get the active subscription for this tenant
-        var subscription = await _context.TenantSubscriptions
+        var subscription = await _masterContext.TenantSubscriptions
             .Include(s => s.Plan)
                 .ThenInclude(p => p.ModuleEntitlements)
                     .ThenInclude(me => me.FeatureFlags)

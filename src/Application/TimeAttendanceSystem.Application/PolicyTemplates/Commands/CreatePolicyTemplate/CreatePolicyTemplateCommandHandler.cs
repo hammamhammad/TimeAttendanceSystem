@@ -7,16 +7,21 @@ namespace TecAxle.Hrms.Application.PolicyTemplates.Commands.CreatePolicyTemplate
 
 public class CreatePolicyTemplateCommandHandler : BaseHandler<CreatePolicyTemplateCommand, Result<long>>
 {
+    private readonly IMasterDbContext _masterContext;
     private readonly ITenantContext _tenantContext;
 
     public CreatePolicyTemplateCommandHandler(
         IApplicationDbContext context,
         ICurrentUser currentUser,
+        IMasterDbContext masterContext,
         ITenantContext tenantContext)
         : base(context, currentUser)
     {
+        _masterContext = masterContext;
         _tenantContext = tenantContext;
     }
+
+    protected override IMasterDbContext? GetMasterContext() => _masterContext;
 
     public override async Task<Result<long>> Handle(CreatePolicyTemplateCommand request, CancellationToken cancellationToken)
     {
@@ -25,7 +30,7 @@ public class CreatePolicyTemplateCommandHandler : BaseHandler<CreatePolicyTempla
             return Result.Failure<long>("Tenant context not resolved");
 
         // Validate code uniqueness within tenant scope
-        var codeExists = await Context.PolicyTemplates
+        var codeExists = await _masterContext.PolicyTemplates
             .AnyAsync(t => t.Code == request.Code && !t.IsDeleted
                 && (t.TenantId == tenantId || t.IsSystemTemplate), cancellationToken);
 
@@ -72,8 +77,8 @@ public class CreatePolicyTemplateCommandHandler : BaseHandler<CreatePolicyTempla
             }
         }
 
-        Context.PolicyTemplates.Add(template);
-        await Context.SaveChangesAsync(cancellationToken);
+        _masterContext.PolicyTemplates.Add(template);
+        await _masterContext.SaveChangesAsync(cancellationToken);
 
         return Result.Success(template.Id);
     }

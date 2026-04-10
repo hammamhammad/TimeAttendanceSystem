@@ -9,16 +9,19 @@ namespace TecAxle.Hrms.Application.Subscriptions.Commands.CancelSubscription;
 
 public class CancelSubscriptionCommandHandler : BaseHandler<CancelSubscriptionCommand, Result>
 {
+    private readonly IMasterDbContext _masterContext;
     private readonly IEntitlementService _entitlementService;
     private readonly IModuleDeactivationService _moduleDeactivationService;
 
     public CancelSubscriptionCommandHandler(
         IApplicationDbContext context,
         ICurrentUser currentUser,
+        IMasterDbContext masterContext,
         IEntitlementService entitlementService,
         IModuleDeactivationService moduleDeactivationService)
         : base(context, currentUser)
     {
+        _masterContext = masterContext;
         _entitlementService = entitlementService;
         _moduleDeactivationService = moduleDeactivationService;
     }
@@ -26,7 +29,7 @@ public class CancelSubscriptionCommandHandler : BaseHandler<CancelSubscriptionCo
     public override async Task<Result> Handle(CancelSubscriptionCommand request, CancellationToken cancellationToken)
     {
         // Verify tenant exists
-        var tenantExists = await Context.Tenants
+        var tenantExists = await _masterContext.Tenants
             .AnyAsync(t => t.Id == request.TenantId && !t.IsDeleted, cancellationToken);
 
         if (!tenantExists)
@@ -35,7 +38,7 @@ public class CancelSubscriptionCommandHandler : BaseHandler<CancelSubscriptionCo
         }
 
         // Find active subscription with plan details
-        var subscription = await Context.TenantSubscriptions
+        var subscription = await _masterContext.TenantSubscriptions
             .Include(s => s.Plan)
                 .ThenInclude(p => p.ModuleEntitlements)
             .FirstOrDefaultAsync(s => s.TenantId == request.TenantId &&
@@ -55,7 +58,7 @@ public class CancelSubscriptionCommandHandler : BaseHandler<CancelSubscriptionCo
             .Select(e => e.Module)
             .ToList();
 
-        Context.EntitlementChangeLogs.Add(new EntitlementChangeLog
+        _masterContext.EntitlementChangeLogs.Add(new EntitlementChangeLog
         {
             TenantId = request.TenantId,
             ChangeType = EntitlementChangeType.SubscriptionCancelled,
@@ -78,7 +81,7 @@ public class CancelSubscriptionCommandHandler : BaseHandler<CancelSubscriptionCo
         subscription.ModifiedAtUtc = now;
         subscription.ModifiedBy = CurrentUser.Username;
 
-        await Context.SaveChangesAsync(cancellationToken);
+        await _masterContext.SaveChangesAsync(cancellationToken);
 
         // Invalidate entitlement cache
         _entitlementService.InvalidateCache(request.TenantId);

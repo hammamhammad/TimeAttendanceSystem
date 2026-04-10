@@ -18,6 +18,7 @@ namespace TecAxle.Hrms.Application.Services;
 public class AttendanceCalculationService : IAttendanceCalculationService
 {
     private readonly IApplicationDbContext _context;
+    private readonly IMasterDbContext? _masterContext;
     private readonly IOvertimeConfigurationService _overtimeConfigService;
     private readonly IPublicHolidayService _publicHolidayService;
     private readonly ITenantSettingsResolver? _tenantSettingsResolver;
@@ -27,10 +28,12 @@ public class AttendanceCalculationService : IAttendanceCalculationService
         IApplicationDbContext context,
         IOvertimeConfigurationService overtimeConfigService,
         IPublicHolidayService publicHolidayService,
+        IMasterDbContext? masterContext = null,
         ITenantSettingsResolver? tenantSettingsResolver = null,
         ILogger<AttendanceCalculationService>? logger = null)
     {
         _context = context;
+        _masterContext = masterContext;
         _overtimeConfigService = overtimeConfigService;
         _publicHolidayService = publicHolidayService;
         _tenantSettingsResolver = tenantSettingsResolver;
@@ -1356,11 +1359,16 @@ public class AttendanceCalculationService : IAttendanceCalculationService
     /// </summary>
     private async Task<long> GetCurrentTenantIdAsync(CancellationToken ct)
     {
-        var tenant = await _context.Tenants
-            .Where(t => t.IsActive && !t.IsDeleted)
-            .OrderBy(t => t.Id)
-            .Select(t => t.Id)
-            .FirstOrDefaultAsync(ct);
-        return tenant;
+        if (_masterContext != null)
+        {
+            var tenant = await _masterContext.Tenants
+                .Where(t => t.IsActive && !t.IsDeleted)
+                .OrderBy(t => t.Id)
+                .Select(t => t.Id)
+                .FirstOrDefaultAsync(ct);
+            return tenant;
+        }
+
+        return 0;
     }
 }

@@ -14,16 +14,21 @@ namespace TecAxle.Hrms.Application.PolicyTemplates.Commands.ApplyPolicyTemplate;
 
 public class ApplyPolicyTemplateCommandHandler : BaseHandler<ApplyPolicyTemplateCommand, Result>
 {
+    private readonly IMasterDbContext _masterContext;
     private readonly ITenantContext _tenantContext;
 
     public ApplyPolicyTemplateCommandHandler(
         IApplicationDbContext context,
         ICurrentUser currentUser,
+        IMasterDbContext masterContext,
         ITenantContext tenantContext)
         : base(context, currentUser)
     {
+        _masterContext = masterContext;
         _tenantContext = tenantContext;
     }
+
+    protected override IMasterDbContext? GetMasterContext() => _masterContext;
 
     public override async Task<Result> Handle(ApplyPolicyTemplateCommand request, CancellationToken cancellationToken)
     {
@@ -31,7 +36,7 @@ public class ApplyPolicyTemplateCommandHandler : BaseHandler<ApplyPolicyTemplate
         if (tenantId == null)
             return Result.Failure("Tenant context not resolved");
 
-        var template = await Context.PolicyTemplates
+        var template = await _masterContext.PolicyTemplates
             .Include(t => t.Items.Where(i => !i.IsDeleted))
             .FirstOrDefaultAsync(t => t.Id == request.TemplateId && !t.IsDeleted, cancellationToken);
 

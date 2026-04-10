@@ -142,6 +142,12 @@ public abstract class BaseHandler<TRequest, TResponse> : IRequestHandler<TReques
     /// Resolves the tenant ID for the current user when TenantContext is not available.
     /// For SystemAdmin users without a tenant_id claim, falls back to the first active tenant.
     /// </summary>
+    /// <summary>
+    /// Override in derived handlers that inject IMasterDbContext to provide it here.
+    /// Default returns null (no master context available).
+    /// </summary>
+    protected virtual IMasterDbContext? GetMasterContext() => null;
+
     protected async Task<long?> ResolveTenantIdAsync(CancellationToken ct = default)
     {
         // Try the user's own tenant ID first
@@ -151,12 +157,16 @@ public abstract class BaseHandler<TRequest, TResponse> : IRequestHandler<TReques
         // SystemAdmin fallback: use the first active tenant
         if (CurrentUser.IsSystemAdmin)
         {
-            var firstTenant = await Context.Tenants
-                .Where(t => t.IsActive && !t.IsDeleted)
-                .OrderBy(t => t.Id)
-                .Select(t => (long?)t.Id)
-                .FirstOrDefaultAsync(ct);
-            return firstTenant;
+            var masterCtx = GetMasterContext();
+            if (masterCtx != null)
+            {
+                var firstTenant = await masterCtx.Tenants
+                    .Where(t => t.IsActive && !t.IsDeleted)
+                    .OrderBy(t => t.Id)
+                    .Select(t => (long?)t.Id)
+                    .FirstOrDefaultAsync(ct);
+                return firstTenant;
+            }
         }
 
         return null;

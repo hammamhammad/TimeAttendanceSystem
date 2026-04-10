@@ -6,18 +6,23 @@ namespace TecAxle.Hrms.Application.Subscriptions.Commands.DeletePlan;
 
 public class DeleteSubscriptionPlanCommandHandler : BaseHandler<DeleteSubscriptionPlanCommand, Result>
 {
-    public DeleteSubscriptionPlanCommandHandler(IApplicationDbContext context, ICurrentUser currentUser)
-        : base(context, currentUser) { }
+    private readonly IMasterDbContext _masterContext;
+
+    public DeleteSubscriptionPlanCommandHandler(IApplicationDbContext context, ICurrentUser currentUser, IMasterDbContext masterContext)
+        : base(context, currentUser)
+    {
+        _masterContext = masterContext;
+    }
 
     public override async Task<Result> Handle(DeleteSubscriptionPlanCommand request, CancellationToken cancellationToken)
     {
-        var plan = await Context.SubscriptionPlans
+        var plan = await _masterContext.SubscriptionPlans
             .FirstOrDefaultAsync(p => p.Id == request.Id && !p.IsDeleted, cancellationToken);
         if (plan == null)
             return Result.Failure("Plan not found.");
 
         // Check for active subscriptions
-        var hasActiveSubs = await Context.TenantSubscriptions
+        var hasActiveSubs = await _masterContext.TenantSubscriptions
             .AnyAsync(s => s.PlanId == plan.Id && s.Status == Domain.Subscriptions.SubscriptionStatus.Active, cancellationToken);
         if (hasActiveSubs)
             return Result.Failure("Cannot delete a plan with active subscriptions. Change tenant plans first.");
@@ -26,7 +31,7 @@ public class DeleteSubscriptionPlanCommandHandler : BaseHandler<DeleteSubscripti
         plan.ModifiedAtUtc = DateTime.UtcNow;
         plan.ModifiedBy = CurrentUser.Username;
 
-        await Context.SaveChangesAsync(cancellationToken);
+        await _masterContext.SaveChangesAsync(cancellationToken);
         return Result.Success();
     }
 }
