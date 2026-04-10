@@ -196,7 +196,43 @@ public class TenantProvisioningService : ITenantProvisioningService
                         tenantDb.UserBranchScopes.Add(new Domain.Users.UserBranchScope { UserId = adminUser.Id, BranchId = bid });
 
                     await tenantDb.SaveChangesAsync(ct);
-                    _logger.LogInformation("Created tenant SystemAdmin ({Email}) in {DatabaseName}", tenantAdminEmail, databaseName);
+                    _logger.LogInformation("Created tenant tecaxleadmin ({Email}) in {DatabaseName}", tenantAdminEmail, databaseName);
+                }
+
+                // 3b. Create systemadmin user (second system user)
+                var systemAdminEmail = $"systemadmin@{emailDomain}";
+                var existingSystemAdmin = await tenantDb.Users.FirstOrDefaultAsync(u => u.Username == "systemadmin", ct);
+                if (existingSystemAdmin == null)
+                {
+                    var (saHash, saSalt) = HashPassword(TenantAdminPassword);
+                    var systemAdminUser = new Domain.Users.User
+                    {
+                        Username = "systemadmin",
+                        Email = systemAdminEmail,
+                        PasswordHash = saHash,
+                        PasswordSalt = saSalt,
+                        IsActive = true,
+                        IsSystemUser = true,
+                        TwoFactorEnabled = false,
+                        EmailConfirmed = true,
+                        MustChangePassword = false,
+                        PreferredLanguage = "en",
+                        CreatedAtUtc = DateTime.UtcNow,
+                        CreatedBy = "SYSTEM"
+                    };
+                    tenantDb.Users.Add(systemAdminUser);
+                    await tenantDb.SaveChangesAsync(ct);
+
+                    var saRole = await tenantDb.Roles.FirstOrDefaultAsync(r => r.Name == "SystemAdmin", ct);
+                    if (saRole != null)
+                        tenantDb.UserRoles.Add(new Domain.Users.UserRole { UserId = systemAdminUser.Id, RoleId = saRole.Id });
+
+                    var saBranchIds = await tenantDb.Branches.Where(b => !b.IsDeleted).Select(b => b.Id).ToListAsync(ct);
+                    foreach (var bid in saBranchIds)
+                        tenantDb.UserBranchScopes.Add(new Domain.Users.UserBranchScope { UserId = systemAdminUser.Id, BranchId = bid });
+
+                    await tenantDb.SaveChangesAsync(ct);
+                    _logger.LogInformation("Created tenant systemadmin ({Email}) in {DatabaseName}", systemAdminEmail, databaseName);
                 }
             }
 
@@ -206,23 +242,27 @@ public class TenantProvisioningService : ITenantProvisioningService
             tenant.DatabaseMigrationVersion = "latest";
             tenant.ModifiedAtUtc = DateTime.UtcNow;
 
-            // 5. Map tenant admin email in master TenantUserEmails
+            // 5. Map both admin emails in master TenantUserEmails
             var mappingDomain = !string.IsNullOrEmpty(tenant.Email) && tenant.Email.Contains('@')
                 ? tenant.Email.Split('@')[1]
                 : $"{tenant.Subdomain}.clockn.net";
-            var tenantAdminEmailForMapping = $"tecaxleadmin@{mappingDomain}";
-            var emailExists = await _context.TenantUserEmails.AnyAsync(
-                tue => tue.Email == tenantAdminEmailForMapping && tue.TenantId == tenantId, ct);
-            if (!emailExists)
+
+            var adminEmails = new[] { $"tecaxleadmin@{mappingDomain}", $"systemadmin@{mappingDomain}" };
+            foreach (var adminEmail in adminEmails)
             {
-                _context.TenantUserEmails.Add(new Domain.Tenants.TenantUserEmail
+                var emailExists = await _context.TenantUserEmails.AnyAsync(
+                    tue => tue.Email == adminEmail && tue.TenantId == tenantId, ct);
+                if (!emailExists)
                 {
-                    Email = tenantAdminEmailForMapping,
-                    TenantId = tenantId,
-                    IsPrimary = true,
-                    CreatedAtUtc = DateTime.UtcNow,
-                    CreatedBy = "SYSTEM"
-                });
+                    _context.TenantUserEmails.Add(new Domain.Tenants.TenantUserEmail
+                    {
+                        Email = adminEmail,
+                        TenantId = tenantId,
+                        IsPrimary = adminEmail.StartsWith("tecaxleadmin"),
+                        CreatedAtUtc = DateTime.UtcNow,
+                        CreatedBy = "SYSTEM"
+                    });
+                }
             }
 
             await _context.SaveChangesAsync(ct);

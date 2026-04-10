@@ -172,7 +172,8 @@ public class GetUsersQueryHandler : BaseHandler<GetUsersQuery, Result<PagedResul
                         .FirstOrDefault()
                     : null, // Last login from most recent session (nullable)
                 u.UserRoles.Select(ur => ur.Role.Name).ToList(), // Role names for display
-                u.UserBranchScopes.Select(ubs => ubs.Branch.Name).ToList() // Branch names for context
+                u.UserBranchScopes.Select(ubs => ubs.Branch.Name).ToList(), // Branch names for context
+                u.IsSystemUser
             ))
             .ToListAsync(cancellationToken);
 

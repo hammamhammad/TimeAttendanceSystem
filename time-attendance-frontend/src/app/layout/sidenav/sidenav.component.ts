@@ -68,6 +68,11 @@ export class SidenavComponent {
       return this.platformPaths.has(item.path);
     }
 
+    // Tenant users must NOT see platform-only paths
+    if (this.platformPaths.has(item.path)) {
+      return false;
+    }
+
     // Check module entitlement first
     if (item.module && !this.entitlementService.isModuleEnabled(item.module)) {
       return false;

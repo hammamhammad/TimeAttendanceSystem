@@ -17,6 +17,7 @@ import { ShiftsService } from '../../pages/shifts/shifts.service';
 import { VacationTypesService } from '../../pages/vacation-types/vacation-types.service';
 import { RolesService } from '../../pages/roles/roles.service';
 import { AuthService } from '../auth/auth.service';
+import { EntitlementService } from './entitlement.service';
 
 @Injectable({
   providedIn: 'root'
@@ -31,6 +32,7 @@ export class FilterRegistryService {
   private vacationTypesService = inject(VacationTypesService);
   private rolesService = inject(RolesService);
   private authService = inject(AuthService);
+  private entitlementService = inject(EntitlementService);
 
   private registry: ModuleFilterRegistry = {};
   private dataCache = new BehaviorSubject<FilterData>({});
@@ -68,6 +70,8 @@ export class FilterRegistryService {
     if (this.authService.isPlatformUser()) {
       return;
     }
+    // Load tenant entitlements for module visibility
+    this.entitlementService.loadEntitlements().subscribe();
     this.loadBranches();
     this.initShiftsData();
     this.initRolesData();

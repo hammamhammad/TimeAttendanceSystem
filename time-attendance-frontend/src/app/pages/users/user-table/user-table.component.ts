@@ -255,7 +255,7 @@ export class UserTableComponent {
   }
 
   isSystemAdmin(user: UserDto): boolean {
-    return user.username.toLowerCase() === 'systemadmin';
+    return user.isSystemUser === true;
   }
 
   getRoleBadges(roles: string[]): Array<{label: string, variant: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info'}> {

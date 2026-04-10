@@ -553,14 +553,15 @@ public static class SeedData
 
     private static async Task SeedUsersAsync(TecAxleDbContext context)
     {
-        // Create SystemAdmin user
-        var (sysAdminHash, sysAdminSalt) = HashPassword("TempP@ssw0rd123!");
-        var systemAdminUser = new User
+        var (taHash, taSalt) = HashPassword("TempP@ssw0rd123!");
+        var (saHash, saSalt) = HashPassword("TempP@ssw0rd123!");
+
+        var tecaxleAdmin = new User
         {
             Username = "tecaxleadmin",
             Email = "tecaxleadmin@system.local",
-            PasswordHash = sysAdminHash,
-            PasswordSalt = sysAdminSalt,
+            PasswordHash = taHash,
+            PasswordSalt = taSalt,
             TwoFactorEnabled = false,
             EmailConfirmed = true,
             IsActive = true,
@@ -569,20 +570,29 @@ public static class SeedData
             CreatedBy = "SYSTEM"
         };
 
-      
-        await context.Users.AddRangeAsync(new[] { systemAdminUser });
-        await context.SaveChangesAsync();
-
-        // Assign SystemAdmin role to tecaxleadmin user
-        var systemAdminRole = await context.Roles.FirstAsync(r => r.Name == "SystemAdmin");
-        var systemAdminUserRole = new UserRole
+        var systemAdmin = new User
         {
-            UserId = systemAdminUser.Id,
-            RoleId = systemAdminRole.Id
+            Username = "systemadmin",
+            Email = "systemadmin@system.local",
+            PasswordHash = saHash,
+            PasswordSalt = saSalt,
+            TwoFactorEnabled = false,
+            EmailConfirmed = true,
+            IsActive = true,
+            IsSystemUser = true,
+            CreatedAtUtc = DateTime.UtcNow,
+            CreatedBy = "SYSTEM"
         };
 
+        await context.Users.AddRangeAsync(tecaxleAdmin, systemAdmin);
+        await context.SaveChangesAsync();
 
-        await context.UserRoles.AddRangeAsync(new[] { systemAdminUserRole });
+        // Assign SystemAdmin role to both users
+        var systemAdminRole = await context.Roles.FirstAsync(r => r.Name == "SystemAdmin");
+        await context.UserRoles.AddRangeAsync(
+            new UserRole { UserId = tecaxleAdmin.Id, RoleId = systemAdminRole.Id },
+            new UserRole { UserId = systemAdmin.Id, RoleId = systemAdminRole.Id }
+        );
         await context.SaveChangesAsync();
     }
 

@@ -49,6 +49,7 @@ export interface UserDto {
   permissions?: string[];
   branchIds?: number[];
   accessFailedCount?: number;
+  isSystemUser?: boolean;
 }
 
 export interface CreateUserRequest {

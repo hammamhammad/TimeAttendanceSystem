@@ -83,5 +83,6 @@ public record UserDto(
     DateTime CreatedAtUtc,
     DateTime? LastLoginAt,
     List<string> Roles,
-    List<string> Branches
+    List<string> Branches,
+    bool IsSystemUser = false
 );
