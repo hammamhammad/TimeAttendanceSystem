@@ -171,7 +171,8 @@
       "Bash(PGPASSWORD='P@ssw0rd@3213' \"/c/Program Files/PostgreSQL/18/bin/psql.exe\" -U postgres -h localhost -p 5432 -c \"DROP DATABASE tecaxle_master;\")",
       "Bash(PGPASSWORD='P@ssw0rd@3213' \"/c/Program Files/PostgreSQL/18/bin/psql.exe\" -U postgres -h localhost -p 5432 -c \"CREATE DATABASE tecaxle_master;\")",
       "Bash(PGPASSWORD='P@ssw0rd@3213' \"/c/Program Files/PostgreSQL/18/bin/psql.exe\" -U postgres -h localhost -p 5432 -d tecaxle_master -c \"SELECT \\\\\"Id\\\\\", \\\\\"Email\\\\\", \\\\\"Name\\\\\", \\\\\"Subdomain\\\\\" FROM \\\\\"Tenants\\\\\";\")",
-      "Bash(PGPASSWORD='P@ssw0rd@3213' \"/c/Program Files/PostgreSQL/18/bin/psql.exe\" -U postgres -h localhost -p 5432 -c \"SELECT datname FROM pg_database WHERE datname LIKE 'ta_%' ORDER BY datname;\")"
+      "Bash(PGPASSWORD='P@ssw0rd@3213' \"/c/Program Files/PostgreSQL/18/bin/psql.exe\" -U postgres -h localhost -p 5432 -c \"SELECT datname FROM pg_database WHERE datname LIKE 'ta_%' ORDER BY datname;\")",
+      "Bash(wc -l d:/Work/TimeAttendanceSystem/TestCases/34-*.md)"
     ],
     "deny": [],
     "ask": []

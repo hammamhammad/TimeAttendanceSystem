@@ -11,7 +11,19 @@
   </div>
 
   <ul class="nav flex-column mt-2">
-    @for (item of menuItems(); track item.path) {
+    @for (group of menuGroups(); track group.groupKey) {
+    @if (hasVisibleGroup(group)) {
+    <!-- Group header -->
+    <li class="nav-group-header">
+      @if (!collapsed()) {
+      <span class="nav-group-label">{{ t(group.titleKey) }}</span>
+      } @else {
+      <span class="nav-group-divider"></span>
+      }
+    </li>
+
+    <!-- Group items -->
+    @for (item of group.items; track item.path) {
     @if (hasParentMenuPermission(item)) {
     <li class="nav-item">
       <!-- Parent menu item -->
@@ -58,6 +70,8 @@
       </a>
       }
     </li>
+    }
+    }
     }
     }
   </ul>

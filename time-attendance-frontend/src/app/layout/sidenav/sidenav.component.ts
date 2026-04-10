@@ -1,7 +1,7 @@
 import { Component, Input, signal, inject } from '@angular/core';
 
 import { RouterModule, Router } from '@angular/router';
-import { MenuService, MenuItem } from '../../core/menu/menu.service';
+import { MenuService, MenuItem, MenuGroup } from '../../core/menu/menu.service';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { AuthService } from '../../core/auth/auth.service';
 import { PermissionService } from '../../core/auth/permission.service';
@@ -25,12 +25,15 @@ export class SidenavComponent {
   public permissionService = inject(PermissionService);
   private entitlementService = inject(EntitlementService);
 
-  menuItems = this.menuService.getMenuItems$();
+  menuGroups = this.menuService.getMenuGroups$();
 
   // Platform-only paths — only these are shown when logged in as platform admin
   private platformPaths = new Set(['/platform', '/tenants', '/subscription-plans']);
 
-  // Track which submenus are open - updated for debugging
+  // Platform-only group keys
+  private platformGroupKeys = new Set(['platform']);
+
+  // Track which submenus are open
   private openSubmenus = signal<Set<string>>(new Set());
 
   isRtl(): boolean {
@@ -131,5 +134,20 @@ export class SidenavComponent {
     return !!(item.children && item.children.some(child =>
       this.hasChildMenuPermission(child)
     ));
+  }
+
+  // Check if a group has any visible items
+  hasVisibleGroup(group: MenuGroup): boolean {
+    // Platform admin: only show platform group
+    if (this.authService.isPlatformUser()) {
+      return this.platformGroupKeys.has(group.groupKey);
+    }
+
+    // Tenant users: hide platform group
+    if (this.platformGroupKeys.has(group.groupKey)) {
+      return false;
+    }
+
+    return group.items.some(item => this.hasParentMenuPermission(item));
   }
 }

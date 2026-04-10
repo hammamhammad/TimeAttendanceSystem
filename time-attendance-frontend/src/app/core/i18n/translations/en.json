@@ -92,6 +92,20 @@
     "user_management": "User Management",
     "employee_management": "Employee Management"
   },
+  "nav_group": {
+    "main": "Main",
+    "platform": "Platform",
+    "organization": "Organization",
+    "timeAttendance": "Time & Attendance",
+    "leaveAbsence": "Leave & Absence",
+    "hrLifecycle": "HR & Lifecycle",
+    "compensation": "Compensation",
+    "performanceGrowth": "Performance & Growth",
+    "workplace": "Workplace",
+    "workflowApprovals": "Workflows & Approvals",
+    "reportsAnalytics": "Reports & Analytics",
+    "settings": "Settings"
+  },
   "nav": {
     "dashboard": "Dashboard",
     "users": "Users",

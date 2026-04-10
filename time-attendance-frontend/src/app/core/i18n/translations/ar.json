@@ -92,6 +92,20 @@
     "user_management": "إدارة المستخدمين",
     "employee_management": "إدارة الموظفين"
   },
+  "nav_group": {
+    "main": "الرئيسية",
+    "platform": "المنصة",
+    "organization": "المنظمة",
+    "timeAttendance": "الوقت والحضور",
+    "leaveAbsence": "الإجازات والغياب",
+    "hrLifecycle": "الموارد البشرية",
+    "compensation": "التعويضات",
+    "performanceGrowth": "الأداء والنمو",
+    "workplace": "بيئة العمل",
+    "workflowApprovals": "سير العمل والموافقات",
+    "reportsAnalytics": "التقارير والتحليلات",
+    "settings": "الإعدادات"
+  },
   "nav": {
     "dashboard": "لوحة التحكم",
     "users": "المستخدمون",

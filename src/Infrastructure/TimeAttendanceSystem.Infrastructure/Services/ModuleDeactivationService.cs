@@ -43,42 +43,49 @@ public class ModuleDeactivationService : IModuleDeactivationService
         var entityTypes = ModuleMetadata.GetEntityTypesForModule(module);
         if (entityTypes.Count > 0)
         {
-            var activeStatuses = new[] { WorkflowStatus.Pending, WorkflowStatus.InProgress };
-
-            // Get workflow instances that need freezing
-            // We need to find instances that belong to this tenant via the workflow definition's branch
-            var workflows = await _context.WorkflowInstances
-                .Where(wi => activeStatuses.Contains(wi.Status)
-                             && entityTypes.Contains(wi.EntityType)
-                             && !wi.IsDeleted)
-                .Include(wi => wi.WorkflowDefinition)
-                .ToListAsync(ct);
-
-            // Filter to this tenant's workflows (via definition's branch → tenant relationship)
-            // Since WorkflowDefinition may be org-wide or branch-specific, check branch's tenant
-            foreach (var workflow in workflows)
+            try
             {
-                // Store the previous status so we can restore it on reactivation
-                var previousContext = string.IsNullOrEmpty(workflow.ContextJson)
-                    ? new Dictionary<string, object>()
-                    : JsonSerializer.Deserialize<Dictionary<string, object>>(workflow.ContextJson)
-                      ?? new Dictionary<string, object>();
+                var activeStatuses = new[] { WorkflowStatus.Pending, WorkflowStatus.InProgress };
 
-                previousContext["FrozenPreviousStatus"] = workflow.Status.ToString();
-                previousContext["FrozenAt"] = DateTime.UtcNow.ToString("O");
-                previousContext["FrozenReason"] = $"Module '{module}' deactivated: {reason}";
+                // Get workflow instances that need freezing
+                var workflows = await _context.WorkflowInstances
+                    .Where(wi => activeStatuses.Contains(wi.Status)
+                                 && entityTypes.Contains(wi.EntityType)
+                                 && !wi.IsDeleted)
+                    .Include(wi => wi.WorkflowDefinition)
+                    .ToListAsync(ct);
 
-                workflow.ContextJson = JsonSerializer.Serialize(previousContext);
-                workflow.Status = WorkflowStatus.Frozen;
-                workflow.ModifiedAtUtc = DateTime.UtcNow;
-                workflow.ModifiedBy = performedBy;
+                foreach (var workflow in workflows)
+                {
+                    // Store the previous status so we can restore it on reactivation
+                    var previousContext = string.IsNullOrEmpty(workflow.ContextJson)
+                        ? new Dictionary<string, object>()
+                        : JsonSerializer.Deserialize<Dictionary<string, object>>(workflow.ContextJson)
+                          ?? new Dictionary<string, object>();
+
+                    previousContext["FrozenPreviousStatus"] = workflow.Status.ToString();
+                    previousContext["FrozenAt"] = DateTime.UtcNow.ToString("O");
+                    previousContext["FrozenReason"] = $"Module '{module}' deactivated: {reason}";
+
+                    workflow.ContextJson = JsonSerializer.Serialize(previousContext);
+                    workflow.Status = WorkflowStatus.Frozen;
+                    workflow.ModifiedAtUtc = DateTime.UtcNow;
+                    workflow.ModifiedBy = performedBy;
+                }
+
+                if (workflows.Count > 0)
+                {
+                    _logger.LogInformation(
+                        "Frozen {Count} workflow(s) for tenant {TenantId} due to module {Module} deactivation",
+                        workflows.Count, tenantId, module);
+                }
             }
-
-            if (workflows.Count > 0)
+            catch (Exception ex) when (ex.InnerException?.Message.Contains("does not exist") == true
+                                       || ex.Message.Contains("does not exist"))
             {
-                _logger.LogInformation(
-                    "Frozen {Count} workflow(s) for tenant {TenantId} due to module {Module} deactivation",
-                    workflows.Count, tenantId, module);
+                _logger.LogWarning(
+                    "Skipping workflow freeze for tenant {TenantId} — WorkflowInstances table does not exist (migrations may be pending)",
+                    tenantId);
             }
         }
 
@@ -113,56 +120,66 @@ public class ModuleDeactivationService : IModuleDeactivationService
         var entityTypes = ModuleMetadata.GetEntityTypesForModule(module);
         if (entityTypes.Count > 0)
         {
-            var frozenWorkflows = await _context.WorkflowInstances
-                .Where(wi => wi.Status == WorkflowStatus.Frozen
-                             && entityTypes.Contains(wi.EntityType)
-                             && !wi.IsDeleted)
-                .ToListAsync(ct);
-
-            foreach (var workflow in frozenWorkflows)
+            try
             {
-                // Restore previous status from context
-                var previousStatus = WorkflowStatus.InProgress; // default fallback
-                if (!string.IsNullOrEmpty(workflow.ContextJson))
-                {
-                    try
-                    {
-                        var context = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(workflow.ContextJson);
-                        if (context != null && context.TryGetValue("FrozenPreviousStatus", out var statusEl))
-                        {
-                            if (Enum.TryParse<WorkflowStatus>(statusEl.GetString(), out var parsed))
-                            {
-                                previousStatus = parsed;
-                            }
-                        }
+                var frozenWorkflows = await _context.WorkflowInstances
+                    .Where(wi => wi.Status == WorkflowStatus.Frozen
+                                 && entityTypes.Contains(wi.EntityType)
+                                 && !wi.IsDeleted)
+                    .ToListAsync(ct);
 
-                        // Clean up freeze metadata
-                        var cleanContext = new Dictionary<string, object>();
-                        foreach (var kvp in context!)
-                        {
-                            if (!kvp.Key.StartsWith("Frozen"))
-                                cleanContext[kvp.Key] = kvp.Value;
-                        }
-                        workflow.ContextJson = cleanContext.Count > 0
-                            ? JsonSerializer.Serialize(cleanContext)
-                            : null;
-                    }
-                    catch
+                foreach (var workflow in frozenWorkflows)
+                {
+                    // Restore previous status from context
+                    var previousStatus = WorkflowStatus.InProgress; // default fallback
+                    if (!string.IsNullOrEmpty(workflow.ContextJson))
                     {
-                        // If context is malformed, just restore to InProgress
+                        try
+                        {
+                            var context = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(workflow.ContextJson);
+                            if (context != null && context.TryGetValue("FrozenPreviousStatus", out var statusEl))
+                            {
+                                if (Enum.TryParse<WorkflowStatus>(statusEl.GetString(), out var parsed))
+                                {
+                                    previousStatus = parsed;
+                                }
+                            }
+
+                            // Clean up freeze metadata
+                            var cleanContext = new Dictionary<string, object>();
+                            foreach (var kvp in context!)
+                            {
+                                if (!kvp.Key.StartsWith("Frozen"))
+                                    cleanContext[kvp.Key] = kvp.Value;
+                            }
+                            workflow.ContextJson = cleanContext.Count > 0
+                                ? JsonSerializer.Serialize(cleanContext)
+                                : null;
+                        }
+                        catch
+                        {
+                            // If context is malformed, just restore to InProgress
+                        }
                     }
+
+                    workflow.Status = previousStatus;
+                    workflow.ModifiedAtUtc = DateTime.UtcNow;
+                    workflow.ModifiedBy = performedBy;
                 }
 
-                workflow.Status = previousStatus;
-                workflow.ModifiedAtUtc = DateTime.UtcNow;
-                workflow.ModifiedBy = performedBy;
+                if (frozenWorkflows.Count > 0)
+                {
+                    _logger.LogInformation(
+                        "Unfroze {Count} workflow(s) for tenant {TenantId} due to module {Module} reactivation",
+                        frozenWorkflows.Count, tenantId, module);
+                }
             }
-
-            if (frozenWorkflows.Count > 0)
+            catch (Exception ex) when (ex.InnerException?.Message.Contains("does not exist") == true
+                                       || ex.Message.Contains("does not exist"))
             {
-                _logger.LogInformation(
-                    "Unfroze {Count} workflow(s) for tenant {TenantId} due to module {Module} reactivation",
-                    frozenWorkflows.Count, tenantId, module);
+                _logger.LogWarning(
+                    "Skipping workflow unfreeze for tenant {TenantId} — WorkflowInstances table does not exist (migrations may be pending)",
+                    tenantId);
             }
         }
 

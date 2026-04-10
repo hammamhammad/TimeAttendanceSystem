@@ -72,7 +72,8 @@ TecAxle HRMS is a comprehensive enterprise-grade **per-tenant database** SaaS wo
 - **MediatR Pipeline Behaviors**: `[RequiresModule]` attribute + `ModuleEntitlementBehavior` for automatic module enforcement; `[RequiresLimit]` + `UsageLimitBehavior` for usage limit enforcement. **173 commands/queries decorated** across all non-Core modules with two-tier access: commands fully blocked, queries allow read-only historical access via `AllowReadWhenDisabled = true`
 - **Tenant-Iterating Background Jobs**: `TenantIteratingJob` abstract base class — iterates all active tenants from master DB, connects to each tenant's database, and runs the job. Replaces the old `ModuleAwareJob` pattern. Can optionally skip tenants without a required module.
 - **Frontend Entitlement Service**: Signal-based `EntitlementService` with `isModuleEnabled()` and `isModuleReadOnly()`, loaded on login via `FilterRegistryService` auth effect (skipped for platform admin). `moduleGuard` on 201 routes (strict mode for create/edit, read-only for list/view), module-tagged navigation items, `ModuleStatusBannerComponent` for read-only warning. Sidenav hides Platform menu items for tenant users and hides modules not in the tenant's subscription plan.
-- **Platform Admin UI Isolation**: Platform admin (`isPlatformUser`) sees ONLY Platform menu items (Tenants, Subscription Plans). Tenant admin does NOT see Platform menu items. Controlled in `sidenav.component.ts` via `platformPaths` set. `FilterRegistryService` and `NotificationBellComponent` skip tenant-only API calls for platform admin.
+- **Platform Admin UI Isolation**: Platform admin (`isPlatformUser`) sees ONLY Platform menu items (Tenants, Subscription Plans). Tenant admin does NOT see Platform menu items. Controlled in `sidenav.component.ts` via `platformPaths` and `platformGroupKeys` sets. `FilterRegistryService` and `NotificationBellComponent` skip tenant-only API calls for platform admin.
+- **Grouped Sidebar Navigation**: Menu items are organized into 12 logical `MenuGroup` sections with visual section headers (uppercase labels in expanded mode, subtle dividers when collapsed). Groups: Main, Platform, Organization, Time & Attendance, Leave & Absence, HR & Lifecycle, Compensation, Performance & Growth, Workplace, Workflows & Approvals, Reports & Analytics, Settings. Defined in `MenuService` via `MenuGroup` interface (`groupKey`, `titleKey`, `items[]`). Sidenav renders groups with `hasVisibleGroup()` gating — empty groups are hidden based on permissions and module entitlements. Translation keys under `nav_group.*` in both EN and AR.
 - **Default Plans**: Starter (5 modules, 50 employees), Professional (13 modules, 500 employees), Enterprise (all 26 modules, unlimited)
 - **Subscription Plan Management UI**: Full plan CRUD at `/subscription-plans` — create, edit, delete plans with module entitlements, feature flags, and usage limits
 - **Tenant Management UI**: Admin pages for CRUD tenants (with auto-provisioning), view/assign/change/cancel subscriptions. Create tenant form includes: Basic Info (with logo upload) + Company Info (email required) + Plan Selection + Default Settings. On creation, the system auto-provisions the tenant DB (`ta_{company_domain}`), seeds two system admin users (`tecaxleadmin` + `systemadmin`), and assigns the selected plan. **Email domain uniqueness enforced** — each tenant must use a unique email domain to prevent `TenantUserEmails` conflicts.
@@ -1499,7 +1500,7 @@ The admin frontend (`time-attendance-frontend`) is the full-featured management 
 #### Entitlement Infrastructure (`core/services/`, `core/auth/guards/`)
 - **EntitlementService** (`core/services/entitlement.service.ts`) - Signal-based service that loads tenant entitlements on login, provides `isModuleEnabled()`, `isFeatureEnabled()`, `getLimit()`, `getCurrentUsage()`
 - **Module Guard** (`core/auth/guards/module.guard.ts`) - `CanMatchFn` that blocks routes for disabled modules
-- **Module-Aware Navigation** - Menu items tagged with `module` property, sidenav filters by entitlement
+- **Module-Aware Grouped Navigation** - Menu items organized into `MenuGroup` sections tagged with `module` property, sidenav filters groups and items by entitlement
 
 #### Error Pages
 - Not Found (404)
@@ -2588,8 +2589,8 @@ Once all applications are running:
 - Location Picker: `time-attendance-frontend/src/app/shared/components/location-picker/` (Leaflet map for GPS coordinate selection, used in branch create/edit/view)
 - Branch Pages: `time-attendance-frontend/src/app/pages/branches/` (list, create-branch, edit-branch, view-branch, branch-table)
 - CSS Design System: `time-attendance-frontend/src/styles/` (variables.css, components.css, utilities.css, patterns.css)
-- Layout Components: `time-attendance-frontend/src/app/layout/` (sidenav with module-aware filtering, topbar, layout)
-- Menu Service: `time-attendance-frontend/src/app/core/menu/menu.service.ts` (module-tagged menu items)
+- Layout Components: `time-attendance-frontend/src/app/layout/` (sidenav with grouped module-aware filtering, topbar, layout)
+- Menu Service: `time-attendance-frontend/src/app/core/menu/menu.service.ts` (`MenuGroup` and `MenuItem` interfaces, 12 navigation groups with module-tagged items)
 - Models: `time-attendance-frontend/src/app/shared/models/`
 - Guards: `time-attendance-frontend/src/app/core/guards/`
 
@@ -2642,4 +2643,4 @@ Once all applications are running:
 ---
 
 **Last Updated**: April 10, 2026
-**Version**: 12.0 - Full Per-Tenant Database Isolation: Master DB contains only 13 platform tables. Tenant DBs named by company domain (`ta_{domain}`). Platform entities removed from `TecAxleDbContext`/`IApplicationDbContext` — all platform handlers use `IMasterDbContext`. Branch.TenantId removed (redundant in per-tenant DB). Dual system admin users (`tecaxleadmin` + `systemadmin`) created during provisioning with `IsSystemUser` protection. Platform menu hidden from tenant admins. Module visibility enforced by subscription plan. Tenant email required. `MasterSeedData` for platform-level seeds. Previous: v11.1 Map-Based Location Picker.
+**Version**: 12.1 - Grouped Sidebar Navigation: Admin portal sidenav reorganized into 12 logical `MenuGroup` sections (Main, Platform, Organization, Time & Attendance, Leave & Absence, HR & Lifecycle, Compensation, Performance & Growth, Workplace, Workflows & Approvals, Reports & Analytics, Settings). Uppercase section headers in expanded mode, subtle dividers when collapsed. Empty groups auto-hidden by permission/entitlement checks. Previous: v12.0 Full Per-Tenant Database Isolation.

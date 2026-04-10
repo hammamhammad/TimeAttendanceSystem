@@ -116,6 +116,38 @@
   border-left: 3px solid var(--app-primary, #4F6BF6);
 }
 
+/* ========================================
+   Group Header Styles
+   ======================================== */
+
+.nav-group-header {
+  padding: 1rem 0.75rem 0.35rem;
+  list-style: none;
+}
+
+.nav-group-header:first-child {
+  padding-top: 0.5rem;
+}
+
+.nav-group-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(148, 163, 196, 0.5);
+  display: block;
+  padding: 0 0.1rem;
+  user-select: none;
+}
+
+.nav-group-divider {
+  display: block;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.06);
+  margin: 0.25rem auto;
+  width: 32px;
+}
+
 /* Chevron rotation animation */
 .rotate-180 {
   transform: rotate(180deg);
@@ -201,6 +233,11 @@
 :host-context([dir="rtl"]) .submenu .nav-link.active {
   border-left: none;
   border-right: 3px solid var(--app-primary, #4F6BF6);
+}
+
+/* Group header in RTL */
+:host-context([dir="rtl"]) .nav-group-label {
+  text-align: right;
 }
 
 /* Collapsed in RTL */
