@@ -63,6 +63,7 @@ public class AuditActionFilter : IAsyncActionFilter
 {
     private readonly IApplicationDbContext _context;
     private readonly ICurrentUser _currentUser;
+    private readonly ITenantContext _tenantContext;
 
     /// <summary>
     /// Initializes a new instance of the AuditActionFilter with required dependencies.
@@ -70,10 +71,12 @@ public class AuditActionFilter : IAsyncActionFilter
     /// </summary>
     /// <param name="context">Application database context for audit log persistence</param>
     /// <param name="currentUser">Current user service providing authenticated user context and identity</param>
-    public AuditActionFilter(IApplicationDbContext context, ICurrentUser currentUser)
+    /// <param name="tenantContext">Scoped tenant context used to skip audit writes when no tenant is resolved</param>
+    public AuditActionFilter(IApplicationDbContext context, ICurrentUser currentUser, ITenantContext tenantContext)
     {
         _context = context;
         _currentUser = currentUser;
+        _tenantContext = tenantContext;
     }
 
     /// <summary>
@@ -102,9 +105,14 @@ public class AuditActionFilter : IAsyncActionFilter
         var executedContext = await next();
 
         // Only audit successful operations that modify data
-        if (executedContext.Result is OkObjectResult okResult && 
-            IsModifyingOperation(context.HttpContext.Request.Method))
+        if (executedContext.Result is OkObjectResult okResult &&
+            IsModifyingOperation(context.HttpContext.Request.Method) &&
+            _tenantContext.IsResolved)
         {
+            // AuditLogs is a tenant-DB table. When no tenant is resolved (pre-auth endpoints,
+            // platform admin acting on master DB), the scoped TecAxleDbContext falls back to
+            // the master DB connection which has no AuditLogs table. Skip the write so we
+            // don't spam logs with "relation AuditLogs does not exist".
             await LogAuditAsync(context, okResult);
         }
     }

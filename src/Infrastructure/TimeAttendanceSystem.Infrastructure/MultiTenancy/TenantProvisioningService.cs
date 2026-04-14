@@ -202,7 +202,19 @@ public class TenantProvisioningService : ITenantProvisioningService
                 // 3b. Create systemadmin user (second system user)
                 var systemAdminEmail = $"systemadmin@{emailDomain}";
                 var existingSystemAdmin = await tenantDb.Users.FirstOrDefaultAsync(u => u.Username == "systemadmin", ct);
-                if (existingSystemAdmin == null)
+                if (existingSystemAdmin != null)
+                {
+                    var (existingSaHash, existingSaSalt) = HashPassword(TenantAdminPassword);
+                    existingSystemAdmin.Email = systemAdminEmail;
+                    existingSystemAdmin.PasswordHash = existingSaHash;
+                    existingSystemAdmin.PasswordSalt = existingSaSalt;
+                    existingSystemAdmin.IsActive = true;
+                    existingSystemAdmin.IsSystemUser = true;
+                    existingSystemAdmin.ModifiedAtUtc = DateTime.UtcNow;
+                    await tenantDb.SaveChangesAsync(ct);
+                    _logger.LogInformation("Updated existing systemadmin email/password to {Email} in {DatabaseName}", systemAdminEmail, databaseName);
+                }
+                else
                 {
                     var (saHash, saSalt) = HashPassword(TenantAdminPassword);
                     var systemAdminUser = new Domain.Users.User

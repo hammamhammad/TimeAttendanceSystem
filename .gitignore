@@ -1,3 +1,8 @@
 /src/Api/TimeAttendanceSystem.Api/bin/Debug
 nul
 *.apk
+publish/
+compose/.env
+scripts/r.sh
+scripts/remote-exec.py
+reverse-proxy/

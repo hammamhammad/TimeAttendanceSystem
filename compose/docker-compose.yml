@@ -1,0 +1,81 @@
+services:
+  hrms-postgres:
+    image: postgres:16-alpine
+    container_name: hrms-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: tecaxle_master
+    volumes:
+      - hrms-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [hrms-net]
+
+  hrms-api:
+    image: mcr.microsoft.com/dotnet/aspnet:9.0
+    container_name: hrms-api
+    restart: unless-stopped
+    working_dir: /app
+    command: ["dotnet", "TecAxle.Hrms.Api.dll"]
+    depends_on:
+      hrms-postgres:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      Kestrel__Endpoints__Http__Url: http://+:8080
+      DOTNET_PRINT_TELEMETRY_MESSAGE: "false"
+      ConnectionStrings__DefaultConnection: "Host=hrms-postgres;Port=5432;Database=tecaxle_master;Username=postgres;Password=${POSTGRES_PASSWORD};Include Error Detail=true"
+      ConnectionStrings__PostgreSqlConnection: "Host=hrms-postgres;Port=5432;Database=tecaxle_master;Username=postgres;Password=${POSTGRES_PASSWORD};Include Error Detail=true"
+      ConnectionStrings__MasterDatabase: "Host=hrms-postgres;Port=5432;Database=tecaxle_master;Username=postgres;Password=${POSTGRES_PASSWORD};Include Error Detail=true"
+      MultiTenancy__Mode: PerTenantDatabase
+      MultiTenancy__DefaultTenantConnectionString: "Host=hrms-postgres;Port=5432;Database=tecaxle_master;Username=postgres;Password=${POSTGRES_PASSWORD};Include Error Detail=true"
+      MultiTenancy__EncryptionKey: ${TENANT_ENCRYPTION_KEY}
+      Jwt__Secret: ${JWT_SECRET}
+      Jwt__Issuer: TecAxleHRMS
+      Jwt__Audience: TecAxleHRMS-Client
+      Jwt__ExpiryMinutes: "1440"
+      Jwt__RememberMeDays: "7"
+      NfcEncryption__SecretKey: ${NFC_SECRET_KEY}
+      NfcEncryption__RequirePayload: "false"
+      Cors__PolicyName: ProductionCorsPolicy
+      Cors__AllowedOrigins__0: https://hrms.tecaxle.com
+      Cors__AllowedOrigins__1: https://hrmsportal.tecaxle.com
+      Cors__AllowCredentials: "true"
+    volumes:
+      - ../artifacts/api:/app
+      - hrms-uploads:/app/uploads
+    networks: [hrms-net, edge-net]
+
+  hrms-admin:
+    image: nginx:1.27-alpine
+    container_name: hrms-admin
+    restart: unless-stopped
+    volumes:
+      - ../artifacts/admin:/usr/share/nginx/html:ro
+      - ./nginx-spa.conf:/etc/nginx/conf.d/default.conf:ro
+    networks: [edge-net]
+
+  hrms-portal:
+    image: nginx:1.27-alpine
+    container_name: hrms-portal
+    restart: unless-stopped
+    volumes:
+      - ../artifacts/portal:/usr/share/nginx/html:ro
+      - ./nginx-spa.conf:/etc/nginx/conf.d/default.conf:ro
+    networks: [edge-net]
+
+volumes:
+  hrms-pgdata:
+  hrms-uploads:
+
+networks:
+  hrms-net:
+    driver: bridge
+  edge-net:
+    external: true

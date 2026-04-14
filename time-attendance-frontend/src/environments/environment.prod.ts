@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://api.clockn.net'
+  apiUrl: 'https://hrmsapi.tecaxle.com'
 };
