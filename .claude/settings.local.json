@@ -181,7 +181,12 @@
       "Read(//d/tmp/**)",
       "Bash(python -c \"import json; d=json.load\\(open\\('/tmp/login-resp.json'\\)\\); print\\('keys:', list\\(d.keys\\(\\)\\)\\); print\\('user:', d.get\\('user',{}\\).get\\('email'\\)\\); print\\('role:', d.get\\('user',{}\\).get\\('role'\\) or d.get\\('role'\\)\\); print\\('token_present:', bool\\(d.get\\('token'\\) or d.get\\('accessToken'\\) or d.get\\('access_token'\\)\\)\\)\")",
       "Bash(python -c \"import json,sys; d=json.loads\\(sys.stdin.read\\(\\)\\); print\\('status:', 'success' if \\('token' in d or 'accessToken' in d or 'access_token' in d or d.get\\('success'\\)\\) else 'see raw'\\); print\\('keys:', list\\(d.keys\\(\\)\\) if isinstance\\(d,dict\\) else type\\(d\\).__name__\\)\")",
-      "Bash(awk '\\($1==\"M\" || $1==\"MM\"\\) && \\($2 ~ /^time-attendance-frontend\\\\/src/ || $2 ~ /^time-attendance-selfservice-frontend/\\){print}')"
+      "Bash(awk '\\($1==\"M\" || $1==\"MM\"\\) && \\($2 ~ /^time-attendance-frontend\\\\/src/ || $2 ~ /^time-attendance-selfservice-frontend/\\){print}')",
+      "Bash(git commit -m ':*)",
+      "Bash(awk '{print $1}')",
+      "Bash(awk -F/ '{print $1\"/\"$2\"/\"$3}')",
+      "Bash(git restore:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []

@@ -85,3 +85,4 @@ D:\Work\TimeAttendanceSystem\src\Infrastructure\TimeAttendanceSystem.Infrastruct
 D:\Work\TimeAttendanceSystem\src\Infrastructure\TimeAttendanceSystem.Infrastructure\obj\Debug\net9.0\refint\TecAxle.Hrms.Infrastructure.dll
 D:\Work\TimeAttendanceSystem\src\Infrastructure\TimeAttendanceSystem.Infrastructure\obj\Debug\net9.0\TecAxle.Hrms.Infrastructure.pdb
 D:\Work\TimeAttendanceSystem\src\Infrastructure\TimeAttendanceSystem.Infrastructure\obj\Debug\net9.0\ref\TecAxle.Hrms.Infrastructure.dll
+D:\Work\TimeAttendanceSystem\src\Infrastructure\TimeAttendanceSystem.Infrastructure\obj\Debug\net9.0\TimeAttendanceSystem.Infrastructure.sourcelink.json

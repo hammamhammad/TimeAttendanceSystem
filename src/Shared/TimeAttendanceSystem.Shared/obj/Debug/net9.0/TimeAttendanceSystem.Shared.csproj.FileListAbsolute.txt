@@ -69,3 +69,4 @@ D:\Work\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\obj\Debug\ne
 D:\Work\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\obj\Debug\net9.0\refint\TecAxle.Hrms.Shared.dll
 D:\Work\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\obj\Debug\net9.0\TecAxle.Hrms.Shared.pdb
 D:\Work\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\obj\Debug\net9.0\ref\TecAxle.Hrms.Shared.dll
+D:\Work\TimeAttendanceSystem\src\Shared\TimeAttendanceSystem.Shared\obj\Debug\net9.0\TimeAttendanceSystem.Shared.sourcelink.json

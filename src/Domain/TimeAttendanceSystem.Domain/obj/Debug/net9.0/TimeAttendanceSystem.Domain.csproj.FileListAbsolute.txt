@@ -44,3 +44,4 @@ D:\Work\TimeAttendanceSystem\src\Domain\TimeAttendanceSystem.Domain\obj\Debug\ne
 D:\Work\TimeAttendanceSystem\src\Domain\TimeAttendanceSystem.Domain\obj\Debug\net9.0\refint\TecAxle.Hrms.Domain.dll
 D:\Work\TimeAttendanceSystem\src\Domain\TimeAttendanceSystem.Domain\obj\Debug\net9.0\TecAxle.Hrms.Domain.pdb
 D:\Work\TimeAttendanceSystem\src\Domain\TimeAttendanceSystem.Domain\obj\Debug\net9.0\ref\TecAxle.Hrms.Domain.dll
+D:\Work\TimeAttendanceSystem\src\Domain\TimeAttendanceSystem.Domain\obj\Debug\net9.0\TimeAttendanceSystem.Domain.sourcelink.json

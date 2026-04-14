@@ -6,3 +6,4 @@ compose/.env
 scripts/r.sh
 scripts/remote-exec.py
 reverse-proxy/
+__pycache__/
