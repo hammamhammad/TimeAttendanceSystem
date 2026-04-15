@@ -1,5 +1,0 @@
-D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\VerifyHash.GeneratedMSBuildEditorConfig.editorconfig
-D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\VerifyHash.AssemblyInfoInputs.cache
-D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\VerifyHash.AssemblyInfo.cs
-D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\VerifyHash.csproj.CoreCompileInputs.cache
-D:\Work\TimeAttendanceSystem\tools\obj\Debug\net9.0\VerifyHash.sourcelink.json
