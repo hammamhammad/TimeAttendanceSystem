@@ -19,6 +19,9 @@ public class PayrollPeriodDto
     public DateTime? ApprovedAt { get; set; }
     public string? Notes { get; set; }
     public DateTime CreatedAtUtc { get; set; }
+    // Lock state — when set, the period is immutable.
+    public DateTime? LockedAtUtc { get; set; }
+    public long? LockedByUserId { get; set; }
 }
 
 public class PayrollRecordDto
@@ -41,6 +44,8 @@ public class PayrollRecordDto
     public int WorkingDays { get; set; }
     public int PaidDays { get; set; }
     public int Status { get; set; }
+    public DateTime? LockedAtUtc { get; set; }
+    public int CalculationVersion { get; set; }
     public List<PayrollRecordDetailDto> Details { get; set; } = new();
 }
 

@@ -139,6 +139,11 @@ public class ApplicationDbContextAdapter : IApplicationDbContext
     public DbSet<InsuranceProvider> InsuranceProviders => _context.InsuranceProviders;
     public DbSet<EmployeeInsurance> EmployeeInsurances => _context.EmployeeInsurances;
 
+    // Payroll production-fix: calculation infrastructure
+    public DbSet<PayrollCalendarPolicy> PayrollCalendarPolicies => _context.PayrollCalendarPolicies;
+    public DbSet<PayrollRunAudit> PayrollRunAudits => _context.PayrollRunAudits;
+    public DbSet<PayrollRunAuditItem> PayrollRunAuditItems => _context.PayrollRunAuditItems;
+
     // Allowance Management
     public DbSet<AllowanceType> AllowanceTypes => _context.AllowanceTypes;
     public DbSet<AllowancePolicy> AllowancePolicies => _context.AllowancePolicies;

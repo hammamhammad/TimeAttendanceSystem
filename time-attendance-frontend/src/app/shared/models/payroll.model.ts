@@ -18,6 +18,9 @@ export interface PayrollPeriod {
   approvedAtUtc?: string;
   paidAtUtc?: string;
   createdAtUtc: string;
+  /** Set when the period transitions to Paid — once set, the period and its records are immutable. */
+  lockedAtUtc?: string;
+  lockedByUserId?: number;
 }
 
 export interface CreatePayrollPeriodRequest {
@@ -47,6 +50,9 @@ export interface PayrollRecord {
   overtimeAmount: number;
   status: string;
   details: PayrollRecordDetail[];
+  /** When present, the record is locked and cannot be modified. */
+  lockedAtUtc?: string;
+  calculationVersion?: number;
 }
 
 export interface PayrollRecordDetail {

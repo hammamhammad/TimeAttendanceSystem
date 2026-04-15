@@ -324,6 +324,95 @@ TecAxle HRMS is a comprehensive enterprise-grade **per-tenant database** SaaS wo
 - **Allowance Requests**: Employee-initiated allowance requests with approval workflow
 - **End-of-Service Benefits**: Saudi labor law compliant EOS calculation
 
+##### Production-Safe Payroll Calculation Pipeline (v13.0)
+The payroll calculation engine was refactored from a procedural handler with hardcoded formulas into a policy-driven pipeline. Every input is resolved by effective date; every multiplier comes from configuration; every run is audited; finalized payroll is locked. See `PAYROLL_PRODUCTION_FIX_REVIEW.md` for the full rationale.
+
+- **Orchestrator**: `IPayrollCalculationService` — per-employee workflow: resolver → calculators → result. Stateless, DI-scoped, injected into `ProcessPayrollPeriodCommandHandler`.
+- **Effective-date resolver**: `IPayrollInputResolver` — centralizes all "which record applies for this period" logic. Builds a fully-resolved `PayrollCalculationContext` before any arithmetic runs.
+  - **Salary**: all `EmployeeSalary` records overlapping `[periodStart, periodEnd]` are returned (ordered by `EffectiveDate`). Two open-ended `IsCurrent=true` rows for the same employee raise `PayrollCalculationException` and fail that employee only.
+  - **Allowances**: all `AllowanceAssignment` rows with `Status=Active` overlapping the period are stacked.
+  - **Tax configuration**: branch-specific beats tenant-wide; within a scope, latest `EffectiveDate ≤ periodEnd` wins.
+  - **Social insurance configuration**: branch-specific > tenant-wide; **nationality-filtered** via new `AppliesToNationalityCode` (exact case-insensitive match on `Employee.Nationality`; falls back to the null-code config if no match).
+  - **Employee insurance**: employee must have an active `EmployeeInsurance` row whose `[StartDate, EndDate]` overlaps the period — otherwise SI contributions are 0 with a warning.
+  - **Overtime configuration**: per-date map — if the config changes mid-period, each day uses the config active on that specific date.
+  - **Calendar policy**: branch-specific > tenant-wide; latest effective wins; falls back to `FixedBasis(30)` + `StandardHoursPerDay=8` if none configured.
+  - **Public holidays**: resolved via existing `PublicHoliday.GetHolidayDateForYear(year)` for each year in the period, filtered to national or branch-matching rules.
+
+- **Calculators** (all stateless, all consume the resolved context — never hardcode):
+  - **`ITaxCalculator`** — builds taxable base (basic + allowances flagged `IsTaxable`), applies progressive `TaxBracket`s via stepping logic (`slice × Rate + FixedAmount`), writes `PayrollRecord.TaxAmount`, adds `TaxDeduction` detail line with config name + effective date. No tax config → 0 + audit warning.
+  - **`ISocialInsuranceCalculator`** — builds insurable base (basic + allowances flagged `IsSocialInsurable`), caps at `MaxInsurableSalary`, multiplies by config rates. Writes `SocialInsuranceEmployee` (deducted) and `SocialInsuranceEmployer` (informational, not in net). No active `EmployeeInsurance` → 0 + warning.
+  - **`IOvertimePayCalculator`** — **reuses existing `OvertimeConfiguration` entity methods**: `GetOvertimeRate(DayType)`, `RoundOvertimeHours`, `MeetsMinimumThreshold`. Classifies each attendance day by `DayType` (Holiday → config.PublicHolidayRate, weekend-when-`WeekendAsOffDay`-is-true → OffDayRate, else NormalDayRate), line-itemizes per day-type bucket. **Never hardcodes 1.5×.**
+  - **`IAbsenceDeductionCalculator`** — `dailyRate = baseSalary / dailyBasisDays`, where `dailyBasisDays` comes from `IPayrollCalendarResolver`. **No hardcoded 30.**
+  - **`IPayrollCalendarResolver`** — produces `dailyBasisDays` per `PayrollCalendarPolicy.BasisType`: `CalendarDays` (28/29/30/31), `WorkingDays` (excl. Fri/Sat; excl. unpaid public holidays if `TreatPublicHolidaysAsPaid=false`), or `FixedBasis` (e.g. 30). Also provides `StandardHoursPerDay` used by the hourly basis for overtime.
+  - **`IProrationCalculator`** — `overlapDays / periodDays`, used by salary slices (mid-period raise), allowance starts/ends inside the period, and any future input that needs partial-period applicability.
+
+- **`PayrollCalendarPolicy`** entity (new, tenant/branch-scoped) — the single source of truth for daily-rate basis. Eliminates the legacy hardcoded 30-day month.
+
+- **`SocialInsuranceConfig.AppliesToNationalityCode`** (new, nullable) — enables Saudi-GOSI-style segregation without requiring a per-nationality config tree. Resolver prefers exact nationality match; falls back to null-code "applies to all."
+
+- **Overtime configuration is consumed, never duplicated**. `OvertimeConfigurationService` (pre-existing) continues to serve read paths; the payroll calculator calls the same entity methods the service uses.
+
+- **Line-itemized breakdowns** — every payroll record now carries explicit `PayrollRecordDetail` rows for Housing Allowance, per-day-type Overtime buckets, Income Tax, SI (Employee deduction), and SI (Employer informational). Each line has a `Notes` column explaining the calculation inputs used.
+
+##### Payroll Status Lifecycle & Locking
+```
+Draft ─process→ Processing ─calc→ Processed ─approve→ Approved ─markPaid→ Paid 🔒
+  │                                    │
+  │                           ┌──recalculate──┐
+  │                           │               │
+  │                           ▼               │
+  │                       Processed ←─────────┘
+  │
+  └────cancel────▶ Cancelled
+```
+- `ProcessPayrollPeriodCommand(long PayrollPeriodId, bool IsRecalculation = false)` — the only entry point. Initial processing requires `Status=Draft`; recalculation requires `Status=Draft|Processed`.
+- `POST /api/v1/payroll-periods/{id}/process` calls it with `IsRecalculation=false`.
+- `POST /api/v1/payroll-periods/{id}/recalculate` calls it with `IsRecalculation=true` — on recalc, existing non-locked `PayrollRecord` rows are soft-deleted (with note linking to the new run) and fresh records are produced. `CalculationVersion` increments.
+- `POST /api/v1/payroll-periods/{id}/mark-paid` transitions `Approved → Paid`, sets `PayrollPeriod.LockedAtUtc`, sets `LockedAtUtc` on every non-deleted record, flips records to `PayrollRecordStatus.Finalized`, and writes a `Finalization` entry to `PayrollRunAudit`.
+- **Lock enforcement**: `/process` and `/recalculate` reject locked periods (HTTP 400 "Payroll period is locked (Paid) and cannot be processed or recalculated.") — checked in the handler up front, before any state mutation. Locked records are never overwritten even if a recalc somehow bypasses the period-level check.
+
+##### Payroll Audit Trail
+- **`PayrollRunAudit`** — one row per run (`InitialProcess` / `Recalculation` / `Adjustment` / `Finalization` / `Cancellation`). Captures triggering user, start/complete timestamps, status (`Running` / `Completed` / `Failed` / `CompletedWithWarnings`), employees processed/failed/skipped, warning count, plus JSON columns `ConfigSnapshotJson`, `WarningsJson`, `ErrorsJson`.
+- **`PayrollRunAuditItem`** — one row per employee per run with calculated totals, status (`Succeeded` / `SkippedNoSalary` / `SkippedInactive` / `FailedWithError` / `CompletedWithWarnings`), per-item warnings/error message.
+- **`PayrollRecord.CalculationBreakdownJson`** — serialized snapshot of the exact inputs used: salary segments with their effective dates, resolved config IDs + effective dates, calendar basis used, hourly basis used, SI config details, OT config IDs touched, and final totals. Supports later forensic audit and explainability.
+- **`PayrollRecord.LastRunId`** — FK to the `PayrollRunAudit` that produced this record.
+- **Endpoint**: `GET /api/v1/payroll-periods/{id}/run-audit` returns the chronological run history for a period.
+
+##### Two-Pass Allowance Resolution (Percentage-of-Gross)
+The orchestrator applies allowances in two passes to support `CalculationType.PercentageOfGross` without self-reference:
+1. **Pass 1** — Fixed amount and `PercentageOfBasic` allowances are resolved and added to `TotalAllowances`. Overtime pay is then computed and also added.
+2. **Pass 2** — `PercentageOfGross` assignments are resolved against a **provisional gross** (`BaseSalary + Pass-1 allowances + OvertimePay`). This fixes the base before computing pct allowances so they can't reference themselves.
+Each pct-of-gross detail line records its basis explicitly in `Notes`, e.g. `"Allowance #2 @ 5.00% of gross (13572.74)"`. Tenants that want stacking pct-of-gross behavior must split assignments into separate effective windows — the engine deliberately does not chain percentages.
+
+##### Recalculation Rules
+- **Blocked when**: period is `Paid` / `LockedAtUtc` is set / period is `Cancelled`.
+- **Allowed when**: period is `Draft` or `Processed` — explicit opt-in via the `/recalculate` endpoint (distinct from `/process`). A second call to `/process` on a `Processed` period is rejected to prevent silent overwrites.
+- **Behavior**: existing `PayrollRecord` rows whose `LockedAtUtc` is null and `Status != Finalized` are soft-deleted (`IsDeleted=true`, `Notes` appended with "Superseded by recalc on {timestamp}"). New records are inserted with `CalculationVersion = 2` and `LastRunId` pointing to the new audit row.
+- **Not allowed**: `PayrollRecordStatus.Adjusted` is a declared state but no code path currently sets it — adjustments flow through recalculation instead.
+
+##### Admin Retroactive Unlock (SystemAdmin-only)
+For rare cases where a Paid/locked payroll must be corrected (e.g. tax bracket error discovered post-finalization):
+- **Endpoint**: `POST /api/v1/payroll-periods/{id}/admin-unlock` with body `{ "reason": "..." }`. SystemAdmin authorization required (returns 403 otherwise). Reason is mandatory (400 if missing).
+- **Preconditions**: period status must be `Paid` with `LockedAtUtc` set. Returns 400 otherwise.
+- **Effect**: reverts period status to `Processed` (NOT Approved — so `/recalculate` is immediately allowed), clears `LockedAtUtc`/`LockedByUserId` on period and every non-deleted record, sets records back to `PayrollRecordStatus.Calculated`, and clears `ApprovedAt`/`ApprovedByUserId` so the full approval workflow re-runs.
+- **Audit**: writes a `PayrollRunAudit` row with `RunType=Adjustment` and the supplied reason serialized into `WarningsJson` as `{ "kind": "admin-unlock", "reason": "...", "records": N }`. Permanent, queryable forensic trail.
+- **Deliberately no auto-recalc**: the admin must consciously call `/recalculate` → `/approve` → `/mark-paid` in sequence, reviewing numbers at each step. The endpoint only unlocks; it never changes calculated values itself.
+
+##### Edge Cases and Warnings
+The calculator emits warnings (surfaced in `PayrollRunAuditItem.WarningsJson` + `PayrollRunAudit.WarningsJson`) for these non-fatal scenarios — calculation continues for other employees:
+- Mid-period salary change → base salary prorated across slices; warning notes the number of slices.
+- No tax configuration effective for the period → `TaxAmount = 0`.
+- No social insurance configuration effective → SI = 0.
+- Employee has no active `EmployeeInsurance` overlapping the period → SI = 0.
+- Overtime hours recorded on a day with no active `OvertimeConfiguration` → that day's OT is skipped.
+
+Fatal (per-employee) errors are caught and recorded as `PayrollRunAuditItem.FailedWithError`; the run continues:
+- Two open-ended `IsCurrent=true` salary records for the same employee → "Resolve before processing payroll."
+- No effective salary found for the period → "Employee X has no effective salary for period Y..Z."
+
+##### DateTime.Kind Normalization
+`HashSet<DateTime>` and `Dictionary<DateTime, T>` mix `DateTimeKind` into the hash, so dates with `Kind=Utc` (from `timestamptz` columns like `SpecificDate`) do not match dates with `Kind=Unspecified` (from `date` columns like `AttendanceDate`) even when representing the same day. The payroll resolver and OT calculator both normalize date-keyed collections to `DateTime.SpecifyKind(d.Date, DateTimeKind.Unspecified)` at both construction and lookup sites. Keep this pattern when adding new date-keyed lookups across Postgres tables that mix column types.
+
 #### 24. Offboarding
 - **Resignation Requests**: Employee resignation submission with notice period tracking
 - **Termination Records**: Employment termination with reason classification and documentation
@@ -1645,8 +1734,24 @@ time-attendance-frontend/
 
 #### Payroll & Compensation (Phase 2)
 - **SalaryStructuresController** - Salary structure and components
-- **PayrollPeriodsController** - Payroll period processing
-- **PayrollSettingsController** - Payroll configuration
+- **PayrollPeriodsController** - Payroll period processing. Endpoints:
+  - `GET /api/v1/payroll-periods` — list (paginated, filterable by branch/status)
+  - `GET /api/v1/payroll-periods/{id}` — get one (returns `LockedAtUtc`, `LockedByUserId`)
+  - `POST /api/v1/payroll-periods` — create in Draft
+  - `POST /api/v1/payroll-periods/{id}/process` — Draft → Processed, rejected if locked or already Processed
+  - `POST /api/v1/payroll-periods/{id}/recalculate` — explicit recalc of Draft/Processed periods (NEW — replaces implicit reprocess via second `/process` call)
+  - `POST /api/v1/payroll-periods/{id}/approve` — Processed → Approved
+  - `POST /api/v1/payroll-periods/{id}/mark-paid` — Approved → Paid + sets lock fields on period and records + writes Finalization audit row
+  - `POST /api/v1/payroll-periods/{id}/admin-unlock` — **SystemAdmin-only**. Body: `{ reason: string }`. Reverts Paid period to Processed + clears all lock fields + records → Calculated. Writes `PayrollRunAudit` with `RunType=Adjustment`. Does NOT auto-recalc.
+  - `POST /api/v1/payroll-periods/{id}/cancel` — any non-Paid → Cancelled
+  - `GET /api/v1/payroll-periods/{id}/records` — records list (includes `LockedAtUtc`, `CalculationVersion`)
+  - `GET /api/v1/payroll-periods/records/{recordId}` — single record with detail line-items
+  - `GET /api/v1/payroll-periods/{id}/run-audit` — chronological run history for the period
+- **PayrollSettingsController** - Payroll configuration. Tabbed UI backs four entity types:
+  - **Tax**: `GET/POST/PUT/DELETE /api/v1/payroll-settings/tax-configs[/{id}]` — configuration + brackets.
+  - **Social Insurance**: `GET/POST/PUT/DELETE /api/v1/payroll-settings/social-insurance[/{id}]` — now persists the optional `appliesToNationalityCode` (normalized to uppercase ISO code; null = applies to all nationalities).
+  - **Insurance Providers**: `GET/POST/PUT/DELETE /api/v1/payroll-settings/insurance-providers[/{id}]`.
+  - **Calendar Policy**: `GET/POST/PUT/DELETE /api/v1/payroll-settings/calendar-policies[/{id}]` — validates `BasisType` ∈ {1,2,3}, requires `FixedBasisDays > 0` when `BasisType = FixedBasis`, requires `StandardHoursPerDay > 0`.
 - **AllowanceTypesController** - Allowance type management
 - **AllowancePoliciesController** - Allowance policy rules
 - **AllowanceAssignmentsController** - Allowance assignment management
@@ -1734,11 +1839,14 @@ time-attendance-frontend/
 - JobGrade
 
 #### Payroll & Compensation (Phase 2)
-- SalaryStructure, SalaryComponent, EmployeeSalary, EmployeeSalaryComponent
-- PayrollPeriod, PayrollRecord, PayrollRecordDetail, PayrollAdjustment
-- AllowanceType, AllowancePolicy, AllowanceAssignment, AllowanceRequest, AllowanceChangeLog
-- TaxConfiguration, TaxBracket, SocialInsuranceConfig
-- InsuranceProvider, EmployeeInsurance, BankTransferFile
+- SalaryStructure, SalaryComponent, EmployeeSalary (effective-dated via `EffectiveDate`/`EndDate`), EmployeeSalaryComponent
+- PayrollPeriod (now with `LockedAtUtc`, `LockedByUserId`, computed `IsLocked`), PayrollRecord (now with `LockedAtUtc`, `LockedByUserId`, `CalculationVersion`, `LastRunId`, `CalculationBreakdownJson`, computed `IsLocked`), PayrollRecordDetail, PayrollAdjustment
+- AllowanceType, AllowancePolicy, AllowanceAssignment (effective-dated via `EffectiveFromDate`/`EffectiveToDate`), AllowanceRequest, AllowanceChangeLog
+- TaxConfiguration (effective-dated via `EffectiveDate`), TaxBracket (progressive: `MinAmount`, `MaxAmount`, `Rate`, `FixedAmount`), SocialInsuranceConfig (effective-dated, with optional `AppliesToNationalityCode` for GOSI-style nationality segregation)
+- InsuranceProvider, EmployeeInsurance (effective-dated via `StartDate`/`EndDate`), BankTransferFile
+- **PayrollCalendarPolicy** (NEW): tenant/branch daily-rate basis policy — `BasisType` (`CalendarDays` / `WorkingDays` / `FixedBasis`), `FixedBasisDays`, `StandardHoursPerDay`, `TreatPublicHolidaysAsPaid`, effective-dated. Eliminates hardcoded 30-day assumption.
+- **PayrollRunAudit** + **PayrollRunAuditItem** (NEW): append-only audit of every payroll run — run type (`InitialProcess` / `Recalculation` / `Adjustment` / `Finalization` / `Cancellation`), status, triggering user, employees processed/failed/skipped, `ConfigSnapshotJson`, `WarningsJson`, `ErrorsJson`; per-employee items with calculated totals and status (`Succeeded` / `SkippedNoSalary` / `SkippedInactive` / `FailedWithError` / `CompletedWithWarnings`).
+- **New enums** (in `Common/Enums.cs`): `PayrollDailyBasisType`, `PayrollRunType`, `PayrollRunStatus`, `PayrollRunItemStatus`.
 
 #### Offboarding (Phase 2)
 - ResignationRequest, TerminationRecord, ExitInterview
@@ -1753,11 +1861,22 @@ time-attendance-frontend/
 #### Core Services
 - AttendanceCalculationService
 - DailyAttendanceGeneratorService
-- OvertimeConfigurationService
+- OvertimeConfigurationService (read-path service for `OvertimeConfiguration` — reused by `IOvertimePayCalculator`; the payroll calculator never duplicates OT logic)
 - LeaveAccrualService
 - InAppNotificationService
 - ChangeTrackingService
 - NfcTagEncryptionService (HMAC-SHA256 payload signing/verification)
+
+#### Payroll Calculation Services (production-safe pipeline)
+All scoped, registered in [DependencyInjection.cs](src/Application/TimeAttendanceSystem.Application/DependencyInjection.cs), injected into `ProcessPayrollPeriodCommandHandler`:
+- **`IPayrollCalculationService`** (`PayrollCalculationService`) — per-employee orchestrator: resolver → calculators → `PayrollCalculationResult`.
+- **`IPayrollInputResolver`** (`PayrollInputResolver`) — effective-date resolution for salary, allowances, tax config, SI config, employee insurance, OT config (per-date), calendar policy, public holidays. Detects overlap anomalies.
+- **`ITaxCalculator`** (`TaxCalculator`) — progressive bracket application using effective `TaxConfiguration`.
+- **`ISocialInsuranceCalculator`** (`SocialInsuranceCalculator`) — nationality-aware; caps insurable base at `MaxInsurableSalary`; respects `IsSocialInsurable` flag.
+- **`IOvertimePayCalculator`** (`OvertimePayCalculator`) — delegates to `OvertimeConfiguration.GetOvertimeRate` / `RoundOvertimeHours` / `MeetsMinimumThreshold`; day-type classification via `PublicHolidayDates` + `WeekendAsOffDay` flag.
+- **`IAbsenceDeductionCalculator`** (`AbsenceDeductionCalculator`) — policy-driven daily rate; no hardcoded 30.
+- **`IProrationCalculator`** (`ProrationCalculator`) — overlap-fraction math for any effective-dated input.
+- **`IPayrollCalendarResolver`** (`PayrollCalendarResolver`) — resolves `dailyBasisDays` and `StandardHoursPerDay` from `PayrollCalendarPolicy`.
 
 #### Multi-Tenant & Entitlement Services
 - **EntitlementService** (`IEntitlementService`) - Cached per-tenant entitlement checking (modules, features, limits). 5-minute TTL. Call `InvalidateCache(tenantId)` after subscription changes.
@@ -1833,6 +1952,21 @@ When working with mobile GPS+NFC attendance:
 - **Device Tracking**: Capture device ID, model, platform, and app version
 - **Timezone Awareness**: Convert UTC to branch local time for transaction timestamps
 - **Configuration**: NFC encryption settings in `appsettings.json` under `NfcEncryption` section
+
+### Payroll Features
+When working with payroll calculation, period lifecycle, or any payroll-adjacent concern:
+- **Never hardcode** multipliers, day-counts, rates, or thresholds. All values come from configuration entities (`OvertimeConfiguration`, `TaxConfiguration`/`TaxBracket`, `SocialInsuranceConfig`, `PayrollCalendarPolicy`) resolved by effective date.
+- **Reuse `OvertimeConfiguration` entity methods** — `GetOvertimeRate(DayType)`, `RoundOvertimeHours(hours)`, `MeetsMinimumThreshold(minutes)`. Do not reimplement overtime math anywhere else.
+- **All new payroll inputs must be effective-dated** (`EffectiveFrom`/`EffectiveTo` or equivalent) and resolved through `IPayrollInputResolver`. Do not add period-window filtering inline in handlers.
+- **Add new calculations as calculator services**, not as `if` blocks in the handler. Keep each calculator stateless and context-consuming.
+- **Respect the lifecycle lock**: any mutation touching `PayrollRecord` or `PayrollPeriod` must first check `LockedAtUtc.HasValue` and reject when set. Never overwrite a finalized record.
+- **Write a `PayrollRunAudit` row** for any new operation that changes payroll records (new run types can be added to `PayrollRunType` enum — currently `InitialProcess`, `Recalculation`, `Adjustment`, `Finalization`, `Cancellation`).
+- **Surface warnings, don't fail silently**: missing tax/SI/OT config should produce a `PayrollRunAuditItem` warning, not a zero-valued record with no explanation.
+- **Normalize date-keyed lookups** to `DateTime.SpecifyKind(d.Date, DateTimeKind.Unspecified)` at both construction and lookup — `HashSet<DateTime>`/`Dictionary<DateTime,T>` hash the `Kind`, and Postgres `timestamptz` vs `date` columns produce different Kinds for the same day.
+- **Proration**: when an input starts or ends mid-period, use `IProrationCalculator.GetFraction` — never DIY ratios.
+- **Recalculation is explicit**: trigger via `POST /{id}/recalculate`, never by calling `/process` twice. Recalc soft-deletes previous non-locked records and bumps `CalculationVersion`.
+- **Line-itemize every contribution** in `PayrollRecordDetail` with a descriptive `Notes` column — payroll must be explainable line-by-line (Tax, SI Employee, SI Employer informational, OT per day-type bucket, Absence Deduction, Housing Allowance, etc.).
+- **Integration side-effects** (loans, advances, expense reimbursements) run in the handler AFTER calculation; they add their own detail lines and adjust totals via `RecomputeTotalsFromDetails`. Never bake these into a calculator.
 
 ### Leave Management Features
 When working with leave/vacation features:
@@ -2574,6 +2708,15 @@ Once all applications are running:
 - **Platform Role Enum**: `src/Domain/TecAxle.Hrms.Domain/Platform/PlatformRole.cs`
 - **Tenant User Email Entity**: `src/Domain/TecAxle.Hrms.Domain/Tenants/TenantUserEmail.cs`
 - Middleware: `src/Api/TecAxle.Hrms.Api/Middleware/` (GlobalExceptionHandler, TenantResolution, RateLimiting, Localization)
+- **Payroll Calculation Services**: `src/Application/TimeAttendanceSystem.Application/Payroll/Services/` — `IPayrollCalculationService`, `IPayrollInputResolver`, `ITaxCalculator`, `ISocialInsuranceCalculator`, `IOvertimePayCalculator`, `IAbsenceDeductionCalculator`, `IProrationCalculator`, `IPayrollCalendarResolver` (interfaces + implementations co-located in each file).
+- **Payroll Calculation Models**: `src/Application/TimeAttendanceSystem.Application/Payroll/Models/` (`PayrollCalculationContext`, `PayrollCalculationResult`).
+- **Payroll Exception**: `src/Application/TimeAttendanceSystem.Application/Payroll/Exceptions/PayrollCalculationException.cs`.
+- **Payroll Handler**: `src/Application/TimeAttendanceSystem.Application/PayrollPeriods/Commands/ProcessPayrollPeriod/ProcessPayrollPeriodCommandHandler.cs` — thin orchestrator: validates lock, opens `PayrollRunAudit`, iterates employees, delegates calculation, integrates loans/advances/reimbursements, writes per-employee audit items, closes the audit.
+- **Payroll Calendar Policy Entity**: `src/Domain/TecAxle.Hrms.Domain/Payroll/PayrollCalendarPolicy.cs`.
+- **Payroll Run Audit Entities**: `src/Domain/TecAxle.Hrms.Domain/Payroll/PayrollRunAudit.cs` (contains both `PayrollRunAudit` and `PayrollRunAuditItem`).
+- **Payroll EF Configurations**: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/Persistence/PostgreSql/Configurations/PayrollCalendarPolicyConfiguration.cs`, `PayrollRunAuditConfiguration.cs`.
+- **Payroll Migration**: `src/Infrastructure/TimeAttendanceSystem.Infrastructure/Persistence/PostgreSql/Migrations/20260414191151_AddPayrollCalculationInfrastructure.cs` — additive: new `PayrollCalendarPolicies` / `PayrollRunAudits` / `PayrollRunAuditItems` tables + nullable columns on `PayrollRecords` / `PayrollPeriods` / `SocialInsuranceConfigs`.
+- **Payroll Unit Tests**: `tests/TecAxle.Hrms.Payroll.Tests/` — xUnit + FluentAssertions. Covers `ProrationCalculator`, `TaxCalculator`, `PayrollCalendarResolver`, `AbsenceDeductionCalculator` — 27 tests, run via `cd tests/TecAxle.Hrms.Payroll.Tests && dotnet test`. Orchestrator + calculators that require a DbContext (input resolver, SI with DB lookups, OT with day-type resolution across multiple configs) are covered by the E2E smoke workflow in `PAYROLL_PRODUCTION_FIX_REVIEW.md` §17 and have not yet been wired as automated integration tests.
 
 #### Frontend (Admin)
 - Pages: `time-attendance-frontend/src/app/pages/`
@@ -2593,6 +2736,10 @@ Once all applications are running:
 - Menu Service: `time-attendance-frontend/src/app/core/menu/menu.service.ts` (`MenuGroup` and `MenuItem` interfaces, 12 navigation groups with module-tagged items)
 - Models: `time-attendance-frontend/src/app/shared/models/`
 - Guards: `time-attendance-frontend/src/app/core/guards/`
+- **Payroll Service**: `time-attendance-frontend/src/app/core/services/payroll.service.ts` — adds `recalculatePeriod(id)` + `getRunAudit(periodId)` + exports `PayrollRunAuditEntry` interface.
+- **Payroll Models**: `time-attendance-frontend/src/app/shared/models/payroll.model.ts` — `PayrollPeriod` / `PayrollRecord` include `lockedAtUtc`, `lockedByUserId` / `calculationVersion`.
+- **Payroll Settings Page**: `time-attendance-frontend/src/app/pages/payroll/payroll-settings/` — **four tabs**: Tax, Social Insurance, Insurance Providers, and **Calendar Policy**. Social Insurance tab has a **Nationality** column/input bound to `appliesToNationalityCode`. Calendar Policy tab exposes inline CRUD over `BasisType` (CalendarDays / WorkingDays / FixedBasis), fixed-days (gated on FixedBasis), standard hours/day, treat-holidays-as-paid toggle, and effective date range.
+- **Payroll Periods Page**: `time-attendance-frontend/src/app/pages/payroll/payroll-periods/` — list exposes a **Recalculate** row action on `Processed`-status periods (calls `POST /{id}/recalculate`). The view page ([view-payroll-period.component](time-attendance-frontend/src/app/pages/payroll/payroll-periods/view-payroll-period/)) shows a **yellow lock banner** + **🔒** icon when the period is Paid/locked, a header-action **Recalculate** button on Processed periods, and a **Payroll Run Audit** section that renders the chronological run history (type / status / timestamps / user / processed / failed / warnings) from `GET /{id}/run-audit`.
 
 #### Frontend (Self-Service)
 - Portal Pages: `time-attendance-selfservice-frontend/src/app/pages/portal/`
@@ -2642,5 +2789,5 @@ Once all applications are running:
 
 ---
 
-**Last Updated**: April 10, 2026
-**Version**: 12.1 - Grouped Sidebar Navigation: Admin portal sidenav reorganized into 12 logical `MenuGroup` sections (Main, Platform, Organization, Time & Attendance, Leave & Absence, HR & Lifecycle, Compensation, Performance & Growth, Workplace, Workflows & Approvals, Reports & Analytics, Settings). Uppercase section headers in expanded mode, subtle dividers when collapsed. Empty groups auto-hidden by permission/entitlement checks. Previous: v12.0 Full Per-Tenant Database Isolation.
+**Last Updated**: April 15, 2026
+**Version**: 13.1 — Payroll Production-Safety Follow-Ups Completed. Built on top of v13.0: (1) Full CRUD for `PayrollCalendarPolicy` via `/api/v1/payroll-settings/calendar-policies` + new 4th tab on the Payroll Settings admin page; (2) Payroll Run Audit browsing section on the period view page; (3) `PercentageOfGross` allowances now implemented via two-pass resolution (fixed + basic pct → overtime → then gross-based pct) with explicit basis noted on each detail line; (4) SystemAdmin-only `POST /api/v1/payroll-periods/{id}/admin-unlock` for retroactive correction of Paid periods — reverts to Processed, clears all lock fields, writes Adjustment audit with required reason, deliberately does not auto-recalc; (5) Fixed a bug where SI configuration's `AppliesToNationalityCode` field was being sent by the frontend but not persisted by the backend; (6) New xUnit test project `tests/TecAxle.Hrms.Payroll.Tests/` with 27 passing tests covering pure calculators (Proration, Tax, CalendarResolver, AbsenceDeduction). Previous: v13.0 Production-Safe Payroll Calculation Pipeline; v12.1 Grouped Sidebar Navigation; v12.0 Full Per-Tenant Database Isolation.

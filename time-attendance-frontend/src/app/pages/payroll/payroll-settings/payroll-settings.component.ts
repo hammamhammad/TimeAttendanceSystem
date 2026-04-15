@@ -38,6 +38,11 @@ interface SocialInsuranceConfig {
   employeeContributionRate: number;
   employerContributionRate: number;
   maxInsurableSalary: number;
+  /**
+   * Optional ISO nationality code this config applies to (e.g. "SA" for Saudi-only GOSI rates).
+   * Leave empty/null to apply to all nationalities.
+   */
+  appliesToNationalityCode?: string;
   effectiveDate: string;
   isActive: boolean;
   editing?: boolean;
@@ -57,6 +62,21 @@ interface InsuranceProvider {
   editing?: boolean;
 }
 
+interface PayrollCalendarPolicy {
+  id?: number;
+  branchId?: number;
+  branchName?: string;
+  /** 1 = CalendarDays, 2 = WorkingDays, 3 = FixedBasis */
+  basisType: number;
+  fixedBasisDays?: number;
+  standardHoursPerDay: number;
+  treatPublicHolidaysAsPaid: boolean;
+  effectiveFromDate: string;
+  effectiveToDate?: string;
+  isActive: boolean;
+  editing?: boolean;
+}
+
 @Component({
   selector: 'app-payroll-settings',
   standalone: true,
@@ -71,23 +91,34 @@ export class PayrollSettingsComponent implements OnInit {
   private http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/api/v1/payroll-settings`;
 
-  activeTab = signal<'tax' | 'social' | 'insurance'>('tax');
+  activeTab = signal<'tax' | 'social' | 'insurance' | 'calendar'>('tax');
   loading = signal(false);
 
   taxConfigs = signal<TaxConfig[]>([]);
   socialConfigs = signal<SocialInsuranceConfig[]>([]);
   insuranceProviders = signal<InsuranceProvider[]>([]);
+  calendarPolicies = signal<PayrollCalendarPolicy[]>([]);
 
   ngOnInit(): void {
     this.loadTaxConfigs();
   }
 
-  setTab(tab: 'tax' | 'social' | 'insurance'): void {
+  setTab(tab: 'tax' | 'social' | 'insurance' | 'calendar'): void {
     this.activeTab.set(tab);
     switch (tab) {
       case 'tax': this.loadTaxConfigs(); break;
       case 'social': this.loadSocialConfigs(); break;
       case 'insurance': this.loadInsuranceProviders(); break;
+      case 'calendar': this.loadCalendarPolicies(); break;
+    }
+  }
+
+  basisTypeLabel(t: number): string {
+    switch (t) {
+      case 1: return 'CalendarDays';
+      case 2: return 'WorkingDays';
+      case 3: return 'FixedBasis';
+      default: return 'Unknown';
     }
   }
 
@@ -218,6 +249,7 @@ export class PayrollSettingsComponent implements OnInit {
       employeeContributionRate: item.employeeContributionRate,
       employerContributionRate: item.employerContributionRate,
       maxInsurableSalary: item.maxInsurableSalary,
+      appliesToNationalityCode: item.appliesToNationalityCode || null,
       effectiveDate: item.effectiveDate,
       isActive: item.isActive
     };
@@ -351,6 +383,91 @@ export class PayrollSettingsComponent implements OnInit {
       });
     } else {
       this.insuranceProviders.update(items => items.filter((_, i) => i !== index));
+    }
+  }
+
+  // ── Payroll Calendar Policy ────────────────────────────────────
+
+  private loadCalendarPolicies(): void {
+    this.loading.set(true);
+    this.http.get<PayrollCalendarPolicy[]>(`${this.baseUrl}/calendar-policies`).subscribe({
+      next: (data) => {
+        this.calendarPolicies.set(data.map(d => ({ ...d, editing: false })));
+        this.loading.set(false);
+      },
+      error: () => {
+        this.notificationService.error(this.i18n.t('common.error_loading'));
+        this.loading.set(false);
+      }
+    });
+  }
+
+  addCalendarPolicy(): void {
+    this.calendarPolicies.update(items => [...items, {
+      basisType: 1,
+      fixedBasisDays: undefined,
+      standardHoursPerDay: 8,
+      treatPublicHolidaysAsPaid: true,
+      effectiveFromDate: new Date().toISOString().substring(0, 10),
+      isActive: true,
+      editing: true
+    }]);
+  }
+
+  saveCalendarPolicy(item: PayrollCalendarPolicy, index: number): void {
+    if (item.basisType === 3 && (!item.fixedBasisDays || item.fixedBasisDays <= 0)) {
+      this.notificationService.error('FixedBasisDays is required (> 0) when basis type is FixedBasis.');
+      return;
+    }
+    if (!item.standardHoursPerDay || item.standardHoursPerDay <= 0) {
+      this.notificationService.error('Standard hours per day must be > 0.');
+      return;
+    }
+    const payload = {
+      branchId: item.branchId,
+      basisType: item.basisType,
+      fixedBasisDays: item.basisType === 3 ? item.fixedBasisDays : null,
+      standardHoursPerDay: item.standardHoursPerDay,
+      treatPublicHolidaysAsPaid: item.treatPublicHolidaysAsPaid,
+      effectiveFromDate: item.effectiveFromDate,
+      effectiveToDate: item.effectiveToDate || null,
+      isActive: item.isActive
+    };
+    const request$ = item.id
+      ? this.http.put(`${this.baseUrl}/calendar-policies/${item.id}`, payload)
+      : this.http.post<{ id: number }>(`${this.baseUrl}/calendar-policies`, payload);
+    request$.subscribe({
+      next: (result: any) => {
+        if (!item.id && result?.id) item.id = result.id;
+        item.editing = false;
+        this.notificationService.success(this.i18n.t('common.saved_successfully'));
+        this.loadCalendarPolicies();
+      },
+      error: () => this.notificationService.error(this.i18n.t('common.error_saving'))
+    });
+  }
+
+  removeCalendarPolicy(index: number): void {
+    const item = this.calendarPolicies()[index];
+    if (item.id) {
+      this.confirmationService.confirm({
+        title: this.i18n.t('common.confirm_delete'),
+        message: this.i18n.t('common.confirm_delete_message'),
+        confirmText: this.i18n.t('common.delete'),
+        confirmButtonClass: 'btn-danger'
+      }).then(result => {
+        if (result.confirmed) {
+          this.http.delete(`${this.baseUrl}/calendar-policies/${item.id}`).subscribe({
+            next: () => {
+              this.notificationService.success(this.i18n.t('common.deleted_successfully'));
+              this.loadCalendarPolicies();
+            },
+            error: () => this.notificationService.error(this.i18n.t('common.error_deleting'))
+          });
+        }
+      });
+    } else {
+      this.calendarPolicies.update(items => items.filter((_, i) => i !== index));
     }
   }
 }

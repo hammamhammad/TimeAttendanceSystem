@@ -216,7 +216,8 @@ public class PayrollSettingsController : ControllerBase
                 s.Id, s.Name, s.NameAr, s.BranchId,
                 BranchName = s.Branch != null ? s.Branch.Name : (string?)null,
                 s.EmployeeContributionRate, s.EmployerContributionRate,
-                s.MaxInsurableSalary, s.EffectiveDate, s.IsActive
+                s.MaxInsurableSalary, s.EffectiveDate, s.IsActive,
+                s.AppliesToNationalityCode
             })
             .ToListAsync();
 
@@ -234,7 +235,8 @@ public class PayrollSettingsController : ControllerBase
                 s.Id, s.Name, s.NameAr, s.BranchId,
                 BranchName = s.Branch != null ? s.Branch.Name : (string?)null,
                 s.EmployeeContributionRate, s.EmployerContributionRate,
-                s.MaxInsurableSalary, s.EffectiveDate, s.IsActive
+                s.MaxInsurableSalary, s.EffectiveDate, s.IsActive,
+                s.AppliesToNationalityCode
             })
             .FirstOrDefaultAsync();
 
@@ -258,6 +260,7 @@ public class PayrollSettingsController : ControllerBase
             MaxInsurableSalary = request.MaxInsurableSalary,
             EffectiveDate = request.EffectiveDate,
             IsActive = request.IsActive,
+            AppliesToNationalityCode = NormalizeNationality(request.AppliesToNationalityCode),
             CreatedAtUtc = DateTime.UtcNow,
             CreatedBy = _currentUser.Username ?? "SYSTEM"
         };
@@ -286,11 +289,18 @@ public class PayrollSettingsController : ControllerBase
         entity.MaxInsurableSalary = request.MaxInsurableSalary;
         entity.EffectiveDate = request.EffectiveDate;
         entity.IsActive = request.IsActive;
+        entity.AppliesToNationalityCode = NormalizeNationality(request.AppliesToNationalityCode);
         entity.ModifiedAtUtc = DateTime.UtcNow;
         entity.ModifiedBy = _currentUser.Username;
 
         await _context.SaveChangesAsync();
         return NoContent();
+    }
+
+    private static string? NormalizeNationality(string? code)
+    {
+        if (string.IsNullOrWhiteSpace(code)) return null;
+        return code.Trim().ToUpperInvariant();
     }
 
     /// <summary>Deletes a social insurance configuration.</summary>
@@ -423,6 +433,135 @@ public class PayrollSettingsController : ControllerBase
         await _context.SaveChangesAsync();
         return NoContent();
     }
+
+    // ── Payroll Calendar Policy ────────────────────────────────────
+    //
+    // Drives the daily-rate basis used by absence deductions, proration, and the
+    // hourly basis for overtime. Branch-specific beats tenant-wide; latest effective wins.
+    // Falls back to FixedBasis(30) if no row exists (pre-fix backward-compat).
+
+    /// <summary>Gets payroll calendar policies.</summary>
+    [HttpGet("calendar-policies")]
+    public async Task<IActionResult> GetCalendarPolicies([FromQuery] long? branchId)
+    {
+        var query = _context.PayrollCalendarPolicies.Where(p => !p.IsDeleted).AsQueryable();
+        if (branchId.HasValue) query = query.Where(p => p.BranchId == branchId.Value);
+
+        var items = await query
+            .OrderByDescending(p => p.EffectiveFromDate)
+            .Select(p => new
+            {
+                p.Id,
+                p.BranchId,
+                BranchName = p.Branch != null ? p.Branch.Name : (string?)null,
+                BasisType = (int)p.BasisType,
+                p.FixedBasisDays,
+                p.StandardHoursPerDay,
+                p.TreatPublicHolidaysAsPaid,
+                p.EffectiveFromDate,
+                p.EffectiveToDate,
+                p.IsActive
+            })
+            .ToListAsync();
+        return Ok(items);
+    }
+
+    /// <summary>Gets a payroll calendar policy by ID.</summary>
+    [HttpGet("calendar-policies/{id}")]
+    public async Task<IActionResult> GetCalendarPolicy(long id)
+    {
+        var item = await _context.PayrollCalendarPolicies
+            .Where(p => p.Id == id && !p.IsDeleted)
+            .Select(p => new
+            {
+                p.Id,
+                p.BranchId,
+                BranchName = p.Branch != null ? p.Branch.Name : (string?)null,
+                BasisType = (int)p.BasisType,
+                p.FixedBasisDays,
+                p.StandardHoursPerDay,
+                p.TreatPublicHolidaysAsPaid,
+                p.EffectiveFromDate,
+                p.EffectiveToDate,
+                p.IsActive
+            })
+            .FirstOrDefaultAsync();
+        if (item == null) return NotFound(new { error = "Calendar policy not found." });
+        return Ok(item);
+    }
+
+    /// <summary>Creates a payroll calendar policy.</summary>
+    [HttpPost("calendar-policies")]
+    public async Task<IActionResult> CreateCalendarPolicy([FromBody] CreatePayrollCalendarPolicyRequest request)
+    {
+        if (!Enum.IsDefined(typeof(PayrollDailyBasisType), request.BasisType))
+            return BadRequest(new { error = "Invalid BasisType. Use 1=CalendarDays, 2=WorkingDays, 3=FixedBasis." });
+        if ((PayrollDailyBasisType)request.BasisType == PayrollDailyBasisType.FixedBasis
+            && (!request.FixedBasisDays.HasValue || request.FixedBasisDays.Value <= 0))
+            return BadRequest(new { error = "FixedBasisDays must be provided and > 0 when BasisType is FixedBasis." });
+        if (request.StandardHoursPerDay <= 0)
+            return BadRequest(new { error = "StandardHoursPerDay must be > 0." });
+
+        var entity = new PayrollCalendarPolicy
+        {
+            BranchId = request.BranchId,
+            BasisType = (PayrollDailyBasisType)request.BasisType,
+            FixedBasisDays = request.FixedBasisDays,
+            StandardHoursPerDay = request.StandardHoursPerDay,
+            TreatPublicHolidaysAsPaid = request.TreatPublicHolidaysAsPaid,
+            EffectiveFromDate = request.EffectiveFromDate,
+            EffectiveToDate = request.EffectiveToDate,
+            IsActive = request.IsActive,
+            CreatedAtUtc = DateTime.UtcNow,
+            CreatedBy = _currentUser.Username ?? "SYSTEM"
+        };
+        _context.PayrollCalendarPolicies.Add(entity);
+        await _context.SaveChangesAsync();
+        return CreatedAtAction(nameof(GetCalendarPolicy), new { id = entity.Id }, new { id = entity.Id });
+    }
+
+    /// <summary>Updates a payroll calendar policy.</summary>
+    [HttpPut("calendar-policies/{id}")]
+    public async Task<IActionResult> UpdateCalendarPolicy(long id, [FromBody] UpdatePayrollCalendarPolicyRequest request)
+    {
+        var entity = await _context.PayrollCalendarPolicies
+            .FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
+        if (entity == null) return NotFound(new { error = "Calendar policy not found." });
+
+        if (!Enum.IsDefined(typeof(PayrollDailyBasisType), request.BasisType))
+            return BadRequest(new { error = "Invalid BasisType." });
+        if ((PayrollDailyBasisType)request.BasisType == PayrollDailyBasisType.FixedBasis
+            && (!request.FixedBasisDays.HasValue || request.FixedBasisDays.Value <= 0))
+            return BadRequest(new { error = "FixedBasisDays must be provided and > 0 when BasisType is FixedBasis." });
+
+        entity.BranchId = request.BranchId;
+        entity.BasisType = (PayrollDailyBasisType)request.BasisType;
+        entity.FixedBasisDays = request.FixedBasisDays;
+        entity.StandardHoursPerDay = request.StandardHoursPerDay;
+        entity.TreatPublicHolidaysAsPaid = request.TreatPublicHolidaysAsPaid;
+        entity.EffectiveFromDate = request.EffectiveFromDate;
+        entity.EffectiveToDate = request.EffectiveToDate;
+        entity.IsActive = request.IsActive;
+        entity.ModifiedAtUtc = DateTime.UtcNow;
+        entity.ModifiedBy = _currentUser.Username;
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
+
+    /// <summary>Deletes a payroll calendar policy (soft delete).</summary>
+    [HttpDelete("calendar-policies/{id}")]
+    public async Task<IActionResult> DeleteCalendarPolicy(long id)
+    {
+        var entity = await _context.PayrollCalendarPolicies
+            .FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
+        if (entity == null) return NotFound(new { error = "Calendar policy not found." });
+
+        entity.IsDeleted = true;
+        entity.ModifiedAtUtc = DateTime.UtcNow;
+        entity.ModifiedBy = _currentUser.Username;
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
 }
 
 // ── Request Records ────────────────────────────────────────────────
@@ -468,7 +607,8 @@ public record CreateSocialInsuranceRequest(
     decimal EmployerContributionRate,
     decimal MaxInsurableSalary,
     DateTime EffectiveDate,
-    bool IsActive
+    bool IsActive,
+    string? AppliesToNationalityCode = null
 );
 
 public record UpdateSocialInsuranceRequest(
@@ -479,6 +619,29 @@ public record UpdateSocialInsuranceRequest(
     decimal EmployerContributionRate,
     decimal MaxInsurableSalary,
     DateTime EffectiveDate,
+    bool IsActive,
+    string? AppliesToNationalityCode = null
+);
+
+public record CreatePayrollCalendarPolicyRequest(
+    long? BranchId,
+    int BasisType,
+    int? FixedBasisDays,
+    decimal StandardHoursPerDay,
+    bool TreatPublicHolidaysAsPaid,
+    DateTime EffectiveFromDate,
+    DateTime? EffectiveToDate,
+    bool IsActive
+);
+
+public record UpdatePayrollCalendarPolicyRequest(
+    long? BranchId,
+    int BasisType,
+    int? FixedBasisDays,
+    decimal StandardHoursPerDay,
+    bool TreatPublicHolidaysAsPaid,
+    DateTime EffectiveFromDate,
+    DateTime? EffectiveToDate,
     bool IsActive
 );
 

@@ -736,6 +736,11 @@ public interface IApplicationDbContext
     DbSet<InsuranceProvider> InsuranceProviders { get; }
     DbSet<EmployeeInsurance> EmployeeInsurances { get; }
 
+    // Payroll production-fix: calculation infrastructure
+    DbSet<PayrollCalendarPolicy> PayrollCalendarPolicies { get; }
+    DbSet<PayrollRunAudit> PayrollRunAudits { get; }
+    DbSet<PayrollRunAuditItem> PayrollRunAuditItems { get; }
+
     // Allowance Management
     DbSet<AllowanceType> AllowanceTypes { get; }
     DbSet<AllowancePolicy> AllowancePolicies { get; }

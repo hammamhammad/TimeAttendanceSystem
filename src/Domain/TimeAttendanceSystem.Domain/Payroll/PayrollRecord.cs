@@ -27,8 +27,22 @@ public class PayrollRecord : BaseEntity
     public string? Notes { get; set; }
     public DateTime? PaySlipGeneratedAt { get; set; }
 
+    // Lock + audit (payroll production-fix)
+    public DateTime? LockedAtUtc { get; set; }
+    public long? LockedByUserId { get; set; }
+    public int CalculationVersion { get; set; } = 1;
+    public long? LastRunId { get; set; }
+
+    /// <summary>
+    /// JSON snapshot of the resolved inputs used to produce this record
+    /// (effective salary, allowances, configs). Supports later explainability and re-audit.
+    /// </summary>
+    public string? CalculationBreakdownJson { get; set; }
+
     // Navigation
     public PayrollPeriod PayrollPeriod { get; set; } = null!;
     public Employee Employee { get; set; } = null!;
     public ICollection<PayrollRecordDetail> Details { get; set; } = new List<PayrollRecordDetail>();
+
+    public bool IsLocked => LockedAtUtc.HasValue || Status == PayrollRecordStatus.Finalized;
 }

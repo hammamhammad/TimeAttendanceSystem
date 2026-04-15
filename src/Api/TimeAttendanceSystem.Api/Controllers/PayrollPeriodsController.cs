@@ -74,11 +74,25 @@ public class PayrollPeriodsController : ControllerBase
     [HttpPost("{id}/process")]
     public async Task<IActionResult> Process(long id)
     {
-        var result = await _mediator.Send(new ProcessPayrollPeriodCommand(id));
+        var result = await _mediator.Send(new ProcessPayrollPeriodCommand(id, IsRecalculation: false));
         if (result.IsFailure)
             return BadRequest(new { error = result.Error });
 
         return Ok(new { id = result.Value, message = "Payroll period processed successfully." });
+    }
+
+    /// <summary>
+    /// Recalculates a Processed payroll period: soft-deletes the previous non-finalized records
+    /// and produces new ones using the current effective configuration and inputs.
+    /// Locked/Finalized records are preserved.
+    /// </summary>
+    [HttpPost("{id}/recalculate")]
+    public async Task<IActionResult> Recalculate(long id)
+    {
+        var result = await _mediator.Send(new ProcessPayrollPeriodCommand(id, IsRecalculation: true));
+        if (result.IsFailure)
+            return BadRequest(new { error = result.Error });
+        return Ok(new { id = result.Value, message = "Payroll period recalculated successfully." });
     }
 
     /// <summary>Approves a processed payroll period.</summary>
@@ -118,10 +132,12 @@ public class PayrollPeriodsController : ControllerBase
             return BadRequest(new { error = "Only Approved payroll periods can be marked as paid." });
 
         period.Status = PayrollPeriodStatus.Paid;
+        period.LockedAtUtc = DateTime.UtcNow;
+        period.LockedByUserId = _currentUser.UserId;
         period.ModifiedAtUtc = DateTime.UtcNow;
         period.ModifiedBy = _currentUser.Username;
 
-        // Finalize all records
+        // Finalize and LOCK all records. A finalized+locked record is immutable.
         var records = await _context.PayrollRecords
             .Where(r => r.PayrollPeriodId == id && !r.IsDeleted)
             .ToListAsync();
@@ -129,12 +145,98 @@ public class PayrollPeriodsController : ControllerBase
         foreach (var r in records)
         {
             r.Status = PayrollRecordStatus.Finalized;
+            r.LockedAtUtc = DateTime.UtcNow;
+            r.LockedByUserId = _currentUser.UserId;
             r.ModifiedAtUtc = DateTime.UtcNow;
             r.ModifiedBy = _currentUser.Username;
         }
 
+        // Audit entry for finalization.
+        _context.PayrollRunAudits.Add(new TecAxle.Hrms.Domain.Payroll.PayrollRunAudit
+        {
+            PayrollPeriodId = id,
+            RunType = PayrollRunType.Finalization,
+            TriggeredByUserId = _currentUser.UserId,
+            TriggeredByUsername = _currentUser.Username,
+            StartedAtUtc = DateTime.UtcNow,
+            CompletedAtUtc = DateTime.UtcNow,
+            Status = PayrollRunStatus.Completed,
+            EmployeesProcessed = records.Count,
+            CreatedAtUtc = DateTime.UtcNow,
+            CreatedBy = _currentUser.Username ?? "SYSTEM"
+        });
+
         await _context.SaveChangesAsync();
-        return Ok(new { message = "Payroll period marked as paid." });
+        return Ok(new { message = "Payroll period marked as paid and locked." });
+    }
+
+    /// <summary>
+    /// SystemAdmin-only: unlocks a Paid payroll period so that corrections can be applied.
+    /// Reverts the period to Processed (so /recalculate is allowed), clears lock fields on
+    /// period + records, and sets records back to Calculated status. Writes a PayrollRunAudit
+    /// entry of type Adjustment capturing the reason. The admin must subsequently call
+    /// /recalculate, /approve, and /mark-paid to re-finalize — this endpoint deliberately
+    /// does NOT trigger a recalc itself, so the operator consciously reviews numbers after unlock.
+    /// </summary>
+    [HttpPost("{id}/admin-unlock")]
+    public async Task<IActionResult> AdminUnlock(long id, [FromBody] AdminUnlockRequest request)
+    {
+        if (!_currentUser.IsSystemAdmin)
+            return Forbid();
+        if (string.IsNullOrWhiteSpace(request?.Reason))
+            return BadRequest(new { error = "A reason is required to unlock a finalized payroll period." });
+
+        var period = await _context.PayrollPeriods
+            .FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
+        if (period == null)
+            return NotFound(new { error = "Payroll period not found." });
+        if (period.Status != PayrollPeriodStatus.Paid || !period.LockedAtUtc.HasValue)
+            return BadRequest(new { error = "Only Paid/locked payroll periods can be admin-unlocked." });
+
+        period.Status = PayrollPeriodStatus.Processed;
+        period.LockedAtUtc = null;
+        period.LockedByUserId = null;
+        period.ApprovedAt = null;
+        period.ApprovedByUserId = null;
+        period.ModifiedAtUtc = DateTime.UtcNow;
+        period.ModifiedBy = _currentUser.Username;
+
+        var records = await _context.PayrollRecords
+            .Where(r => r.PayrollPeriodId == id && !r.IsDeleted)
+            .ToListAsync();
+        foreach (var r in records)
+        {
+            r.LockedAtUtc = null;
+            r.LockedByUserId = null;
+            r.Status = PayrollRecordStatus.Calculated;
+            r.ModifiedAtUtc = DateTime.UtcNow;
+            r.ModifiedBy = _currentUser.Username;
+        }
+
+        _context.PayrollRunAudits.Add(new TecAxle.Hrms.Domain.Payroll.PayrollRunAudit
+        {
+            PayrollPeriodId = id,
+            RunType = PayrollRunType.Adjustment,
+            TriggeredByUserId = _currentUser.UserId,
+            TriggeredByUsername = _currentUser.Username,
+            StartedAtUtc = DateTime.UtcNow,
+            CompletedAtUtc = DateTime.UtcNow,
+            Status = PayrollRunStatus.Completed,
+            EmployeesProcessed = records.Count,
+            WarningsJson = System.Text.Json.JsonSerializer.Serialize(new[]
+            {
+                new { kind = "admin-unlock", reason = request.Reason, records = records.Count }
+            }),
+            CreatedAtUtc = DateTime.UtcNow,
+            CreatedBy = _currentUser.Username ?? "SYSTEM"
+        });
+
+        await _context.SaveChangesAsync();
+        return Ok(new
+        {
+            message = "Payroll period unlocked. Status reverted to Processed. Call /recalculate (optional), then /approve and /mark-paid to re-finalize.",
+            unlockedRecords = records.Count
+        });
     }
 
     /// <summary>Cancels a payroll period (only Draft or Processed).</summary>
@@ -190,11 +292,40 @@ public class PayrollPeriodsController : ControllerBase
                 NetSalary = r.NetSalary,
                 WorkingDays = r.WorkingDays,
                 PaidDays = r.PaidDays,
-                Status = (int)r.Status
+                Status = (int)r.Status,
+                LockedAtUtc = r.LockedAtUtc,
+                CalculationVersion = r.CalculationVersion
             })
             .ToListAsync();
 
         return Ok(records);
+    }
+
+    /// <summary>Gets the payroll-run audit history for a period.</summary>
+    [HttpGet("{id}/run-audit")]
+    public async Task<IActionResult> GetRunAudit(long id)
+    {
+        var audits = await _context.PayrollRunAudits
+            .Where(a => a.PayrollPeriodId == id && !a.IsDeleted)
+            .OrderByDescending(a => a.StartedAtUtc)
+            .Select(a => new
+            {
+                id = a.Id,
+                runType = (int)a.RunType,
+                status = (int)a.Status,
+                startedAtUtc = a.StartedAtUtc,
+                completedAtUtc = a.CompletedAtUtc,
+                triggeredByUsername = a.TriggeredByUsername,
+                employeesProcessed = a.EmployeesProcessed,
+                employeesFailed = a.EmployeesFailed,
+                employeesSkipped = a.EmployeesSkipped,
+                warningCount = a.WarningCount,
+                warningsJson = a.WarningsJson,
+                errorsJson = a.ErrorsJson
+            })
+            .ToListAsync();
+
+        return Ok(audits);
     }
 
     /// <summary>Gets a single payroll record with line-item details.</summary>
@@ -223,6 +354,8 @@ public class PayrollPeriodsController : ControllerBase
                 WorkingDays = r.WorkingDays,
                 PaidDays = r.PaidDays,
                 Status = (int)r.Status,
+                LockedAtUtc = r.LockedAtUtc,
+                CalculationVersion = r.CalculationVersion,
                 Details = r.Details.Where(d => !d.IsDeleted).Select(d => new PayrollRecordDetailDto
                 {
                     Id = d.Id,
@@ -253,3 +386,5 @@ public record CreatePayrollPeriodRequest(
     DateTime EndDate,
     string? Notes
 );
+
+public record AdminUnlockRequest(string Reason);

@@ -45,6 +45,7 @@ export class PayrollPeriodsComponent implements OnInit {
     { key: 'view', label: this.i18n.t('common.view'), icon: 'fa-solid fa-eye', color: 'info' },
     { key: 'edit', label: this.i18n.t('common.edit'), icon: 'fa-solid fa-edit', color: 'secondary', condition: (item) => item.status === 'Draft' },
     { key: 'process', label: this.i18n.t('payroll.periods.process'), icon: 'fa-solid fa-cog', color: 'primary', condition: (item) => item.status === 'Draft' },
+    { key: 'recalculate', label: 'Recalculate', icon: 'fa-solid fa-rotate', color: 'warning', condition: (item) => item.status === 'Processed' },
     { key: 'approve', label: this.i18n.t('common.approve'), icon: 'fa-solid fa-check', color: 'success', condition: (item) => item.status === 'Processed' },
     { key: 'markPaid', label: this.i18n.t('payroll.periods.mark_paid'), icon: 'fa-solid fa-money-bill', color: 'success', condition: (item) => item.status === 'Approved' },
     { key: 'cancel', label: this.i18n.t('common.cancel'), icon: 'fa-solid fa-ban', color: 'danger', condition: (item) => item.status === 'Draft' || item.status === 'Processed' }
@@ -85,6 +86,9 @@ export class PayrollPeriodsComponent implements OnInit {
       case 'process':
         this.processPeriod(event.item);
         break;
+      case 'recalculate':
+        this.recalculatePeriod(event.item);
+        break;
       case 'approve':
         this.approvePeriod(event.item);
         break;
@@ -108,6 +112,25 @@ export class PayrollPeriodsComponent implements OnInit {
         this.payrollService.processPeriod(item.id).subscribe({
           next: () => {
             this.notificationService.success(this.i18n.t('payroll.periods.processed_successfully'));
+            this.loadData();
+          },
+          error: () => this.notificationService.error(this.i18n.t('common.error_processing'))
+        });
+      }
+    });
+  }
+
+  recalculatePeriod(item: PayrollPeriod): void {
+    this.confirmationService.confirm({
+      title: 'Recalculate Payroll',
+      message: 'This will replace the current payroll records with freshly calculated ones using the latest effective configuration. Finalized/locked records are preserved. Continue?',
+      confirmText: 'Recalculate',
+      cancelText: this.i18n.t('common.cancel')
+    }).then((confirmed) => {
+      if (confirmed) {
+        this.payrollService.recalculatePeriod(item.id).subscribe({
+          next: () => {
+            this.notificationService.success('Payroll period recalculated successfully.');
             this.loadData();
           },
           error: () => this.notificationService.error(this.i18n.t('common.error_processing'))

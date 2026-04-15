@@ -27,6 +27,12 @@ public class PayrollPeriod : BaseEntity
     public long? WorkflowInstanceId { get; set; }
     public long? SubmittedByUserId { get; set; }
 
+    // Lock state (payroll production-fix). Set when the period transitions to Paid.
+    public DateTime? LockedAtUtc { get; set; }
+    public long? LockedByUserId { get; set; }
+
+    public bool IsLocked => LockedAtUtc.HasValue || Status == PayrollPeriodStatus.Paid;
+
     // Navigation
     public Branch Branch { get; set; } = null!;
     public WorkflowInstance? WorkflowInstance { get; set; }

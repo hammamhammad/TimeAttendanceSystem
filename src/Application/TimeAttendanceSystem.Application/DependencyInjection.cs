@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Application.Common.Behaviors;
+using TecAxle.Hrms.Application.Payroll.Services;
 using TecAxle.Hrms.Application.Services;
 using TecAxle.Hrms.Application.Workflows.Services;
 
@@ -42,6 +43,16 @@ public static class DependencyInjection
         services.AddScoped<Settings.Commands.CreateOvertimeConfiguration.CreateOvertimeConfigurationCommandHandler>();
         services.AddScoped<Settings.Commands.UpdateOvertimeConfiguration.UpdateOvertimeConfigurationCommandHandler>();
         services.AddScoped<Settings.Commands.ActivateOvertimeConfiguration.ActivateOvertimeConfigurationCommandHandler>();
+
+        // Register payroll calculation pipeline (production-fix)
+        services.AddScoped<IProrationCalculator, ProrationCalculator>();
+        services.AddScoped<IPayrollCalendarResolver, PayrollCalendarResolver>();
+        services.AddScoped<ITaxCalculator, TaxCalculator>();
+        services.AddScoped<ISocialInsuranceCalculator, SocialInsuranceCalculator>();
+        services.AddScoped<IOvertimePayCalculator, OvertimePayCalculator>();
+        services.AddScoped<IAbsenceDeductionCalculator, AbsenceDeductionCalculator>();
+        services.AddScoped<IPayrollInputResolver, PayrollInputResolver>();
+        services.AddScoped<IPayrollCalculationService, PayrollCalculationService>();
 
         return services;
     }

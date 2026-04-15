@@ -49,7 +49,9 @@ public class GetPayrollPeriodsQueryHandler : BaseHandler<GetPayrollPeriodsQuery,
                 ProcessedAt = p.ProcessedAt,
                 ApprovedAt = p.ApprovedAt,
                 Notes = p.Notes,
-                CreatedAtUtc = p.CreatedAtUtc
+                CreatedAtUtc = p.CreatedAtUtc,
+                LockedAtUtc = p.LockedAtUtc,
+                LockedByUserId = p.LockedByUserId
             })
             .ToListAsync(cancellationToken);
 

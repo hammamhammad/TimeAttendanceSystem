@@ -3,8 +3,9 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { I18nService } from '../../../../core/i18n/i18n.service';
 import { NotificationService } from '../../../../core/notifications/notification.service';
 import { ConfirmationService } from '../../../../core/confirmation/confirmation.service';
-import { PayrollService } from '../../../../core/services/payroll.service';
+import { PayrollService, PayrollRunAuditEntry } from '../../../../core/services/payroll.service';
 import { PayrollPeriod, PayrollRecord, PayrollStatus } from '../../../../shared/models/payroll.model';
+import { CommonModule } from '@angular/common';
 import { FormHeaderComponent, FormHeaderAction } from '../../../../shared/components/form-header/form-header.component';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { SectionCardComponent } from '../../../../shared/components/section-card/section-card.component';
@@ -17,7 +18,7 @@ import { AuditHistoryComponent } from '../../../../shared/components/audit-histo
   selector: 'app-view-payroll-period',
   standalone: true,
   imports: [
-    RouterModule, FormHeaderComponent, LoadingSpinnerComponent,
+    CommonModule, RouterModule, FormHeaderComponent, LoadingSpinnerComponent,
     SectionCardComponent, DefinitionListComponent, StatusBadgeComponent, DataTableComponent,
     AuditHistoryComponent
   ],
@@ -36,6 +37,8 @@ export class ViewPayrollPeriodComponent implements OnInit {
   period = signal<PayrollPeriod | null>(null);
   records = signal<PayrollRecord[]>([]);
   processing = signal(false);
+  runAudit = signal<PayrollRunAuditEntry[]>([]);
+  showAudit = signal(false);
 
   periodInfoItems = computed<DefinitionItem[]>(() => {
     const p = this.period();
@@ -70,6 +73,7 @@ export class ViewPayrollPeriodComponent implements OnInit {
       actions.push({ label: this.i18n.t('payroll.periods.process'), icon: 'fa-solid fa-cog', type: 'primary', action: () => this.processPeriod() });
     }
     if (p.status === 'Processed') {
+      actions.push({ label: 'Recalculate', icon: 'fa-solid fa-rotate', type: 'secondary', action: () => this.recalculatePeriod() });
       actions.push({ label: this.i18n.t('common.approve'), icon: 'fa-solid fa-check', type: 'success', action: () => this.approvePeriod() });
     }
     if (p.status === 'Approved') {
@@ -79,6 +83,12 @@ export class ViewPayrollPeriodComponent implements OnInit {
       actions.push({ label: this.i18n.t('common.cancel'), icon: 'fa-solid fa-ban', type: 'danger', action: () => this.cancelPeriod() });
     }
     return actions;
+  });
+
+  /** True when the period has been finalized and locked (status = Paid). */
+  isLocked = computed(() => {
+    const p = this.period();
+    return !!(p && (p.lockedAtUtc || p.status === 'Paid'));
   });
 
   recordColumns: TableColumn[] = [
@@ -98,7 +108,54 @@ export class ViewPayrollPeriodComponent implements OnInit {
     if (id) {
       this.loadData(id);
       this.loadRecords(id);
+      this.loadRunAudit(id);
     }
+  }
+
+  loadRunAudit(periodId: number): void {
+    this.payrollService.getRunAudit(periodId).subscribe({
+      next: (entries) => this.runAudit.set(entries),
+      error: () => {}
+    });
+  }
+
+  toggleAudit(): void {
+    this.showAudit.update(v => !v);
+  }
+
+  recalculatePeriod(): void {
+    const p = this.period();
+    if (!p) return;
+    this.confirmationService.confirm({
+      title: 'Recalculate Payroll',
+      message: 'This replaces existing (non-locked) records with freshly calculated ones using the latest effective configuration. Continue?',
+      confirmText: 'Recalculate',
+      cancelText: this.i18n.t('common.cancel')
+    }).then((confirmed) => {
+      if (confirmed) {
+        this.processing.set(true);
+        this.payrollService.recalculatePeriod(p.id).subscribe({
+          next: () => {
+            this.notificationService.success('Payroll period recalculated successfully.');
+            this.loadData(p.id);
+            this.loadRecords(p.id);
+            this.loadRunAudit(p.id);
+            this.processing.set(false);
+          },
+          error: () => { this.notificationService.error(this.i18n.t('common.error_processing')); this.processing.set(false); }
+        });
+      }
+    });
+  }
+
+  runTypeLabel(t: number): string {
+    return ({ 1: 'Initial Process', 2: 'Recalculation', 3: 'Adjustment', 4: 'Finalization', 5: 'Cancellation' } as any)[t] || `Run #${t}`;
+  }
+  runStatusLabel(s: number): string {
+    return ({ 1: 'Running', 2: 'Completed', 3: 'Failed', 4: 'With Warnings' } as any)[s] || `Status #${s}`;
+  }
+  runStatusVariant(s: number): string {
+    return ({ 1: 'info', 2: 'success', 3: 'danger', 4: 'warning' } as any)[s] || 'secondary';
   }
 
   loadData(id: number): void {

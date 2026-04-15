@@ -365,6 +365,39 @@ public enum PayrollRecordStatus
     Finalized = 4
 }
 
+public enum PayrollDailyBasisType
+{
+    CalendarDays = 1,
+    WorkingDays = 2,
+    FixedBasis = 3
+}
+
+public enum PayrollRunType
+{
+    InitialProcess = 1,
+    Recalculation = 2,
+    Adjustment = 3,
+    Finalization = 4,
+    Cancellation = 5
+}
+
+public enum PayrollRunStatus
+{
+    Running = 1,
+    Completed = 2,
+    Failed = 3,
+    CompletedWithWarnings = 4
+}
+
+public enum PayrollRunItemStatus
+{
+    Succeeded = 1,
+    SkippedNoSalary = 2,
+    SkippedInactive = 3,
+    FailedWithError = 4,
+    CompletedWithWarnings = 5
+}
+
 public enum BankFileFormat
 {
     WPS = 1,

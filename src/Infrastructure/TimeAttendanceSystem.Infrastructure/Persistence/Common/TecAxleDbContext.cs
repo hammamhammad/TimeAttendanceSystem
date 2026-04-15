@@ -198,6 +198,11 @@ public class TecAxleDbContext : DbContext, IApplicationDbContext
     public DbSet<InsuranceProvider> InsuranceProviders => Set<InsuranceProvider>();
     public DbSet<EmployeeInsurance> EmployeeInsurances => Set<EmployeeInsurance>();
 
+    // Payroll production-fix: calculation infrastructure
+    public DbSet<PayrollCalendarPolicy> PayrollCalendarPolicies => Set<PayrollCalendarPolicy>();
+    public DbSet<PayrollRunAudit> PayrollRunAudits => Set<PayrollRunAudit>();
+    public DbSet<PayrollRunAuditItem> PayrollRunAuditItems => Set<PayrollRunAuditItem>();
+
     // Allowance Management
     public DbSet<AllowanceType> AllowanceTypes => Set<AllowanceType>();
     public DbSet<AllowancePolicy> AllowancePolicies => Set<AllowancePolicy>();

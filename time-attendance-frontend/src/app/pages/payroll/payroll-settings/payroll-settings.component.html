@@ -17,6 +17,11 @@
         <i class="fa-solid fa-file-shield me-2"></i>{{ i18n.t('payroll.settings.insurance_providers') }}
       </a>
     </li>
+    <li class="nav-item">
+      <a class="nav-link" [class.active]="activeTab() === 'calendar'" (click)="setTab('calendar')" role="button">
+        <i class="fa-solid fa-calendar-days me-2"></i>Calendar Policy
+      </a>
+    </li>
   </ul>
 
   <!-- Tax Configurations Tab -->
@@ -94,6 +99,7 @@
               <th>{{ i18n.t('payroll.settings.employee_rate') }} (%)</th>
               <th>{{ i18n.t('payroll.settings.employer_rate') }} (%)</th>
               <th>{{ i18n.t('payroll.settings.max_salary') }}</th>
+              <th>Nationality</th>
               <th>{{ i18n.t('payroll.settings.effective_date') }}</th>
               <th>{{ i18n.t('common.status') }}</th>
               <th>{{ i18n.t('common.actions') }}</th>
@@ -107,6 +113,7 @@
                   <td><input type="number" class="form-control form-control-sm" [(ngModel)]="item.employeeContributionRate"></td>
                   <td><input type="number" class="form-control form-control-sm" [(ngModel)]="item.employerContributionRate"></td>
                   <td><input type="number" class="form-control form-control-sm" [(ngModel)]="item.maxInsurableSalary"></td>
+                  <td><input type="text" class="form-control form-control-sm" [(ngModel)]="item.appliesToNationalityCode" placeholder="e.g. SA" maxlength="8"></td>
                   <td><input type="date" class="form-control form-control-sm" [(ngModel)]="item.effectiveDate"></td>
                   <td>
                     <div class="form-check">
@@ -122,6 +129,7 @@
                   <td>{{ item.employeeContributionRate }}%</td>
                   <td>{{ item.employerContributionRate }}%</td>
                   <td>{{ item.maxInsurableSalary ? item.maxInsurableSalary.toLocaleString() : '-' }}</td>
+                  <td>{{ item.appliesToNationalityCode || 'All' }}</td>
                   <td>{{ item.effectiveDate ? (item.effectiveDate | date:'mediumDate') : '-' }}</td>
                   <td><span class="badge" [class.bg-success]="item.isActive" [class.bg-secondary]="!item.isActive">{{ item.isActive ? i18n.t('common.active') : i18n.t('common.inactive') }}</span></td>
                   <td>
@@ -132,10 +140,10 @@
               </tr>
             }
             @if (socialConfigs().length === 0 && !loading()) {
-              <tr><td colspan="7" class="text-center text-muted py-4">{{ i18n.t('payroll.settings.no_social_configs') }}</td></tr>
+              <tr><td colspan="8" class="text-center text-muted py-4">{{ i18n.t('payroll.settings.no_social_configs') }}</td></tr>
             }
             @if (loading()) {
-              <tr><td colspan="7" class="text-center py-4"><span class="spinner-border spinner-border-sm me-2"></span>{{ i18n.t('common.loading') }}</td></tr>
+              <tr><td colspan="8" class="text-center py-4"><span class="spinner-border spinner-border-sm me-2"></span>{{ i18n.t('common.loading') }}</td></tr>
             }
           </tbody>
         </table>
@@ -198,6 +206,91 @@
             }
             @if (loading()) {
               <tr><td colspan="6" class="text-center py-4"><span class="spinner-border spinner-border-sm me-2"></span>{{ i18n.t('common.loading') }}</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </app-section-card>
+  }
+
+  <!-- Payroll Calendar Policy Tab -->
+  @if (activeTab() === 'calendar') {
+    <app-section-card title="Payroll Calendar Policy" icon="fas fa-calendar-days">
+      <p class="text-muted small mb-3">
+        Drives the daily-rate basis used for absences, proration, and overtime hourly basis.
+        Branch-specific policies override tenant-wide. Latest effective wins.
+        If no policy exists, payroll falls back to FixedBasis(30) + 8 hours/day.
+      </p>
+      <div class="d-flex justify-content-end mb-3">
+        <button class="btn btn-sm btn-primary" (click)="addCalendarPolicy()">
+          <i class="fa-solid fa-plus me-2"></i>{{ i18n.t('common.add') }}
+        </button>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Basis Type</th>
+              <th>Fixed Basis Days</th>
+              <th>Standard Hours/Day</th>
+              <th>Holidays Paid?</th>
+              <th>Effective From</th>
+              <th>Effective To</th>
+              <th>{{ i18n.t('common.status') }}</th>
+              <th>{{ i18n.t('common.actions') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of calendarPolicies(); track $index) {
+              <tr>
+                @if (item.editing) {
+                  <td>
+                    <select class="form-select form-select-sm" [(ngModel)]="item.basisType">
+                      <option [ngValue]="1">CalendarDays</option>
+                      <option [ngValue]="2">WorkingDays</option>
+                      <option [ngValue]="3">FixedBasis</option>
+                    </select>
+                  </td>
+                  <td>
+                    <input type="number" class="form-control form-control-sm" [(ngModel)]="item.fixedBasisDays" [disabled]="item.basisType !== 3" min="1" placeholder="30">
+                  </td>
+                  <td><input type="number" step="0.25" class="form-control form-control-sm" [(ngModel)]="item.standardHoursPerDay"></td>
+                  <td>
+                    <div class="form-check">
+                      <input type="checkbox" class="form-check-input" [(ngModel)]="item.treatPublicHolidaysAsPaid">
+                    </div>
+                  </td>
+                  <td><input type="date" class="form-control form-control-sm" [(ngModel)]="item.effectiveFromDate"></td>
+                  <td><input type="date" class="form-control form-control-sm" [(ngModel)]="item.effectiveToDate"></td>
+                  <td>
+                    <div class="form-check">
+                      <input type="checkbox" class="form-check-input" [(ngModel)]="item.isActive">
+                    </div>
+                  </td>
+                  <td>
+                    <button class="btn btn-sm btn-success me-1" (click)="saveCalendarPolicy(item, $index)"><i class="fa-solid fa-check"></i></button>
+                    <button class="btn btn-sm btn-danger" (click)="removeCalendarPolicy($index)"><i class="fa-solid fa-trash"></i></button>
+                  </td>
+                } @else {
+                  <td>{{ basisTypeLabel(item.basisType) }}</td>
+                  <td>{{ item.basisType === 3 ? (item.fixedBasisDays || '-') : '-' }}</td>
+                  <td>{{ item.standardHoursPerDay }}</td>
+                  <td><span class="badge" [class.bg-success]="item.treatPublicHolidaysAsPaid" [class.bg-secondary]="!item.treatPublicHolidaysAsPaid">{{ item.treatPublicHolidaysAsPaid ? 'Yes' : 'No' }}</span></td>
+                  <td>{{ item.effectiveFromDate ? (item.effectiveFromDate | date:'mediumDate') : '-' }}</td>
+                  <td>{{ item.effectiveToDate ? (item.effectiveToDate | date:'mediumDate') : 'Open' }}</td>
+                  <td><span class="badge" [class.bg-success]="item.isActive" [class.bg-secondary]="!item.isActive">{{ item.isActive ? i18n.t('common.active') : i18n.t('common.inactive') }}</span></td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-primary me-1" (click)="item.editing = true"><i class="fa-solid fa-edit"></i></button>
+                    <button class="btn btn-sm btn-outline-danger" (click)="removeCalendarPolicy($index)"><i class="fa-solid fa-trash"></i></button>
+                  </td>
+                }
+              </tr>
+            }
+            @if (calendarPolicies().length === 0 && !loading()) {
+              <tr><td colspan="8" class="text-center text-muted py-4">No payroll calendar policies configured — payroll will use the default FixedBasis(30) + 8 hours/day.</td></tr>
+            }
+            @if (loading()) {
+              <tr><td colspan="8" class="text-center py-4"><span class="spinner-border spinner-border-sm me-2"></span>{{ i18n.t('common.loading') }}</td></tr>
             }
           </tbody>
         </table>

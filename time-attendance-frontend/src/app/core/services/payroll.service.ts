@@ -30,6 +30,19 @@ export class PayrollService {
     return this.http.post<PayrollPeriod>(`${this.apiUrl}/${id}/process`, {});
   }
 
+  /**
+   * Explicit recalculation of a Processed period. Previous (non-finalized) records are soft-deleted;
+   * new ones are produced using the current effective configuration.
+   */
+  recalculatePeriod(id: number): Observable<PayrollPeriod> {
+    return this.http.post<PayrollPeriod>(`${this.apiUrl}/${id}/recalculate`, {});
+  }
+
+  /** Audit history for a period: one row per run (initial, recalc, finalization, cancellation). */
+  getRunAudit(periodId: number): Observable<PayrollRunAuditEntry[]> {
+    return this.http.get<PayrollRunAuditEntry[]>(`${this.apiUrl}/${periodId}/run-audit`);
+  }
+
   approvePeriod(id: number): Observable<PayrollPeriod> {
     return this.http.post<PayrollPeriod>(`${this.apiUrl}/${id}/approve`, {});
   }
@@ -57,4 +70,22 @@ export class PayrollService {
   exportToCsv(periodId: number): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/${periodId}/export`, { responseType: 'blob' });
   }
+}
+
+/** A single payroll-run audit entry returned by GET /{id}/run-audit. */
+export interface PayrollRunAuditEntry {
+  id: number;
+  /** Backend enum: 1=InitialProcess, 2=Recalculation, 3=Adjustment, 4=Finalization, 5=Cancellation */
+  runType: number;
+  /** Backend enum: 1=Running, 2=Completed, 3=Failed, 4=CompletedWithWarnings */
+  status: number;
+  startedAtUtc: string;
+  completedAtUtc?: string;
+  triggeredByUsername?: string;
+  employeesProcessed: number;
+  employeesFailed: number;
+  employeesSkipped: number;
+  warningCount: number;
+  warningsJson?: string;
+  errorsJson?: string;
 }
