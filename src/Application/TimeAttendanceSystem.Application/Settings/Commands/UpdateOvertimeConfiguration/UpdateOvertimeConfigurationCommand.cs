@@ -1,8 +1,6 @@
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Application.Common;
-using TecAxle.Hrms.Application.Common.Behaviors;
 using TecAxle.Hrms.Domain.Common;
-using TecAxle.Hrms.Domain.Modules;
 using TecAxle.Hrms.Domain.Settings;
 
 namespace TecAxle.Hrms.Application.Settings.Commands.UpdateOvertimeConfiguration;
@@ -29,7 +27,6 @@ namespace TecAxle.Hrms.Application.Settings.Commands.UpdateOvertimeConfiguration
 /// <param name="IsActive">Whether this configuration should be active</param>
 /// <param name="EffectiveFromDate">Date when this configuration becomes effective</param>
 /// <param name="EffectiveToDate">Optional end date for this configuration</param>
-[RequiresModule(SystemModule.TimeAttendance)]
 public record UpdateOvertimeConfigurationCommand(
     long Id,
     bool EnablePreShiftOvertime,

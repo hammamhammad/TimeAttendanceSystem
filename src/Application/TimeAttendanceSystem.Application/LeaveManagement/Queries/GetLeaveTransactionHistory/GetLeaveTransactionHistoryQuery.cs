@@ -1,7 +1,5 @@
 using MediatR;
 using TecAxle.Hrms.Application.Common;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.LeaveManagement.Queries.GetLeaveTransactionHistory;
 
@@ -14,7 +12,6 @@ namespace TecAxle.Hrms.Application.LeaveManagement.Queries.GetLeaveTransactionHi
 /// <param name="Year">Calendar year for transactions (optional - null returns all years)</param>
 /// <param name="PageNumber">Page number for pagination (default 1)</param>
 /// <param name="PageSize">Page size for pagination (default 50)</param>
-[RequiresModule(SystemModule.LeaveManagement, AllowReadWhenDisabled = true)]
 public record GetLeaveTransactionHistoryQuery(
     long EmployeeId,
     long? VacationTypeId = null,

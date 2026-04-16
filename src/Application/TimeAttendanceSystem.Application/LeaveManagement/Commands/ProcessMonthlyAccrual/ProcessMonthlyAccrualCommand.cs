@@ -1,7 +1,5 @@
 using MediatR;
 using TecAxle.Hrms.Application.Common;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.LeaveManagement.Commands.ProcessMonthlyAccrual;
 
@@ -53,7 +51,6 @@ namespace TecAxle.Hrms.Application.LeaveManagement.Commands.ProcessMonthlyAccrua
 /// - Includes detailed error messages for troubleshooting
 /// - Logs comprehensive information for monitoring
 /// </remarks>
-[RequiresModule(SystemModule.LeaveManagement)]
 public record ProcessMonthlyAccrualCommand(
     int Year,
     int Month,

@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 
 import '../core/l10n/app_localizations.dart';
 
-import '../features/tenant_discovery/presentation/tenant_discovery_screen.dart';
 import '../features/auth/presentation/login_screen.dart';
 import '../features/home/presentation/home_screen.dart';
 import '../features/attendance/presentation/attendance_screen.dart';
@@ -40,25 +39,16 @@ final routerProvider = Provider<GoRouter>((ref) {
     // Refresh router when auth state changes
     refreshListenable: GoRouterRefreshStream(ref.read(authStateProvider.notifier).stream),
 
-    // Redirect unauthenticated users to tenant discovery/login
+    // Redirect unauthenticated users to login
     redirect: (context, state) {
       final isAuthenticated = authState.valueOrNull?.isAuthenticated ?? false;
-      final hasTenant = authState.valueOrNull?.hasTenant ?? false;
       final isGoingToAuth = state.matchedLocation == '/login' ||
-                            state.matchedLocation == '/tenant-discovery' ||
                             state.matchedLocation == '/';
 
-      // Not configured tenant yet
-      if (!hasTenant && state.matchedLocation != '/tenant-discovery' && state.matchedLocation != '/') {
-        return '/tenant-discovery';
-      }
-
-      // Not authenticated
-      if (hasTenant && !isAuthenticated && state.matchedLocation != '/login') {
+      if (!isAuthenticated && state.matchedLocation != '/login' && state.matchedLocation != '/') {
         return '/login';
       }
 
-      // Already authenticated, redirect from auth pages
       if (isAuthenticated && isGoingToAuth) {
         return '/home';
       }
@@ -67,19 +57,11 @@ final routerProvider = Provider<GoRouter>((ref) {
     },
 
     routes: [
-      // Initial route - check tenant configuration
       GoRoute(
         path: '/',
-        builder: (context, state) => const TenantDiscoveryScreen(),
+        builder: (context, state) => const LoginScreen(),
       ),
 
-      // Tenant discovery
-      GoRoute(
-        path: '/tenant-discovery',
-        builder: (context, state) => const TenantDiscoveryScreen(),
-      ),
-
-      // Login
       GoRoute(
         path: '/login',
         builder: (context, state) => const LoginScreen(),

@@ -61,7 +61,6 @@ public class NotificationRecipientResolverTests
         {
             db.TenantSettings.Add(new TenantSettings
             {
-                TenantId = 1,
                 NotificationRecipientRolesCsv = rolesCsv,
                 CreatedAtUtc = DateTime.UtcNow,
                 ModifiedAtUtc = DateTime.UtcNow,

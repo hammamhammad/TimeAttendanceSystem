@@ -5,14 +5,12 @@ using TecAxle.Hrms.Api.Filters;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Application.EmployeeSubEntities.Dtos;
 using TecAxle.Hrms.Domain.Employees;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/job-grades")]
 [Authorize]
-[RequiresModuleEndpoint(SystemModule.EmployeeLifecycle)]
 public class JobGradesController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
@@ -26,7 +24,6 @@ public class JobGradesController : ControllerBase
 
     /// <summary>Gets all job grades.</summary>
     [HttpGet]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetAll()
     {
         var items = await _context.JobGrades
@@ -55,7 +52,6 @@ public class JobGradesController : ControllerBase
 
     /// <summary>Gets a specific job grade by ID.</summary>
     [HttpGet("{id}")]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetById(long id)
     {
         var item = await _context.JobGrades
@@ -180,7 +176,6 @@ public class JobGradesController : ControllerBase
 
     /// <summary>Gets active job grades for dropdown selection.</summary>
     [HttpGet("dropdown")]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetDropdown()
     {
         var items = await _context.JobGrades

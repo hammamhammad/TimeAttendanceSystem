@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using TecAxle.Hrms.Api.Filters;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Domain.Common;
-using TecAxle.Hrms.Domain.Modules;
 using TecAxle.Hrms.Domain.Recruitment;
 
 namespace TecAxle.Hrms.Api.Controllers;
@@ -12,7 +11,6 @@ namespace TecAxle.Hrms.Api.Controllers;
 [ApiController]
 [Route("api/v1/interviews")]
 [Authorize]
-[RequiresModuleEndpoint(SystemModule.Recruitment)]
 public class InterviewSchedulesController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
@@ -26,7 +24,6 @@ public class InterviewSchedulesController : ControllerBase
 
     /// <summary>Lists interview schedules with optional filters and pagination.</summary>
     [HttpGet]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetAll(
         [FromQuery] long? applicationId,
         [FromQuery] long? interviewerEmployeeId,
@@ -82,7 +79,6 @@ public class InterviewSchedulesController : ControllerBase
 
     /// <summary>Gets an interview schedule by ID.</summary>
     [HttpGet("{id}")]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetById(long id)
     {
         var item = await _context.InterviewSchedules

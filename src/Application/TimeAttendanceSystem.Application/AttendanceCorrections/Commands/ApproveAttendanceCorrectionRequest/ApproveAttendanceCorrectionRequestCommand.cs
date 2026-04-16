@@ -1,8 +1,6 @@
 using MediatR;
 using TecAxle.Hrms.Application.Common;
 using TecAxle.Hrms.Domain.Excuses;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.AttendanceCorrections.Commands.ApproveAttendanceCorrectionRequest;
 
@@ -39,7 +37,6 @@ namespace TecAxle.Hrms.Application.AttendanceCorrections.Commands.ApproveAttenda
 /// - Links created transaction to correction request
 /// - Notifications sent to employee about decision
 /// </remarks>
-[RequiresModule(SystemModule.TimeAttendance)]
 [Obsolete("Use ApproveStepCommand via the workflow engine instead. This legacy path bypasses " +
           "the workflow engine. Scheduled for removal in v14.")]
 public record ApproveAttendanceCorrectionRequestCommand(

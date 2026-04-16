@@ -1,8 +1,6 @@
 using MediatR;
 using TecAxle.Hrms.Application.Common;
 using TecAxle.Hrms.Domain.Common;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.EmployeeVacations.Commands.UpdateEmployeeVacation;
 
@@ -38,7 +36,6 @@ namespace TecAxle.Hrms.Application.EmployeeVacations.Commands.UpdateEmployeeVaca
 /// - Previous attendance records reverted if vacation dates change
 /// - New attendance records created for new vacation dates
 /// </remarks>
-[RequiresModule(SystemModule.LeaveManagement)]
 public record UpdateEmployeeVacationCommand(
     long Id,
     long VacationTypeId,

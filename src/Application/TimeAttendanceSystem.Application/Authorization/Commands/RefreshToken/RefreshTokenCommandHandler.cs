@@ -110,9 +110,6 @@ public class RefreshTokenCommandHandler : BaseHandler<RefreshTokenCommand, Resul
 
         var branchIds = user.UserBranchScopes.Select(ubs => ubs.BranchId).ToList();
 
-        // In per-tenant DB, tenantId comes from the request context, not from branch entity
-        var tenantId = CurrentUser.TenantId;
-
         // Fetch linked employee for full name and employee context
         string? employeeFullName = null;
         string? employeeFullNameAr = null;
@@ -135,7 +132,7 @@ public class RefreshTokenCommandHandler : BaseHandler<RefreshTokenCommand, Resul
         }
 
         // Generate new tokens
-        var accessToken = _tokenGenerator.GenerateAccessToken(user, roles, permissions, branchIds, tenantId);
+        var accessToken = _tokenGenerator.GenerateAccessToken(user, roles, permissions, branchIds);
         var newRefreshToken = _tokenGenerator.GenerateRefreshToken();
         var expiresAt = _tokenGenerator.GetTokenExpiration();
 

@@ -38,13 +38,11 @@ public sealed class ValidationThresholds
 public sealed class ValidationSettingsProvider : IValidationSettingsProvider
 {
     private readonly IApplicationDbContext _context;
-    private readonly ITenantContext _tenantContext;
     private ValidationThresholds? _cached;
 
-    public ValidationSettingsProvider(IApplicationDbContext context, ITenantContext tenantContext)
+    public ValidationSettingsProvider(IApplicationDbContext context)
     {
         _context = context;
-        _tenantContext = tenantContext;
     }
 
     public ValidationThresholds Current => _cached ?? new ValidationThresholds();
@@ -52,16 +50,10 @@ public sealed class ValidationSettingsProvider : IValidationSettingsProvider
     public async Task WarmAsync(CancellationToken ct = default)
     {
         if (_cached != null) return;
-        var tenantId = _tenantContext.TenantId;
-        if (tenantId == null)
-        {
-            _cached = new ValidationThresholds();
-            return;
-        }
 
         var s = await _context.TenantSettings
             .AsNoTracking()
-            .FirstOrDefaultAsync(t => t.TenantId == tenantId.Value && !t.IsDeleted, ct);
+            .FirstOrDefaultAsync(t => !t.IsDeleted, ct);
 
         _cached = s == null
             ? new ValidationThresholds()

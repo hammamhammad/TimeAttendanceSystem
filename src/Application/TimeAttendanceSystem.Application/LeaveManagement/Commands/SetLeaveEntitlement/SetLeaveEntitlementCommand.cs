@@ -1,7 +1,5 @@
 using MediatR;
 using TecAxle.Hrms.Application.Common;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.LeaveManagement.Commands.SetLeaveEntitlement;
 
@@ -60,7 +58,6 @@ namespace TecAxle.Hrms.Application.LeaveManagement.Commands.SetLeaveEntitlement;
 /// - Includes warnings for potential balance impacts
 /// - Supports localized error messages based on user language
 /// </remarks>
-[RequiresModule(SystemModule.LeaveManagement)]
 public record SetLeaveEntitlementCommand(
     long EmployeeId,
     long VacationTypeId,

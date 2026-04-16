@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using TecAxle.Hrms.Api.Filters;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Domain.Common;
-using TecAxle.Hrms.Domain.Modules;
 using TecAxle.Hrms.Domain.Onboarding;
 
 namespace TecAxle.Hrms.Api.Controllers;
@@ -12,7 +11,6 @@ namespace TecAxle.Hrms.Api.Controllers;
 [ApiController]
 [Route("api/v1/onboarding-tasks")]
 [Authorize]
-[RequiresModuleEndpoint(SystemModule.Onboarding)]
 public class OnboardingTasksController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
@@ -26,7 +24,6 @@ public class OnboardingTasksController : ControllerBase
 
     /// <summary>Lists onboarding tasks with optional filters.</summary>
     [HttpGet]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetAll(
         [FromQuery] long? processId,
         [FromQuery] long? assignedToId,
@@ -167,7 +164,6 @@ public class OnboardingTasksController : ControllerBase
 
     /// <summary>Gets onboarding tasks assigned to the current user (self-service).</summary>
     [HttpGet("my-tasks")]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetMyTasks(
         [FromQuery] OnboardingTaskStatus? status,
         [FromQuery] int page = 1,

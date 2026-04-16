@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TecAxle.Hrms.Api.Filters;
 using TecAxle.Hrms.Application.Abstractions;
-using TecAxle.Hrms.Domain.Modules;
 using TecAxle.Hrms.Domain.Performance;
 
 namespace TecAxle.Hrms.Api.Controllers;
@@ -11,7 +10,6 @@ namespace TecAxle.Hrms.Api.Controllers;
 [ApiController]
 [Route("api/v1/competency-frameworks")]
 [Authorize]
-[RequiresModuleEndpoint(SystemModule.Performance)]
 public class CompetencyFrameworksController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
@@ -25,7 +23,6 @@ public class CompetencyFrameworksController : ControllerBase
 
     /// <summary>Lists competency frameworks.</summary>
     [HttpGet]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetAll(
         [FromQuery] bool? isActive,
         [FromQuery] string? search,
@@ -63,7 +60,6 @@ public class CompetencyFrameworksController : ControllerBase
 
     /// <summary>Gets a competency framework by ID with competencies.</summary>
     [HttpGet("{id}")]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetById(long id)
     {
         var item = await _context.CompetencyFrameworks
@@ -215,7 +211,6 @@ public class CompetencyFrameworksController : ControllerBase
 
     /// <summary>Gets active frameworks for dropdown/select components.</summary>
     [HttpGet("dropdown")]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetDropdown()
     {
         var items = await _context.CompetencyFrameworks

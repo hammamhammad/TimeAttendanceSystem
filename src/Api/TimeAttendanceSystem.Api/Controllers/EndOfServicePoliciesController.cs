@@ -7,7 +7,6 @@ using TecAxle.Hrms.Application.EndOfServicePolicies.Commands.DeleteEndOfServiceP
 using TecAxle.Hrms.Application.EndOfServicePolicies.Commands.UpdateEndOfServicePolicy;
 using TecAxle.Hrms.Application.EndOfServicePolicies.Queries.GetEndOfServicePolicies;
 using TecAxle.Hrms.Application.EndOfServicePolicies.Queries.GetEndOfServicePolicyById;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Api.Controllers;
 
@@ -19,7 +18,6 @@ namespace TecAxle.Hrms.Api.Controllers;
 [ApiController]
 [Route("api/v1/end-of-service-policies")]
 [Authorize]
-[RequiresModuleEndpoint(SystemModule.Offboarding)]
 public class EndOfServicePoliciesController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -30,7 +28,6 @@ public class EndOfServicePoliciesController : ControllerBase
     }
 
     [HttpGet]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetAll([FromQuery] bool? activeOnly = null, [FromQuery] string? countryCode = null)
     {
         var result = await _mediator.Send(new GetEndOfServicePoliciesQuery(activeOnly, countryCode));
@@ -38,7 +35,6 @@ public class EndOfServicePoliciesController : ControllerBase
     }
 
     [HttpGet("{id:long}")]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetById(long id)
     {
         var result = await _mediator.Send(new GetEndOfServicePolicyByIdQuery(id));

@@ -5,7 +5,6 @@ using TecAxle.Hrms.Api.Filters;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Application.Lifecycle.Events;
 using TecAxle.Hrms.Domain.Common;
-using TecAxle.Hrms.Domain.Modules;
 using TecAxle.Hrms.Domain.Offboarding;
 
 namespace TecAxle.Hrms.Api.Controllers;
@@ -13,7 +12,6 @@ namespace TecAxle.Hrms.Api.Controllers;
 [ApiController]
 [Route("api/v1/clearance")]
 [Authorize]
-[RequiresModuleEndpoint(SystemModule.Offboarding)]
 public class ClearanceController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
@@ -31,7 +29,6 @@ public class ClearanceController : ControllerBase
     }
 
     [HttpGet("{terminationId}")]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetByTermination(long terminationId)
     {
         var checklist = await _context.ClearanceChecklists
@@ -193,7 +190,6 @@ public class ClearanceController : ControllerBase
     }
 
     [HttpGet("pending")]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetPending()
     {
         var checklists = await _context.ClearanceChecklists

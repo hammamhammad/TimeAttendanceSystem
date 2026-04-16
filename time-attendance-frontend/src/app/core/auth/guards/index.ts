@@ -32,4 +32,3 @@ export { systemAdminGuard } from './system-admin.guard';
 export { adminGuard } from './admin.guard';
 export { managerGuard } from './manager.guard';
 export { employeeGuard } from './employee.guard';
-export { moduleGuard } from './module.guard';

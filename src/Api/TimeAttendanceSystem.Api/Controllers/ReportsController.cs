@@ -5,7 +5,6 @@ using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Application.Reports.DTOs;
 using TecAxle.Hrms.Application.Reports.Queries;
 using TecAxle.Hrms.Application.Reports.Services;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Api.Controllers;
 
@@ -28,8 +27,6 @@ public class ReportsController : ControllerBase
     // ============================================================
 
     [HttpGet("attendance")]
-    [RequiresModuleEndpoint(SystemModule.TimeAttendance)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(typeof(AttendanceReportSummary), StatusCodes.Status200OK)]
     public async Task<ActionResult<AttendanceReportSummary>> GetAttendanceReport(
         [FromQuery] DateTime from,
@@ -52,8 +49,6 @@ public class ReportsController : ControllerBase
     }
 
     [HttpGet("attendance/export")]
-    [RequiresModuleEndpoint(SystemModule.TimeAttendance)]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetAttendanceReportCsv(
         [FromQuery] DateTime from,
         [FromQuery] DateTime to,
@@ -75,8 +70,6 @@ public class ReportsController : ControllerBase
     }
 
     [HttpGet("leaves")]
-    [RequiresModuleEndpoint(SystemModule.LeaveManagement)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(typeof(LeaveReportSummary), StatusCodes.Status200OK)]
     public async Task<ActionResult<LeaveReportSummary>> GetLeaveReport(
         [FromQuery] DateTime from,
@@ -107,8 +100,6 @@ public class ReportsController : ControllerBase
     /// Returns a breakdown of all employee salary components for the period.
     /// </summary>
     [HttpGet("salary-register")]
-    [RequiresModuleEndpoint(SystemModule.Payroll)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(typeof(SalaryRegisterReport), StatusCodes.Status200OK)]
     public async Task<ActionResult<SalaryRegisterReport>> GetSalaryRegister(
         [FromQuery] long payrollPeriodId)
@@ -122,8 +113,6 @@ public class ReportsController : ControllerBase
     /// Shows total salary costs per department for a given year and optional month.
     /// </summary>
     [HttpGet("department-cost")]
-    [RequiresModuleEndpoint(SystemModule.Payroll)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(typeof(DepartmentCostReport), StatusCodes.Status200OK)]
     public async Task<ActionResult<DepartmentCostReport>> GetDepartmentCostReport(
         [FromQuery] int year,
@@ -139,8 +128,6 @@ public class ReportsController : ControllerBase
     /// Returns paginated YTD salary totals grouped by employee.
     /// </summary>
     [HttpGet("ytd-earnings")]
-    [RequiresModuleEndpoint(SystemModule.Payroll)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(typeof(YtdEarningsReport), StatusCodes.Status200OK)]
     public async Task<ActionResult<YtdEarningsReport>> GetYtdEarningsReport(
         [FromQuery] int year,
@@ -162,8 +149,6 @@ public class ReportsController : ControllerBase
     /// Returns active contracts with end dates within the threshold period.
     /// </summary>
     [HttpGet("contract-expiry")]
-    [RequiresModuleEndpoint(SystemModule.EmployeeLifecycle)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(typeof(ContractExpiryReport), StatusCodes.Status200OK)]
     public async Task<ActionResult<ContractExpiryReport>> GetContractExpiryReport(
         [FromQuery] int daysThreshold = 30,
@@ -178,8 +163,6 @@ public class ReportsController : ControllerBase
     /// Returns documents with expiry dates within the threshold period.
     /// </summary>
     [HttpGet("document-expiry")]
-    [RequiresModuleEndpoint(SystemModule.Documents)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(typeof(DocumentExpiryReport), StatusCodes.Status200OK)]
     public async Task<ActionResult<DocumentExpiryReport>> GetDocumentExpiryReport(
         [FromQuery] int daysThreshold = 30,
@@ -194,8 +177,6 @@ public class ReportsController : ControllerBase
     /// Returns active/pending certifications with expiry dates within the threshold period.
     /// </summary>
     [HttpGet("certification-expiry")]
-    [RequiresModuleEndpoint(SystemModule.Training)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(typeof(CertificationExpiryReport), StatusCodes.Status200OK)]
     public async Task<ActionResult<CertificationExpiryReport>> GetCertificationExpiryReport(
         [FromQuery] int daysThreshold = 30,
@@ -210,8 +191,6 @@ public class ReportsController : ControllerBase
     /// Provides counts at 7-day, 30-day, and 90-day thresholds plus already-expired counts.
     /// </summary>
     [HttpGet("compliance-summary")]
-    [RequiresModuleEndpoint(SystemModule.EmployeeLifecycle)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(typeof(ComplianceSummaryReport), StatusCodes.Status200OK)]
     public async Task<ActionResult<ComplianceSummaryReport>> GetComplianceSummary(
         [FromQuery] long? branchId = null)

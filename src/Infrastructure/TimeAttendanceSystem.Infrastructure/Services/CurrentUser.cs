@@ -13,15 +13,6 @@ public class CurrentUser : ICurrentUser
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public long? TenantId
-    {
-        get
-        {
-            var tenantClaim = _httpContextAccessor.HttpContext?.User?.FindFirst("tenant_id")?.Value;
-            return long.TryParse(tenantClaim, out var tenantId) ? tenantId : null;
-        }
-    }
-
     public long? UserId
     {
         get

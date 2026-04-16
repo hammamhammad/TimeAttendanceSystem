@@ -3,8 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Application.Common;
 using TecAxle.Hrms.Application.PublicHolidays.Queries.GetPublicHolidays;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.PublicHolidays.Queries.GetHolidayCalendar;
 
@@ -64,7 +62,6 @@ namespace TecAxle.Hrms.Application.PublicHolidays.Queries.GetHolidayCalendar;
 /// - Audit trail for calendar access patterns
 /// - Permission validation for holiday visibility
 /// </remarks>
-[RequiresModule(SystemModule.TimeAttendance, AllowReadWhenDisabled = true)]
 public record GetHolidayCalendarQuery(
     int Year,
     long? BranchId = null,

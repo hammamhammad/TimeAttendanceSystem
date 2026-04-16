@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, BehaviorSubject, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
-import { User, LoginRequest, LoginResponse, RefreshTokenRequest, RefreshTokenResponse, ResolveTenantsResponse } from '../../shared/models/user.model';
+import { User, LoginRequest, LoginResponse, RefreshTokenRequest, RefreshTokenResponse } from '../../shared/models/user.model';
 import { API_CONFIG } from '../http/api.config';
 
 /**
@@ -122,41 +122,6 @@ export class AuthService {
           return throwError(() => error);
         })
       );
-  }
-
-  /**
-   * Resolves which tenant(s) a user email belongs to.
-   * Used during email-based login to determine if the user needs to select a tenant.
-   * If only one tenant is found, the client can proceed directly to login.
-   * If multiple tenants are found, the client should show a tenant picker.
-   *
-   * @param email - User email to look up
-   * @returns Observable<ResolveTenantsResponse> - Tenant list and whether selection is required
-   *
-   * @example
-   * ```typescript
-   * this.authService.resolveTenants('user@company.com').subscribe({
-   *   next: (response) => {
-   *     if (response.requiresTenantSelection) {
-   *       // Show tenant picker with response.tenants
-   *     } else {
-   *       // Proceed with single tenant
-   *     }
-   *   },
-   *   error: (error) => console.error('Tenant resolution failed', error)
-   * });
-   * ```
-   */
-  resolveTenants(email: string): Observable<ResolveTenantsResponse> {
-    return this.http.post<ResolveTenantsResponse>(
-      `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.auth.resolveTenants}`,
-      { email }
-    ).pipe(
-      catchError(error => {
-        console.error('Tenant resolution failed:', error);
-        return throwError(() => error);
-      })
-    );
   }
 
   /**
@@ -354,18 +319,9 @@ export class AuthService {
       localStorage.setItem(this.REFRESH_TOKEN_KEY, authResult.refreshToken);
     }
     localStorage.setItem(this.USER_KEY, JSON.stringify(authResult.user));
-    if (authResult.isPlatformUser) {
-      localStorage.setItem('is_platform_user', 'true');
-    } else {
-      localStorage.removeItem('is_platform_user');
-    }
 
     this.currentUser.set(authResult.user);
     this.currentUserSubject.next(authResult.user);
-  }
-
-  isPlatformUser(): boolean {
-    return localStorage.getItem('is_platform_user') === 'true';
   }
 
   /**
@@ -419,7 +375,6 @@ export class AuthService {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.REFRESH_TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);
-    localStorage.removeItem('is_platform_user');
 
     this.currentUser.set(null);
     this.currentUserSubject.next(null);

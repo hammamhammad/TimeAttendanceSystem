@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using TecAxle.Hrms.Api.Filters;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Domain.Common;
-using TecAxle.Hrms.Domain.Modules;
 using TecAxle.Hrms.Domain.Shifts;
 
 namespace TecAxle.Hrms.Api.Controllers;
@@ -16,7 +15,6 @@ namespace TecAxle.Hrms.Api.Controllers;
 [ApiController]
 [Route("api/v1/mobile/schedule")]
 [Authorize]
-[RequiresModuleEndpoint(SystemModule.TimeAttendance)]
 public class MobileScheduleController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
@@ -38,7 +36,6 @@ public class MobileScheduleController : ControllerBase
     /// Returns the assigned shift with periods and off-day status for today.
     /// </summary>
     [HttpGet("today")]
-    [AllowModuleReadOnly]
     [ProducesResponseType(typeof(DailyScheduleDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -60,7 +57,6 @@ public class MobileScheduleController : ControllerBase
     /// </summary>
     /// <param name="weekStart">Start date of the week (defaults to current week's Sunday)</param>
     [HttpGet("weekly")]
-    [AllowModuleReadOnly]
     [ProducesResponseType(typeof(List<DailyScheduleDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -89,7 +85,6 @@ public class MobileScheduleController : ControllerBase
     /// <param name="startDate">Start date of the range</param>
     /// <param name="endDate">End date of the range</param>
     [HttpGet]
-    [AllowModuleReadOnly]
     [ProducesResponseType(typeof(List<DailyScheduleDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

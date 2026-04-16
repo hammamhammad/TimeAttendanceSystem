@@ -54,32 +54,6 @@ class SecureStorageService {
     await _storage.delete(key: AppConfig.refreshTokenKey);
   }
   
-  // ===== TENANT CONFIGURATION =====
-  
-  /// Save tenant configuration.
-  Future<void> saveTenantConfig(TenantConfig config) async {
-    final json = jsonEncode(config.toJson());
-    await _storage.write(key: AppConfig.tenantConfigKey, value: json);
-  }
-  
-  /// Get tenant configuration.
-  Future<TenantConfig?> getTenantConfig() async {
-    final json = await _storage.read(key: AppConfig.tenantConfigKey);
-    if (json == null) return null;
-    
-    try {
-      final map = jsonDecode(json) as Map<String, dynamic>;
-      return TenantConfig.fromJson(map);
-    } catch (e) {
-      return null;
-    }
-  }
-  
-  /// Clear tenant configuration.
-  Future<void> clearTenantConfig() async {
-    await _storage.delete(key: AppConfig.tenantConfigKey);
-  }
-  
   // ===== USER DATA =====
   
   /// Save user data as JSON.

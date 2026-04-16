@@ -2,8 +2,6 @@ using MediatR;
 using TecAxle.Hrms.Application.Common;
 using TecAxle.Hrms.Domain.Attendance;
 using TecAxle.Hrms.Domain.Excuses;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.AttendanceCorrections.Queries.GetAttendanceCorrectionRequests;
 
@@ -35,7 +33,6 @@ namespace TecAxle.Hrms.Application.AttendanceCorrections.Queries.GetAttendanceCo
 /// - Manager users can see requests for their subordinates
 /// - Admin/HR users can see all requests in their branch scope
 /// </remarks>
-[RequiresModule(SystemModule.TimeAttendance, AllowReadWhenDisabled = true)]
 public record GetAttendanceCorrectionRequestsQuery(
     long? EmployeeId = null,
     DateTime? StartDate = null,

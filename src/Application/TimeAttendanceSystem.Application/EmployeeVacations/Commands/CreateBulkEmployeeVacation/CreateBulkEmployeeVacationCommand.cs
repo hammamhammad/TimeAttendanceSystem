@@ -1,7 +1,5 @@
 using MediatR;
 using TecAxle.Hrms.Application.Common;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.EmployeeVacations.Commands.CreateBulkEmployeeVacation;
 
@@ -43,7 +41,6 @@ namespace TecAxle.Hrms.Application.EmployeeVacations.Commands.CreateBulkEmployee
 /// - Individual vacation records created for proper audit trail and management
 /// - Bulk operation maintains transactional integrity
 /// </remarks>
-[RequiresModule(SystemModule.LeaveManagement)]
 public record CreateBulkEmployeeVacationCommand(
     long VacationTypeId,
     DateTime StartDate,

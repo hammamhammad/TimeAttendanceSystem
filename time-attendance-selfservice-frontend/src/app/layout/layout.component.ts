@@ -7,7 +7,6 @@ import { TopbarComponent } from './topbar/topbar.component';
 import { NotificationComponent } from '../core/notifications/notification.component';
 import { ConfirmationComponent } from '../core/confirmation/confirmation.component';
 import { AuthService } from '../core/auth/auth.service';
-import { EntitlementService } from '../core/services/entitlement.service';
 
 @Component({
   selector: 'app-layout',
@@ -19,7 +18,6 @@ import { EntitlementService } from '../core/services/entitlement.service';
 export class LayoutComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private authService = inject(AuthService);
-  private entitlementService = inject(EntitlementService);
 
   sidenavCollapsed = signal(false);
   showMobileSidenav = signal(false);
@@ -28,16 +26,10 @@ export class LayoutComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   ngOnInit(): void {
-    // Check if user must change password
     if (this.authService.getMustChangePassword()) {
       this.router.navigate(['/auth/change-password']);
       return;
     }
-
-    // Load tenant module entitlements for menu filtering and route guards
-    this.entitlementService.loadEntitlements().pipe(
-      takeUntil(this.destroy$)
-    ).subscribe();
 
     this.checkScreenSize();
 

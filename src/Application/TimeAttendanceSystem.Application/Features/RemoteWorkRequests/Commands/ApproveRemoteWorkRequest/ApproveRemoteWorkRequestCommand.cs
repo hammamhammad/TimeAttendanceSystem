@@ -1,8 +1,6 @@
 using MediatR;
 using TecAxle.Hrms.Application.Common;
 using TecAxle.Hrms.Domain.RemoteWork;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.Features.RemoteWorkRequests.Commands.ApproveRemoteWorkRequest;
 
@@ -28,7 +26,6 @@ namespace TecAxle.Hrms.Application.Features.RemoteWorkRequests.Commands.ApproveR
 /// - Rejection reason is mandatory for rejections
 /// - Audit trail maintained for compliance
 /// </remarks>
-[RequiresModule(SystemModule.RemoteWork)]
 [Obsolete("Use ApproveStepCommand via the workflow engine instead. This legacy path bypasses " +
           "the workflow engine and skips attendance updates when approving. Scheduled for removal in v14.")]
 public record ApproveRemoteWorkRequestCommand(

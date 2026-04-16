@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using TecAxle.Hrms.Api.Filters;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Domain.Common;
-using TecAxle.Hrms.Domain.Modules;
 using TecAxle.Hrms.Domain.Performance;
 
 namespace TecAxle.Hrms.Api.Controllers;
@@ -12,7 +11,6 @@ namespace TecAxle.Hrms.Api.Controllers;
 [ApiController]
 [Route("api/v1/goals")]
 [Authorize]
-[RequiresModuleEndpoint(SystemModule.Performance)]
 public class GoalDefinitionsController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
@@ -26,7 +24,6 @@ public class GoalDefinitionsController : ControllerBase
 
     /// <summary>Lists goals with optional filters.</summary>
     [HttpGet]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetAll(
         [FromQuery] long? employeeId,
         [FromQuery] long? reviewId,
@@ -82,7 +79,6 @@ public class GoalDefinitionsController : ControllerBase
 
     /// <summary>Gets a goal by ID.</summary>
     [HttpGet("{id}")]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetById(long id)
     {
         var item = await _context.GoalDefinitions
@@ -230,7 +226,6 @@ public class GoalDefinitionsController : ControllerBase
 
     /// <summary>Gets current employee's own goals (self-service).</summary>
     [HttpGet("my-goals")]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetMyGoals(
         [FromQuery] GoalStatus? status,
         [FromQuery] int page = 1,

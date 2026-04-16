@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Domain.Branches;
-using TecAxle.Hrms.Domain.Platform;
 using TecAxle.Hrms.Domain.Common;
 using TecAxle.Hrms.Domain.Employees;
 using TecAxle.Hrms.Domain.Users;
@@ -16,7 +15,6 @@ using TecAxle.Hrms.Domain.Workflows;
 using TecAxle.Hrms.Domain.LeaveManagement;
 using TecAxle.Hrms.Domain.Notifications;
 using TecAxle.Hrms.Domain.Tenants;
-using TecAxle.Hrms.Domain.Subscriptions;
 using TecAxle.Hrms.Domain.Payroll;
 using TecAxle.Hrms.Domain.Offboarding;
 using TecAxle.Hrms.Domain.Recruitment;
@@ -35,7 +33,6 @@ using TecAxle.Hrms.Domain.Timesheets;
 using TecAxle.Hrms.Domain.Succession;
 using TecAxle.Hrms.Domain.Benefits;
 using TecAxle.Hrms.Domain.Reports;
-using TecAxle.Hrms.Domain.Configuration;
 using TecAxle.Hrms.Domain.Departments;
 
 namespace TecAxle.Hrms.Infrastructure.Persistence;
@@ -302,12 +299,10 @@ public class ApplicationDbContextAdapter : IApplicationDbContext
     public DbSet<OvertimeConfiguration> OvertimeConfigurations => _context.OvertimeConfigurations;
     public DbSet<OffDay> OffDays => _context.OffDays;
 
-    // Tenant Configuration & Policy Framework
+    // Company Configuration
     public DbSet<TenantSettings> TenantSettings => _context.TenantSettings;
     public DbSet<BranchSettingsOverride> BranchSettingsOverrides => _context.BranchSettingsOverrides;
     public DbSet<DepartmentSettingsOverride> DepartmentSettingsOverrides => _context.DepartmentSettingsOverrides;
-    // PolicyTemplates and PolicyTemplateItems are in IMasterDbContext only
-    public DbSet<SetupStep> SetupSteps => _context.SetupSteps;
 
     // v13.5 Lifecycle Automation
     public DbSet<TecAxle.Hrms.Domain.Lifecycle.LifecycleAutomationAudit> LifecycleAutomationAudits

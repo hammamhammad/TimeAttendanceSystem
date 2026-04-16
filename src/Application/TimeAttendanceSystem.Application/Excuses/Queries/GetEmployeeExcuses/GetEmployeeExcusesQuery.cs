@@ -1,8 +1,6 @@
 using MediatR;
 using TecAxle.Hrms.Application.Common;
 using TecAxle.Hrms.Domain.Excuses;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.Excuses.Queries.GetEmployeeExcuses;
 
@@ -40,7 +38,6 @@ namespace TecAxle.Hrms.Application.Excuses.Queries.GetEmployeeExcuses;
 /// - Projection to DTOs for minimal data transfer
 /// - Date range filtering for performance on large datasets
 /// </remarks>
-[RequiresModule(SystemModule.LeaveManagement, AllowReadWhenDisabled = true)]
 public record GetEmployeeExcusesQuery(
     long? EmployeeId = null,
     DateTime? StartDate = null,

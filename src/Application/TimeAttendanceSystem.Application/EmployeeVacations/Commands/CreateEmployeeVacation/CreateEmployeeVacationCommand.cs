@@ -1,8 +1,6 @@
 using MediatR;
 using TecAxle.Hrms.Application.Common;
 using TecAxle.Hrms.Domain.Common;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.EmployeeVacations.Commands.CreateEmployeeVacation;
 
@@ -43,7 +41,6 @@ namespace TecAxle.Hrms.Application.EmployeeVacations.Commands.CreateEmployeeVaca
 /// - Historical attendance records updated if vacation is in past
 /// - Future attendance processing considers vacation periods
 /// </remarks>
-[RequiresModule(SystemModule.LeaveManagement)]
 public record CreateEmployeeVacationCommand(
     long EmployeeId,
     long VacationTypeId,

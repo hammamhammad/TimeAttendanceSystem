@@ -1,8 +1,6 @@
 using MediatR;
 using TecAxle.Hrms.Application.Common;
 using TecAxle.Hrms.Domain.Excuses;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.Excuses.Commands.ApproveEmployeeExcuse;
 
@@ -37,7 +35,6 @@ namespace TecAxle.Hrms.Application.Excuses.Commands.ApproveEmployeeExcuse;
 /// - Audit trail maintained for compliance
 /// - Notifications sent to employee about decision
 /// </remarks>
-[RequiresModule(SystemModule.LeaveManagement)]
 [Obsolete("Use ApproveStepCommand via the workflow engine instead. This legacy path bypasses " +
           "the workflow engine, which means approver resolution (v13.6), routing audit, and " +
           "return-for-correction are not available when calling this command directly. " +

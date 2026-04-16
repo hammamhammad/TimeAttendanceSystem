@@ -36,7 +36,6 @@ internal static class TestHarness
     {
         var s = new TenantSettings
         {
-            TenantId = 1,
             // Defaults aligned with v13.5 DB defaults — tests override per scenario.
             LifecycleAutomationEnabled = true,
             AutoCreateOnboardingOnOfferAcceptance = true,
@@ -88,7 +87,6 @@ internal static class TestHarness
         var mock = new Mock<ICurrentUser>();
         mock.Setup(u => u.UserId).Returns(userId);
         mock.Setup(u => u.Username).Returns(username);
-        mock.Setup(u => u.TenantId).Returns(1);
         mock.Setup(u => u.IsAuthenticated).Returns(true);
         mock.Setup(u => u.IsSystemAdmin).Returns(true); // bypass branch-scope checks
         mock.Setup(u => u.Roles).Returns(new ReadOnlyCollection<string>(new[] { "SystemAdmin" }));

@@ -1,13 +1,11 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { AuthService } from '../auth/auth.service';
-import { EntitlementService } from '../services/entitlement.service';
 
 export interface MenuItem {
   path: string;
   titleKey: string;
   icon: string;
   permission?: string;
-  module?: string;
   isManagerOnly?: boolean;
   isSeparator?: boolean;
   children?: MenuItem[];
@@ -22,7 +20,6 @@ export interface MenuItem {
 })
 export class MenuService {
   private readonly authService = inject(AuthService);
-  private readonly entitlementService = inject(EntitlementService);
 
   // Standalone items (always visible, no grouping needed)
   private readonly standaloneItems: MenuItem[] = [
@@ -46,11 +43,11 @@ export class MenuService {
       titleKey: 'portal.nav_group.time_attendance',
       icon: 'bi bi-calendar-check',
       children: [
-        { path: '/my-attendance', titleKey: 'portal.my_attendance', icon: 'bi bi-calendar-check', module: 'TimeAttendance' },
-        { path: '/attendance-corrections', titleKey: 'portal.attendance_corrections', icon: 'bi bi-pencil-square', module: 'TimeAttendance' },
-        { path: '/shift-swap-requests', titleKey: 'portal.shift_swaps.title', icon: 'bi bi-arrow-left-right', module: 'ShiftSwaps' },
-        { path: '/my-on-call', titleKey: 'portal.on_call.title', icon: 'bi bi-telephone', module: 'ShiftSwaps' },
-        { path: '/my-timesheets', titleKey: 'portal.timesheets.title', icon: 'bi bi-clock-history', module: 'Timesheets' }
+        { path: '/my-attendance', titleKey: 'portal.my_attendance', icon: 'bi bi-calendar-check' },
+        { path: '/attendance-corrections', titleKey: 'portal.attendance_corrections', icon: 'bi bi-pencil-square' },
+        { path: '/shift-swap-requests', titleKey: 'portal.shift_swaps.title', icon: 'bi bi-arrow-left-right' },
+        { path: '/my-on-call', titleKey: 'portal.on_call.title', icon: 'bi bi-telephone' },
+        { path: '/my-timesheets', titleKey: 'portal.timesheets.title', icon: 'bi bi-clock-history' }
       ]
     },
     // Leave & Requests group
@@ -59,11 +56,11 @@ export class MenuService {
       titleKey: 'portal.nav_group.leave_requests',
       icon: 'bi bi-calendar-heart',
       children: [
-        { path: '/vacation-requests', titleKey: 'portal.vacation_requests', icon: 'bi bi-calendar-heart', module: 'LeaveManagement' },
-        { path: '/excuse-requests', titleKey: 'portal.excuse_requests', icon: 'bi bi-clock-history', module: 'LeaveManagement' },
-        { path: '/remote-work-requests', titleKey: 'portal.remote_work_requests', icon: 'bi bi-laptop', module: 'RemoteWork' },
-        { path: '/my-compensatory-offs', titleKey: 'portal.compensatory_offs.title', icon: 'bi bi-calendar-plus', module: 'LeaveManagement' },
-        { path: '/my-leave-encashments', titleKey: 'portal.leave_encashments.title', icon: 'bi bi-cash-coin', module: 'LeaveManagement' }
+        { path: '/vacation-requests', titleKey: 'portal.vacation_requests', icon: 'bi bi-calendar-heart' },
+        { path: '/excuse-requests', titleKey: 'portal.excuse_requests', icon: 'bi bi-clock-history' },
+        { path: '/remote-work-requests', titleKey: 'portal.remote_work_requests', icon: 'bi bi-laptop' },
+        { path: '/my-compensatory-offs', titleKey: 'portal.compensatory_offs.title', icon: 'bi bi-calendar-plus' },
+        { path: '/my-leave-encashments', titleKey: 'portal.leave_encashments.title', icon: 'bi bi-cash-coin' }
       ]
     },
     // Compensation group
@@ -72,10 +69,10 @@ export class MenuService {
       titleKey: 'portal.nav_group.compensation',
       icon: 'bi bi-wallet2',
       children: [
-        { path: '/my-payslips', titleKey: 'portal.payslips.title', icon: 'bi bi-receipt', module: 'Payroll' },
-        { path: '/my-salary', titleKey: 'portal.salary.title', icon: 'bi bi-wallet2', module: 'Payroll' },
-        { path: '/my-allowances', titleKey: 'portal.allowances.title', icon: 'bi bi-cash-coin', module: 'Allowances' },
-        { path: '/my-benefits', titleKey: 'portal.benefits.title', icon: 'bi bi-heart-pulse', module: 'Benefits' }
+        { path: '/my-payslips', titleKey: 'portal.payslips.title', icon: 'bi bi-receipt' },
+        { path: '/my-salary', titleKey: 'portal.salary.title', icon: 'bi bi-wallet2' },
+        { path: '/my-allowances', titleKey: 'portal.allowances.title', icon: 'bi bi-cash-coin' },
+        { path: '/my-benefits', titleKey: 'portal.benefits.title', icon: 'bi bi-heart-pulse' }
       ]
     },
     // HR Services group
@@ -84,14 +81,14 @@ export class MenuService {
       titleKey: 'portal.nav_group.hr_services',
       icon: 'bi bi-building',
       children: [
-        { path: '/my-resignation', titleKey: 'portal.resignation.title', icon: 'bi bi-box-arrow-right', module: 'Offboarding' },
-        { path: '/my-documents', titleKey: 'portal.documents.title', icon: 'bi bi-folder', module: 'Documents' },
-        { path: '/my-letters', titleKey: 'portal.letters.title', icon: 'bi bi-envelope', module: 'Documents' },
-        { path: '/my-expenses', titleKey: 'portal.expenses.title', icon: 'bi bi-receipt', module: 'Expenses' },
-        { path: '/my-loans', titleKey: 'portal.loans.title', icon: 'bi bi-cash-stack', module: 'Loans' },
-        { path: '/my-assets', titleKey: 'portal.assets.title', icon: 'bi bi-box-seam', module: 'Assets' },
-        { path: '/my-grievances', titleKey: 'portal.grievances.title', icon: 'bi bi-exclamation-triangle', module: 'EmployeeRelations' },
-        { path: '/my-disciplinary', titleKey: 'portal.disciplinary.title', icon: 'bi bi-shield-exclamation', module: 'EmployeeRelations' }
+        { path: '/my-resignation', titleKey: 'portal.resignation.title', icon: 'bi bi-box-arrow-right' },
+        { path: '/my-documents', titleKey: 'portal.documents.title', icon: 'bi bi-folder' },
+        { path: '/my-letters', titleKey: 'portal.letters.title', icon: 'bi bi-envelope' },
+        { path: '/my-expenses', titleKey: 'portal.expenses.title', icon: 'bi bi-receipt' },
+        { path: '/my-loans', titleKey: 'portal.loans.title', icon: 'bi bi-cash-stack' },
+        { path: '/my-assets', titleKey: 'portal.assets.title', icon: 'bi bi-box-seam' },
+        { path: '/my-grievances', titleKey: 'portal.grievances.title', icon: 'bi bi-exclamation-triangle' },
+        { path: '/my-disciplinary', titleKey: 'portal.disciplinary.title', icon: 'bi bi-shield-exclamation' }
       ]
     },
     // Development group
@@ -100,10 +97,10 @@ export class MenuService {
       titleKey: 'portal.nav_group.development',
       icon: 'bi bi-book',
       children: [
-        { path: '/my-training', titleKey: 'portal.training.my_training', icon: 'bi bi-book', module: 'Training' },
-        { path: '/training-catalog', titleKey: 'portal.training.catalog', icon: 'bi bi-grid', module: 'Training' },
-        { path: '/my-certifications', titleKey: 'portal.training.my_certifications', icon: 'bi bi-patch-check', module: 'Training' },
-        { path: '/my-career', titleKey: 'portal.my_career.title', icon: 'bi bi-compass', module: 'SuccessionPlanning' }
+        { path: '/my-training', titleKey: 'portal.training.my_training', icon: 'bi bi-book' },
+        { path: '/training-catalog', titleKey: 'portal.training.catalog', icon: 'bi bi-grid' },
+        { path: '/my-certifications', titleKey: 'portal.training.my_certifications', icon: 'bi bi-patch-check' },
+        { path: '/my-career', titleKey: 'portal.my_career.title', icon: 'bi bi-compass' }
       ]
     },
     // Engagement group
@@ -112,8 +109,8 @@ export class MenuService {
       titleKey: 'portal.nav_group.engagement',
       icon: 'bi bi-megaphone',
       children: [
-        { path: '/announcements', titleKey: 'portal.announcements.title', icon: 'bi bi-megaphone', module: 'Announcements' },
-        { path: '/my-surveys', titleKey: 'portal.surveys.title', icon: 'bi bi-clipboard2-check', module: 'Surveys' }
+        { path: '/announcements', titleKey: 'portal.announcements.title', icon: 'bi bi-megaphone' },
+        { path: '/my-surveys', titleKey: 'portal.surveys.title', icon: 'bi bi-clipboard2-check' }
       ]
     }
   ];
@@ -151,27 +148,16 @@ export class MenuService {
   ];
 
   /**
-   * Check if a menu item's module is enabled.
-   * Items with no module are always visible.
-   */
-  isModuleEnabled(item: MenuItem): boolean {
-    return !item.module || this.entitlementService.isModuleEnabled(item.module);
-  }
-
-  /**
-   * Check if a grouped menu item has any visible (module-enabled) children.
+   * Check if a grouped menu item has any visible children.
    */
   hasVisibleChildren(item: MenuItem): boolean {
-    if (!item.children) return false;
-    return item.children.some(child => this.isModuleEnabled(child));
+    return !!(item.children && item.children.length > 0);
   }
 
-  // Computed menu items based on user role and module entitlements
   readonly menuItems = computed(() => {
     const isManager = this.authService.isManager();
     const items: MenuItem[] = [...this.standaloneItems];
 
-    // Add grouped items, filtering out groups with no visible children
     for (const group of this.groupedItems) {
       if (this.hasVisibleChildren(group)) {
         items.push(group);

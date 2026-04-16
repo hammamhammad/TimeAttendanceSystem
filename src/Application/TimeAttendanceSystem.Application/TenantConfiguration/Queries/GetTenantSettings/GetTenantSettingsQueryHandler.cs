@@ -7,37 +7,27 @@ namespace TecAxle.Hrms.Application.TenantConfiguration.Queries.GetTenantSettings
 
 public class GetTenantSettingsQueryHandler : BaseHandler<GetTenantSettingsQuery, Result<TenantSettingsDto>>
 {
-    private readonly ITenantContext _tenantContext;
-
     public GetTenantSettingsQueryHandler(
         IApplicationDbContext context,
-        ICurrentUser currentUser,
-        ITenantContext tenantContext)
+        ICurrentUser currentUser)
         : base(context, currentUser)
     {
-        _tenantContext = tenantContext;
     }
 
     public override async Task<Result<TenantSettingsDto>> Handle(GetTenantSettingsQuery request, CancellationToken cancellationToken)
     {
-        var tenantId = _tenantContext.TenantId ?? await ResolveTenantIdAsync(cancellationToken);
-        if (tenantId == null)
-            return Result.Failure<TenantSettingsDto>("Tenant context not resolved");
-
         var settings = await Context.TenantSettings
             .AsNoTracking()
-            .FirstOrDefaultAsync(s => s.TenantId == tenantId.Value && !s.IsDeleted, cancellationToken);
+            .FirstOrDefaultAsync(s => !s.IsDeleted, cancellationToken);
 
         if (settings == null)
         {
-            // Return defaults
-            return Result.Success(new TenantSettingsDto { TenantId = tenantId.Value });
+            return Result.Success(new TenantSettingsDto());
         }
 
         var dto = new TenantSettingsDto
         {
             Id = settings.Id,
-            TenantId = settings.TenantId,
             FiscalYearStartMonth = settings.FiscalYearStartMonth,
             WeekStartDay = settings.WeekStartDay,
             DateFormat = settings.DateFormat,

@@ -2343,6 +2343,10 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<double?>("Longitude")
                         .HasColumnType("double precision");
 
+                    b.Property<long?>("ManagerEmployeeId")
+                        .HasColumnType("bigint")
+                        .HasComment("FK to designated branch-manager Employee, used by workflow engine for BranchManager approver type (v13.6)");
+
                     b.Property<DateTime?>("ModifiedAtUtc")
                         .HasColumnType("timestamp with time zone");
 
@@ -2373,6 +2377,9 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                         .IsUnique()
                         .HasDatabaseName("IX_Branches_Code")
                         .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("ManagerEmployeeId")
+                        .HasDatabaseName("IX_Branches_ManagerEmployeeId");
 
                     b.ToTable("Branches", (string)null);
                 });
@@ -2917,92 +2924,6 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasDatabaseName("IX_FileAttachments_EntityType_EntityId");
 
                     b.ToTable("FileAttachments", (string)null);
-                });
-
-            modelBuilder.Entity("TecAxle.Hrms.Domain.Configuration.SetupStep", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<DateTime?>("CompletedAtUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CompletedByUserId")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("NOW()");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<bool>("IsCompleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
-
-                    b.Property<bool>("IsRequired")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true);
-
-                    b.Property<DateTime>("ModifiedAtUtc")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("NOW()");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bytea")
-                        .HasDefaultValue(new byte[] { 1 });
-
-                    b.Property<int>("SortOrder")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0);
-
-                    b.Property<string>("StepKey")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<long>("TenantId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TenantId")
-                        .HasDatabaseName("IX_SetupSteps_TenantId");
-
-                    b.HasIndex("TenantId", "StepKey")
-                        .IsUnique()
-                        .HasDatabaseName("IX_SetupSteps_TenantId_StepKey");
-
-                    b.ToTable("SetupSteps", (string)null);
                 });
 
             modelBuilder.Entity("TecAxle.Hrms.Domain.Departments.DepartmentSettingsOverride", b =>
@@ -14950,198 +14871,6 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("SurveyTemplates", (string)null);
                 });
 
-            modelBuilder.Entity("TecAxle.Hrms.Domain.Tenants.Tenant", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Address")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<string>("ApiBaseUrl")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasComment("Base URL for tenant's API endpoint");
-
-                    b.Property<string>("City")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("CompanyRegistrationNumber")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("Country")
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
-                        .HasDefaultValue("SA");
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("NOW()")
-                        .HasComment("UTC timestamp when record was created");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasComment("User who created the record");
-
-                    b.Property<string>("CustomDomain")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasComment("Optional custom domain for enterprise tenants");
-
-                    b.Property<DateTime?>("DatabaseCreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("DatabaseIdentifier")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
-                        .HasComment("Database connection identifier for tenant isolation");
-
-                    b.Property<string>("DatabaseMigrationVersion")
-                        .HasColumnType("text");
-
-                    b.Property<string>("DatabaseName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("DefaultCurrency")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
-                        .HasDefaultValue("SAR");
-
-                    b.Property<string>("DefaultLanguage")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
-                        .HasDefaultValue("en");
-
-                    b.Property<string>("DefaultTimezone")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasDefaultValue("Asia/Riyadh");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("EncryptedConnectionString")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Industry")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasComment("Whether tenant account is active");
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false)
-                        .HasComment("Soft delete flag");
-
-                    b.Property<string>("LogoUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasComment("URL to tenant's logo image");
-
-                    b.Property<DateTime?>("ModifiedAtUtc")
-                        .HasColumnType("timestamp with time zone")
-                        .HasComment("UTC timestamp when record was last modified");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasComment("User who last modified the record");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .IsUnicode(true)
-                        .HasColumnType("character varying(200)")
-                        .HasComment("Display name of the tenant organization");
-
-                    b.Property<string>("NameAr")
-                        .HasMaxLength(200)
-                        .IsUnicode(true)
-                        .HasColumnType("character varying(200)")
-                        .HasComment("Arabic display name of the tenant organization");
-
-                    b.Property<string>("Phone")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bytea")
-                        .HasDefaultValue(new byte[] { 1 })
-                        .HasComment("Concurrency control timestamp");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasDefaultValue("Active");
-
-                    b.Property<string>("Subdomain")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasComment("Subdomain identifier for tenant (e.g., acme)");
-
-                    b.Property<string>("TaxIdentificationNumber")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<DateTime?>("TrialEndDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("TrialStartDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Website")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CustomDomain")
-                        .IsUnique()
-                        .HasDatabaseName("IX_Tenants_CustomDomain")
-                        .HasFilter("\"IsDeleted\" = false AND \"CustomDomain\" IS NOT NULL");
-
-                    b.HasIndex("IsActive")
-                        .HasDatabaseName("IX_Tenants_IsActive")
-                        .HasFilter("\"IsDeleted\" = false AND \"IsActive\" = true");
-
-                    b.HasIndex("Subdomain")
-                        .IsUnique()
-                        .HasDatabaseName("IX_Tenants_Subdomain")
-                        .HasFilter("\"IsDeleted\" = false");
-
-                    b.ToTable("Tenants", (string)null);
-                });
-
             modelBuilder.Entity("TecAxle.Hrms.Domain.Tenants.TenantSettings", b =>
                 {
                     b.Property<long>("Id")
@@ -15371,6 +15100,16 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasColumnType("integer")
                         .HasDefaultValue(2);
 
+                    b.Property<int>("MaxWorkflowDelegationDepth")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(2);
+
+                    b.Property<int>("MaxWorkflowResubmissions")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(3);
+
                     b.Property<int>("MinDaysBeforeLeaveRequest")
                         .HasColumnType("integer");
 
@@ -15487,9 +15226,6 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasColumnType("character varying(100)")
                         .HasDefaultValue("30,7,1");
 
-                    b.Property<long>("TenantId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("TimeFormat")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
@@ -15526,11 +15262,17 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasColumnType("character varying(20)")
                         .HasDefaultValue("Sunday");
 
-                    b.HasKey("Id");
+                    b.Property<string>("WorkflowFallbackApproverRole")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("HRManager");
 
-                    b.HasIndex("TenantId")
-                        .IsUnique()
-                        .HasDatabaseName("IX_TenantSettings_TenantId");
+                    b.Property<long?>("WorkflowFallbackApproverUserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
 
                     b.ToTable("TenantSettings", (string)null);
                 });
@@ -17367,9 +17109,16 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<long>("RoleId")
                         .HasColumnType("bigint");
 
+                    b.Property<int>("Priority")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasComment("Seniority priority within role; higher wins under FixedPriority strategy (v13.6)");
+
                     b.HasKey("UserId", "RoleId");
 
-                    b.HasIndex("RoleId");
+                    b.HasIndex("RoleId", "Priority")
+                        .HasDatabaseName("IX_UserRoles_RoleId_Priority");
 
                     b.ToTable("UserRoles", (string)null);
                 });
@@ -17926,6 +17675,19 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasColumnType("bigint")
                         .HasComment("Current step in workflow (null if completed)");
 
+                    b.Property<string>("DefinitionSnapshotJson")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("jsonb")
+                        .HasDefaultValueSql("'{}'::jsonb")
+                        .HasComment("Frozen snapshot of workflow definition consumed for step transitions (v13.6)");
+
+                    b.Property<int>("DefinitionVersion")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1)
+                        .HasComment("Snapshotted workflow definition version at instance creation (v13.6)");
+
                     b.Property<long>("EntityId")
                         .HasColumnType("bigint")
                         .HasComment("ID of the entity being processed");
@@ -17967,6 +17729,20 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasColumnType("bigint")
                         .HasComment("User who initiated the workflow");
 
+                    b.Property<int>("ResubmissionCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasComment("Resubmission counter; capped by TenantSettings.MaxWorkflowResubmissions (v13.6)");
+
+                    b.Property<DateTime?>("ReturnedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC when an approver returned the workflow for correction (v13.6)");
+
+                    b.Property<long?>("ReturnedByUserId")
+                        .HasColumnType("bigint")
+                        .HasComment("Approver who returned the workflow for correction (v13.6)");
+
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .IsRequired()
@@ -17998,6 +17774,8 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasDatabaseName("IX_WorkflowInstances_RequestedByUserId")
                         .HasFilter("\"IsDeleted\" = false");
 
+                    b.HasIndex("ReturnedByUserId");
+
                     b.HasIndex("Status")
                         .HasDatabaseName("IX_WorkflowInstances_Status")
                         .HasFilter("\"IsDeleted\" = false");
@@ -18017,6 +17795,66 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("WorkflowInstances", (string)null);
                 });
 
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Workflows.WorkflowRoleAssignmentCursor", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("LastAssignedAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("UTC timestamp of the last advance — diagnostic only");
+
+                    b.Property<long?>("LastAssignedUserId")
+                        .HasColumnType("bigint")
+                        .HasComment("Most recently assigned user id (null before first rotation)");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("RoleId")
+                        .HasColumnType("bigint")
+                        .HasComment("Role whose user pool is rotated by this cursor");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LastAssignedUserId");
+
+                    b.HasIndex("RoleId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_WorkflowRoleAssignmentCursors_RoleId");
+
+                    b.ToTable("WorkflowRoleAssignmentCursors", (string)null);
+                });
+
             modelBuilder.Entity("TecAxle.Hrms.Domain.Workflows.WorkflowStep", b =>
                 {
                     b.Property<long>("Id")
@@ -18030,6 +17868,12 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasColumnType("boolean")
                         .HasDefaultValue(true)
                         .HasComment("Whether step allows delegation");
+
+                    b.Property<bool>("AllowReturnForCorrection")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasComment("Whether approver can use the non-final Return-for-Correction action (v13.6)");
 
                     b.Property<string>("ApproverInstructions")
                         .HasMaxLength(2000)
@@ -18135,6 +17979,12 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasDefaultValue(true)
                         .HasComment("Require comments when rejecting");
 
+                    b.Property<int>("RoleAssignmentStrategy")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(3)
+                        .HasComment("Role-based approver-selection strategy (v13.6): 1=FirstMatch, 2=RoundRobin, 3=LeastPendingApprovals, 4=FixedPriority");
+
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .IsRequired()
@@ -18160,6 +18010,15 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<int?>("TimeoutHours")
                         .HasColumnType("integer")
                         .HasComment("Hours before escalation");
+
+                    b.Property<string>("ValidationConfigJson")
+                        .HasColumnType("jsonb")
+                        .HasComment("Per-step configuration passed to the validation rule (v13.6)");
+
+                    b.Property<string>("ValidationRuleCode")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasComment("Identifier of the IWorkflowValidationRule to execute on Validation steps (v13.6)");
 
                     b.Property<long>("WorkflowDefinitionId")
                         .HasColumnType("bigint")
@@ -18290,6 +18149,10 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasColumnType("bigint")
                         .HasComment("Workflow step being executed");
 
+                    b.Property<string>("ValidationDetailsJson")
+                        .HasColumnType("jsonb")
+                        .HasComment("Validation-rule output for Validation steps (v13.6)");
+
                     b.Property<long>("WorkflowInstanceId")
                         .HasColumnType("bigint")
                         .HasComment("Parent workflow instance");
@@ -18328,6 +18191,81 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasFilter("\"IsDeleted\" = false AND \"Action\" IS NULL");
 
                     b.ToTable("WorkflowStepExecutions", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Workflows.WorkflowSystemActionAudit", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("ActionType")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("DetailsJson")
+                        .HasColumnType("jsonb");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<long?>("StepExecutionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("SystemUserId")
+                        .HasColumnType("bigint")
+                        .HasComment("Resolved via ISystemUserResolver at the moment the action fired — never 0");
+
+                    b.Property<DateTime>("TriggeredAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("WorkflowInstanceId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActionType")
+                        .HasDatabaseName("IX_WorkflowSystemActionAudits_ActionType");
+
+                    b.HasIndex("StepExecutionId");
+
+                    b.HasIndex("SystemUserId");
+
+                    b.HasIndex("WorkflowInstanceId", "TriggeredAtUtc")
+                        .HasDatabaseName("IX_WorkflowSystemActionAudits_Instance_TriggeredAt");
+
+                    b.ToTable("WorkflowSystemActionAudits", (string)null);
                 });
 
             modelBuilder.Entity("TecAxle.Hrms.Domain.Analytics.AnalyticsSnapshot", b =>
@@ -18775,6 +18713,17 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("Branch");
                 });
 
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Branches.Branch", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Employees.Employee", "ManagerEmployee")
+                        .WithMany()
+                        .HasForeignKey("ManagerEmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_Branches_ManagerEmployee");
+
+                    b.Navigation("ManagerEmployee");
+                });
+
             modelBuilder.Entity("TecAxle.Hrms.Domain.Branches.BranchSettingsOverride", b =>
                 {
                     b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
@@ -18825,17 +18774,6 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                         .IsRequired();
 
                     b.Navigation("AuditLog");
-                });
-
-            modelBuilder.Entity("TecAxle.Hrms.Domain.Configuration.SetupStep", b =>
-                {
-                    b.HasOne("TecAxle.Hrms.Domain.Tenants.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("TecAxle.Hrms.Domain.Departments.DepartmentSettingsOverride", b =>
@@ -21044,17 +20982,6 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("Question");
                 });
 
-            modelBuilder.Entity("TecAxle.Hrms.Domain.Tenants.TenantSettings", b =>
-                {
-                    b.HasOne("TecAxle.Hrms.Domain.Tenants.Tenant", "Tenant")
-                        .WithOne()
-                        .HasForeignKey("TecAxle.Hrms.Domain.Tenants.TenantSettings", "TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tenant");
-                });
-
             modelBuilder.Entity("TecAxle.Hrms.Domain.Timesheets.Project", b =>
                 {
                     b.HasOne("TecAxle.Hrms.Domain.Branches.Branch", "Branch")
@@ -21527,6 +21454,12 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                         .IsRequired()
                         .HasConstraintName("FK_WorkflowInstances_RequestedByUser");
 
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "ReturnedByUser")
+                        .WithMany()
+                        .HasForeignKey("ReturnedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_WorkflowInstances_ReturnedByUser");
+
                     b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowDefinition", "WorkflowDefinition")
                         .WithMany("Instances")
                         .HasForeignKey("WorkflowDefinitionId")
@@ -21540,7 +21473,29 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
 
                     b.Navigation("RequestedByUser");
 
+                    b.Navigation("ReturnedByUser");
+
                     b.Navigation("WorkflowDefinition");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Workflows.WorkflowRoleAssignmentCursor", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "LastAssignedUser")
+                        .WithMany()
+                        .HasForeignKey("LastAssignedUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_WorkflowRoleAssignmentCursors_Users");
+
+                    b.HasOne("TecAxle.Hrms.Domain.Users.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_WorkflowRoleAssignmentCursors_Roles");
+
+                    b.Navigation("LastAssignedUser");
+
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("TecAxle.Hrms.Domain.Workflows.WorkflowStep", b =>
@@ -21629,6 +21584,35 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Navigation("DelegatedToUser");
 
                     b.Navigation("Step");
+
+                    b.Navigation("WorkflowInstance");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Workflows.WorkflowSystemActionAudit", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowStepExecution", "StepExecution")
+                        .WithMany()
+                        .HasForeignKey("StepExecutionId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("FK_WorkflowSystemActionAudits_StepExecution");
+
+                    b.HasOne("TecAxle.Hrms.Domain.Users.User", "SystemUser")
+                        .WithMany()
+                        .HasForeignKey("SystemUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_WorkflowSystemActionAudits_SystemUser");
+
+                    b.HasOne("TecAxle.Hrms.Domain.Workflows.WorkflowInstance", "WorkflowInstance")
+                        .WithMany("SystemActions")
+                        .HasForeignKey("WorkflowInstanceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_WorkflowSystemActionAudits_WorkflowInstances");
+
+                    b.Navigation("StepExecution");
+
+                    b.Navigation("SystemUser");
 
                     b.Navigation("WorkflowInstance");
                 });
@@ -22074,6 +22058,8 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
             modelBuilder.Entity("TecAxle.Hrms.Domain.Workflows.WorkflowInstance", b =>
                 {
                     b.Navigation("StepExecutions");
+
+                    b.Navigation("SystemActions");
                 });
 
             modelBuilder.Entity("TecAxle.Hrms.Domain.Workflows.WorkflowStep", b =>

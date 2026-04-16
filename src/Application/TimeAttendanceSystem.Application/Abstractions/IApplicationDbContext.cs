@@ -32,7 +32,6 @@ using TecAxle.Hrms.Domain.Timesheets;
 using TecAxle.Hrms.Domain.Succession;
 using TecAxle.Hrms.Domain.Benefits;
 using TecAxle.Hrms.Domain.Reports;
-using TecAxle.Hrms.Domain.Configuration;
 using TecAxle.Hrms.Domain.Departments;
 using TecAxle.Hrms.Domain.Lifecycle;
 
@@ -716,8 +715,6 @@ public interface IApplicationDbContext
     /// <value>DbSet for querying and managing AttendanceVerificationLog entities</value>
     DbSet<AttendanceVerificationLog> AttendanceVerificationLogs { get; }
 
-    // Platform entities (Tenants, Subscriptions, etc.) are in IMasterDbContext only
-
     // Phase 1: Employee Lifecycle
     DbSet<EmployeeContract> EmployeeContracts { get; }
     DbSet<EmployeeTransfer> EmployeeTransfers { get; }
@@ -908,12 +905,10 @@ public interface IApplicationDbContext
     DbSet<OvertimeConfiguration> OvertimeConfigurations { get; }
     DbSet<OffDay> OffDays { get; }
 
-    // Tenant Configuration & Policy Framework
+    // Company Configuration
     DbSet<TenantSettings> TenantSettings { get; }
     DbSet<BranchSettingsOverride> BranchSettingsOverrides { get; }
     DbSet<DepartmentSettingsOverride> DepartmentSettingsOverrides { get; }
-    // PolicyTemplates and PolicyTemplateItems are in IMasterDbContext only
-    DbSet<SetupStep> SetupSteps { get; }
 
     // v13.5: Lifecycle Automation audit trail — one row per automation attempt
     // (succeeded / skipped / failed / disabled / duplicate-suppressed / missing-prerequisite).

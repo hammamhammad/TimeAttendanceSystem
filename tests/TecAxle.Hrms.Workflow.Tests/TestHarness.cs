@@ -29,7 +29,6 @@ internal static class TestHarness
         var s = new TenantSettings
         {
             Id = 1,
-            TenantId = 1,
             WorkflowFallbackApproverRole = "HRManager",
             MaxWorkflowDelegationDepth = 2,
             MaxWorkflowResubmissions = 3,

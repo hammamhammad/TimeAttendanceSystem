@@ -153,12 +153,6 @@ export class LoginComponent {
             'Please change your password to continue'
           );
           this.router.navigate(['/auth/change-password']);
-        } else if (response.isPlatformUser) {
-          this.notificationService.success(
-            this.t('auth.login_success'),
-            'Welcome, Platform Administrator'
-          );
-          this.router.navigate(['/tenants']);
         } else {
           this.notificationService.success(
             this.t('auth.login_success'),

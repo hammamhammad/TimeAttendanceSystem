@@ -1,8 +1,6 @@
 using MediatR;
 using TecAxle.Hrms.Application.Common;
 using TecAxle.Hrms.Application.EmployeeVacations.Queries.Common;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.EmployeeVacations.Queries.GetEmployeeVacations;
 
@@ -44,7 +42,6 @@ namespace TecAxle.Hrms.Application.EmployeeVacations.Queries.GetEmployeeVacation
 /// - Pagination prevents large result sets
 /// - Lazy loading disabled for predictable performance
 /// </remarks>
-[RequiresModule(SystemModule.LeaveManagement, AllowReadWhenDisabled = true)]
 public record GetEmployeeVacationsQuery(
     long? EmployeeId = null,
     long? VacationTypeId = null,

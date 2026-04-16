@@ -14,7 +14,7 @@ public class V13_4_ConfigurationTests
     [Fact]
     public void TenantSettings_new_fields_have_the_exact_pre_v13_4_defaults()
     {
-        var s = new TenantSettings { TenantId = 1 };
+        var s = new TenantSettings();
 
         s.AttendanceCorrectionMaxRetroactiveDays.Should().Be(30);
         s.DocumentExpiryAlertDaysCsv.Should().Be("30,15,7");

@@ -9,7 +9,6 @@ import { PageHeaderComponent } from '../../../shared/components/page-header/page
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
 import { StatsCard, Activity, QuickAction } from '../models/employee-dashboard.model';
-import { EntitlementService } from '../../../core/services/entitlement.service';
 import { environment } from '../../../../environments/environment';
 
 interface DashboardAnnouncement {
@@ -46,46 +45,14 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly http = inject(HttpClient);
   readonly i18n = inject(I18nService);
-  readonly entitlementService = inject(EntitlementService);
 
   // Dashboard state from service
   dashboard = this.portalService.dashboard;
   loading = this.portalService.dashboardLoading;
   error = this.portalService.dashboardError;
 
-  // Map stats card IDs to module entitlement names
-  private readonly statsModuleMap: Record<string, string> = {
-    'attendance': 'TimeAttendance',
-    'working-hours': 'TimeAttendance',
-    'overtime': 'TimeAttendance',
-    'vacation': 'LeaveManagement'
-  };
-
-  // Map quick action IDs to module entitlement names
-  private readonly actionModuleMap: Record<string, string> = {
-    'request-vacation': 'LeaveManagement',
-    'request-excuse': 'LeaveManagement',
-    'view-attendance': 'TimeAttendance',
-    'attendance-correction': 'TimeAttendance'
-  };
-
-  // Computed stats cards filtered by module entitlements
-  statsCards = computed(() => {
-    const cards = this.portalService.statsCards();
-    return cards.filter(card => {
-      const module = this.statsModuleMap[card.id];
-      return !module || this.entitlementService.isModuleEnabled(module);
-    });
-  });
-
-  // Computed quick actions filtered by module entitlements
-  quickActions = computed(() => {
-    const actions = this.portalService.quickActions();
-    return actions.filter(action => {
-      const module = this.actionModuleMap[action.id];
-      return !module || this.entitlementService.isModuleEnabled(module);
-    });
-  });
+  statsCards = computed(() => this.portalService.statsCards());
+  quickActions = computed(() => this.portalService.quickActions());
 
   // Current user
   currentUser = computed(() => this.authService.currentUser());

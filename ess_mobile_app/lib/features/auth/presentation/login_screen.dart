@@ -29,7 +29,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _canUseBiometric = false;
   bool _biometricEnabled = false;
   String? _errorMessage;
-  TenantConfig? _tenantConfig;
+
+  String get _apiBaseUrl => AppConfig.isDevelopment ? AppConfig.localApiUrl : AppConfig.apiBaseUrl;
 
   @override
   void initState() {
@@ -38,22 +39,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _loadData() async {
-    // Load tenant config
-    _tenantConfig = await SecureStorageService.instance.getTenantConfig();
-    
-    // Check biometric availability
     final canCheckBiometrics = await _localAuth.canCheckBiometrics;
     final isDeviceSupported = await _localAuth.isDeviceSupported();
     _canUseBiometric = canCheckBiometrics && isDeviceSupported;
-    
-    // Check if biometric is enabled
+
     _biometricEnabled = await SecureStorageService.instance.isBiometricEnabled();
-    
+
     if (_biometricEnabled && _canUseBiometric) {
-      // Auto-trigger biometric login
       _authenticateWithBiometric();
     }
-    
+
     setState(() {});
   }
 
@@ -75,9 +70,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     try {
       final dio = Dio();
       final response = await dio.post(
-        '${_tenantConfig?.apiBaseUrl}/api/v1/auth/login',
+        '$_apiBaseUrl/api/v1/auth/login',
         data: {
-          'username': _emailController.text.trim(),
+          'email': _emailController.text.trim(),
           'password': _passwordController.text,
         },
       );
@@ -147,16 +142,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       );
 
       if (authenticated) {
-        // Biometric success - retrieve stored credentials and login
-        // For security, we use stored refresh token instead of password
+        // Biometric success - use stored refresh token to log back in
         final refreshToken = await SecureStorageService.instance.getRefreshToken();
-        
-        if (refreshToken != null && _tenantConfig != null) {
+
+        if (refreshToken != null) {
           setState(() => _isLoading = true);
-          
+
           final dio = Dio();
           final response = await dio.post(
-            '${_tenantConfig!.apiBaseUrl}/api/v1/auth/refresh',
+            '$_apiBaseUrl/api/v1/auth/refresh',
             data: {'refreshToken': refreshToken},
           );
           
@@ -192,15 +186,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () async {
-            // Go back to tenant discovery and clear tenant
-            await ref.read(authStateProvider.notifier).reset();
-            if (mounted) context.go('/tenant-discovery');
-          },
-        ),
-        title: Text(_tenantConfig?.name ?? ''),
+        title: Text(l10n.login),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -227,17 +213,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 style: theme.textTheme.headlineMedium,
                 textAlign: TextAlign.center,
               ),
-              
-              const SizedBox(height: 8),
-              
-              if (_tenantConfig != null)
-                Text(
-                  _tenantConfig!.name,
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: theme.colorScheme.primary,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
               
               const SizedBox(height: 48),
               

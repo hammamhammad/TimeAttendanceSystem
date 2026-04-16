@@ -7,31 +7,22 @@ namespace TecAxle.Hrms.Application.TenantConfiguration.Commands.UpdateTenantSett
 
 public class UpdateTenantSettingsCommandHandler : BaseHandler<UpdateTenantSettingsCommand, Result>
 {
-    private readonly ITenantContext _tenantContext;
-
     public UpdateTenantSettingsCommandHandler(
         IApplicationDbContext context,
-        ICurrentUser currentUser,
-        ITenantContext tenantContext)
+        ICurrentUser currentUser)
         : base(context, currentUser)
     {
-        _tenantContext = tenantContext;
     }
 
     public override async Task<Result> Handle(UpdateTenantSettingsCommand request, CancellationToken cancellationToken)
     {
-        var tenantId = _tenantContext.TenantId ?? await ResolveTenantIdAsync(cancellationToken);
-        if (tenantId == null)
-            return Result.Failure("Tenant context not resolved");
-
         var settings = await Context.TenantSettings
-            .FirstOrDefaultAsync(s => s.TenantId == tenantId.Value && !s.IsDeleted, cancellationToken);
+            .FirstOrDefaultAsync(s => !s.IsDeleted, cancellationToken);
 
         if (settings == null)
         {
             settings = new TenantSettings
             {
-                TenantId = tenantId.Value,
                 CreatedBy = CurrentUser.Username ?? "SYSTEM"
             };
             Context.TenantSettings.Add(settings);

@@ -1,7 +1,5 @@
 using MediatR;
 using TecAxle.Hrms.Application.Common;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.AttendanceCorrections.Commands.DeleteAttendanceCorrectionRequest;
 
@@ -23,5 +21,4 @@ namespace TecAxle.Hrms.Application.AttendanceCorrections.Commands.DeleteAttendan
 /// - Approved requests deletion requires recalculation
 /// - Rejected requests cannot be modified
 /// </remarks>
-[RequiresModule(SystemModule.TimeAttendance)]
 public record DeleteAttendanceCorrectionRequestCommand(long Id) : IRequest<Result<bool>>;

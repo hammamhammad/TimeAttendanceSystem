@@ -18,15 +18,11 @@ public class TenantSettingsResolver : ITenantSettingsResolver
     }
 
     public async Task<ResolvedSettingsDto> GetSettingsAsync(
-        long tenantId, long? branchId = null, long? departmentId = null, CancellationToken ct = default)
+        long? branchId = null, long? departmentId = null, CancellationToken ct = default)
     {
-        // Step 1: Load tenant settings (cached)
-        var tenantSettings = await GetTenantSettingsCachedAsync(tenantId, ct);
+        var tenantSettings = await GetTenantSettingsCachedAsync(ct);
+        var resolved = MapFromTenantSettings(tenantSettings);
 
-        // Build resolved DTO from tenant settings
-        var resolved = MapFromTenantSettings(tenantSettings, tenantId);
-
-        // Step 2: Apply branch overrides if requested
         if (branchId.HasValue)
         {
             resolved.BranchId = branchId.Value;
@@ -38,7 +34,6 @@ public class TenantSettingsResolver : ITenantSettingsResolver
                 ApplyBranchOverrides(resolved, branchOverrides);
         }
 
-        // Step 3: Apply department overrides if requested
         if (departmentId.HasValue)
         {
             resolved.DepartmentId = departmentId.Value;
@@ -53,21 +48,21 @@ public class TenantSettingsResolver : ITenantSettingsResolver
         return resolved;
     }
 
-    public void InvalidateCache(long tenantId)
+    public void InvalidateCache()
     {
-        _cache.Remove($"tenant-settings:{tenantId}");
+        _cache.Remove("company-settings");
     }
 
-    private async Task<Domain.Tenants.TenantSettings?> GetTenantSettingsCachedAsync(long tenantId, CancellationToken ct)
+    private async Task<Domain.Tenants.TenantSettings?> GetTenantSettingsCachedAsync(CancellationToken ct)
     {
-        var cacheKey = $"tenant-settings:{tenantId}";
+        const string cacheKey = "company-settings";
 
         if (_cache.TryGetValue<Domain.Tenants.TenantSettings>(cacheKey, out var cached))
             return cached;
 
         var settings = await _context.TenantSettings
             .AsNoTracking()
-            .FirstOrDefaultAsync(s => s.TenantId == tenantId && !s.IsDeleted, ct);
+            .FirstOrDefaultAsync(s => !s.IsDeleted, ct);
 
         if (settings != null)
             _cache.Set(cacheKey, settings, CacheDuration);
@@ -75,9 +70,9 @@ public class TenantSettingsResolver : ITenantSettingsResolver
         return settings;
     }
 
-    private static ResolvedSettingsDto MapFromTenantSettings(Domain.Tenants.TenantSettings? settings, long tenantId)
+    private static ResolvedSettingsDto MapFromTenantSettings(Domain.Tenants.TenantSettings? settings)
     {
-        var dto = new ResolvedSettingsDto { TenantId = tenantId };
+        var dto = new ResolvedSettingsDto();
 
         if (settings == null)
         {

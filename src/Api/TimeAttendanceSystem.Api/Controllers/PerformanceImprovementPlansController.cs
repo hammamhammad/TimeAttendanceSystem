@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using TecAxle.Hrms.Api.Filters;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Domain.Common;
-using TecAxle.Hrms.Domain.Modules;
 using TecAxle.Hrms.Domain.Performance;
 using TecAxle.Hrms.Domain.Workflows;
 using TecAxle.Hrms.Domain.Workflows.Enums;
@@ -14,7 +13,6 @@ namespace TecAxle.Hrms.Api.Controllers;
 [ApiController]
 [Route("api/v1/pips")]
 [Authorize]
-[RequiresModuleEndpoint(SystemModule.Performance)]
 public class PerformanceImprovementPlansController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
@@ -28,7 +26,6 @@ public class PerformanceImprovementPlansController : ControllerBase
 
     /// <summary>Lists performance improvement plans with optional filters.</summary>
     [HttpGet]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetAll(
         [FromQuery] long? employeeId,
         [FromQuery] PipStatus? status,
@@ -75,7 +72,6 @@ public class PerformanceImprovementPlansController : ControllerBase
 
     /// <summary>Gets a PIP by ID.</summary>
     [HttpGet("{id}")]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetById(long id)
     {
         var item = await _context.PerformanceImprovementPlans

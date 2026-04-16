@@ -6,15 +6,11 @@ namespace TecAxle.Hrms.Application.TenantConfiguration.Commands.ResetBranchSetti
 
 public class ResetBranchSettingsCommandHandler : BaseHandler<ResetBranchSettingsCommand, Result>
 {
-    private readonly ITenantContext _tenantContext;
-
     public ResetBranchSettingsCommandHandler(
         IApplicationDbContext context,
-        ICurrentUser currentUser,
-        ITenantContext tenantContext)
+        ICurrentUser currentUser)
         : base(context, currentUser)
     {
-        _tenantContext = tenantContext;
     }
 
     public override async Task<Result> Handle(ResetBranchSettingsCommand request, CancellationToken cancellationToken)

@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using TecAxle.Hrms.Api.Filters;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Domain.Common;
-using TecAxle.Hrms.Domain.Modules;
 using TecAxle.Hrms.Domain.Recruitment;
 
 namespace TecAxle.Hrms.Api.Controllers;
@@ -12,7 +11,6 @@ namespace TecAxle.Hrms.Api.Controllers;
 [ApiController]
 [Route("api/v1/interview-feedbacks")]
 [Authorize]
-[RequiresModuleEndpoint(SystemModule.Recruitment)]
 public class InterviewFeedbacksController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
@@ -26,7 +24,6 @@ public class InterviewFeedbacksController : ControllerBase
 
     /// <summary>Gets feedback for a specific interview.</summary>
     [HttpGet("{interviewId}")]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetByInterview(long interviewId)
     {
         var feedback = await _context.InterviewFeedbacks

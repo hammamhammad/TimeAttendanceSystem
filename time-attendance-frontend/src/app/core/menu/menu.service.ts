@@ -5,7 +5,6 @@ export interface MenuItem {
   titleKey: string;
   icon: string;
   permission?: string;
-  module?: string;
   children?: MenuItem[];
 }
 
@@ -33,23 +32,6 @@ export class MenuService {
         }
       ]
     },
-    // ── PLATFORM ──
-    {
-      groupKey: 'platform',
-      titleKey: 'nav_group.platform',
-      items: [
-        {
-          path: '/platform',
-          titleKey: 'Platform',
-          icon: 'fa-solid fa-server',
-          permission: 'system.manage',
-          children: [
-            { path: '/tenants', titleKey: 'Tenants', icon: 'fa-solid fa-building', permission: 'system.manage' },
-            { path: '/subscription-plans', titleKey: 'Subscription Plans', icon: 'fa-solid fa-credit-card', permission: 'system.manage' }
-          ]
-        }
-      ]
-    },
     // ── ORGANIZATION ──
     {
       groupKey: 'organization',
@@ -72,7 +54,6 @@ export class MenuService {
           titleKey: 'nav.shifts',
           icon: 'fa-solid fa-clock',
           permission: undefined,
-          module: 'TimeAttendance',
           children: [
             { path: '/shifts', titleKey: 'shifts.title', icon: 'fa-solid fa-clock', permission: 'shift.read' },
             { path: '/shifts/assign', titleKey: 'shifts.assignments.title', icon: 'fa-solid fa-user-clock', permission: 'shift.assign' }
@@ -83,13 +64,12 @@ export class MenuService {
           titleKey: 'nav.attendance',
           icon: 'fa-solid fa-calendar-check',
           permission: undefined,
-          module: 'TimeAttendance',
           children: [
             { path: '/attendance', titleKey: 'attendance.dashboard_title', icon: 'fa-solid fa-chart-line', permission: 'attendance.read' },
             { path: '/attendance/daily', titleKey: 'attendance.daily_view', icon: 'fa-solid fa-calendar-day', permission: 'attendance.read' },
             { path: '/attendance/monthly-report', titleKey: 'attendance.monthly_report', icon: 'fa-solid fa-calendar-alt', permission: 'attendance.read' },
-            { path: '/attendance/shift-swaps', titleKey: 'nav.shiftSwaps', icon: 'fa-solid fa-exchange-alt', permission: 'shiftSwapRequest.read', module: 'ShiftSwaps' },
-            { path: '/attendance/on-call', titleKey: 'nav.onCallSchedules', icon: 'fa-solid fa-phone-volume', permission: 'onCallSchedule.read', module: 'ShiftSwaps' }
+            { path: '/attendance/shift-swaps', titleKey: 'nav.shiftSwaps', icon: 'fa-solid fa-exchange-alt', permission: 'shiftSwapRequest.read' },
+            { path: '/attendance/on-call', titleKey: 'nav.onCallSchedules', icon: 'fa-solid fa-phone-volume', permission: 'onCallSchedule.read' }
           ]
         }
       ]
@@ -99,20 +79,19 @@ export class MenuService {
       groupKey: 'leaveAbsence',
       titleKey: 'nav_group.leaveAbsence',
       items: [
-        { path: '/employee-vacations', titleKey: 'nav.employeeVacations', icon: 'fa-solid fa-calendar-week', permission: 'vacation.read', module: 'LeaveManagement' },
-        { path: '/employee-excuses', titleKey: 'employee_excuses.title', icon: 'fa-solid fa-clipboard-check', permission: 'excuse.read', module: 'LeaveManagement' },
+        { path: '/employee-vacations', titleKey: 'nav.employeeVacations', icon: 'fa-solid fa-calendar-week', permission: 'vacation.read' },
+        { path: '/employee-excuses', titleKey: 'employee_excuses.title', icon: 'fa-solid fa-clipboard-check', permission: 'excuse.read' },
         {
           path: '/leave-management',
           titleKey: 'nav.leaveManagement',
           icon: 'fa-solid fa-calendar-minus',
           permission: undefined,
-          module: 'LeaveManagement',
           children: [
             { path: '/leave-management/compensatory-offs', titleKey: 'nav.compensatoryOffs', icon: 'fa-solid fa-calendar-plus', permission: 'compensatoryOff.read' },
             { path: '/leave-management/leave-encashments', titleKey: 'nav.leaveEncashments', icon: 'fa-solid fa-money-bill-wave', permission: 'leaveEncashment.read' }
           ]
         },
-        { path: '/remote-work', titleKey: 'remoteWork.request.title', icon: 'fa-solid fa-laptop-house', permission: 'remoteWork.request.read', module: 'RemoteWork' }
+        { path: '/remote-work', titleKey: 'remoteWork.request.title', icon: 'fa-solid fa-laptop-house', permission: 'remoteWork.request.read' }
       ]
     },
     // ── HR & LIFECYCLE ──
@@ -125,14 +104,13 @@ export class MenuService {
           titleKey: 'nav.hr',
           icon: 'fa-solid fa-user-tie',
           permission: undefined,
-          module: 'EmployeeLifecycle',
           children: [
             { path: '/employee-contracts', titleKey: 'nav.contracts', icon: 'fa-solid fa-file-contract', permission: 'contract.read' },
             { path: '/employee-transfers', titleKey: 'nav.transfers', icon: 'fa-solid fa-exchange-alt', permission: 'transfer.read' },
             { path: '/employee-promotions', titleKey: 'nav.promotions', icon: 'fa-solid fa-arrow-up', permission: 'promotion.read' },
             { path: '/salary-adjustments', titleKey: 'nav.salaryAdjustments', icon: 'fa-solid fa-hand-holding-usd', permission: 'salaryAdjustment.read' },
-            { path: '/allowances', titleKey: 'nav.allowances', icon: 'fa-solid fa-coins', permission: 'allowanceAssignment.read', module: 'Allowances' },
-            { path: '/allowance-requests', titleKey: 'nav.allowanceRequests', icon: 'fa-solid fa-file-invoice-dollar', permission: 'allowanceRequest.read', module: 'Allowances' },
+            { path: '/allowances', titleKey: 'nav.allowances', icon: 'fa-solid fa-coins', permission: 'allowanceAssignment.read' },
+            { path: '/allowance-requests', titleKey: 'nav.allowanceRequests', icon: 'fa-solid fa-file-invoice-dollar', permission: 'allowanceRequest.read' },
             { path: '/job-grades', titleKey: 'nav.jobGrades', icon: 'fa-solid fa-layer-group', permission: 'jobGrade.read' }
           ]
         },
@@ -141,7 +119,6 @@ export class MenuService {
           titleKey: 'nav.recruitment',
           icon: 'fa-solid fa-briefcase',
           permission: undefined,
-          module: 'Recruitment',
           children: [
             { path: '/recruitment/requisitions', titleKey: 'nav.jobRequisitions', icon: 'fa-solid fa-file-alt', permission: 'jobRequisition.read' },
             { path: '/recruitment/postings', titleKey: 'nav.jobPostings', icon: 'fa-solid fa-bullhorn', permission: 'jobPosting.read' },
@@ -156,7 +133,6 @@ export class MenuService {
           titleKey: 'nav.onboarding',
           icon: 'fa-solid fa-clipboard-check',
           permission: undefined,
-          module: 'Onboarding',
           children: [
             { path: '/onboarding/templates', titleKey: 'nav.onboardingTemplates', icon: 'fa-solid fa-clipboard-list', permission: 'onboardingTemplate.read' },
             { path: '/onboarding/processes', titleKey: 'nav.onboardingProcesses', icon: 'fa-solid fa-tasks', permission: 'onboarding.read' },
@@ -168,7 +144,6 @@ export class MenuService {
           titleKey: 'nav.offboarding',
           icon: 'fa-solid fa-door-open',
           permission: undefined,
-          module: 'Offboarding',
           children: [
             { path: '/offboarding/resignations', titleKey: 'nav.resignations', icon: 'fa-solid fa-file-signature', permission: 'resignation.read' },
             { path: '/offboarding/terminations', titleKey: 'nav.terminations', icon: 'fa-solid fa-user-slash', permission: 'termination.read' },
@@ -188,7 +163,6 @@ export class MenuService {
           titleKey: 'nav.payroll',
           icon: 'fa-solid fa-money-check-alt',
           permission: undefined,
-          module: 'Payroll',
           children: [
             { path: '/payroll/salary-structures', titleKey: 'nav.salaryStructures', icon: 'fa-solid fa-project-diagram', permission: 'salaryStructure.read' },
             { path: '/payroll/periods', titleKey: 'nav.payrollPeriods', icon: 'fa-solid fa-calendar-alt', permission: 'payroll.read' },
@@ -200,7 +174,6 @@ export class MenuService {
           titleKey: 'nav.benefits',
           icon: 'fa-solid fa-heart-pulse',
           permission: undefined,
-          module: 'Benefits',
           children: [
             { path: '/benefits/plans', titleKey: 'nav.benefitPlans', icon: 'fa-solid fa-file-medical', permission: 'benefitPlan.read' },
             { path: '/benefits/enrollment-periods', titleKey: 'nav.enrollmentPeriods', icon: 'fa-solid fa-calendar-plus', permission: 'openEnrollmentPeriod.read' },
@@ -220,7 +193,6 @@ export class MenuService {
           titleKey: 'nav.performance',
           icon: 'fa-solid fa-star',
           permission: undefined,
-          module: 'Performance',
           children: [
             { path: '/performance/cycles', titleKey: 'nav.reviewCycles', icon: 'fa-solid fa-sync-alt', permission: 'performanceReviewCycle.read' },
             { path: '/performance/reviews', titleKey: 'nav.reviews', icon: 'fa-solid fa-star', permission: 'performanceReview.read' },
@@ -235,7 +207,6 @@ export class MenuService {
           titleKey: 'nav.training',
           icon: 'fa-solid fa-graduation-cap',
           permission: undefined,
-          module: 'Training',
           children: [
             { path: '/training/categories', titleKey: 'nav.trainingCategories', icon: 'fa-solid fa-tags', permission: 'trainingCategory.read' },
             { path: '/training/courses', titleKey: 'nav.trainingCourses', icon: 'fa-solid fa-book-open', permission: 'trainingCourse.read' },
@@ -251,7 +222,6 @@ export class MenuService {
           titleKey: 'nav.succession',
           icon: 'fa-solid fa-chess-queen',
           permission: undefined,
-          module: 'SuccessionPlanning',
           children: [
             { path: '/succession/key-positions', titleKey: 'nav.keyPositions', icon: 'fa-solid fa-key', permission: 'keyPosition.read' },
             { path: '/succession/talent-profiles', titleKey: 'nav.talentProfiles', icon: 'fa-solid fa-user-tie', permission: 'talentProfile.read' },
@@ -272,7 +242,6 @@ export class MenuService {
           titleKey: 'nav.documents',
           icon: 'fa-solid fa-folder-open',
           permission: undefined,
-          module: 'Documents',
           children: [
             { path: '/documents/categories', titleKey: 'nav.documentCategories', icon: 'fa-solid fa-tags', permission: 'documentCategory.read' },
             { path: '/documents/employee-documents', titleKey: 'nav.employeeDocuments', icon: 'fa-solid fa-file-alt', permission: 'employeeDocument.read' },
@@ -286,7 +255,6 @@ export class MenuService {
           titleKey: 'nav.announcements',
           icon: 'fa-solid fa-bullhorn',
           permission: undefined,
-          module: 'Announcements',
           children: [
             { path: '/announcements/categories', titleKey: 'nav.announcementCategories', icon: 'fa-solid fa-tags', permission: 'announcementCategory.read' },
             { path: '/announcements', titleKey: 'nav.announcementList', icon: 'fa-solid fa-bullhorn', permission: 'announcement.read' }
@@ -297,7 +265,6 @@ export class MenuService {
           titleKey: 'nav.assets',
           icon: 'fa-solid fa-boxes-stacked',
           permission: undefined,
-          module: 'Assets',
           children: [
             { path: '/assets', titleKey: 'nav.assetList', icon: 'fa-solid fa-box', permission: 'asset.read' },
             { path: '/assets/categories', titleKey: 'nav.assetCategories', icon: 'fa-solid fa-tags', permission: 'assetCategory.read' },
@@ -310,7 +277,6 @@ export class MenuService {
           titleKey: 'nav.employeeRelations',
           icon: 'fa-solid fa-handshake',
           permission: undefined,
-          module: 'EmployeeRelations',
           children: [
             { path: '/employee-relations/grievances', titleKey: 'nav.grievances', icon: 'fa-solid fa-exclamation-circle', permission: 'grievance.read' },
             { path: '/employee-relations/disciplinary-actions', titleKey: 'nav.disciplinaryActions', icon: 'fa-solid fa-gavel', permission: 'disciplinaryAction.read' },
@@ -323,7 +289,6 @@ export class MenuService {
           titleKey: 'nav.surveys',
           icon: 'fa-solid fa-clipboard-question',
           permission: undefined,
-          module: 'Surveys',
           children: [
             { path: '/surveys/templates', titleKey: 'nav.surveyTemplates', icon: 'fa-solid fa-file-lines', permission: 'surveyTemplate.read' },
             { path: '/surveys/distributions', titleKey: 'nav.surveyDistributions', icon: 'fa-solid fa-paper-plane', permission: 'surveyDistribution.read' }
@@ -334,7 +299,6 @@ export class MenuService {
           titleKey: 'nav.expenses',
           icon: 'fa-solid fa-receipt',
           permission: undefined,
-          module: 'Expenses',
           children: [
             { path: '/expenses/categories', titleKey: 'nav.expenseCategories', icon: 'fa-solid fa-tags', permission: 'expenseCategory.read' },
             { path: '/expenses/policies', titleKey: 'nav.expensePolicies', icon: 'fa-solid fa-shield-alt', permission: 'expensePolicy.read' },
@@ -346,7 +310,6 @@ export class MenuService {
           titleKey: 'nav.loans',
           icon: 'fa-solid fa-hand-holding-usd',
           permission: undefined,
-          module: 'Loans',
           children: [
             { path: '/loans/types', titleKey: 'nav.loanTypes', icon: 'fa-solid fa-list', permission: 'loanType.read' },
             { path: '/loans/policies', titleKey: 'nav.loanPolicies', icon: 'fa-solid fa-shield-alt', permission: 'loanPolicy.read' },
@@ -388,9 +351,9 @@ export class MenuService {
             { path: '/reports/leaves', titleKey: 'reports.leaves', icon: 'fa-solid fa-calendar-minus', permission: 'vacation.read' },
             { path: '/reports/sessions', titleKey: 'sessions.title', icon: 'fa-solid fa-wifi', permission: 'session.read' },
             { path: '/reports/audit-logs', titleKey: 'audit_logs.title', icon: 'fa-solid fa-history', permission: 'audit.read' },
-            { path: '/reports/payroll', titleKey: 'nav.payrollReports', icon: 'fa-solid fa-money-check-alt', permission: 'payroll.read', module: 'Payroll' },
+            { path: '/reports/payroll', titleKey: 'nav.payrollReports', icon: 'fa-solid fa-money-check-alt', permission: 'payroll.read' },
             { path: '/reports/compliance', titleKey: 'nav.complianceReports', icon: 'fa-solid fa-clipboard-check', permission: 'attendance.read' },
-            { path: '/reports/custom-reports', titleKey: 'nav.customReports', icon: 'fa-solid fa-file-chart-line', permission: 'customReport.read', module: 'CustomReports' }
+            { path: '/reports/custom-reports', titleKey: 'nav.customReports', icon: 'fa-solid fa-file-chart-line', permission: 'customReport.read' }
           ]
         },
         {
@@ -398,7 +361,6 @@ export class MenuService {
           titleKey: 'nav.analytics',
           icon: 'fa-solid fa-chart-line',
           permission: undefined,
-          module: 'Analytics',
           children: [
             { path: '/analytics', titleKey: 'nav.executiveDashboard', icon: 'fa-solid fa-tachometer-alt', permission: 'analytics.read' },
             { path: '/analytics/headcount', titleKey: 'nav.headcount', icon: 'fa-solid fa-users', permission: 'analytics.read' },
@@ -416,7 +378,6 @@ export class MenuService {
           titleKey: 'nav.timesheets',
           icon: 'fa-solid fa-clock',
           permission: undefined,
-          module: 'Timesheets',
           children: [
             { path: '/timesheets/projects', titleKey: 'nav.timesheetProjects', icon: 'fa-solid fa-project-diagram', permission: 'project.read' },
             { path: '/timesheets/periods', titleKey: 'nav.timesheetPeriods', icon: 'fa-solid fa-calendar-alt', permission: 'timesheetPeriod.read' },
@@ -438,15 +399,15 @@ export class MenuService {
           children: [
             { path: '/settings/tenant-config', titleKey: 'tenant_configuration.title', icon: 'fa-solid fa-building-gear', permission: undefined },
             { path: '/settings', titleKey: 'settings.dashboard', icon: 'fa-solid fa-cog', permission: undefined },
-            { path: '/settings/overtime', titleKey: 'settings.overtime.title', icon: 'fa-solid fa-clock', permission: 'settings.overtime.read', module: 'TimeAttendance' },
-            { path: '/settings/public-holidays', titleKey: 'settings.holidays.title', icon: 'fa-solid fa-calendar-check', permission: 'publicHoliday.read', module: 'TimeAttendance' },
-            { path: '/vacation-types', titleKey: 'vacation_types.title', icon: 'fa-solid fa-calendar-alt', permission: 'vacationType.read', module: 'LeaveManagement' },
-            { path: '/settings/excuse-policies', titleKey: 'excuse_policies.title', icon: 'fa-solid fa-user-clock', permission: 'settings.excusePolicy.read', module: 'LeaveManagement' },
-            { path: '/settings/remote-work-policy', titleKey: 'remoteWork.policy.title', icon: 'fa-solid fa-laptop-house', permission: 'remoteWork.policy.read', module: 'RemoteWork' },
-            { path: '/settings/workflows', titleKey: 'workflows.title', icon: 'fa-solid fa-project-diagram', permission: 'workflow.read', module: 'Workflows' },
-            { path: '/settings/leave-entitlements', titleKey: 'leaveBalance.leaveEntitlements', icon: 'fa-solid fa-calendar-check', permission: 'leaveBalance.read', module: 'LeaveManagement' },
-            { path: '/settings/allowance-types', titleKey: 'nav.allowanceTypes', icon: 'fa-solid fa-tags', permission: 'allowanceType.read', module: 'Allowances' },
-            { path: '/settings/allowance-policies', titleKey: 'nav.allowancePolicies', icon: 'fa-solid fa-shield-alt', permission: 'allowancePolicy.read', module: 'Allowances' }
+            { path: '/settings/overtime', titleKey: 'settings.overtime.title', icon: 'fa-solid fa-clock', permission: 'settings.overtime.read' },
+            { path: '/settings/public-holidays', titleKey: 'settings.holidays.title', icon: 'fa-solid fa-calendar-check', permission: 'publicHoliday.read' },
+            { path: '/vacation-types', titleKey: 'vacation_types.title', icon: 'fa-solid fa-calendar-alt', permission: 'vacationType.read' },
+            { path: '/settings/excuse-policies', titleKey: 'excuse_policies.title', icon: 'fa-solid fa-user-clock', permission: 'settings.excusePolicy.read' },
+            { path: '/settings/remote-work-policy', titleKey: 'remoteWork.policy.title', icon: 'fa-solid fa-laptop-house', permission: 'remoteWork.policy.read' },
+            { path: '/settings/workflows', titleKey: 'workflows.title', icon: 'fa-solid fa-project-diagram', permission: 'workflow.read' },
+            { path: '/settings/leave-entitlements', titleKey: 'leaveBalance.leaveEntitlements', icon: 'fa-solid fa-calendar-check', permission: 'leaveBalance.read' },
+            { path: '/settings/allowance-types', titleKey: 'nav.allowanceTypes', icon: 'fa-solid fa-tags', permission: 'allowanceType.read' },
+            { path: '/settings/allowance-policies', titleKey: 'nav.allowancePolicies', icon: 'fa-solid fa-shield-alt', permission: 'allowancePolicy.read' }
           ]
         }
       ]

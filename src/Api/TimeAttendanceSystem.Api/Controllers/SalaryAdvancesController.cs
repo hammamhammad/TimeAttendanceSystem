@@ -5,14 +5,12 @@ using TecAxle.Hrms.Api.Filters;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Domain.Common;
 using TecAxle.Hrms.Domain.Loans;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/salary-advances")]
 [Authorize]
-[RequiresModuleEndpoint(SystemModule.Payroll)]
 public class SalaryAdvancesController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
@@ -25,7 +23,6 @@ public class SalaryAdvancesController : ControllerBase
     }
 
     [HttpGet]
-    [AllowModuleReadOnly]
     [Authorize(Policy = "SalaryAdvanceRead")]
     public async Task<IActionResult> GetAll(
         [FromQuery] long? employeeId = null,
@@ -62,7 +59,6 @@ public class SalaryAdvancesController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    [AllowModuleReadOnly]
     [Authorize(Policy = "SalaryAdvanceRead")]
     public async Task<IActionResult> GetById(long id)
     {

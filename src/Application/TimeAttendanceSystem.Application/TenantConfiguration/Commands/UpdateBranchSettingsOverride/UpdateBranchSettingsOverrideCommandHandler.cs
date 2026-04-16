@@ -7,15 +7,11 @@ namespace TecAxle.Hrms.Application.TenantConfiguration.Commands.UpdateBranchSett
 
 public class UpdateBranchSettingsOverrideCommandHandler : BaseHandler<UpdateBranchSettingsOverrideCommand, Result>
 {
-    private readonly ITenantContext _tenantContext;
-
     public UpdateBranchSettingsOverrideCommandHandler(
         IApplicationDbContext context,
-        ICurrentUser currentUser,
-        ITenantContext tenantContext)
+        ICurrentUser currentUser)
         : base(context, currentUser)
     {
-        _tenantContext = tenantContext;
     }
 
     public override async Task<Result> Handle(UpdateBranchSettingsOverrideCommand request, CancellationToken cancellationToken)

@@ -36,9 +36,6 @@ export class TenantConfigurationComponent {
     { route: 'approval', icon: 'fa-solid fa-check-double', labelKey: 'tenant_configuration.approval.title' },
     { route: 'notification', icon: 'fa-solid fa-bell', labelKey: 'tenant_configuration.notification.title' },
     { route: 'mobile', icon: 'fa-solid fa-mobile-alt', labelKey: 'tenant_configuration.mobile.title' },
-    { route: 'security', icon: 'fa-solid fa-shield-alt', labelKey: 'tenant_configuration.security.title' },
-    { route: 'divider', icon: '', labelKey: '' },
-    { route: 'templates', icon: 'fa-solid fa-file-lines', labelKey: 'tenant_configuration.templates.title' },
-    { route: 'setup-status', icon: 'fa-solid fa-list-check', labelKey: 'tenant_configuration.setup_status.title' },
+    { route: 'security', icon: 'fa-solid fa-shield-alt', labelKey: 'tenant_configuration.security.title' }
   ];
 }

@@ -1,8 +1,6 @@
 using MediatR;
 using TecAxle.Hrms.Application.Common;
-using TecAxle.Hrms.Application.Common.Behaviors;
 using TecAxle.Hrms.Domain.Common;
-using TecAxle.Hrms.Domain.Subscriptions;
 
 namespace TecAxle.Hrms.Application.Employees.Commands.CreateEmployee;
 
@@ -69,7 +67,6 @@ namespace TecAxle.Hrms.Application.Employees.Commands.CreateEmployee;
 /// - Includes failure reasons for troubleshooting
 /// - Supports localized error messages based on user language
 /// </remarks>
-[RequiresLimit(LimitType.MaxEmployees)]
 public record CreateEmployeeCommand(
     long BranchId,
     string EmployeeNumber,

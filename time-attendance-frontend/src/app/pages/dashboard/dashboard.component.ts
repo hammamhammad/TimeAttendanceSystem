@@ -5,7 +5,6 @@ import { AuthService } from '../../core/auth/auth.service';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { DashboardService, DashboardOverview, DashboardFilters } from './dashboard.service';
 import { NotificationService } from '../../core/notifications/notification.service';
-import { EntitlementService } from '../../core/services/entitlement.service';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
 import { StatsGridComponent, StatGridItem } from '../../shared/components/stats-grid/stats-grid.component';
@@ -129,11 +128,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
     ];
 
-    // Filter cards by module entitlement
-    return allCards.filter(card => {
-      const entitlementModule = this.cardModuleMap[card.module];
-      return !entitlementModule || this.entitlementService.isModuleEnabled(entitlementModule);
-    });
+    return allCards;
   });
 
   // Transform dashboard cards to StatGridItems for StatsGridComponent
@@ -161,9 +156,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // Widget visibility based on user permissions AND module entitlements
   showOrganizationWidget = computed(() => this.hasPermission('branch.read') || this.hasPermission('department.read'));
   showHumanResourcesWidget = computed(() => this.hasPermission('user.read') || this.hasPermission('employee.read'));
-  showAttendanceWidget = computed(() => this.hasPermission('attendance.read') && this.entitlementService.isModuleEnabled('TimeAttendance'));
-  showVacationWidget = computed(() => this.hasPermission('vacation.read') && this.entitlementService.isModuleEnabled('LeaveManagement'));
-  showShiftWidget = computed(() => this.hasPermission('shift.read') && this.entitlementService.isModuleEnabled('TimeAttendance'));
+  showAttendanceWidget = computed(() => this.hasPermission('attendance.read'));
+  showVacationWidget = computed(() => this.hasPermission('vacation.read'));
+  showShiftWidget = computed(() => this.hasPermission('shift.read'));
   showSystemWidget = computed(() => this.isSystemAdmin());
 
   // Auto-refresh options
@@ -174,8 +169,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     { value: 300, label: '5 minutes' },
     { value: 900, label: '15 minutes' }
   ];
-
-  private entitlementService = inject(EntitlementService);
 
   constructor(
     private authService: AuthService,

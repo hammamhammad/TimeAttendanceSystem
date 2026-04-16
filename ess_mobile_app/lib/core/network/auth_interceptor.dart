@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../config/app_config.dart';
 import '../storage/secure_storage_service.dart';
 import '../../shared/providers/auth_provider.dart';
 
@@ -66,13 +67,11 @@ class AuthInterceptor extends Interceptor {
     try {
       final refreshToken = await SecureStorageService.instance.getRefreshToken();
       if (refreshToken == null) return false;
-      
-      final tenantConfig = await SecureStorageService.instance.getTenantConfig();
-      if (tenantConfig == null) return false;
-      
+
+      final baseUrl = AppConfig.isDevelopment ? AppConfig.localApiUrl : AppConfig.apiBaseUrl;
       final dio = Dio();
       final response = await dio.post(
-        '${tenantConfig.apiBaseUrl}/api/v1/auth/refresh-token',
+        '$baseUrl/api/v1/auth/refresh-token',
         data: {'refreshToken': refreshToken},
       );
       

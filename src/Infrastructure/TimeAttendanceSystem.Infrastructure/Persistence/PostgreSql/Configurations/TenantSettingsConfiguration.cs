@@ -11,18 +11,6 @@ public class TenantSettingsConfiguration : IEntityTypeConfiguration<TenantSettin
         builder.ToTable("TenantSettings");
         builder.HasKey(e => e.Id);
 
-        // One-to-one with Tenant
-        builder.HasOne(e => e.Tenant)
-            .WithOne()
-            .HasForeignKey<TenantSettings>(e => e.TenantId)
-            .OnDelete(DeleteBehavior.Cascade)
-            .IsRequired();
-
-        // Unique constraint on TenantId
-        builder.HasIndex(e => e.TenantId)
-            .IsUnique()
-            .HasDatabaseName("IX_TenantSettings_TenantId");
-
         // General settings
         builder.Property(e => e.FiscalYearStartMonth).HasMaxLength(2).HasDefaultValue("01");
         builder.Property(e => e.WeekStartDay).HasMaxLength(20).HasDefaultValue("Sunday");

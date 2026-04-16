@@ -10,7 +10,6 @@ using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Infrastructure;
 using TecAxle.Hrms.Infrastructure.BackgroundJobs;
 using TecAxle.Hrms.Infrastructure.Persistence;
-using TecAxle.Hrms.Infrastructure.Persistence.Master;
 using TecAxle.Hrms.Shared.Localization;
 using System.Globalization;
 
@@ -150,11 +149,9 @@ try
 {
     using (var scope = app.Services.CreateScope())
     {
-        // Only migrate the master database at startup.
-        // Tenant databases are migrated during provisioning (TenantProvisioningService).
-        var masterContext = scope.ServiceProvider.GetRequiredService<MasterDbContext>();
-        await masterContext.Database.MigrateAsync();
-        await MasterSeedData.SeedAsync(masterContext);
+        var dbContext = scope.ServiceProvider.GetRequiredService<TecAxleDbContext>();
+        await dbContext.Database.MigrateAsync();
+        await SeedData.SeedAsync(dbContext);
     }
 }
 catch (Exception ex)
@@ -339,7 +336,6 @@ app.UseWebSockets();
 app.UseMiddleware<RateLimitingMiddleware>(app.Services.GetRequiredService<RateLimitOptions>());
 app.UseMiddleware<LocalizationMiddleware>();
 app.UseAuthentication();
-app.UseMiddleware<TenantResolutionMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 

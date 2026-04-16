@@ -54,16 +54,12 @@ public class ProcessMobileTransactionCommandHandler : BaseHandler<ProcessMobileT
             return CreateFailureResult("Employee not found");
         }
 
-        // ==== RESOLVE TENANT SETTINGS FOR MOBILE CHECK-IN ====
+        // ==== RESOLVE COMPANY SETTINGS FOR MOBILE CHECK-IN ====
         ResolvedSettingsDto? resolvedSettings = null;
         if (_tenantSettingsResolver != null)
         {
-            var tenantId = await ResolveTenantIdAsync(cancellationToken);
-            if (tenantId.HasValue)
-            {
-                try { resolvedSettings = await _tenantSettingsResolver.GetSettingsAsync(tenantId.Value, branch.Id, ct: cancellationToken); }
-                catch { /* Fall back to requiring both GPS and NFC if resolver fails */ }
-            }
+            try { resolvedSettings = await _tenantSettingsResolver.GetSettingsAsync(branch.Id, ct: cancellationToken); }
+            catch { /* Fall back to requiring both GPS and NFC if resolver fails */ }
         }
 
         var requireGps = resolvedSettings?.RequireGpsForMobile ?? true;

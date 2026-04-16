@@ -1,7 +1,5 @@
 using MediatR;
 using TecAxle.Hrms.Application.Common;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.VacationTypes.Queries.GetVacationTypes;
 
@@ -82,7 +80,6 @@ namespace TecAxle.Hrms.Application.VacationTypes.Queries.GetVacationTypes;
 /// - Vacation types requiring approval: GetVacationTypesQuery(RequiresApproval: true)
 /// - Specific accrual type: GetVacationTypesQuery(AccrualType: "Monthly")
 /// </remarks>
-[RequiresModule(SystemModule.LeaveManagement, AllowReadWhenDisabled = true)]
 public record GetVacationTypesQuery(
     int Page = 1,
     int PageSize = 10,

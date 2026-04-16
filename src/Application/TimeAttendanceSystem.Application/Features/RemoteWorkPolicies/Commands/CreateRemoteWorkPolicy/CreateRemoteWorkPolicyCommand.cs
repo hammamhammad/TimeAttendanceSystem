@@ -1,13 +1,10 @@
 using MediatR;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.Features.RemoteWorkPolicies.Commands.CreateRemoteWorkPolicy;
 
 /// <summary>
 /// Command to create a new remote work policy for a branch or company-wide.
 /// </summary>
-[RequiresModule(SystemModule.RemoteWork)]
 public class CreateRemoteWorkPolicyCommand : IRequest<long>
 {
     /// <summary>

@@ -1,7 +1,5 @@
 using MediatR;
 using TecAxle.Hrms.Application.Common;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.VacationTypes.Commands.UpdateVacationType;
 
@@ -24,7 +22,6 @@ namespace TecAxle.Hrms.Application.VacationTypes.Commands.UpdateVacationType;
 /// - Vacation type name uniqueness enforced per branch scope
 /// - Multi-tenant isolation through branch relationship (null = all branches)
 /// </remarks>
-[RequiresModule(SystemModule.LeaveManagement)]
 public record UpdateVacationTypeCommand(
     long Id,
     long? BranchId,

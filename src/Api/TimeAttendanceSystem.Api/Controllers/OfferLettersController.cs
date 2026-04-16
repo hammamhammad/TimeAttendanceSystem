@@ -5,7 +5,6 @@ using TecAxle.Hrms.Api.Filters;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Domain.Common;
 using TecAxle.Hrms.Domain.Employees;
-using TecAxle.Hrms.Domain.Modules;
 using TecAxle.Hrms.Domain.Onboarding;
 using TecAxle.Hrms.Domain.Payroll;
 using TecAxle.Hrms.Domain.Recruitment;
@@ -19,7 +18,6 @@ namespace TecAxle.Hrms.Api.Controllers;
 [ApiController]
 [Route("api/v1/offer-letters")]
 [Authorize]
-[RequiresModuleEndpoint(SystemModule.Recruitment)]
 public class OfferLettersController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
@@ -59,7 +57,6 @@ public class OfferLettersController : ControllerBase
 
     /// <summary>Lists offer letters with optional filters and pagination.</summary>
     [HttpGet]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetAll(
         [FromQuery] long? applicationId,
         [FromQuery] OfferStatus? status,
@@ -112,7 +109,6 @@ public class OfferLettersController : ControllerBase
 
     /// <summary>Gets an offer letter by ID.</summary>
     [HttpGet("{id}")]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetById(long id)
     {
         var item = await _context.OfferLetters

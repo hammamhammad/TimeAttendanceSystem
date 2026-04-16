@@ -3,7 +3,6 @@ namespace TecAxle.Hrms.Application.TenantConfiguration.Dtos;
 public class TenantSettingsDto
 {
     public long Id { get; set; }
-    public long TenantId { get; set; }
 
     // General
     public string FiscalYearStartMonth { get; set; } = "01";

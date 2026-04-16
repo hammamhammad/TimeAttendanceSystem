@@ -2,8 +2,6 @@ using MediatR;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Application.Common;
 using TecAxle.Hrms.Domain.Settings;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.PublicHolidays.Commands.UpdatePublicHoliday;
 
@@ -69,7 +67,6 @@ namespace TecAxle.Hrms.Application.PublicHolidays.Commands.UpdatePublicHoliday;
 /// - Integration with attendance recalculation if needed
 /// - Notification system for affected overtime calculations
 /// </remarks>
-[RequiresModule(SystemModule.TimeAttendance)]
 public record UpdatePublicHolidayCommand(
     long Id,
     string Name,

@@ -1,7 +1,5 @@
 using MediatR;
 using TecAxle.Hrms.Application.Common;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.VacationTypes.Queries.GetVacationTypeById;
 
@@ -66,5 +64,4 @@ namespace TecAxle.Hrms.Application.VacationTypes.Queries.GetVacationTypeById;
 /// - Administrative dashboard with stats: GetVacationTypeByIdQuery(123, true)
 /// - API endpoint for single vacation type: GetVacationTypeByIdQuery(id)
 /// </remarks>
-[RequiresModule(SystemModule.LeaveManagement, AllowReadWhenDisabled = true)]
 public record GetVacationTypeByIdQuery(long Id, bool IncludeUsageStatistics = false) : IRequest<Result<VacationTypeDetailDto>>;

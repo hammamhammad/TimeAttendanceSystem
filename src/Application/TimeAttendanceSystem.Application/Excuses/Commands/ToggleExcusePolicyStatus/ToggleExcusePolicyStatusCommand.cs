@@ -1,7 +1,5 @@
 using MediatR;
 using TecAxle.Hrms.Application.Common;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.Excuses.Commands.ToggleExcusePolicyStatus;
 
@@ -27,7 +25,6 @@ namespace TecAxle.Hrms.Application.Excuses.Commands.ToggleExcusePolicyStatus;
 /// - Branch-scoped access control for multi-tenant environments
 /// - Audit trail maintained for compliance
 /// </remarks>
-[RequiresModule(SystemModule.LeaveManagement)]
 public record ToggleExcusePolicyStatusCommand(
     long Id
 ) : IRequest<Result<bool>>;

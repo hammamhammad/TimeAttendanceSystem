@@ -1,8 +1,6 @@
 using MediatR;
 using TecAxle.Hrms.Application.Common;
 using TecAxle.Hrms.Domain.Excuses;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.Excuses.Commands.CreateEmployeeExcuse;
 
@@ -49,7 +47,6 @@ namespace TecAxle.Hrms.Application.Excuses.Commands.CreateEmployeeExcuse;
 /// - Attendance calculation integration for approved excuses
 /// - Approval workflow based on policy configuration
 /// </remarks>
-[RequiresModule(SystemModule.LeaveManagement)]
 public record CreateEmployeeExcuseCommand(
     long EmployeeId,
     DateTime ExcuseDate,

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TecAxle.Hrms.Api.Filters;
 using TecAxle.Hrms.Application.Abstractions;
-using TecAxle.Hrms.Domain.Modules;
 using TecAxle.Hrms.Domain.Offboarding;
 
 namespace TecAxle.Hrms.Api.Controllers;
@@ -11,7 +10,6 @@ namespace TecAxle.Hrms.Api.Controllers;
 [ApiController]
 [Route("api/v1/exit-interviews")]
 [Authorize]
-[RequiresModuleEndpoint(SystemModule.Offboarding)]
 public class ExitInterviewsController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
@@ -24,7 +22,6 @@ public class ExitInterviewsController : ControllerBase
     }
 
     [HttpGet("{terminationId}")]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetByTermination(long terminationId)
     {
         var interview = await _context.ExitInterviews

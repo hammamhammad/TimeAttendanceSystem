@@ -1,7 +1,5 @@
 using MediatR;
 using TecAxle.Hrms.Application.Common;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.Attendance.Queries.GetLeaveExcuseDetails;
 
@@ -31,7 +29,6 @@ namespace TecAxle.Hrms.Application.Attendance.Queries.GetLeaveExcuseDetails;
 /// - Minimal data transfer with projection
 /// - Single query per data type for efficiency
 /// </remarks>
-[RequiresModule(SystemModule.TimeAttendance, AllowReadWhenDisabled = true)]
 public record GetLeaveExcuseDetailsQuery(
     long EmployeeId,
     DateTime Date

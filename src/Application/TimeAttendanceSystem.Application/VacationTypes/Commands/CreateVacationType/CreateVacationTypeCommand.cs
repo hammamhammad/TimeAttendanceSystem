@@ -1,8 +1,6 @@
 using MediatR;
 using TecAxle.Hrms.Application.Common;
 using TecAxle.Hrms.Domain.VacationTypes;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.VacationTypes.Commands.CreateVacationType;
 
@@ -24,7 +22,6 @@ namespace TecAxle.Hrms.Application.VacationTypes.Commands.CreateVacationType;
 /// - Active status defaults to true for immediate availability
 /// - Multi-tenant isolation through branch relationship (null = all branches)
 /// </remarks>
-[RequiresModule(SystemModule.LeaveManagement)]
 public record CreateVacationTypeCommand(
     long? BranchId,
     string Name,

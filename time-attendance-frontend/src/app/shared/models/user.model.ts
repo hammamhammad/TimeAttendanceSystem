@@ -105,7 +105,6 @@ export interface LoginResponse {
   expiresAt: string;
   mustChangePassword: boolean;
   user: User;
-  isPlatformUser?: boolean;
 }
 
 export interface RefreshTokenRequest {
@@ -120,14 +119,3 @@ export interface RefreshTokenResponse {
   user: User;
 }
 
-export interface TenantOption {
-  tenantId: number;
-  name: string;
-  nameAr?: string;
-  logoUrl?: string;
-}
-
-export interface ResolveTenantsResponse {
-  requiresTenantSelection: boolean;
-  tenants: TenantOption[];
-}

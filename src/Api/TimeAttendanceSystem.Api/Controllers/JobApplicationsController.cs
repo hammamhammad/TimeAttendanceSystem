@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using TecAxle.Hrms.Api.Filters;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Domain.Common;
-using TecAxle.Hrms.Domain.Modules;
 using TecAxle.Hrms.Domain.Recruitment;
 
 namespace TecAxle.Hrms.Api.Controllers;
@@ -12,7 +11,6 @@ namespace TecAxle.Hrms.Api.Controllers;
 [ApiController]
 [Route("api/v1/job-applications")]
 [Authorize]
-[RequiresModuleEndpoint(SystemModule.Recruitment)]
 public class JobApplicationsController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
@@ -26,7 +24,6 @@ public class JobApplicationsController : ControllerBase
 
     /// <summary>Lists job applications with optional filters and pagination.</summary>
     [HttpGet]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetAll(
         [FromQuery] long? postingId,
         [FromQuery] long? candidateId,
@@ -78,7 +75,6 @@ public class JobApplicationsController : ControllerBase
 
     /// <summary>Gets a job application by ID with full details.</summary>
     [HttpGet("{id}")]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetById(long id)
     {
         var item = await _context.JobApplications
@@ -260,7 +256,6 @@ public class JobApplicationsController : ControllerBase
 
     /// <summary>Gets pipeline view for a specific posting (count per stage).</summary>
     [HttpGet("posting/{postingId}/pipeline")]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetPipeline(long postingId)
     {
         var pipeline = await _context.JobApplications

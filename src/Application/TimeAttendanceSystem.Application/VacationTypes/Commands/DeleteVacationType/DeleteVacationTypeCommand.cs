@@ -1,7 +1,5 @@
 using MediatR;
 using TecAxle.Hrms.Application.Common;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.VacationTypes.Commands.DeleteVacationType;
 
@@ -46,5 +44,4 @@ namespace TecAxle.Hrms.Application.VacationTypes.Commands.DeleteVacationType;
 /// - Includes specific reasons why deletion might be prevented
 /// - Supports localized error messages based on user language preferences
 /// </remarks>
-[RequiresModule(SystemModule.LeaveManagement)]
 public record DeleteVacationTypeCommand(long Id) : IRequest<Result<bool>>;

@@ -1,7 +1,5 @@
 using MediatR;
 using TecAxle.Hrms.Application.Common;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.Excuses.Commands.CreateExcusePolicy;
 
@@ -39,7 +37,6 @@ namespace TecAxle.Hrms.Application.Excuses.Commands.CreateExcusePolicy;
 /// - Previous policies deactivated automatically
 /// - Policy hierarchy: Branch-specific overrides organization-wide
 /// </remarks>
-[RequiresModule(SystemModule.LeaveManagement)]
 public record CreateExcusePolicyCommand(
     long? BranchId,
     int MaxPersonalExcusesPerMonth,

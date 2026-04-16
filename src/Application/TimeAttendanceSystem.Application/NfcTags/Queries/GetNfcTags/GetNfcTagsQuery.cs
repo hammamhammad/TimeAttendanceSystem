@@ -1,15 +1,12 @@
 using MediatR;
 using TecAxle.Hrms.Application.Common;
 using TecAxle.Hrms.Domain.Branches;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.NfcTags.Queries.GetNfcTags;
 
 /// <summary>
 /// Query to get a paginated list of NFC tags.
 /// </summary>
-[RequiresModule(SystemModule.TimeAttendance, AllowReadWhenDisabled = true)]
 public record GetNfcTagsQuery(
     int Page,
     int PageSize,

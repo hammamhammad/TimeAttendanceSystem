@@ -5,7 +5,6 @@ using TecAxle.Hrms.Api.Filters;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Application.Lifecycle.Events;
 using TecAxle.Hrms.Domain.Common;
-using TecAxle.Hrms.Domain.Modules;
 using TecAxle.Hrms.Domain.Onboarding;
 
 namespace TecAxle.Hrms.Api.Controllers;
@@ -13,7 +12,6 @@ namespace TecAxle.Hrms.Api.Controllers;
 [ApiController]
 [Route("api/v1/onboarding-processes")]
 [Authorize]
-[RequiresModuleEndpoint(SystemModule.Onboarding)]
 public class OnboardingProcessesController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
@@ -32,7 +30,6 @@ public class OnboardingProcessesController : ControllerBase
 
     /// <summary>Lists onboarding processes with optional filters.</summary>
     [HttpGet]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetAll(
         [FromQuery] long? employeeId,
         [FromQuery] OnboardingStatus? status,
@@ -85,7 +82,6 @@ public class OnboardingProcessesController : ControllerBase
 
     /// <summary>Gets an onboarding process by ID with tasks and documents.</summary>
     [HttpGet("{id}")]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetById(long id)
     {
         var item = await _context.OnboardingProcesses
@@ -314,7 +310,6 @@ public class OnboardingProcessesController : ControllerBase
 
     /// <summary>Gets dashboard summary stats for onboarding.</summary>
     [HttpGet("dashboard")]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetDashboard()
     {
         var query = _context.OnboardingProcesses.Where(p => !p.IsDeleted);

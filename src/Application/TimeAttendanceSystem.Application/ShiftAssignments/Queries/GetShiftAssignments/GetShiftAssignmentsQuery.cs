@@ -1,8 +1,6 @@
 using MediatR;
 using TecAxle.Hrms.Application.Common;
 using TecAxle.Hrms.Domain.Common;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.ShiftAssignments.Queries.GetShiftAssignments;
 
@@ -34,7 +32,6 @@ namespace TecAxle.Hrms.Application.ShiftAssignments.Queries.GetShiftAssignments;
 /// - Selective loading of related entities to minimize data transfer
 /// - Query optimization for common filtering scenarios
 /// </remarks>
-[RequiresModule(SystemModule.TimeAttendance, AllowReadWhenDisabled = true)]
 public record GetShiftAssignmentsQuery(
     /// <summary>
     /// Page number for pagination (1-based indexing).

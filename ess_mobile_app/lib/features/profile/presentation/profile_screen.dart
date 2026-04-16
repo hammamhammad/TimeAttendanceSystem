@@ -207,7 +207,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final user = authState.valueOrNull?.user;
     final fallbackName = user?['fullName'] ?? 'User';
     final fallbackEmail = user?['email'] ?? '';
-    final tenantName = authState.valueOrNull?.tenantConfig?.name ?? '';
+    const tenantName = '';
 
     return Scaffold(
       appBar: AppBar(
@@ -903,18 +903,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             title: Text(isArabic ? 'تغيير كلمة المرور' : 'Change Password'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _showChangePasswordDialog(context, l10n),
-          ),
-          const Divider(height: 1),
-          ListTile(
-            leading: const Icon(Icons.business),
-            title: Text(isArabic ? 'تبديل الشركة' : 'Switch Company'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () async {
-              await ref.read(authStateProvider.notifier).reset();
-              if (mounted) {
-                context.go('/tenant-discovery');
-              }
-            },
           ),
           const Divider(height: 1),
           ListTile(

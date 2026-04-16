@@ -13,8 +13,6 @@ using TecAxle.Hrms.Application.Authorization.Commands.Register;
 using TecAxle.Hrms.Application.Authorization.Commands.VerifyEmail;
 using TecAxle.Hrms.Application.Authorization.Commands.ResendEmailVerification;
 using TecAxle.Hrms.Application.Authorization.Commands.ChangePassword;
-using ResolveTenants = TecAxle.Hrms.Application.Authorization.Commands.ResolveTenants;
-using PlatformLogin = TecAxle.Hrms.Application.Authorization.Commands.PlatformLogin;
 
 namespace TecAxle.Hrms.Api.Controllers;
 
@@ -108,7 +106,7 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var command = new LoginCommand(request.Email, request.Password, request.TenantId, request.DeviceInfo, request.RememberMe);
+        var command = new LoginCommand(request.Email, request.Password, request.DeviceInfo, request.RememberMe);
         var result = await _mediator.Send(command);
 
         if (result.IsFailure)
@@ -125,17 +123,6 @@ public class AuthController : ControllerBase
         }
 
         var loginResult = result.Value;
-
-        // Multi-tenant selection needed
-        if (loginResult.RequiresTenantSelection)
-        {
-            return Ok(new
-            {
-                requiresTenantSelection = true,
-                tenants = loginResult.Tenants
-            });
-        }
-
         var response = loginResult.Response!;
         SetRefreshTokenCookie(response.RefreshToken);
 
@@ -144,8 +131,7 @@ public class AuthController : ControllerBase
             accessToken = response.AccessToken,
             expiresAt = response.ExpiresAt,
             mustChangePassword = response.MustChangePassword,
-            user = response.User,
-            isPlatformUser = response.IsPlatformUser
+            user = response.User
         });
     }
 
@@ -294,7 +280,7 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> DebugLogin([FromBody] LoginRequest request)
     {
         // FOR TESTING ONLY - bypasses password verification
-        var command = new LoginCommand("test@debug.com", "", null, request.DeviceInfo);
+        var command = new LoginCommand("test@debug.com", "", request.DeviceInfo);
         
         // Create a mock test user response for 2FA testing
         var mockUser = new UserInfo(1, "testuser", "test@example.com", "en", new List<string> { "Admin" }, new List<string> { "user.read" }, new List<long> { 1 });
@@ -556,25 +542,6 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
-    /// Resolves which tenant(s) a user email belongs to.
-    /// Used before login to determine which tenant database to authenticate against.
-    /// If only one tenant is found, the client can proceed directly to login.
-    /// If multiple tenants are found, the client should show a tenant picker.
-    /// </summary>
-    [HttpPost("resolve-tenants")]
-    [AllowAnonymous]
-    public async Task<IActionResult> ResolveTenants([FromBody] ResolveTenantsRequest request)
-    {
-        var command = new ResolveTenants.ResolveTenantsCommand(request.Email);
-        var result = await _mediator.Send(command);
-
-        if (result.IsFailure)
-            return BadRequest(new { error = result.Error });
-
-        return Ok(result.Value);
-    }
-
-    /// <summary>
     /// Sets a secure HTTP-only cookie containing the refresh token.
     /// Implements multiple security layers to protect against token theft.
     /// </summary>
@@ -645,7 +612,7 @@ public class AuthController : ControllerBase
 /// <param name="Password">User's password in plain text (encrypted in transit via HTTPS)</param>
 /// <param name="DeviceInfo">Optional device/browser information for session fingerprinting</param>
 /// <param name="RememberMe">Flag indicating whether to use extended token expiration for persistent sessions</param>
-public record LoginRequest(string Email, string Password, long? TenantId = null, string? DeviceInfo = null, bool RememberMe = false);
+public record LoginRequest(string Email, string Password, string? DeviceInfo = null, bool RememberMe = false);
 
 /// <summary>
 /// Request model for refreshing expired access tokens.
@@ -729,16 +696,3 @@ public record ResendEmailVerificationRequest(string Email);
 /// <param name="NewPassword">New password meeting strength requirements</param>
 public record ChangePasswordRequest(string CurrentPassword, string NewPassword);
 
-/// <summary>
-/// Request model for resolving tenants by email address.
-/// </summary>
-/// <param name="Email">User email to look up in the master database</param>
-public record ResolveTenantsRequest(string Email);
-
-/// <summary>
-/// Request model for platform admin authentication.
-/// </summary>
-/// <param name="Email">Platform admin email</param>
-/// <param name="Password">Platform admin password</param>
-/// <param name="DeviceInfo">Optional device information</param>
-/// <param name="RememberMe">Extended session flag</param>

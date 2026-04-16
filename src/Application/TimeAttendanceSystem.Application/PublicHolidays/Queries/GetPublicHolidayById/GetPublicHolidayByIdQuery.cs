@@ -3,8 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Application.Common;
 using TecAxle.Hrms.Application.PublicHolidays.Queries.GetPublicHolidays;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.PublicHolidays.Queries.GetPublicHolidayById;
 
@@ -45,7 +43,6 @@ namespace TecAxle.Hrms.Application.PublicHolidays.Queries.GetPublicHolidayById;
 /// - Multi-tenant data isolation maintained
 /// - Permission validation for sensitive fields
 /// </remarks>
-[RequiresModule(SystemModule.TimeAttendance, AllowReadWhenDisabled = true)]
 public record GetPublicHolidayByIdQuery(
     long Id,
     bool IncludeConflicts = false,

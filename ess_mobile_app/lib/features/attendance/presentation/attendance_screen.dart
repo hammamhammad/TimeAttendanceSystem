@@ -395,12 +395,12 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen> {
       }
 
       // Verify location with backend (check geofence)
-      final tenantConfig = await SecureStorageService.instance.getTenantConfig();
       final accessToken = await SecureStorageService.instance.getAccessToken();
+      final baseUrl = AppConfig.isDevelopment ? AppConfig.localApiUrl : AppConfig.apiBaseUrl;
 
       final dio = Dio();
       final response = await dio.post(
-        '${tenantConfig?.apiBaseUrl}/api/v1/mobile/attendance/check-location',
+        '$baseUrl/api/v1/mobile/attendance/check-location',
         data: {
           'branchId': _branchId,
           'latitude': _latitude,
@@ -570,12 +570,12 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen> {
     });
 
     try {
-      final tenantConfig = await SecureStorageService.instance.getTenantConfig();
       final accessToken = await SecureStorageService.instance.getAccessToken();
+      final baseUrl = AppConfig.isDevelopment ? AppConfig.localApiUrl : AppConfig.apiBaseUrl;
 
       final dio = Dio();
       final response = await dio.post(
-        '${tenantConfig?.apiBaseUrl}/api/v1/mobile/attendance/transaction',
+        '$baseUrl/api/v1/mobile/attendance/transaction',
         data: {
           'employeeId': _employeeId,
           'branchId': _branchId,

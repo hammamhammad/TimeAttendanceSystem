@@ -1,8 +1,6 @@
 using MediatR;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Application.Common;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.PublicHolidays.Commands.DeletePublicHoliday;
 
@@ -47,7 +45,6 @@ namespace TecAxle.Hrms.Application.PublicHolidays.Commands.DeletePublicHoliday;
 /// - System maintenance and optimization
 /// - Correcting erroneous holiday configurations
 /// </remarks>
-[RequiresModule(SystemModule.TimeAttendance)]
 public record DeletePublicHolidayCommand(long Id) : IRequest<Result>;
 
 /// <summary>

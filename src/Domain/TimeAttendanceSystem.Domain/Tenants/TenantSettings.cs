@@ -3,15 +3,12 @@ using TecAxle.Hrms.Domain.Common;
 namespace TecAxle.Hrms.Domain.Tenants;
 
 /// <summary>
-/// Centralized operational settings for a tenant (company).
-/// One row per tenant. Covers cross-cutting configuration that doesn't belong to a specific policy entity.
+/// Centralized operational settings for the company.
+/// Singleton row. Covers cross-cutting configuration that doesn't belong to a specific policy entity.
 /// Branch-level overrides are handled by BranchSettingsOverride; department-level by DepartmentSettingsOverride.
 /// </summary>
 public class TenantSettings : BaseEntity
 {
-    public long TenantId { get; set; }
-    public Tenant Tenant { get; set; } = null!;
-
     // ── General Settings ─────────────────────────────────
 
     /// <summary>Month number "01"–"12" when the fiscal year starts.</summary>

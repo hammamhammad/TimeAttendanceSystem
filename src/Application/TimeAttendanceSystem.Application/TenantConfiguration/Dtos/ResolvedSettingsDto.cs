@@ -7,7 +7,6 @@ namespace TecAxle.Hrms.Application.TenantConfiguration.Dtos;
 /// </summary>
 public class ResolvedSettingsDto
 {
-    public long TenantId { get; set; }
     public long? BranchId { get; set; }
     public long? DepartmentId { get; set; }
 

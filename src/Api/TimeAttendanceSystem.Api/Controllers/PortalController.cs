@@ -29,7 +29,6 @@ using TecAxle.Hrms.Domain.Workflows.Enums;
 using TecAxle.Hrms.Domain.Timesheets;
 using TecAxle.Hrms.Domain.Succession;
 using TecAxle.Hrms.Domain.Benefits;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Api.Controllers;
 
@@ -327,8 +326,6 @@ public class PortalController : ControllerBase
     /// <response code="401">Unauthorized - user not authenticated</response>
     /// <response code="404">Employee profile not found for current user</response>
     [HttpGet("my-attendance")]
-    [RequiresModuleEndpoint(SystemModule.TimeAttendance)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(typeof(Result<List<MyAttendanceRecordDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -568,8 +565,6 @@ public class PortalController : ControllerBase
     /// <response code="401">Unauthorized - user not authenticated</response>
     /// <response code="404">Employee profile not found for current user</response>
     [HttpGet("my-vacations")]
-    [RequiresModuleEndpoint(SystemModule.LeaveManagement)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(typeof(Result<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -630,8 +625,6 @@ public class PortalController : ControllerBase
     /// <response code="401">Unauthorized - user not authenticated</response>
     /// <response code="404">Vacation not found or doesn't belong to current employee</response>
     [HttpGet("my-vacations/{id}")]
-    [RequiresModuleEndpoint(SystemModule.LeaveManagement)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(typeof(Application.EmployeeVacations.Queries.Common.EmployeeVacationDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -813,8 +806,6 @@ public class PortalController : ControllerBase
     /// <response code="403">Forbidden - user is not an approver for this request</response>
     /// <response code="404">Vacation not found</response>
     [HttpGet("approval-vacation/{id}")]
-    [RequiresModuleEndpoint(SystemModule.LeaveManagement)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(typeof(Application.EmployeeVacations.Queries.Common.EmployeeVacationDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -1018,8 +1009,6 @@ public class PortalController : ControllerBase
     /// <response code="401">Unauthorized - user not authenticated</response>
     /// <response code="404">Employee profile not found for current user</response>
     [HttpGet("my-excuses")]
-    [RequiresModuleEndpoint(SystemModule.LeaveManagement)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(typeof(Result<PagedResult<EmployeeExcuseDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -1079,8 +1068,6 @@ public class PortalController : ControllerBase
     /// <response code="401">Unauthorized - user not authenticated</response>
     /// <response code="404">Excuse not found or doesn't belong to current employee</response>
     [HttpGet("my-excuses/{id}")]
-    [RequiresModuleEndpoint(SystemModule.LeaveManagement)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(typeof(EmployeeExcuseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -1247,8 +1234,6 @@ public class PortalController : ControllerBase
     /// <response code="403">Forbidden - user is not an approver for this request</response>
     /// <response code="404">Excuse not found</response>
     [HttpGet("approval-excuse/{id}")]
-    [RequiresModuleEndpoint(SystemModule.LeaveManagement)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(typeof(EmployeeExcuseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -1434,7 +1419,6 @@ public class PortalController : ControllerBase
     /// <response code="401">Unauthorized - user not authenticated</response>
     /// <response code="404">Excuse not found or doesn't belong to current employee</response>
     [HttpDelete("my-excuses/{id}")]
-    [RequiresModuleEndpoint(SystemModule.LeaveManagement)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -1531,8 +1515,6 @@ public class PortalController : ControllerBase
     /// <response code="401">Unauthorized - user not authenticated</response>
     /// <response code="404">Employee profile not found for current user</response>
     [HttpGet("my-attendance-corrections")]
-    [RequiresModuleEndpoint(SystemModule.TimeAttendance)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -1596,8 +1578,6 @@ public class PortalController : ControllerBase
     /// <response code="401">Unauthorized - user not authenticated</response>
     /// <response code="404">Correction not found or doesn't belong to current employee</response>
     [HttpGet("my-attendance-corrections/{id}")]
-    [RequiresModuleEndpoint(SystemModule.TimeAttendance)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -1656,7 +1636,6 @@ public class PortalController : ControllerBase
     /// <response code="401">Unauthorized - user not authenticated</response>
     /// <response code="404">Correction not found or doesn't belong to current employee</response>
     [HttpDelete("my-attendance-corrections/{id}")]
-    [RequiresModuleEndpoint(SystemModule.TimeAttendance)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -1750,8 +1729,6 @@ public class PortalController : ControllerBase
     /// <response code="403">Forbidden - user is not an approver for this request</response>
     /// <response code="404">Correction not found</response>
     [HttpGet("approval-attendance-correction/{id}")]
-    [RequiresModuleEndpoint(SystemModule.TimeAttendance)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -1841,8 +1818,6 @@ public class PortalController : ControllerBase
     /// <response code="401">Unauthorized - user not authenticated</response>
     /// <response code="404">Employee profile not found for current user</response>
     [HttpGet("my-remote-work-requests")]
-    [RequiresModuleEndpoint(SystemModule.RemoteWork)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -1958,8 +1933,6 @@ public class PortalController : ControllerBase
     /// <response code="401">Unauthorized - user not authenticated</response>
     /// <response code="404">Remote work request not found or doesn't belong to current employee</response>
     [HttpGet("my-remote-work-requests/{id}")]
-    [RequiresModuleEndpoint(SystemModule.RemoteWork)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(typeof(Application.Features.RemoteWorkRequests.Queries.RemoteWorkRequestDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -2126,8 +2099,6 @@ public class PortalController : ControllerBase
     /// <response code="403">Forbidden - user is not an approver for this request</response>
     /// <response code="404">Remote work request not found</response>
     [HttpGet("approval-remote-work/{id}")]
-    [RequiresModuleEndpoint(SystemModule.RemoteWork)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(typeof(Application.Features.RemoteWorkRequests.Queries.RemoteWorkRequestDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -2326,8 +2297,6 @@ public class PortalController : ControllerBase
     /// Get current employee's active allowances
     /// </summary>
     [HttpGet("my-allowances")]
-    [RequiresModuleEndpoint(SystemModule.Allowances)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -2382,8 +2351,6 @@ public class PortalController : ControllerBase
     /// Get current employee's allowance summary (total)
     /// </summary>
     [HttpGet("my-allowances/summary")]
-    [RequiresModuleEndpoint(SystemModule.Allowances)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -2427,8 +2394,6 @@ public class PortalController : ControllerBase
     /// Get current employee's payslip history
     /// </summary>
     [HttpGet("my-payslips")]
-    [RequiresModuleEndpoint(SystemModule.Payroll)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -2521,8 +2486,6 @@ public class PortalController : ControllerBase
     /// Get current employee's salary details
     /// </summary>
     [HttpGet("my-salary")]
-    [RequiresModuleEndpoint(SystemModule.Payroll)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -2589,8 +2552,6 @@ public class PortalController : ControllerBase
     /// Get current employee's resignation request (if any)
     /// </summary>
     [HttpGet("my-resignation")]
-    [RequiresModuleEndpoint(SystemModule.Offboarding)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -2645,7 +2606,6 @@ public class PortalController : ControllerBase
     /// Submit a resignation request for the current employee
     /// </summary>
     [HttpPost("my-resignation")]
-    [RequiresModuleEndpoint(SystemModule.Offboarding)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -2741,8 +2701,6 @@ public class PortalController : ControllerBase
     /// Get current employee's documents
     /// </summary>
     [HttpGet("my-documents")]
-    [RequiresModuleEndpoint(SystemModule.Documents)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -2794,8 +2752,6 @@ public class PortalController : ControllerBase
     /// Get company policies with acknowledgment status for the current employee
     /// </summary>
     [HttpGet("company-policies")]
-    [RequiresModuleEndpoint(SystemModule.Documents)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -2853,8 +2809,6 @@ public class PortalController : ControllerBase
     /// Get current employee's letter requests
     /// </summary>
     [HttpGet("my-letter-requests")]
-    [RequiresModuleEndpoint(SystemModule.Documents)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -2907,8 +2861,6 @@ public class PortalController : ControllerBase
     /// Get current employee's expense claims
     /// </summary>
     [HttpGet("my-expense-claims")]
-    [RequiresModuleEndpoint(SystemModule.Expenses)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -2959,8 +2911,6 @@ public class PortalController : ControllerBase
     /// Get current employee's loan applications
     /// </summary>
     [HttpGet("my-loan-applications")]
-    [RequiresModuleEndpoint(SystemModule.Loans)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -3018,8 +2968,6 @@ public class PortalController : ControllerBase
     /// Get current employee's salary advances
     /// </summary>
     [HttpGet("my-salary-advances")]
-    [RequiresModuleEndpoint(SystemModule.Payroll)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -3073,8 +3021,6 @@ public class PortalController : ControllerBase
     /// Includes acknowledged flag for each announcement.
     /// </summary>
     [HttpGet("announcements")]
-    [RequiresModuleEndpoint(SystemModule.Announcements)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -3211,7 +3157,6 @@ public class PortalController : ControllerBase
     /// Acknowledge an announcement for the current employee.
     /// </summary>
     [HttpPost("announcements/{id}/acknowledge")]
-    [RequiresModuleEndpoint(SystemModule.Announcements)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -3277,8 +3222,6 @@ public class PortalController : ControllerBase
     /// Get current employee's training enrollments with session/course info
     /// </summary>
     [HttpGet("my-training")]
-    [RequiresModuleEndpoint(SystemModule.Training)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -3339,8 +3282,6 @@ public class PortalController : ControllerBase
     /// Get current employee's certifications
     /// </summary>
     [HttpGet("my-certifications")]
-    [RequiresModuleEndpoint(SystemModule.Training)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -3395,8 +3336,6 @@ public class PortalController : ControllerBase
     /// Get training catalog - active sessions and programs available for enrollment
     /// </summary>
     [HttpGet("training-catalog")]
-    [RequiresModuleEndpoint(SystemModule.Training)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetTrainingCatalog()
@@ -3484,8 +3423,6 @@ public class PortalController : ControllerBase
     /// Get current employee's grievances
     /// </summary>
     [HttpGet("my-grievances")]
-    [RequiresModuleEndpoint(SystemModule.EmployeeRelations)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -3548,7 +3485,6 @@ public class PortalController : ControllerBase
     /// File a new grievance as current employee
     /// </summary>
     [HttpPost("my-grievances")]
-    [RequiresModuleEndpoint(SystemModule.EmployeeRelations)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -3636,8 +3572,6 @@ public class PortalController : ControllerBase
     /// Get current employee's disciplinary actions
     /// </summary>
     [HttpGet("my-disciplinary-actions")]
-    [RequiresModuleEndpoint(SystemModule.EmployeeRelations)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -3706,7 +3640,6 @@ public class PortalController : ControllerBase
     /// Employee acknowledges a disciplinary action via portal
     /// </summary>
     [HttpPost("my-disciplinary-actions/{id}/acknowledge")]
-    [RequiresModuleEndpoint(SystemModule.EmployeeRelations)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -3778,8 +3711,6 @@ public class PortalController : ControllerBase
     /// Gets the current employee's active asset assignments
     /// </summary>
     [HttpGet("my-assets")]
-    [RequiresModuleEndpoint(SystemModule.Assets)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -3853,8 +3784,6 @@ public class PortalController : ControllerBase
     /// Gets current employee's pending and completed surveys
     /// </summary>
     [HttpGet("my-surveys")]
-    [RequiresModuleEndpoint(SystemModule.Surveys)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -3918,8 +3847,6 @@ public class PortalController : ControllerBase
     /// Gets survey questions for a distribution (for the employee to respond to)
     /// </summary>
     [HttpGet("my-surveys/{distributionId}")]
-    [RequiresModuleEndpoint(SystemModule.Surveys)]
-    [AllowModuleReadOnly]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -4016,7 +3943,6 @@ public class PortalController : ControllerBase
     /// Validates the participant token, marks participant as completed.
     /// </summary>
     [HttpPost("my-surveys/{distributionId}/submit")]
-    [RequiresModuleEndpoint(SystemModule.Surveys)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -4116,8 +4042,6 @@ public class PortalController : ControllerBase
 
     /// <summary>Gets the current employee's timesheets (paginated).</summary>
     [HttpGet("my-timesheets")]
-    [RequiresModuleEndpoint(SystemModule.Timesheets)]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetMyTimesheets(
         [FromQuery] TimesheetStatus? status = null,
         [FromQuery] int pageNumber = 1,
@@ -4177,8 +4101,6 @@ public class PortalController : ControllerBase
 
     /// <summary>Gets a specific timesheet for the current employee with entries.</summary>
     [HttpGet("my-timesheets/{id}")]
-    [RequiresModuleEndpoint(SystemModule.Timesheets)]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetMyTimesheetById(long id)
     {
         try
@@ -4248,7 +4170,6 @@ public class PortalController : ControllerBase
 
     /// <summary>Creates a timesheet for the current employee.</summary>
     [HttpPost("my-timesheets")]
-    [RequiresModuleEndpoint(SystemModule.Timesheets)]
     public async Task<IActionResult> CreateMyTimesheet([FromBody] PortalCreateTimesheetRequest request)
     {
         try
@@ -4303,7 +4224,6 @@ public class PortalController : ControllerBase
 
     /// <summary>Updates a timesheet and its entries for the current employee.</summary>
     [HttpPut("my-timesheets/{id}")]
-    [RequiresModuleEndpoint(SystemModule.Timesheets)]
     public async Task<IActionResult> UpdateMyTimesheet(long id, [FromBody] PortalUpdateTimesheetRequest request)
     {
         try
@@ -4380,7 +4300,6 @@ public class PortalController : ControllerBase
 
     /// <summary>Submits a timesheet for approval for the current employee.</summary>
     [HttpPost("my-timesheets/{id}/submit")]
-    [RequiresModuleEndpoint(SystemModule.Timesheets)]
     public async Task<IActionResult> SubmitMyTimesheet(long id)
     {
         try
@@ -4432,7 +4351,6 @@ public class PortalController : ControllerBase
 
     /// <summary>Recalls a submitted timesheet for the current employee.</summary>
     [HttpPost("my-timesheets/{id}/recall")]
-    [RequiresModuleEndpoint(SystemModule.Timesheets)]
     public async Task<IActionResult> RecallMyTimesheet(long id)
     {
         try
@@ -4473,8 +4391,6 @@ public class PortalController : ControllerBase
 
     /// <summary>Auto-populates a timesheet from attendance records for the current employee.</summary>
     [HttpGet("my-timesheets/{id}/auto-populate")]
-    [RequiresModuleEndpoint(SystemModule.Timesheets)]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetMyTimesheetAutoPopulate(long id)
     {
         try
@@ -4530,8 +4446,6 @@ public class PortalController : ControllerBase
 
     /// <summary>Gets active projects for dropdown (self-service).</summary>
     [HttpGet("projects/dropdown")]
-    [RequiresModuleEndpoint(SystemModule.Timesheets)]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetPortalProjectsDropdown()
     {
         try
@@ -4563,8 +4477,6 @@ public class PortalController : ControllerBase
 
     /// <summary>Gets active project tasks for dropdown (self-service).</summary>
     [HttpGet("project-tasks/dropdown")]
-    [RequiresModuleEndpoint(SystemModule.Timesheets)]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetPortalProjectTasksDropdown([FromQuery] long? projectId = null)
     {
         try
@@ -4606,8 +4518,6 @@ public class PortalController : ControllerBase
 
     /// <summary>Gets the current employee's talent profile.</summary>
     [HttpGet("my-career/talent-profile")]
-    [RequiresModuleEndpoint(SystemModule.SuccessionPlanning)]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetMyTalentProfile()
     {
         try
@@ -4664,8 +4574,6 @@ public class PortalController : ControllerBase
 
     /// <summary>Gets career paths available for the current employee.</summary>
     [HttpGet("my-career/career-paths")]
-    [RequiresModuleEndpoint(SystemModule.SuccessionPlanning)]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetMyCareerPaths()
     {
         try
@@ -4713,8 +4621,6 @@ public class PortalController : ControllerBase
 
     /// <summary>Gets development suggestions for the current employee based on their talent profile.</summary>
     [HttpGet("my-career/development-suggestions")]
-    [RequiresModuleEndpoint(SystemModule.SuccessionPlanning)]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetMyDevelopmentSuggestions()
     {
         try
@@ -4783,8 +4689,6 @@ public class PortalController : ControllerBase
 
     /// <summary>Gets current employee's benefit enrollments summary.</summary>
     [HttpGet("my-benefits")]
-    [RequiresModuleEndpoint(SystemModule.Benefits)]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetMyBenefits()
     {
         try
@@ -4837,8 +4741,6 @@ public class PortalController : ControllerBase
 
     /// <summary>Gets available benefit plans filtered by eligibility for current employee.</summary>
     [HttpGet("my-benefits/available-plans")]
-    [RequiresModuleEndpoint(SystemModule.Benefits)]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetAvailableBenefitPlans()
     {
         try
@@ -4922,7 +4824,6 @@ public class PortalController : ControllerBase
 
     /// <summary>Enrolls the current employee in a benefit plan.</summary>
     [HttpPost("my-benefits/enroll")]
-    [RequiresModuleEndpoint(SystemModule.Benefits)]
     public async Task<IActionResult> EnrollInBenefitPlan([FromBody] PortalBenefitEnrollRequest request)
     {
         try
@@ -4986,7 +4887,6 @@ public class PortalController : ControllerBase
 
     /// <summary>Updates current employee's benefit enrollment (only pending).</summary>
     [HttpPut("my-benefits/enrollments/{id}")]
-    [RequiresModuleEndpoint(SystemModule.Benefits)]
     public async Task<IActionResult> UpdateMyEnrollment(long id, [FromBody] PortalUpdateBenefitEnrollRequest request)
     {
         try
@@ -5029,7 +4929,6 @@ public class PortalController : ControllerBase
 
     /// <summary>Cancels current employee's benefit enrollment.</summary>
     [HttpPost("my-benefits/enrollments/{id}/cancel")]
-    [RequiresModuleEndpoint(SystemModule.Benefits)]
     public async Task<IActionResult> CancelMyEnrollment(long id)
     {
         try
@@ -5070,8 +4969,6 @@ public class PortalController : ControllerBase
 
     /// <summary>Gets current employee's benefit dependents across all enrollments.</summary>
     [HttpGet("my-benefits/dependents")]
-    [RequiresModuleEndpoint(SystemModule.Benefits)]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetMyBenefitDependents()
     {
         try
@@ -5119,7 +5016,6 @@ public class PortalController : ControllerBase
 
     /// <summary>Adds a dependent to current employee's benefit enrollment.</summary>
     [HttpPost("my-benefits/dependents")]
-    [RequiresModuleEndpoint(SystemModule.Benefits)]
     public async Task<IActionResult> AddMyBenefitDependent([FromBody] PortalAddBenefitDependentRequest request)
     {
         try
@@ -5181,7 +5077,6 @@ public class PortalController : ControllerBase
 
     /// <summary>Removes a dependent from current employee's benefit enrollment.</summary>
     [HttpDelete("my-benefits/dependents/{id}")]
-    [RequiresModuleEndpoint(SystemModule.Benefits)]
     public async Task<IActionResult> RemoveMyBenefitDependent(long id)
     {
         try
@@ -5218,8 +5113,6 @@ public class PortalController : ControllerBase
 
     /// <summary>Gets current employee's benefit claims.</summary>
     [HttpGet("my-benefits/claims")]
-    [RequiresModuleEndpoint(SystemModule.Benefits)]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetMyBenefitClaims()
     {
         try
@@ -5268,7 +5161,6 @@ public class PortalController : ControllerBase
 
     /// <summary>Creates a benefit claim for the current employee.</summary>
     [HttpPost("my-benefits/claims")]
-    [RequiresModuleEndpoint(SystemModule.Benefits)]
     public async Task<IActionResult> CreateMyBenefitClaim([FromBody] PortalCreateBenefitClaimRequest request)
     {
         try
@@ -5324,8 +5216,6 @@ public class PortalController : ControllerBase
 
     /// <summary>Gets a specific benefit claim for the current employee.</summary>
     [HttpGet("my-benefits/claims/{id}")]
-    [RequiresModuleEndpoint(SystemModule.Benefits)]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetMyBenefitClaimById(long id)
     {
         try

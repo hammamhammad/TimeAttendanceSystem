@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using TecAxle.Hrms.Domain.Common;
-using TecAxle.Hrms.Domain.Platform;
 using TecAxle.Hrms.Domain.Branches;
 using TecAxle.Hrms.Domain.Employees;
 using TecAxle.Hrms.Domain.Users;
@@ -15,7 +14,6 @@ using TecAxle.Hrms.Domain.Workflows;
 using TecAxle.Hrms.Domain.LeaveManagement;
 using TecAxle.Hrms.Domain.Notifications;
 using TecAxle.Hrms.Domain.Tenants;
-using TecAxle.Hrms.Domain.Subscriptions;
 using TecAxle.Hrms.Domain.Payroll;
 using TecAxle.Hrms.Domain.Offboarding;
 using TecAxle.Hrms.Domain.Recruitment;
@@ -34,7 +32,6 @@ using TecAxle.Hrms.Domain.Timesheets;
 using TecAxle.Hrms.Domain.Succession;
 using TecAxle.Hrms.Domain.Benefits;
 using TecAxle.Hrms.Domain.Reports;
-using TecAxle.Hrms.Domain.Configuration;
 using TecAxle.Hrms.Domain.Departments;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Application.Services;
@@ -168,8 +165,6 @@ public class TecAxleDbContext : DbContext, IApplicationDbContext
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<NotificationBroadcast> NotificationBroadcasts => Set<NotificationBroadcast>();
     public DbSet<PushNotificationToken> PushNotificationTokens => Set<PushNotificationToken>();
-
-    // Platform entities (Tenants, Subscriptions, etc.) are in MasterDbContext only
 
     // Phase 1: Employee Lifecycle
     public DbSet<EmployeeContract> EmployeeContracts => Set<EmployeeContract>();
@@ -361,8 +356,6 @@ public class TecAxleDbContext : DbContext, IApplicationDbContext
     public DbSet<TenantSettings> TenantSettings => Set<TenantSettings>();
     public DbSet<BranchSettingsOverride> BranchSettingsOverrides => Set<BranchSettingsOverride>();
     public DbSet<DepartmentSettingsOverride> DepartmentSettingsOverrides => Set<DepartmentSettingsOverride>();
-    // PolicyTemplates and PolicyTemplateItems are in MasterDbContext only
-    public DbSet<SetupStep> SetupSteps => Set<SetupStep>();
 
     // v13.5: Lifecycle Automation
     public DbSet<Domain.Lifecycle.LifecycleAutomationAudit> LifecycleAutomationAudits
@@ -391,22 +384,9 @@ public class TecAxleDbContext : DbContext, IApplicationDbContext
     /// </remarks>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Apply PostgreSQL specific configurations
-        // Platform entity configurations are in MasterDbContext only — exclude them here
-        // TenantConfiguration stays — Tenants table is kept in tenant DB for FK on TenantSettings/SetupSteps
-        var platformConfigTypes = new HashSet<string>
-        {
-            "TenantUserEmailConfiguration", "PlatformUserConfiguration",
-            "SubscriptionPlanConfiguration", "PlanModuleEntitlementConfiguration",
-            "PlanFeatureFlagConfiguration", "PlanLimitConfiguration",
-            "TenantSubscriptionConfiguration", "TenantModuleAddOnConfiguration",
-            "TenantFeatureOverrideConfiguration", "EntitlementChangeLogConfiguration",
-            "PolicyTemplateConfiguration", "PolicyTemplateItemConfiguration"
-        };
         modelBuilder.ApplyConfigurationsFromAssembly(
             typeof(TecAxleDbContext).Assembly,
             type => type.Namespace?.Contains("Persistence.PostgreSql.Configurations") == true
-                    && !platformConfigTypes.Contains(type.Name)
         );
 
         base.OnModelCreating(modelBuilder);

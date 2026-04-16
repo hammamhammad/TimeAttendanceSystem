@@ -1,14 +1,12 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TecAxle.Hrms.Application.TenantConfiguration.Commands.UpdateTenantSettings;
-using TecAxle.Hrms.Application.TenantConfiguration.Commands.UpdateBranchSettingsOverride;
 using TecAxle.Hrms.Application.TenantConfiguration.Commands.ResetBranchSettings;
-using TecAxle.Hrms.Application.TenantConfiguration.Queries.GetTenantSettings;
-using TecAxle.Hrms.Application.TenantConfiguration.Queries.GetResolvedSettings;
+using TecAxle.Hrms.Application.TenantConfiguration.Commands.UpdateBranchSettingsOverride;
+using TecAxle.Hrms.Application.TenantConfiguration.Commands.UpdateTenantSettings;
 using TecAxle.Hrms.Application.TenantConfiguration.Queries.GetBranchSettingsOverride;
-using TecAxle.Hrms.Application.SetupTracking.Queries.GetSetupStatus;
-using TecAxle.Hrms.Application.SetupTracking.Commands.RecalculateSetupCompletion;
+using TecAxle.Hrms.Application.TenantConfiguration.Queries.GetResolvedSettings;
+using TecAxle.Hrms.Application.TenantConfiguration.Queries.GetTenantSettings;
 
 namespace TecAxle.Hrms.Api.Controllers;
 
@@ -24,72 +22,46 @@ public class TenantConfigurationController : ControllerBase
         _mediator = mediator;
     }
 
-    /// <summary>Get tenant settings for the current tenant.</summary>
     [HttpGet]
-    public async Task<IActionResult> GetTenantSettings()
+    public async Task<IActionResult> GetSettings()
     {
         var result = await _mediator.Send(new GetTenantSettingsQuery());
-        return result.IsFailure ? BadRequest(new { error = result.Error }) : Ok(result.Value);
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(new { error = result.Error });
     }
 
-    /// <summary>Create or update tenant settings.</summary>
     [HttpPut]
-    public async Task<IActionResult> UpdateTenantSettings([FromBody] UpdateTenantSettingsCommand command)
+    public async Task<IActionResult> UpdateSettings([FromBody] UpdateTenantSettingsCommand command)
     {
         var result = await _mediator.Send(command);
-        return result.IsFailure ? BadRequest(new { error = result.Error }) : Ok();
+        return result.IsSuccess ? Ok() : BadRequest(new { error = result.Error });
     }
 
-    /// <summary>Get fully resolved settings for a branch/department (inheritance applied).</summary>
     [HttpGet("resolved")]
-    public async Task<IActionResult> GetResolvedSettings([FromQuery] long? branchId, [FromQuery] long? departmentId)
+    public async Task<IActionResult> GetResolved([FromQuery] long? branchId = null, [FromQuery] long? deptId = null)
     {
-        var result = await _mediator.Send(new GetResolvedSettingsQuery(branchId, departmentId));
-        return result.IsFailure ? BadRequest(new { error = result.Error }) : Ok(result.Value);
+        var result = await _mediator.Send(new GetResolvedSettingsQuery(branchId, deptId));
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(new { error = result.Error });
     }
 
-    /// <summary>Get branch-level setting overrides.</summary>
-    [HttpGet("branches/{branchId:long}")]
-    public async Task<IActionResult> GetBranchSettingsOverride(long branchId)
+    [HttpGet("branches/{id:long}")]
+    public async Task<IActionResult> GetBranchOverrides(long id)
     {
-        var result = await _mediator.Send(new GetBranchSettingsOverrideQuery(branchId));
-        return result.IsFailure ? BadRequest(new { error = result.Error }) : Ok(result.Value);
+        var result = await _mediator.Send(new GetBranchSettingsOverrideQuery(id));
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(new { error = result.Error });
     }
 
-    /// <summary>Create or update branch-level setting overrides.</summary>
-    [HttpPut("branches/{branchId:long}")]
-    public async Task<IActionResult> UpdateBranchSettingsOverride(long branchId, [FromBody] UpdateBranchSettingsOverrideCommand command)
+    [HttpPut("branches/{id:long}")]
+    public async Task<IActionResult> UpdateBranchOverrides(long id, [FromBody] UpdateBranchSettingsOverrideCommand command)
     {
-        if (command.BranchId != branchId)
-            return BadRequest(new { error = "Branch ID mismatch" });
-
+        if (command.BranchId != id) return BadRequest(new { error = "Branch ID mismatch." });
         var result = await _mediator.Send(command);
-        return result.IsFailure ? BadRequest(new { error = result.Error }) : Ok();
+        return result.IsSuccess ? Ok() : BadRequest(new { error = result.Error });
     }
 
-    /// <summary>Reset all branch overrides (branch inherits all settings from tenant).</summary>
-    [HttpDelete("branches/{branchId:long}")]
-    public async Task<IActionResult> ResetBranchSettings(long branchId)
+    [HttpDelete("branches/{id:long}")]
+    public async Task<IActionResult> ResetBranchOverrides(long id)
     {
-        var result = await _mediator.Send(new ResetBranchSettingsCommand(branchId));
-        return result.IsFailure ? BadRequest(new { error = result.Error }) : Ok();
-    }
-
-    // ── Setup Status ─────────────────────────────────────────
-
-    /// <summary>Get setup completion status for the current tenant.</summary>
-    [HttpGet("setup-status")]
-    public async Task<IActionResult> GetSetupStatus()
-    {
-        var result = await _mediator.Send(new GetSetupStatusQuery());
-        return result.IsFailure ? BadRequest(new { error = result.Error }) : Ok(result.Value);
-    }
-
-    /// <summary>Recalculate setup completion by auto-detecting configured items.</summary>
-    [HttpPost("setup-status/recalculate")]
-    public async Task<IActionResult> RecalculateSetupCompletion()
-    {
-        var result = await _mediator.Send(new RecalculateSetupCompletionCommand());
-        return result.IsFailure ? BadRequest(new { error = result.Error }) : Ok(result.Value);
+        var result = await _mediator.Send(new ResetBranchSettingsCommand(id));
+        return result.IsSuccess ? Ok() : BadRequest(new { error = result.Error });
     }
 }

@@ -10,9 +10,7 @@ using Coravel;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Application.Services;
 using TecAxle.Hrms.Infrastructure.BackgroundJobs;
-using TecAxle.Hrms.Infrastructure.MultiTenancy;
 using TecAxle.Hrms.Infrastructure.Persistence;
-using TecAxle.Hrms.Infrastructure.Persistence.Master;
 using TecAxle.Hrms.Infrastructure.Persistence.Repositories;
 using TecAxle.Hrms.Infrastructure.Security;
 using TecAxle.Hrms.Infrastructure.Services;
@@ -23,25 +21,12 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        // Configure databases
+        // Configure database
         ConfigureDatabase(services, configuration);
-        ConfigureMasterDatabase(services, configuration);
-
-        // Multi-tenancy services
-        services.Configure<MultiTenancyOptions>(configuration.GetSection(MultiTenancyOptions.SectionName));
-        services.AddSingleton<IConnectionStringEncryption, ConnectionStringEncryption>();
-        services.AddScoped<ITenantConnectionResolver, TenantConnectionResolver>();
-        services.AddScoped<ITenantDbContextFactory, TenantDbContextFactory>();
-        services.AddScoped<ITenantProvisioningService, TenantProvisioningService>();
-        services.AddScoped<TenantMigrationRunner>();
 
         services.AddScoped<IApplicationDbContext, ApplicationDbContextAdapter>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<ICurrentUser, CurrentUser>();
-        services.AddScoped<TenantContext>();
-        services.AddScoped<ITenantContext>(sp => sp.GetRequiredService<TenantContext>());
-        services.AddScoped<IEntitlementService, EntitlementService>();
-        services.AddScoped<IModuleDeactivationService, ModuleDeactivationService>();
         services.AddScoped<ITenantSettingsResolver, TenantSettingsResolver>();
         services.AddScoped<ISystemUserResolver, SystemUserResolver>();
         services.AddScoped<INotificationRecipientResolver, NotificationRecipientResolver>();
@@ -1842,90 +1827,26 @@ public static class DependencyInjection
     /// </summary>
     /// <param name="services">Service collection for dependency injection</param>
     /// <param name="configuration">Application configuration</param>
-    private static void ConfigureMasterDatabase(IServiceCollection services, IConfiguration configuration)
+    private static void ConfigureDatabase(IServiceCollection services, IConfiguration configuration)
     {
-        // Master DB uses a dedicated connection string, falling back to the main connection if not configured
-        var masterConnectionString = configuration.GetConnectionString("MasterDatabase")
+        var connectionString = configuration.GetConnectionString("DefaultConnection")
             ?? configuration.GetConnectionString("PostgreSqlConnection")
-            ?? configuration.GetConnectionString("DefaultConnection");
+            ?? throw new InvalidOperationException(
+                "PostgreSQL connection string not found. " +
+                "Please ensure 'DefaultConnection' is configured in appsettings.json");
 
-        if (string.IsNullOrEmpty(masterConnectionString))
+        services.AddDbContext<TecAxleDbContext>(options =>
         {
-            throw new InvalidOperationException(
-                "Master database connection string not found. " +
-                "Please configure 'MasterDatabase', 'PostgreSqlConnection', or 'DefaultConnection' in appsettings.json");
-        }
-
-        services.AddDbContext<MasterDbContext>(options =>
-        {
-            options.UseNpgsql(masterConnectionString, npgsqlOptions =>
+            options.UseNpgsql(connectionString, npgsqlOptions =>
             {
-                npgsqlOptions.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(30), errorCodesToAdd: null);
+                npgsqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 5,
+                    maxRetryDelay: TimeSpan.FromSeconds(30),
+                    errorCodesToAdd: null);
                 npgsqlOptions.CommandTimeout(30);
-                npgsqlOptions.MigrationsAssembly(typeof(MasterDbContext).Assembly.FullName);
+                npgsqlOptions.MigrationsAssembly(typeof(TecAxleDbContext).Assembly.FullName);
             });
             options.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
         });
-
-        services.AddScoped<IMasterDbContext>(sp => sp.GetRequiredService<MasterDbContext>());
-    }
-
-    private static void ConfigureDatabase(IServiceCollection services, IConfiguration configuration)
-    {
-        var defaultConnectionString = configuration.GetConnectionString("PostgreSqlConnection")
-            ?? configuration.GetConnectionString("DefaultConnection")
-            ?? throw new InvalidOperationException(
-                "PostgreSQL connection string not found. " +
-                "Please ensure 'PostgreSqlConnection' or 'DefaultConnection' is configured in appsettings.json");
-
-        var multiTenancyMode = configuration.GetValue<string>("MultiTenancy:Mode") ?? "SharedDatabase";
-
-        if (multiTenancyMode == "SharedDatabase")
-        {
-            // SharedDatabase mode: static connection string, same as before
-            services.AddDbContext<TecAxleDbContext>(options =>
-            {
-                ConfigureDbContextOptions(options, defaultConnectionString);
-            });
-        }
-        else
-        {
-            // Hybrid or PerTenantDatabase mode: dynamic connection per request
-            services.AddScoped<TecAxleDbContext>(sp =>
-            {
-                var tenantContext = sp.GetRequiredService<TenantContext>();
-                string connectionString;
-
-                if (tenantContext.IsResolved)
-                {
-                    var resolver = sp.GetRequiredService<ITenantConnectionResolver>();
-                    connectionString = resolver.GetConnectionStringAsync(tenantContext.TenantId!.Value)
-                        .GetAwaiter().GetResult();
-                }
-                else
-                {
-                    // Unauthenticated endpoints (login, discovery) — use default
-                    connectionString = defaultConnectionString;
-                }
-
-                var options = new DbContextOptionsBuilder<TecAxleDbContext>();
-                ConfigureDbContextOptions(options, connectionString);
-                return new TecAxleDbContext(options.Options);
-            });
-        }
-    }
-
-    private static void ConfigureDbContextOptions(DbContextOptionsBuilder options, string connectionString)
-    {
-        options.UseNpgsql(connectionString, npgsqlOptions =>
-        {
-            npgsqlOptions.EnableRetryOnFailure(
-                maxRetryCount: 5,
-                maxRetryDelay: TimeSpan.FromSeconds(30),
-                errorCodesToAdd: null);
-            npgsqlOptions.CommandTimeout(30);
-            npgsqlOptions.MigrationsAssembly(typeof(TecAxleDbContext).Assembly.FullName);
-        });
-        options.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
     }
 }

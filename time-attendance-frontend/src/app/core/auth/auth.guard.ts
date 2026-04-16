@@ -63,12 +63,6 @@ export const authGuard: CanMatchFn = (route: Route, segments: UrlSegment[]) => {
 
   // Check if token is expired
   if (authService.isTokenExpired()) {
-    // Platform users don't have refresh tokens
-    if (authService.isPlatformUser()) {
-      authService.logout();
-      router.navigate(['/login']);
-      return false;
-    }
     const refreshToken = authService.getRefreshToken();
     if (refreshToken) {
       authService.refreshToken().subscribe({

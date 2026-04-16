@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using TecAxle.Hrms.Api.Filters;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Domain.Common;
-using TecAxle.Hrms.Domain.Modules;
 using TecAxle.Hrms.Domain.Payroll;
 
 namespace TecAxle.Hrms.Api.Controllers;
@@ -12,7 +11,6 @@ namespace TecAxle.Hrms.Api.Controllers;
 [ApiController]
 [Route("api/v1/payroll-settings")]
 [Authorize]
-[RequiresModuleEndpoint(SystemModule.Payroll)]
 public class PayrollSettingsController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
@@ -28,7 +26,6 @@ public class PayrollSettingsController : ControllerBase
 
     /// <summary>Gets all tax configurations.</summary>
     [HttpGet("tax-configs")]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetTaxConfigs([FromQuery] long? branchId)
     {
         var query = _context.TaxConfigurations.Where(t => !t.IsDeleted).AsQueryable();
@@ -55,7 +52,6 @@ public class PayrollSettingsController : ControllerBase
 
     /// <summary>Gets a tax configuration by ID.</summary>
     [HttpGet("tax-configs/{id}")]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetTaxConfig(long id)
     {
         var item = await _context.TaxConfigurations
@@ -207,7 +203,6 @@ public class PayrollSettingsController : ControllerBase
 
     /// <summary>Gets all social insurance configurations.</summary>
     [HttpGet("social-insurance")]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetSocialInsuranceConfigs([FromQuery] long? branchId)
     {
         var query = _context.SocialInsuranceConfigs.Where(s => !s.IsDeleted).AsQueryable();
@@ -232,7 +227,6 @@ public class PayrollSettingsController : ControllerBase
 
     /// <summary>Gets a social insurance configuration by ID.</summary>
     [HttpGet("social-insurance/{id}")]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetSocialInsuranceConfig(long id)
     {
         var item = await _context.SocialInsuranceConfigs
@@ -332,7 +326,6 @@ public class PayrollSettingsController : ControllerBase
 
     /// <summary>Gets all insurance providers.</summary>
     [HttpGet("insurance-providers")]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetInsuranceProviders()
     {
         var items = await _context.InsuranceProviders
@@ -351,7 +344,6 @@ public class PayrollSettingsController : ControllerBase
 
     /// <summary>Gets an insurance provider by ID.</summary>
     [HttpGet("insurance-providers/{id}")]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetInsuranceProvider(long id)
     {
         var item = await _context.InsuranceProviders
@@ -451,7 +443,6 @@ public class PayrollSettingsController : ControllerBase
 
     /// <summary>Gets payroll calendar policies.</summary>
     [HttpGet("calendar-policies")]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetCalendarPolicies([FromQuery] long? branchId)
     {
         var query = _context.PayrollCalendarPolicies.Where(p => !p.IsDeleted).AsQueryable();
@@ -478,7 +469,6 @@ public class PayrollSettingsController : ControllerBase
 
     /// <summary>Gets a payroll calendar policy by ID.</summary>
     [HttpGet("calendar-policies/{id}")]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetCalendarPolicy(long id)
     {
         var item = await _context.PayrollCalendarPolicies

@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using TecAxle.Hrms.Api.Filters;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Domain.Common;
-using TecAxle.Hrms.Domain.Modules;
 using TecAxle.Hrms.Domain.Performance;
 
 namespace TecAxle.Hrms.Api.Controllers;
@@ -12,7 +11,6 @@ namespace TecAxle.Hrms.Api.Controllers;
 [ApiController]
 [Route("api/v1/feedback-requests")]
 [Authorize]
-[RequiresModuleEndpoint(SystemModule.Performance)]
 public class FeedbackRequestsController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
@@ -26,7 +24,6 @@ public class FeedbackRequestsController : ControllerBase
 
     /// <summary>Lists 360 feedback requests with optional filters.</summary>
     [HttpGet]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetAll(
         [FromQuery] long? reviewId,
         [FromQuery] FeedbackStatus? status,
@@ -113,7 +110,6 @@ public class FeedbackRequestsController : ControllerBase
 
     /// <summary>Gets pending feedback requests assigned to the current user (self-service).</summary>
     [HttpGet("my-pending")]
-    [AllowModuleReadOnly]
     public async Task<IActionResult> GetMyPending(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20)

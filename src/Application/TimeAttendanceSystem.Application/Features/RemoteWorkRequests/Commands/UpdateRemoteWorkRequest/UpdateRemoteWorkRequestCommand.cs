@@ -1,8 +1,6 @@
 using MediatR;
 using TecAxle.Hrms.Application.Common;
 using TecAxle.Hrms.Domain.RemoteWork;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.Features.RemoteWorkRequests.Commands.UpdateRemoteWorkRequest;
 
@@ -11,7 +9,6 @@ namespace TecAxle.Hrms.Application.Features.RemoteWorkRequests.Commands.UpdateRe
 /// HR can update dates, reason, status, and approval comments.
 /// Employee assignment cannot be changed.
 /// </summary>
-[RequiresModule(SystemModule.RemoteWork)]
 public class UpdateRemoteWorkRequestCommand : IRequest<Result>
 {
     public long Id { get; set; }

@@ -97,11 +97,7 @@ public class VerifyTwoFactorCommandHandler : BaseHandler<VerifyTwoFactorCommand,
 
         var branchIds = user.UserBranchScopes.Select(ubs => ubs.BranchId).ToList();
 
-        // In per-tenant DB, tenantId comes from the request context, not from branch entity
-        var tenantId = CurrentUser.TenantId;
-
-        // Generate tokens
-        var accessToken = _tokenGenerator.GenerateAccessToken(user, roles, permissions, branchIds, tenantId);
+        var accessToken = _tokenGenerator.GenerateAccessToken(user, roles, permissions, branchIds);
         var refreshToken = _tokenGenerator.GenerateRefreshToken();
         var expiresAt = _tokenGenerator.GetTokenExpiration();
 

@@ -1,8 +1,6 @@
 using MediatR;
 using TecAxle.Hrms.Application.Common;
 using TecAxle.Hrms.Domain.Attendance;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.AttendanceCorrections.Commands.UpdateAttendanceCorrectionRequest;
 
@@ -28,7 +26,6 @@ namespace TecAxle.Hrms.Application.AttendanceCorrections.Commands.UpdateAttendan
 /// - Cannot change employee ID
 /// - Correction date cannot be in the future
 /// </remarks>
-[RequiresModule(SystemModule.TimeAttendance)]
 public record UpdateAttendanceCorrectionRequestCommand(
     long Id,
     DateTime CorrectionDate,

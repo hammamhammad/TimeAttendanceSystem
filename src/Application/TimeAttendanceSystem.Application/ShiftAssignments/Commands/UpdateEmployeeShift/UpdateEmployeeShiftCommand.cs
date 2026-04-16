@@ -1,7 +1,5 @@
 using TecAxle.Hrms.Application.Common;
 using TecAxle.Hrms.Domain.Common;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.ShiftAssignments.Commands.UpdateEmployeeShift;
 
@@ -16,7 +14,6 @@ namespace TecAxle.Hrms.Application.ShiftAssignments.Commands.UpdateEmployeeShift
 /// - Maintaining audit trail and proper effective dates
 /// - Ensuring only one active shift assignment exists per employee
 /// </remarks>
-[RequiresModule(SystemModule.TimeAttendance)]
 public record UpdateEmployeeShiftCommand(
     /// <summary>
     /// The employee identifier whose shift is being updated.

@@ -2,8 +2,6 @@ using MediatR;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Application.Common;
 using TecAxle.Hrms.Domain.Settings;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.PublicHolidays.Commands.CreatePublicHoliday;
 
@@ -63,7 +61,6 @@ namespace TecAxle.Hrms.Application.PublicHolidays.Commands.CreatePublicHoliday;
 /// - Regional OneTime: Company Anniversary (SpecificDate=2024-03-15, BranchId=123)
 /// - Monthly Recurring: First Monday Safety Meeting (DayOfWeek=Monday, WeekOccurrence=1)
 /// </remarks>
-[RequiresModule(SystemModule.TimeAttendance)]
 public record CreatePublicHolidayCommand(
     string Name,
     string? NameAr,

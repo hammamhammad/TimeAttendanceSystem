@@ -1,7 +1,5 @@
 using MediatR;
 using TecAxle.Hrms.Application.Common;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.EmployeeVacations.Commands.ToggleEmployeeVacationStatus;
 
@@ -27,7 +25,6 @@ namespace TecAxle.Hrms.Application.EmployeeVacations.Commands.ToggleEmployeeVaca
 /// - Rejection: Removes/reverts attendance records for vacation period
 /// - Audit log entry created for status change
 /// </remarks>
-[RequiresModule(SystemModule.LeaveManagement)]
 [Obsolete("Use ApproveStepCommand / RejectStepCommand via the workflow engine instead. " +
           "This legacy toggle bypasses the workflow engine. Scheduled for removal in v14.")]
 public record ToggleEmployeeVacationStatusCommand(

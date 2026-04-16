@@ -18,7 +18,6 @@ namespace TecAxle.Hrms.Application.Services;
 public class AttendanceCalculationService : IAttendanceCalculationService
 {
     private readonly IApplicationDbContext _context;
-    private readonly IMasterDbContext? _masterContext;
     private readonly IOvertimeConfigurationService _overtimeConfigService;
     private readonly IPublicHolidayService _publicHolidayService;
     private readonly ITenantSettingsResolver? _tenantSettingsResolver;
@@ -28,12 +27,10 @@ public class AttendanceCalculationService : IAttendanceCalculationService
         IApplicationDbContext context,
         IOvertimeConfigurationService overtimeConfigService,
         IPublicHolidayService publicHolidayService,
-        IMasterDbContext? masterContext = null,
         ITenantSettingsResolver? tenantSettingsResolver = null,
         ILogger<AttendanceCalculationService>? logger = null)
     {
         _context = context;
-        _masterContext = masterContext;
         _overtimeConfigService = overtimeConfigService;
         _publicHolidayService = publicHolidayService;
         _tenantSettingsResolver = tenantSettingsResolver;
@@ -1333,42 +1330,23 @@ public class AttendanceCalculationService : IAttendanceCalculationService
         if (_tenantSettingsResolver == null) return null;
         try
         {
-            // Resolve tenant from the first employee's branch in the current context
-            var resolved = await _tenantSettingsResolver.GetSettingsAsync(await GetCurrentTenantIdAsync(ct), ct: ct);
+            var resolved = await _tenantSettingsResolver.GetSettingsAsync(ct: ct);
             return resolved.LateGracePeriodMinutes > 0 ? resolved.LateGracePeriodMinutes : null;
         }
         catch { return null; }
     }
 
     /// <summary>
-    /// Gets the tenant-level early leave grace period from TenantSettings.
+    /// Gets the company-level early leave grace period from TenantSettings.
     /// </summary>
     private async Task<int?> GetTenantEarlyLeaveGracePeriodAsync(CancellationToken ct)
     {
         if (_tenantSettingsResolver == null) return null;
         try
         {
-            var resolved = await _tenantSettingsResolver.GetSettingsAsync(await GetCurrentTenantIdAsync(ct), ct: ct);
+            var resolved = await _tenantSettingsResolver.GetSettingsAsync(ct: ct);
             return resolved.EarlyLeaveGracePeriodMinutes > 0 ? resolved.EarlyLeaveGracePeriodMinutes : null;
         }
         catch { return null; }
-    }
-
-    /// <summary>
-    /// Resolves the current tenant ID from the first available tenant.
-    /// </summary>
-    private async Task<long> GetCurrentTenantIdAsync(CancellationToken ct)
-    {
-        if (_masterContext != null)
-        {
-            var tenant = await _masterContext.Tenants
-                .Where(t => t.IsActive && !t.IsDeleted)
-                .OrderBy(t => t.Id)
-                .Select(t => t.Id)
-                .FirstOrDefaultAsync(ct);
-            return tenant;
-        }
-
-        return 0;
     }
 }

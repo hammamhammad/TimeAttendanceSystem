@@ -1,7 +1,5 @@
 using TecAxle.Hrms.Application.Common;
 using TecAxle.Hrms.Domain.Common;
-using TecAxle.Hrms.Application.Common.Behaviors;
-using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Application.ShiftAssignments.Commands.CreateShiftAssignment;
 
@@ -31,7 +29,6 @@ namespace TecAxle.Hrms.Application.ShiftAssignments.Commands.CreateShiftAssignme
 /// - Referenced entities (Shift, Employee, Department, Branch) must exist and be active
 /// - User must have permission to create assignments for the specified scope
 /// </remarks>
-[RequiresModule(SystemModule.TimeAttendance)]
 public record CreateShiftAssignmentCommand(
     /// <summary>
     /// The identifier of the shift to be assigned.

@@ -7,15 +7,11 @@ namespace TecAxle.Hrms.Application.TenantConfiguration.Queries.GetBranchSettings
 
 public class GetBranchSettingsOverrideQueryHandler : BaseHandler<GetBranchSettingsOverrideQuery, Result<BranchSettingsOverrideDto>>
 {
-    private readonly ITenantContext _tenantContext;
-
     public GetBranchSettingsOverrideQueryHandler(
         IApplicationDbContext context,
-        ICurrentUser currentUser,
-        ITenantContext tenantContext)
+        ICurrentUser currentUser)
         : base(context, currentUser)
     {
-        _tenantContext = tenantContext;
     }
 
     public override async Task<Result<BranchSettingsOverrideDto>> Handle(GetBranchSettingsOverrideQuery request, CancellationToken cancellationToken)
