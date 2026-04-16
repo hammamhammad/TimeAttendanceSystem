@@ -54,6 +54,22 @@ export interface TenantSettingsDto {
   sessionTimeoutMinutes: number;
   require2FA: boolean;
   passwordHistoryCount: number;
+  passwordMinLength?: number;
+  loginLockoutPolicyJson?: string | null;
+  // v13.3: Tenant-configurable business rules (previously hardcoded)
+  contractExpiryAlertDaysCsv?: string;
+  visaExpiryAlertDaysCsv?: string;
+  reviewReminderDaysCsv?: string;
+  loanRepaymentReminderDays?: number;
+  frozenWorkflowCleanupDays?: number;
+  defaultProbationDays?: number;
+  maxUploadSizeMb?: number;
+  maxVacationDaysPerRequest?: number;
+  maxVacationFuturePlanningYears?: number;
+  maxShiftGracePeriodMinutes?: number;
+  excuseBackwardWindowDays?: number;
+  excuseForwardWindowDays?: number;
+  overtimeConfigMaxFutureDays?: number;
 }
 
 // ── Branch Settings Override ─────────────────────────────────

@@ -1420,3 +1420,56 @@ public enum HalfDayType
     Morning = 1,
     Afternoon = 2
 }
+
+// ============================================================
+// v13.5: Lifecycle Automation Enums
+// ============================================================
+
+/// <summary>
+/// Identifies the specific automation that produced a <see cref="TecAxle.Hrms.Domain.Lifecycle.LifecycleAutomationAudit"/> row.
+/// One enum value per distinct step so audit queries remain unambiguous.
+/// </summary>
+public enum LifecycleAutomationType
+{
+    OfferAcceptedCreateOnboarding = 1,
+    OnboardingCompletedActivateEmployee = 2,
+    ResignationApprovedCreateTermination = 3,
+    TerminationCreateClearance = 4,
+    TerminationSuspendEmployee = 5,
+    ClearanceCompletedEnableSettlement = 6,
+    FinalSettlementPaidDeactivateEmployee = 7,
+    ContractExpiredAction = 8
+}
+
+/// <summary>
+/// Terminal status of a single lifecycle automation attempt.
+/// </summary>
+public enum LifecycleAutomationStatus
+{
+    Succeeded = 1,
+    Skipped = 2,
+    Failed = 3,
+    /// <summary>Automation already ran successfully for this source entity; re-fire suppressed.</summary>
+    DuplicateSuppressed = 4,
+    /// <summary>Automation globally disabled (master kill-switch) or specifically disabled via tenant flag.</summary>
+    Disabled = 5,
+    /// <summary>Required input was missing (template, linked entity, employee link, etc.).</summary>
+    MissingPrerequisite = 6
+}
+
+/// <summary>
+/// Per-tenant choice of what happens to contracts whose <c>EndDate</c> has passed.
+/// Default <see cref="AutoMarkExpired"/> fixes the pre-v13.5 bug where contracts stayed
+/// <c>Active</c> indefinitely past their end date.
+/// </summary>
+public enum ContractExpiredAction
+{
+    /// <summary>No status change; only send the existing alert notifications.</summary>
+    NotifyOnly = 1,
+    /// <summary>Flip contract <c>Status</c> to <c>Expired</c> and notify (default).</summary>
+    AutoMarkExpired = 2,
+    /// <summary>Mark expired, then suspend the employee (block login, keep record visible).</summary>
+    Suspend = 3,
+    /// <summary>Mark expired, then fully deactivate the employee (hide from normal operations).</summary>
+    Deactivate = 4
+}

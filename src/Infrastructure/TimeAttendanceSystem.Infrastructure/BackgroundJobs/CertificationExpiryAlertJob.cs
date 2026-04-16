@@ -14,11 +14,16 @@ namespace TecAxle.Hrms.Infrastructure.BackgroundJobs;
 public class CertificationExpiryAlertJob : IInvocable
 {
     private readonly IApplicationDbContext _context;
+    private readonly INotificationRecipientResolver _recipientResolver;
     private readonly ILogger<CertificationExpiryAlertJob> _logger;
 
-    public CertificationExpiryAlertJob(IApplicationDbContext context, ILogger<CertificationExpiryAlertJob> logger)
+    public CertificationExpiryAlertJob(
+        IApplicationDbContext context,
+        INotificationRecipientResolver recipientResolver,
+        ILogger<CertificationExpiryAlertJob> logger)
     {
         _context = context;
+        _recipientResolver = recipientResolver;
         _logger = logger;
     }
 
@@ -30,12 +35,7 @@ public class CertificationExpiryAlertJob : IInvocable
         {
             var today = DateTime.UtcNow.Date;
 
-            // Get HR user IDs to notify
-            var hrUserIds = await _context.UserRoles
-                .Where(ur => ur.Role.Name == "HRManager" || ur.Role.Name == "SystemAdmin")
-                .Select(ur => ur.UserId)
-                .Distinct()
-                .ToListAsync();
+            var hrUserIds = await _recipientResolver.GetRecipientUserIdsAsync();
 
             // Find certifications that are active, have an expiry date, renewal is required,
             // and are within the renewal reminder window

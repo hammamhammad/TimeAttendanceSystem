@@ -2511,6 +2511,17 @@
     }
   },
   "portal": {
+    "return_for_correction": "Return for Correction",
+    "return_for_correction_title": "Return Request for Correction",
+    "return_for_correction_comments": "Comments (required) — explain what the requester should change",
+    "return_for_correction_success": "Request returned to requester",
+    "return_for_correction_failed": "Failed to return request",
+    "resubmit": "Resubmit",
+    "resubmit_success": "Request resubmitted for approval",
+    "resubmit_failed": "Failed to resubmit request",
+    "returned_for_correction_banner": "This request was returned for correction. Please amend and resubmit.",
+    "delegated_from": "Delegated from",
+    "resubmission_count": "Resubmission count",
     "documents": {
       "title": "My Documents",
       "my_documents": "My Documents",

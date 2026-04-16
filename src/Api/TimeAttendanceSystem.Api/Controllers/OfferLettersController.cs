@@ -1,14 +1,17 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TecAxle.Hrms.Api.Filters;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Domain.Common;
 using TecAxle.Hrms.Domain.Employees;
+using TecAxle.Hrms.Domain.Modules;
 using TecAxle.Hrms.Domain.Onboarding;
 using TecAxle.Hrms.Domain.Payroll;
 using TecAxle.Hrms.Domain.Recruitment;
 using TecAxle.Hrms.Domain.Workflows;
 using TecAxle.Hrms.Domain.Workflows.Enums;
+using TecAxle.Hrms.Application.Lifecycle.Events;
 using TecAxle.Hrms.Infrastructure.Persistence;
 
 namespace TecAxle.Hrms.Api.Controllers;
@@ -16,24 +19,47 @@ namespace TecAxle.Hrms.Api.Controllers;
 [ApiController]
 [Route("api/v1/offer-letters")]
 [Authorize]
+[RequiresModuleEndpoint(SystemModule.Recruitment)]
 public class OfferLettersController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
     private readonly ICurrentUser _currentUser;
     private readonly TecAxleDbContext _dbContext;
+    private readonly ILifecycleEventPublisher _lifecyclePublisher;
 
     public OfferLettersController(
         IApplicationDbContext context,
         ICurrentUser currentUser,
-        TecAxleDbContext dbContext)
+        TecAxleDbContext dbContext,
+        ILifecycleEventPublisher lifecyclePublisher)
     {
         _context = context;
         _currentUser = currentUser;
         _dbContext = dbContext;
+        _lifecyclePublisher = lifecyclePublisher;
+    }
+
+    /// <summary>Returns the tenant-configured default probation days (fallback 90 when no settings row exists).</summary>
+    private async Task<int> GetDefaultProbationDaysAsync()
+    {
+        var settings = await _context.TenantSettings
+            .AsNoTracking()
+            .FirstOrDefaultAsync(s => !s.IsDeleted);
+        return settings?.DefaultProbationDays > 0 ? settings.DefaultProbationDays : 90;
+    }
+
+    /// <summary>v13.5: optional pre-hire gate. Default false.</summary>
+    private async Task<bool> IsPreHireModeEnabledAsync()
+    {
+        var settings = await _context.TenantSettings
+            .AsNoTracking()
+            .FirstOrDefaultAsync(s => !s.IsDeleted);
+        return settings?.CreateEmployeeInactiveAtOfferAcceptance == true;
     }
 
     /// <summary>Lists offer letters with optional filters and pagination.</summary>
     [HttpGet]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetAll(
         [FromQuery] long? applicationId,
         [FromQuery] OfferStatus? status,
@@ -86,6 +112,7 @@ public class OfferLettersController : ControllerBase
 
     /// <summary>Gets an offer letter by ID.</summary>
     [HttpGet("{id}")]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetById(long id)
     {
         var item = await _context.OfferLetters
@@ -367,6 +394,10 @@ public class OfferLettersController : ControllerBase
             var employeeNumber = await GenerateEmployeeNumber(requisition.BranchId);
 
             // 4. Create Employee from Candidate + Offer
+            // v13.5: optional pre-hire gate. When CreateEmployeeInactiveAtOfferAcceptance is
+            // on, the employee is created IsActive=false + IsPreHire=true and will be
+            // activated by the onboarding-completed lifecycle handler.
+            var preHireMode = await IsPreHireModeEnabledAsync();
             var employee = new Employee
             {
                 FirstName = candidate.FirstName,
@@ -388,11 +419,12 @@ public class OfferLettersController : ControllerBase
                 HireDate = offer.StartDate,
                 EmploymentStatus = EmploymentStatus.Active,
                 EmployeeNumber = employeeNumber,
-                IsActive = true,
+                IsActive = !preHireMode,
+                IsPreHire = preHireMode,
                 WorkLocationType = WorkLocationType.OnSite,
                 CurrentContractType = offer.ContractType,
                 ProbationStatus = ProbationStatus.InProgress,
-                ProbationEndDate = offer.StartDate.AddDays(90),
+                ProbationEndDate = offer.StartDate.AddDays(await GetDefaultProbationDaysAsync()),
                 CreatedAtUtc = DateTime.UtcNow,
                 CreatedBy = _currentUser.Username ?? "SYSTEM"
             };
@@ -400,7 +432,8 @@ public class OfferLettersController : ControllerBase
             _context.Employees.Add(employee);
             await _context.SaveChangesAsync();
 
-            // 5. Create EmployeeContract
+            // 5. Create EmployeeContract — probation defaults to tenant-configured value.
+            var probationDays = await GetDefaultProbationDaysAsync();
             var contract = new EmployeeContract
             {
                 EmployeeId = employee.Id,
@@ -410,8 +443,8 @@ public class OfferLettersController : ControllerBase
                 Currency = offer.Currency,
                 StartDate = offer.StartDate,
                 Status = ContractStatus.Active,
-                ProbationPeriodDays = 90,
-                ProbationEndDate = offer.StartDate.AddDays(90),
+                ProbationPeriodDays = probationDays,
+                ProbationEndDate = offer.StartDate.AddDays(probationDays),
                 ProbationStatus = ProbationStatus.InProgress,
                 CreatedAtUtc = DateTime.UtcNow,
                 CreatedBy = _currentUser.Username ?? "SYSTEM"
@@ -464,63 +497,19 @@ public class OfferLettersController : ControllerBase
             requisition.ModifiedAtUtc = DateTime.UtcNow;
             requisition.ModifiedBy = _currentUser.Username;
 
-            // 11. Trigger Onboarding - find the best matching template
-            var template = await _context.OnboardingTemplates
-                .Include(t => t.Tasks.Where(task => !task.IsDeleted))
-                .Where(t => t.IsActive && !t.IsDeleted
-                    && (t.DepartmentId == requisition.DepartmentId || t.DepartmentId == null)
-                    && (t.BranchId == requisition.BranchId || t.BranchId == null))
-                .OrderByDescending(t => t.DepartmentId.HasValue) // prefer department-specific
-                .ThenByDescending(t => t.BranchId.HasValue) // then branch-specific
-                .ThenByDescending(t => t.IsDefault) // then default
-                .FirstOrDefaultAsync();
-
-            if (template != null)
-            {
-                var activeTasks = template.Tasks.Where(t => !t.IsDeleted).ToList();
-
-                var process = new OnboardingProcess
-                {
-                    EmployeeId = employee.Id,
-                    OnboardingTemplateId = template.Id,
-                    StartDate = offer.StartDate,
-                    ExpectedCompletionDate = offer.StartDate.AddDays(activeTasks.Any()
-                        ? activeTasks.Max(t => t.DueDaysAfterJoining)
-                        : 30),
-                    Status = OnboardingStatus.InProgress,
-                    TotalTasks = activeTasks.Count,
-                    CompletedTasks = 0,
-                    OfferLetterId = offer.Id,
-                    CreatedAtUtc = DateTime.UtcNow,
-                    CreatedBy = _currentUser.Username ?? "SYSTEM"
-                };
-
-                _context.OnboardingProcesses.Add(process);
-                await _context.SaveChangesAsync();
-
-                foreach (var templateTask in activeTasks.OrderBy(t => t.DisplayOrder))
-                {
-                    var task = new OnboardingTask
-                    {
-                        OnboardingProcessId = process.Id,
-                        OnboardingTemplateTaskId = templateTask.Id,
-                        TaskName = templateTask.TaskName,
-                        TaskNameAr = templateTask.TaskNameAr,
-                        Description = templateTask.Description,
-                        Category = templateTask.Category,
-                        DueDate = offer.StartDate.AddDays(templateTask.DueDaysAfterJoining),
-                        IsRequired = templateTask.IsRequired,
-                        Priority = templateTask.Priority,
-                        Status = OnboardingTaskStatus.Pending,
-                        CreatedAtUtc = DateTime.UtcNow,
-                        CreatedBy = _currentUser.Username ?? "SYSTEM"
-                    };
-                    _context.OnboardingTasks.Add(task);
-                }
-            }
+            // 11. v13.5: onboarding auto-creation is now driven by a lifecycle event.
+            // The OfferAcceptedHandler reads TenantSettings.AutoCreateOnboardingOnOfferAcceptance
+            // (default true → matches v13.x behavior) and DefaultOnboardingTemplateId, resolves
+            // the template (dept → branch → IsDefault fallback), creates the process+tasks,
+            // and writes an audit row. Failures here do NOT roll back the offer — they land
+            // as Failed audit rows that HR can remediate.
 
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
+
+            await _lifecyclePublisher.PublishAsync(
+                new OfferAcceptedEvent(offer.Id, candidate.Id, employee.Id, _currentUser.UserId),
+                HttpContext.RequestAborted);
 
             return Ok(new
             {

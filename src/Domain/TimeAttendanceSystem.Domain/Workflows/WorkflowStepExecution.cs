@@ -96,6 +96,12 @@ public class WorkflowStepExecution : BaseEntity
     /// </summary>
     public DateTime? ReminderSentAt { get; set; }
 
+    /// <summary>
+    /// JSON payload captured when a validation step ran. Contains the rule code, config, outcome,
+    /// reason, and any rule-specific details. Null for non-validation steps. (v13.6)
+    /// </summary>
+    public string? ValidationDetailsJson { get; set; }
+
     // Navigation Properties
 
     /// <summary>
@@ -215,6 +221,39 @@ public class WorkflowStepExecution : BaseEntity
         Action = ApprovalAction.Escalated;
         ActionTakenAt = DateTime.UtcNow;
         Comments = reason ?? "Escalated due to timeout";
+    }
+
+    /// <summary>
+    /// Records that the approver returned this step to the requester for correction. (v13.6)
+    /// </summary>
+    public void ReturnForCorrection(long approverUserId, string comments)
+    {
+        ActionTakenByUserId = approverUserId;
+        ActionTakenAt = DateTime.UtcNow;
+        Action = ApprovalAction.ReturnedForCorrection;
+        Comments = comments;
+    }
+
+    /// <summary>
+    /// Marks this step execution as failed because no approver could be resolved even after
+    /// fallback. Written alongside a <c>WorkflowSystemActionAudit</c> row. (v13.6)
+    /// </summary>
+    public void MarkFailedNoApprover(string reason)
+    {
+        Action = ApprovalAction.FailedNoApprover;
+        ActionTakenAt = DateTime.UtcNow;
+        Comments = reason;
+    }
+
+    /// <summary>
+    /// Stores validation-rule output after a validation step ran. (v13.6)
+    /// </summary>
+    public void RecordValidationOutcome(bool passed, string? reason, string? detailsJson)
+    {
+        Action = passed ? ApprovalAction.AutoApproved : ApprovalAction.AutoRejected;
+        ActionTakenAt = DateTime.UtcNow;
+        Comments = reason ?? (passed ? "Validation passed" : "Validation failed");
+        ValidationDetailsJson = detailsJson;
     }
 
     /// <summary>

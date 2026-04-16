@@ -15,12 +15,19 @@ namespace TecAxle.Hrms.Infrastructure.BackgroundJobs;
 /// </summary>
 public class SuccessionPlanReviewReminderJob : IInvocable
 {
+    private static readonly int[] DefaultReminderDays = { 30, 7, 1 };
+
     private readonly IApplicationDbContext _context;
+    private readonly INotificationRecipientResolver _recipientResolver;
     private readonly ILogger<SuccessionPlanReviewReminderJob> _logger;
 
-    public SuccessionPlanReviewReminderJob(IApplicationDbContext context, ILogger<SuccessionPlanReviewReminderJob> logger)
+    public SuccessionPlanReviewReminderJob(
+        IApplicationDbContext context,
+        INotificationRecipientResolver recipientResolver,
+        ILogger<SuccessionPlanReviewReminderJob> logger)
     {
         _context = context;
+        _recipientResolver = recipientResolver;
         _logger = logger;
     }
 
@@ -31,7 +38,11 @@ public class SuccessionPlanReviewReminderJob : IInvocable
         try
         {
             var today = DateTime.UtcNow.Date;
-            var reminderDays = new[] { 30, 7, 1 };
+            var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync();
+            var reminderDays = BackgroundJobSettingsHelper.ParseCsvDays(settings?.SuccessionPlanReminderDaysCsv, DefaultReminderDays);
+
+            // Resolve recipients once (legacy "HR" / "Admin" preserved as extras for backward-compat).
+            var hrUserIds = await _recipientResolver.GetRecipientUserIdsAsync(new[] { "HR", "Admin" });
             int remindersSent = 0;
 
             foreach (var days in reminderDays)
@@ -51,13 +62,6 @@ public class SuccessionPlanReviewReminderJob : IInvocable
 
                 foreach (var plan in plansNeedingReview)
                 {
-                    // Find HR users in the branch to notify
-                    var hrUserIds = await _context.UserRoles
-                        .Where(ur => ur.Role.Name == "HR" || ur.Role.Name == "SystemAdmin" || ur.Role.Name == "Admin")
-                        .Select(ur => ur.UserId)
-                        .Distinct()
-                        .ToListAsync();
-
                     foreach (var userId in hrUserIds)
                     {
                         var notification = new Notification

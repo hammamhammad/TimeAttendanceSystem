@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TecAxle.Hrms.Api.Filters;
 using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Lifecycle.Events;
 using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Modules;
 using TecAxle.Hrms.Domain.Offboarding;
 
 namespace TecAxle.Hrms.Api.Controllers;
@@ -10,18 +13,25 @@ namespace TecAxle.Hrms.Api.Controllers;
 [ApiController]
 [Route("api/v1/clearance")]
 [Authorize]
+[RequiresModuleEndpoint(SystemModule.Offboarding)]
 public class ClearanceController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
     private readonly ICurrentUser _currentUser;
+    private readonly ILifecycleEventPublisher _lifecyclePublisher;
 
-    public ClearanceController(IApplicationDbContext context, ICurrentUser currentUser)
+    public ClearanceController(
+        IApplicationDbContext context,
+        ICurrentUser currentUser,
+        ILifecycleEventPublisher lifecyclePublisher)
     {
         _context = context;
         _currentUser = currentUser;
+        _lifecyclePublisher = lifecyclePublisher;
     }
 
     [HttpGet("{terminationId}")]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetByTermination(long terminationId)
     {
         var checklist = await _context.ClearanceChecklists
@@ -123,8 +133,10 @@ public class ClearanceController : ControllerBase
             .Where(i => i.ClearanceChecklistId == item.ClearanceChecklistId && !i.IsDeleted && i.Id != itemId)
             .AllAsync(i => i.IsCompleted);
 
+        var flippedToCompleted = false;
         if (allCompleted)
         {
+            flippedToCompleted = item.ClearanceChecklist.OverallStatus != ClearanceStatus.Completed;
             item.ClearanceChecklist.OverallStatus = ClearanceStatus.Completed;
             item.ClearanceChecklist.CompletedAt = DateTime.UtcNow;
             item.ClearanceChecklist.ModifiedAtUtc = DateTime.UtcNow;
@@ -138,6 +150,18 @@ public class ClearanceController : ControllerBase
         }
 
         await _context.SaveChangesAsync();
+
+        // v13.5: only fire the lifecycle event once per transition to Completed.
+        if (flippedToCompleted)
+        {
+            await _lifecyclePublisher.PublishAsync(
+                new ClearanceCompletedEvent(
+                    item.ClearanceChecklist.Id,
+                    item.ClearanceChecklist.TerminationRecordId,
+                    item.ClearanceChecklist.EmployeeId,
+                    _currentUser.UserId),
+                HttpContext.RequestAborted);
+        }
 
         return NoContent();
     }
@@ -169,6 +193,7 @@ public class ClearanceController : ControllerBase
     }
 
     [HttpGet("pending")]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetPending()
     {
         var checklists = await _context.ClearanceChecklists

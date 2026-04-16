@@ -43,6 +43,8 @@ public static class DependencyInjection
         services.AddScoped<IEntitlementService, EntitlementService>();
         services.AddScoped<IModuleDeactivationService, ModuleDeactivationService>();
         services.AddScoped<ITenantSettingsResolver, TenantSettingsResolver>();
+        services.AddScoped<ISystemUserResolver, SystemUserResolver>();
+        services.AddScoped<INotificationRecipientResolver, NotificationRecipientResolver>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IPasswordService, PasswordService>();
         services.AddScoped<ITwoFactorService, TwoFactorService>();
@@ -54,6 +56,10 @@ public static class DependencyInjection
         services.AddScoped<IInAppNotificationService, InAppNotificationService>();
         services.AddScoped<INfcTagEncryptionService, NfcTagEncryptionService>();
         services.AddScoped<IFileStorageService, LocalDiskFileStorageService>();
+
+        // v13.5 Lifecycle Automation: wraps IPublisher with try/catch so handler failures
+        // never cascade back into the originating command.
+        services.AddScoped<ILifecycleEventPublisher, LifecycleEventPublisher>();
 
         // Add Coravel for background jobs
         services.AddScheduler();

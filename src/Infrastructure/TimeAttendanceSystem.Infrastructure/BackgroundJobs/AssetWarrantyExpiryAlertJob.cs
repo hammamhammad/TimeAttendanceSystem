@@ -13,12 +13,19 @@ namespace TecAxle.Hrms.Infrastructure.BackgroundJobs;
 /// </summary>
 public class AssetWarrantyExpiryAlertJob : IInvocable
 {
+    private static readonly int[] DefaultAlertDays = { 30, 15, 7, 1 };
+
     private readonly IApplicationDbContext _context;
+    private readonly INotificationRecipientResolver _recipientResolver;
     private readonly ILogger<AssetWarrantyExpiryAlertJob> _logger;
 
-    public AssetWarrantyExpiryAlertJob(IApplicationDbContext context, ILogger<AssetWarrantyExpiryAlertJob> logger)
+    public AssetWarrantyExpiryAlertJob(
+        IApplicationDbContext context,
+        INotificationRecipientResolver recipientResolver,
+        ILogger<AssetWarrantyExpiryAlertJob> logger)
     {
         _context = context;
+        _recipientResolver = recipientResolver;
         _logger = logger;
     }
 
@@ -29,15 +36,17 @@ public class AssetWarrantyExpiryAlertJob : IInvocable
         try
         {
             var today = DateTime.UtcNow.Date;
+            var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync();
+            var alertDays = BackgroundJobSettingsHelper.ParseCsvDays(settings?.AssetWarrantyExpiryAlertDaysCsv, DefaultAlertDays);
 
-            // Get HR user IDs to notify
-            var hrUserIds = await _context.UserRoles
-                .Where(ur => ur.Role.Name == "HRManager" || ur.Role.Name == "SystemAdmin" || ur.Role.Name == "Admin")
-                .Select(ur => ur.UserId)
-                .Distinct()
-                .ToListAsync();
+            // Recipients via resolver; pass "Admin" as extra role so legacy behavior is preserved
+            // for tenants still relying on it. Admin can later remove it from the tenant CSV.
+            var hrUserIds = await _recipientResolver.GetRecipientUserIdsAsync(new[] { "Admin" });
 
-            // Find active assets with warranty expiring within 30 days
+            // Find active assets with warranty expiring soon (next X days where X = max alert window).
+            var maxAlertDays = alertDays.DefaultIfEmpty(30).Max();
+            var horizon = today.AddDays(maxAlertDays);
+
             var expiringAssets = await _context.Assets
                 .Include(a => a.Category)
                 .Include(a => a.Branch)
@@ -45,12 +54,12 @@ public class AssetWarrantyExpiryAlertJob : IInvocable
                     && !a.IsDeleted
                     && a.WarrantyExpiryDate != null
                     && a.WarrantyExpiryDate.Value.Date >= today
+                    && a.WarrantyExpiryDate.Value.Date <= horizon
                     && a.Status != AssetStatus.Disposed
                     && a.Status != AssetStatus.Retired)
                 .ToListAsync();
 
             var notificationCount = 0;
-            var alertDays = new[] { 30, 15, 7, 1 };
 
             foreach (var asset in expiringAssets)
             {

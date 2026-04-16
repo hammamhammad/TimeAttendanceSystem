@@ -88,6 +88,10 @@ public class ApplicationDbContextAdapter : IApplicationDbContext
     public DbSet<WorkflowStepExecution> WorkflowStepExecutions => _context.WorkflowStepExecutions;
     public DbSet<ApprovalDelegation> ApprovalDelegations => _context.ApprovalDelegations;
 
+    // v13.6 Workflow Routing Hardening
+    public DbSet<WorkflowRoleAssignmentCursor> WorkflowRoleAssignmentCursors => _context.WorkflowRoleAssignmentCursors;
+    public DbSet<WorkflowSystemActionAudit> WorkflowSystemActionAudits => _context.WorkflowSystemActionAudits;
+
     // Leave Management entities
     public DbSet<LeaveEntitlement> LeaveEntitlements => _context.LeaveEntitlements;
     public DbSet<LeaveBalance> LeaveBalances => _context.LeaveBalances;
@@ -157,6 +161,9 @@ public class ApplicationDbContextAdapter : IApplicationDbContext
     public DbSet<ClearanceChecklist> ClearanceChecklists => _context.ClearanceChecklists;
     public DbSet<ClearanceItem> ClearanceItems => _context.ClearanceItems;
     public DbSet<EndOfServiceBenefit> EndOfServiceBenefits => _context.EndOfServiceBenefits;
+    public DbSet<EndOfServicePolicy> EndOfServicePolicies => _context.EndOfServicePolicies;
+    public DbSet<EndOfServicePolicyTier> EndOfServicePolicyTiers => _context.EndOfServicePolicyTiers;
+    public DbSet<EndOfServiceResignationDeductionTier> EndOfServiceResignationDeductionTiers => _context.EndOfServiceResignationDeductionTiers;
     public DbSet<FinalSettlement> FinalSettlements => _context.FinalSettlements;
     public DbSet<ExitInterview> ExitInterviews => _context.ExitInterviews;
 
@@ -301,6 +308,10 @@ public class ApplicationDbContextAdapter : IApplicationDbContext
     public DbSet<DepartmentSettingsOverride> DepartmentSettingsOverrides => _context.DepartmentSettingsOverrides;
     // PolicyTemplates and PolicyTemplateItems are in IMasterDbContext only
     public DbSet<SetupStep> SetupSteps => _context.SetupSteps;
+
+    // v13.5 Lifecycle Automation
+    public DbSet<TecAxle.Hrms.Domain.Lifecycle.LifecycleAutomationAudit> LifecycleAutomationAudits
+        => _context.LifecycleAutomationAudits;
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

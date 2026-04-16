@@ -42,7 +42,7 @@ public class FilesController : ControllerBase
     /// <returns>The created file attachment metadata.</returns>
     [HttpPost("upload")]
     [Authorize]
-    [RequestSizeLimit(10_485_760)] // 10 MB
+    [RequestSizeLimit(104_857_600)] // 100 MB transport cap; per-tenant size enforced below.
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -66,10 +66,13 @@ public class FilesController : ControllerBase
             return BadRequest(new { message = $"File type '{extension}' is not allowed. Allowed types: {string.Join(", ", AllowedExtensions)}" });
         }
 
-        // Validate file size (10 MB)
-        if (file.Length > 10_485_760)
+        // Validate file size against tenant-configured cap (default 10 MB).
+        var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync(s => !s.IsDeleted);
+        var maxMb = settings?.MaxUploadSizeMb > 0 ? settings.MaxUploadSizeMb : 10;
+        var maxBytes = (long)maxMb * 1024L * 1024L;
+        if (file.Length > maxBytes)
         {
-            return BadRequest(new { message = "File size exceeds the maximum allowed (10 MB)." });
+            return BadRequest(new { message = $"File size exceeds the maximum allowed ({maxMb} MB)." });
         }
 
         // Upload to storage

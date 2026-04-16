@@ -541,6 +541,47 @@ export class PortalService {
   }
 
   /**
+   * v13.6 — Return a workflow request to the requester for corrections.
+   * Only allowed when the current step has AllowReturnForCorrection = true.
+   */
+  returnForCorrection(workflowInstanceId: number, comments: string): Observable<void> {
+    return this.http.post<void>(
+      `${environment.apiUrl}/api/v1/approvals/${workflowInstanceId}/return-for-correction`,
+      { comments }
+    ).pipe(
+      tap(() => {
+        this.notificationService.success(this.i18n.t('portal.return_for_correction_success'));
+        this.loadPendingApprovals().subscribe();
+      }),
+      catchError(error => {
+        const errorMessage = error.error?.error || error.message || this.i18n.t('portal.return_for_correction_failed');
+        this.notificationService.error(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * v13.6 — Resubmit a workflow that was previously returned for correction.
+   * Only the original requester may invoke.
+   */
+  resubmitWorkflow(workflowInstanceId: number, comments?: string): Observable<void> {
+    return this.http.post<void>(
+      `${environment.apiUrl}/api/v1/approvals/${workflowInstanceId}/resubmit`,
+      { comments }
+    ).pipe(
+      tap(() => {
+        this.notificationService.success(this.i18n.t('portal.resubmit_success'));
+      }),
+      catchError(error => {
+        const errorMessage = error.error?.error || error.message || this.i18n.t('portal.resubmit_failed');
+        this.notificationService.error(errorMessage);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
    * Delegates a workflow step to another user
    */
   delegateWorkflowStep(workflowInstanceId: number, delegateToUserId: number, comments?: string): Observable<void> {

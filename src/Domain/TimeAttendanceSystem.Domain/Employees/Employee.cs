@@ -150,6 +150,28 @@ public class Employee : BaseEntity
     /// <value>Boolean flag indicating active status (true = active, false = inactive)</value>
     public bool IsActive { get; set; } = true;
 
+    /// <summary>
+    /// v13.5: true when the employee has been terminated but final settlement has not yet been paid.
+    /// In this state the linked User login is blocked, but the employee record remains IsActive=true
+    /// so reports / payroll / clearance can still see them. Flipped back to false when the employee
+    /// is fully deactivated (IsActive=false) at final-settlement-paid.
+    /// </summary>
+    public bool IsSuspended { get; set; } = false;
+
+    /// <summary>
+    /// v13.5: true when the employee record was created at offer acceptance but is awaiting
+    /// onboarding completion before being activated. Only set when the tenant opts in via
+    /// <c>TenantSettings.CreateEmployeeInactiveAtOfferAcceptance</c>. Default employees are
+    /// active on day one and skip this state entirely.
+    /// </summary>
+    public bool IsPreHire { get; set; } = false;
+
+    /// <summary>
+    /// v13.5: UTC timestamp when the onboarding process was marked complete. Set by the
+    /// onboarding-completed lifecycle handler regardless of whether activation is gated.
+    /// </summary>
+    public DateTime? OnboardingCompletedAt { get; set; }
+
     public Branch Branch { get; set; } = null!;
     public Department? Department { get; set; }
     public Employee? Manager { get; set; }

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Payroll.Services;
 using TecAxle.Hrms.Domain.Common;
 using TecAxle.Hrms.Domain.Offboarding;
 
@@ -8,8 +9,16 @@ namespace TecAxle.Hrms.Application.FinalSettlements.Commands.CalculateFinalSettl
 
 public class CalculateFinalSettlementCommandHandler : BaseHandler<CalculateFinalSettlementCommand, Result<long>>
 {
-    public CalculateFinalSettlementCommandHandler(IApplicationDbContext context, ICurrentUser currentUser)
-        : base(context, currentUser) { }
+    private readonly ITenantPayrollCalendarService _calendarService;
+
+    public CalculateFinalSettlementCommandHandler(
+        IApplicationDbContext context,
+        ICurrentUser currentUser,
+        ITenantPayrollCalendarService calendarService)
+        : base(context, currentUser)
+    {
+        _calendarService = calendarService;
+    }
 
     public override async Task<Result<long>> Handle(CalculateFinalSettlementCommand request, CancellationToken cancellationToken)
     {
@@ -19,6 +28,22 @@ public class CalculateFinalSettlementCommandHandler : BaseHandler<CalculateFinal
 
         if (termination == null)
             return Result.Failure<long>("Termination record not found.");
+
+        // v13.5: optional gate — when enabled, reject calculation until clearance is Completed.
+        var settings = await Context.TenantSettings.AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+        if (settings is { RequireClearanceCompleteBeforeFinalSettlement: true })
+        {
+            var clearance = await Context.ClearanceChecklists
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.TerminationRecordId == request.TerminationRecordId && !c.IsDeleted, cancellationToken);
+
+            if (clearance == null || clearance.OverallStatus != ClearanceStatus.Completed)
+            {
+                return Result.Failure<long>(
+                    "Clearance must be completed before final settlement can be calculated. " +
+                    "(TenantSettings.RequireClearanceCompleteBeforeFinalSettlement is enabled.)");
+            }
+        }
 
         var employee = termination.Employee;
 
@@ -49,7 +74,10 @@ public class CalculateFinalSettlementCommandHandler : BaseHandler<CalculateFinal
 
         var totalLeaveDays = leaveBalances.Sum(lb => lb.AccruedDays - lb.UsedDays);
         if (totalLeaveDays < 0) totalLeaveDays = 0;
-        var dailySalary = (salary.BaseSalary + totalAllowances) / 30m;
+
+        // Daily rate driven by PayrollCalendarPolicy (no hardcoded /30).
+        var dailyBasis = await _calendarService.GetMonthlyDailyBasisAsync(employee.BranchId, lastWorkingDate, cancellationToken);
+        var dailySalary = dailyBasis > 0 ? (salary.BaseSalary + totalAllowances) / dailyBasis : 0m;
         var leaveEncashmentAmount = totalLeaveDays * dailySalary;
 
         // Get EOS amount

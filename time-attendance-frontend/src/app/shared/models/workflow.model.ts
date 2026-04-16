@@ -25,7 +25,29 @@ export type ApproverType =
   | 'DirectManager'
   | 'DepartmentHead'
   | 'Role'
-  | 'SpecificUser';
+  | 'SpecificUser'
+  | 'BranchManager'
+  | 'System';
+
+/**
+ * v13.6 — Role-based approver-selection strategy.
+ */
+export type RoleAssignmentStrategy =
+  | 'FirstMatch'
+  | 'RoundRobin'
+  | 'LeastPendingApprovals'
+  | 'FixedPriority';
+
+/**
+ * v13.6 — System-triggered audit action type.
+ */
+export type WorkflowSystemActionType =
+  | 'Timeout'
+  | 'Escalation'
+  | 'AutoApprove'
+  | 'AutoReject'
+  | 'Expire'
+  | 'FallbackRouting';
 
 /**
  * Timeout action types - determines what happens when a step times out
@@ -44,7 +66,10 @@ export type WorkflowStatus =
   | 'InProgress'
   | 'Completed'
   | 'Cancelled'
-  | 'Rejected';
+  | 'Rejected'
+  // v13.6 additions:
+  | 'ReturnedForCorrection'
+  | 'FailedRouting';
 
 /**
  * Approval action types
@@ -54,7 +79,14 @@ export type ApprovalAction =
   | 'Rejected'
   | 'Delegated'
   | 'Skipped'
-  | 'TimedOut';
+  | 'TimedOut'
+  | 'AutoApproved'
+  | 'AutoRejected'
+  | 'Escalated'
+  // v13.6 additions:
+  | 'ReturnedForCorrection'
+  | 'FailedNoApprover'
+  | 'Resubmitted';
 
 /**
  * Workflow step definition
@@ -83,6 +115,12 @@ export interface WorkflowStep {
   approverInstructionsAr?: string;
   requireCommentsOnApprove: boolean;
   requireCommentsOnReject: boolean;
+
+  // v13.6 — Workflow Routing Hardening
+  roleAssignmentStrategy?: RoleAssignmentStrategy;
+  allowReturnForCorrection?: boolean;
+  validationRuleCode?: string;
+  validationConfigJson?: string;
 
   // Navigation properties for display
   approverRoleName?: string;
@@ -182,6 +220,67 @@ export interface PendingApproval {
   startDate?: string;
   endDate?: string;
   reason?: string;
+
+  // v13.6 additions — surfaced from GET /api/v1/approvals/pending
+  allowReturnForCorrection?: boolean;
+  isDelegated?: boolean;
+  delegatedFromUserId?: number;
+  delegatedFromUserName?: string;
+  isReturnedForCorrection?: boolean;
+  resubmissionCount?: number;
+}
+
+/**
+ * v13.6 — system-action audit row for the admin browser.
+ */
+export interface WorkflowSystemAction {
+  id: number;
+  workflowInstanceId: number;
+  stepExecutionId?: number;
+  actionType: WorkflowSystemActionType;
+  triggeredAtUtc: string;
+  systemUserId: number;
+  reason?: string;
+  detailsJson?: string;
+}
+
+/**
+ * v13.6 — validation-rule registry entry for the workflow-step admin form.
+ */
+export interface WorkflowValidationRuleInfo {
+  ruleCode: string;
+  displayName: string;
+}
+
+/**
+ * v13.6 — role-assignment stats for HR operational debugging.
+ */
+export interface RoleAssignmentStats {
+  roleId: number;
+  cursor?: {
+    lastAssignedUserId?: number;
+    lastAssignedAtUtc?: string;
+  };
+  candidates: {
+    userId: number;
+    username: string;
+    priority: number;
+    pendingCount: number;
+  }[];
+}
+
+/**
+ * v13.6 — payload for the Return-for-Correction action.
+ */
+export interface ReturnForCorrectionRequest {
+  comments: string;
+}
+
+/**
+ * v13.6 — payload for resubmitting a returned workflow.
+ */
+export interface ResubmitRequest {
+  comments?: string;
 }
 
 /**
@@ -256,6 +355,12 @@ export interface CreateWorkflowStepRequest {
   approverInstructionsAr?: string;
   requireCommentsOnApprove: boolean;
   requireCommentsOnReject: boolean;
+
+  // v13.6 — Workflow Routing Hardening
+  roleAssignmentStrategy?: RoleAssignmentStrategy;
+  allowReturnForCorrection?: boolean;
+  validationRuleCode?: string;
+  validationConfigJson?: string;
 }
 
 /**

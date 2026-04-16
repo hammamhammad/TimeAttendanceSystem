@@ -1,15 +1,20 @@
 using FluentValidation;
+using TecAxle.Hrms.Application.Validation;
 
 namespace TecAxle.Hrms.Application.EmployeeVacations.Commands.CreateBulkEmployeeVacation;
 
 /// <summary>
-/// Validator for CreateBulkEmployeeVacationCommand.
-/// Ensures all required fields are provided and business rules are enforced.
+/// Validator for CreateBulkEmployeeVacationCommand. Future-planning window and max-period are
+/// tenant-configurable via <c>TenantSettings.MaxVacationFuturePlanningYears</c> and
+/// <c>MaxVacationDaysPerRequest</c> (both with sensible defaults preserving pre-v13.3 behavior).
 /// </summary>
 public class CreateBulkEmployeeVacationCommandValidator : AbstractValidator<CreateBulkEmployeeVacationCommand>
 {
-    public CreateBulkEmployeeVacationCommandValidator()
+    private readonly IValidationSettingsProvider _settings;
+
+    public CreateBulkEmployeeVacationCommandValidator(IValidationSettingsProvider settings)
     {
+        _settings = settings;
         RuleFor(x => x.VacationTypeId)
             .GreaterThan(0)
             .WithMessage("Vacation type is required");
@@ -56,19 +61,31 @@ public class CreateBulkEmployeeVacationCommandValidator : AbstractValidator<Crea
             .MaximumLength(1000)
             .WithMessage("Notes cannot exceed 1000 characters");
 
-        // Additional business rule: Start date should not be too far in the past
+        // Start date should not be too far in the past
         RuleFor(x => x.StartDate)
             .GreaterThanOrEqualTo(DateTime.Today.AddYears(-1))
             .WithMessage("Start date cannot be more than 1 year in the past");
 
-        // Additional business rule: End date should not be too far in the future
-        RuleFor(x => x.EndDate)
-            .LessThanOrEqualTo(DateTime.Today.AddYears(2))
-            .WithMessage("End date cannot be more than 2 years in the future");
-
-        // Vacation period should not exceed reasonable duration (e.g., 6 months)
+        // End date cannot exceed tenant-configured future planning window
         RuleFor(x => x)
-            .Must(x => (x.EndDate - x.StartDate).TotalDays <= 180)
-            .WithMessage("Vacation period cannot exceed 180 days");
+            .MustAsync(async (cmd, ct) =>
+            {
+                await _settings.WarmAsync(ct);
+                var maxYears = _settings.Current.MaxVacationFuturePlanningYears;
+                return cmd.EndDate <= DateTime.Today.AddYears(maxYears);
+            })
+            .WithMessage(_ => $"End date cannot be more than {_settings.Current.MaxVacationFuturePlanningYears} years in the future")
+            .WithName("EndDate");
+
+        // Vacation period cannot exceed tenant-configured max days per request
+        RuleFor(x => x)
+            .MustAsync(async (cmd, ct) =>
+            {
+                await _settings.WarmAsync(ct);
+                var totalDays = (cmd.EndDate.Date - cmd.StartDate.Date).Days + 1;
+                return totalDays <= _settings.Current.MaxVacationDaysPerRequest;
+            })
+            .WithMessage(_ => $"Vacation period cannot exceed {_settings.Current.MaxVacationDaysPerRequest} days")
+            .WithName("DateRange");
     }
 }

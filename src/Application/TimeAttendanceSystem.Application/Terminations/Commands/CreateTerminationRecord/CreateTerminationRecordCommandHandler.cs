@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Lifecycle.Events;
 using TecAxle.Hrms.Domain.Common;
 using TecAxle.Hrms.Domain.Offboarding;
 
@@ -8,8 +9,16 @@ namespace TecAxle.Hrms.Application.Terminations.Commands.CreateTerminationRecord
 
 public class CreateTerminationRecordCommandHandler : BaseHandler<CreateTerminationRecordCommand, Result<long>>
 {
-    public CreateTerminationRecordCommandHandler(IApplicationDbContext context, ICurrentUser currentUser)
-        : base(context, currentUser) { }
+    private readonly ILifecycleEventPublisher _lifecyclePublisher;
+
+    public CreateTerminationRecordCommandHandler(
+        IApplicationDbContext context,
+        ICurrentUser currentUser,
+        ILifecycleEventPublisher lifecyclePublisher)
+        : base(context, currentUser)
+    {
+        _lifecyclePublisher = lifecyclePublisher;
+    }
 
     public override async Task<Result<long>> Handle(CreateTerminationRecordCommand request, CancellationToken cancellationToken)
     {
@@ -22,11 +31,13 @@ public class CreateTerminationRecordCommandHandler : BaseHandler<CreateTerminati
         if (!CurrentUser.IsSystemAdmin && CurrentUser.BranchIds.Any() && !CurrentUser.BranchIds.Contains(employee.BranchId))
             return Result.Failure<long>("Access denied to this employee's branch.");
 
-        // Update employee
+        // v13.5: Do NOT directly flip IsActive=false here. The termination-created
+        // lifecycle handler will run SuspendEmployeeCommand (gated by
+        // AutoSuspendEmployeeOnTerminationCreated, default true) which sets IsSuspended=true
+        // and blocks login. Full deactivation (IsActive=false) happens at final-settlement-paid.
         employee.EmploymentStatus = EmploymentStatus.Terminated;
         employee.TerminationDate = request.TerminationDate;
         employee.LastWorkingDate = request.LastWorkingDate;
-        employee.IsActive = false;
         employee.ModifiedAtUtc = DateTime.UtcNow;
         employee.ModifiedBy = CurrentUser.Username;
 
@@ -48,33 +59,13 @@ public class CreateTerminationRecordCommandHandler : BaseHandler<CreateTerminati
         Context.TerminationRecords.Add(termination);
         await Context.SaveChangesAsync(cancellationToken);
 
-        // Auto-create clearance checklist with default items
-        var checklist = new ClearanceChecklist
-        {
-            TerminationRecordId = termination.Id,
-            EmployeeId = request.EmployeeId,
-            OverallStatus = ClearanceStatus.Pending,
-            CreatedAtUtc = DateTime.UtcNow,
-            CreatedBy = CurrentUser.Username ?? "system"
-        };
-
-        Context.ClearanceChecklists.Add(checklist);
-        await Context.SaveChangesAsync(cancellationToken);
-
-        var defaultItems = new List<ClearanceItem>
-        {
-            new() { ClearanceChecklistId = checklist.Id, Department = ClearanceDepartment.IT, ItemName = "Return laptop and equipment", ItemNameAr = "إعادة اللابتوب والمعدات", DisplayOrder = 1, CreatedAtUtc = DateTime.UtcNow, CreatedBy = CurrentUser.Username ?? "system" },
-            new() { ClearanceChecklistId = checklist.Id, Department = ClearanceDepartment.IT, ItemName = "Revoke system access", ItemNameAr = "إلغاء صلاحيات النظام", DisplayOrder = 2, CreatedAtUtc = DateTime.UtcNow, CreatedBy = CurrentUser.Username ?? "system" },
-            new() { ClearanceChecklistId = checklist.Id, Department = ClearanceDepartment.Finance, ItemName = "Settle outstanding advances", ItemNameAr = "تسوية السلف المستحقة", DisplayOrder = 3, CreatedAtUtc = DateTime.UtcNow, CreatedBy = CurrentUser.Username ?? "system" },
-            new() { ClearanceChecklistId = checklist.Id, Department = ClearanceDepartment.Finance, ItemName = "Return company credit card", ItemNameAr = "إعادة بطاقة الشركة الائتمانية", DisplayOrder = 4, CreatedAtUtc = DateTime.UtcNow, CreatedBy = CurrentUser.Username ?? "system" },
-            new() { ClearanceChecklistId = checklist.Id, Department = ClearanceDepartment.Admin, ItemName = "Return access card and keys", ItemNameAr = "إعادة بطاقة الدخول والمفاتيح", DisplayOrder = 5, CreatedAtUtc = DateTime.UtcNow, CreatedBy = CurrentUser.Username ?? "system" },
-            new() { ClearanceChecklistId = checklist.Id, Department = ClearanceDepartment.Admin, ItemName = "Return parking permit", ItemNameAr = "إعادة تصريح المواقف", DisplayOrder = 6, CreatedAtUtc = DateTime.UtcNow, CreatedBy = CurrentUser.Username ?? "system" },
-            new() { ClearanceChecklistId = checklist.Id, Department = ClearanceDepartment.HR, ItemName = "Complete exit interview", ItemNameAr = "إتمام مقابلة نهاية الخدمة", DisplayOrder = 7, CreatedAtUtc = DateTime.UtcNow, CreatedBy = CurrentUser.Username ?? "system" },
-            new() { ClearanceChecklistId = checklist.Id, Department = ClearanceDepartment.HR, ItemName = "Sign final settlement", ItemNameAr = "توقيع التسوية النهائية", DisplayOrder = 8, CreatedAtUtc = DateTime.UtcNow, CreatedBy = CurrentUser.Username ?? "system" },
-        };
-
-        Context.ClearanceItems.AddRange(defaultItems);
-        await Context.SaveChangesAsync(cancellationToken);
+        // v13.5: Clearance auto-creation is now driven by a lifecycle handler (reading
+        // TenantSettings.AutoCreateClearanceOnTermination; default true → same as v13.x).
+        // The handler also runs SuspendEmployeeCommand based on
+        // AutoSuspendEmployeeOnTerminationCreated.
+        await _lifecyclePublisher.PublishAsync(
+            new TerminationCreatedEvent(termination.Id, request.EmployeeId, CurrentUser.UserId),
+            cancellationToken);
 
         return Result.Success(termination.Id);
     }

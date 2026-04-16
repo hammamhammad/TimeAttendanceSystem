@@ -69,7 +69,43 @@ public class WorkflowInstanceConfiguration : IEntityTypeConfiguration<WorkflowIn
         builder.Property(wi => wi.CompletedByUserId)
             .HasComment("User who completed the workflow");
 
+        // v13.6 Workflow Routing Hardening — snapshot + return-for-correction fields
+        builder.Property(wi => wi.DefinitionVersion)
+            .IsRequired()
+            .HasDefaultValue(1)
+            .HasComment("Snapshotted workflow definition version at instance creation (v13.6)");
+
+        builder.Property(wi => wi.DefinitionSnapshotJson)
+            .IsRequired()
+            .HasColumnType("jsonb")
+            .HasDefaultValueSql("'{}'::jsonb")
+            .HasComment("Frozen snapshot of workflow definition consumed for step transitions (v13.6)");
+
+        builder.Property(wi => wi.ReturnedAtUtc)
+            .HasColumnType("timestamp with time zone")
+            .HasComment("UTC when an approver returned the workflow for correction (v13.6)");
+
+        builder.Property(wi => wi.ReturnedByUserId)
+            .HasComment("Approver who returned the workflow for correction (v13.6)");
+
+        builder.Property(wi => wi.ResubmissionCount)
+            .IsRequired()
+            .HasDefaultValue(0)
+            .HasComment("Resubmission counter; capped by TenantSettings.MaxWorkflowResubmissions (v13.6)");
+
         // Relationships
+        builder.HasOne(wi => wi.ReturnedByUser)
+            .WithMany()
+            .HasForeignKey(wi => wi.ReturnedByUserId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .HasConstraintName("FK_WorkflowInstances_ReturnedByUser");
+
+        builder.HasMany(wi => wi.SystemActions)
+            .WithOne(a => a.WorkflowInstance)
+            .HasForeignKey(a => a.WorkflowInstanceId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("FK_WorkflowSystemActionAudits_WorkflowInstances");
+
         builder.HasOne(wi => wi.CurrentStep)
             .WithMany()
             .HasForeignKey(wi => wi.CurrentStepId)

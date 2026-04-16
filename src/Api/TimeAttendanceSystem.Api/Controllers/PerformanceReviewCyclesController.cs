@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TecAxle.Hrms.Api.Filters;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Modules;
 using TecAxle.Hrms.Domain.Performance;
 
 namespace TecAxle.Hrms.Api.Controllers;
@@ -10,6 +12,7 @@ namespace TecAxle.Hrms.Api.Controllers;
 [ApiController]
 [Route("api/v1/performance-cycles")]
 [Authorize]
+[RequiresModuleEndpoint(SystemModule.Performance)]
 public class PerformanceReviewCyclesController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
@@ -23,6 +26,7 @@ public class PerformanceReviewCyclesController : ControllerBase
 
     /// <summary>Lists performance review cycles.</summary>
     [HttpGet]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetAll(
         [FromQuery] ReviewCycleStatus? status,
         [FromQuery] ReviewCycleType? cycleType,
@@ -70,6 +74,7 @@ public class PerformanceReviewCyclesController : ControllerBase
 
     /// <summary>Gets a performance review cycle by ID with review count.</summary>
     [HttpGet("{id}")]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetById(long id)
     {
         var item = await _context.PerformanceReviewCycles

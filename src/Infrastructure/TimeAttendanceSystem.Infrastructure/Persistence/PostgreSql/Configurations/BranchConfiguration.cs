@@ -48,5 +48,18 @@ public class BranchConfiguration : IEntityTypeConfiguration<Branch>
             .WithOne(x => x.Branch)
             .HasForeignKey(x => x.BranchId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        // v13.6 Workflow Routing Hardening — explicit branch manager for BranchManager approver type
+        builder.Property(x => x.ManagerEmployeeId)
+            .HasComment("FK to designated branch-manager Employee, used by workflow engine for BranchManager approver type (v13.6)");
+
+        builder.HasOne(x => x.ManagerEmployee)
+            .WithMany()
+            .HasForeignKey(x => x.ManagerEmployeeId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .HasConstraintName("FK_Branches_ManagerEmployee");
+
+        builder.HasIndex(x => x.ManagerEmployeeId)
+            .HasDatabaseName("IX_Branches_ManagerEmployeeId");
     }
 }

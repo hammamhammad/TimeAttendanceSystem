@@ -1,0 +1,59 @@
+<div class="card app-automation-history-card">
+  <div class="card-header d-flex align-items-center justify-content-between">
+    <div class="d-flex align-items-center gap-2">
+      <i class="fa-solid fa-clock-rotate-left"></i>
+      <span class="fw-semibold">{{ i18n.t('lifecycle_automation.history_title') }}</span>
+    </div>
+    <button type="button" class="btn btn-ghost btn-sm" (click)="reload()" [disabled]="loading()">
+      <i class="fa-solid fa-rotate" [class.fa-spin]="loading()"></i>
+    </button>
+  </div>
+
+  <div class="card-body">
+    @if (error()) {
+      <div class="alert alert-danger py-2 mb-0">{{ error() }}</div>
+    } @else if (loading() && entries().length === 0) {
+      <div class="text-center py-4">
+        <i class="fa-solid fa-circle-notch fa-spin text-primary"></i>
+      </div>
+    } @else if (entries().length === 0) {
+      <div class="text-center text-muted py-3">
+        <i class="fa-regular fa-folder-open mb-2" style="font-size: 1.5rem; display: block;"></i>
+        {{ i18n.t('lifecycle_automation.no_history') }}
+      </div>
+    } @else {
+      <ul class="list-unstyled mb-0 app-automation-timeline">
+        @for (entry of entries(); track entry.id) {
+          <li class="app-automation-timeline__item">
+            <div class="app-automation-timeline__marker bg-{{ statusVariant(entry.status) }}"></div>
+            <div class="app-automation-timeline__content">
+              <div class="d-flex align-items-start justify-content-between gap-2">
+                <div>
+                  <div class="fw-semibold">{{ automationTypeLabel(entry.automationType) }}</div>
+                  <div class="text-muted small">
+                    {{ entry.triggeredAtUtc | date:'yyyy-MM-dd HH:mm' }}
+                    @if (entry.targetEntityType && entry.targetEntityId) {
+                      · {{ entry.targetEntityType }} #{{ entry.targetEntityId }}
+                    }
+                  </div>
+                </div>
+                <span class="badge bg-{{ statusVariant(entry.status) }}">
+                  {{ statusLabel(entry.status) }}
+                </span>
+              </div>
+              @if (entry.reason) {
+                <div class="small text-body-secondary mt-1">{{ entry.reason }}</div>
+              }
+              @if (entry.errorMessage) {
+                <div class="small text-danger mt-1">
+                  <i class="fa-solid fa-triangle-exclamation"></i>
+                  {{ entry.errorMessage }}
+                </div>
+              }
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</div>

@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TecAxle.Hrms.Api.Filters;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Modules;
 using TecAxle.Hrms.Domain.Onboarding;
 
 namespace TecAxle.Hrms.Api.Controllers;
@@ -10,6 +12,7 @@ namespace TecAxle.Hrms.Api.Controllers;
 [ApiController]
 [Route("api/v1/onboarding-templates")]
 [Authorize]
+[RequiresModuleEndpoint(SystemModule.Onboarding)]
 public class OnboardingTemplatesController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
@@ -23,6 +26,7 @@ public class OnboardingTemplatesController : ControllerBase
 
     /// <summary>Lists onboarding templates with optional filters.</summary>
     [HttpGet]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetAll(
         [FromQuery] long? departmentId,
         [FromQuery] long? branchId,
@@ -73,6 +77,7 @@ public class OnboardingTemplatesController : ControllerBase
 
     /// <summary>Gets an onboarding template by ID with tasks.</summary>
     [HttpGet("{id}")]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetById(long id)
     {
         var item = await _context.OnboardingTemplates
@@ -265,6 +270,7 @@ public class OnboardingTemplatesController : ControllerBase
 
     /// <summary>Gets templates for dropdown/select components.</summary>
     [HttpGet("dropdown")]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetDropdown([FromQuery] long? departmentId, [FromQuery] long? branchId)
     {
         var query = _context.OnboardingTemplates

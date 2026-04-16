@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Domain.Settings;
@@ -11,14 +12,27 @@ namespace TecAxle.Hrms.Application.Services;
 public class OvertimeConfigurationService : IOvertimeConfigurationService
 {
     private readonly ISettingsRepository _settingsRepository;
+    private readonly IApplicationDbContext _context;
     private readonly ILogger<OvertimeConfigurationService> _logger;
+    private int? _cachedMaxFutureDays;
 
     public OvertimeConfigurationService(
         ISettingsRepository settingsRepository,
+        IApplicationDbContext context,
         ILogger<OvertimeConfigurationService> logger)
     {
         _settingsRepository = settingsRepository;
+        _context = context;
         _logger = logger;
+    }
+
+    /// <summary>Cached per-scope read of the tenant-configured OT-config future cap (default 30).</summary>
+    private async Task<int> GetMaxFutureDaysAsync(CancellationToken ct)
+    {
+        if (_cachedMaxFutureDays.HasValue) return _cachedMaxFutureDays.Value;
+        var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync(s => !s.IsDeleted, ct);
+        _cachedMaxFutureDays = settings?.OvertimeConfigMaxFutureDays > 0 ? settings.OvertimeConfigMaxFutureDays : 30;
+        return _cachedMaxFutureDays.Value;
     }
 
     public async Task<OvertimeConfiguration> GetActiveConfigurationAsync(CancellationToken cancellationToken = default)
@@ -44,7 +58,8 @@ public class OvertimeConfigurationService : IOvertimeConfigurationService
 
     public async Task<OvertimeConfiguration> CreateConfigurationAsync(OvertimeConfiguration configuration, CancellationToken cancellationToken = default)
     {
-        var (isValid, errors) = ValidateConfiguration(configuration);
+        var maxFutureDays = await GetMaxFutureDaysAsync(cancellationToken);
+        var (isValid, errors) = ValidateConfigurationInternal(configuration, maxFutureDays);
         if (!isValid)
         {
             throw new ArgumentException($"Invalid overtime configuration: {string.Join(", ", errors)}");
@@ -66,7 +81,8 @@ public class OvertimeConfigurationService : IOvertimeConfigurationService
 
     public async Task<OvertimeConfiguration> UpdateConfigurationAsync(OvertimeConfiguration configuration, CancellationToken cancellationToken = default)
     {
-        var (isValid, errors) = ValidateConfiguration(configuration);
+        var maxFutureDays = await GetMaxFutureDaysAsync(cancellationToken);
+        var (isValid, errors) = ValidateConfigurationInternal(configuration, maxFutureDays);
         if (!isValid)
         {
             throw new ArgumentException($"Invalid overtime configuration: {string.Join(", ", errors)}");
@@ -95,7 +111,8 @@ public class OvertimeConfigurationService : IOvertimeConfigurationService
             return false;
         }
 
-        var (isValid, errors) = ValidateConfiguration(configuration);
+        var maxFutureDays = await GetMaxFutureDaysAsync(cancellationToken);
+        var (isValid, errors) = ValidateConfigurationInternal(configuration, maxFutureDays);
         if (!isValid)
         {
             _logger.LogWarning("Cannot activate overtime configuration {ConfigId}: validation failed: {Errors}",
@@ -168,6 +185,13 @@ public class OvertimeConfigurationService : IOvertimeConfigurationService
 
     public (bool IsValid, List<string> Errors) ValidateConfiguration(OvertimeConfiguration configuration)
     {
+        // Tenant-configurable future cap — cached on first read (default 30 days).
+        var maxFutureDays = _cachedMaxFutureDays ?? 30;
+        return ValidateConfigurationInternal(configuration, maxFutureDays);
+    }
+
+    private static (bool IsValid, List<string> Errors) ValidateConfigurationInternal(OvertimeConfiguration configuration, int maxFutureDays)
+    {
         if (configuration == null)
         {
             return (false, new List<string> { "Configuration cannot be null" });
@@ -175,10 +199,9 @@ public class OvertimeConfigurationService : IOvertimeConfigurationService
 
         var (isValid, errors) = configuration.ValidateConfiguration();
 
-        // Additional business validations
-        if (configuration.IsActive && configuration.EffectiveFromDate > DateTime.UtcNow.AddDays(30))
+        if (configuration.IsActive && configuration.EffectiveFromDate > DateTime.UtcNow.AddDays(maxFutureDays))
         {
-            errors.Add("Active configuration cannot have effective date more than 30 days in the future");
+            errors.Add($"Active configuration cannot have effective date more than {maxFutureDays} days in the future");
         }
 
         return (errors.Count == 0, errors);

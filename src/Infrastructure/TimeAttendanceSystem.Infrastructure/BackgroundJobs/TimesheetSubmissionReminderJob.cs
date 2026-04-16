@@ -34,7 +34,10 @@ public class TimesheetSubmissionReminderJob : IInvocable
         try
         {
             var today = DateTime.UtcNow.Date;
-            var reminderDaysBefore = 2; // Send reminders 2 days before deadline
+            var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync();
+            var reminderDaysBefore = settings?.TimesheetSubmissionReminderDaysBefore > 0
+                ? settings.TimesheetSubmissionReminderDaysBefore
+                : 2;
 
             // Find open periods with approaching deadlines
             var approachingPeriods = await _context.TimesheetPeriods

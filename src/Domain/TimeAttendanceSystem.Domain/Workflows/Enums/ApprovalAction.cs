@@ -50,5 +50,26 @@ public enum ApprovalAction
     /// The step was escalated to a higher authority.
     /// Original approver was bypassed due to timeout or policy.
     /// </summary>
-    Escalated = 8
+    Escalated = 8,
+
+    /// <summary>
+    /// The approver returned the request to the requester for corrections.
+    /// Non-terminal action — the workflow pauses in <see cref="WorkflowStatus.ReturnedForCorrection"/>
+    /// until the requester resubmits. Added in v13.6.
+    /// </summary>
+    ReturnedForCorrection = 9,
+
+    /// <summary>
+    /// The workflow engine could not resolve an approver for the step and the tenant fallback chain
+    /// also failed. The step is recorded as failed and the instance transitions to
+    /// <see cref="WorkflowStatus.FailedRouting"/>. Added in v13.6 to eliminate silent stalls.
+    /// </summary>
+    FailedNoApprover = 10,
+
+    /// <summary>
+    /// The requester resubmitted a previously returned request. Records the moment of resubmission
+    /// and carries the resubmission comments. Workflow resumes execution at the configured
+    /// <c>ResumeFromStepOrder</c> (default step 1). Added in v13.6.
+    /// </summary>
+    Resubmitted = 11
 }

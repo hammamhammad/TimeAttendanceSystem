@@ -1,4 +1,57 @@
 {
+  "lifecycle_automation": {
+    "history_title": "Automation History",
+    "no_history": "No automation events recorded for this record.",
+    "settings_title": "Lifecycle Automation",
+    "settings_description": "Configure which HR lifecycle transitions happen automatically. Every step writes an audit row you can review in the Automation History tab of the related record.",
+    "master_switch": "Lifecycle automation enabled",
+    "master_switch_help": "Global kill-switch. Turn off to suspend every automation at once. Individual commands (accept offer, approve resignation, etc.) still work manually.",
+    "stages": {
+      "recruitment": "Recruitment & Onboarding",
+      "offboarding": "Offboarding & Settlement",
+      "contracts": "Contracts"
+    },
+    "flags": {
+      "AutoCreateOnboardingOnOfferAcceptance": "Auto-create onboarding on offer acceptance",
+      "DefaultOnboardingTemplateId": "Default onboarding template",
+      "CreateEmployeeInactiveAtOfferAcceptance": "Create employee in pre-hire state at offer acceptance",
+      "AutoActivateEmployeeOnOnboardingComplete": "Activate employee on onboarding completion",
+      "OnboardingCompletionRequiresAllRequiredTasks": "Require all mandatory tasks to complete onboarding",
+      "OnboardingCompletionRequiresAllRequiredDocuments": "Require all mandatory documents to complete onboarding",
+      "AutoCreateTerminationOnResignationApproved": "Auto-create termination on resignation approval",
+      "AutoCreateClearanceOnTermination": "Auto-create clearance checklist on termination",
+      "DefaultClearanceTemplateId": "Default clearance template",
+      "AutoSuspendEmployeeOnTerminationCreated": "Suspend employee on termination (blocks login, keeps records visible)",
+      "RequireClearanceCompleteBeforeFinalSettlement": "Require clearance complete before final settlement",
+      "AutoEnableFinalSettlementCalcOnClearanceComplete": "Auto-calculate final settlement on clearance completion",
+      "AutoDeactivateEmployeeOnFinalSettlementPaid": "Deactivate employee on final settlement paid",
+      "ContractExpiredAction": "Contract expired action"
+    },
+    "contract_expired_actions": {
+      "NotifyOnly": "Notify only",
+      "AutoMarkExpired": "Mark contract as Expired",
+      "Suspend": "Mark Expired + suspend employee",
+      "Deactivate": "Mark Expired + deactivate employee"
+    },
+    "types": {
+      "OfferAcceptedCreateOnboarding": "Offer accepted → create onboarding",
+      "OnboardingCompletedActivateEmployee": "Onboarding completed → activate employee",
+      "ResignationApprovedCreateTermination": "Resignation approved → create termination",
+      "TerminationCreateClearance": "Termination → create clearance",
+      "TerminationSuspendEmployee": "Termination → suspend employee",
+      "ClearanceCompletedEnableSettlement": "Clearance complete → enable settlement",
+      "FinalSettlementPaidDeactivateEmployee": "Final settlement paid → deactivate employee",
+      "ContractExpiredAction": "Contract expired action"
+    },
+    "status": {
+      "Succeeded": "Succeeded",
+      "Skipped": "Skipped",
+      "Failed": "Failed",
+      "DuplicateSuppressed": "Duplicate suppressed",
+      "Disabled": "Disabled",
+      "MissingPrerequisite": "Missing prerequisite"
+    }
+  },
   "app": {
     "title": "TecAxle HRMS",
     "loading": "Loading...",
@@ -3435,6 +3488,42 @@
       "deleted": "Deleted",
       "viewed": "Viewed"
     }
+  },
+  "workflow_routing": {
+    "title": "Workflow Routing Hardening (v13.6)",
+    "role_strategy": "Role Assignment Strategy",
+    "role_strategy_first_match": "First Match",
+    "role_strategy_round_robin": "Round Robin",
+    "role_strategy_least_pending": "Least Pending Approvals",
+    "role_strategy_fixed_priority": "Fixed Priority",
+    "allow_return_for_correction": "Allow Return for Correction",
+    "validation_rule_code": "Validation Rule",
+    "validation_config_json": "Validation Rule Configuration (JSON)",
+    "fallback_approver_role": "Fallback Approver Role",
+    "fallback_approver_user": "Fallback Approver User",
+    "max_delegation_depth": "Max Delegation Depth",
+    "max_resubmissions": "Max Resubmissions",
+    "branch_manager": "Branch Manager",
+    "system_actions_title": "System Action Audit",
+    "system_action_timeout": "Timeout",
+    "system_action_escalation": "Escalation",
+    "system_action_auto_approve": "Auto Approve",
+    "system_action_auto_reject": "Auto Reject",
+    "system_action_expire": "Expire",
+    "system_action_fallback_routing": "Fallback Routing"
+  },
+  "approvals_v136": {
+    "return_for_correction": "Return for Correction",
+    "return_for_correction_title": "Return Request for Correction",
+    "return_for_correction_comments": "Comments (required) — explain what the requester should change",
+    "return_for_correction_success": "Request returned to requester",
+    "return_for_correction_failed": "Failed to return request",
+    "resubmit": "Resubmit",
+    "resubmit_success": "Request resubmitted for approval",
+    "resubmit_failed": "Failed to resubmit request",
+    "returned_for_correction_banner": "This request was returned for correction. Please amend and resubmit.",
+    "delegated_from": "Delegated from",
+    "resubmission_count": "Resubmission count"
   },
   "workflows": {
     "title": "Approval Workflows",

@@ -29,6 +29,8 @@ namespace TecAxle.Hrms.Application.Features.RemoteWorkRequests.Commands.ApproveR
 /// - Audit trail maintained for compliance
 /// </remarks>
 [RequiresModule(SystemModule.RemoteWork)]
+[Obsolete("Use ApproveStepCommand via the workflow engine instead. This legacy path bypasses " +
+          "the workflow engine and skips attendance updates when approving. Scheduled for removal in v14.")]
 public record ApproveRemoteWorkRequestCommand(
     long RequestId,
     long ApproverId,

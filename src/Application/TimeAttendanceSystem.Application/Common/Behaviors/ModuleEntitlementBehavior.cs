@@ -53,16 +53,19 @@ public class ModuleEntitlementBehavior<TRequest, TResponse> : IPipelineBehavior<
 
         if (responseType.IsGenericType && responseType.GetGenericTypeDefinition() == typeof(Result<>))
         {
-            var failureMethod = responseType.GetMethod("Failure", BindingFlags.Public | BindingFlags.Static, null,
-                new[] { typeof(string) }, null);
+            // Result<T>.Failure is the generic method `Result.Failure<T>(string)` on the non-generic
+            // Result class. Resolve it via MakeGenericMethod — direct GetMethod on Result<T> won't
+            // find it because the factory is declared on the base Result type.
+            var valueType = responseType.GetGenericArguments()[0];
+            var failureMethod = typeof(Result)
+                .GetMethods(BindingFlags.Public | BindingFlags.Static)
+                .First(m => m.Name == nameof(Result.Failure) && m.IsGenericMethodDefinition)
+                .MakeGenericMethod(valueType);
 
-            if (failureMethod != null)
+            return (TResponse)failureMethod.Invoke(null, new object[]
             {
-                return (TResponse)failureMethod.Invoke(null, new object[]
-                {
-                    $"The '{attribute.Module}' module is not available in your current subscription plan."
-                })!;
-            }
+                $"The '{attribute.Module}' module is not available in your current subscription plan."
+            })!;
         }
 
         throw new UnauthorizedAccessException($"The '{attribute.Module}' module is not available in your current subscription plan.");

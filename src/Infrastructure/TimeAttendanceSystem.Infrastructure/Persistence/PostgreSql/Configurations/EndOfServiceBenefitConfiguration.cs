@@ -76,6 +76,19 @@ public class EndOfServiceBenefitConfiguration : IEntityTypeConfiguration<EndOfSe
             .HasMaxLength(1000)
             .HasComment("Additional notes");
 
+        builder.Property(x => x.EndOfServicePolicyId)
+            .HasComment("FK to the EOS policy used for this calculation");
+
+        builder.Property(x => x.AppliedPolicySnapshotJson)
+            .HasColumnType("jsonb")
+            .HasComment("JSON snapshot of the policy + tiers at calculation time");
+
+        builder.HasOne(x => x.EndOfServicePolicy)
+            .WithMany()
+            .HasForeignKey(x => x.EndOfServicePolicyId)
+            .OnDelete(DeleteBehavior.SetNull)
+            .IsRequired(false);
+
         // Relationships
         builder.HasOne(x => x.TerminationRecord)
             .WithOne(x => x.EndOfServiceBenefit)

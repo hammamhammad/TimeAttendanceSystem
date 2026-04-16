@@ -40,6 +40,8 @@ namespace TecAxle.Hrms.Application.AttendanceCorrections.Commands.ApproveAttenda
 /// - Notifications sent to employee about decision
 /// </remarks>
 [RequiresModule(SystemModule.TimeAttendance)]
+[Obsolete("Use ApproveStepCommand via the workflow engine instead. This legacy path bypasses " +
+          "the workflow engine. Scheduled for removal in v14.")]
 public record ApproveAttendanceCorrectionRequestCommand(
     long CorrectionRequestId,
     long ApproverId,

@@ -28,6 +28,8 @@ namespace TecAxle.Hrms.Application.EmployeeVacations.Commands.ToggleEmployeeVaca
 /// - Audit log entry created for status change
 /// </remarks>
 [RequiresModule(SystemModule.LeaveManagement)]
+[Obsolete("Use ApproveStepCommand / RejectStepCommand via the workflow engine instead. " +
+          "This legacy toggle bypasses the workflow engine. Scheduled for removal in v14.")]
 public record ToggleEmployeeVacationStatusCommand(
     long Id
 ) : IRequest<Result>;

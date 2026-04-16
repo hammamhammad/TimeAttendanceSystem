@@ -99,9 +99,14 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<LoginRes
         {
             user.FailedLoginAttempts++;
             user.LastFailedLoginAtUtc = DateTime.UtcNow;
-            if (user.FailedLoginAttempts >= 15) user.LockoutEndUtc = DateTime.UtcNow.AddHours(24);
-            else if (user.FailedLoginAttempts >= 10) user.LockoutEndUtc = DateTime.UtcNow.AddHours(1);
-            else if (user.FailedLoginAttempts >= 5) user.LockoutEndUtc = DateTime.UtcNow.AddMinutes(15);
+
+            // Progressive lockout driven by tenant-configurable policy (v13.3).
+            var settings = await tenantDb.TenantSettings.AsNoTracking().FirstOrDefaultAsync(ct);
+            var policy = Services.LoginLockoutPolicy.ParseOrDefault(settings?.LoginLockoutPolicyJson);
+            var lockoutDuration = policy.GetLockoutForAttempts(user.FailedLoginAttempts);
+            if (lockoutDuration.HasValue)
+                user.LockoutEndUtc = DateTime.UtcNow.Add(lockoutDuration.Value);
+
             await tenantDb.SaveChangesAsync(ct);
             return Result.Failure<LoginResult>("Invalid credentials.");
         }

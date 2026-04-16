@@ -1,14 +1,23 @@
 using Microsoft.EntityFrameworkCore;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Lifecycle.Events;
 using TecAxle.Hrms.Domain.Common;
 
 namespace TecAxle.Hrms.Application.FinalSettlements.Commands.MarkFinalSettlementPaid;
 
 public class MarkFinalSettlementPaidCommandHandler : BaseHandler<MarkFinalSettlementPaidCommand, Result>
 {
-    public MarkFinalSettlementPaidCommandHandler(IApplicationDbContext context, ICurrentUser currentUser)
-        : base(context, currentUser) { }
+    private readonly ILifecycleEventPublisher _lifecyclePublisher;
+
+    public MarkFinalSettlementPaidCommandHandler(
+        IApplicationDbContext context,
+        ICurrentUser currentUser,
+        ILifecycleEventPublisher lifecyclePublisher)
+        : base(context, currentUser)
+    {
+        _lifecyclePublisher = lifecyclePublisher;
+    }
 
     public override async Task<Result> Handle(MarkFinalSettlementPaidCommand request, CancellationToken cancellationToken)
     {
@@ -27,6 +36,16 @@ public class MarkFinalSettlementPaidCommandHandler : BaseHandler<MarkFinalSettle
         settlement.ModifiedBy = CurrentUser.Username;
 
         await Context.SaveChangesAsync(cancellationToken);
+
+        // v13.5: lifecycle handler will deactivate the employee (gated by
+        // AutoDeactivateEmployeeOnFinalSettlementPaid, default true).
+        await _lifecyclePublisher.PublishAsync(
+            new FinalSettlementPaidEvent(
+                settlement.Id,
+                settlement.TerminationRecordId,
+                settlement.EmployeeId,
+                CurrentUser.UserId),
+            cancellationToken);
 
         return Result.Success();
     }

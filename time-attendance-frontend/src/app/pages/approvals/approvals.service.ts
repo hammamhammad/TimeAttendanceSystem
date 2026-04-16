@@ -12,7 +12,9 @@ import {
   ApprovalActionRequest,
   DelegateApprovalRequest,
   CreateDelegationRequest,
-  PagedWorkflowResponse
+  PagedWorkflowResponse,
+  ReturnForCorrectionRequest,
+  ResubmitRequest
 } from '../../shared/models/workflow.model';
 
 /**
@@ -172,15 +174,39 @@ export class ApprovalsService {
   }
 
   /**
+   * v13.6 — Return a workflow request to the requester for corrections.
+   * Only allowed when the current step has AllowReturnForCorrection = true.
+   */
+  returnForCorrection(workflowInstanceId: number, comments: string): Observable<void> {
+    const payload: ReturnForCorrectionRequest = { comments };
+    return this.http.post<void>(`${this.baseUrl}/${workflowInstanceId}/return-for-correction`, payload);
+  }
+
+  /**
+   * v13.6 — Resubmit a workflow that was previously returned for correction.
+   * Only the original requester may invoke. Capped by TenantSettings.MaxWorkflowResubmissions.
+   */
+  resubmit(workflowInstanceId: number, comments?: string): Observable<void> {
+    const payload: ResubmitRequest = { comments };
+    return this.http.post<void>(`${this.baseUrl}/${workflowInstanceId}/resubmit`, payload);
+  }
+
+  /**
    * Get action display name
    */
   getActionDisplayName(action: ApprovalAction): string {
-    const displayNames: Record<ApprovalAction, string> = {
+    const displayNames: Partial<Record<ApprovalAction, string>> = {
       'Approved': 'Approved',
       'Rejected': 'Rejected',
       'Delegated': 'Delegated',
       'Skipped': 'Skipped',
-      'TimedOut': 'Timed Out'
+      'TimedOut': 'Timed Out',
+      'AutoApproved': 'Auto-approved',
+      'AutoRejected': 'Auto-rejected',
+      'Escalated': 'Escalated',
+      'ReturnedForCorrection': 'Returned for Correction',
+      'FailedNoApprover': 'Routing Failed',
+      'Resubmitted': 'Resubmitted'
     };
     return displayNames[action] || action;
   }
@@ -189,12 +215,18 @@ export class ApprovalsService {
    * Get action badge class
    */
   getActionBadgeClass(action: ApprovalAction): string {
-    const classes: Record<ApprovalAction, string> = {
+    const classes: Partial<Record<ApprovalAction, string>> = {
       'Approved': 'bg-success',
       'Rejected': 'bg-danger',
       'Delegated': 'bg-info',
       'Skipped': 'bg-secondary',
-      'TimedOut': 'bg-warning text-dark'
+      'TimedOut': 'bg-warning text-dark',
+      'AutoApproved': 'bg-success',
+      'AutoRejected': 'bg-danger',
+      'Escalated': 'bg-warning text-dark',
+      'ReturnedForCorrection': 'bg-warning text-dark',
+      'FailedNoApprover': 'bg-danger',
+      'Resubmitted': 'bg-info'
     };
     return classes[action] || 'bg-secondary';
   }

@@ -13,12 +13,19 @@ namespace TecAxle.Hrms.Infrastructure.BackgroundJobs;
 /// </summary>
 public class GrievanceSlaAlertJob : IInvocable
 {
+    private static readonly int[] DefaultAlertDays = { 3, 1 };
+
     private readonly IApplicationDbContext _context;
+    private readonly INotificationRecipientResolver _recipientResolver;
     private readonly ILogger<GrievanceSlaAlertJob> _logger;
 
-    public GrievanceSlaAlertJob(IApplicationDbContext context, ILogger<GrievanceSlaAlertJob> logger)
+    public GrievanceSlaAlertJob(
+        IApplicationDbContext context,
+        INotificationRecipientResolver recipientResolver,
+        ILogger<GrievanceSlaAlertJob> logger)
     {
         _context = context;
+        _recipientResolver = recipientResolver;
         _logger = logger;
     }
 
@@ -29,17 +36,16 @@ public class GrievanceSlaAlertJob : IInvocable
         try
         {
             var today = DateTime.UtcNow.Date;
+            var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync();
+            var alertDaysConfigured = BackgroundJobSettingsHelper.ParseCsvDays(settings?.GrievanceSlaAlertDaysCsv, DefaultAlertDays);
 
-            // Get HR user IDs to notify
-            var hrUserIds = await _context.UserRoles
-                .Where(ur => ur.Role.Name == "HR" || ur.Role.Name == "SystemAdmin")
-                .Select(ur => ur.UserId)
-                .Distinct()
-                .ToListAsync();
+            // Recipients: tenant-configured set + legacy "HR" role for backward compat.
+            var hrUserIdsList = await _recipientResolver.GetRecipientUserIdsAsync(new[] { "HR" });
+            var hrUserIds = hrUserIdsList.ToList();
 
             if (!hrUserIds.Any())
             {
-                _logger.LogWarning("No HR users found to send grievance SLA alerts");
+                _logger.LogWarning("No recipients resolved for grievance SLA alerts");
                 return;
             }
 
@@ -93,9 +99,8 @@ public class GrievanceSlaAlertJob : IInvocable
             if (overdueGrievances.Any())
                 _logger.LogInformation("Found {Count} overdue grievances", overdueGrievances.Count);
 
-            // Check for grievances approaching due date (3 days, 1 day)
-            var alertDays = new[] { 3, 1 };
-            foreach (var days in alertDays)
+            // Check for grievances approaching due date using tenant-configured windows.
+            foreach (var days in alertDaysConfigured)
             {
                 var targetDate = today.AddDays(days);
                 var approachingGrievances = await _context.Grievances

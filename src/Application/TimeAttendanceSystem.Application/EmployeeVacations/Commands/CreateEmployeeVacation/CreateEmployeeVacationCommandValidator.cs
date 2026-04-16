@@ -1,15 +1,20 @@
 using FluentValidation;
+using TecAxle.Hrms.Application.Validation;
 
 namespace TecAxle.Hrms.Application.EmployeeVacations.Commands.CreateEmployeeVacation;
 
 /// <summary>
-/// Fluent Validation rules for CreateEmployeeVacationCommand.
-/// Ensures data integrity and business rule compliance before processing.
+/// Validation rules for CreateEmployeeVacationCommand. Max-period rule uses the tenant-configured
+/// <c>TenantSettings.MaxVacationDaysPerRequest</c> (default 365) rather than a hardcoded 365.
 /// </summary>
 public class CreateEmployeeVacationCommandValidator : AbstractValidator<CreateEmployeeVacationCommand>
 {
-    public CreateEmployeeVacationCommandValidator()
+    private readonly IValidationSettingsProvider _settings;
+
+    public CreateEmployeeVacationCommandValidator(IValidationSettingsProvider settings)
     {
+        _settings = settings;
+
         RuleFor(x => x.EmployeeId)
             .GreaterThan(0)
             .WithMessage("Employee ID must be provided");
@@ -32,13 +37,12 @@ public class CreateEmployeeVacationCommandValidator : AbstractValidator<CreateEm
             .MaximumLength(1000)
             .WithMessage("Notes cannot exceed 1000 characters");
 
-        // Custom validation for date range
+        // Tenant-configurable maximum vacation period
         RuleFor(x => x)
-            .Must(HaveValidDateRange)
-            .WithMessage("Vacation period cannot exceed 365 days")
+            .MustAsync(HaveValidDateRangeAsync)
+            .WithMessage(_ => $"Vacation period cannot exceed {_settings.Current.MaxVacationDaysPerRequest} days")
             .WithName("DateRange");
 
-        // Half-day leave validation
         RuleFor(x => x.HalfDayType)
             .NotNull()
             .When(x => x.IsHalfDay)
@@ -51,12 +55,13 @@ public class CreateEmployeeVacationCommandValidator : AbstractValidator<CreateEm
             .WithName("HalfDayDateRange");
     }
 
-    private static bool HaveValidDateRange(CreateEmployeeVacationCommand command)
+    private async Task<bool> HaveValidDateRangeAsync(CreateEmployeeVacationCommand command, CancellationToken ct)
     {
         if (command.EndDate < command.StartDate)
             return false;
 
+        await _settings.WarmAsync(ct);
         var totalDays = (command.EndDate.Date - command.StartDate.Date).Days + 1;
-        return totalDays <= 365; // Maximum vacation period of 1 year
+        return totalDays <= _settings.Current.MaxVacationDaysPerRequest;
     }
 }

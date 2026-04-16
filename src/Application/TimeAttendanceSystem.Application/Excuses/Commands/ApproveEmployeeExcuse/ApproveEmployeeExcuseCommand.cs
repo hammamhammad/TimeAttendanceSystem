@@ -38,6 +38,10 @@ namespace TecAxle.Hrms.Application.Excuses.Commands.ApproveEmployeeExcuse;
 /// - Notifications sent to employee about decision
 /// </remarks>
 [RequiresModule(SystemModule.LeaveManagement)]
+[Obsolete("Use ApproveStepCommand via the workflow engine instead. This legacy path bypasses " +
+          "the workflow engine, which means approver resolution (v13.6), routing audit, and " +
+          "return-for-correction are not available when calling this command directly. " +
+          "Scheduled for removal in v14.")]
 public record ApproveEmployeeExcuseCommand(
     long ExcuseId,
     long ApproverId,

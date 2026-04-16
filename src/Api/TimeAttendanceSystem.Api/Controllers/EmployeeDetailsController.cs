@@ -1,16 +1,19 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TecAxle.Hrms.Api.Filters;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Application.EmployeeSubEntities.Dtos;
 using TecAxle.Hrms.Domain.Common;
 using TecAxle.Hrms.Domain.Employees;
+using TecAxle.Hrms.Domain.Modules;
 
 namespace TecAxle.Hrms.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/employee-details")]
 [Authorize]
+[RequiresModuleEndpoint(SystemModule.EmployeeLifecycle)]
 public class EmployeeDetailsController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
@@ -27,6 +30,7 @@ public class EmployeeDetailsController : ControllerBase
     // ===========================
 
     [HttpGet("{employeeId}/bank-details")]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetBankDetails(long employeeId)
     {
         if (!await HasAccessToEmployee(employeeId))
@@ -142,6 +146,7 @@ public class EmployeeDetailsController : ControllerBase
     // ===========================
 
     [HttpGet("{employeeId}/dependents")]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetDependents(long employeeId)
     {
         if (!await HasAccessToEmployee(employeeId))
@@ -261,6 +266,7 @@ public class EmployeeDetailsController : ControllerBase
     // ===========================
 
     [HttpGet("{employeeId}/emergency-contacts")]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetEmergencyContacts(long employeeId)
     {
         if (!await HasAccessToEmployee(employeeId))
@@ -372,6 +378,7 @@ public class EmployeeDetailsController : ControllerBase
     // ===========================
 
     [HttpGet("{employeeId}/addresses")]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetAddresses(long employeeId)
     {
         if (!await HasAccessToEmployee(employeeId))
@@ -489,6 +496,7 @@ public class EmployeeDetailsController : ControllerBase
     // ===========================
 
     [HttpGet("{employeeId}/education")]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetEducation(long employeeId)
     {
         if (!await HasAccessToEmployee(employeeId))
@@ -612,6 +620,7 @@ public class EmployeeDetailsController : ControllerBase
     // ===========================
 
     [HttpGet("{employeeId}/work-experience")]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetWorkExperience(long employeeId)
     {
         if (!await HasAccessToEmployee(employeeId))
@@ -731,6 +740,7 @@ public class EmployeeDetailsController : ControllerBase
     // ===========================
 
     [HttpGet("{employeeId}/visas")]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetVisas(long employeeId)
     {
         if (!await HasAccessToEmployee(employeeId))
@@ -838,6 +848,7 @@ public class EmployeeDetailsController : ControllerBase
 
     /// <summary>Gets visas expiring within the specified number of days across all employees.</summary>
     [HttpGet("visas/expiring")]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetExpiringVisas([FromQuery] int daysAhead = 30)
     {
         var cutoff = DateTime.UtcNow.AddDays(daysAhead);

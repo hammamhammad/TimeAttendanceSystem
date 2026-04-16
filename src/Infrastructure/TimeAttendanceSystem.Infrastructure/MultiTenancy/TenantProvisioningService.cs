@@ -142,6 +142,59 @@ public class TenantProvisioningService : ITenantProvisioningService
                     };
                     tenantDb.SetupSteps.AddRange(steps);
                 }
+
+                // 2d. Seed a default End-of-Service policy (v13.3) — replaces the previously hardcoded
+                // Saudi formula in the EOS handler. Safe to call; idempotent via any-exists check.
+                if (!await tenantDb.EndOfServicePolicies.AnyAsync(ct))
+                {
+                    var eosCountry = (tenant.Country ?? "SA").ToUpperInvariant();
+                    var seedEffectiveFrom = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                    var eosPolicy = new Domain.Offboarding.EndOfServicePolicy
+                    {
+                        Name = $"{eosCountry} Standard EOS",
+                        Description = $"Default end-of-service policy seeded at tenant provisioning ({eosCountry}).",
+                        CountryCode = eosCountry.Length == 2 ? eosCountry : null,
+                        IsActive = true,
+                        EffectiveFromDate = seedEffectiveFrom,
+                        MinimumServiceYearsForEligibility = 0m,
+                        CreatedAtUtc = DateTime.UtcNow,
+                        CreatedBy = "SYSTEM"
+                    };
+                    // Tiers: Saudi-style — first 5 years 0.5 month/year, after 5 years 1.0 month/year.
+                    eosPolicy.Tiers.Add(new Domain.Offboarding.EndOfServicePolicyTier
+                    {
+                        MinYearsInclusive = 0m, MaxYearsExclusive = 5m, MonthsPerYearMultiplier = 0.5m,
+                        SortOrder = 1, CreatedAtUtc = DateTime.UtcNow, CreatedBy = "SYSTEM"
+                    });
+                    eosPolicy.Tiers.Add(new Domain.Offboarding.EndOfServicePolicyTier
+                    {
+                        MinYearsInclusive = 5m, MaxYearsExclusive = null, MonthsPerYearMultiplier = 1.0m,
+                        SortOrder = 2, CreatedAtUtc = DateTime.UtcNow, CreatedBy = "SYSTEM"
+                    });
+                    // Resignation deduction tiers: <2y=100%, 2-5y=2/3, 5-10y=1/3, 10+=0%
+                    eosPolicy.ResignationDeductions.Add(new Domain.Offboarding.EndOfServiceResignationDeductionTier
+                    {
+                        MinYearsInclusive = 0m, MaxYearsExclusive = 2m, DeductionFraction = 1.0m,
+                        SortOrder = 1, CreatedAtUtc = DateTime.UtcNow, CreatedBy = "SYSTEM"
+                    });
+                    eosPolicy.ResignationDeductions.Add(new Domain.Offboarding.EndOfServiceResignationDeductionTier
+                    {
+                        MinYearsInclusive = 2m, MaxYearsExclusive = 5m, DeductionFraction = 2m / 3m,
+                        SortOrder = 2, CreatedAtUtc = DateTime.UtcNow, CreatedBy = "SYSTEM"
+                    });
+                    eosPolicy.ResignationDeductions.Add(new Domain.Offboarding.EndOfServiceResignationDeductionTier
+                    {
+                        MinYearsInclusive = 5m, MaxYearsExclusive = 10m, DeductionFraction = 1m / 3m,
+                        SortOrder = 3, CreatedAtUtc = DateTime.UtcNow, CreatedBy = "SYSTEM"
+                    });
+                    eosPolicy.ResignationDeductions.Add(new Domain.Offboarding.EndOfServiceResignationDeductionTier
+                    {
+                        MinYearsInclusive = 10m, MaxYearsExclusive = null, DeductionFraction = 0m,
+                        SortOrder = 4, CreatedAtUtc = DateTime.UtcNow, CreatedBy = "SYSTEM"
+                    });
+                    tenantDb.EndOfServicePolicies.Add(eosPolicy);
+                }
+
                 await tenantDb.SaveChangesAsync(ct);
 
                 // 3. Create tenant SystemAdmin using company email domain

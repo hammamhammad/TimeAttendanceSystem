@@ -34,6 +34,7 @@ using TecAxle.Hrms.Domain.Benefits;
 using TecAxle.Hrms.Domain.Reports;
 using TecAxle.Hrms.Domain.Configuration;
 using TecAxle.Hrms.Domain.Departments;
+using TecAxle.Hrms.Domain.Lifecycle;
 
 namespace TecAxle.Hrms.Application.Abstractions;
 
@@ -586,6 +587,18 @@ public interface IApplicationDbContext
     DbSet<ApprovalDelegation> ApprovalDelegations { get; }
 
     /// <summary>
+    /// v13.6: Per-role cursor state used by the <c>RoundRobin</c> role-assignment strategy.
+    /// </summary>
+    DbSet<WorkflowRoleAssignmentCursor> WorkflowRoleAssignmentCursors { get; }
+
+    /// <summary>
+    /// v13.6: Append-only audit log of system-triggered workflow actions
+    /// (timeouts, escalations, auto-approvals, fallback routing, expirations).
+    /// Replaces the previous pattern where system actions were attributed to user "0".
+    /// </summary>
+    DbSet<WorkflowSystemActionAudit> WorkflowSystemActionAudits { get; }
+
+    /// <summary>
     /// Gets the database set for LeaveEntitlement entities representing annual leave entitlement configuration.
     /// Defines base leave entitlements for employees with carry-over and proration support.
     /// </summary>
@@ -754,6 +767,9 @@ public interface IApplicationDbContext
     DbSet<ClearanceChecklist> ClearanceChecklists { get; }
     DbSet<ClearanceItem> ClearanceItems { get; }
     DbSet<EndOfServiceBenefit> EndOfServiceBenefits { get; }
+    DbSet<EndOfServicePolicy> EndOfServicePolicies { get; }
+    DbSet<EndOfServicePolicyTier> EndOfServicePolicyTiers { get; }
+    DbSet<EndOfServiceResignationDeductionTier> EndOfServiceResignationDeductionTiers { get; }
     DbSet<FinalSettlement> FinalSettlements { get; }
     DbSet<ExitInterview> ExitInterviews { get; }
 
@@ -898,6 +914,10 @@ public interface IApplicationDbContext
     DbSet<DepartmentSettingsOverride> DepartmentSettingsOverrides { get; }
     // PolicyTemplates and PolicyTemplateItems are in IMasterDbContext only
     DbSet<SetupStep> SetupSteps { get; }
+
+    // v13.5: Lifecycle Automation audit trail — one row per automation attempt
+    // (succeeded / skipped / failed / disabled / duplicate-suppressed / missing-prerequisite).
+    DbSet<LifecycleAutomationAudit> LifecycleAutomationAudits { get; }
 
     /// <summary>
     /// Asynchronously saves all pending changes to the database.

@@ -1,14 +1,23 @@
 using Microsoft.EntityFrameworkCore;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Lifecycle.Events;
 using TecAxle.Hrms.Domain.Common;
 
 namespace TecAxle.Hrms.Application.Resignations.Commands.ApproveResignation;
 
 public class ApproveResignationCommandHandler : BaseHandler<ApproveResignationCommand, Result>
 {
-    public ApproveResignationCommandHandler(IApplicationDbContext context, ICurrentUser currentUser)
-        : base(context, currentUser) { }
+    private readonly ILifecycleEventPublisher _lifecyclePublisher;
+
+    public ApproveResignationCommandHandler(
+        IApplicationDbContext context,
+        ICurrentUser currentUser,
+        ILifecycleEventPublisher lifecyclePublisher)
+        : base(context, currentUser)
+    {
+        _lifecyclePublisher = lifecyclePublisher;
+    }
 
     public override async Task<Result> Handle(ApproveResignationCommand request, CancellationToken cancellationToken)
     {
@@ -36,6 +45,13 @@ public class ApproveResignationCommandHandler : BaseHandler<ApproveResignationCo
         employee.ModifiedBy = CurrentUser.Username;
 
         await Context.SaveChangesAsync(cancellationToken);
+
+        // v13.5 lifecycle automation: fire event AFTER persist. Handler may create a
+        // TerminationRecord depending on tenant settings. Exceptions in the handler are
+        // swallowed — they cannot affect the approval itself.
+        await _lifecyclePublisher.PublishAsync(
+            new ResignationApprovedEvent(resignation.Id, resignation.EmployeeId, CurrentUser.UserId),
+            cancellationToken);
 
         return Result.Success();
     }

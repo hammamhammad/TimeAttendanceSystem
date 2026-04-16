@@ -1,0 +1,45 @@
+.app-automation-history-card .card-header {
+  background-color: var(--app-gray-25, #fafafa);
+  border-bottom: 1px solid var(--app-gray-200, #eaecf0);
+}
+
+.app-automation-timeline {
+  position: relative;
+  padding-left: 24px;
+  padding-right: 0;
+}
+
+:host-context([dir="rtl"]) .app-automation-timeline {
+  padding-left: 0;
+  padding-right: 24px;
+}
+
+.app-automation-timeline__item {
+  position: relative;
+  padding: 12px 0;
+  border-bottom: 1px dashed var(--app-gray-200, #eaecf0);
+}
+
+.app-automation-timeline__item:last-child {
+  border-bottom: none;
+}
+
+.app-automation-timeline__marker {
+  position: absolute;
+  left: -20px;
+  top: 18px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--app-surface, #ffffff);
+  box-shadow: 0 0 0 2px var(--app-gray-200, #eaecf0);
+}
+
+:host-context([dir="rtl"]) .app-automation-timeline__marker {
+  left: auto;
+  right: -20px;
+}
+
+.app-automation-timeline__content {
+  padding-left: 4px;
+}

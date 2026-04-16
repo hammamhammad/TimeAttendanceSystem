@@ -69,7 +69,7 @@ namespace TecAxle.Hrms.Infrastructure.Services;
 /// </remarks>
 public class PasswordService : IPasswordService
 {
-    private const int MinLength = 8;
+    private const int DefaultMinLength = 8;
     private const int MaxLength = 128;
 
     /// <summary>
@@ -112,12 +112,22 @@ public class PasswordService : IPasswordService
     /// - Industry-standard security practice implementation
     /// </remarks>
     public Result ValidatePasswordStrength(string password)
+        => ValidatePasswordStrength(password, DefaultMinLength);
+
+    /// <summary>
+    /// Validates password strength with an explicit minimum-length threshold.
+    /// Callers (LoginCommandHandler, RegisterCommandHandler, etc.) resolve the tenant-configured
+    /// <c>TenantSettings.PasswordMinLength</c> and pass it here.
+    /// </summary>
+    public Result ValidatePasswordStrength(string password, int minLength)
     {
         if (string.IsNullOrWhiteSpace(password))
             return Result.Failure("Password is required.");
 
-        if (password.Length < MinLength)
-            return Result.Failure($"Password must be at least {MinLength} characters long.");
+        if (minLength < DefaultMinLength) minLength = DefaultMinLength;
+
+        if (password.Length < minLength)
+            return Result.Failure($"Password must be at least {minLength} characters long.");
 
         if (password.Length > MaxLength)
             return Result.Failure($"Password must not exceed {MaxLength} characters.");

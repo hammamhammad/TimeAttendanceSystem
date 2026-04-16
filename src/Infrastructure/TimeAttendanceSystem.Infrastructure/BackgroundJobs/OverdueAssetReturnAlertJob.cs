@@ -15,12 +15,19 @@ namespace TecAxle.Hrms.Infrastructure.BackgroundJobs;
 /// </summary>
 public class OverdueAssetReturnAlertJob : IInvocable
 {
+    private static readonly int[] DefaultAlertDays = { 1, 3, 7, 14, 30 };
+
     private readonly IApplicationDbContext _context;
+    private readonly INotificationRecipientResolver _recipientResolver;
     private readonly ILogger<OverdueAssetReturnAlertJob> _logger;
 
-    public OverdueAssetReturnAlertJob(IApplicationDbContext context, ILogger<OverdueAssetReturnAlertJob> logger)
+    public OverdueAssetReturnAlertJob(
+        IApplicationDbContext context,
+        INotificationRecipientResolver recipientResolver,
+        ILogger<OverdueAssetReturnAlertJob> logger)
     {
         _context = context;
+        _recipientResolver = recipientResolver;
         _logger = logger;
     }
 
@@ -31,13 +38,11 @@ public class OverdueAssetReturnAlertJob : IInvocable
         try
         {
             var today = DateTime.UtcNow.Date;
+            var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync();
+            var alertDays = BackgroundJobSettingsHelper.ParseCsvDays(settings?.AssetOverdueReturnAlertDaysCsv, DefaultAlertDays);
 
-            // Get HR user IDs to notify
-            var hrUserIds = await _context.UserRoles
-                .Where(ur => ur.Role.Name == "HRManager" || ur.Role.Name == "SystemAdmin" || ur.Role.Name == "Admin")
-                .Select(ur => ur.UserId)
-                .Distinct()
-                .ToListAsync();
+            // HR recipients via resolver, with legacy "Admin" extension preserved.
+            var hrUserIds = await _recipientResolver.GetRecipientUserIdsAsync(new[] { "Admin" });
 
             // Find active assignments with overdue expected return dates
             var overdueAssignments = await _context.AssetAssignments
@@ -60,8 +65,6 @@ public class OverdueAssetReturnAlertJob : IInvocable
                 assignment.ModifiedAtUtc = DateTime.UtcNow;
                 assignment.ModifiedBy = "SYSTEM";
 
-                // Only send reminders at key intervals: 1, 3, 7, 14, 30 days overdue
-                var alertDays = new[] { 1, 3, 7, 14, 30 };
                 if (!alertDays.Contains(daysOverdue)) continue;
 
                 // Notify the employee (via their user link)

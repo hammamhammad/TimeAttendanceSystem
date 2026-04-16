@@ -4449,6 +4449,12 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("IsPreHire")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsSuspended")
+                        .HasColumnType("boolean");
+
                     b.Property<long?>("JobGradeId")
                         .HasColumnType("bigint");
 
@@ -4511,6 +4517,9 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
 
                     b.Property<int?>("NumberOfDependents")
                         .HasColumnType("integer");
+
+                    b.Property<DateTime?>("OnboardingCompletedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("PassportExpiryDate")
                         .HasColumnType("timestamp with time zone");
@@ -6893,6 +6902,97 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("LeaveTransactions", (string)null);
                 });
 
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Lifecycle.LifecycleAutomationAudit", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("AutomationType")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("CompletedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ContextJson")
+                        .HasColumnType("jsonb");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<long>("SourceEntityId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("SourceEntityType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<long?>("TargetEntityId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("TargetEntityType")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("TriggeredAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("TriggeredByUserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SourceEntityType", "SourceEntityId")
+                        .HasDatabaseName("IX_LifecycleAutomationAudits_Source")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("SourceEntityType", "SourceEntityId", "AutomationType", "Status")
+                        .HasDatabaseName("IX_LifecycleAutomationAudits_Source_Type_Status")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("LifecycleAutomationAudits", (string)null);
+                });
+
             modelBuilder.Entity("TecAxle.Hrms.Domain.Loans.LoanApplication", b =>
                 {
                     b.Property<long>("Id")
@@ -7891,6 +7991,10 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<string>("AppliedPolicySnapshotJson")
+                        .HasColumnType("jsonb")
+                        .HasComment("JSON snapshot of the policy + tiers at calculation time");
+
                     b.Property<decimal>("BasicSalary")
                         .HasColumnType("decimal(18,2)")
                         .HasComment("Employee basic salary at time of termination");
@@ -7922,6 +8026,10 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<long>("EmployeeId")
                         .HasColumnType("bigint")
                         .HasComment("Employee identifier");
+
+                    b.Property<long?>("EndOfServicePolicyId")
+                        .HasColumnType("bigint")
+                        .HasComment("FK to the EOS policy used for this calculation");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
@@ -7985,12 +8093,213 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasDatabaseName("IX_EndOfServiceBenefits_EmployeeId")
                         .HasFilter("\"IsDeleted\" = false");
 
+                    b.HasIndex("EndOfServicePolicyId");
+
                     b.HasIndex("TerminationRecordId")
                         .IsUnique()
                         .HasDatabaseName("IX_EndOfServiceBenefits_TerminationRecordId")
                         .HasFilter("\"IsDeleted\" = false");
 
                     b.ToTable("EndOfServiceBenefits", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Offboarding.EndOfServicePolicy", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("CountryCode")
+                        .HasMaxLength(2)
+                        .HasColumnType("character varying(2)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTime>("EffectiveFromDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("EffectiveToDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<decimal>("MinimumServiceYearsForEligibility")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(5,2)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive", "EffectiveFromDate", "CountryCode")
+                        .HasDatabaseName("IX_EndOfServicePolicies_Active_Effective_Country")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("EndOfServicePolicies", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Offboarding.EndOfServicePolicyTier", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("EndOfServicePolicyId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<decimal?>("MaxYearsExclusive")
+                        .HasColumnType("decimal(6,2)");
+
+                    b.Property<decimal>("MinYearsInclusive")
+                        .HasColumnType("decimal(6,2)");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<decimal>("MonthsPerYearMultiplier")
+                        .HasColumnType("decimal(6,3)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("SortOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EndOfServicePolicyId", "SortOrder")
+                        .HasDatabaseName("IX_EndOfServicePolicyTiers_Policy_Sort")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("EndOfServicePolicyTiers", (string)null);
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Offboarding.EndOfServiceResignationDeductionTier", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<decimal>("DeductionFraction")
+                        .HasColumnType("decimal(6,4)");
+
+                    b.Property<long>("EndOfServicePolicyId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<decimal?>("MaxYearsExclusive")
+                        .HasColumnType("decimal(6,2)");
+
+                    b.Property<decimal>("MinYearsInclusive")
+                        .HasColumnType("decimal(6,2)");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("SortOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EndOfServicePolicyId", "SortOrder")
+                        .HasDatabaseName("IX_EndOfServiceResignationDeductionTiers_Policy_Sort")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("EndOfServiceResignationDeductionTiers", (string)null);
                 });
 
             modelBuilder.Entity("TecAxle.Hrms.Domain.Offboarding.ExitInterview", b =>
@@ -14856,6 +15165,28 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<bool>("AllowSelfApproval")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("AssetOverdueReturnAlertDaysCsv")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("1,3,7,14,30");
+
+                    b.Property<string>("AssetWarrantyExpiryAlertDaysCsv")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("30,15,7,1");
+
+                    b.Property<int>("AttendanceCorrectionMaxRetroactiveDays")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(30);
+
+                    b.Property<bool>("AutoActivateEmployeeOnOnboardingComplete")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("AutoApproveAfterTimeout")
                         .HasColumnType("boolean");
 
@@ -14864,6 +15195,38 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
 
                     b.Property<TimeOnly?>("AutoCheckOutTime")
                         .HasColumnType("time without time zone");
+
+                    b.Property<bool>("AutoCreateClearanceOnTermination")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AutoCreateOnboardingOnOfferAcceptance")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AutoCreateTerminationOnResignationApproved")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AutoDeactivateEmployeeOnFinalSettlementPaid")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AutoEnableFinalSettlementCalcOnClearanceComplete")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AutoSuspendEmployeeOnTerminationCreated")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("ContractExpiredAction")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ContractExpiryAlertDaysCsv")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("30,15,7");
+
+                    b.Property<bool>("CreateEmployeeInactiveAtOfferAcceptance")
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime>("CreatedAtUtc")
                         .ValueGeneratedOnAdd()
@@ -14887,6 +15250,24 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
 
                     b.Property<int>("DefaultApprovalTimeoutHours")
                         .HasColumnType("integer");
+
+                    b.Property<long?>("DefaultClearanceTemplateId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("DefaultOnboardingTemplateId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("DefaultProbationDays")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(90);
+
+                    b.Property<string>("DocumentExpiryAlertDaysCsv")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("30,15,7");
 
                     b.Property<int>("EarlyLeaveGracePeriodMinutes")
                         .HasColumnType("integer");
@@ -14915,12 +15296,34 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<bool>("EnableSmsNotifications")
                         .HasColumnType("boolean");
 
+                    b.Property<int>("ExcuseBackwardWindowDays")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(365);
+
+                    b.Property<int>("ExcuseForwardWindowDays")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(30);
+
                     b.Property<string>("FiscalYearStartMonth")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(2)
                         .HasColumnType("character varying(2)")
                         .HasDefaultValue("01");
+
+                    b.Property<int>("FrozenWorkflowCleanupDays")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(90);
+
+                    b.Property<string>("GrievanceSlaAlertDaysCsv")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("3,1");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
@@ -14934,8 +15337,39 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasMaxLength(5)
                         .HasColumnType("character varying(5)");
 
+                    b.Property<bool>("LifecycleAutomationEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("LoanRepaymentReminderDays")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(7);
+
+                    b.Property<string>("LoginLockoutPolicyJson")
+                        .HasColumnType("jsonb");
+
                     b.Property<int>("MaxLoginAttempts")
                         .HasColumnType("integer");
+
+                    b.Property<int>("MaxShiftGracePeriodMinutes")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(120);
+
+                    b.Property<int>("MaxUploadSizeMb")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(10);
+
+                    b.Property<int>("MaxVacationDaysPerRequest")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(365);
+
+                    b.Property<int>("MaxVacationFuturePlanningYears")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(2);
 
                     b.Property<int>("MinDaysBeforeLeaveRequest")
                         .HasColumnType("integer");
@@ -14955,6 +15389,13 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<string>("NotificationRecipientRolesCsv")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasDefaultValue("HRManager,SystemAdmin");
+
                     b.Property<bool>("NotifyEmployeeOnApproval")
                         .HasColumnType("boolean");
 
@@ -14968,11 +15409,27 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasColumnType("character varying(10)")
                         .HasDefaultValue("en-US");
 
+                    b.Property<bool>("OnboardingCompletionRequiresAllRequiredDocuments")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("OnboardingCompletionRequiresAllRequiredTasks")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("OvertimeConfigMaxFutureDays")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(30);
+
                     b.Property<int>("PasswordExpiryDays")
                         .HasColumnType("integer");
 
                     b.Property<int>("PasswordHistoryCount")
                         .HasColumnType("integer");
+
+                    b.Property<int>("PasswordMinLength")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(8);
 
                     b.Property<string>("PayrollCurrency")
                         .HasMaxLength(3)
@@ -14990,11 +15447,21 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<bool>("RequireAttachmentForSickLeave")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("RequireClearanceCompleteBeforeFinalSettlement")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("RequireGpsForMobile")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("RequireNfcForMobile")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("ReviewReminderDaysCsv")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("7,3,1");
 
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
@@ -15013,6 +15480,13 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<int>("SessionTimeoutMinutes")
                         .HasColumnType("integer");
 
+                    b.Property<string>("SuccessionPlanReminderDaysCsv")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("30,7,1");
+
                     b.Property<long>("TenantId")
                         .HasColumnType("bigint");
 
@@ -15023,8 +15497,27 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasColumnType("character varying(20)")
                         .HasDefaultValue("HH:mm");
 
+                    b.Property<int>("TimesheetSubmissionReminderDaysBefore")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(2);
+
                     b.Property<bool>("TrackBreakTime")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("TrainingSessionReminderDaysCsv")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("7,3,1");
+
+                    b.Property<string>("VisaExpiryAlertDaysCsv")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("90,60,30,15,7");
 
                     b.Property<string>("WeekStartDay")
                         .IsRequired()
@@ -19292,6 +19785,11 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                         .IsRequired()
                         .HasConstraintName("FK_EndOfServiceBenefits_Employees");
 
+                    b.HasOne("TecAxle.Hrms.Domain.Offboarding.EndOfServicePolicy", "EndOfServicePolicy")
+                        .WithMany()
+                        .HasForeignKey("EndOfServicePolicyId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("TecAxle.Hrms.Domain.Offboarding.TerminationRecord", "TerminationRecord")
                         .WithOne("EndOfServiceBenefit")
                         .HasForeignKey("TecAxle.Hrms.Domain.Offboarding.EndOfServiceBenefit", "TerminationRecordId")
@@ -19301,7 +19799,31 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
 
                     b.Navigation("Employee");
 
+                    b.Navigation("EndOfServicePolicy");
+
                     b.Navigation("TerminationRecord");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Offboarding.EndOfServicePolicyTier", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Offboarding.EndOfServicePolicy", "EndOfServicePolicy")
+                        .WithMany("Tiers")
+                        .HasForeignKey("EndOfServicePolicyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EndOfServicePolicy");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Offboarding.EndOfServiceResignationDeductionTier", b =>
+                {
+                    b.HasOne("TecAxle.Hrms.Domain.Offboarding.EndOfServicePolicy", "EndOfServicePolicy")
+                        .WithMany("ResignationDeductions")
+                        .HasForeignKey("EndOfServicePolicyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EndOfServicePolicy");
                 });
 
             modelBuilder.Entity("TecAxle.Hrms.Domain.Offboarding.ExitInterview", b =>
@@ -21279,6 +21801,13 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
             modelBuilder.Entity("TecAxle.Hrms.Domain.Offboarding.ClearanceChecklist", b =>
                 {
                     b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Offboarding.EndOfServicePolicy", b =>
+                {
+                    b.Navigation("ResignationDeductions");
+
+                    b.Navigation("Tiers");
                 });
 
             modelBuilder.Entity("TecAxle.Hrms.Domain.Offboarding.TerminationRecord", b =>

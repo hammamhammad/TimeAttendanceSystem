@@ -23,6 +23,8 @@ public class ReviewCycleReminderJob : IInvocable
         _logger = logger;
     }
 
+    private static readonly int[] DefaultReminderDays = { 7, 3, 1 };
+
     public async Task Invoke()
     {
         _logger.LogInformation("Starting review cycle reminder job at {Time}", DateTime.UtcNow);
@@ -30,7 +32,8 @@ public class ReviewCycleReminderJob : IInvocable
         try
         {
             var today = DateTime.UtcNow.Date;
-            var reminderDays = new[] { 7, 3, 1 };
+            var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync();
+            var reminderDays = BackgroundJobSettingsHelper.ParseCsvDays(settings?.ReviewReminderDaysCsv, DefaultReminderDays);
 
             int selfAssessmentReminders = 0;
             int managerReviewReminders = 0;

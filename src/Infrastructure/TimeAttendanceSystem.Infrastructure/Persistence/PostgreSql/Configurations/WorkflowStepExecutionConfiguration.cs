@@ -101,6 +101,11 @@ public class WorkflowStepExecutionConfiguration : IEntityTypeConfiguration<Workf
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("FK_WorkflowStepExecutions_DelegatedFromExecution");
 
+        // v13.6 — validation step output (null for non-validation steps)
+        builder.Property(wse => wse.ValidationDetailsJson)
+            .HasColumnType("jsonb")
+            .HasComment("Validation-rule output for Validation steps (v13.6)");
+
         // Indexes
         builder.HasIndex(wse => wse.WorkflowInstanceId)
             .HasDatabaseName("IX_WorkflowStepExecutions_WorkflowInstanceId")

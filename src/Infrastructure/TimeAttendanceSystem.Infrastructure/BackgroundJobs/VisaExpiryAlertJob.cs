@@ -8,17 +8,25 @@ using TecAxle.Hrms.Domain.Notifications;
 namespace TecAxle.Hrms.Infrastructure.BackgroundJobs;
 
 /// <summary>
-/// Background job that checks for employee visas expiring within 90, 60, 30, 15, or 7 days
-/// and creates notifications for HR users to take action.
+/// Background job that checks for employee visas expiring within the tenant-configured alert
+/// windows (<see cref="Domain.Tenants.TenantSettings.VisaExpiryAlertDaysCsv"/>,
+/// default "90,60,30,15,7") and creates notifications for HR users to take action.
 /// </summary>
 public class VisaExpiryAlertJob : IInvocable
 {
+    private static readonly int[] DefaultAlertDays = { 90, 60, 30, 15, 7 };
+
     private readonly IApplicationDbContext _context;
+    private readonly INotificationRecipientResolver _recipientResolver;
     private readonly ILogger<VisaExpiryAlertJob> _logger;
 
-    public VisaExpiryAlertJob(IApplicationDbContext context, ILogger<VisaExpiryAlertJob> logger)
+    public VisaExpiryAlertJob(
+        IApplicationDbContext context,
+        INotificationRecipientResolver recipientResolver,
+        ILogger<VisaExpiryAlertJob> logger)
     {
         _context = context;
+        _recipientResolver = recipientResolver;
         _logger = logger;
     }
 
@@ -29,14 +37,10 @@ public class VisaExpiryAlertJob : IInvocable
         try
         {
             var today = DateTime.UtcNow.Date;
-            var alertDays = new[] { 90, 60, 30, 15, 7 };
+            var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync();
+            var alertDays = BackgroundJobSettingsHelper.ParseCsvDays(settings?.VisaExpiryAlertDaysCsv, DefaultAlertDays);
 
-            // Get HR user IDs to notify
-            var hrUserIds = await _context.UserRoles
-                .Where(ur => ur.Role.Name == "HRManager" || ur.Role.Name == "SystemAdmin")
-                .Select(ur => ur.UserId)
-                .Distinct()
-                .ToListAsync();
+            var hrUserIds = await _recipientResolver.GetRecipientUserIdsAsync();
 
             if (!hrUserIds.Any())
             {

@@ -1,14 +1,23 @@
 using Microsoft.EntityFrameworkCore;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Payroll.Services;
 using TecAxle.Hrms.Domain.LeaveManagement;
 
 namespace TecAxle.Hrms.Application.LeaveEncashments.Commands.CreateLeaveEncashment;
 
 public class CreateLeaveEncashmentCommandHandler : BaseHandler<CreateLeaveEncashmentCommand, Result<long>>
 {
-    public CreateLeaveEncashmentCommandHandler(IApplicationDbContext context, ICurrentUser currentUser)
-        : base(context, currentUser) { }
+    private readonly ITenantPayrollCalendarService _calendarService;
+
+    public CreateLeaveEncashmentCommandHandler(
+        IApplicationDbContext context,
+        ICurrentUser currentUser,
+        ITenantPayrollCalendarService calendarService)
+        : base(context, currentUser)
+    {
+        _calendarService = calendarService;
+    }
 
     public override async Task<Result<long>> Handle(CreateLeaveEncashmentCommand request, CancellationToken cancellationToken)
     {
@@ -81,14 +90,16 @@ public class CreateLeaveEncashmentCommandHandler : BaseHandler<CreateLeaveEncash
                 return Result.Failure<long>($"Exceeds maximum encashment days. Max: {vacationType.EncashmentMaxDays.Value}, Already encashed: {alreadyEncashed}, Requested: {request.DaysEncashed}");
         }
 
-        // Calculate AmountPerDay from employee salary (BaseSalary / 30)
+        // Calculate AmountPerDay from employee salary, using the branch/tenant PayrollCalendarPolicy
+        // (no more hardcoded /30 — honors PayrollCalendarPolicy.BasisType).
         var salary = await Context.EmployeeSalaries
             .FirstOrDefaultAsync(es => es.EmployeeId == request.EmployeeId && es.IsCurrent && !es.IsDeleted, cancellationToken);
 
         decimal amountPerDay = 0;
         if (salary != null)
         {
-            amountPerDay = salary.BaseSalary / 30m;
+            var dailyBasis = await _calendarService.GetMonthlyDailyBasisAsync(employee.BranchId, DateTime.UtcNow.Date, cancellationToken);
+            amountPerDay = dailyBasis > 0 ? salary.BaseSalary / dailyBasis : 0m;
         }
 
         var totalAmount = request.DaysEncashed * amountPerDay;

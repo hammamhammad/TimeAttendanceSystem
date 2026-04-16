@@ -2489,6 +2489,17 @@
     "unknown": "حدث خطأ غير معروف. يرجى المحاولة مرة أخرى."
   },
   "portal": {
+    "return_for_correction": "إعادة للتصحيح",
+    "return_for_correction_title": "إعادة الطلب للتصحيح",
+    "return_for_correction_comments": "الملاحظات (مطلوبة) — وضّح ما يجب على مقدم الطلب تغييره",
+    "return_for_correction_success": "تم إعادة الطلب إلى مقدمه",
+    "return_for_correction_failed": "فشل إعادة الطلب",
+    "resubmit": "إعادة التقديم",
+    "resubmit_success": "تم إعادة تقديم الطلب للموافقة",
+    "resubmit_failed": "فشل إعادة تقديم الطلب",
+    "returned_for_correction_banner": "تمت إعادة هذا الطلب للتصحيح. يرجى التعديل وإعادة التقديم.",
+    "delegated_from": "تم التفويض من",
+    "resubmission_count": "عدد مرات إعادة التقديم",
     "documents": {
       "title": "مستنداتي",
       "my_documents": "مستنداتي",

@@ -105,6 +105,18 @@ public class Branch : BaseEntity
     public int GeofenceRadiusMeters { get; set; } = 100;
 
     /// <summary>
+    /// FK to <c>Employee</c> designated as branch manager. Used by the workflow engine for
+    /// <see cref="Workflows.Enums.ApproverType.BranchManager"/> resolution. Nullable — tenants
+    /// without a designated branch manager fall back to the tenant routing-fallback chain. (v13.6)
+    /// </summary>
+    public long? ManagerEmployeeId { get; set; }
+
+    /// <summary>
+    /// Navigation to the branch manager employee. (v13.6)
+    /// </summary>
+    public Employees.Employee? ManagerEmployee { get; set; }
+
+    /// <summary>
     /// Gets or sets the collection of departments operating within this branch location.
     /// Represents the organizational subdivision providing functional structure and employee grouping.
     /// </summary>

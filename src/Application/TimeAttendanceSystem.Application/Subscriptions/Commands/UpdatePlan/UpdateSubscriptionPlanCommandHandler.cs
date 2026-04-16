@@ -9,11 +9,17 @@ namespace TecAxle.Hrms.Application.Subscriptions.Commands.UpdatePlan;
 public class UpdateSubscriptionPlanCommandHandler : BaseHandler<UpdateSubscriptionPlanCommand, Result>
 {
     private readonly IMasterDbContext _masterContext;
+    private readonly IEntitlementService _entitlementService;
 
-    public UpdateSubscriptionPlanCommandHandler(IApplicationDbContext context, ICurrentUser currentUser, IMasterDbContext masterContext)
+    public UpdateSubscriptionPlanCommandHandler(
+        IApplicationDbContext context,
+        ICurrentUser currentUser,
+        IMasterDbContext masterContext,
+        IEntitlementService entitlementService)
         : base(context, currentUser)
     {
         _masterContext = masterContext;
+        _entitlementService = entitlementService;
     }
 
     public override async Task<Result> Handle(UpdateSubscriptionPlanCommand request, CancellationToken cancellationToken)
@@ -95,6 +101,17 @@ public class UpdateSubscriptionPlanCommandHandler : BaseHandler<UpdateSubscripti
         }
 
         await _masterContext.SaveChangesAsync(cancellationToken);
+
+        // Invalidate entitlement cache for every tenant currently on this plan so the new
+        // module set / limits take effect without waiting for the 5-minute TTL.
+        var affectedTenantIds = await _masterContext.TenantSubscriptions
+            .Where(s => s.PlanId == plan.Id && s.Status == Domain.Subscriptions.SubscriptionStatus.Active)
+            .Select(s => s.TenantId)
+            .Distinct()
+            .ToListAsync(cancellationToken);
+        foreach (var tenantId in affectedTenantIds)
+            _entitlementService.InvalidateCache(tenantId);
+
         return Result.Success();
     }
 }

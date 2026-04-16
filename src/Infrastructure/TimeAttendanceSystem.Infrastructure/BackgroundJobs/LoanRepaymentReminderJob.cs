@@ -14,11 +14,16 @@ namespace TecAxle.Hrms.Infrastructure.BackgroundJobs;
 public class LoanRepaymentReminderJob : IInvocable
 {
     private readonly IApplicationDbContext _context;
+    private readonly INotificationRecipientResolver _recipientResolver;
     private readonly ILogger<LoanRepaymentReminderJob> _logger;
 
-    public LoanRepaymentReminderJob(IApplicationDbContext context, ILogger<LoanRepaymentReminderJob> logger)
+    public LoanRepaymentReminderJob(
+        IApplicationDbContext context,
+        INotificationRecipientResolver recipientResolver,
+        ILogger<LoanRepaymentReminderJob> logger)
     {
         _context = context;
+        _recipientResolver = recipientResolver;
         _logger = logger;
     }
 
@@ -51,15 +56,12 @@ public class LoanRepaymentReminderJob : IInvocable
                 _logger.LogInformation("Marked {Count} loan repayments as overdue", overdueRepayments.Count);
             }
 
-            // Get HR users for notifications
-            var hrUserIds = await _context.UserRoles
-                .Where(ur => ur.Role.Name == "HRManager" || ur.Role.Name == "SystemAdmin")
-                .Select(ur => ur.UserId)
-                .Distinct()
-                .ToListAsync();
+            var hrUserIds = await _recipientResolver.GetRecipientUserIdsAsync();
 
-            // Notify about upcoming repayments (7 days)
-            var upcomingDate = today.AddDays(7);
+            // Notify about upcoming repayments (tenant-configurable window, default 7 days)
+            var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync();
+            var reminderDays = settings?.LoanRepaymentReminderDays > 0 ? settings.LoanRepaymentReminderDays : 7;
+            var upcomingDate = today.AddDays(reminderDays);
             var upcomingRepayments = await _context.LoanRepayments
                 .Include(r => r.LoanApplication)
                     .ThenInclude(l => l.Employee)
@@ -77,10 +79,10 @@ public class LoanRepaymentReminderJob : IInvocable
                     {
                         UserId = userId,
                         Type = NotificationType.ApprovalReminder,
-                        TitleEn = "Loan Repayment Due in 7 Days",
-                        TitleAr = "قسط قرض مستحق خلال 7 أيام",
-                        MessageEn = $"Installment #{repayment.InstallmentNumber} ({repayment.Amount:N2} SAR) for {emp.FullName} is due on {repayment.DueDate:yyyy-MM-dd}.",
-                        MessageAr = $"القسط رقم {repayment.InstallmentNumber} ({repayment.Amount:N2} ر.س) للموظف {emp.FullNameAr ?? emp.FullName} مستحق في {repayment.DueDate:yyyy-MM-dd}.",
+                        TitleEn = $"Loan Repayment Due in {reminderDays} Days",
+                        TitleAr = $"قسط قرض مستحق خلال {reminderDays} أيام",
+                        MessageEn = $"Installment #{repayment.InstallmentNumber} ({repayment.Amount:N2}) for {emp.FullName} is due on {repayment.DueDate:yyyy-MM-dd}.",
+                        MessageAr = $"القسط رقم {repayment.InstallmentNumber} ({repayment.Amount:N2}) للموظف {emp.FullNameAr ?? emp.FullName} مستحق في {repayment.DueDate:yyyy-MM-dd}.",
                         EntityType = "LoanApplication",
                         EntityId = repayment.LoanApplicationId,
                         IsRead = false,
@@ -93,7 +95,7 @@ public class LoanRepaymentReminderJob : IInvocable
 
             if (upcomingRepayments.Any())
             {
-                _logger.LogInformation("Found {Count} loan repayments due in 7 days", upcomingRepayments.Count);
+                _logger.LogInformation("Found {Count} loan repayments due in {Days} days", upcomingRepayments.Count, reminderDays);
             }
 
             await _context.SaveChangesAsync(default);

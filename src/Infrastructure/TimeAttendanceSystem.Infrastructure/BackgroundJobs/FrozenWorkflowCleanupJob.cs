@@ -8,19 +8,18 @@ using TecAxle.Hrms.Domain.Workflows.Enums;
 namespace TecAxle.Hrms.Infrastructure.BackgroundJobs;
 
 /// <summary>
-/// Background job that cancels workflow instances that have been Frozen for more than 90 days.
-/// Workflows are frozen when their owning module is deactivated.
-/// After 90 days, it's unlikely the module will be re-enabled, so we auto-cancel.
+/// Background job that cancels workflow instances that have been Frozen beyond the tenant's
+/// configured threshold (<see cref="Domain.Tenants.TenantSettings.FrozenWorkflowCleanupDays"/>,
+/// default 90). Workflows are frozen when their owning module is deactivated — after the threshold,
+/// it's unlikely the module will be re-enabled, so we auto-cancel.
 /// </summary>
 public class FrozenWorkflowCleanupJob : IInvocable
 {
     private readonly IApplicationDbContext _context;
     private readonly ILogger<FrozenWorkflowCleanupJob> _logger;
 
-    /// <summary>
-    /// Number of days a workflow can remain Frozen before being auto-cancelled.
-    /// </summary>
-    private const int FrozenDaysThreshold = 90;
+    /// <summary>Fallback when no TenantSettings row exists — matches the pre-v13.3 hardcoded value.</summary>
+    private const int DefaultFrozenDaysThreshold = 90;
 
     public FrozenWorkflowCleanupJob(IApplicationDbContext context, ILogger<FrozenWorkflowCleanupJob> logger)
     {
@@ -34,7 +33,9 @@ public class FrozenWorkflowCleanupJob : IInvocable
 
         try
         {
-            var cutoffDate = DateTime.UtcNow.AddDays(-FrozenDaysThreshold);
+            var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync();
+            var threshold = settings?.FrozenWorkflowCleanupDays ?? DefaultFrozenDaysThreshold;
+            var cutoffDate = DateTime.UtcNow.AddDays(-threshold);
 
             var frozenWorkflows = await _context.WorkflowInstances
                 .Where(wi => wi.Status == WorkflowStatus.Frozen
@@ -44,7 +45,6 @@ public class FrozenWorkflowCleanupJob : IInvocable
             var cancelledCount = 0;
             foreach (var workflow in frozenWorkflows)
             {
-                // Check FrozenAt from ContextJson
                 DateTime? frozenAt = null;
                 if (!string.IsNullOrEmpty(workflow.ContextJson))
                 {
@@ -60,13 +60,12 @@ public class FrozenWorkflowCleanupJob : IInvocable
                     catch { /* If context is malformed, use ModifiedAtUtc */ }
                 }
 
-                // Fall back to ModifiedAtUtc if FrozenAt is not available
                 var effectiveFrozenDate = frozenAt ?? workflow.ModifiedAtUtc ?? DateTime.UtcNow;
 
                 if (effectiveFrozenDate <= cutoffDate)
                 {
                     workflow.Status = WorkflowStatus.Cancelled;
-                    workflow.FinalComments = $"Auto-cancelled: workflow was frozen for over {FrozenDaysThreshold} days due to module deactivation.";
+                    workflow.FinalComments = $"Auto-cancelled: workflow was frozen for over {threshold} days due to module deactivation.";
                     workflow.CompletedAt = DateTime.UtcNow;
                     workflow.ModifiedAtUtc = DateTime.UtcNow;
                     workflow.ModifiedBy = "SYSTEM";
@@ -78,11 +77,11 @@ public class FrozenWorkflowCleanupJob : IInvocable
             {
                 await _context.SaveChangesAsync(default);
                 _logger.LogInformation("Cancelled {Count} frozen workflow(s) that exceeded {Days}-day threshold",
-                    cancelledCount, FrozenDaysThreshold);
+                    cancelledCount, threshold);
             }
             else
             {
-                _logger.LogDebug("No frozen workflows exceeded the {Days}-day threshold", FrozenDaysThreshold);
+                _logger.LogDebug("No frozen workflows exceeded the {Days}-day threshold", threshold);
             }
         }
         catch (Exception ex)

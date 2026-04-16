@@ -49,5 +49,21 @@ public enum WorkflowStatus
     /// If the module is re-enabled, frozen workflows resume from their previous state.
     /// After 90 days frozen, workflows are automatically cancelled.
     /// </summary>
-    Frozen = 7
+    Frozen = 7,
+
+    /// <summary>
+    /// An approver returned the request to the requester for corrections (v13.6).
+    /// Non-terminal status — the requester can amend and resubmit, which transitions the workflow
+    /// back to <see cref="InProgress"/>. Resubmission count is capped by
+    /// <c>TenantSettings.MaxWorkflowResubmissions</c>.
+    /// </summary>
+    ReturnedForCorrection = 8,
+
+    /// <summary>
+    /// The workflow engine could not route the request to any approver — the primary approver
+    /// resolution failed and the tenant fallback chain (role + user override) also failed.
+    /// Terminal state (v13.6). A notification is fired to <c>NotificationRecipientRolesCsv</c>
+    /// recipients so HR can remediate the routing configuration.
+    /// </summary>
+    FailedRouting = 9
 }

@@ -21,5 +21,14 @@ public class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
             .WithMany(x => x.UserRoles)
             .HasForeignKey(x => x.RoleId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        // v13.6 — priority used by RoleAssignmentStrategy.FixedPriority
+        builder.Property(x => x.Priority)
+            .IsRequired()
+            .HasDefaultValue(0)
+            .HasComment("Seniority priority within role; higher wins under FixedPriority strategy (v13.6)");
+
+        builder.HasIndex(x => new { x.RoleId, x.Priority })
+            .HasDatabaseName("IX_UserRoles_RoleId_Priority");
     }
 }

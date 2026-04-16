@@ -143,6 +143,32 @@ public class WorkflowStep : BaseEntity
     /// </summary>
     public bool RequireCommentsOnReject { get; set; } = true;
 
+    /// <summary>
+    /// The strategy used to pick a single user from the role pool when <see cref="ApproverType"/>
+    /// is <see cref="ApproverType.Role"/>. Default <see cref="RoleAssignmentStrategy.LeastPendingApprovals"/>.
+    /// Ignored for other approver types. (v13.6)
+    /// </summary>
+    public RoleAssignmentStrategy RoleAssignmentStrategy { get; set; } = RoleAssignmentStrategy.LeastPendingApprovals;
+
+    /// <summary>
+    /// When true, an approver on this step may use the non-final "Return for Correction" action
+    /// instead of rejecting. The request goes back to the requester for amendment. (v13.6)
+    /// </summary>
+    public bool AllowReturnForCorrection { get; set; } = false;
+
+    /// <summary>
+    /// Identifier of the <c>IWorkflowValidationRule</c> to execute when <see cref="StepType"/> is
+    /// <see cref="WorkflowStepType.Validation"/>. If null or unregistered at runtime the validation
+    /// step fails closed (AutoRejected) — no more silent passes. (v13.6)
+    /// </summary>
+    public string? ValidationRuleCode { get; set; }
+
+    /// <summary>
+    /// JSON configuration passed to the validation rule at evaluation time. Rule-specific.
+    /// Example for <c>vacation_balance</c>: <c>{ "minDaysRemaining": 0 }</c>. (v13.6)
+    /// </summary>
+    public string? ValidationConfigJson { get; set; }
+
     // Navigation Properties
 
     /// <summary>
@@ -206,6 +232,12 @@ public class WorkflowStep : BaseEntity
         if (StepType == WorkflowStepType.Condition && string.IsNullOrWhiteSpace(ConditionJson))
         {
             errors.Add("Conditional step requires a condition to be specified");
+        }
+
+        if (StepType == WorkflowStepType.Validation && string.IsNullOrWhiteSpace(ValidationRuleCode))
+        {
+            errors.Add("Validation step requires a ValidationRuleCode (v13.6). " +
+                       "Without one the step will fail closed at runtime.");
         }
 
         return (errors.Count == 0, errors);

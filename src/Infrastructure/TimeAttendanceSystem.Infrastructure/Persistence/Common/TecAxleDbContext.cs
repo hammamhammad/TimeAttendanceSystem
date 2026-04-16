@@ -160,6 +160,10 @@ public class TecAxleDbContext : DbContext, IApplicationDbContext
     public DbSet<WorkflowStepExecution> WorkflowStepExecutions => Set<WorkflowStepExecution>();
     public DbSet<ApprovalDelegation> ApprovalDelegations => Set<ApprovalDelegation>();
 
+    // v13.6 Workflow Routing Hardening
+    public DbSet<WorkflowRoleAssignmentCursor> WorkflowRoleAssignmentCursors => Set<WorkflowRoleAssignmentCursor>();
+    public DbSet<WorkflowSystemActionAudit> WorkflowSystemActionAudits => Set<WorkflowSystemActionAudit>();
+
     // Notification entities
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<NotificationBroadcast> NotificationBroadcasts => Set<NotificationBroadcast>();
@@ -216,6 +220,9 @@ public class TecAxleDbContext : DbContext, IApplicationDbContext
     public DbSet<ClearanceChecklist> ClearanceChecklists => Set<ClearanceChecklist>();
     public DbSet<ClearanceItem> ClearanceItems => Set<ClearanceItem>();
     public DbSet<EndOfServiceBenefit> EndOfServiceBenefits => Set<EndOfServiceBenefit>();
+    public DbSet<EndOfServicePolicy> EndOfServicePolicies => Set<EndOfServicePolicy>();
+    public DbSet<EndOfServicePolicyTier> EndOfServicePolicyTiers => Set<EndOfServicePolicyTier>();
+    public DbSet<EndOfServiceResignationDeductionTier> EndOfServiceResignationDeductionTiers => Set<EndOfServiceResignationDeductionTier>();
     public DbSet<FinalSettlement> FinalSettlements => Set<FinalSettlement>();
     public DbSet<ExitInterview> ExitInterviews => Set<ExitInterview>();
 
@@ -356,6 +363,10 @@ public class TecAxleDbContext : DbContext, IApplicationDbContext
     public DbSet<DepartmentSettingsOverride> DepartmentSettingsOverrides => Set<DepartmentSettingsOverride>();
     // PolicyTemplates and PolicyTemplateItems are in MasterDbContext only
     public DbSet<SetupStep> SetupSteps => Set<SetupStep>();
+
+    // v13.5: Lifecycle Automation
+    public DbSet<Domain.Lifecycle.LifecycleAutomationAudit> LifecycleAutomationAudits
+        => Set<Domain.Lifecycle.LifecycleAutomationAudit>();
 
     /// <summary>
     /// Configures the database model using Fluent API configurations from the current assembly.

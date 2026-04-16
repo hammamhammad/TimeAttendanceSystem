@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TecAxle.Hrms.Api.Filters;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Domain.Common;
 using TecAxle.Hrms.Domain.Employees;
+using TecAxle.Hrms.Domain.Modules;
 using TecAxle.Hrms.Domain.Performance;
 
 namespace TecAxle.Hrms.Api.Controllers;
@@ -11,6 +13,7 @@ namespace TecAxle.Hrms.Api.Controllers;
 [ApiController]
 [Route("api/v1/performance-reviews")]
 [Authorize]
+[RequiresModuleEndpoint(SystemModule.Performance)]
 public class PerformanceReviewsController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
@@ -24,6 +27,7 @@ public class PerformanceReviewsController : ControllerBase
 
     /// <summary>Lists performance reviews with optional filters.</summary>
     [HttpGet]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetAll(
         [FromQuery] long? cycleId,
         [FromQuery] long? employeeId,
@@ -80,6 +84,7 @@ public class PerformanceReviewsController : ControllerBase
 
     /// <summary>Gets a performance review by ID with goals and competency assessments.</summary>
     [HttpGet("{id}")]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetById(long id)
     {
         var item = await _context.PerformanceReviews
@@ -491,6 +496,7 @@ public class PerformanceReviewsController : ControllerBase
 
     /// <summary>Gets current user's own reviews (self-service).</summary>
     [HttpGet("my-reviews")]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetMyReviews([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
     {
         var employeeLink = await _context.EmployeeUserLinks
@@ -536,6 +542,7 @@ public class PerformanceReviewsController : ControllerBase
 
     /// <summary>Gets team reviews for a manager (self-service).</summary>
     [HttpGet("team-reviews")]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetTeamReviews(
         [FromQuery] long? cycleId,
         [FromQuery] int page = 1,

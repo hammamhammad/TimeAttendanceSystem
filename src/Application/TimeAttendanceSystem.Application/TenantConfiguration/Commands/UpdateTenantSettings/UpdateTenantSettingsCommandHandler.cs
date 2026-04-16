@@ -99,6 +99,34 @@ public class UpdateTenantSettingsCommandHandler : BaseHandler<UpdateTenantSettin
         settings.Require2FA = request.Require2FA;
         settings.PasswordHistoryCount = request.PasswordHistoryCount;
 
+        // v13.3 tenant-configurable thresholds — null means "keep current".
+        if (request.PasswordMinLength.HasValue) settings.PasswordMinLength = request.PasswordMinLength.Value;
+        if (request.LoginLockoutPolicyJson != null) settings.LoginLockoutPolicyJson = request.LoginLockoutPolicyJson;
+        if (!string.IsNullOrWhiteSpace(request.ContractExpiryAlertDaysCsv)) settings.ContractExpiryAlertDaysCsv = request.ContractExpiryAlertDaysCsv;
+        if (!string.IsNullOrWhiteSpace(request.VisaExpiryAlertDaysCsv)) settings.VisaExpiryAlertDaysCsv = request.VisaExpiryAlertDaysCsv;
+        if (!string.IsNullOrWhiteSpace(request.ReviewReminderDaysCsv)) settings.ReviewReminderDaysCsv = request.ReviewReminderDaysCsv;
+        if (request.LoanRepaymentReminderDays.HasValue) settings.LoanRepaymentReminderDays = request.LoanRepaymentReminderDays.Value;
+        if (request.FrozenWorkflowCleanupDays.HasValue) settings.FrozenWorkflowCleanupDays = request.FrozenWorkflowCleanupDays.Value;
+        if (request.DefaultProbationDays.HasValue) settings.DefaultProbationDays = request.DefaultProbationDays.Value;
+        if (request.MaxUploadSizeMb.HasValue) settings.MaxUploadSizeMb = request.MaxUploadSizeMb.Value;
+        if (request.MaxVacationDaysPerRequest.HasValue) settings.MaxVacationDaysPerRequest = request.MaxVacationDaysPerRequest.Value;
+        if (request.MaxVacationFuturePlanningYears.HasValue) settings.MaxVacationFuturePlanningYears = request.MaxVacationFuturePlanningYears.Value;
+        if (request.MaxShiftGracePeriodMinutes.HasValue) settings.MaxShiftGracePeriodMinutes = request.MaxShiftGracePeriodMinutes.Value;
+        if (request.ExcuseBackwardWindowDays.HasValue) settings.ExcuseBackwardWindowDays = request.ExcuseBackwardWindowDays.Value;
+        if (request.ExcuseForwardWindowDays.HasValue) settings.ExcuseForwardWindowDays = request.ExcuseForwardWindowDays.Value;
+        if (request.OvertimeConfigMaxFutureDays.HasValue) settings.OvertimeConfigMaxFutureDays = request.OvertimeConfigMaxFutureDays.Value;
+
+        // v13.4 — null means "keep current".
+        if (request.AttendanceCorrectionMaxRetroactiveDays.HasValue) settings.AttendanceCorrectionMaxRetroactiveDays = request.AttendanceCorrectionMaxRetroactiveDays.Value;
+        if (!string.IsNullOrWhiteSpace(request.DocumentExpiryAlertDaysCsv)) settings.DocumentExpiryAlertDaysCsv = request.DocumentExpiryAlertDaysCsv;
+        if (!string.IsNullOrWhiteSpace(request.AssetWarrantyExpiryAlertDaysCsv)) settings.AssetWarrantyExpiryAlertDaysCsv = request.AssetWarrantyExpiryAlertDaysCsv;
+        if (!string.IsNullOrWhiteSpace(request.AssetOverdueReturnAlertDaysCsv)) settings.AssetOverdueReturnAlertDaysCsv = request.AssetOverdueReturnAlertDaysCsv;
+        if (!string.IsNullOrWhiteSpace(request.TrainingSessionReminderDaysCsv)) settings.TrainingSessionReminderDaysCsv = request.TrainingSessionReminderDaysCsv;
+        if (!string.IsNullOrWhiteSpace(request.SuccessionPlanReminderDaysCsv)) settings.SuccessionPlanReminderDaysCsv = request.SuccessionPlanReminderDaysCsv;
+        if (request.TimesheetSubmissionReminderDaysBefore.HasValue) settings.TimesheetSubmissionReminderDaysBefore = request.TimesheetSubmissionReminderDaysBefore.Value;
+        if (!string.IsNullOrWhiteSpace(request.GrievanceSlaAlertDaysCsv)) settings.GrievanceSlaAlertDaysCsv = request.GrievanceSlaAlertDaysCsv;
+        if (!string.IsNullOrWhiteSpace(request.NotificationRecipientRolesCsv)) settings.NotificationRecipientRolesCsv = request.NotificationRecipientRolesCsv;
+
         settings.ModifiedBy = CurrentUser.Username ?? "SYSTEM";
 
         await Context.SaveChangesAsync(cancellationToken);

@@ -89,6 +89,39 @@ public class WorkflowInstance : BaseEntity
     /// </summary>
     public long? CompletedByUserId { get; set; }
 
+    /// <summary>
+    /// The version of the workflow definition this instance started under. Snapshotted at
+    /// <c>StartWorkflowAsync</c>; never changes. Admin edits to the live definition increment
+    /// <see cref="WorkflowDefinition.Version"/> without affecting running instances. (v13.6)
+    /// </summary>
+    public int DefinitionVersion { get; set; } = 1;
+
+    /// <summary>
+    /// Serialized snapshot of the full workflow definition (steps, approvers, timeouts, validation
+    /// rules) taken at instance creation. Every subsequent step transition reads from this snapshot
+    /// instead of the live definition. Carries a <c>schemaVersion</c> field so future format
+    /// changes stay backward-compatible. (v13.6)
+    /// </summary>
+    public string DefinitionSnapshotJson { get; set; } = "{}";
+
+    /// <summary>
+    /// UTC timestamp when the workflow was returned to the requester for correction.
+    /// Null if never returned. (v13.6)
+    /// </summary>
+    public DateTime? ReturnedAtUtc { get; set; }
+
+    /// <summary>
+    /// The approver who returned the request. Null if never returned. (v13.6)
+    /// </summary>
+    public long? ReturnedByUserId { get; set; }
+
+    /// <summary>
+    /// Number of times this workflow has been resubmitted after a return-for-correction action.
+    /// Capped by <c>TenantSettings.MaxWorkflowResubmissions</c> (default 3). Exceeds → resubmit
+    /// is rejected with a clear error asking the requester to cancel and recreate. (v13.6)
+    /// </summary>
+    public int ResubmissionCount { get; set; }
+
     // Navigation Properties
 
     /// <summary>
@@ -112,10 +145,21 @@ public class WorkflowInstance : BaseEntity
     public User? CompletedByUser { get; set; }
 
     /// <summary>
+    /// Navigation to the user who returned the request for correction. Null if never returned. (v13.6)
+    /// </summary>
+    public User? ReturnedByUser { get; set; }
+
+    /// <summary>
     /// Gets or sets the collection of step executions.
     /// History of all actions taken on this workflow instance.
     /// </summary>
     public ICollection<WorkflowStepExecution> StepExecutions { get; set; } = new List<WorkflowStepExecution>();
+
+    /// <summary>
+    /// System-action audit rows (timeout / escalation / auto-approve / fallback routing / expire)
+    /// recorded against this instance. Append-only. (v13.6)
+    /// </summary>
+    public ICollection<WorkflowSystemActionAudit> SystemActions { get; set; } = new List<WorkflowSystemActionAudit>();
 
     // Business Logic Methods
 
@@ -181,14 +225,41 @@ public class WorkflowInstance : BaseEntity
 
     /// <summary>
     /// Checks if the workflow is in a terminal state.
+    /// <see cref="WorkflowStatus.ReturnedForCorrection"/> is NOT terminal — the requester can resubmit.
+    /// <see cref="WorkflowStatus.FailedRouting"/> IS terminal — HR must remediate configuration. (v13.6)
     /// </summary>
-    /// <returns>True if workflow is completed, rejected, or cancelled</returns>
+    /// <returns>True if workflow is completed, rejected, cancelled, expired, or failed routing</returns>
     public bool IsTerminated()
     {
         return Status == WorkflowStatus.Approved ||
                Status == WorkflowStatus.Rejected ||
                Status == WorkflowStatus.Cancelled ||
-               Status == WorkflowStatus.Expired;
+               Status == WorkflowStatus.Expired ||
+               Status == WorkflowStatus.FailedRouting;
+    }
+
+    /// <summary>
+    /// Records that an approver returned this request to the requester for corrections.
+    /// Non-terminal transition — the workflow pauses until the requester resubmits. (v13.6)
+    /// </summary>
+    public void ReturnForCorrection(long approverUserId, string comments)
+    {
+        Status = WorkflowStatus.ReturnedForCorrection;
+        ReturnedAtUtc = DateTime.UtcNow;
+        ReturnedByUserId = approverUserId;
+        CurrentStepId = null;
+        FinalComments = comments;
+    }
+
+    /// <summary>
+    /// Records that the requester resubmitted a returned request. Resumes the workflow so that
+    /// <c>ProcessStepAsync</c> can pick up execution again. (v13.6)
+    /// </summary>
+    public void RecordResubmission()
+    {
+        Status = WorkflowStatus.InProgress;
+        ResubmissionCount++;
+        // ReturnedAtUtc / ReturnedByUserId are preserved for audit history of the last return.
     }
 
     /// <summary>

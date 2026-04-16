@@ -1,4 +1,57 @@
 {
+  "lifecycle_automation": {
+    "history_title": "سجل الأتمتة",
+    "no_history": "لا توجد أحداث أتمتة مسجلة لهذا السجل.",
+    "settings_title": "أتمتة دورة الحياة",
+    "settings_description": "تحكّم بالانتقالات الآلية في دورة حياة الموظف. يُكتب سجل تدقيق لكل خطوة يمكن مراجعته من تبويب «سجل الأتمتة» على السجل ذي الصلة.",
+    "master_switch": "تفعيل أتمتة دورة الحياة",
+    "master_switch_help": "مفتاح إيقاف شامل. عند إيقافه تتوقف كل الأتمتة. الأوامر اليدوية تظل تعمل.",
+    "stages": {
+      "recruitment": "التوظيف والتهيئة",
+      "offboarding": "الخروج والتسوية",
+      "contracts": "العقود"
+    },
+    "flags": {
+      "AutoCreateOnboardingOnOfferAcceptance": "إنشاء عملية تهيئة تلقائيًا عند قبول العرض",
+      "DefaultOnboardingTemplateId": "قالب التهيئة الافتراضي",
+      "CreateEmployeeInactiveAtOfferAcceptance": "إنشاء الموظف بحالة ما قبل التعيين عند قبول العرض",
+      "AutoActivateEmployeeOnOnboardingComplete": "تفعيل الموظف عند إتمام التهيئة",
+      "OnboardingCompletionRequiresAllRequiredTasks": "اشتراط إكمال جميع المهام الإلزامية لإنهاء التهيئة",
+      "OnboardingCompletionRequiresAllRequiredDocuments": "اشتراط توثيق جميع المستندات الإلزامية لإنهاء التهيئة",
+      "AutoCreateTerminationOnResignationApproved": "إنشاء إنهاء خدمة تلقائيًا عند اعتماد الاستقالة",
+      "AutoCreateClearanceOnTermination": "إنشاء قائمة إخلاء طرف تلقائيًا عند الإنهاء",
+      "DefaultClearanceTemplateId": "قالب الإخلاء الافتراضي",
+      "AutoSuspendEmployeeOnTerminationCreated": "تعليق الموظف عند الإنهاء (يمنع الدخول مع الإبقاء على السجل)",
+      "RequireClearanceCompleteBeforeFinalSettlement": "اشتراط إتمام الإخلاء قبل التسوية النهائية",
+      "AutoEnableFinalSettlementCalcOnClearanceComplete": "حساب التسوية النهائية تلقائيًا عند إتمام الإخلاء",
+      "AutoDeactivateEmployeeOnFinalSettlementPaid": "إلغاء تفعيل الموظف عند صرف التسوية النهائية",
+      "ContractExpiredAction": "الإجراء عند انتهاء العقد"
+    },
+    "contract_expired_actions": {
+      "NotifyOnly": "إشعار فقط",
+      "AutoMarkExpired": "تعليم العقد كمنتهي",
+      "Suspend": "تعليم كمنتهي وتعليق الموظف",
+      "Deactivate": "تعليم كمنتهي وإلغاء تفعيل الموظف"
+    },
+    "types": {
+      "OfferAcceptedCreateOnboarding": "قبول العرض ← إنشاء التهيئة",
+      "OnboardingCompletedActivateEmployee": "إتمام التهيئة ← تفعيل الموظف",
+      "ResignationApprovedCreateTermination": "اعتماد الاستقالة ← إنشاء الإنهاء",
+      "TerminationCreateClearance": "الإنهاء ← إنشاء الإخلاء",
+      "TerminationSuspendEmployee": "الإنهاء ← تعليق الموظف",
+      "ClearanceCompletedEnableSettlement": "اكتمال الإخلاء ← إتاحة التسوية",
+      "FinalSettlementPaidDeactivateEmployee": "صرف التسوية ← إلغاء تفعيل الموظف",
+      "ContractExpiredAction": "إجراء انتهاء العقد"
+    },
+    "status": {
+      "Succeeded": "ناجح",
+      "Skipped": "متجاوز",
+      "Failed": "فشل",
+      "DuplicateSuppressed": "مكرر، تم تجاوزه",
+      "Disabled": "معطّل",
+      "MissingPrerequisite": "متطلب ناقص"
+    }
+  },
   "app": {
     "title": "TecAxle HRMS",
     "loading": "جاري التحميل...",
@@ -3347,6 +3400,42 @@
       "terminate_all_failed": "فشل إنهاء جميع الجلسات",
       "cannot_terminate_current": "لا يمكن إنهاء جلستك الحالية"
     }
+  },
+  "workflow_routing": {
+    "title": "تقوية توجيه سير العمل (v13.6)",
+    "role_strategy": "استراتيجية تعيين الدور",
+    "role_strategy_first_match": "أول تطابق",
+    "role_strategy_round_robin": "بالتناوب",
+    "role_strategy_least_pending": "الأقل انتظاراً",
+    "role_strategy_fixed_priority": "الأولوية الثابتة",
+    "allow_return_for_correction": "السماح بالإعادة للتصحيح",
+    "validation_rule_code": "قاعدة التحقق",
+    "validation_config_json": "إعدادات قاعدة التحقق (JSON)",
+    "fallback_approver_role": "دور المُعتمد الاحتياطي",
+    "fallback_approver_user": "المُعتمد الاحتياطي (مستخدم)",
+    "max_delegation_depth": "أقصى عمق للتفويض",
+    "max_resubmissions": "أقصى مرات إعادة التقديم",
+    "branch_manager": "مدير الفرع",
+    "system_actions_title": "سجل إجراءات النظام",
+    "system_action_timeout": "انتهت المهلة",
+    "system_action_escalation": "تصعيد",
+    "system_action_auto_approve": "موافقة تلقائية",
+    "system_action_auto_reject": "رفض تلقائي",
+    "system_action_expire": "منتهية الصلاحية",
+    "system_action_fallback_routing": "توجيه احتياطي"
+  },
+  "approvals_v136": {
+    "return_for_correction": "إعادة للتصحيح",
+    "return_for_correction_title": "إعادة الطلب للتصحيح",
+    "return_for_correction_comments": "الملاحظات (مطلوبة) — وضّح ما يجب على مقدم الطلب تغييره",
+    "return_for_correction_success": "تم إعادة الطلب إلى مقدمه",
+    "return_for_correction_failed": "فشل إعادة الطلب",
+    "resubmit": "إعادة التقديم",
+    "resubmit_success": "تم إعادة تقديم الطلب للموافقة",
+    "resubmit_failed": "فشل إعادة تقديم الطلب",
+    "returned_for_correction_banner": "تمت إعادة هذا الطلب للتصحيح. يرجى التعديل وإعادة التقديم.",
+    "delegated_from": "تم التفويض من",
+    "resubmission_count": "عدد مرات إعادة التقديم"
   },
   "workflows": {
     "title": "مسارات الموافقة",

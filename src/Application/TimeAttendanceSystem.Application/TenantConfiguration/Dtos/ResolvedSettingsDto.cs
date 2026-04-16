@@ -70,6 +70,34 @@ public class ResolvedSettingsDto
     public int SessionTimeoutMinutes { get; set; }
     public bool Require2FA { get; set; }
     public int PasswordHistoryCount { get; set; }
+    public int PasswordMinLength { get; set; } = 8;
+    public string? LoginLockoutPolicyJson { get; set; }
+
+    // v13.3: Reminder windows / limits / defaults
+    public string ContractExpiryAlertDaysCsv { get; set; } = "30,15,7";
+    public string VisaExpiryAlertDaysCsv { get; set; } = "90,60,30,15,7";
+    public string ReviewReminderDaysCsv { get; set; } = "7,3,1";
+    public int LoanRepaymentReminderDays { get; set; } = 7;
+    public int FrozenWorkflowCleanupDays { get; set; } = 90;
+    public int DefaultProbationDays { get; set; } = 90;
+    public int MaxUploadSizeMb { get; set; } = 10;
+    public int MaxVacationDaysPerRequest { get; set; } = 365;
+    public int MaxVacationFuturePlanningYears { get; set; } = 2;
+    public int MaxShiftGracePeriodMinutes { get; set; } = 120;
+    public int ExcuseBackwardWindowDays { get; set; } = 365;
+    public int ExcuseForwardWindowDays { get; set; } = 30;
+    public int OvertimeConfigMaxFutureDays { get; set; } = 30;
+
+    // v13.4
+    public int AttendanceCorrectionMaxRetroactiveDays { get; set; } = 30;
+    public string DocumentExpiryAlertDaysCsv { get; set; } = "30,15,7";
+    public string AssetWarrantyExpiryAlertDaysCsv { get; set; } = "30,15,7,1";
+    public string AssetOverdueReturnAlertDaysCsv { get; set; } = "1,3,7,14,30";
+    public string TrainingSessionReminderDaysCsv { get; set; } = "7,3,1";
+    public string SuccessionPlanReminderDaysCsv { get; set; } = "30,7,1";
+    public int TimesheetSubmissionReminderDaysBefore { get; set; } = 2;
+    public string GrievanceSlaAlertDaysCsv { get; set; } = "3,1";
+    public string NotificationRecipientRolesCsv { get; set; } = "HRManager,SystemAdmin";
 
     // Department overrides
     public long? DefaultShiftId { get; set; }

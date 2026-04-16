@@ -8,7 +8,11 @@ import {
   WorkflowEntityType,
   CreateWorkflowDefinitionRequest,
   UpdateWorkflowDefinitionRequest,
-  PagedWorkflowResponse
+  PagedWorkflowResponse,
+  WorkflowSystemAction,
+  WorkflowSystemActionType,
+  WorkflowValidationRuleInfo,
+  RoleAssignmentStats
 } from '../../../shared/models/workflow.model';
 
 @Injectable({
@@ -123,5 +127,40 @@ export class WorkflowsService {
       { value: 'RemoteWork', label: this.i18n.t('workflows.entity_type_remote_work') },
       { value: 'AttendanceCorrection', label: this.i18n.t('workflows.entity_type_attendance_correction') }
     ];
+  }
+
+  // =====================================================================
+  // v13.6 — Workflow Routing Hardening
+  // =====================================================================
+
+  /** List of registered IWorkflowValidationRule codes, for the step-config form. */
+  getValidationRules(): Observable<WorkflowValidationRuleInfo[]> {
+    return this.http.get<WorkflowValidationRuleInfo[]>(`${this.baseUrl}/validation-rules`);
+  }
+
+  /** Browse the system-action audit trail (timeouts, escalations, fallback routing). */
+  getSystemActions(
+    workflowInstanceId?: number,
+    actionType?: WorkflowSystemActionType,
+    fromDate?: string,
+    toDate?: string,
+    page: number = 1,
+    pageSize: number = 50
+  ): Observable<{ total: number; page: number; pageSize: number; items: WorkflowSystemAction[] }> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('pageSize', pageSize.toString());
+    if (workflowInstanceId !== undefined) params = params.set('workflowInstanceId', workflowInstanceId.toString());
+    if (actionType !== undefined) params = params.set('actionType', actionType);
+    if (fromDate) params = params.set('fromDate', fromDate);
+    if (toDate) params = params.set('toDate', toDate);
+    return this.http.get<{ total: number; page: number; pageSize: number; items: WorkflowSystemAction[] }>(
+      `${this.baseUrl}/system-actions`, { params });
+  }
+
+  /** Cursor state + per-candidate pending counts for a role. Operational debugging. */
+  getRoleAssignmentStats(roleId: number): Observable<RoleAssignmentStats> {
+    const params = new HttpParams().set('roleId', roleId.toString());
+    return this.http.get<RoleAssignmentStats>(`${this.baseUrl}/role-assignment-stats`, { params });
   }
 }

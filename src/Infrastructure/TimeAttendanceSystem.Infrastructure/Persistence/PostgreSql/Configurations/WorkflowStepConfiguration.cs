@@ -111,6 +111,26 @@ public class WorkflowStepConfiguration : IEntityTypeConfiguration<WorkflowStep>
             .HasDefaultValue(true)
             .HasComment("Require comments when rejecting");
 
+        // v13.6 Workflow Routing Hardening — role strategy, return-for-correction, validation rules
+        builder.Property(ws => ws.RoleAssignmentStrategy)
+            .IsRequired()
+            .HasConversion<int>()
+            .HasDefaultValue(Domain.Workflows.Enums.RoleAssignmentStrategy.LeastPendingApprovals)
+            .HasComment("Role-based approver-selection strategy (v13.6): 1=FirstMatch, 2=RoundRobin, 3=LeastPendingApprovals, 4=FixedPriority");
+
+        builder.Property(ws => ws.AllowReturnForCorrection)
+            .IsRequired()
+            .HasDefaultValue(false)
+            .HasComment("Whether approver can use the non-final Return-for-Correction action (v13.6)");
+
+        builder.Property(ws => ws.ValidationRuleCode)
+            .HasMaxLength(100)
+            .HasComment("Identifier of the IWorkflowValidationRule to execute on Validation steps (v13.6)");
+
+        builder.Property(ws => ws.ValidationConfigJson)
+            .HasColumnType("jsonb")
+            .HasComment("Per-step configuration passed to the validation rule (v13.6)");
+
         // Relationships
         builder.HasOne(ws => ws.ApproverRole)
             .WithMany()

@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TecAxle.Hrms.Api.Filters;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Modules;
 using TecAxle.Hrms.Domain.Recruitment;
 using TecAxle.Hrms.Domain.Workflows.Enums;
 
@@ -11,6 +13,7 @@ namespace TecAxle.Hrms.Api.Controllers;
 [ApiController]
 [Route("api/v1/job-requisitions")]
 [Authorize]
+[RequiresModuleEndpoint(SystemModule.Recruitment)]
 public class JobRequisitionsController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
@@ -24,6 +27,7 @@ public class JobRequisitionsController : ControllerBase
 
     /// <summary>Lists job requisitions with optional filters and pagination.</summary>
     [HttpGet]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetAll(
         [FromQuery] long? branchId,
         [FromQuery] long? departmentId,
@@ -85,6 +89,7 @@ public class JobRequisitionsController : ControllerBase
 
     /// <summary>Gets a job requisition by ID.</summary>
     [HttpGet("{id}")]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetById(long id)
     {
         var item = await _context.JobRequisitions

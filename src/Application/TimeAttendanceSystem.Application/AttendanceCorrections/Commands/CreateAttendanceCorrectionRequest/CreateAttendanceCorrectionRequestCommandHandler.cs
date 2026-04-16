@@ -19,11 +19,6 @@ public class CreateAttendanceCorrectionRequestCommandHandler : IRequestHandler<C
     private readonly IWorkflowEngine _workflowEngine;
     private readonly ICurrentUser _currentUser;
 
-    /// <summary>
-    /// Maximum number of days in the past for which a correction can be submitted.
-    /// </summary>
-    private const int MaxRetroactiveDays = 30;
-
     public CreateAttendanceCorrectionRequestCommandHandler(
         IApplicationDbContext context,
         IWorkflowEngine workflowEngine,
@@ -73,11 +68,17 @@ public class CreateAttendanceCorrectionRequestCommandHandler : IRequestHandler<C
             return Result.Failure<long>("Correction date cannot be in the future");
         }
 
-        // Check retroactive limits
+        // Retroactive limit driven by tenant configuration
+        // (TenantSettings.AttendanceCorrectionMaxRetroactiveDays, default 30).
+        var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+        var maxRetroactiveDays = settings?.AttendanceCorrectionMaxRetroactiveDays > 0
+            ? settings.AttendanceCorrectionMaxRetroactiveDays
+            : 30;
+
         var daysDiff = (DateTime.Today - request.CorrectionDate.Date).Days;
-        if (daysDiff > MaxRetroactiveDays)
+        if (daysDiff > maxRetroactiveDays)
         {
-            return Result.Failure<long>($"Cannot create correction request more than {MaxRetroactiveDays} days in the past");
+            return Result.Failure<long>($"Cannot create correction request more than {maxRetroactiveDays} days in the past");
         }
 
         // Check for duplicate pending correction requests for same employee, date, and type

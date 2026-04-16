@@ -15,11 +15,16 @@ namespace TecAxle.Hrms.Infrastructure.BackgroundJobs;
 public class OnboardingTaskOverdueJob : IInvocable
 {
     private readonly IApplicationDbContext _context;
+    private readonly INotificationRecipientResolver _recipientResolver;
     private readonly ILogger<OnboardingTaskOverdueJob> _logger;
 
-    public OnboardingTaskOverdueJob(IApplicationDbContext context, ILogger<OnboardingTaskOverdueJob> logger)
+    public OnboardingTaskOverdueJob(
+        IApplicationDbContext context,
+        INotificationRecipientResolver recipientResolver,
+        ILogger<OnboardingTaskOverdueJob> logger)
     {
         _context = context;
+        _recipientResolver = recipientResolver;
         _logger = logger;
     }
 
@@ -49,12 +54,7 @@ public class OnboardingTaskOverdueJob : IInvocable
 
             _logger.LogInformation("Found {Count} overdue onboarding tasks", overdueTasks.Count);
 
-            // Get HR user IDs to notify
-            var hrUserIds = await _context.UserRoles
-                .Where(ur => ur.Role.Name == "HRManager" || ur.Role.Name == "SystemAdmin")
-                .Select(ur => ur.UserId)
-                .Distinct()
-                .ToListAsync();
+            var hrUserIds = await _recipientResolver.GetRecipientUserIdsAsync();
 
             foreach (var task in overdueTasks)
             {

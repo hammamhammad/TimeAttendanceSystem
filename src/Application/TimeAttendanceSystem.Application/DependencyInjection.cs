@@ -7,6 +7,8 @@ using TecAxle.Hrms.Application.Common.Behaviors;
 using TecAxle.Hrms.Application.Payroll.Services;
 using TecAxle.Hrms.Application.Services;
 using TecAxle.Hrms.Application.Workflows.Services;
+using TecAxle.Hrms.Application.Workflows.Validation;
+using TecAxle.Hrms.Application.Workflows.Validation.Rules;
 
 namespace TecAxle.Hrms.Application;
 
@@ -32,8 +34,15 @@ public static class DependencyInjection
         // Register leave accrual service
         services.AddScoped<ILeaveAccrualService, LeaveAccrualService>();
 
-        // Register workflow services
+        // Register workflow services (v13.6 routing-hardened)
+        services.AddScoped<IApproverResolver, ApproverResolver>();
         services.AddScoped<IWorkflowEngine, WorkflowEngine>();
+        services.AddScoped<IWorkflowStarter, WorkflowStarter>();
+
+        // Workflow validation-rule registry + built-in rules (v13.6)
+        services.AddScoped<IWorkflowValidationRule, VacationBalanceRule>();
+        services.AddScoped<IWorkflowValidationRuleRegistry>(sp =>
+            new WorkflowValidationRuleRegistry(sp.GetServices<IWorkflowValidationRule>()));
 
         // Register reporting services
         services.AddScoped<Reports.Services.IReportsService, Reports.Services.ReportsService>();
@@ -53,6 +62,13 @@ public static class DependencyInjection
         services.AddScoped<IAbsenceDeductionCalculator, AbsenceDeductionCalculator>();
         services.AddScoped<IPayrollInputResolver, PayrollInputResolver>();
         services.AddScoped<IPayrollCalculationService, PayrollCalculationService>();
+
+        // End-of-service calculation (policy-driven, effective-dated)
+        services.AddScoped<EndOfService.Services.IEndOfServiceCalculator, EndOfService.Services.EndOfServiceCalculator>();
+
+        // Tenant-configurable validation settings + monthly daily-rate resolver
+        services.AddScoped<Validation.IValidationSettingsProvider, Validation.ValidationSettingsProvider>();
+        services.AddScoped<Payroll.Services.ITenantPayrollCalendarService, Payroll.Services.TenantPayrollCalendarService>();
 
         return services;
     }

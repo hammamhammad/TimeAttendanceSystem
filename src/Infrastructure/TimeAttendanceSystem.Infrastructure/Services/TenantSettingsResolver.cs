@@ -145,6 +145,34 @@ public class TenantSettingsResolver : ITenantSettingsResolver
         dto.SessionTimeoutMinutes = settings.SessionTimeoutMinutes;
         dto.Require2FA = settings.Require2FA;
         dto.PasswordHistoryCount = settings.PasswordHistoryCount;
+        dto.PasswordMinLength = settings.PasswordMinLength;
+        dto.LoginLockoutPolicyJson = settings.LoginLockoutPolicyJson;
+
+        // v13.3 tenant-configurable fields
+        dto.ContractExpiryAlertDaysCsv = settings.ContractExpiryAlertDaysCsv;
+        dto.VisaExpiryAlertDaysCsv = settings.VisaExpiryAlertDaysCsv;
+        dto.ReviewReminderDaysCsv = settings.ReviewReminderDaysCsv;
+        dto.LoanRepaymentReminderDays = settings.LoanRepaymentReminderDays;
+        dto.FrozenWorkflowCleanupDays = settings.FrozenWorkflowCleanupDays;
+        dto.DefaultProbationDays = settings.DefaultProbationDays;
+        dto.MaxUploadSizeMb = settings.MaxUploadSizeMb;
+        dto.MaxVacationDaysPerRequest = settings.MaxVacationDaysPerRequest;
+        dto.MaxVacationFuturePlanningYears = settings.MaxVacationFuturePlanningYears;
+        dto.MaxShiftGracePeriodMinutes = settings.MaxShiftGracePeriodMinutes;
+        dto.ExcuseBackwardWindowDays = settings.ExcuseBackwardWindowDays;
+        dto.ExcuseForwardWindowDays = settings.ExcuseForwardWindowDays;
+        dto.OvertimeConfigMaxFutureDays = settings.OvertimeConfigMaxFutureDays;
+
+        // v13.4
+        dto.AttendanceCorrectionMaxRetroactiveDays = settings.AttendanceCorrectionMaxRetroactiveDays;
+        dto.DocumentExpiryAlertDaysCsv = settings.DocumentExpiryAlertDaysCsv;
+        dto.AssetWarrantyExpiryAlertDaysCsv = settings.AssetWarrantyExpiryAlertDaysCsv;
+        dto.AssetOverdueReturnAlertDaysCsv = settings.AssetOverdueReturnAlertDaysCsv;
+        dto.TrainingSessionReminderDaysCsv = settings.TrainingSessionReminderDaysCsv;
+        dto.SuccessionPlanReminderDaysCsv = settings.SuccessionPlanReminderDaysCsv;
+        dto.TimesheetSubmissionReminderDaysBefore = settings.TimesheetSubmissionReminderDaysBefore;
+        dto.GrievanceSlaAlertDaysCsv = settings.GrievanceSlaAlertDaysCsv;
+        dto.NotificationRecipientRolesCsv = settings.NotificationRecipientRolesCsv;
 
         SetAllSources(dto, "tenant");
         return dto;

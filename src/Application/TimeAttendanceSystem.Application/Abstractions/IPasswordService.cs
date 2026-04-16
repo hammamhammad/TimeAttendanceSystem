@@ -109,6 +109,13 @@ public interface IPasswordService
     Result ValidatePasswordStrength(string password);
 
     /// <summary>
+    /// Validates password strength with a caller-supplied minimum-length override (typically
+    /// resolved from <c>TenantSettings.PasswordMinLength</c>). Falls back to the built-in
+    /// minimum (8) if <paramref name="minLength"/> is smaller.
+    /// </summary>
+    Result ValidatePasswordStrength(string password, int minLength);
+
+    /// <summary>
     /// Securely hashes a password using PBKDF2-SHA256 with a unique cryptographic salt.
     /// Creates secure password storage format resistant to rainbow table and brute force attacks.
     /// </summary>

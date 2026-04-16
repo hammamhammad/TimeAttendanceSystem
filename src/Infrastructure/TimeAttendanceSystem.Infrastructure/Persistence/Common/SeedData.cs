@@ -62,9 +62,63 @@ public static class SeedData
             await SeedDefaultAllowanceTypesAsync(context);
         }
 
+        // v13.3: Default End-of-Service policy (Saudi-standard formula) if none exists.
+        if (!await context.EndOfServicePolicies.AnyAsync())
+        {
+            await SeedDefaultEndOfServicePolicyAsync(context);
+        }
+
         await context.SaveChangesAsync();
 
-        Console.WriteLine("Tenant database seeding completed (permissions, roles, systemadmin user, default shift, remote work policy, default workflows, vacation types, excuse policy, allowance types)");
+        Console.WriteLine("Tenant database seeding completed (permissions, roles, systemadmin user, default shift, remote work policy, default workflows, vacation types, excuse policy, allowance types, end-of-service policy)");
+    }
+
+    private static Task SeedDefaultEndOfServicePolicyAsync(TecAxleDbContext context)
+    {
+        var effectiveFrom = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        var policy = new Domain.Offboarding.EndOfServicePolicy
+        {
+            Name = "SA Standard EOS",
+            Description = "Default end-of-service policy seeded at first run. Replaces hardcoded Saudi labor-law formula in v13.3.",
+            CountryCode = "SA",
+            IsActive = true,
+            EffectiveFromDate = effectiveFrom,
+            MinimumServiceYearsForEligibility = 0m,
+            CreatedAtUtc = DateTime.UtcNow,
+            CreatedBy = "SYSTEM"
+        };
+        policy.Tiers.Add(new Domain.Offboarding.EndOfServicePolicyTier
+        {
+            MinYearsInclusive = 0m, MaxYearsExclusive = 5m, MonthsPerYearMultiplier = 0.5m,
+            SortOrder = 1, CreatedAtUtc = DateTime.UtcNow, CreatedBy = "SYSTEM"
+        });
+        policy.Tiers.Add(new Domain.Offboarding.EndOfServicePolicyTier
+        {
+            MinYearsInclusive = 5m, MaxYearsExclusive = null, MonthsPerYearMultiplier = 1.0m,
+            SortOrder = 2, CreatedAtUtc = DateTime.UtcNow, CreatedBy = "SYSTEM"
+        });
+        policy.ResignationDeductions.Add(new Domain.Offboarding.EndOfServiceResignationDeductionTier
+        {
+            MinYearsInclusive = 0m, MaxYearsExclusive = 2m, DeductionFraction = 1.0m,
+            SortOrder = 1, CreatedAtUtc = DateTime.UtcNow, CreatedBy = "SYSTEM"
+        });
+        policy.ResignationDeductions.Add(new Domain.Offboarding.EndOfServiceResignationDeductionTier
+        {
+            MinYearsInclusive = 2m, MaxYearsExclusive = 5m, DeductionFraction = 2m / 3m,
+            SortOrder = 2, CreatedAtUtc = DateTime.UtcNow, CreatedBy = "SYSTEM"
+        });
+        policy.ResignationDeductions.Add(new Domain.Offboarding.EndOfServiceResignationDeductionTier
+        {
+            MinYearsInclusive = 5m, MaxYearsExclusive = 10m, DeductionFraction = 1m / 3m,
+            SortOrder = 3, CreatedAtUtc = DateTime.UtcNow, CreatedBy = "SYSTEM"
+        });
+        policy.ResignationDeductions.Add(new Domain.Offboarding.EndOfServiceResignationDeductionTier
+        {
+            MinYearsInclusive = 10m, MaxYearsExclusive = null, DeductionFraction = 0m,
+            SortOrder = 4, CreatedAtUtc = DateTime.UtcNow, CreatedBy = "SYSTEM"
+        });
+        context.EndOfServicePolicies.Add(policy);
+        return Task.CompletedTask;
     }
 
     private static async Task SeedPermissionsAsync(TecAxleDbContext context)

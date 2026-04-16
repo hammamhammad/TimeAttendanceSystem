@@ -105,6 +105,21 @@ public interface IWorkflowEngine
     /// </summary>
     /// <returns>Number of steps processed</returns>
     Task<int> ProcessTimeoutsAsync();
+
+    /// <summary>
+    /// v13.6 — non-final approver action. Transitions the workflow to
+    /// <see cref="WorkflowStatus.ReturnedForCorrection"/> so the requester can amend and resubmit.
+    /// Only allowed when the current step has <c>AllowReturnForCorrection = true</c>.
+    /// </summary>
+    Task<WorkflowResult<bool>> ReturnForCorrectionAsync(long workflowInstanceId, long userId, string comments);
+
+    /// <summary>
+    /// v13.6 — requester resubmits a returned workflow. Resumes execution at step 1
+    /// (or the first active step after snapshot lookup). Increments
+    /// <c>WorkflowInstance.ResubmissionCount</c>; capped by
+    /// <c>TenantSettings.MaxWorkflowResubmissions</c>.
+    /// </summary>
+    Task<WorkflowResult<bool>> ResubmitAsync(long workflowInstanceId, long userId, string? comments);
 }
 
 /// <summary>
@@ -184,4 +199,12 @@ public class PendingApproval
     public DateTime? DueAt { get; set; }
     public bool IsOverdue { get; set; }
     public bool AllowDelegation { get; set; }
+
+    // v13.6 additions — surfaced by GET /api/v1/approvals/pending
+    public bool AllowReturnForCorrection { get; set; }
+    public long? DelegatedFromUserId { get; set; }
+    public string? DelegatedFromUserName { get; set; }
+    public bool IsDelegated { get; set; }
+    public bool IsReturnedForCorrection { get; set; }
+    public int ResubmissionCount { get; set; }
 }

@@ -1,20 +1,20 @@
 using FluentValidation;
+using TecAxle.Hrms.Application.Validation;
 
 namespace TecAxle.Hrms.Application.AttendanceCorrections.Commands.UpdateAttendanceCorrectionRequest;
 
 /// <summary>
-/// Fluent Validation rules for UpdateAttendanceCorrectionRequestCommand.
-/// Ensures data integrity and business rule compliance before processing.
+/// Validator for UpdateAttendanceCorrectionRequestCommand. Retroactive-window cap uses
+/// the tenant-configured <c>TenantSettings.AttendanceCorrectionMaxRetroactiveDays</c> (default 30).
 /// </summary>
 public class UpdateAttendanceCorrectionRequestCommandValidator : AbstractValidator<UpdateAttendanceCorrectionRequestCommand>
 {
-    /// <summary>
-    /// Maximum number of days in the past for which a correction can be submitted.
-    /// </summary>
-    private const int MaxRetroactiveDays = 30;
+    private readonly IValidationSettingsProvider _settings;
 
-    public UpdateAttendanceCorrectionRequestCommandValidator()
+    public UpdateAttendanceCorrectionRequestCommandValidator(IValidationSettingsProvider settings)
     {
+        _settings = settings;
+
         RuleFor(x => x.Id)
             .GreaterThan(0)
             .WithMessage("Valid correction request ID is required");
@@ -24,8 +24,8 @@ public class UpdateAttendanceCorrectionRequestCommandValidator : AbstractValidat
             .WithMessage("Correction date is required")
             .Must(BeInPast)
             .WithMessage("Correction date must be before today (corrections are only for past dates)")
-            .Must(BeWithinRetroactiveLimit)
-            .WithMessage($"Correction date cannot be more than {MaxRetroactiveDays} days in the past");
+            .MustAsync(BeWithinRetroactiveLimitAsync)
+            .WithMessage(_ => $"Correction date cannot be more than {_settings.Current.AttendanceCorrectionMaxRetroactiveDays} days in the past");
 
         RuleFor(x => x.CorrectionTime)
             .NotEmpty()
@@ -50,14 +50,12 @@ public class UpdateAttendanceCorrectionRequestCommandValidator : AbstractValidat
     }
 
     private static bool BeInPast(DateTime correctionDate)
-    {
-        // Correction date must be strictly before today (yesterday or earlier)
-        return correctionDate.Date < DateTime.Today;
-    }
+        => correctionDate.Date < DateTime.Today;
 
-    private static bool BeWithinRetroactiveLimit(DateTime correctionDate)
+    private async Task<bool> BeWithinRetroactiveLimitAsync(DateTime correctionDate, CancellationToken ct)
     {
-        var maxRetroactiveDate = DateTime.Today.AddDays(-MaxRetroactiveDays);
-        return correctionDate.Date >= maxRetroactiveDate;
+        await _settings.WarmAsync(ct);
+        var max = _settings.Current.AttendanceCorrectionMaxRetroactiveDays;
+        return correctionDate.Date >= DateTime.Today.AddDays(-max);
     }
 }

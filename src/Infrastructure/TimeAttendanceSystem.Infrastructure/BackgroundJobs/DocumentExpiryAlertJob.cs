@@ -8,17 +8,26 @@ using TecAxle.Hrms.Domain.Notifications;
 namespace TecAxle.Hrms.Infrastructure.BackgroundJobs;
 
 /// <summary>
-/// Background job that checks for employee documents expiring within 30, 15, or 7 days
-/// and creates notifications for HR users to take action.
+/// Background job that checks for employee documents expiring within the tenant-configured
+/// alert windows (<see cref="Domain.Tenants.TenantSettings.DocumentExpiryAlertDaysCsv"/>,
+/// default "30,15,7") and notifies the resolved recipients (via
+/// <see cref="INotificationRecipientResolver"/>).
 /// </summary>
 public class DocumentExpiryAlertJob : IInvocable
 {
+    private static readonly int[] DefaultAlertDays = { 30, 15, 7 };
+
     private readonly IApplicationDbContext _context;
+    private readonly INotificationRecipientResolver _recipientResolver;
     private readonly ILogger<DocumentExpiryAlertJob> _logger;
 
-    public DocumentExpiryAlertJob(IApplicationDbContext context, ILogger<DocumentExpiryAlertJob> logger)
+    public DocumentExpiryAlertJob(
+        IApplicationDbContext context,
+        INotificationRecipientResolver recipientResolver,
+        ILogger<DocumentExpiryAlertJob> logger)
     {
         _context = context;
+        _recipientResolver = recipientResolver;
         _logger = logger;
     }
 
@@ -29,17 +38,13 @@ public class DocumentExpiryAlertJob : IInvocable
         try
         {
             var today = DateTime.UtcNow.Date;
-            var alertDays = new[] { 30, 15, 7 };
+            var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync();
+            var alertDays = BackgroundJobSettingsHelper.ParseCsvDays(settings?.DocumentExpiryAlertDaysCsv, DefaultAlertDays);
 
-            var hrUserIds = await _context.UserRoles
-                .Where(ur => ur.Role.Name == "HRManager" || ur.Role.Name == "SystemAdmin")
-                .Select(ur => ur.UserId)
-                .Distinct()
-                .ToListAsync();
-
-            if (!hrUserIds.Any())
+            var recipientIds = await _recipientResolver.GetRecipientUserIdsAsync();
+            if (recipientIds.Count == 0)
             {
-                _logger.LogWarning("No HR users found to send document expiry alerts");
+                _logger.LogWarning("No notification recipients resolved for document expiry alerts");
                 return;
             }
 
@@ -56,9 +61,9 @@ public class DocumentExpiryAlertJob : IInvocable
 
                 foreach (var doc in expiringDocs)
                 {
-                    foreach (var userId in hrUserIds)
+                    foreach (var userId in recipientIds)
                     {
-                        var notification = new Notification
+                        _context.Notifications.Add(new Notification
                         {
                             UserId = userId,
                             Type = NotificationType.ApprovalReminder,
@@ -71,15 +76,12 @@ public class DocumentExpiryAlertJob : IInvocable
                             IsRead = false,
                             CreatedAtUtc = DateTime.UtcNow,
                             CreatedBy = "SYSTEM"
-                        };
-                        _context.Notifications.Add(notification);
+                        });
                     }
                 }
 
                 if (expiringDocs.Any())
-                {
                     _logger.LogInformation("Found {Count} documents expiring in {Days} days", expiringDocs.Count, days);
-                }
             }
 
             await _context.SaveChangesAsync(default);

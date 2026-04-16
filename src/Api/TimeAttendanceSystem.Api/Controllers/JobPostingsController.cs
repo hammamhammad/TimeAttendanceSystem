@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TecAxle.Hrms.Api.Filters;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Modules;
 using TecAxle.Hrms.Domain.Recruitment;
 
 namespace TecAxle.Hrms.Api.Controllers;
@@ -10,6 +12,7 @@ namespace TecAxle.Hrms.Api.Controllers;
 [ApiController]
 [Route("api/v1/job-postings")]
 [Authorize]
+[RequiresModuleEndpoint(SystemModule.Recruitment)]
 public class JobPostingsController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
@@ -23,6 +26,7 @@ public class JobPostingsController : ControllerBase
 
     /// <summary>Lists job postings with optional filters and pagination.</summary>
     [HttpGet]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetAll(
         [FromQuery] long? requisitionId,
         [FromQuery] JobPostingStatus? status,
@@ -78,6 +82,7 @@ public class JobPostingsController : ControllerBase
 
     /// <summary>Gets a job posting by ID.</summary>
     [HttpGet("{id}")]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetById(long id)
     {
         var item = await _context.JobPostings
@@ -251,6 +256,7 @@ public class JobPostingsController : ControllerBase
 
     /// <summary>Gets internal postings for self-service portal.</summary>
     [HttpGet("internal")]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetInternalPostings(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20)

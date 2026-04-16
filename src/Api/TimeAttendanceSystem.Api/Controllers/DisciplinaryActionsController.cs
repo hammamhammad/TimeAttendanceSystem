@@ -15,11 +15,16 @@ public class DisciplinaryActionsController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
     private readonly ICurrentUser _currentUser;
+    private readonly INotificationRecipientResolver _recipientResolver;
 
-    public DisciplinaryActionsController(IApplicationDbContext context, ICurrentUser currentUser)
+    public DisciplinaryActionsController(
+        IApplicationDbContext context,
+        ICurrentUser currentUser,
+        INotificationRecipientResolver recipientResolver)
     {
         _context = context;
         _currentUser = currentUser;
+        _recipientResolver = recipientResolver;
     }
 
     private bool CanViewConfidential()
@@ -351,12 +356,7 @@ public class DisciplinaryActionsController : ControllerBase
         entity.ModifiedAtUtc = DateTime.UtcNow;
         entity.ModifiedBy = _currentUser.Username;
 
-        // Notify HR users
-        var hrUserIds = await _context.UserRoles
-            .Where(ur => ur.Role.Name == "HR" || ur.Role.Name == "SystemAdmin")
-            .Select(ur => ur.UserId)
-            .Distinct()
-            .ToListAsync();
+        var hrUserIds = await _recipientResolver.GetRecipientUserIdsAsync(new[] { "HR" });
 
         foreach (var hrUserId in hrUserIds)
         {

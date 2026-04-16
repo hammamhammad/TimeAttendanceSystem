@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TecAxle.Hrms.Api.Filters;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Modules;
 using TecAxle.Hrms.Domain.Recruitment;
 
 namespace TecAxle.Hrms.Api.Controllers;
@@ -10,6 +12,7 @@ namespace TecAxle.Hrms.Api.Controllers;
 [ApiController]
 [Route("api/v1/candidates")]
 [Authorize]
+[RequiresModuleEndpoint(SystemModule.Recruitment)]
 public class CandidatesController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
@@ -23,6 +26,7 @@ public class CandidatesController : ControllerBase
 
     /// <summary>Lists candidates with optional search and pagination.</summary>
     [HttpGet]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetAll(
         [FromQuery] string? search,
         [FromQuery] ApplicationSource? source,
@@ -71,6 +75,7 @@ public class CandidatesController : ControllerBase
 
     /// <summary>Gets a candidate by ID.</summary>
     [HttpGet("{id}")]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetById(long id)
     {
         var item = await _context.Candidates

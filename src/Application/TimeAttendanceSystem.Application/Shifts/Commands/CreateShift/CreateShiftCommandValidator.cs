@@ -1,16 +1,20 @@
 using FluentValidation;
+using TecAxle.Hrms.Application.Validation;
 using TecAxle.Hrms.Domain.Shifts;
 
 namespace TecAxle.Hrms.Application.Shifts.Commands.CreateShift;
 
 /// <summary>
-/// FluentValidation validator for CreateShiftCommand ensuring comprehensive shift data validation.
-/// Implements business rules from shift management requirements with security-focused validation.
+/// FluentValidation validator for CreateShiftCommand. Grace-period cap uses the tenant-configured
+/// <c>TenantSettings.MaxShiftGracePeriodMinutes</c> (default 120) rather than a hardcoded 120.
 /// </summary>
 public class CreateShiftCommandValidator : AbstractValidator<CreateShiftCommand>
 {
-    public CreateShiftCommandValidator()
+    private readonly IValidationSettingsProvider _settings;
+
+    public CreateShiftCommandValidator(IValidationSettingsProvider settings)
     {
+        _settings = settings;
         // Name validation: Required and unique per branch
         RuleFor(x => x.Name)
             .NotEmpty()
@@ -88,8 +92,12 @@ public class CreateShiftCommandValidator : AbstractValidator<CreateShiftCommand>
         RuleFor(x => x.GracePeriodMinutes)
             .GreaterThan(0)
             .WithMessage("Grace period must be greater than 0")
-            .LessThanOrEqualTo(120)
-            .WithMessage("Grace period cannot exceed 2 hours (120 minutes)")
+            .MustAsync(async (v, ct) =>
+            {
+                await _settings.WarmAsync(ct);
+                return !v.HasValue || v.Value <= _settings.Current.MaxShiftGracePeriodMinutes;
+            })
+            .WithMessage(_ => $"Grace period cannot exceed {_settings.Current.MaxShiftGracePeriodMinutes} minutes")
             .When(x => x.ShiftType == ShiftType.TimeBased && !x.AllowFlexibleHours && x.GracePeriodMinutes.HasValue);
 
         // Shift periods validation

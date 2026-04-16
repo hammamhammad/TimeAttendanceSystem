@@ -13,6 +13,8 @@ namespace TecAxle.Hrms.Infrastructure.BackgroundJobs;
 /// </summary>
 public class TrainingSessionReminderJob : IInvocable
 {
+    private static readonly int[] DefaultReminderDays = { 7, 3, 1 };
+
     private readonly IApplicationDbContext _context;
     private readonly ILogger<TrainingSessionReminderJob> _logger;
 
@@ -29,7 +31,8 @@ public class TrainingSessionReminderJob : IInvocable
         try
         {
             var today = DateTime.UtcNow.Date;
-            var reminderDays = new[] { 7, 3, 1 };
+            var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync();
+            var reminderDays = BackgroundJobSettingsHelper.ParseCsvDays(settings?.TrainingSessionReminderDaysCsv, DefaultReminderDays);
             var notificationCount = 0;
 
             foreach (var days in reminderDays)

@@ -20,6 +20,7 @@ public class DailyAttendanceGeneratorService : IDailyAttendanceGeneratorService
     private readonly IAttendanceRepository _attendanceRepository;
     private readonly IAttendanceTransactionRepository _transactionRepository;
     private readonly IAttendanceCalculationService _calculationService;
+    private readonly ISystemUserResolver _systemUserResolver;
     private readonly ILogger<DailyAttendanceGeneratorService> _logger;
 
     public DailyAttendanceGeneratorService(
@@ -27,12 +28,14 @@ public class DailyAttendanceGeneratorService : IDailyAttendanceGeneratorService
         IAttendanceRepository attendanceRepository,
         IAttendanceTransactionRepository transactionRepository,
         IAttendanceCalculationService calculationService,
+        ISystemUserResolver systemUserResolver,
         ILogger<DailyAttendanceGeneratorService> logger)
     {
         _context = context;
         _attendanceRepository = attendanceRepository;
         _transactionRepository = transactionRepository;
         _calculationService = calculationService;
+        _systemUserResolver = systemUserResolver;
         _logger = logger;
     }
 
@@ -552,17 +555,18 @@ public class DailyAttendanceGeneratorService : IDailyAttendanceGeneratorService
                 return existingAssignment;
             }
 
-            // Create new shift assignment
+            // Create new shift assignment — system user resolved from IsSystemUser=true rather than hardcoded ID 1.
+            var systemUserId = await _systemUserResolver.GetSystemUserIdAsync(cancellationToken);
             var shiftAssignment = new ShiftAssignment
             {
                 ShiftId = defaultShift.Id,
                 AssignmentType = ShiftAssignmentType.Employee,
                 EmployeeId = employeeId,
-                EffectiveFromDate = effectiveDate.Date, // Start from the current date
+                EffectiveFromDate = effectiveDate.Date,
                 Status = ShiftAssignmentStatus.Active,
-                Priority = 50, // Default priority for auto-assignments
+                Priority = 50,
                 Notes = $"Auto-assigned default shift '{defaultShift.Name}' for attendance generation",
-                AssignedByUserId = 1 // System user ID - should be configurable
+                AssignedByUserId = systemUserId
             };
 
             // Add and save the assignment

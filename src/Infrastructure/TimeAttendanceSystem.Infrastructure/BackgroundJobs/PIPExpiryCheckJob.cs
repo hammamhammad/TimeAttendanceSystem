@@ -16,11 +16,16 @@ namespace TecAxle.Hrms.Infrastructure.BackgroundJobs;
 public class PIPExpiryCheckJob : IInvocable
 {
     private readonly IApplicationDbContext _context;
+    private readonly INotificationRecipientResolver _recipientResolver;
     private readonly ILogger<PIPExpiryCheckJob> _logger;
 
-    public PIPExpiryCheckJob(IApplicationDbContext context, ILogger<PIPExpiryCheckJob> logger)
+    public PIPExpiryCheckJob(
+        IApplicationDbContext context,
+        INotificationRecipientResolver recipientResolver,
+        ILogger<PIPExpiryCheckJob> logger)
     {
         _context = context;
+        _recipientResolver = recipientResolver;
         _logger = logger;
     }
 
@@ -79,12 +84,7 @@ public class PIPExpiryCheckJob : IInvocable
                     _context.Notifications.Add(notification);
                 }
 
-                // Also notify HR
-                var hrUserIds = await _context.UserRoles
-                    .Where(ur => ur.Role.Name == "HRManager" || ur.Role.Name == "SystemAdmin")
-                    .Select(ur => ur.UserId)
-                    .Distinct()
-                    .ToListAsync();
+                var hrUserIds = await _recipientResolver.GetRecipientUserIdsAsync();
 
                 foreach (var hrUserId in hrUserIds)
                 {

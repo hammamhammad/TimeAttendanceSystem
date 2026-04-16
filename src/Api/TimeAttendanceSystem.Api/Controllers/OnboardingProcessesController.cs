@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TecAxle.Hrms.Api.Filters;
 using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Lifecycle.Events;
 using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Modules;
 using TecAxle.Hrms.Domain.Onboarding;
 
 namespace TecAxle.Hrms.Api.Controllers;
@@ -10,19 +13,26 @@ namespace TecAxle.Hrms.Api.Controllers;
 [ApiController]
 [Route("api/v1/onboarding-processes")]
 [Authorize]
+[RequiresModuleEndpoint(SystemModule.Onboarding)]
 public class OnboardingProcessesController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
     private readonly ICurrentUser _currentUser;
+    private readonly ILifecycleEventPublisher _lifecyclePublisher;
 
-    public OnboardingProcessesController(IApplicationDbContext context, ICurrentUser currentUser)
+    public OnboardingProcessesController(
+        IApplicationDbContext context,
+        ICurrentUser currentUser,
+        ILifecycleEventPublisher lifecyclePublisher)
     {
         _context = context;
         _currentUser = currentUser;
+        _lifecyclePublisher = lifecyclePublisher;
     }
 
     /// <summary>Lists onboarding processes with optional filters.</summary>
     [HttpGet]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetAll(
         [FromQuery] long? employeeId,
         [FromQuery] OnboardingStatus? status,
@@ -75,6 +85,7 @@ public class OnboardingProcessesController : ControllerBase
 
     /// <summary>Gets an onboarding process by ID with tasks and documents.</summary>
     [HttpGet("{id}")]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetById(long id)
     {
         var item = await _context.OnboardingProcesses
@@ -221,6 +232,7 @@ public class OnboardingProcessesController : ControllerBase
     {
         var process = await _context.OnboardingProcesses
             .Include(p => p.Tasks.Where(t => !t.IsDeleted))
+            .Include(p => p.Documents.Where(d => !d.IsDeleted))
             .FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
 
         if (process == null)
@@ -229,17 +241,38 @@ public class OnboardingProcessesController : ControllerBase
         if (process.Status == OnboardingStatus.Completed)
             return BadRequest(new { error = "Process is already completed." });
 
-        // Check all required tasks are completed or skipped
-        var pendingRequired = process.Tasks
-            .Where(t => t.IsRequired && t.Status != OnboardingTaskStatus.Completed && t.Status != OnboardingTaskStatus.Skipped)
-            .ToList();
+        // v13.5: both gates are configurable per tenant with defaults matching v13.x.
+        var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync();
+        var requireTasks = settings?.OnboardingCompletionRequiresAllRequiredTasks ?? true;
+        var requireDocs = settings?.OnboardingCompletionRequiresAllRequiredDocuments ?? false;
 
-        if (pendingRequired.Any())
-            return BadRequest(new
-            {
-                error = $"Cannot complete: {pendingRequired.Count} required task(s) are not yet completed.",
-                pendingTasks = pendingRequired.Select(t => new { t.Id, t.TaskName, t.Status })
-            });
+        if (requireTasks)
+        {
+            var pendingRequired = process.Tasks
+                .Where(t => t.IsRequired && t.Status != OnboardingTaskStatus.Completed && t.Status != OnboardingTaskStatus.Skipped)
+                .ToList();
+
+            if (pendingRequired.Any())
+                return BadRequest(new
+                {
+                    error = $"Cannot complete: {pendingRequired.Count} required task(s) are not yet completed.",
+                    pendingTasks = pendingRequired.Select(t => new { t.Id, t.TaskName, t.Status })
+                });
+        }
+
+        if (requireDocs)
+        {
+            var pendingRequiredDocs = process.Documents
+                .Where(d => d.IsRequired && d.Status != DocumentCollectionStatus.Verified)
+                .ToList();
+
+            if (pendingRequiredDocs.Any())
+                return BadRequest(new
+                {
+                    error = $"Cannot complete: {pendingRequiredDocs.Count} required document(s) are not yet verified.",
+                    pendingDocuments = pendingRequiredDocs.Select(d => new { d.Id, d.DocumentName, d.Status })
+                });
+        }
 
         process.Status = OnboardingStatus.Completed;
         process.ActualCompletionDate = DateTime.UtcNow;
@@ -247,6 +280,12 @@ public class OnboardingProcessesController : ControllerBase
         process.ModifiedBy = _currentUser.Username;
 
         await _context.SaveChangesAsync();
+
+        // v13.5: lifecycle handler may activate the employee (gated by
+        // AutoActivateEmployeeOnOnboardingComplete, default false → milestone-only).
+        await _lifecyclePublisher.PublishAsync(
+            new OnboardingCompletedEvent(process.Id, process.EmployeeId, _currentUser.UserId),
+            HttpContext.RequestAborted);
 
         return Ok(new { message = "Onboarding process completed." });
     }
@@ -275,6 +314,7 @@ public class OnboardingProcessesController : ControllerBase
 
     /// <summary>Gets dashboard summary stats for onboarding.</summary>
     [HttpGet("dashboard")]
+    [AllowModuleReadOnly]
     public async Task<IActionResult> GetDashboard()
     {
         var query = _context.OnboardingProcesses.Where(p => !p.IsDeleted);

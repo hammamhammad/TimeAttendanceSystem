@@ -1,15 +1,21 @@
 using FluentValidation;
+using TecAxle.Hrms.Application.Validation;
 
 namespace TecAxle.Hrms.Application.Excuses.Commands.CreateEmployeeExcuse;
 
 /// <summary>
-/// Fluent Validation rules for CreateEmployeeExcuseCommand.
-/// Ensures data integrity and business rule compliance before processing.
+/// Validator for CreateEmployeeExcuseCommand. Excuse window is tenant-configurable via
+/// <c>TenantSettings.ExcuseBackwardWindowDays</c> (default 365) and
+/// <c>ExcuseForwardWindowDays</c> (default 30).
 /// </summary>
 public class CreateEmployeeExcuseCommandValidator : AbstractValidator<CreateEmployeeExcuseCommand>
 {
-    public CreateEmployeeExcuseCommandValidator()
+    private readonly IValidationSettingsProvider _settings;
+
+    public CreateEmployeeExcuseCommandValidator(IValidationSettingsProvider settings)
     {
+        _settings = settings;
+
         RuleFor(x => x.EmployeeId)
             .GreaterThan(0)
             .WithMessage("Employee ID must be provided");
@@ -17,8 +23,8 @@ public class CreateEmployeeExcuseCommandValidator : AbstractValidator<CreateEmpl
         RuleFor(x => x.ExcuseDate)
             .NotEmpty()
             .WithMessage("Excuse date is required")
-            .Must(BeWithinValidRange)
-            .WithMessage("Excuse date must be within the last year or next 30 days");
+            .MustAsync(BeWithinValidRangeAsync)
+            .WithMessage(_ => $"Excuse date must be within the last {_settings.Current.ExcuseBackwardWindowDays} days or next {_settings.Current.ExcuseForwardWindowDays} days");
 
         RuleFor(x => x.StartTime)
             .NotEmpty()
@@ -46,20 +52,19 @@ public class CreateEmployeeExcuseCommandValidator : AbstractValidator<CreateEmpl
             .When(x => !string.IsNullOrEmpty(x.ProcessingNotes))
             .WithMessage("Processing notes cannot exceed 1000 characters");
 
-        // Custom validation for duration
         RuleFor(x => x)
             .Must(HaveValidDuration)
             .WithMessage("Excuse duration must be between 0.1 and 24 hours")
             .WithName("Duration");
     }
 
-    private static bool BeWithinValidRange(DateTime excuseDate)
+    private async Task<bool> BeWithinValidRangeAsync(DateTime excuseDate, CancellationToken ct)
     {
+        await _settings.WarmAsync(ct);
         var today = DateTime.Today;
-        var oneYearAgo = today.AddYears(-1);
-        var thirtyDaysFromNow = today.AddDays(30);
-
-        return excuseDate.Date >= oneYearAgo && excuseDate.Date <= thirtyDaysFromNow;
+        var backward = today.AddDays(-_settings.Current.ExcuseBackwardWindowDays);
+        var forward = today.AddDays(_settings.Current.ExcuseForwardWindowDays);
+        return excuseDate.Date >= backward && excuseDate.Date <= forward;
     }
 
     private static bool HaveValidDuration(CreateEmployeeExcuseCommand command)
