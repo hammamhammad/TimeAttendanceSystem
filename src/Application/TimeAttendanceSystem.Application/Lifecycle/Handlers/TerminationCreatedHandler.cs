@@ -48,7 +48,7 @@ public class TerminationCreatedHandler
     }
 
     private async Task RunClearanceSubStepAsync(
-        TerminationCreatedEvent ev, Domain.Tenants.TenantSettings? settings, CancellationToken ct)
+        TerminationCreatedEvent ev, Domain.Company.CompanySettings? settings, CancellationToken ct)
     {
         const LifecycleAutomationType sub = LifecycleAutomationType.TerminationCreateClearance;
         var triggeredAtUtc = DateTime.UtcNow;
@@ -119,7 +119,7 @@ public class TerminationCreatedHandler
     }
 
     private async Task RunSuspendSubStepAsync(
-        TerminationCreatedEvent ev, Domain.Tenants.TenantSettings? settings, CancellationToken ct)
+        TerminationCreatedEvent ev, Domain.Company.CompanySettings? settings, CancellationToken ct)
     {
         const LifecycleAutomationType sub = LifecycleAutomationType.TerminationSuspendEmployee;
         var triggeredAtUtc = DateTime.UtcNow;

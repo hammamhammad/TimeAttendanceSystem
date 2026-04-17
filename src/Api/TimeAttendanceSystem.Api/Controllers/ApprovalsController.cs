@@ -233,7 +233,7 @@ public class ApprovalsController : ControllerBase
 
     /// <summary>
     /// v13.6 — Resubmit a workflow that was previously returned for correction.
-    /// Only the original requester may invoke. Capped by <c>TenantSettings.MaxWorkflowResubmissions</c>.
+    /// Only the original requester may invoke. Capped by <c>CompanySettings.MaxWorkflowResubmissions</c>.
     /// </summary>
     [HttpPost("{workflowInstanceId:long}/resubmit")]
     public async Task<IActionResult> Resubmit(long workflowInstanceId, [FromBody] ResubmitRequest? request = null)

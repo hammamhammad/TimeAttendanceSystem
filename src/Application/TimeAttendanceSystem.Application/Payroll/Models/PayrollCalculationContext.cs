@@ -1,4 +1,5 @@
 using TecAxle.Hrms.Domain.Attendance;
+using TecAxle.Hrms.Domain.Benefits;
 using TecAxle.Hrms.Domain.Employees;
 using TecAxle.Hrms.Domain.Payroll;
 using TecAxle.Hrms.Domain.Settings;
@@ -38,6 +39,13 @@ public class PayrollCalculationContext
     public required IReadOnlyDictionary<DateTime, OvertimeConfiguration> OvertimeConfigByDate { get; init; }
 
     public required PayrollCalendarPolicy CalendarPolicy { get; init; }
+
+    /// <summary>
+    /// Phase 1 (v14.1): Active benefit enrollments with payroll deduction enabled whose effective
+    /// window overlaps the payroll period. Consumed by the BenefitDeductionIntegrator to produce
+    /// an employee-premium deduction line. Empty list = no benefit deductions.
+    /// </summary>
+    public IReadOnlyList<BenefitEnrollment> BenefitEnrollments { get; init; } = Array.Empty<BenefitEnrollment>();
 
     /// <summary>
     /// Non-fatal issues captured during input resolution. Calculators may append more.

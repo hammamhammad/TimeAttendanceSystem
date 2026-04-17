@@ -67,7 +67,7 @@ public class FilesController : ControllerBase
         }
 
         // Validate file size against tenant-configured cap (default 10 MB).
-        var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync(s => !s.IsDeleted);
+        var settings = await _context.CompanySettings.AsNoTracking().FirstOrDefaultAsync(s => !s.IsDeleted);
         var maxMb = settings?.MaxUploadSizeMb > 0 ? settings.MaxUploadSizeMb : 10;
         var maxBytes = (long)maxMb * 1024L * 1024L;
         if (file.Length > maxBytes)

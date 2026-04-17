@@ -1,20 +1,20 @@
 using FluentAssertions;
-using TecAxle.Hrms.Domain.Tenants;
+using TecAxle.Hrms.Domain.Company;
 
 namespace TecAxle.Hrms.BusinessRules.Tests;
 
 /// <summary>
 /// Guardrails against regressing the v13.4 "every alert window is configurable" rule.
-/// Each new <see cref="TenantSettings"/> field must have the exact default that preserves
+/// Each new <see cref="CompanySettings"/> field must have the exact default that preserves
 /// pre-v13.4 behavior. If any of these assertions fail, someone accidentally changed a
 /// hardcoded behavior during deploy — reject the change.
 /// </summary>
 public class V13_4_ConfigurationTests
 {
     [Fact]
-    public void TenantSettings_new_fields_have_the_exact_pre_v13_4_defaults()
+    public void CompanySettings_new_fields_have_the_exact_pre_v13_4_defaults()
     {
-        var s = new TenantSettings();
+        var s = new CompanySettings();
 
         s.AttendanceCorrectionMaxRetroactiveDays.Should().Be(30);
         s.DocumentExpiryAlertDaysCsv.Should().Be("30,15,7");
@@ -36,7 +36,7 @@ public class V13_4_ConfigurationTests
     [InlineData("3,1", new[] { 3, 1 })]
     public void ParseCsvDays_handles_each_new_default_shape(string csv, int[] expectedDesc)
     {
-        var asm = typeof(TenantSettings).Assembly;
+        var asm = typeof(CompanySettings).Assembly;
         // Access the helper via the Infrastructure assembly (it's internal to BackgroundJobs namespace)
         var infraAsm = System.Reflection.Assembly.Load("TecAxle.Hrms.Infrastructure");
         var helperType = infraAsm.GetType("TecAxle.Hrms.Infrastructure.BackgroundJobs.BackgroundJobSettingsHelper")!;

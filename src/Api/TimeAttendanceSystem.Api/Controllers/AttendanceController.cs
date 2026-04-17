@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using TecAxle.Hrms.Api.Models;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Application.Attendance.Queries.GetMonthlyReport;
@@ -27,6 +28,8 @@ public class AttendanceController : ControllerBase
     private readonly ICurrentUser _currentUser;
     private readonly ILogger<AttendanceController> _logger;
     private readonly IMediator _mediator;
+    private readonly ITimezoneService _timezoneService;
+    private readonly ICompanySettingsResolver _settingsResolver;
 
     public AttendanceController(
         IAttendanceRepository attendanceRepository,
@@ -36,7 +39,9 @@ public class AttendanceController : ControllerBase
         IApplicationDbContext context,
         ICurrentUser currentUser,
         ILogger<AttendanceController> logger,
-        IMediator mediator)
+        IMediator mediator,
+        ITimezoneService timezoneService,
+        ICompanySettingsResolver settingsResolver)
     {
         _attendanceRepository = attendanceRepository;
         _transactionRepository = transactionRepository;
@@ -46,6 +51,8 @@ public class AttendanceController : ControllerBase
         _currentUser = currentUser;
         _logger = logger;
         _mediator = mediator;
+        _timezoneService = timezoneService;
+        _settingsResolver = settingsResolver;
     }
 
     /// <summary>
@@ -297,18 +304,61 @@ public class AttendanceController : ControllerBase
                 return BadRequest("Valid employee ID is required");
             }
 
-            // Set default values
-            var transactionTime = request.TransactionTimeUtc ?? DateTime.UtcNow;
-            var attendanceDate = request.AttendanceDate ?? transactionTime.Date;
+            // Phase 2: resolve the employee's branch so all derived values (local time, AttendanceDate
+            // bucket, holiday/overtime day-type classification) are computed against the correct branch TZ.
+            var employee = await _context.Employees
+                .Where(e => e.Id == request.EmployeeId)
+                .Select(e => new { e.Id, e.BranchId })
+                .FirstOrDefaultAsync();
+            if (employee == null)
+                return BadRequest("Employee not found");
+
+            // Set default values (UTC is the source of truth)
+            var transactionTimeUtc = request.TransactionTimeUtc ?? DateTime.UtcNow;
+            if (transactionTimeUtc.Kind != DateTimeKind.Utc)
+                transactionTimeUtc = DateTime.SpecifyKind(transactionTimeUtc, DateTimeKind.Utc);
+
+            var localTime = await _timezoneService.ToBranchLocalAsync(transactionTimeUtc, employee.BranchId);
+            // AttendanceDate is the branch-local calendar date bucket. Callers may override, but
+            // the default is derived from the branch clock, not UTC — overnight shifts correct.
+            var attendanceDate = request.AttendanceDate?.Date ?? localTime.Date;
+
+            // Phase 2: duplicate-punch suppression window.
+            var settings = await _settingsResolver.GetSettingsAsync(employee.BranchId, null);
+            var suppressSeconds = Math.Max(0, settings.AttendanceDuplicateSuppressionSeconds);
+            if (suppressSeconds > 0)
+            {
+                var sinceUtc = transactionTimeUtc.AddSeconds(-suppressSeconds);
+                var isManualFlag = true; // this path is always manual
+                var duplicate = await _context.AttendanceTransactions
+                    .Where(t => t.EmployeeId == request.EmployeeId
+                             && t.TransactionType == request.TransactionType
+                             && t.IsManual == isManualFlag
+                             && t.TransactionTimeUtc >= sinceUtc
+                             && t.TransactionTimeUtc <= transactionTimeUtc
+                             && !t.IsDeleted)
+                    .OrderByDescending(t => t.TransactionTimeUtc)
+                    .FirstOrDefaultAsync();
+                if (duplicate != null)
+                {
+                    return Ok(new
+                    {
+                        message = "Duplicate punch suppressed within the configured window.",
+                        suppressedWindowSeconds = suppressSeconds,
+                        existingTransactionId = duplicate.Id,
+                        transactionTimeUtc = duplicate.TransactionTimeUtc
+                    });
+                }
+            }
 
             // Create the transaction
             var transaction = new AttendanceTransaction
             {
                 EmployeeId = request.EmployeeId,
                 TransactionType = request.TransactionType,
-                TransactionTimeUtc = transactionTime,
-                TransactionTimeLocal = transactionTime, // TODO: Convert to branch timezone
-                AttendanceDate = attendanceDate,
+                TransactionTimeUtc = transactionTimeUtc,
+                TransactionTimeLocal = localTime,
+                AttendanceDate = DateTime.SpecifyKind(attendanceDate, DateTimeKind.Unspecified),
                 IsManual = true,
                 EnteredByUserId = _currentUser.UserId,
                 Notes = request.Notes,
@@ -1058,6 +1108,11 @@ public class AttendanceController : ControllerBase
 
     /// <summary>
     /// Creates or updates a time transaction (check-in/check-out) for manual edits.
+    /// Phase 2: accepts an incoming wall-clock time and converts it correctly:
+    /// if the caller passes a UTC-kind DateTime we keep it as UTC; if they pass Local/Unspecified
+    /// we treat it as branch-local and convert to UTC via <see cref="ITimezoneService"/>.
+    /// The stored <c>TransactionTimeLocal</c> is now a genuine branch-local wall-clock value,
+    /// not a duplicate of the UTC value.
     /// </summary>
     private async Task CreateOrUpdateTimeTransaction(
         long employeeId,
@@ -1069,9 +1124,25 @@ public class AttendanceController : ControllerBase
         // Find existing transaction of the same type
         var existingTransaction = existingTransactions.FirstOrDefault(t => t.TransactionType == transactionType);
 
-        // Ensure both UTC and local times have UTC kind for PostgreSQL compatibility
-        var utcTime = EnsureUtcDateTime(transactionTime);
-        var localTime = EnsureUtcDateTime(transactionTime); // Store local time with UTC kind for PostgreSQL
+        // Resolve the employee's branch for tz conversion.
+        var branchId = await _context.Employees
+            .Where(e => e.Id == employeeId)
+            .Select(e => (long?)e.BranchId)
+            .FirstOrDefaultAsync();
+
+        DateTime utcTime;
+        DateTime localTime;
+        if (transactionTime.Kind == DateTimeKind.Utc)
+        {
+            utcTime = transactionTime;
+            localTime = await _timezoneService.ToBranchLocalAsync(utcTime, branchId);
+        }
+        else
+        {
+            // Treat incoming value as branch-local wall-clock; convert to UTC.
+            utcTime = await _timezoneService.FromBranchLocalAsync(transactionTime, branchId);
+            localTime = DateTime.SpecifyKind(transactionTime, DateTimeKind.Unspecified);
+        }
 
         if (existingTransaction != null)
         {

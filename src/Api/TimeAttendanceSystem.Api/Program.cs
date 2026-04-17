@@ -187,6 +187,30 @@ app.Services.UseScheduler(scheduler =>
     scheduler.Schedule<FrozenWorkflowCleanupJob>()
         .DailyAtHour(3); // Run at 3:00 AM daily
 
+    // Phase 2 (v14.2): Surface lifecycle automation failures (Failed / MissingPrerequisite)
+    // that do NOT throw into visible operational alerts. Deduped by IFailureAlertService,
+    // so running hourly is safe.
+    scheduler.Schedule<OperationalFailureSurfacerJob>()
+        .Hourly();
+
+    // Phase 2 (v14.2) completion: Enforce LeaveAccrualPolicy.CarryOverExpiryMonths.
+    // Runs daily at 04:00 UTC. Job is fully idempotent (per-balance/per-year marker
+    // transaction), so a missed day catches up on the next run.
+    scheduler.Schedule<LeaveCarryoverExpiryJob>()
+        .DailyAtHour(4);
+
+    // Phase 3 (v14.3): shift-driven auto-checkout. Runs hourly; only creates an
+    // AutoCheckOut transaction for an employee AFTER their effective shift end +
+    // grace period is in the past (branch-TZ aware). Idempotent on rerun.
+    scheduler.Schedule<ShiftDrivenAutoCheckOutJob>()
+        .Hourly();
+
+    // Phase 3 (v14.3): PIP follow-through. Runs hourly; when a PIP transitions to
+    // CompletedUnsuccessful, creates a pending ResignationRequest so the unsuccessful
+    // outcome is not a dead-end state. Idempotent via PIP.RelatedResignationId.
+    scheduler.Schedule<PipFollowThroughJob>()
+        .Hourly();
+
     // Schedule temporary allowance expiration to run daily at 2 AM
     scheduler.Schedule<ExpireTemporaryAllowancesJob>()
         .DailyAtHour(2); // Expire temporary allowances at 2:00 AM daily

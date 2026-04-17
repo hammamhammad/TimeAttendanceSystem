@@ -9,12 +9,12 @@ namespace TecAxle.Hrms.Application.FinalSettlements.Commands.CalculateFinalSettl
 
 public class CalculateFinalSettlementCommandHandler : BaseHandler<CalculateFinalSettlementCommand, Result<long>>
 {
-    private readonly ITenantPayrollCalendarService _calendarService;
+    private readonly ICompanyPayrollCalendarService _calendarService;
 
     public CalculateFinalSettlementCommandHandler(
         IApplicationDbContext context,
         ICurrentUser currentUser,
-        ITenantPayrollCalendarService calendarService)
+        ICompanyPayrollCalendarService calendarService)
         : base(context, currentUser)
     {
         _calendarService = calendarService;
@@ -30,7 +30,7 @@ public class CalculateFinalSettlementCommandHandler : BaseHandler<CalculateFinal
             return Result.Failure<long>("Termination record not found.");
 
         // v13.5: optional gate — when enabled, reject calculation until clearance is Completed.
-        var settings = await Context.TenantSettings.AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+        var settings = await Context.CompanySettings.AsNoTracking().FirstOrDefaultAsync(cancellationToken);
         if (settings is { RequireClearanceCompleteBeforeFinalSettlement: true })
         {
             var clearance = await Context.ClearanceChecklists
@@ -41,7 +41,7 @@ public class CalculateFinalSettlementCommandHandler : BaseHandler<CalculateFinal
             {
                 return Result.Failure<long>(
                     "Clearance must be completed before final settlement can be calculated. " +
-                    "(TenantSettings.RequireClearanceCompleteBeforeFinalSettlement is enabled.)");
+                    "(CompanySettings.RequireClearanceCompleteBeforeFinalSettlement is enabled.)");
             }
         }
 

@@ -5,7 +5,7 @@ namespace TecAxle.Hrms.Application.EmployeeVacations.Commands.CreateEmployeeVaca
 
 /// <summary>
 /// Validation rules for CreateEmployeeVacationCommand. Max-period rule uses the tenant-configured
-/// <c>TenantSettings.MaxVacationDaysPerRequest</c> (default 365) rather than a hardcoded 365.
+/// <c>CompanySettings.MaxVacationDaysPerRequest</c> (default 365) rather than a hardcoded 365.
 /// </summary>
 public class CreateEmployeeVacationCommandValidator : AbstractValidator<CreateEmployeeVacationCommand>
 {

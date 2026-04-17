@@ -7,47 +7,105 @@ on:
     branches: [ "main", "master" ]
 
 jobs:
-  backend-build:
+  # -------------------------------------------------------------------
+  # Backend unit tests (no Postgres required).
+  # -------------------------------------------------------------------
+  backend-unit:
     runs-on: ubuntu-latest
-    
+    name: Backend — build + unit tests
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 9.0.x
-        
-    - name: Restore Dependencies
-      run: dotnet restore ./src/TimeAttendanceSystem.sln
-      
-    - name: Build Backend
-      run: dotnet build ./src/TimeAttendanceSystem.sln --no-restore
-      
-    - name: Test Backend
-      run: dotnet test ./src/TimeAttendanceSystem.sln --no-build --verbosity normal
 
-  frontend-build:
+    - name: Restore dependencies
+      run: dotnet restore ./TimeAttendanceSystem.sln
+
+    - name: Build solution
+      run: dotnet build ./TimeAttendanceSystem.sln --no-restore --configuration Release
+
+    # Run everything EXCEPT the Postgres-gated tests. The PostgresRequiredFact
+    # attribute auto-skips when HRMS_INTEGRATION_DB is unset, but we still want
+    # the unit job to run without attempting to reach a DB.
+    - name: Run backend unit tests
+      run: dotnet test ./TimeAttendanceSystem.sln --no-build --configuration Release --verbosity normal
+
+  # -------------------------------------------------------------------
+  # Backend integration tests (real Postgres transactions).
+  # Uses a Postgres service container pinned to match production (v18).
+  # -------------------------------------------------------------------
+  backend-integration:
     runs-on: ubuntu-latest
+    name: Backend — Postgres integration
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_PASSWORD: ci_secret
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        # Wait until the server is healthy before the first test run.
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore ./TimeAttendanceSystem.sln
+
+    - name: Build solution
+      run: dotnet build ./TimeAttendanceSystem.sln --no-restore --configuration Release
+
+    # HRMS_INTEGRATION_DB is the admin (CREATEDB-capable) connection string
+    # PostgresTestHarness uses to provision per-test throwaway databases.
+    - name: Run backend integration tests
+      env:
+        HRMS_INTEGRATION_DB: "Host=localhost;Port=5432;Username=postgres;Password=ci_secret"
+      run: |
+        dotnet test ./tests/TecAxle.Hrms.LifecycleAutomation.Tests/TecAxle.Hrms.LifecycleAutomation.Tests.csproj \
+          --no-build --configuration Release \
+          --filter "FullyQualifiedName~PayrollTransactionRollbackTests" \
+          --verbosity normal
+
+  # -------------------------------------------------------------------
+  # Frontend build + Karma specs.
+  # -------------------------------------------------------------------
+  frontend:
+    runs-on: ubuntu-latest
+    name: Frontend — build + spec tests
     defaults:
       run:
         working-directory: ./time-attendance-frontend
 
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '20'
         cache: 'npm'
         cache-dependency-path: ./time-attendance-frontend/package-lock.json
-        
-    - name: Install Dependencies
+
+    - name: Install dependencies
       run: npm ci
-      
-    - name: Build Frontend
+
+    - name: Build frontend
       run: npm run build -- --configuration production
-      
-    - name: Test Frontend
+
+    - name: Run frontend specs
       run: npm run test -- --watch=false --browsers=ChromeHeadless

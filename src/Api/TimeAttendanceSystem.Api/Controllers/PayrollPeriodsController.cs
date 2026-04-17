@@ -20,12 +20,18 @@ public class PayrollPeriodsController : ControllerBase
     private readonly IMediator _mediator;
     private readonly IApplicationDbContext _context;
     private readonly ICurrentUser _currentUser;
+    private readonly IPayrollSideEffectReverser _sideEffectReverser;
 
-    public PayrollPeriodsController(IMediator mediator, IApplicationDbContext context, ICurrentUser currentUser)
+    public PayrollPeriodsController(
+        IMediator mediator,
+        IApplicationDbContext context,
+        ICurrentUser currentUser,
+        IPayrollSideEffectReverser sideEffectReverser)
     {
         _mediator = mediator;
         _context = context;
         _currentUser = currentUser;
+        _sideEffectReverser = sideEffectReverser;
     }
 
     /// <summary>Gets all payroll periods with optional filtering.</summary>
@@ -213,6 +219,14 @@ public class PayrollPeriodsController : ControllerBase
             r.ModifiedBy = _currentUser.Username;
         }
 
+        // Phase 2 (v14.2): reverse payroll-linked side-effects (loans/advances/expenses) so a
+        // subsequent /recalculate sees a clean slate. Without this, repayments/advances/claims
+        // would stay in Paid/Deducted/Reimbursed state and the rerun would skip them entirely
+        // (matching logic ignores rows with non-null PayrollRecordId), silently producing a
+        // shorter payroll. Runs INSIDE the same transaction as the status flip via SaveChanges.
+        await _sideEffectReverser.ReverseAllInPeriodAsync(id,
+            $"admin-unlock by {_currentUser.Username}: {request.Reason}");
+
         _context.PayrollRunAudits.Add(new TecAxle.Hrms.Domain.Payroll.PayrollRunAudit
         {
             PayrollPeriodId = id,
@@ -256,8 +270,29 @@ public class PayrollPeriodsController : ControllerBase
         period.ModifiedAtUtc = DateTime.UtcNow;
         period.ModifiedBy = _currentUser.Username;
 
+        // Phase 2 (v14.2): reverse any already-applied side-effects on the records we are
+        // about to cancel. Also cascade-soft-delete any orphan PayrollRecordDetail rows so
+        // cancelled-period data is consistent.
+        await _sideEffectReverser.ReverseAllInPeriodAsync(id,
+            $"period-cancel by {_currentUser.Username}");
+        await _sideEffectReverser.CascadeDeleteDetailsAsync(id);
+
+        // Soft-delete the PayrollRecord rows owned by the cancelled period so they no longer
+        // appear in records lists (audit trail preserved — IsDeleted is a soft flag, the
+        // PayrollRunAudit + CalculationBreakdownJson history remain intact).
+        var records = await _context.PayrollRecords
+            .Where(r => r.PayrollPeriodId == id && !r.IsDeleted)
+            .ToListAsync();
+        foreach (var r in records)
+        {
+            r.IsDeleted = true;
+            r.ModifiedAtUtc = DateTime.UtcNow;
+            r.ModifiedBy = _currentUser.Username;
+            r.Notes = (r.Notes ?? "") + $" | Cancelled with period {id} on {DateTime.UtcNow:O}";
+        }
+
         await _context.SaveChangesAsync();
-        return Ok(new { message = "Payroll period cancelled." });
+        return Ok(new { message = "Payroll period cancelled.", reversedRecords = records.Count });
     }
 
     /// <summary>Gets all payroll records for a period.</summary>

@@ -69,8 +69,8 @@ public class CreateAttendanceCorrectionRequestCommandHandler : IRequestHandler<C
         }
 
         // Retroactive limit driven by tenant configuration
-        // (TenantSettings.AttendanceCorrectionMaxRetroactiveDays, default 30).
-        var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+        // (CompanySettings.AttendanceCorrectionMaxRetroactiveDays, default 30).
+        var settings = await _context.CompanySettings.AsNoTracking().FirstOrDefaultAsync(cancellationToken);
         var maxRetroactiveDays = settings?.AttendanceCorrectionMaxRetroactiveDays > 0
             ? settings.AttendanceCorrectionMaxRetroactiveDays
             : 30;

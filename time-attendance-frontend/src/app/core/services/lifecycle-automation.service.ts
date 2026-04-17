@@ -12,7 +12,7 @@ import {
 
 /**
  * Client for GET /api/v1/lifecycle-automation/audit endpoints.
- * Tenant-settings toggles are handled by the existing TenantConfigurationService — this
+ * Tenant-settings toggles are handled by the existing CompanyConfigurationService — this
  * service only deals with the audit trail.
  */
 @Injectable({ providedIn: 'root' })

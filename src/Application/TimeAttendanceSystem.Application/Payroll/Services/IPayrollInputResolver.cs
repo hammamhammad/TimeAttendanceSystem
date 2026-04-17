@@ -147,6 +147,19 @@ public sealed class PayrollInputResolver : IPayrollInputResolver
             .OrderByDescending(ei => ei.StartDate)
             .FirstOrDefaultAsync(ct);
 
+        // --- Phase 1 (v14.1): Active benefit enrollments with payroll deduction enabled
+        // whose effective window overlaps the period.
+        var benefitEnrollments = await _db.BenefitEnrollments
+            .Include(e => e.BenefitPlan)
+            .Where(e => !e.IsDeleted
+                        && e.EmployeeId == employee.Id
+                        && e.Status == Domain.Common.BenefitEnrollmentStatus.Active
+                        && e.PayrollDeductionEnabled
+                        && e.EmployeeMonthlyContribution > 0
+                        && e.EffectiveDate.Date <= periodEnd
+                        && (e.TerminationDate == null || e.TerminationDate.Value.Date >= periodStart))
+            .ToListAsync(ct);
+
         // --- Calendar policy (branch override beats tenant default; latest effective wins).
         var calendarPolicy = await _db.PayrollCalendarPolicies
             .Where(p => !p.IsDeleted
@@ -194,7 +207,8 @@ public sealed class PayrollInputResolver : IPayrollInputResolver
             SocialInsuranceConfig = siConfig,
             EmployeeInsurance = employeeInsurance,
             OvertimeConfigByDate = otByDate,
-            CalendarPolicy = calendarPolicy
+            CalendarPolicy = calendarPolicy,
+            BenefitEnrollments = benefitEnrollments
         };
 
         if (taxConfig == null)

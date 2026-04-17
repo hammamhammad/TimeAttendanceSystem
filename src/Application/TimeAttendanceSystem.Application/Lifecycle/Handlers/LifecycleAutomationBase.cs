@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Domain.Common;
 using TecAxle.Hrms.Domain.Lifecycle;
-using TecAxle.Hrms.Domain.Tenants;
+using TecAxle.Hrms.Domain.Company;
 
 namespace TecAxle.Hrms.Application.Lifecycle.Handlers;
 
@@ -25,11 +25,11 @@ public abstract class LifecycleAutomationBase
         Logger = logger;
     }
 
-    protected async Task<TenantSettings?> LoadSettingsAsync(CancellationToken ct)
+    protected async Task<CompanySettings?> LoadSettingsAsync(CancellationToken ct)
     {
         // The request is already scoped to the correct tenant DB by TenantResolutionMiddleware,
-        // so there is at most one TenantSettings row in this context.
-        return await Context.TenantSettings.AsNoTracking().FirstOrDefaultAsync(ct);
+        // so there is at most one CompanySettings row in this context.
+        return await Context.CompanySettings.AsNoTracking().FirstOrDefaultAsync(ct);
     }
 
     protected async Task<bool> AlreadySucceededAsync(

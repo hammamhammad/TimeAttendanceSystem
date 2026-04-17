@@ -48,5 +48,12 @@ public enum NotificationType
     /// <summary>
     /// Admin broadcast notification sent to multiple recipients.
     /// </summary>
-    Broadcast = 9
+    Broadcast = 9,
+
+    /// <summary>
+    /// Phase 1 (v14.1): Operational system alert for HR/SystemAdmin —
+    /// lifecycle automation failure, workflow FailedRouting, approval-execution error,
+    /// payroll side-effect problem, etc. Wired to <see cref="Operations.OperationalFailureAlert"/>.
+    /// </summary>
+    SystemAlert = 10
 }

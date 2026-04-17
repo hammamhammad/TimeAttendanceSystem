@@ -117,7 +117,7 @@ public class WorkflowInstance : BaseEntity
 
     /// <summary>
     /// Number of times this workflow has been resubmitted after a return-for-correction action.
-    /// Capped by <c>TenantSettings.MaxWorkflowResubmissions</c> (default 3). Exceeds → resubmit
+    /// Capped by <c>CompanySettings.MaxWorkflowResubmissions</c> (default 3). Exceeds → resubmit
     /// is rejected with a clear error asking the requester to cancel and recreate. (v13.6)
     /// </summary>
     public int ResubmissionCount { get; set; }

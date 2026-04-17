@@ -6,7 +6,7 @@ namespace TecAxle.Hrms.Application.Authorization.Services;
 /// Progressive login-lockout escalation policy. Represents an ordered list of tiers where
 /// hitting a given number of failed attempts triggers a specific lockout duration.
 /// Pre-v13.3 behavior (for tenant users): 5→15min, 10→1h, 15→24h.
-/// Stored serialized in <c>TenantSettings.LoginLockoutPolicyJson</c>.
+/// Stored serialized in <c>CompanySettings.LoginLockoutPolicyJson</c>.
 /// </summary>
 public sealed record LoginLockoutPolicy(IReadOnlyList<LockoutTier> Tiers)
 {

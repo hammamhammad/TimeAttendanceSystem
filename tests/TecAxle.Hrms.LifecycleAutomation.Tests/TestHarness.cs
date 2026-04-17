@@ -10,7 +10,7 @@ using TecAxle.Hrms.Domain.Lifecycle;
 using TecAxle.Hrms.Domain.Offboarding;
 using TecAxle.Hrms.Domain.Onboarding;
 using TecAxle.Hrms.Domain.Recruitment;
-using TecAxle.Hrms.Domain.Tenants;
+using TecAxle.Hrms.Domain.Company;
 using TecAxle.Hrms.Domain.Users;
 using TecAxle.Hrms.Infrastructure.Persistence;
 
@@ -18,7 +18,7 @@ namespace TecAxle.Hrms.LifecycleAutomation.Tests;
 
 /// <summary>
 /// Shared helpers: new InMemory DbContext per test, stub <see cref="ICurrentUser"/>,
-/// minimal tenant/settings/employee seeding, and a Moq-wired <see cref="IMediator"/>
+/// minimal company/settings/employee seeding, and a Moq-wired <see cref="IMediator"/>
 /// that exposes the commands the handlers under test need.
 /// </summary>
 internal static class TestHarness
@@ -32,9 +32,9 @@ internal static class TestHarness
         return new TecAxleDbContext(options);
     }
 
-    public static TenantSettings SeedSettings(TecAxleDbContext db, Action<TenantSettings>? configure = null)
+    public static CompanySettings SeedSettings(TecAxleDbContext db, Action<CompanySettings>? configure = null)
     {
-        var s = new TenantSettings
+        var s = new CompanySettings
         {
             // Defaults aligned with v13.5 DB defaults — tests override per scenario.
             LifecycleAutomationEnabled = true,
@@ -56,7 +56,7 @@ internal static class TestHarness
             ModifiedBy = "test"
         };
         configure?.Invoke(s);
-        db.TenantSettings.Add(s);
+        db.CompanySettings.Add(s);
         db.SaveChanges();
         return s;
     }

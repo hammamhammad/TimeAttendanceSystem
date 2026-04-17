@@ -1,0 +1,92 @@
+<div class="ops-alerts-page">
+  <header class="page-header">
+    <h1>Operational Alerts</h1>
+    <p class="subtitle">Unresolved failures across lifecycle automation, workflow routing, approval execution, and payroll processing.</p>
+  </header>
+
+  <section class="filters">
+    <label>
+      <input type="checkbox" [ngModel]="!isResolved()" (ngModelChange)="isResolved.set(!$event); reload()" />
+      Show unresolved only
+    </label>
+
+    <label>
+      Category:
+      <select [ngModel]="category()" (ngModelChange)="category.set($event); reload()">
+        <option value="">All</option>
+        <option value="LifecycleAutomation">Lifecycle Automation</option>
+        <option value="WorkflowRouting">Workflow Routing</option>
+        <option value="ApprovalExecution">Approval Execution</option>
+        <option value="PayrollProcessing">Payroll Processing</option>
+        <option value="BackgroundJob">Background Job</option>
+        <option value="Integration">Integration</option>
+      </select>
+    </label>
+
+    <label>
+      Min Severity:
+      <select [ngModel]="minSeverity()" (ngModelChange)="minSeverity.set($event); reload()">
+        <option value="">Any</option>
+        <option value="Info">Info</option>
+        <option value="Warning">Warning</option>
+        <option value="Error">Error</option>
+        <option value="Critical">Critical</option>
+      </select>
+    </label>
+
+    <button type="button" (click)="reload()">Refresh</button>
+  </section>
+
+  <section class="bulk-actions" *ngIf="selectedIds().size > 0">
+    <span>{{ selectedIds().size }} selected</span>
+    <button type="button" (click)="bulkResolve()">Bulk resolve</button>
+    <button type="button" (click)="bulkRetry()">Bulk retry</button>
+  </section>
+
+  <div *ngIf="errorMessage()" class="error-banner">{{ errorMessage() }}</div>
+  <div *ngIf="loading()" class="loading-banner">Loading…</div>
+
+  <table class="alerts-table" *ngIf="items().length > 0; else emptyState">
+    <thead>
+      <tr>
+        <th><input type="checkbox" [checked]="allSelected()" (change)="toggleAll()" /></th>
+        <th>Severity</th>
+        <th>Category</th>
+        <th>Source</th>
+        <th>Reason</th>
+        <th>Failed</th>
+        <th>Retries</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of rows()" [class.resolved]="row.isResolved">
+        <td><input type="checkbox" [checked]="row.selected" (change)="toggle(row.id)" /></td>
+        <td><span class="badge severity-{{ row.severity | lowercase }}">{{ row.severity }}</span></td>
+        <td>{{ row.category }}</td>
+        <td>{{ row.sourceEntityType }}#{{ row.sourceEntityId }}</td>
+        <td class="reason">
+          <strong>{{ row.failureCode }}</strong><br />
+          <span class="muted">{{ row.reason }}</span>
+        </td>
+        <td>{{ row.failedAtUtc | date:'short' }}</td>
+        <td>{{ row.retryCount }}</td>
+        <td class="actions">
+          <button type="button" (click)="resolve(row)" *ngIf="!row.isResolved">Resolve</button>
+          <button type="button" (click)="retry(row)" *ngIf="!row.isResolved && row.isRetryable">Retry</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <ng-template #emptyState>
+    <p class="empty-state" *ngIf="!loading()">No alerts match the current filters.</p>
+  </ng-template>
+
+  <footer class="pagination">
+    <span>Total: {{ total() }}</span>
+    <button type="button" [disabled]="page() <= 1" (click)="page.set(page() - 1); reload()">Previous</button>
+    <span>Page {{ page() }}</span>
+    <button type="button" [disabled]="items().length < pageSize()" (click)="page.set(page() + 1); reload()">Next</button>
+  </footer>
+</div>

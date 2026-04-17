@@ -330,7 +330,14 @@ public enum SalaryComponentType
     SocialInsuranceDeduction = 11,
     LoanDeduction = 12,
     OtherDeduction = 13,
-    Benefit = 20
+    Benefit = 20,
+
+    /// <summary>
+    /// Phase 1 (v14.1): Informational line for an employer-side contribution
+    /// (e.g. BenefitPlan.EmployerMonthlyContribution). NOT included in gross/net totals —
+    /// mirrors the existing SocialInsuranceEmployer pattern on PayrollRecord.
+    /// </summary>
+    EmployerContribution = 30
 }
 
 public enum CalculationType

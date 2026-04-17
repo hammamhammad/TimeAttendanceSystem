@@ -34,7 +34,9 @@ export class CreateAdvanceComponent implements OnInit {
       employeeId: [null, Validators.required],
       amount: [0, [Validators.required, Validators.min(1)]],
       currency: ['SAR'],
-      deductionMonth: [null, Validators.required],
+      // Phase 7 (v14.7): replaced YYYYMM integer with a date-range pair.
+      deductionStartDate: [null, Validators.required],
+      deductionEndDate: [null, Validators.required],
       reason: [''],
       reasonAr: ['']
     });
@@ -54,7 +56,8 @@ export class CreateAdvanceComponent implements OnInit {
       employeeId: val.employeeId,
       amount: val.amount,
       currency: val.currency || 'SAR',
-      deductionMonth: val.deductionMonth,
+      deductionStartDate: val.deductionStartDate,
+      deductionEndDate: val.deductionEndDate,
       reason: val.reason,
       reasonAr: val.reasonAr
     }).subscribe({

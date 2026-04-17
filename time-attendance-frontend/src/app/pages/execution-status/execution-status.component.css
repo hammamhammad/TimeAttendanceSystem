@@ -1,0 +1,27 @@
+.exec-status-page { padding: 1.25rem; max-width: 960px; }
+.page-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1rem; }
+.page-header h1 { margin: 0; font-size: 1.25rem; }
+.page-header .back-link { color: var(--app-primary, #2563eb); text-decoration: none; margin-left: auto; }
+
+.error-banner { padding: .5rem .75rem; background: var(--app-danger-bg, #fee2e2); color: var(--app-danger, #b91c1c); border-radius: 6px; margin-bottom: .5rem; }
+.toast { padding: .5rem .75rem; background: var(--app-info-bg, #eff6ff); color: var(--app-info, #1e40af); border-radius: 6px; margin-bottom: .5rem; }
+.loading-banner { padding: .5rem; color: var(--app-text-muted, #6b7280); font-style: italic; }
+
+.status-panel { background: var(--app-card-bg, #fff); border: 1px solid var(--app-border, #e5e7eb); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+.status-row { display: flex; gap: .75rem; align-items: baseline; margin-bottom: .5rem; }
+.status-row .label { font-weight: 600; color: var(--app-text-muted, #6b7280); min-width: 120px; }
+.badge { display: inline-block; padding: .125rem .75rem; border-radius: 999px; font-size: .8rem; font-weight: 600; }
+.badge.success { background: #dcfce7; color: #065f46; }
+.badge.warn { background: #fef3c7; color: #92400e; }
+.error-text { color: var(--app-danger, #b91c1c); }
+
+.actions { display: flex; gap: .5rem; margin-top: 1rem; }
+.actions button { padding: .375rem 1rem; }
+.actions .primary { background: var(--app-primary, #2563eb); color: white; border: none; border-radius: 6px; }
+.actions .primary:disabled { opacity: .5; cursor: not-allowed; }
+
+.kv-panel { background: var(--app-card-bg, #fff); border: 1px solid var(--app-border, #e5e7eb); border-radius: 8px; padding: 1rem; }
+.kv-panel h2 { margin: 0 0 .75rem 0; font-size: 1rem; }
+.kv-panel table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+.kv-panel th, .kv-panel td { padding: .375rem .5rem; border-bottom: 1px solid var(--app-border, #e5e7eb); vertical-align: top; text-align: left; }
+.kv-panel th { font-weight: 600; color: var(--app-text-muted, #6b7280); width: 200px; white-space: nowrap; }

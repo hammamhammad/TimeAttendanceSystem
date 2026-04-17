@@ -27,6 +27,14 @@ public class LoanApplication : BaseEntity
     public long? WorkflowInstanceId { get; set; }
     public long? SubmittedByUserId { get; set; }
 
+    // Phase 1 (v14.1): Execution tracking — the LoanApplicationExecutor generates
+    // the LoanRepayment schedule after approval. IsExecuted guards duplicate generation.
+    public bool IsExecuted { get; set; }
+    public DateTime? ExecutedAtUtc { get; set; }
+    public long? ExecutedByUserId { get; set; }
+    public string? ExecutionError { get; set; }
+    public bool ScheduleGenerated { get; set; }
+
     // Navigation
     public Employee Employee { get; set; } = null!;
     public LoanType LoanType { get; set; } = null!;

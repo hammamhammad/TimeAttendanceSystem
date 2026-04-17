@@ -336,6 +336,32 @@ export class MenuService {
         }
       ]
     },
+    // ── OPERATIONS (Phase 4, v14.4) ──
+    // Admin UI surface for the Phase 1–3 operational endpoints. Single entry point
+    // for HR/admin — dashboard, queues, alerts, approval-execution visibility, search.
+    {
+      groupKey: 'operations',
+      titleKey: 'nav_group.operations',
+      items: [
+        { path: '/ops-dashboard',        titleKey: 'Operations Dashboard', icon: 'fa-solid fa-gauge-high' },
+        { path: '/operational-alerts',   titleKey: 'Operational Alerts',   icon: 'fa-solid fa-triangle-exclamation' },
+        { path: '/approved-not-executed',titleKey: 'Approved Not Executed',icon: 'fa-solid fa-circle-exclamation' },
+        { path: '/global-search',        titleKey: 'Global Search',        icon: 'fa-solid fa-magnifying-glass' },
+        {
+          path: '/work-queues/overdue-approvals',
+          titleKey: 'Work Queues',
+          icon: 'fa-solid fa-list-check',
+          children: [
+            { path: '/work-queues/overdue-approvals',        titleKey: 'Overdue Approvals',        icon: 'fa-solid fa-clock' },
+            { path: '/work-queues/overdue-onboarding-tasks', titleKey: 'Overdue Onboarding Tasks', icon: 'fa-solid fa-user-plus' },
+            { path: '/work-queues/overdue-clearance-items',  titleKey: 'Overdue Clearance Items',  icon: 'fa-solid fa-user-minus' },
+            { path: '/work-queues/unresolved-alerts',        titleKey: 'Unresolved Alerts',        icon: 'fa-solid fa-bell' },
+            { path: '/work-queues/auto-checkout-review',     titleKey: 'Auto-Checkout Review',     icon: 'fa-solid fa-right-from-bracket' },
+            { path: '/work-queues/pip-follow-through',       titleKey: 'PIP Follow-Through',       icon: 'fa-solid fa-arrow-trend-down' }
+          ]
+        }
+      ]
+    },
     // ── REPORTS & ANALYTICS ──
     {
       groupKey: 'reportsAnalytics',
@@ -397,7 +423,7 @@ export class MenuService {
           icon: 'fa-solid fa-cog',
           permission: undefined,
           children: [
-            { path: '/settings/tenant-config', titleKey: 'tenant_configuration.title', icon: 'fa-solid fa-building-gear', permission: undefined },
+            { path: '/settings/company-config', titleKey: 'tenant_configuration.title', icon: 'fa-solid fa-building-gear', permission: undefined },
             { path: '/settings', titleKey: 'settings.dashboard', icon: 'fa-solid fa-cog', permission: undefined },
             { path: '/settings/overtime', titleKey: 'settings.overtime.title', icon: 'fa-solid fa-clock', permission: 'settings.overtime.read' },
             { path: '/settings/public-holidays', titleKey: 'settings.holidays.title', icon: 'fa-solid fa-calendar-check', permission: 'publicHoliday.read' },

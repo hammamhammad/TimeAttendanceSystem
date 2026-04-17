@@ -9,7 +9,7 @@ namespace TecAxle.Hrms.Infrastructure.BackgroundJobs;
 
 /// <summary>
 /// Background job that cancels workflow instances that have been Frozen beyond the tenant's
-/// configured threshold (<see cref="Domain.Tenants.TenantSettings.FrozenWorkflowCleanupDays"/>,
+/// configured threshold (<see cref="Domain.Company.CompanySettings.FrozenWorkflowCleanupDays"/>,
 /// default 90). Workflows are frozen when their owning module is deactivated — after the threshold,
 /// it's unlikely the module will be re-enabled, so we auto-cancel.
 /// </summary>
@@ -18,7 +18,7 @@ public class FrozenWorkflowCleanupJob : IInvocable
     private readonly IApplicationDbContext _context;
     private readonly ILogger<FrozenWorkflowCleanupJob> _logger;
 
-    /// <summary>Fallback when no TenantSettings row exists — matches the pre-v13.3 hardcoded value.</summary>
+    /// <summary>Fallback when no CompanySettings row exists — matches the pre-v13.3 hardcoded value.</summary>
     private const int DefaultFrozenDaysThreshold = 90;
 
     public FrozenWorkflowCleanupJob(IApplicationDbContext context, ILogger<FrozenWorkflowCleanupJob> logger)
@@ -33,7 +33,7 @@ public class FrozenWorkflowCleanupJob : IInvocable
 
         try
         {
-            var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync();
+            var settings = await _context.CompanySettings.AsNoTracking().FirstOrDefaultAsync();
             var threshold = settings?.FrozenWorkflowCleanupDays ?? DefaultFrozenDaysThreshold;
             var cutoffDate = DateTime.UtcNow.AddDays(-threshold);
 

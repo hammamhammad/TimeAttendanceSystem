@@ -23,6 +23,15 @@ public class BenefitEnrollment : BaseEntity
     public string? Notes { get; set; }
     public long? WorkflowInstanceId { get; set; }
 
+    // Phase 1 (v14.1): Execution tracking.
+    // After approval the BenefitEnrollmentExecutor marks the enrollment Active and flags it
+    // as "ready for payroll deduction" so the payroll engine includes the EmployeeMonthlyContribution.
+    public bool IsExecuted { get; set; }
+    public DateTime? ExecutedAtUtc { get; set; }
+    public long? ExecutedByUserId { get; set; }
+    public string? ExecutionError { get; set; }
+    public bool PayrollDeductionEnabled { get; set; }
+
     // Navigation
     public Employee Employee { get; set; } = null!;
     public BenefitPlan BenefitPlan { get; set; } = null!;

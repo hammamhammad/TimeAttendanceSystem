@@ -320,7 +320,7 @@ public sealed class ApproverResolver : IApproverResolver
 
     private async Task<ApproverResolution> ResolveFallbackAsync(ApproverResolution primary, CancellationToken ct)
     {
-        var settings = await _db.TenantSettings.AsNoTracking().FirstOrDefaultAsync(ct);
+        var settings = await _db.CompanySettings.AsNoTracking().FirstOrDefaultAsync(ct);
 
         // 2a) Explicit user override.
         if (settings?.WorkflowFallbackApproverUserId is { } fbUserId && fbUserId > 0

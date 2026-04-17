@@ -40,7 +40,7 @@ public class OfferLettersController : ControllerBase
     /// <summary>Returns the tenant-configured default probation days (fallback 90 when no settings row exists).</summary>
     private async Task<int> GetDefaultProbationDaysAsync()
     {
-        var settings = await _context.TenantSettings
+        var settings = await _context.CompanySettings
             .AsNoTracking()
             .FirstOrDefaultAsync(s => !s.IsDeleted);
         return settings?.DefaultProbationDays > 0 ? settings.DefaultProbationDays : 90;
@@ -49,7 +49,7 @@ public class OfferLettersController : ControllerBase
     /// <summary>v13.5: optional pre-hire gate. Default false.</summary>
     private async Task<bool> IsPreHireModeEnabledAsync()
     {
-        var settings = await _context.TenantSettings
+        var settings = await _context.CompanySettings
             .AsNoTracking()
             .FirstOrDefaultAsync(s => !s.IsDeleted);
         return settings?.CreateEmployeeInactiveAtOfferAcceptance == true;
@@ -494,7 +494,7 @@ public class OfferLettersController : ControllerBase
             requisition.ModifiedBy = _currentUser.Username;
 
             // 11. v13.5: onboarding auto-creation is now driven by a lifecycle event.
-            // The OfferAcceptedHandler reads TenantSettings.AutoCreateOnboardingOnOfferAcceptance
+            // The OfferAcceptedHandler reads CompanySettings.AutoCreateOnboardingOnOfferAcceptance
             // (default true → matches v13.x behavior) and DefaultOnboardingTemplateId, resolves
             // the template (dept → branch → IsDefault fallback), creates the process+tasks,
             // and writes an audit row. Failures here do NOT roll back the offer — they land

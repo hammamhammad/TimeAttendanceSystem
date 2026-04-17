@@ -36,7 +36,7 @@ public class GrievanceSlaAlertJob : IInvocable
         try
         {
             var today = DateTime.UtcNow.Date;
-            var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync();
+            var settings = await _context.CompanySettings.AsNoTracking().FirstOrDefaultAsync();
             var alertDaysConfigured = BackgroundJobSettingsHelper.ParseCsvDays(settings?.GrievanceSlaAlertDaysCsv, DefaultAlertDays);
 
             // Recipients: tenant-configured set + legacy "HR" role for backward compat.

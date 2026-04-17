@@ -11,9 +11,29 @@
       </button>
     </div>
 
-    <!-- Center section: Page title -->
+    <!-- Center section: page title + omnibox global search -->
     <div class="topbar-center">
       <h1 class="page-title mb-0">{{ pageTitle() }}</h1>
+    </div>
+
+    <div class="topbar-omnibox-wrap">
+      <form (ngSubmit)="onSearchSubmit()" role="search">
+        <div class="omnibox-inner">
+          <i class="fa-solid fa-magnifying-glass omnibox-icon" aria-hidden="true"></i>
+          <input
+            id="topbar-omnibox"
+            type="search"
+            class="form-control form-control-sm omnibox-input"
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)"
+            (keydown.escape)="searchQuery.set(''); $event.preventDefault()"
+            name="q"
+            autocomplete="off"
+            [attr.placeholder]="t('search.placeholder')"
+            [attr.aria-label]="t('search.placeholder')" />
+          <kbd class="omnibox-hint d-none d-md-inline">Ctrl+K</kbd>
+        </div>
+      </form>
     </div>
 
     <!-- Right section: User menu and language switch -->

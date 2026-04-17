@@ -4,6 +4,7 @@ using System.Text.Json;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Application.Workflows.Validation;
 using TecAxle.Hrms.Domain.Notifications;
+using TecAxle.Hrms.Domain.Operations;
 using TecAxle.Hrms.Domain.Workflows;
 using TecAxle.Hrms.Domain.Workflows.Enums;
 
@@ -31,6 +32,7 @@ public class WorkflowEngine : IWorkflowEngine
     private readonly ISystemUserResolver _systemUserResolver;
     private readonly IWorkflowValidationRuleRegistry _validationRegistry;
     private readonly INotificationRecipientResolver _notificationRecipients;
+    private readonly IFailureAlertService _failureAlerts;
     private readonly ILogger<WorkflowEngine> _logger;
 
     public WorkflowEngine(
@@ -40,6 +42,7 @@ public class WorkflowEngine : IWorkflowEngine
         ISystemUserResolver systemUserResolver,
         IWorkflowValidationRuleRegistry validationRegistry,
         INotificationRecipientResolver notificationRecipients,
+        IFailureAlertService failureAlerts,
         ILogger<WorkflowEngine> logger)
     {
         _context = context;
@@ -48,6 +51,7 @@ public class WorkflowEngine : IWorkflowEngine
         _systemUserResolver = systemUserResolver;
         _validationRegistry = validationRegistry;
         _notificationRecipients = notificationRecipients;
+        _failureAlerts = failureAlerts;
         _logger = logger;
     }
 
@@ -210,8 +214,8 @@ public class WorkflowEngine : IWorkflowEngine
             return WorkflowResult<bool>.Failure("Delegate user is inactive or does not exist");
 
         // v13.6 — bound the chain depth and reject cycles.
-        var tenantSettings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync();
-        var maxDepth = Math.Max(1, tenantSettings?.MaxWorkflowDelegationDepth ?? 2);
+        var companySettings = await _context.CompanySettings.AsNoTracking().FirstOrDefaultAsync();
+        var maxDepth = Math.Max(1, companySettings?.MaxWorkflowDelegationDepth ?? 2);
 
         var (depth, chainUserIds) = await WalkDelegationChainAsync(execution.Id);
         if (depth >= maxDepth)
@@ -301,8 +305,8 @@ public class WorkflowEngine : IWorkflowEngine
         if (instance.RequestedByUserId != userId)
             return WorkflowResult<bool>.Failure("Only the original requester can resubmit");
 
-        var tenantSettings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync();
-        var maxResubmits = Math.Max(1, tenantSettings?.MaxWorkflowResubmissions ?? 3);
+        var companySettings = await _context.CompanySettings.AsNoTracking().FirstOrDefaultAsync();
+        var maxResubmits = Math.Max(1, companySettings?.MaxWorkflowResubmissions ?? 3);
         if (instance.ResubmissionCount >= maxResubmits)
         {
             return WorkflowResult<bool>.Failure(
@@ -768,6 +772,43 @@ public class WorkflowEngine : IWorkflowEngine
 
         await _context.SaveChangesAsync();
         await NotifyRoutingFailureAsync(instance, step, resolution);
+
+        // Phase 1 (v14.1): also raise an OperationalFailureAlert so the HR dashboard
+        // at /api/v1/operational-alerts shows this routing failure alongside lifecycle /
+        // approval-execution / payroll failures. Deduplicated automatically on
+        // (Category, SourceEntityType, SourceEntityId, FailureCode) when the same
+        // workflow instance re-enters RecordFailedRoutingAsync (shouldn't happen, but safe).
+        try
+        {
+            await _failureAlerts.RaiseAsync(new RaiseFailureAlertRequest
+            {
+                Category = OperationalFailureCategory.WorkflowRouting,
+                SourceEntityType = "WorkflowInstance",
+                SourceEntityId = instance.Id,
+                FailureCode = "FailedRouting",
+                Reason = $"Workflow {instance.Id} ({instance.EntityType} #{instance.EntityId}) could not resolve an approver at step '{step.Name}'. {resolution.Reason}",
+                Severity = OperationalFailureSeverity.Error,
+                IsRetryable = false, // HR must fix workflow config / role assignment first
+                MetadataJson = JsonSerializer.Serialize(new
+                {
+                    workflowInstanceId = instance.Id,
+                    workflowEntityType = instance.EntityType.ToString(),
+                    workflowEntityId = instance.EntityId,
+                    stepId = step.Id,
+                    stepName = step.Name,
+                    resolutionSource = resolution.Source.ToString(),
+                    resolutionReason = resolution.Reason,
+                    resolutionDetails = resolution.Details
+                })
+            });
+        }
+        catch (Exception ex)
+        {
+            // An alert-system failure must not mask the routing failure itself.
+            _logger.LogWarning(ex,
+                "Could not persist OperationalFailureAlert for FailedRouting on workflow instance {InstanceId}.",
+                instance.Id);
+        }
     }
 
     private async Task NotifyRoutingFailureAsync(WorkflowInstance instance, WorkflowStep step, ApproverResolution resolution)

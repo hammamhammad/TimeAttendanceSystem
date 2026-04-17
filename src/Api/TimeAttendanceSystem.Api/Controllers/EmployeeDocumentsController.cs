@@ -42,7 +42,7 @@ public class EmployeeDocumentsController : ControllerBase
         if (expiringSoon == true)
         {
             // Horizon = max of the tenant-configured DocumentExpiryAlertDaysCsv (default "30,15,7" → 30).
-            var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync();
+            var settings = await _context.CompanySettings.AsNoTracking().FirstOrDefaultAsync();
             var parsed = (settings?.DocumentExpiryAlertDaysCsv ?? "30,15,7")
                 .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 .Select(s => int.TryParse(s, out var v) && v > 0 ? v : 0)

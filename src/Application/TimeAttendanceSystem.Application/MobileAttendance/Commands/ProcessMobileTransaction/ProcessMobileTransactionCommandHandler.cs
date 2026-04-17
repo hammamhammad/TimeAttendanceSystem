@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Application.Common;
-using TecAxle.Hrms.Application.TenantConfiguration.Dtos;
+using TecAxle.Hrms.Application.CompanyConfiguration.Dtos;
 using TecAxle.Hrms.Domain.Attendance;
 using TecAxle.Hrms.Domain.Branches;
 
@@ -10,22 +10,22 @@ namespace TecAxle.Hrms.Application.MobileAttendance.Commands.ProcessMobileTransa
 /// <summary>
 /// Handler for processing mobile attendance transactions with dual verification (GPS + NFC).
 /// Validates GPS geofence, NFC tag, and creates audit logs for all attempts.
-/// GPS and NFC requirements are configurable via TenantSettings and BranchSettingsOverride.
+/// GPS and NFC requirements are configurable via CompanySettings and BranchSettingsOverride.
 /// </summary>
 public class ProcessMobileTransactionCommandHandler : BaseHandler<ProcessMobileTransactionCommand, Result<MobileTransactionResult>>
 {
     private readonly INfcTagEncryptionService _encryptionService;
-    private readonly ITenantSettingsResolver? _tenantSettingsResolver;
+    private readonly ICompanySettingsResolver? _companySettingsResolver;
 
     public ProcessMobileTransactionCommandHandler(
         IApplicationDbContext context,
         ICurrentUser currentUser,
         INfcTagEncryptionService encryptionService,
-        ITenantSettingsResolver? tenantSettingsResolver = null)
+        ICompanySettingsResolver? companySettingsResolver = null)
         : base(context, currentUser)
     {
         _encryptionService = encryptionService;
-        _tenantSettingsResolver = tenantSettingsResolver;
+        _companySettingsResolver = companySettingsResolver;
     }
 
     public override async Task<Result<MobileTransactionResult>> Handle(ProcessMobileTransactionCommand request, CancellationToken cancellationToken)
@@ -56,9 +56,9 @@ public class ProcessMobileTransactionCommandHandler : BaseHandler<ProcessMobileT
 
         // ==== RESOLVE COMPANY SETTINGS FOR MOBILE CHECK-IN ====
         ResolvedSettingsDto? resolvedSettings = null;
-        if (_tenantSettingsResolver != null)
+        if (_companySettingsResolver != null)
         {
-            try { resolvedSettings = await _tenantSettingsResolver.GetSettingsAsync(branch.Id, ct: cancellationToken); }
+            try { resolvedSettings = await _companySettingsResolver.GetSettingsAsync(branch.Id, ct: cancellationToken); }
             catch { /* Fall back to requiring both GPS and NFC if resolver fails */ }
         }
 
@@ -73,7 +73,7 @@ public class ProcessMobileTransactionCommandHandler : BaseHandler<ProcessMobileT
             return CreateFailureResult("Mobile check-in is not enabled for this organization");
         }
 
-        // ==== GPS GEOFENCE VERIFICATION (if required by TenantSettings) ====
+        // ==== GPS GEOFENCE VERIFICATION (if required by CompanySettings) ====
         double? distanceFromBranch = null;
         if (requireGps)
         {

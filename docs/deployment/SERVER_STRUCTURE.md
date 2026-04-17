@@ -84,7 +84,7 @@ The project name defaults to the folder name (`compose`). Docker prefixes resour
 
 | Resource | Name | Notes |
 |---|---|---|
-| Container | `hrms-postgres` | `postgres:16-alpine`. Only on `hrms-net`. Volume `compose_hrms-pgdata`. Healthy. |
+| Container | `hrms-postgres` | `postgres:18-alpine` (bumped from 16 in v14.7). Only on `hrms-net`. Volume `compose_hrms-pgdata`. Healthy. |
 | Container | `hrms-api` | `mcr.microsoft.com/dotnet/aspnet:9.0`. On both `hrms-net` and `edge-net`. Bind `../artifacts/api:/app` RW, volume `compose_hrms-uploads:/app/uploads`. Listens container-internal `:8080`. |
 | Container | `hrms-admin` | `nginx:1.27-alpine`. Only on `edge-net`. Bind `../artifacts/admin:/usr/share/nginx/html:ro`, config `./nginx-spa.conf:/etc/nginx/conf.d/default.conf:ro`. |
 | Container | `hrms-portal` | `nginx:1.27-alpine`. Only on `edge-net`. Same shape as hrms-admin with `../artifacts/portal`. |
@@ -107,8 +107,7 @@ caddy  [reverse-proxy project, attached to edge-net]
 hrms-api
   ↓  via hrms-net (internal)
 hrms-postgres:5432
-  ↳  master DB: tecaxle_master
-  ↳  tenant DBs: ta_* (created dynamically by TenantProvisioningService)
+  ↳  single DB: tecaxle_hrms (v14.0+ single-company architecture)
 ```
 
 `hrms-postgres` is **never** attached to `edge-net` and its port 5432 is never published to the host. DB admin from outside requires SSH + `docker exec -it hrms-postgres psql ...`.
@@ -145,36 +144,33 @@ To force a renewal attempt (for testing): `sudo docker compose -f /root/reverse-
 
 ## Secrets
 
-Live in `/root/applications/hrms/compose/.env` (mode `0600`, owner `root:root`). Generated at deploy time via `openssl rand -base64 ...` (or the python `secrets` module). **Never committed to git.** The four keys:
+Live in `/root/applications/hrms/compose/.env` (mode `0600`, owner `root:root`). Generated at deploy time via `openssl rand -base64 ...` (or the python `secrets` module). **Never committed to git.** Post-v14.0 single-company architecture uses **three** keys (the legacy `TENANT_ENCRYPTION_KEY` was retired with multi-tenancy):
 
 | Key | Used by | Purpose |
 |---|---|---|
-| `POSTGRES_PASSWORD` | compose + api env vars | Postgres superuser password, used in all three ConnectionStrings |
+| `POSTGRES_PASSWORD` | compose + api env var | Postgres superuser password, used in `DefaultConnection` |
 | `JWT_SECRET` | api `Jwt__Secret` | Signs JWT access tokens |
-| `TENANT_ENCRYPTION_KEY` | api `MultiTenancy__EncryptionKey` | AES-256 key for encrypting per-tenant connection strings stored in master DB |
 | `NFC_SECRET_KEY` | api `NfcEncryption__SecretKey` | HMAC-SHA256 signing key for NFC tag payloads |
 
-Rotating any of these requires restarting `hrms-api`. Rotating `TENANT_ENCRYPTION_KEY` also requires re-encrypting existing tenant connection strings in the master DB — **don't do this casually**; document the migration before.
+Rotating any of these requires restarting `hrms-api`.
 
-## Platform admin seed credentials
+## System admin seed credentials
 
-Seeded automatically on first startup of `hrms-api` by [`MasterSeedData.cs`](../../src/Infrastructure/TimeAttendanceSystem.Infrastructure/Persistence/Master/MasterSeedData.cs):
+Seeded automatically on first startup of `hrms-api` by [`SeedData.cs`](../../src/Infrastructure/TimeAttendanceSystem.Infrastructure/Persistence/Common/SeedData.cs) (v14.0+ single-company). Two SystemAdmin users are created:
 
-| Field | Value |
-|---|---|
-| Email | `admin@tecaxle.com` |
-| Username | `tecaxleadmin` |
-| Password | `TecAxle@Admin2026!` (hardcoded in source) |
-| Role | `TecAxleAdmin` (full platform access) |
+| Email | Username | Password | Notes |
+|---|---|---|---|
+| `tecaxleadmin@system.local` | `tecaxleadmin` | `TempP@ssw0rd123!` | `IsSystemUser=true`, SystemAdmin role |
+| `systemadmin@system.local` | `systemadmin` | `TempP@ssw0rd123!` | `IsSystemUser=true`, SystemAdmin role |
 
-Used for the first login to `https://hrms.tecaxle.com`. Change it after first login.
+Used for the first login to `https://hrms.tecaxle.com`. `MustChangePassword` is true on first login. Change these after first login — the passwords are hardcoded in `SeedData.cs`.
 
 ## Volumes that must never be deleted
 
 These hold persistent state. Deleting them loses data:
 
 - `reverse-proxy_caddy_data` — Let's Encrypt certificate material. If lost, you need to re-issue (subject to Let's Encrypt rate limits).
-- `compose_hrms-pgdata` — all databases (master + every tenant). Irrecoverable without backups.
+- `compose_hrms-pgdata` — the `tecaxle_hrms` database. Irrecoverable without backups.
 - `compose_hrms-uploads` — every file uploaded via the UI (employee photos, contract PDFs, etc.).
 
 **Never run `docker compose down -v`** on either project. Use `docker compose down` (without `-v`) if you need to stop containers while preserving state.
@@ -184,8 +180,8 @@ These hold persistent state. Deleting them loses data:
 No automated backup is configured at the time of writing. Manual backup procedure:
 
 ```bash
-# postgres (master + all tenant DBs in one dump)
-sudo docker exec hrms-postgres pg_dumpall -U postgres > /tmp/pg-$(date +%F).sql
+# postgres (single DB)
+sudo docker exec hrms-postgres pg_dump -U postgres -d tecaxle_hrms > /tmp/pg-$(date +%F).sql
 
 # uploads volume
 sudo docker run --rm -v compose_hrms-uploads:/src -v /tmp:/dest alpine \
@@ -214,11 +210,11 @@ sudo docker logs -f hrms-api
 # Stream Caddy logs (watch for ACME activity)
 sudo docker logs -f caddy
 
-# List all tenant databases (confirms per-tenant provisioning is working)
+# List databases (should show `tecaxle_hrms` + templates only)
 sudo docker exec hrms-postgres psql -U postgres -c "\l"
 
 # Shell into postgres
-sudo docker exec -it hrms-postgres psql -U postgres tecaxle_master
+sudo docker exec -it hrms-postgres psql -U postgres tecaxle_hrms
 
 # Restart a single container (e.g. after an artifact redeploy)
 sudo docker compose -f /root/applications/hrms/compose/docker-compose.yml restart hrms-api

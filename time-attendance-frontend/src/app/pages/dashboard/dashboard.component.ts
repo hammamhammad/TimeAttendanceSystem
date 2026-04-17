@@ -37,17 +37,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   lastRefresh!: any;
   autoRefresh!: any;
 
-  // Map internal card module names to SystemModule entitlement names
-  private readonly cardModuleMap: Record<string, string | null> = {
-    'humanResources': null,  // Core - always shown
-    'attendance': 'TimeAttendance',
-    'leaves': 'LeaveManagement',
-    'shifts': 'TimeAttendance',
-    'organization': null,  // Core - always shown
-    'system': null  // Core - always shown
-  };
+  // Phase 7 (v14.7): the cardModuleMap was a leftover from the removed entitlement
+  // layer (v14.0 collapse). In single-company mode all modules are always enabled.
 
-  // Dashboard cards computed from API data, filtered by module entitlements
   dashboardCards = computed(() => {
     const data = this.dashboardData();
     if (!data) return [];

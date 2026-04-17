@@ -7,7 +7,7 @@ namespace TecAxle.Hrms.Application.Workflows.Commands.Resubmit;
 /// v13.6 — requester resubmits a workflow that was previously returned for correction.
 /// Resumes the workflow at step 1 (or <c>ResumeFromStepOrder</c> if configured).
 /// Only the original requester may invoke; increments <c>ResubmissionCount</c>; capped by
-/// <c>TenantSettings.MaxWorkflowResubmissions</c>.
+/// <c>CompanySettings.MaxWorkflowResubmissions</c>.
 /// </summary>
 public record ResubmitWorkflowCommand(
     long WorkflowInstanceId,

@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using TecAxle.Hrms.Domain.Branches;
 using TecAxle.Hrms.Domain.Employees;
-using TecAxle.Hrms.Domain.Tenants;
+using TecAxle.Hrms.Domain.Company;
 using TecAxle.Hrms.Domain.Users;
 using TecAxle.Hrms.Infrastructure.Persistence;
 
@@ -21,12 +21,12 @@ internal static class TestHarness
         return new TecAxleDbContext(options);
     }
 
-    public static TenantSettings SeedSettings(TecAxleDbContext db, Action<TenantSettings>? configure = null)
+    public static CompanySettings SeedSettings(TecAxleDbContext db, Action<CompanySettings>? configure = null)
     {
         // TecAxleDbContext (tenant DB) does not hold the Tenants table — that lives in MasterDbContext.
-        // For InMemory tests we only need the TenantSettings row itself; the FK pointing at Tenants
+        // For InMemory tests we only need the CompanySettings row itself; the FK pointing at Tenants
         // is not enforced by the InMemory provider.
-        var s = new TenantSettings
+        var s = new CompanySettings
         {
             Id = 1,
             WorkflowFallbackApproverRole = "HRManager",
@@ -36,7 +36,7 @@ internal static class TestHarness
             ModifiedAtUtc = DateTime.UtcNow
         };
         configure?.Invoke(s);
-        db.TenantSettings.Add(s);
+        db.CompanySettings.Add(s);
         db.SaveChanges();
         return s;
     }

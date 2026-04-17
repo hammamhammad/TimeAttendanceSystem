@@ -54,7 +54,10 @@ export class ViewAdvanceComponent implements OnInit {
       { label: this.i18n.t('salary_advances.employee_number'), value: a.employeeNumber ?? '-' },
       { label: this.i18n.t('salary_advances.requested_amount'), value: a.requestedAmount != null ? a.requestedAmount.toFixed(2) : '-' },
       { label: this.i18n.t('salary_advances.approved_amount'), value: a.approvedAmount != null ? a.approvedAmount.toFixed(2) : '-' },
-      { label: this.i18n.t('salary_advances.deduction_month'), value: a.deductionMonth ?? '-' },
+      { label: this.i18n.t('salary_advances.deduction_range'),
+        value: a.deductionStartDate && a.deductionEndDate
+          ? `${new Date(a.deductionStartDate).toLocaleDateString()} → ${new Date(a.deductionEndDate).toLocaleDateString()}`
+          : '-' },
       { label: this.i18n.t('salary_advances.reason'), value: a.reason ?? '-' },
       { label: this.i18n.t('salary_advances.approved_by'), value: a.approvedByName ?? '-' },
       { label: this.i18n.t('salary_advances.approved_at'), value: a.approvedAtUtc ? new Date(a.approvedAtUtc).toLocaleDateString() : '-' },

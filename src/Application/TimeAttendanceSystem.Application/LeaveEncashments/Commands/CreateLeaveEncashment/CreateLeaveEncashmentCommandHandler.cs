@@ -8,12 +8,12 @@ namespace TecAxle.Hrms.Application.LeaveEncashments.Commands.CreateLeaveEncashme
 
 public class CreateLeaveEncashmentCommandHandler : BaseHandler<CreateLeaveEncashmentCommand, Result<long>>
 {
-    private readonly ITenantPayrollCalendarService _calendarService;
+    private readonly ICompanyPayrollCalendarService _calendarService;
 
     public CreateLeaveEncashmentCommandHandler(
         IApplicationDbContext context,
         ICurrentUser currentUser,
-        ITenantPayrollCalendarService calendarService)
+        ICompanyPayrollCalendarService calendarService)
         : base(context, currentUser)
     {
         _calendarService = calendarService;

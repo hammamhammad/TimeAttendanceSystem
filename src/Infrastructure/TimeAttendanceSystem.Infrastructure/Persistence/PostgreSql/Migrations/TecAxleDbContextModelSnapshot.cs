@@ -1953,7 +1953,19 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<DateTime>("EnrollmentDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTime?>("ExecutedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("ExecutedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ExecutionError")
+                        .HasColumnType("text");
+
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsExecuted")
                         .HasColumnType("boolean");
 
                     b.Property<DateTime?>("LifeEventDate")
@@ -1975,6 +1987,9 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
 
                     b.Property<long?>("OpenEnrollmentPeriodId")
                         .HasColumnType("bigint");
+
+                    b.Property<bool>("PayrollDeductionEnabled")
+                        .HasColumnType("boolean");
 
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
@@ -2391,12 +2406,6 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasColumnType("bigint");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<bool?>("AutoCheckOutEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<TimeOnly?>("AutoCheckOutTime")
-                        .HasColumnType("time without time zone");
 
                     b.Property<long>("BranchId")
                         .HasColumnType("bigint");
@@ -2926,6 +2935,413 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("FileAttachments", (string)null);
                 });
 
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Company.CompanySettings", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("AllowHalfDayLeave")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AllowLeaveEncashment")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AllowMockLocation")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AllowNegativeLeaveBalance")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AllowSelfApproval")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("AssetOverdueReturnAlertDaysCsv")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("1,3,7,14,30");
+
+                    b.Property<string>("AssetWarrantyExpiryAlertDaysCsv")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("30,15,7,1");
+
+                    b.Property<int>("AttendanceCorrectionMaxRetroactiveDays")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(30);
+
+                    b.Property<int>("AttendanceDuplicateSuppressionSeconds")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("AutoActivateEmployeeOnOnboardingComplete")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AutoApproveAfterTimeout")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AutoCreateClearanceOnTermination")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AutoCreateOnboardingOnOfferAcceptance")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AutoCreateTerminationOnResignationApproved")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AutoDeactivateEmployeeOnFinalSettlementPaid")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AutoEnableFinalSettlementCalcOnClearanceComplete")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AutoSuspendEmployeeOnTerminationCreated")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("ContractExpiredAction")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ContractExpiryAlertDaysCsv")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("30,15,7");
+
+                    b.Property<bool>("CreateEmployeeInactiveAtOfferAcceptance")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("DailyAttendanceSummaryEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("DateFormat")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("dd/MM/yyyy");
+
+                    b.Property<int>("DefaultApprovalTimeoutHours")
+                        .HasColumnType("integer");
+
+                    b.Property<long?>("DefaultClearanceTemplateId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("DefaultOnboardingTemplateId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("DefaultProbationDays")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(90);
+
+                    b.Property<string>("DefaultTimeZoneId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("DocumentExpiryAlertDaysCsv")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("30,15,7");
+
+                    b.Property<int>("EarlyLeaveGracePeriodMinutes")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("EnableBiometricAttendance")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("EnableEmailNotifications")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("EnableEndOfServiceCalc")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("EnableGpsAttendance")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("EnableManualAttendance")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("EnableNfcAttendance")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("EnablePushNotifications")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("EnableSmsNotifications")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("ExcuseBackwardWindowDays")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(365);
+
+                    b.Property<int>("ExcuseForwardWindowDays")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(30);
+
+                    b.Property<string>("FiscalYearStartMonth")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(2)
+                        .HasColumnType("character varying(2)")
+                        .HasDefaultValue("01");
+
+                    b.Property<int>("FrozenWorkflowCleanupDays")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(90);
+
+                    b.Property<string>("GrievanceSlaAlertDaysCsv")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("3,1");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<int>("LateGracePeriodMinutes")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("LeaveYearStart")
+                        .HasMaxLength(5)
+                        .HasColumnType("character varying(5)");
+
+                    b.Property<bool>("LifecycleAutomationEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("LoanRepaymentReminderDays")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(7);
+
+                    b.Property<string>("LoginLockoutPolicyJson")
+                        .HasColumnType("jsonb");
+
+                    b.Property<int>("MaxLoginAttempts")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MaxShiftGracePeriodMinutes")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(120);
+
+                    b.Property<int>("MaxUploadSizeMb")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(10);
+
+                    b.Property<int>("MaxVacationDaysPerRequest")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(365);
+
+                    b.Property<int>("MaxVacationFuturePlanningYears")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(2);
+
+                    b.Property<int>("MaxWorkflowDelegationDepth")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(2);
+
+                    b.Property<int>("MaxWorkflowResubmissions")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(3);
+
+                    b.Property<int>("MinDaysBeforeLeaveRequest")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MinimumWorkingHoursForPresent")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("MobileCheckInEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("ModifiedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("NotificationRecipientRolesCsv")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasDefaultValue("HRManager,SystemAdmin");
+
+                    b.Property<bool>("NotifyEmployeeOnApproval")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("NotifyManagerOnLeaveRequest")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("NumberFormat")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasDefaultValue("en-US");
+
+                    b.Property<bool>("OnboardingCompletionRequiresAllRequiredDocuments")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("OnboardingCompletionRequiresAllRequiredTasks")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("OvertimeConfigMaxFutureDays")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(30);
+
+                    b.Property<int>("PasswordExpiryDays")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PasswordHistoryCount")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PasswordMinLength")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(8);
+
+                    b.Property<string>("PayrollCurrency")
+                        .HasMaxLength(3)
+                        .HasColumnType("character varying(3)");
+
+                    b.Property<int>("PayrollCutOffDay")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("Require2FA")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("RequireApprovalComments")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("RequireAttachmentForSickLeave")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("RequireClearanceCompleteBeforeFinalSettlement")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("RequireGpsForMobile")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("RequireNfcForMobile")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("ReviewReminderDaysCsv")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("7,3,1");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<string>("SalaryCalculationBasis")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("Calendar");
+
+                    b.Property<int>("SessionTimeoutMinutes")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("SuccessionPlanReminderDaysCsv")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("30,7,1");
+
+                    b.Property<string>("TimeFormat")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("HH:mm");
+
+                    b.Property<int>("TimesheetSubmissionReminderDaysBefore")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(2);
+
+                    b.Property<bool>("TrackBreakTime")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("TrainingSessionReminderDaysCsv")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("7,3,1");
+
+                    b.Property<string>("VisaExpiryAlertDaysCsv")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("90,60,30,15,7");
+
+                    b.Property<string>("WeekStartDay")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("Sunday");
+
+                    b.Property<string>("WorkflowFallbackApproverRole")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("HRManager");
+
+                    b.Property<long?>("WorkflowFallbackApproverUserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CompanySettings", (string)null);
+                });
+
             modelBuilder.Entity("TecAxle.Hrms.Domain.Departments.DepartmentSettingsOverride", b =>
                 {
                     b.Property<long>("Id")
@@ -3243,6 +3659,15 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<long>("EmployeeId")
                         .HasColumnType("bigint");
 
+                    b.Property<DateTime?>("ExecutedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("ExecutedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ExecutionError")
+                        .HasColumnType("text");
+
                     b.Property<DateTime?>("GeneratedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -3251,6 +3676,9 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasColumnType("character varying(500)");
 
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsExecuted")
                         .HasColumnType("boolean");
 
                     b.Property<int>("LetterType")
@@ -6078,10 +6506,22 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<long>("EmployeeId")
                         .HasColumnType("bigint");
 
+                    b.Property<DateTime?>("ExecutedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("ExecutedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ExecutionError")
+                        .HasColumnType("text");
+
                     b.Property<long?>("ExpensePolicyId")
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsExecuted")
                         .HasColumnType("boolean");
 
                     b.Property<DateTime?>("ModifiedAtUtc")
@@ -6090,6 +6530,9 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<string>("ModifiedBy")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<int>("ReimbursementMethod")
+                        .HasColumnType("integer");
 
                     b.Property<string>("RejectionReason")
                         .HasMaxLength(1000)
@@ -6945,10 +7388,22 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTime?>("ExecutedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("ExecutedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ExecutionError")
+                        .HasColumnType("text");
+
                     b.Property<decimal>("InterestRate")
                         .HasColumnType("decimal(8,4)");
 
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsExecuted")
                         .HasColumnType("boolean");
 
                     b.Property<long?>("LoanPolicyId")
@@ -6998,6 +7453,9 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bytea")
                         .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<bool>("ScheduleGenerated")
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("timestamp with time zone");
@@ -7271,13 +7729,28 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)");
 
-                    b.Property<int>("DeductionMonth")
-                        .HasColumnType("integer");
+                    b.Property<DateTime?>("DeductionEndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DeductionStartDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<long>("EmployeeId")
                         .HasColumnType("bigint");
 
+                    b.Property<DateTime?>("ExecutedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("ExecutedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ExecutionError")
+                        .HasColumnType("text");
+
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsExecuted")
                         .HasColumnType("boolean");
 
                     b.Property<DateTime?>("ModifiedAtUtc")
@@ -7323,9 +7796,6 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DeductionMonth")
-                        .HasDatabaseName("IX_SalaryAdvances_DeductionMonth");
-
                     b.HasIndex("EmployeeId")
                         .HasDatabaseName("IX_SalaryAdvances_EmployeeId");
 
@@ -7335,6 +7805,9 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                         .HasDatabaseName("IX_SalaryAdvances_Status");
 
                     b.HasIndex("WorkflowInstanceId");
+
+                    b.HasIndex("DeductionStartDate", "DeductionEndDate")
+                        .HasDatabaseName("IX_SalaryAdvances_DeductionRange");
 
                     b.ToTable("SalaryAdvances", (string)null);
                 });
@@ -9135,6 +9608,115 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("OnboardingTemplateTasks", (string)null);
                 });
 
+            modelBuilder.Entity("TecAxle.Hrms.Domain.Operations.OperationalFailureAlert", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("Category")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long?>("EmployeeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<DateTime>("FailedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FailureCode")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsResolved")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsRetryable")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastRetryAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("MetadataJson")
+                        .HasColumnType("jsonb");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("ResolutionNotes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime?>("ResolvedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("ResolvedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("RetryCount")
+                        .HasColumnType("integer");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bytea")
+                        .HasDefaultValue(new byte[] { 1 });
+
+                    b.Property<int>("Severity")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("SourceEntityId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("SourceEntityType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsResolved", "FailedAtUtc")
+                        .HasDatabaseName("IX_OperationalFailureAlerts_Dashboard")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("Category", "SourceEntityType", "SourceEntityId", "FailureCode", "IsResolved")
+                        .HasDatabaseName("IX_OperationalFailureAlerts_Dedup")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("OperationalFailureAlerts", (string)null);
+                });
+
             modelBuilder.Entity("TecAxle.Hrms.Domain.Payroll.AllowanceAssignment", b =>
                 {
                     b.Property<long>("Id")
@@ -9466,7 +10048,19 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<long>("EmployeeId")
                         .HasColumnType("bigint");
 
+                    b.Property<DateTime?>("ExecutedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("ExecutedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ExecutionError")
+                        .HasColumnType("text");
+
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsExecuted")
                         .HasColumnType("boolean");
 
                     b.Property<string>("Justification")
@@ -9500,6 +10094,9 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
 
                     b.Property<decimal?>("RequestedPercentage")
                         .HasColumnType("decimal(8,4)");
+
+                    b.Property<long?>("ResultingAssignmentId")
+                        .HasColumnType("bigint");
 
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
@@ -11784,6 +12381,9 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTime?>("FollowThroughProcessedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Goals")
                         .HasMaxLength(4000)
                         .HasColumnType("character varying(4000)");
@@ -11819,6 +12419,9 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                     b.Property<string>("ReasonAr")
                         .HasMaxLength(2000)
                         .HasColumnType("character varying(2000)");
+
+                    b.Property<long?>("RelatedResignationRequestId")
+                        .HasColumnType("bigint");
 
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
@@ -14871,412 +15474,6 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                     b.ToTable("SurveyTemplates", (string)null);
                 });
 
-            modelBuilder.Entity("TecAxle.Hrms.Domain.Tenants.TenantSettings", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<bool>("AllowHalfDayLeave")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("AllowLeaveEncashment")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("AllowMockLocation")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("AllowNegativeLeaveBalance")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("AllowSelfApproval")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("AssetOverdueReturnAlertDaysCsv")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasDefaultValue("1,3,7,14,30");
-
-                    b.Property<string>("AssetWarrantyExpiryAlertDaysCsv")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasDefaultValue("30,15,7,1");
-
-                    b.Property<int>("AttendanceCorrectionMaxRetroactiveDays")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(30);
-
-                    b.Property<bool>("AutoActivateEmployeeOnOnboardingComplete")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("AutoApproveAfterTimeout")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("AutoCheckOutEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<TimeOnly?>("AutoCheckOutTime")
-                        .HasColumnType("time without time zone");
-
-                    b.Property<bool>("AutoCreateClearanceOnTermination")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("AutoCreateOnboardingOnOfferAcceptance")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("AutoCreateTerminationOnResignationApproved")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("AutoDeactivateEmployeeOnFinalSettlementPaid")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("AutoEnableFinalSettlementCalcOnClearanceComplete")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("AutoSuspendEmployeeOnTerminationCreated")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("ContractExpiredAction")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("ContractExpiryAlertDaysCsv")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasDefaultValue("30,15,7");
-
-                    b.Property<bool>("CreateEmployeeInactiveAtOfferAcceptance")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("NOW()");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<bool>("DailyAttendanceSummaryEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("DateFormat")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasDefaultValue("dd/MM/yyyy");
-
-                    b.Property<int>("DefaultApprovalTimeoutHours")
-                        .HasColumnType("integer");
-
-                    b.Property<long?>("DefaultClearanceTemplateId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("DefaultOnboardingTemplateId")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("DefaultProbationDays")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(90);
-
-                    b.Property<string>("DocumentExpiryAlertDaysCsv")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasDefaultValue("30,15,7");
-
-                    b.Property<int>("EarlyLeaveGracePeriodMinutes")
-                        .HasColumnType("integer");
-
-                    b.Property<bool>("EnableBiometricAttendance")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("EnableEmailNotifications")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("EnableEndOfServiceCalc")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("EnableGpsAttendance")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("EnableManualAttendance")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("EnableNfcAttendance")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("EnablePushNotifications")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("EnableSmsNotifications")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("ExcuseBackwardWindowDays")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(365);
-
-                    b.Property<int>("ExcuseForwardWindowDays")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(30);
-
-                    b.Property<string>("FiscalYearStartMonth")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(2)
-                        .HasColumnType("character varying(2)")
-                        .HasDefaultValue("01");
-
-                    b.Property<int>("FrozenWorkflowCleanupDays")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(90);
-
-                    b.Property<string>("GrievanceSlaAlertDaysCsv")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasDefaultValue("3,1");
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
-
-                    b.Property<int>("LateGracePeriodMinutes")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("LeaveYearStart")
-                        .HasMaxLength(5)
-                        .HasColumnType("character varying(5)");
-
-                    b.Property<bool>("LifecycleAutomationEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("LoanRepaymentReminderDays")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(7);
-
-                    b.Property<string>("LoginLockoutPolicyJson")
-                        .HasColumnType("jsonb");
-
-                    b.Property<int>("MaxLoginAttempts")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("MaxShiftGracePeriodMinutes")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(120);
-
-                    b.Property<int>("MaxUploadSizeMb")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(10);
-
-                    b.Property<int>("MaxVacationDaysPerRequest")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(365);
-
-                    b.Property<int>("MaxVacationFuturePlanningYears")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(2);
-
-                    b.Property<int>("MaxWorkflowDelegationDepth")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(2);
-
-                    b.Property<int>("MaxWorkflowResubmissions")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(3);
-
-                    b.Property<int>("MinDaysBeforeLeaveRequest")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("MinimumWorkingHoursForPresent")
-                        .HasColumnType("integer");
-
-                    b.Property<bool>("MobileCheckInEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime>("ModifiedAtUtc")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("NOW()");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("NotificationRecipientRolesCsv")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasDefaultValue("HRManager,SystemAdmin");
-
-                    b.Property<bool>("NotifyEmployeeOnApproval")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("NotifyManagerOnLeaveRequest")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("NumberFormat")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
-                        .HasDefaultValue("en-US");
-
-                    b.Property<bool>("OnboardingCompletionRequiresAllRequiredDocuments")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("OnboardingCompletionRequiresAllRequiredTasks")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("OvertimeConfigMaxFutureDays")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(30);
-
-                    b.Property<int>("PasswordExpiryDays")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("PasswordHistoryCount")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("PasswordMinLength")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(8);
-
-                    b.Property<string>("PayrollCurrency")
-                        .HasMaxLength(3)
-                        .HasColumnType("character varying(3)");
-
-                    b.Property<int>("PayrollCutOffDay")
-                        .HasColumnType("integer");
-
-                    b.Property<bool>("Require2FA")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("RequireApprovalComments")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("RequireAttachmentForSickLeave")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("RequireClearanceCompleteBeforeFinalSettlement")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("RequireGpsForMobile")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("RequireNfcForMobile")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("ReviewReminderDaysCsv")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasDefaultValue("7,3,1");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bytea")
-                        .HasDefaultValue(new byte[] { 1 });
-
-                    b.Property<string>("SalaryCalculationBasis")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasDefaultValue("Calendar");
-
-                    b.Property<int>("SessionTimeoutMinutes")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("SuccessionPlanReminderDaysCsv")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasDefaultValue("30,7,1");
-
-                    b.Property<string>("TimeFormat")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasDefaultValue("HH:mm");
-
-                    b.Property<int>("TimesheetSubmissionReminderDaysBefore")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(2);
-
-                    b.Property<bool>("TrackBreakTime")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("TrainingSessionReminderDaysCsv")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasDefaultValue("7,3,1");
-
-                    b.Property<string>("VisaExpiryAlertDaysCsv")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasDefaultValue("90,60,30,15,7");
-
-                    b.Property<string>("WeekStartDay")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasDefaultValue("Sunday");
-
-                    b.Property<string>("WorkflowFallbackApproverRole")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasDefaultValue("HRManager");
-
-                    b.Property<long?>("WorkflowFallbackApproverUserId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TenantSettings", (string)null);
-                });
-
             modelBuilder.Entity("TecAxle.Hrms.Domain.Timesheets.Project", b =>
                 {
                     b.Property<long>("Id")
@@ -17733,7 +17930,7 @@ namespace TecAxle.Hrms.Infrastructure.Persistence.PostgreSql.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasDefaultValue(0)
-                        .HasComment("Resubmission counter; capped by TenantSettings.MaxWorkflowResubmissions (v13.6)");
+                        .HasComment("Resubmission counter; capped by CompanySettings.MaxWorkflowResubmissions (v13.6)");
 
                     b.Property<DateTime?>("ReturnedAtUtc")
                         .HasColumnType("timestamp with time zone")

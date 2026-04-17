@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using TecAxle.Hrms.Domain.Branches;
+using TecAxle.Hrms.Domain.Operations;
 using TecAxle.Hrms.Domain.Common;
 using TecAxle.Hrms.Domain.Employees;
 using TecAxle.Hrms.Domain.Users;
@@ -13,7 +15,7 @@ using TecAxle.Hrms.Domain.RemoteWork;
 using TecAxle.Hrms.Domain.Workflows;
 using TecAxle.Hrms.Domain.LeaveManagement;
 using TecAxle.Hrms.Domain.Notifications;
-using TecAxle.Hrms.Domain.Tenants;
+using TecAxle.Hrms.Domain.Company;
 using TecAxle.Hrms.Domain.Payroll;
 using TecAxle.Hrms.Domain.Offboarding;
 using TecAxle.Hrms.Domain.Recruitment;
@@ -906,13 +908,18 @@ public interface IApplicationDbContext
     DbSet<OffDay> OffDays { get; }
 
     // Company Configuration
-    DbSet<TenantSettings> TenantSettings { get; }
+    DbSet<CompanySettings> CompanySettings { get; }
     DbSet<BranchSettingsOverride> BranchSettingsOverrides { get; }
     DbSet<DepartmentSettingsOverride> DepartmentSettingsOverrides { get; }
 
     // v13.5: Lifecycle Automation audit trail — one row per automation attempt
     // (succeeded / skipped / failed / disabled / duplicate-suppressed / missing-prerequisite).
     DbSet<LifecycleAutomationAudit> LifecycleAutomationAudits { get; }
+
+    // Phase 1 (v14.1): Actionable operational failures.
+    // Captures only UNRESOLVED failures; resolving preserves the row but flips IsResolved.
+    // Populated by IFailureAlertService from lifecycle, workflow, executor, and payroll paths.
+    DbSet<OperationalFailureAlert> OperationalFailureAlerts { get; }
 
     /// <summary>
     /// Asynchronously saves all pending changes to the database.
@@ -942,4 +949,13 @@ public interface IApplicationDbContext
     /// Useful after bulk operations to ensure fresh data is loaded from the database.
     /// </summary>
     void ClearChangeTracker();
+
+    /// <summary>
+    /// Phase 1 (v14.1): Begin an explicit database transaction spanning multiple SaveChangesAsync calls.
+    /// Required by ProcessPayrollPeriodCommandHandler so that per-employee payroll record creation
+    /// PLUS loan/advance/expense/benefit side-effect updates either all commit or all roll back.
+    /// Returns null when the current provider is transaction-less (e.g. EF InMemory test provider),
+    /// in which case the caller should degrade gracefully — see PayrollTransactionScope.
+    /// </summary>
+    Task<IDbContextTransaction?> BeginTransactionAsync(CancellationToken cancellationToken = default);
 }

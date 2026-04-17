@@ -5,7 +5,7 @@ namespace TecAxle.Hrms.Application.Excuses.Commands.CreateEmployeeExcuse;
 
 /// <summary>
 /// Validator for CreateEmployeeExcuseCommand. Excuse window is tenant-configurable via
-/// <c>TenantSettings.ExcuseBackwardWindowDays</c> (default 365) and
+/// <c>CompanySettings.ExcuseBackwardWindowDays</c> (default 365) and
 /// <c>ExcuseForwardWindowDays</c> (default 30).
 /// </summary>
 public class CreateEmployeeExcuseCommandValidator : AbstractValidator<CreateEmployeeExcuseCommand>

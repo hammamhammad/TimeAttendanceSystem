@@ -22,7 +22,7 @@ public sealed class NotificationRecipientResolver : INotificationRecipientResolv
 
     public async Task<IReadOnlyList<long>> GetRecipientUserIdsAsync(IEnumerable<string> extraRoles, CancellationToken ct = default)
     {
-        var settings = await _context.TenantSettings
+        var settings = await _context.CompanySettings
             .AsNoTracking()
             .FirstOrDefaultAsync(s => !s.IsDeleted, ct);
 

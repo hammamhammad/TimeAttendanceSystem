@@ -1,0 +1,131 @@
+.company-config-page {
+  padding: 0;
+}
+
+.page-header h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--app-gray-900, #101828);
+}
+
+.config-layout {
+  display: flex;
+  gap: 24px;
+  min-height: 600px;
+}
+
+.config-sidebar {
+  width: 260px;
+  min-width: 260px;
+  background: #fff;
+  border: 1px solid var(--app-gray-200, #EAECF0);
+  border-radius: 12px;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  height: fit-content;
+  position: sticky;
+  top: 24px;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  color: var(--app-gray-700, #344054);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.sidebar-item:hover {
+  background: var(--app-primary-50, #EEF0FF);
+  color: var(--app-primary, #4F6BF6);
+}
+
+.sidebar-item.active {
+  background: var(--app-primary-50, #EEF0FF);
+  color: var(--app-primary, #4F6BF6);
+  font-weight: 600;
+}
+
+.sidebar-item.active .sidebar-icon {
+  color: var(--app-primary, #4F6BF6);
+}
+
+.sidebar-icon {
+  width: 18px;
+  text-align: center;
+  color: var(--app-gray-500, #667085);
+  font-size: 14px;
+}
+
+.sidebar-item-external {
+  opacity: 0.85;
+  font-size: 13px;
+}
+
+.sidebar-item-external:hover {
+  opacity: 1;
+}
+
+.sidebar-external-icon {
+  font-size: 10px;
+  color: var(--app-gray-400, #98A2B3);
+}
+
+.sidebar-divider {
+  margin: 8px 14px;
+  border-color: var(--app-gray-200, #EAECF0);
+}
+
+.sidebar-section-label {
+  padding: 4px 14px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--app-gray-500, #667085);
+}
+
+.config-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* RTL Support */
+:host-context([dir="rtl"]) .sidebar-external-icon {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+@media (max-width: 768px) {
+  .config-layout {
+    flex-direction: column;
+  }
+
+  .config-sidebar {
+    width: 100%;
+    min-width: 100%;
+    position: static;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 4px;
+    padding: 8px;
+  }
+
+  .sidebar-item {
+    white-space: nowrap;
+    padding: 8px 12px;
+  }
+
+  .sidebar-divider,
+  .sidebar-section-label,
+  .sidebar-item-external {
+    display: none;
+  }
+}

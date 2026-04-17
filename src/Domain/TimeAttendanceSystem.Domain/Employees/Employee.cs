@@ -161,7 +161,7 @@ public class Employee : BaseEntity
     /// <summary>
     /// v13.5: true when the employee record was created at offer acceptance but is awaiting
     /// onboarding completion before being activated. Only set when the tenant opts in via
-    /// <c>TenantSettings.CreateEmployeeInactiveAtOfferAcceptance</c>. Default employees are
+    /// <c>CompanySettings.CreateEmployeeInactiveAtOfferAcceptance</c>. Default employees are
     /// active on day one and skip this state entirely.
     /// </summary>
     public bool IsPreHire { get; set; } = false;

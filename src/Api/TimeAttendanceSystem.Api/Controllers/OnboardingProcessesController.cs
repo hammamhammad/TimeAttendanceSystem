@@ -238,7 +238,7 @@ public class OnboardingProcessesController : ControllerBase
             return BadRequest(new { error = "Process is already completed." });
 
         // v13.5: both gates are configurable per tenant with defaults matching v13.x.
-        var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync();
+        var settings = await _context.CompanySettings.AsNoTracking().FirstOrDefaultAsync();
         var requireTasks = settings?.OnboardingCompletionRequiresAllRequiredTasks ?? true;
         var requireDocs = settings?.OnboardingCompletionRequiresAllRequiredDocuments ?? false;
 

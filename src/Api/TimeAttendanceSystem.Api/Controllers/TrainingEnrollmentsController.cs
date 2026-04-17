@@ -14,11 +14,16 @@ public class TrainingEnrollmentsController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
     private readonly ICurrentUser _currentUser;
+    private readonly ITrainingEnrollmentValidator _prerequisiteValidator;
 
-    public TrainingEnrollmentsController(IApplicationDbContext context, ICurrentUser currentUser)
+    public TrainingEnrollmentsController(
+        IApplicationDbContext context,
+        ICurrentUser currentUser,
+        ITrainingEnrollmentValidator prerequisiteValidator)
     {
         _context = context;
         _currentUser = currentUser;
+        _prerequisiteValidator = prerequisiteValidator;
     }
 
     /// <summary>Lists training enrollments with optional filters.</summary>
@@ -145,6 +150,13 @@ public class TrainingEnrollmentsController : ControllerBase
             if (alreadyEnrolled) return BadRequest(new { error = "Employee is already enrolled in this session." });
         }
 
+        // Phase 2 completion: program-level prerequisite + duplicate-program enforcement
+        // (extends the session-level checks above using the structured TrainingProgramCourse model).
+        var prereq = await _prerequisiteValidator.ValidateAsync(
+            request.EmployeeId, request.TrainingSessionId, request.TrainingProgramId);
+        if (prereq.IsFailure)
+            return BadRequest(new { error = prereq.Error });
+
         var entity = new TrainingEnrollment
         {
             EmployeeId = request.EmployeeId,
@@ -252,9 +264,21 @@ public class TrainingEnrollmentsController : ControllerBase
 
         var newEmployeeIds = request.EmployeeIds.Except(existingEnrollments).ToList();
         var enrollments = new List<TrainingEnrollment>();
+        var skippedByPrereq = new List<object>();
 
         foreach (var empId in newEmployeeIds)
         {
+            // Phase 2 completion: program-sequence prerequisite enforcement per employee.
+            // On failure the individual employee is skipped and reported; other employees
+            // in the bulk set are still processed.
+            var prereq = await _prerequisiteValidator.ValidateAsync(
+                empId, request.TrainingSessionId, request.TrainingProgramId);
+            if (prereq.IsFailure)
+            {
+                skippedByPrereq.Add(new { employeeId = empId, reason = prereq.Error });
+                continue;
+            }
+
             var enrollment = new TrainingEnrollment
             {
                 EmployeeId = empId,
@@ -276,7 +300,8 @@ public class TrainingEnrollmentsController : ControllerBase
         {
             message = $"Enrolled {enrollments.Count} employees.",
             enrolledCount = enrollments.Count,
-            skippedCount = existingEnrollments.Count
+            skippedCount = existingEnrollments.Count,
+            skippedByPrerequisite = skippedByPrereq
         });
     }
 

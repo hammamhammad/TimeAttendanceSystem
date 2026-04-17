@@ -59,7 +59,7 @@ public class LoanRepaymentReminderJob : IInvocable
             var hrUserIds = await _recipientResolver.GetRecipientUserIdsAsync();
 
             // Notify about upcoming repayments (tenant-configurable window, default 7 days)
-            var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync();
+            var settings = await _context.CompanySettings.AsNoTracking().FirstOrDefaultAsync();
             var reminderDays = settings?.LoanRepaymentReminderDays > 0 ? settings.LoanRepaymentReminderDays : 7;
             var upcomingDate = today.AddDays(reminderDays);
             var upcomingRepayments = await _context.LoanRepayments

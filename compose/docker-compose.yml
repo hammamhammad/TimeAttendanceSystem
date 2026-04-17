@@ -1,12 +1,14 @@
 services:
+  # Postgres 18 to match the production-safe baseline documented in CLAUDE.md.
+  # Alpine image for size + speed. `tecaxle_hrms` is the single-company DB (v14.0+).
   hrms-postgres:
-    image: postgres:16-alpine
+    image: postgres:18-alpine
     container_name: hrms-postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: tecaxle_master
+      POSTGRES_DB: tecaxle_hrms
     volumes:
       - hrms-pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -26,16 +28,14 @@ services:
       hrms-postgres:
         condition: service_healthy
     environment:
+      # Staging runs in Production mode so seed + auto-migration paths are identical to prod.
+      # Change to `Staging` only if a staging-only code branch is ever introduced.
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:8080
       Kestrel__Endpoints__Http__Url: http://+:8080
       DOTNET_PRINT_TELEMETRY_MESSAGE: "false"
-      ConnectionStrings__DefaultConnection: "Host=hrms-postgres;Port=5432;Database=tecaxle_master;Username=postgres;Password=${POSTGRES_PASSWORD};Include Error Detail=true"
-      ConnectionStrings__PostgreSqlConnection: "Host=hrms-postgres;Port=5432;Database=tecaxle_master;Username=postgres;Password=${POSTGRES_PASSWORD};Include Error Detail=true"
-      ConnectionStrings__MasterDatabase: "Host=hrms-postgres;Port=5432;Database=tecaxle_master;Username=postgres;Password=${POSTGRES_PASSWORD};Include Error Detail=true"
-      MultiTenancy__Mode: PerTenantDatabase
-      MultiTenancy__DefaultTenantConnectionString: "Host=hrms-postgres;Port=5432;Database=tecaxle_master;Username=postgres;Password=${POSTGRES_PASSWORD};Include Error Detail=true"
-      MultiTenancy__EncryptionKey: ${TENANT_ENCRYPTION_KEY}
+      # v14.0 collapsed the multi-tenant setup — only DefaultConnection is used.
+      ConnectionStrings__DefaultConnection: "Host=hrms-postgres;Port=5432;Database=tecaxle_hrms;Username=postgres;Password=${POSTGRES_PASSWORD};Include Error Detail=true"
       Jwt__Secret: ${JWT_SECRET}
       Jwt__Issuer: TecAxleHRMS
       Jwt__Audience: TecAxleHRMS-Client

@@ -32,7 +32,7 @@ public class ReviewCycleReminderJob : IInvocable
         try
         {
             var today = DateTime.UtcNow.Date;
-            var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync();
+            var settings = await _context.CompanySettings.AsNoTracking().FirstOrDefaultAsync();
             var reminderDays = BackgroundJobSettingsHelper.ParseCsvDays(settings?.ReviewReminderDaysCsv, DefaultReminderDays);
 
             int selfAssessmentReminders = 0;

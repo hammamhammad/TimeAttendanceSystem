@@ -55,7 +55,7 @@ public enum WorkflowStatus
     /// An approver returned the request to the requester for corrections (v13.6).
     /// Non-terminal status — the requester can amend and resubmit, which transitions the workflow
     /// back to <see cref="InProgress"/>. Resubmission count is capped by
-    /// <c>TenantSettings.MaxWorkflowResubmissions</c>.
+    /// <c>CompanySettings.MaxWorkflowResubmissions</c>.
     /// </summary>
     ReturnedForCorrection = 8,
 

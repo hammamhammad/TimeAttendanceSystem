@@ -2,18 +2,18 @@
 
 This guide covers two scenarios:
 
-1. **New deployment** — setting up HRMS on a fresh server (or rebuilding from scratch)
-2. **Update deployment** — pushing new code (backend and/or frontend) to an already-running server
+1. **New deployment / fresh rebuild** — setting up HRMS on a fresh server, or rebuilding from scratch (e.g. staging reset).
+2. **Update deployment** — pushing new code (backend and/or frontend) to an already-running server.
 
 The model is **build-on-laptop, run-on-server**. The server never needs a .NET SDK or Node.js — only Docker. All artifacts are built locally, packaged, rsynced over, and bind-mounted into stock runtime containers.
 
-For the full server layout, networks, volumes, and credentials, see [SERVER_STRUCTURE.md](SERVER_STRUCTURE.md).
+**Version baseline:** v14.7 (single-company architecture). For server layout, networks, volumes, and credentials, see [SERVER_STRUCTURE.md](SERVER_STRUCTURE.md).
 
 ---
 
 ## 0. Prerequisites on the developer laptop
 
-- .NET 9 SDK (`dotnet --version` → 9.x)
+- .NET 9 SDK (`dotnet --version` → 9.x or 10.x — 10 targets net9.0 cleanly)
 - Node.js 20+ and npm
 - Git Bash (Windows) or bash (Linux/macOS)
 - `rsync` in PATH (Git Bash ships it under `/usr/bin/rsync`)
@@ -31,7 +31,7 @@ After that, `scripts/deploy-artifacts.sh` runs without any password prompt.
 
 ---
 
-## 1. New deployment (first time, or full rebuild)
+## 1. New deployment (first time, or full rebuild / staging reset)
 
 ### Phase A — Build artifacts locally
 
@@ -110,7 +110,7 @@ The compose files, Caddyfile, and nginx config live on the server in `/root/`, w
 
 ### Phase B.2 — Generate and install secrets
 
-Generate strong secrets locally and upload as a single `.env` file with mode 0600:
+Generate strong secrets locally and upload as a single `.env` file with mode 0600. Post-v14.0 the single-company HRMS only needs **three** secrets (the old `TENANT_ENCRYPTION_KEY` is gone — multi-tenancy is no longer supported):
 
 ```bash
 # Generate locally
@@ -119,7 +119,6 @@ import secrets, base64
 def gen(n=32): return base64.b64encode(secrets.token_bytes(n)).decode()
 print('POSTGRES_PASSWORD=' + gen(24))
 print('JWT_SECRET=' + gen(48))
-print('TENANT_ENCRYPTION_KEY=' + gen(32))
 print('NFC_SECRET_KEY=' + gen(32))
 " > /tmp/hrms-env-local.txt
 
@@ -137,7 +136,7 @@ cat /tmp/hrms-env-local.txt
 rm /tmp/hrms-env-local.txt
 ```
 
-> **Keep a secure offline copy** of the generated secrets. If `/root/applications/hrms/compose/.env` is lost (e.g. if the host is rebuilt), you cannot recover tenant data without the original `TENANT_ENCRYPTION_KEY` — tenant connection strings in the master DB are AES-256 encrypted against that key.
+> **Keep a secure offline copy** of the generated secrets. If `/root/applications/hrms/compose/.env` is lost (e.g. host rebuild), you must restore from backup or all JWTs + NFC payloads become invalid.
 
 ### Phase C — DNS at Hostinger
 
@@ -186,7 +185,7 @@ cd publish && tar czf /tmp/hrms-publish.tar.gz api admin portal && cd ..
 
 # Extract into place on the server
 ./scripts/r.sh exec "echo 'Tec@axle2026' | sudo -S -p '' bash -c '
-    rm -rf /root/applications/hrms/artifacts/{api,admin,portal}
+    rm -rf /root/applications/hrms/artifacts/api /root/applications/hrms/artifacts/admin /root/applications/hrms/artifacts/portal
     mkdir -p /root/applications/hrms/artifacts
     tar xzf /tmp/hrms-publish.tar.gz -C /root/applications/hrms/artifacts/
     chown -R root:root /root/applications/hrms/artifacts
@@ -196,17 +195,14 @@ cd publish && tar czf /tmp/hrms-publish.tar.gz api admin portal && cd ..
 # Start the HRMS stack
 ./scripts/r.sh exec "echo 'Tec@axle2026' | sudo -S -p '' bash -c 'cd /root/applications/hrms/compose && docker compose up -d'"
 
-# Watch the API start + master DB migrate
-./scripts/r.sh exec "echo 'Tec@axle2026' | sudo -S -p '' docker logs hrms-api 2>&1 | tail -60"
+# Watch the API start + DB migrate + seed
+./scripts/r.sh exec "echo 'Tec@axle2026' | sudo -S -p '' docker logs hrms-api 2>&1 | tail -80"
 ```
 
 Expect to see:
-- `Applying migration '...InitialMaster'.`
-- `Seeded TecAxle Admin platform user (admin@tecaxle.com)`
-- `Seeded 3 subscription plans ...`
-- `Now listening on: http://[::]:8080`
-
-The leave accrual background job will log an error about missing `Employees` table — this is expected on a fresh install (no tenants yet) and will stop once the first tenant is provisioned. Non-blocking.
+- EF migrations applied in order: `20260416163539_Initial`, `20260417121022_RenameTenantSettingsToCompanySettings`, `20260417131611_RemoveLegacyAutoCheckoutSettings`, `20260417152940_RemoveDeductionMonth`.
+- Seed messages for two system admin users + default shift + vacation types + Saudi EOS policy.
+- `Now listening on: http://[::]:8080`.
 
 Clean up local:
 
@@ -214,36 +210,64 @@ Clean up local:
 rm /tmp/hrms-publish.tar.gz
 ```
 
+### Phase E.1 — Seed sample business data (staging only)
+
+For a staging env we want realistic volumes (5 branches, 20 departments, 50 employees with user accounts, all with password `Emp@123!`). The SQL seed script at [scripts/sample-data-with-users.sql](../../scripts/sample-data-with-users.sql) is idempotent on a fresh DB.
+
+```bash
+# Upload the script
+./scripts/r.sh put scripts/sample-data-with-users.sql /tmp/sample-data-with-users.sql
+
+# Copy into the postgres container and run it as the postgres superuser
+./scripts/r.sh exec "echo 'Tec@axle2026' | sudo -S -p '' bash -c '
+    docker cp /tmp/sample-data-with-users.sql hrms-postgres:/tmp/sample.sql
+    docker exec hrms-postgres psql -U postgres -d tecaxle_hrms -f /tmp/sample.sql
+    docker exec hrms-postgres rm /tmp/sample.sql
+    rm /tmp/sample-data-with-users.sql
+'"
+```
+
+Sample-data verification:
+
+```bash
+./scripts/r.sh exec "echo 'Tec@axle2026' | sudo -S -p '' docker exec hrms-postgres psql -U postgres -d tecaxle_hrms -c '
+    SELECT (SELECT COUNT(*) FROM \"Branches\") AS branches,
+           (SELECT COUNT(*) FROM \"Departments\") AS departments,
+           (SELECT COUNT(*) FROM \"Employees\") AS employees,
+           (SELECT COUNT(*) FROM \"Users\") AS users;
+'"
+```
+
+Expected: 5 branches, 20 departments, 50 employees, 52 users (50 employees + 2 system admins).
+
+**Skip this phase for production.** Staging only.
+
 ### Phase F — Smoke tests
 
 From your laptop (not the server — hairpin NAT may block self-connections):
 
 ```bash
-for u in https://hrms.tecaxle.com/ https://hrmsportal.tecaxle.com/ https://hrmsapi.tecaxle.com/api/v1/tenants/discover; do
-    printf '%-55s ' "$u"
+for u in https://hrms.tecaxle.com/ https://hrmsportal.tecaxle.com/ https://hrmsapi.tecaxle.com/swagger/v1/swagger.json; do
+    printf '%-65s ' "$u"
     curl -sk -o /dev/null -w '%{http_code}\n' --connect-timeout 15 "$u"
 done
 
 # Expect:
-# https://hrms.tecaxle.com/                                     200
-# https://hrmsportal.tecaxle.com/                               200
-# https://hrmsapi.tecaxle.com/api/v1/tenants/discover           400  (validation — API is alive)
+# https://hrms.tecaxle.com/                                         200
+# https://hrmsportal.tecaxle.com/                                   200
+# https://hrmsapi.tecaxle.com/swagger/v1/swagger.json               200
 ```
 
-Test login as platform admin:
+Test login as a system admin (seed credentials from `SeedData.cs`):
 
 ```bash
 curl -sk -X POST -H "Content-Type: application/json" \
-    -d '{"email":"admin@tecaxle.com","password":"TecAxle@Admin2026!"}' \
+    -d '{"email":"systemadmin@system.local","password":"TempP@ssw0rd123!"}' \
     https://hrmsapi.tecaxle.com/api/v1/auth/login
-# Expect: {"accessToken":"...","expiresAt":...,"user":{...},"isPlatformUser":true}
+# Expect: {"accessToken":"...","expiresAt":"...","mustChangePassword":true,"user":{...}}
 ```
 
-Then log in via the browser at [https://hrms.tecaxle.com/](https://hrms.tecaxle.com/) with the same credentials, verify SignalR connects (devtools → Network → `/hubs/notifications` → 101 Switching Protocols), and create a test tenant from the admin UI. Verify that a new `ta_*` database appears:
-
-```bash
-./scripts/r.sh exec "echo 'Tec@axle2026' | sudo -S -p '' docker exec hrms-postgres psql -U postgres -l"
-```
+Then log in via the browser at [https://hrms.tecaxle.com/](https://hrms.tecaxle.com/) with the same credentials, verify SignalR connects (devtools → Network → `/hubs/notifications` → 101 Switching Protocols), and after sample-data seed, try a sample employee login (e.g. `ahmed.rashid@company.com` / `Emp@123!`).
 
 ---
 
@@ -314,7 +338,7 @@ For Caddyfile changes, upload then either `docker compose up -d` (which recreate
 
 ### Secrets rotation
 
-Rotate any of the four secrets in `/root/applications/hrms/compose/.env` via `sudo` interactive edit, then restart the api:
+Rotate any of the three secrets in `/root/applications/hrms/compose/.env` via `sudo` interactive edit, then restart the api:
 
 ```bash
 ssh -p 2222 hhammad@187.124.217.81
@@ -323,19 +347,15 @@ sudo nano /root/applications/hrms/compose/.env
 cd /root/applications/hrms/compose && sudo docker compose up -d hrms-api
 ```
 
-> **Do not** rotate `TENANT_ENCRYPTION_KEY` without a planned re-encryption migration — existing tenant connection strings in the master DB are encrypted with the old key.
-
 ### Database migrations
 
-Backend migrations for the master DB run automatically on `hrms-api` startup (see `Program.cs` → `MasterDbContext.Database.Migrate()`). After deploying a backend update that adds a migration:
+Backend migrations run automatically on `hrms-api` startup via `dbContext.Database.MigrateAsync()` in `Program.cs`. After deploying a backend update that adds a migration:
 
 ```bash
 ./scripts/deploy-artifacts.sh   # rsync + restart hrms-api
 # Migrations apply during startup. Check logs:
 ssh -p 2222 deploy@187.124.217.81 "sudo docker logs hrms-api 2>&1 | grep -i migrat"
 ```
-
-Tenant DB migrations are handled by `TenantProvisioningService` when each tenant DB is first created. Existing tenant DBs do not auto-migrate on backend restart — if you add a tenant-DB migration, you need a separate update path (not yet automated; see TODO list).
 
 ---
 
@@ -353,7 +373,7 @@ cp -r /path/to/previous/publish publish
 ./scripts/deploy-artifacts.sh
 ```
 
-No data loss — `hrms-pgdata` and `hrms-uploads` volumes are untouched.
+**No data loss** for artifact rollbacks — `hrms-pgdata` and `hrms-uploads` volumes are untouched. Be aware that **schema migrations don't auto-reverse** when you deploy older code — you would have to manually run `Down` migrations via EF tooling first. For staging this is usually OK; for production, plan carefully.
 
 ### Rolling back code in git + rebuild
 
@@ -366,12 +386,33 @@ git checkout main   # return to tip
 
 ### What NOT to do
 
-- **Never** run `sudo docker compose down -v` (with `-v`) — that deletes the named volumes and destroys all tenant data.
+- **Never** run `sudo docker compose down -v` (with `-v`) on production — that deletes the named volumes and destroys all data.
 - **Never** delete the `reverse-proxy_caddy_data` volume — you'll lose the Let's Encrypt certs and hit rate limits when re-issuing.
+- Staging resets MAY use `docker compose down -v` intentionally; only the HRMS pgdata volume and uploads volume are in scope.
 
 ---
 
-## 4. Troubleshooting
+## 4. Staging reset (fresh DB + re-seed)
+
+Full reset workflow for staging when you need a clean slate:
+
+```bash
+./scripts/r.sh exec "echo 'Tec@axle2026' | sudo -S -p '' bash -c '
+    cd /root/applications/hrms/compose
+    docker compose down
+    # Destroy DB + uploads volumes for a clean rebuild. SAFE on staging only.
+    docker volume rm compose_hrms-pgdata compose_hrms-uploads 2>/dev/null || true
+'"
+
+# Re-upload fresh artifacts + start the stack (see Phase E above).
+# Then re-seed sample data (Phase E.1).
+```
+
+Never do this on production.
+
+---
+
+## 5. Troubleshooting
 
 ### `docker compose ps` shows hrms-api Restarting
 
@@ -381,9 +422,9 @@ sudo docker logs hrms-api --tail 200
 ```
 
 Common causes:
-- Master DB connection — check `.env` matches what the compose file expects
-- Migration failure — read the EF Core exception
-- Kestrel bind — look for `Now listening on: http://...`. If it's `http://localhost:5099` instead of `http://[::]:8080`, the `Kestrel__Endpoints__Http__Url` env var override is missing from the compose file
+- DB connection — check `.env` has a valid `POSTGRES_PASSWORD` and compose `DefaultConnection` matches.
+- Migration failure — read the EF Core exception. For staging, a `docker volume rm compose_hrms-pgdata` + restart is the fastest fix (after Phase E artifacts are in place).
+- Kestrel bind — look for `Now listening on: http://...`. If it's `http://localhost:5099` instead of `http://[::]:8080`, the `Kestrel__Endpoints__Http__Url` env var override is missing from the compose file.
 
 ### 502 Bad Gateway on `hrmsapi.tecaxle.com`
 
@@ -393,8 +434,8 @@ Caddy is reachable but can't reach `hrms-api:8080`. Check:
 ssh -p 2222 deploy@187.124.217.81
 sudo docker logs caddy --tail 50
 # Look for: "dial tcp ...: connect: connection refused"
-sudo docker exec caddy wget -qO- http://hrms-api:8080/api/v1/tenants/discover
-# Should return JSON with a validation error, not a connection error
+sudo docker exec caddy wget -qO- http://hrms-api:8080/swagger/v1/swagger.json
+# Should return the Swagger JSON
 ```
 
 If Caddy can reach hrms-api directly but the public URL still 502s, check that `hrms-api` is attached to the `edge-net` network (`docker inspect hrms-api | grep -A5 Networks`).
@@ -410,15 +451,6 @@ Typical causes:
 - UFW blocking 80 or 443 → `sudo ufw status`
 - Hit Let's Encrypt rate limit → wait 1 hour, or switch Caddy to staging endpoint temporarily
 
-### Background leave accrual error
-
-```
-fail: TecAxle.Hrms.Application.Services.LeaveAccrualService[0]
-      Error processing monthly accrual for all employees ... relation "Employees" does not exist
-```
-
-Non-blocking. The `MonthlyLeaveAccrualJob` tries to query the master DB for tenant employees, but that table only exists in tenant DBs. It stops once at least one tenant has been created. TODO: `TenantIteratingJob` should skip when no tenants exist.
-
 ### SSH password prompt mid-deploy
 
 Happens when no SSH key is installed for `deploy`. Fix once:
@@ -429,7 +461,7 @@ ssh-copy-id -p 2222 deploy@187.124.217.81
 
 ---
 
-## 5. Quick command reference
+## 6. Quick command reference
 
 ```bash
 # Build everything locally
@@ -450,8 +482,8 @@ ssh -p 2222 deploy@187.124.217.81 "sudo docker logs -f hrms-api"
 # Check container state
 ssh -p 2222 deploy@187.124.217.81 "sudo docker compose -f /root/applications/hrms/compose/docker-compose.yml ps"
 
-# List databases (master + tenants)
-ssh -p 2222 deploy@187.124.217.81 "sudo docker exec hrms-postgres psql -U postgres -l"
+# Shell into postgres
+ssh -p 2222 deploy@187.124.217.81 "sudo docker exec -it hrms-postgres psql -U postgres tecaxle_hrms"
 
 # Caddy reload (after Caddyfile edit, no restart)
 ssh -p 2222 hhammad@187.124.217.81 "sudo docker exec caddy caddy reload --config /etc/caddy/Caddyfile"
@@ -462,7 +494,7 @@ ssh -p 2222 hhammad@187.124.217.81 "cd /root/applications/hrms/compose && sudo d
 
 ---
 
-## 6. Files reference
+## 7. Files reference
 
 **Committed to repo:**
 
@@ -470,9 +502,10 @@ ssh -p 2222 hhammad@187.124.217.81 "cd /root/applications/hrms/compose && sudo d
 |---|---|
 | [compose/docker-compose.yml](../../compose/docker-compose.yml) | HRMS stack (postgres, api, admin, portal). Attaches to external `edge-net` |
 | [compose/nginx-spa.conf](../../compose/nginx-spa.conf) | Shared nginx config for admin + portal SPAs |
-| [scripts/build-artifacts.sh](../../scripts/build-artifacts.sh) | Local build (dotnet publish + 2x ng build) |
+| [scripts/build-artifacts.sh](../../scripts/build-artifacts.sh) | Local build (dotnet publish + 2× ng build) |
 | [scripts/deploy-artifacts.sh](../../scripts/deploy-artifacts.sh) | Local → server rsync + compose restart |
 | [scripts/server-bootstrap.sh](../../scripts/server-bootstrap.sh) | One-time server bootstrap (sudoers, dirs, edge-net, firewall) |
+| [scripts/sample-data-with-users.sql](../../scripts/sample-data-with-users.sql) | Staging seed: 5 branches, 20 departments, 50 employees |
 | `.gitignore` includes `publish/`, `compose/.env`, `reverse-proxy/` |
 
 **Server-only, not committed** (see SERVER_STRUCTURE.md for contents):
@@ -481,7 +514,7 @@ ssh -p 2222 hhammad@187.124.217.81 "cd /root/applications/hrms/compose && sudo d
 |---|---|
 | `/root/reverse-proxy/docker-compose.yml` | Caddy compose |
 | `/root/reverse-proxy/Caddyfile` | All sites for all systems behind Caddy |
-| `/root/applications/hrms/compose/.env` | Secrets (mode 0600) |
+| `/root/applications/hrms/compose/.env` | Secrets (mode 0600): POSTGRES_PASSWORD, JWT_SECRET, NFC_SECRET_KEY |
 
 **Session-local helpers (git-ignored, Windows deploy laptop only):**
 

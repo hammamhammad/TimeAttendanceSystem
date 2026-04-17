@@ -3,8 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Application.Common;
 using TecAxle.Hrms.Application.Extensions;
+using TecAxle.Hrms.Application.Features.ApprovalExecution.Events;
 using TecAxle.Hrms.Application.Workflows.Services;
 using TecAxle.Hrms.Domain.Attendance;
+using TecAxle.Hrms.Domain.Common;
 using TecAxle.Hrms.Domain.Excuses;
 using TecAxle.Hrms.Domain.Workflows.Enums;
 
@@ -23,19 +25,22 @@ public class ApproveStepCommandHandler : IRequestHandler<ApproveStepCommand, Res
     private readonly ILeaveAccrualService _leaveAccrualService;
     private readonly IAttendanceCalculationService _calculationService;
     private readonly IAttendanceTransactionRepository _transactionRepository;
+    private readonly IPublisher _publisher;
 
     public ApproveStepCommandHandler(
         IWorkflowEngine workflowEngine,
         IApplicationDbContext context,
         ILeaveAccrualService leaveAccrualService,
         IAttendanceCalculationService calculationService,
-        IAttendanceTransactionRepository transactionRepository)
+        IAttendanceTransactionRepository transactionRepository,
+        IPublisher publisher)
     {
         _workflowEngine = workflowEngine;
         _context = context;
         _leaveAccrualService = leaveAccrualService;
         _calculationService = calculationService;
         _transactionRepository = transactionRepository;
+        _publisher = publisher;
     }
 
     public async Task<Result<bool>> Handle(ApproveStepCommand request, CancellationToken cancellationToken)
@@ -102,7 +107,192 @@ public class ApproveStepCommandHandler : IRequestHandler<ApproveStepCommand, Res
             case WorkflowEntityType.AttendanceCorrection:
                 await UpdateAttendanceCorrectionStatusAsync(workflowInstance, cancellationToken);
                 break;
+
+            // Phase 1 (v14.1): transition the 6 approval-execution targets to Approved
+            // and publish RequestFinallyApprovedEvent so the auto-execute pipeline fires.
+            case WorkflowEntityType.AllowanceRequest:
+                await UpdateAllowanceRequestStatusAsync(workflowInstance, cancellationToken);
+                break;
+            case WorkflowEntityType.LoanApplication:
+                await UpdateLoanApplicationStatusAsync(workflowInstance, cancellationToken);
+                break;
+            case WorkflowEntityType.SalaryAdvance:
+                await UpdateSalaryAdvanceStatusAsync(workflowInstance, cancellationToken);
+                break;
+            case WorkflowEntityType.ExpenseClaim:
+                await UpdateExpenseClaimStatusAsync(workflowInstance, cancellationToken);
+                break;
+            case WorkflowEntityType.BenefitEnrollment:
+                await UpdateBenefitEnrollmentStatusAsync(workflowInstance, cancellationToken);
+                break;
+            case WorkflowEntityType.LetterRequest:
+                await UpdateLetterRequestStatusAsync(workflowInstance, cancellationToken);
+                break;
         }
+    }
+
+    // ---------------------------------------------------------------------------------
+    // Phase 1 (v14.1): status-transition helpers for the 6 approval-execution targets.
+    // Each one:
+    //   (a) sets the entity's Status to Approved (or Rejected) on final workflow outcome;
+    //   (b) captures ApprovedByUserId / ApprovedAt;
+    //   (c) on Approved, publishes RequestFinallyApprovedEvent so the downstream executor
+    //       runs automatically. The publish uses MediatR IPublisher which surfaces handler
+    //       exceptions through the configured Application-layer pipeline behaviours —
+    //       the dedicated RequestFinallyApprovedHandler itself catches every exception and
+    //       converts it into an OperationalFailureAlert so approval never HTTP-500s.
+    // Idempotency is guaranteed by the executors' IsExecuted guard.
+    // ---------------------------------------------------------------------------------
+
+    private async Task UpdateAllowanceRequestStatusAsync(Domain.Workflows.WorkflowInstance wi, CancellationToken ct)
+    {
+        var req = await _context.AllowanceRequests.FirstOrDefaultAsync(x => x.Id == wi.EntityId, ct);
+        if (req == null) return;
+        var approverId = await GetApproverUserIdAsync(wi.Id, ct);
+        if (wi.FinalOutcome == ApprovalAction.Approved)
+        {
+            req.Status = AllowanceRequestStatus.Approved;
+            req.ApprovedByUserId = approverId;
+            req.ApprovedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync(ct);
+            await _publisher.Publish(new RequestFinallyApprovedEvent(
+                WorkflowEntityType.AllowanceRequest, req.Id, wi.Id, approverId), ct);
+        }
+        else if (wi.FinalOutcome == ApprovalAction.Rejected)
+        {
+            req.Status = AllowanceRequestStatus.Rejected;
+            req.RejectionReason = await GetLastCommentsAsync(wi.Id, ct);
+            await _context.SaveChangesAsync(ct);
+        }
+    }
+
+    private async Task UpdateLoanApplicationStatusAsync(Domain.Workflows.WorkflowInstance wi, CancellationToken ct)
+    {
+        var loan = await _context.LoanApplications.FirstOrDefaultAsync(x => x.Id == wi.EntityId, ct);
+        if (loan == null) return;
+        var approverId = await GetApproverUserIdAsync(wi.Id, ct);
+        if (wi.FinalOutcome == ApprovalAction.Approved)
+        {
+            loan.Status = LoanApplicationStatus.Approved;
+            loan.ApprovedByUserId = approverId;
+            loan.ApprovedAt = DateTime.UtcNow;
+            loan.ApprovedAmount ??= loan.RequestedAmount;
+            await _context.SaveChangesAsync(ct);
+            await _publisher.Publish(new RequestFinallyApprovedEvent(
+                WorkflowEntityType.LoanApplication, loan.Id, wi.Id, approverId), ct);
+        }
+        else if (wi.FinalOutcome == ApprovalAction.Rejected)
+        {
+            loan.Status = LoanApplicationStatus.Rejected;
+            loan.RejectionReason = await GetLastCommentsAsync(wi.Id, ct);
+            await _context.SaveChangesAsync(ct);
+        }
+    }
+
+    private async Task UpdateSalaryAdvanceStatusAsync(Domain.Workflows.WorkflowInstance wi, CancellationToken ct)
+    {
+        var adv = await _context.SalaryAdvances.FirstOrDefaultAsync(x => x.Id == wi.EntityId, ct);
+        if (adv == null) return;
+        var approverId = await GetApproverUserIdAsync(wi.Id, ct);
+        if (wi.FinalOutcome == ApprovalAction.Approved)
+        {
+            adv.Status = SalaryAdvanceStatus.Approved;
+            adv.ApprovedByUserId = approverId;
+            adv.ApprovedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync(ct);
+            await _publisher.Publish(new RequestFinallyApprovedEvent(
+                WorkflowEntityType.SalaryAdvance, adv.Id, wi.Id, approverId), ct);
+        }
+        else if (wi.FinalOutcome == ApprovalAction.Rejected)
+        {
+            adv.Status = SalaryAdvanceStatus.Rejected;
+            adv.RejectionReason = await GetLastCommentsAsync(wi.Id, ct);
+            await _context.SaveChangesAsync(ct);
+        }
+    }
+
+    private async Task UpdateExpenseClaimStatusAsync(Domain.Workflows.WorkflowInstance wi, CancellationToken ct)
+    {
+        var claim = await _context.ExpenseClaims.FirstOrDefaultAsync(x => x.Id == wi.EntityId, ct);
+        if (claim == null) return;
+        var approverId = await GetApproverUserIdAsync(wi.Id, ct);
+        if (wi.FinalOutcome == ApprovalAction.Approved)
+        {
+            claim.Status = ExpenseClaimStatus.Approved;
+            claim.ApprovedByUserId = approverId;
+            claim.ApprovedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync(ct);
+            await _publisher.Publish(new RequestFinallyApprovedEvent(
+                WorkflowEntityType.ExpenseClaim, claim.Id, wi.Id, approverId), ct);
+        }
+        else if (wi.FinalOutcome == ApprovalAction.Rejected)
+        {
+            claim.Status = ExpenseClaimStatus.Rejected;
+            claim.RejectionReason = await GetLastCommentsAsync(wi.Id, ct);
+            await _context.SaveChangesAsync(ct);
+        }
+    }
+
+    private async Task UpdateBenefitEnrollmentStatusAsync(Domain.Workflows.WorkflowInstance wi, CancellationToken ct)
+    {
+        var en = await _context.BenefitEnrollments.FirstOrDefaultAsync(x => x.Id == wi.EntityId, ct);
+        if (en == null) return;
+        var approverId = await GetApproverUserIdAsync(wi.Id, ct);
+        if (wi.FinalOutcome == ApprovalAction.Approved)
+        {
+            // BenefitEnrollmentStatus has no "Approved" value; the executor will flip to Active.
+            // Keep the current status (PendingApproval) so the executor's ready-state check
+            // still allows processing; approval tracking is captured on the workflow instance.
+            await _publisher.Publish(new RequestFinallyApprovedEvent(
+                WorkflowEntityType.BenefitEnrollment, en.Id, wi.Id, approverId), ct);
+        }
+        else if (wi.FinalOutcome == ApprovalAction.Rejected)
+        {
+            en.Status = BenefitEnrollmentStatus.Cancelled;
+            en.TerminationReason = "Rejected via workflow";
+            en.TerminationDate = DateTime.UtcNow;
+            await _context.SaveChangesAsync(ct);
+        }
+    }
+
+    private async Task UpdateLetterRequestStatusAsync(Domain.Workflows.WorkflowInstance wi, CancellationToken ct)
+    {
+        var req = await _context.LetterRequests.FirstOrDefaultAsync(x => x.Id == wi.EntityId, ct);
+        if (req == null) return;
+        var approverId = await GetApproverUserIdAsync(wi.Id, ct);
+        if (wi.FinalOutcome == ApprovalAction.Approved)
+        {
+            req.Status = LetterRequestStatus.Approved;
+            req.ApprovedByUserId = approverId;
+            req.ApprovedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync(ct);
+            await _publisher.Publish(new RequestFinallyApprovedEvent(
+                WorkflowEntityType.LetterRequest, req.Id, wi.Id, approverId), ct);
+        }
+        else if (wi.FinalOutcome == ApprovalAction.Rejected)
+        {
+            req.Status = LetterRequestStatus.Rejected;
+            req.RejectionReason = await GetLastCommentsAsync(wi.Id, ct);
+            await _context.SaveChangesAsync(ct);
+        }
+    }
+
+    private async Task<long?> GetApproverUserIdAsync(long workflowInstanceId, CancellationToken ct)
+    {
+        var last = await _context.WorkflowStepExecutions
+            .Where(x => x.WorkflowInstanceId == workflowInstanceId && x.Action.HasValue)
+            .OrderByDescending(x => x.ActionTakenAt)
+            .FirstOrDefaultAsync(ct);
+        return last?.ActionTakenByUserId ?? last?.AssignedToUserId;
+    }
+
+    private async Task<string?> GetLastCommentsAsync(long workflowInstanceId, CancellationToken ct)
+    {
+        var last = await _context.WorkflowStepExecutions
+            .Where(x => x.WorkflowInstanceId == workflowInstanceId && x.Action.HasValue)
+            .OrderByDescending(x => x.ActionTakenAt)
+            .FirstOrDefaultAsync(ct);
+        return last?.Comments;
     }
 
     private async Task UpdateVacationStatusAsync(Domain.Workflows.WorkflowInstance workflowInstance, CancellationToken cancellationToken)

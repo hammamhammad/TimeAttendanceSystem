@@ -184,7 +184,7 @@ export class ApprovalsService {
 
   /**
    * v13.6 — Resubmit a workflow that was previously returned for correction.
-   * Only the original requester may invoke. Capped by TenantSettings.MaxWorkflowResubmissions.
+   * Only the original requester may invoke. Capped by CompanySettings.MaxWorkflowResubmissions.
    */
   resubmit(workflowInstanceId: number, comments?: string): Observable<void> {
     const payload: ResubmitRequest = { comments };

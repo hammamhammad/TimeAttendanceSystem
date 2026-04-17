@@ -34,7 +34,7 @@ export class SalaryAdvancesComponent implements OnInit {
     { key: 'employeeName', label: this.i18n.t('salary_advances.employee'), sortable: true, priority: 'high' },
     { key: 'requestedAmount', label: this.i18n.t('salary_advances.requested_amount'), sortable: true, priority: 'high' },
     { key: 'approvedAmount', label: this.i18n.t('salary_advances.approved_amount'), sortable: true, priority: 'medium' },
-    { key: 'deductionMonth', label: this.i18n.t('salary_advances.deduction_month'), sortable: true, priority: 'medium' },
+    { key: 'deductionStartDate', label: this.i18n.t('salary_advances.deduction_start_date'), sortable: true, priority: 'medium' },
     { key: 'status', label: this.i18n.t('common.status'), sortable: true, priority: 'high' }
   ];
 

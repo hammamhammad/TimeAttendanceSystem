@@ -30,7 +30,7 @@ public class OvertimeConfigurationService : IOvertimeConfigurationService
     private async Task<int> GetMaxFutureDaysAsync(CancellationToken ct)
     {
         if (_cachedMaxFutureDays.HasValue) return _cachedMaxFutureDays.Value;
-        var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync(s => !s.IsDeleted, ct);
+        var settings = await _context.CompanySettings.AsNoTracking().FirstOrDefaultAsync(s => !s.IsDeleted, ct);
         _cachedMaxFutureDays = settings?.OvertimeConfigMaxFutureDays > 0 ? settings.OvertimeConfigMaxFutureDays : 30;
         return _cachedMaxFutureDays.Value;
     }

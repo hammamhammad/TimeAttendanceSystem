@@ -38,7 +38,7 @@ public class OverdueAssetReturnAlertJob : IInvocable
         try
         {
             var today = DateTime.UtcNow.Date;
-            var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync();
+            var settings = await _context.CompanySettings.AsNoTracking().FirstOrDefaultAsync();
             var alertDays = BackgroundJobSettingsHelper.ParseCsvDays(settings?.AssetOverdueReturnAlertDaysCsv, DefaultAlertDays);
 
             // HR recipients via resolver, with legacy "Admin" extension preserved.

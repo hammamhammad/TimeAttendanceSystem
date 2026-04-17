@@ -110,7 +110,7 @@ public interface IPasswordService
 
     /// <summary>
     /// Validates password strength with a caller-supplied minimum-length override (typically
-    /// resolved from <c>TenantSettings.PasswordMinLength</c>). Falls back to the built-in
+    /// resolved from <c>CompanySettings.PasswordMinLength</c>). Falls back to the built-in
     /// minimum (8) if <paramref name="minLength"/> is smaller.
     /// </summary>
     Result ValidatePasswordStrength(string password, int minLength);

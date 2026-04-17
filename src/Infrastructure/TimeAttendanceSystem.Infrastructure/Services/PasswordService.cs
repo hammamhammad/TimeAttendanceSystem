@@ -117,7 +117,7 @@ public class PasswordService : IPasswordService
     /// <summary>
     /// Validates password strength with an explicit minimum-length threshold.
     /// Callers (LoginCommandHandler, RegisterCommandHandler, etc.) resolve the tenant-configured
-    /// <c>TenantSettings.PasswordMinLength</c> and pass it here.
+    /// <c>CompanySettings.PasswordMinLength</c> and pass it here.
     /// </summary>
     public Result ValidatePasswordStrength(string password, int minLength)
     {

@@ -11,7 +11,7 @@ namespace TecAxle.Hrms.Infrastructure.BackgroundJobs;
 /// <summary>
 /// Daily job with two responsibilities:
 /// 1. Send alert notifications for contracts expiring within the tenant-configured windows
-///    (<see cref="Domain.Tenants.TenantSettings.ContractExpiryAlertDaysCsv"/>, default "30,15,7").
+///    (<see cref="Domain.Company.CompanySettings.ContractExpiryAlertDaysCsv"/>, default "30,15,7").
 /// 2. v13.5: for contracts whose <c>EndDate &lt;= today</c> and <c>Status == Active</c>, publish a
 ///    <see cref="ContractExpiredEvent"/> so the lifecycle handler applies the tenant-configured
 ///    <c>ContractExpiredAction</c> (NotifyOnly / AutoMarkExpired / Suspend / Deactivate).
@@ -46,7 +46,7 @@ public class ContractExpiryAlertJob : IInvocable
         try
         {
             var today = DateTime.UtcNow.Date;
-            var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync();
+            var settings = await _context.CompanySettings.AsNoTracking().FirstOrDefaultAsync();
             var alertDays = BackgroundJobSettingsHelper.ParseCsvDays(settings?.ContractExpiryAlertDaysCsv, DefaultAlertDays);
 
             var hrUserIds = await _recipientResolver.GetRecipientUserIdsAsync();

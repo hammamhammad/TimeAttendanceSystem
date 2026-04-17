@@ -5,7 +5,7 @@ namespace TecAxle.Hrms.Application.AttendanceCorrections.Commands.UpdateAttendan
 
 /// <summary>
 /// Validator for UpdateAttendanceCorrectionRequestCommand. Retroactive-window cap uses
-/// the tenant-configured <c>TenantSettings.AttendanceCorrectionMaxRetroactiveDays</c> (default 30).
+/// the tenant-configured <c>CompanySettings.AttendanceCorrectionMaxRetroactiveDays</c> (default 30).
 /// </summary>
 public class UpdateAttendanceCorrectionRequestCommandValidator : AbstractValidator<UpdateAttendanceCorrectionRequestCommand>
 {

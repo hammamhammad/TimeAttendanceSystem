@@ -6,7 +6,7 @@ namespace TecAxle.Hrms.Application.Shifts.Commands.CreateShift;
 
 /// <summary>
 /// FluentValidation validator for CreateShiftCommand. Grace-period cap uses the tenant-configured
-/// <c>TenantSettings.MaxShiftGracePeriodMinutes</c> (default 120) rather than a hardcoded 120.
+/// <c>CompanySettings.MaxShiftGracePeriodMinutes</c> (default 120) rather than a hardcoded 120.
 /// </summary>
 public class CreateShiftCommandValidator : AbstractValidator<CreateShiftCommand>
 {

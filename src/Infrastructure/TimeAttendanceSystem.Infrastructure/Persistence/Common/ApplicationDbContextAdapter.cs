@@ -14,7 +14,7 @@ using TecAxle.Hrms.Domain.RemoteWork;
 using TecAxle.Hrms.Domain.Workflows;
 using TecAxle.Hrms.Domain.LeaveManagement;
 using TecAxle.Hrms.Domain.Notifications;
-using TecAxle.Hrms.Domain.Tenants;
+using TecAxle.Hrms.Domain.Company;
 using TecAxle.Hrms.Domain.Payroll;
 using TecAxle.Hrms.Domain.Offboarding;
 using TecAxle.Hrms.Domain.Recruitment;
@@ -300,13 +300,17 @@ public class ApplicationDbContextAdapter : IApplicationDbContext
     public DbSet<OffDay> OffDays => _context.OffDays;
 
     // Company Configuration
-    public DbSet<TenantSettings> TenantSettings => _context.TenantSettings;
+    public DbSet<CompanySettings> CompanySettings => _context.CompanySettings;
     public DbSet<BranchSettingsOverride> BranchSettingsOverrides => _context.BranchSettingsOverrides;
     public DbSet<DepartmentSettingsOverride> DepartmentSettingsOverrides => _context.DepartmentSettingsOverrides;
 
     // v13.5 Lifecycle Automation
     public DbSet<TecAxle.Hrms.Domain.Lifecycle.LifecycleAutomationAudit> LifecycleAutomationAudits
         => _context.LifecycleAutomationAudits;
+
+    // Phase 1 (v14.1) Operational failure alerts
+    public DbSet<TecAxle.Hrms.Domain.Operations.OperationalFailureAlert> OperationalFailureAlerts
+        => _context.OperationalFailureAlerts;
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
@@ -321,4 +325,12 @@ public class ApplicationDbContextAdapter : IApplicationDbContext
     {
         _context.ChangeTracker.Clear();
     }
+
+    /// <summary>
+    /// Phase 1 (v14.1): Delegates to the underlying DbContext. Null when the provider
+    /// doesn't support real transactions (e.g. EF InMemory for unit tests).
+    /// </summary>
+    public Task<Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction?> BeginTransactionAsync(
+        CancellationToken cancellationToken = default)
+        => _context.BeginTransactionAsync(cancellationToken);
 }

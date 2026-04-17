@@ -14,11 +14,16 @@ public class LoanApplicationsController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
     private readonly ICurrentUser _currentUser;
+    private readonly ILoanPolicyValidator _policyValidator;
 
-    public LoanApplicationsController(IApplicationDbContext context, ICurrentUser currentUser)
+    public LoanApplicationsController(
+        IApplicationDbContext context,
+        ICurrentUser currentUser,
+        ILoanPolicyValidator policyValidator)
     {
         _context = context;
         _currentUser = currentUser;
+        _policyValidator = policyValidator;
     }
 
     [HttpGet]
@@ -123,11 +128,13 @@ public class LoanApplicationsController : ControllerBase
         if (loan.Status != LoanApplicationStatus.Draft)
             return BadRequest(new { error = "Only draft applications can be submitted." });
 
-        // Check concurrent loans
-        var activeLoans = await _context.LoanApplications
-            .CountAsync(x => x.EmployeeId == loan.EmployeeId
-                && (x.Status == LoanApplicationStatus.Active || x.Status == LoanApplicationStatus.Approved)
-                && !x.IsDeleted);
+        // Phase 2 completion: enforce LoanPolicy constraints (MaxConcurrentLoans,
+        // MinServiceMonths, MaxPercentageOfSalary) before transitioning to Pending.
+        // The old hand-rolled "Check concurrent loans" count here was never actually
+        // compared against anything — it was dead code. Replaced with full policy eval.
+        var policyResult = await _policyValidator.ValidateAsync(loan.Id);
+        if (policyResult.IsFailure)
+            return BadRequest(new { error = policyResult.Error });
 
         loan.Status = LoanApplicationStatus.Pending;
         loan.ModifiedAtUtc = DateTime.UtcNow;

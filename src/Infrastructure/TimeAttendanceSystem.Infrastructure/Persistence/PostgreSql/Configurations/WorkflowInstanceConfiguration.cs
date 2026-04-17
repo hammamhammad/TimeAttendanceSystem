@@ -91,7 +91,7 @@ public class WorkflowInstanceConfiguration : IEntityTypeConfiguration<WorkflowIn
         builder.Property(wi => wi.ResubmissionCount)
             .IsRequired()
             .HasDefaultValue(0)
-            .HasComment("Resubmission counter; capped by TenantSettings.MaxWorkflowResubmissions (v13.6)");
+            .HasComment("Resubmission counter; capped by CompanySettings.MaxWorkflowResubmissions (v13.6)");
 
         // Relationships
         builder.HasOne(wi => wi.ReturnedByUser)

@@ -5,7 +5,7 @@ namespace TecAxle.Hrms.Application.EmployeeVacations.Commands.CreateBulkEmployee
 
 /// <summary>
 /// Validator for CreateBulkEmployeeVacationCommand. Future-planning window and max-period are
-/// tenant-configurable via <c>TenantSettings.MaxVacationFuturePlanningYears</c> and
+/// tenant-configurable via <c>CompanySettings.MaxVacationFuturePlanningYears</c> and
 /// <c>MaxVacationDaysPerRequest</c> (both with sensible defaults preserving pre-v13.3 behavior).
 /// </summary>
 public class CreateBulkEmployeeVacationCommandValidator : AbstractValidator<CreateBulkEmployeeVacationCommand>

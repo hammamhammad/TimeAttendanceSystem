@@ -4,7 +4,9 @@ using TecAxle.Hrms.Application.Abstractions;
 using TecAxle.Hrms.Application.Common;
 using TecAxle.Hrms.Application.Payroll.Exceptions;
 using TecAxle.Hrms.Application.Payroll.Services;
+using TecAxle.Hrms.Domain.Benefits;
 using TecAxle.Hrms.Domain.Common;
+using TecAxle.Hrms.Domain.Operations;
 using TecAxle.Hrms.Domain.Payroll;
 
 namespace TecAxle.Hrms.Application.PayrollPeriods.Commands.ProcessPayrollPeriod;
@@ -13,24 +15,42 @@ namespace TecAxle.Hrms.Application.PayrollPeriods.Commands.ProcessPayrollPeriod;
 /// Orchestrates payroll processing for a period. Delegates all arithmetic to
 /// <see cref="IPayrollCalculationService"/>. Opens a <see cref="PayrollRunAudit"/>
 /// row, iterates employees, persists results and per-employee audit items,
-/// and integrates loan/advance/expense reimbursement side-effects.
+/// and integrates loan/advance/expense/benefit side-effects.
 ///
 /// Handles both:
 ///   - Initial processing: period.Status must be Draft.
 ///   - Recalculation:     period.Status must be Processed AND <c>request.IsRecalculation</c> is true.
 /// Finalized/Paid periods CANNOT be processed — explicitly rejected.
+///
+/// Phase 1 (v14.1) changes:
+///   - Per-employee work (calculate + side-effects + linking) is wrapped in a DB transaction
+///     so that a failure never leaves loans marked Paid without a PayrollRecord (transactional
+///     side-effect safety).
+///   - SalaryAdvance matching prefers DeductionStartDate/EndDate (date range) over the legacy
+///     YYYYMM DeductionMonth integer.
+///   - Expense reimbursement integration requires the claim to have been approved on or before
+///     the period end (claim-date validation) to avoid double-reimbursement of stale claims.
+///   - Benefit enrollment payroll deductions are integrated (employee premium only; employer-side
+///     is already tracked on <see cref="BenefitEnrollment.EmployerMonthlyContribution"/>).
+///   - Per-employee failures raise an <see cref="OperationalFailureAlert"/> so HR sees them.
 /// </summary>
 public class ProcessPayrollPeriodCommandHandler : BaseHandler<ProcessPayrollPeriodCommand, Result<long>>
 {
     private readonly IPayrollCalculationService _calculator;
+    private readonly IFailureAlertService _alerts;
+    private readonly IPayrollSideEffectReverser _sideEffectReverser;
 
     public ProcessPayrollPeriodCommandHandler(
         IApplicationDbContext context,
         ICurrentUser currentUser,
-        IPayrollCalculationService calculator)
+        IPayrollCalculationService calculator,
+        IFailureAlertService alerts,
+        IPayrollSideEffectReverser sideEffectReverser)
         : base(context, currentUser)
     {
         _calculator = calculator;
+        _alerts = alerts;
+        _sideEffectReverser = sideEffectReverser;
     }
 
     public override async Task<Result<long>> Handle(ProcessPayrollPeriodCommand request, CancellationToken cancellationToken)
@@ -78,11 +98,23 @@ public class ProcessPayrollPeriodCommandHandler : BaseHandler<ProcessPayrollPeri
             {
                 if (existing.LockedAtUtc.HasValue || existing.Status == PayrollRecordStatus.Finalized)
                     continue; // never overwrite a locked record
+
+                // Phase 2 (v14.2): reverse side-effects (loans/advances/expenses) BEFORE
+                // soft-deleting the PayrollRecord, so the fresh calc run sees a clean slate
+                // and won't double-deduct or skip linked rows already stuck on the old record.
+                await _sideEffectReverser.ReverseAsync(existing.Id, "recalc supersede", cancellationToken);
+
                 existing.IsDeleted = true;
                 existing.ModifiedAtUtc = DateTime.UtcNow;
                 existing.ModifiedBy = CurrentUser.Username ?? "SYSTEM";
                 existing.Notes = (existing.Notes ?? "") + $" | Superseded by recalc on {DateTime.UtcNow:O}";
             }
+
+            // Phase 2 (v14.2): cascade-soft-delete orphaned PayrollRecordDetail rows that
+            // were attached to just-superseded (or previously superseded) records. Keeps the
+            // detail table clean — no misleading "Benefit Premium" line orphaned under a
+            // soft-deleted parent record.
+            await _sideEffectReverser.CascadeDeleteDetailsAsync(period.Id, cancellationToken);
         }
 
         // ---- Load active employees ----
@@ -112,14 +144,18 @@ public class ProcessPayrollPeriodCommandHandler : BaseHandler<ProcessPayrollPeri
                 CreatedBy = CurrentUser.Username ?? "SYSTEM"
             };
 
+            // Phase 1 (v14.1): per-employee transactional boundary spanning
+            // calculation + side-effects + linking. Partial failure rolls back.
+            var tx = await Context.BeginTransactionAsync(cancellationToken);
             try
             {
                 var calc = await _calculator.CalculateAsync(emp, period, empAdjustments, cancellationToken);
 
-                // --- Integrate external module side-effects (loans, advances, reimbursements) BEFORE final net total ---
+                // --- Integrate external module side-effects (loans, advances, reimbursements, benefits) BEFORE final net total ---
                 await IntegrateLoanRepaymentsAsync(emp, period, calc, cancellationToken);
                 await IntegrateSalaryAdvancesAsync(emp, period, calc, cancellationToken);
-                await IntegrateExpenseReimbursementsAsync(emp, calc, cancellationToken);
+                await IntegrateExpenseReimbursementsAsync(emp, period, calc, cancellationToken);
+                await IntegrateBenefitDeductionsAsync(emp, period, calc, cancellationToken);
 
                 // Recompute totals after side-effects may have added detail lines.
                 RecomputeTotalsFromDetails(calc);
@@ -183,18 +219,52 @@ public class ProcessPayrollPeriodCommandHandler : BaseHandler<ProcessPayrollPeri
                 totalDeductions += calc.TotalDeductions;
                 totalNet += calc.NetSalary;
                 employeeCount++;
+
+                if (tx != null) await tx.CommitAsync(cancellationToken);
             }
             catch (PayrollCalculationException pex)
             {
+                if (tx != null) await tx.RollbackAsync(cancellationToken);
                 auditItem.Status = PayrollRunItemStatus.FailedWithError;
                 auditItem.ErrorMessage = pex.Message;
                 errorsAll.Add(new { employeeId = emp.Id, category = pex.Category, error = pex.Message });
+
+                await _alerts.RaiseAsync(new RaiseFailureAlertRequest
+                {
+                    Category = OperationalFailureCategory.PayrollProcessing,
+                    SourceEntityType = "PayrollPeriod",
+                    SourceEntityId = period.Id,
+                    EmployeeId = emp.Id,
+                    FailureCode = pex.Category ?? "CalculationError",
+                    Reason = $"Payroll calculation failed for employee #{emp.Id} in period {period.StartDate:yyyy-MM}.",
+                    ErrorMessage = pex.Message,
+                    Severity = OperationalFailureSeverity.Error,
+                    IsRetryable = true
+                }, cancellationToken);
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
+                if (tx != null) await tx.RollbackAsync(cancellationToken);
                 auditItem.Status = PayrollRunItemStatus.FailedWithError;
                 auditItem.ErrorMessage = ex.Message;
                 errorsAll.Add(new { employeeId = emp.Id, category = "Unexpected", error = ex.Message });
+
+                await _alerts.RaiseAsync(new RaiseFailureAlertRequest
+                {
+                    Category = OperationalFailureCategory.PayrollProcessing,
+                    SourceEntityType = "PayrollPeriod",
+                    SourceEntityId = period.Id,
+                    EmployeeId = emp.Id,
+                    FailureCode = "UnhandledException",
+                    Reason = $"Unhandled exception while processing payroll for employee #{emp.Id}.",
+                    ErrorMessage = ex.Message,
+                    Severity = OperationalFailureSeverity.Error,
+                    IsRetryable = true
+                }, cancellationToken);
+            }
+            finally
+            {
+                tx?.Dispose();
             }
 
             Context.PayrollRunAuditItems.Add(auditItem);
@@ -230,11 +300,14 @@ public class ProcessPayrollPeriodCommandHandler : BaseHandler<ProcessPayrollPeri
 
     private async Task IntegrateLoanRepaymentsAsync(Domain.Employees.Employee emp, PayrollPeriod period, TecAxle.Hrms.Application.Payroll.Models.PayrollCalculationResult calc, CancellationToken ct)
     {
+        // Match by date range: any scheduled repayment whose DueDate falls inside the payroll period.
+        var periodStart = period.StartDate.Date;
+        var periodEnd = period.EndDate.Date;
         var dueRepayments = await Context.LoanRepayments
             .Include(r => r.LoanApplication)
             .Where(r => r.Status == LoanRepaymentStatus.Scheduled
-                && r.DueDate.Month == period.StartDate.Month
-                && r.DueDate.Year == period.StartDate.Year
+                && r.DueDate.Date >= periodStart
+                && r.DueDate.Date <= periodEnd
                 && r.LoanApplication.EmployeeId == emp.Id
                 && r.PayrollRecordId == null
                 && !r.IsDeleted && !r.LoanApplication.IsDeleted)
@@ -256,13 +329,22 @@ public class ProcessPayrollPeriodCommandHandler : BaseHandler<ProcessPayrollPeri
 
     private async Task IntegrateSalaryAdvancesAsync(Domain.Employees.Employee emp, PayrollPeriod period, TecAxle.Hrms.Application.Payroll.Models.PayrollCalculationResult calc, CancellationToken ct)
     {
-        var periodMonth = period.StartDate.Year * 100 + period.StartDate.Month;
+        // Phase 1 (v14.1): date-range matching over DeductionStartDate/EndDate. Correctly
+        // handles payroll periods that straddle month boundaries (e.g. Apr 20 → May 20).
+        // Phase 7 (v14.7): the legacy YYYYMM `DeductionMonth` fallback branch was removed
+        // after the pre-drop migration back-filled every row to the date-range pair.
+        var periodStart = period.StartDate.Date;
+        var periodEnd = period.EndDate.Date;
+
         var approvedAdvances = await Context.SalaryAdvances
             .Where(a => a.EmployeeId == emp.Id
                 && a.Status == SalaryAdvanceStatus.Approved
-                && a.DeductionMonth == periodMonth
                 && a.PayrollRecordId == null
-                && !a.IsDeleted)
+                && !a.IsDeleted
+                && a.DeductionStartDate != null
+                && a.DeductionEndDate != null
+                && a.DeductionStartDate.Value.Date <= periodEnd
+                && a.DeductionEndDate.Value.Date >= periodStart)
             .ToListAsync(ct);
 
         foreach (var advance in approvedAdvances)
@@ -279,14 +361,19 @@ public class ProcessPayrollPeriodCommandHandler : BaseHandler<ProcessPayrollPeri
         }
     }
 
-    private async Task IntegrateExpenseReimbursementsAsync(Domain.Employees.Employee emp, TecAxle.Hrms.Application.Payroll.Models.PayrollCalculationResult calc, CancellationToken ct)
+    private async Task IntegrateExpenseReimbursementsAsync(Domain.Employees.Employee emp, PayrollPeriod period, TecAxle.Hrms.Application.Payroll.Models.PayrollCalculationResult calc, CancellationToken ct)
     {
+        // Phase 1 (v14.1): require ExpenseClaim.ApprovedAt <= period.EndDate to prevent stale
+        // claims from being re-reimbursed months after their approval window.
+        var periodEnd = period.EndDate.Date;
         var pending = await Context.ExpenseReimbursements
             .Include(r => r.ExpenseClaim)
             .Where(r => r.Method == ReimbursementMethod.Payroll
                 && r.PayrollRecordId == null
                 && r.ExpenseClaim.EmployeeId == emp.Id
                 && r.ExpenseClaim.Status == ExpenseClaimStatus.Approved
+                && r.ExpenseClaim.ApprovedAt != null
+                && r.ExpenseClaim.ApprovedAt.Value.Date <= periodEnd
                 && !r.IsDeleted && !r.ExpenseClaim.IsDeleted)
             .ToListAsync(ct);
 
@@ -304,14 +391,71 @@ public class ProcessPayrollPeriodCommandHandler : BaseHandler<ProcessPayrollPeri
         }
     }
 
+    /// <summary>
+    /// Phase 1 (v14.1): Integrate active benefit enrollments with payroll deduction enabled.
+    /// Adds a single "Benefit Premium" deduction line per enrollment for the employee premium.
+    /// Idempotency: we only add a detail line here; no enrollment state is mutated, so payroll
+    /// recalculation on the same period is safe.
+    /// </summary>
+    private async Task IntegrateBenefitDeductionsAsync(Domain.Employees.Employee emp, PayrollPeriod period, TecAxle.Hrms.Application.Payroll.Models.PayrollCalculationResult calc, CancellationToken ct)
+    {
+        var periodStart = period.StartDate.Date;
+        var periodEnd = period.EndDate.Date;
+        var enrollments = await Context.BenefitEnrollments
+            .Include(e => e.BenefitPlan)
+            .Where(e => !e.IsDeleted
+                        && e.EmployeeId == emp.Id
+                        && e.Status == BenefitEnrollmentStatus.Active
+                        && e.PayrollDeductionEnabled
+                        && e.EmployeeMonthlyContribution > 0
+                        && e.EffectiveDate.Date <= periodEnd
+                        && (e.TerminationDate == null || e.TerminationDate.Value.Date >= periodStart))
+            .ToListAsync(ct);
+
+        foreach (var en in enrollments)
+        {
+            var planName = en.BenefitPlan?.Name ?? $"Plan #{en.BenefitPlanId}";
+
+            // Employee premium → deduction line (negative), included in OtherDeductions.
+            calc.Details.Add(new PayrollRecordDetail
+            {
+                ComponentName = $"Benefit Premium: {planName}",
+                ComponentNameAr = $"قسط تأمين: {planName}",
+                ComponentType = SalaryComponentType.OtherDeduction,
+                Amount = -en.EmployeeMonthlyContribution,
+                Notes = $"BenefitEnrollment #{en.Id}"
+            });
+            calc.OtherDeductions += en.EmployeeMonthlyContribution;
+
+            // Phase 1 (v14.1): informational employer-contribution line. Not included in any
+            // total — mirrors the SocialInsuranceEmployer pattern on PayrollRecord. Visible on
+            // payslips and in PayrollRecordDetail queries so finance can reconcile full cost.
+            if (en.EmployerMonthlyContribution > 0)
+            {
+                calc.Details.Add(new PayrollRecordDetail
+                {
+                    ComponentName = $"Employer Benefit Contribution: {planName}",
+                    ComponentNameAr = $"مساهمة صاحب العمل في التأمين: {planName}",
+                    ComponentType = SalaryComponentType.EmployerContribution,
+                    Amount = en.EmployerMonthlyContribution,
+                    Notes = $"Informational only. BenefitEnrollment #{en.Id}"
+                });
+            }
+        }
+    }
+
     private async Task LinkIntegrationsAsync(Domain.Employees.Employee emp, PayrollPeriod period, long payrollRecordId, CancellationToken ct)
     {
-        // Link loan repayments
+        var periodStart = period.StartDate.Date;
+        var periodEnd = period.EndDate.Date;
+        // Phase 7: periodMonth YYYYMM key removed together with SalaryAdvance.DeductionMonth.
+
+        // Link loan repayments (date-range match)
         var dueRepayments = await Context.LoanRepayments
             .Include(r => r.LoanApplication)
             .Where(r => r.Status == LoanRepaymentStatus.Scheduled
-                && r.DueDate.Month == period.StartDate.Month
-                && r.DueDate.Year == period.StartDate.Year
+                && r.DueDate.Date >= periodStart
+                && r.DueDate.Date <= periodEnd
                 && r.LoanApplication.EmployeeId == emp.Id
                 && r.PayrollRecordId == null
                 && !r.IsDeleted && !r.LoanApplication.IsDeleted)
@@ -339,13 +483,16 @@ public class ProcessPayrollPeriodCommandHandler : BaseHandler<ProcessPayrollPeri
             }
         }
 
-        var periodMonth = period.StartDate.Year * 100 + period.StartDate.Month;
+        // Phase 7: date-range matching only; legacy YYYYMM fallback removed.
         var approvedAdvances = await Context.SalaryAdvances
             .Where(a => a.EmployeeId == emp.Id
                 && a.Status == SalaryAdvanceStatus.Approved
-                && a.DeductionMonth == periodMonth
                 && a.PayrollRecordId == null
-                && !a.IsDeleted)
+                && !a.IsDeleted
+                && a.DeductionStartDate != null
+                && a.DeductionEndDate != null
+                && a.DeductionStartDate.Value.Date <= periodEnd
+                && a.DeductionEndDate.Value.Date >= periodStart)
             .ToListAsync(ct);
 
         foreach (var advance in approvedAdvances)
@@ -356,12 +503,15 @@ public class ProcessPayrollPeriodCommandHandler : BaseHandler<ProcessPayrollPeri
             advance.ModifiedBy = CurrentUser.Username ?? "SYSTEM";
         }
 
+        // Link expense reimbursements (with ApprovedAt <= period end filter)
         var reimb = await Context.ExpenseReimbursements
             .Include(r => r.ExpenseClaim)
             .Where(r => r.Method == ReimbursementMethod.Payroll
                 && r.PayrollRecordId == null
                 && r.ExpenseClaim.EmployeeId == emp.Id
                 && r.ExpenseClaim.Status == ExpenseClaimStatus.Approved
+                && r.ExpenseClaim.ApprovedAt != null
+                && r.ExpenseClaim.ApprovedAt.Value.Date <= periodEnd
                 && !r.IsDeleted && !r.ExpenseClaim.IsDeleted)
             .ToListAsync(ct);
 
@@ -375,6 +525,9 @@ public class ProcessPayrollPeriodCommandHandler : BaseHandler<ProcessPayrollPeri
             r.ExpenseClaim.ModifiedAtUtc = DateTime.UtcNow;
             r.ExpenseClaim.ModifiedBy = CurrentUser.Username ?? "SYSTEM";
         }
+
+        // NOTE: BenefitEnrollment is NOT mutated here — deduction is a pure read, re-runnable
+        // across payroll recalculations without cascading state drift.
     }
 
     private static void RecomputeTotalsFromDetails(TecAxle.Hrms.Application.Payroll.Models.PayrollCalculationResult calc)

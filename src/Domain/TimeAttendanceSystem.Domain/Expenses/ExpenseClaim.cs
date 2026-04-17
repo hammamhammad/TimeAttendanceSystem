@@ -19,6 +19,21 @@ public class ExpenseClaim : BaseEntity
     public long? WorkflowInstanceId { get; set; }
     public long? SubmittedByUserId { get; set; }
 
+    /// <summary>
+    /// Phase 1 (v14.1): Chosen reimbursement method when the claim is approved.
+    /// Controls what the ExpenseClaimExecutor produces on execute:
+    /// - Payroll → creates ExpenseReimbursement(Method=Payroll), to be picked up by next payroll run.
+    /// - BankTransfer / Cash → creates ExpenseReimbursement(Method=&lt;non-payroll&gt;) in "payable" state.
+    /// Defaults to Payroll for backward compatibility.
+    /// </summary>
+    public Domain.Common.ReimbursementMethod ReimbursementMethod { get; set; } = Domain.Common.ReimbursementMethod.Payroll;
+
+    // Phase 1 (v14.1): Execution tracking.
+    public bool IsExecuted { get; set; }
+    public DateTime? ExecutedAtUtc { get; set; }
+    public long? ExecutedByUserId { get; set; }
+    public string? ExecutionError { get; set; }
+
     // Navigation
     public Employee Employee { get; set; } = null!;
     public ExpensePolicy? ExpensePolicy { get; set; }

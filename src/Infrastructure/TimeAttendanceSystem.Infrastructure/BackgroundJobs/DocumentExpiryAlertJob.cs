@@ -9,7 +9,7 @@ namespace TecAxle.Hrms.Infrastructure.BackgroundJobs;
 
 /// <summary>
 /// Background job that checks for employee documents expiring within the tenant-configured
-/// alert windows (<see cref="Domain.Tenants.TenantSettings.DocumentExpiryAlertDaysCsv"/>,
+/// alert windows (<see cref="Domain.Company.CompanySettings.DocumentExpiryAlertDaysCsv"/>,
 /// default "30,15,7") and notifies the resolved recipients (via
 /// <see cref="INotificationRecipientResolver"/>).
 /// </summary>
@@ -38,7 +38,7 @@ public class DocumentExpiryAlertJob : IInvocable
         try
         {
             var today = DateTime.UtcNow.Date;
-            var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync();
+            var settings = await _context.CompanySettings.AsNoTracking().FirstOrDefaultAsync();
             var alertDays = BackgroundJobSettingsHelper.ParseCsvDays(settings?.DocumentExpiryAlertDaysCsv, DefaultAlertDays);
 
             var recipientIds = await _recipientResolver.GetRecipientUserIdsAsync();

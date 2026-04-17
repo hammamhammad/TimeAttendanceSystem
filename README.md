@@ -409,7 +409,38 @@ Verifies all sample data was loaded correctly
 
 ---
 
-## 🧪 Testing Checklist
+## 🧪 Testing
+
+### Automated test layers
+
+The test suite is split into three clearly-labelled layers. Each has a
+dedicated script in `scripts/` so contributors don't have to remember which
+`dotnet test` flags to pass.
+
+| Layer | Script (unix) | Script (win) | Requires Postgres | What runs |
+|---|---|---|---|---|
+| Backend unit | `./scripts/test-backend-unit.sh` | — | No (auto-skips Postgres tests) | Everything in `./TimeAttendanceSystem.sln`. Tests marked with `[PostgresRequiredFact]` are auto-skipped when `HRMS_INTEGRATION_DB` is unset and no local Postgres is reachable. |
+| Backend integration | `./scripts/test-backend-integration.sh` | — | Yes (local or CI service container) | `PayrollTransactionRollbackTests` against real Postgres transactions, FK constraints, and migrations. See `PostgresTestHarness`. |
+| Frontend | `./scripts/test-frontend.sh` | — | No | Karma + Jasmine specs for `time-attendance-frontend` via headless Chrome. |
+| All layers | `./scripts/test-all.sh` | `pwsh ./scripts/test-all.ps1` | Optional — auto-skips Postgres tests when unreachable | Runs all three scripts in sequence. |
+
+### Configuring the Postgres integration harness
+
+`PostgresTestHarness` provisions a disposable `tecaxle_test_{guid}` database per
+test class and drops it on tear-down. Point it at any Postgres cluster you have
+CREATEDB rights on via the `HRMS_INTEGRATION_DB` env-var:
+
+```bash
+export HRMS_INTEGRATION_DB="Host=localhost;Port=5432;Username=postgres;Password=..."
+./scripts/test-backend-integration.sh
+```
+
+If unset, the harness falls back to the default dev connection string
+(`localhost:5432` + `postgres` / `P@ssw0rd@3213`). In CI, GitHub Actions
+(`.github/workflows/ci.yml`) runs these tests against a Postgres 18 service
+container in a dedicated `backend-integration` job.
+
+### Manual post-deploy smoke test
 
 After starting all applications:
 - [ ] Backend: Visit http://localhost:5099/swagger for API documentation

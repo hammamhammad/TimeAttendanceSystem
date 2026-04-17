@@ -366,6 +366,24 @@ public class PerformanceReviewsController : ControllerBase
         if (review.Status != ReviewStatus.ManagerReviewCompleted && review.Status != ReviewStatus.Approved)
             return BadRequest(new { error = "Review must be completed or approved to recommend promotion." });
 
+        // Phase 2 completion: idempotency guard. A review can recommend exactly one promotion.
+        // If one already exists and is still Pending, return the existing id (idempotent) so
+        // duplicate clicks from the UI don't spawn duplicate pending promotions. If the prior
+        // recommendation was Approved/Rejected the caller must create a new review.
+        if (review.RelatedPromotionId.HasValue)
+        {
+            var existing = await _context.EmployeePromotions.AsNoTracking()
+                .Where(p => p.Id == review.RelatedPromotionId.Value && !p.IsDeleted)
+                .Select(p => new { p.Id, p.Status })
+                .FirstOrDefaultAsync();
+            if (existing != null)
+            {
+                if (existing.Status == PromotionStatus.Pending)
+                    return Ok(new { promotionId = existing.Id, message = "Existing pending promotion returned (idempotent)." });
+                return Conflict(new { error = $"Review already has a prior promotion recommendation #{existing.Id} in status {existing.Status}." });
+            }
+        }
+
         var employee = review.Employee;
 
         var promotion = new EmployeePromotion
@@ -415,6 +433,23 @@ public class PerformanceReviewsController : ControllerBase
         if (review.Status != ReviewStatus.ManagerReviewCompleted && review.Status != ReviewStatus.Approved)
             return BadRequest(new { error = "Review must be completed or approved to recommend salary increase." });
 
+        // Phase 2 completion: idempotency guard — mirror of recommend-promotion. A review
+        // has at most one pending salary adjustment; a second call with an existing pending
+        // one returns the same id. Terminal-state prior adjustments block re-recommendation.
+        if (review.RelatedSalaryAdjustmentId.HasValue)
+        {
+            var existing = await _context.SalaryAdjustments.AsNoTracking()
+                .Where(a => a.Id == review.RelatedSalaryAdjustmentId.Value && !a.IsDeleted)
+                .Select(a => new { a.Id, a.Status })
+                .FirstOrDefaultAsync();
+            if (existing != null)
+            {
+                if (existing.Status == SalaryAdjustmentStatus.Pending)
+                    return Ok(new { salaryAdjustmentId = existing.Id, message = "Existing pending salary adjustment returned (idempotent)." });
+                return Conflict(new { error = $"Review already has a prior salary adjustment #{existing.Id} in status {existing.Status}." });
+            }
+        }
+
         var adjustmentAmount = request.NewBaseSalary - request.CurrentBaseSalary;
         var percentageChange = request.CurrentBaseSalary > 0
             ? Math.Round((adjustmentAmount / request.CurrentBaseSalary) * 100, 2)
@@ -460,6 +495,22 @@ public class PerformanceReviewsController : ControllerBase
 
         if (review == null)
             return NotFound(new { error = "Performance review not found." });
+
+        // Phase 2 completion: idempotency guard — a review can spawn at most one PIP.
+        // Active/Draft PIP returns same id; terminal PIPs block re-creation.
+        if (review.RelatedPipId.HasValue)
+        {
+            var existing = await _context.PerformanceImprovementPlans.AsNoTracking()
+                .Where(p => p.Id == review.RelatedPipId.Value && !p.IsDeleted)
+                .Select(p => new { p.Id, p.Status })
+                .FirstOrDefaultAsync();
+            if (existing != null)
+            {
+                if (existing.Status == PipStatus.Draft || existing.Status == PipStatus.Active)
+                    return Ok(new { pipId = existing.Id, message = "Existing PIP returned (idempotent)." });
+                return Conflict(new { error = $"Review already has a prior PIP #{existing.Id} in terminal state {existing.Status}." });
+            }
+        }
 
         var pip = new PerformanceImprovementPlan
         {

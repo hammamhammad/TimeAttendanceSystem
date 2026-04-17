@@ -20,20 +20,20 @@ public class AttendanceCalculationService : IAttendanceCalculationService
     private readonly IApplicationDbContext _context;
     private readonly IOvertimeConfigurationService _overtimeConfigService;
     private readonly IPublicHolidayService _publicHolidayService;
-    private readonly ITenantSettingsResolver? _tenantSettingsResolver;
+    private readonly ICompanySettingsResolver? _companySettingsResolver;
     private readonly ILogger<AttendanceCalculationService>? _logger;
 
     public AttendanceCalculationService(
         IApplicationDbContext context,
         IOvertimeConfigurationService overtimeConfigService,
         IPublicHolidayService publicHolidayService,
-        ITenantSettingsResolver? tenantSettingsResolver = null,
+        ICompanySettingsResolver? companySettingsResolver = null,
         ILogger<AttendanceCalculationService>? logger = null)
     {
         _context = context;
         _overtimeConfigService = overtimeConfigService;
         _publicHolidayService = publicHolidayService;
-        _tenantSettingsResolver = tenantSettingsResolver;
+        _companySettingsResolver = companySettingsResolver;
         _logger = logger;
     }
 
@@ -872,7 +872,7 @@ public class AttendanceCalculationService : IAttendanceCalculationService
             // Grace Period Business Rules:
             // - If late entry <= grace period: No delay counted (0 late minutes)
             // - If late entry > grace period: Count the FULL late time (not reduced by grace period)
-            // Priority: Shift-level grace period → TenantSettings grace period → 0
+            // Priority: Shift-level grace period → CompanySettings grace period → 0
             var graceMinutes = shift?.GracePeriodMinutes
                 ?? await GetTenantLateGracePeriodAsync(cancellationToken)
                 ?? 0;
@@ -965,7 +965,7 @@ public class AttendanceCalculationService : IAttendanceCalculationService
         if (earlyMinutes <= 0)
             return 0;
 
-        // Apply early leave grace period from TenantSettings
+        // Apply early leave grace period from CompanySettings
         var earlyLeaveGrace = await GetTenantEarlyLeaveGracePeriodAsync(cancellationToken) ?? 0;
         if (earlyMinutes <= earlyLeaveGrace)
             return 0;
@@ -1318,33 +1318,33 @@ public class AttendanceCalculationService : IAttendanceCalculationService
         bool IsFullDayExcuse,
         ExcuseType? DominantExcuseType);
 
-    // ── TenantSettings Helpers ────────────────────────────────
+    // ── CompanySettings Helpers ────────────────────────────────
 
     /// <summary>
-    /// Gets the tenant-level late grace period from TenantSettings.
+    /// Gets the tenant-level late grace period from CompanySettings.
     /// Returns null if resolver is not available or no settings configured.
     /// Shift-level grace period takes priority over this.
     /// </summary>
     private async Task<int?> GetTenantLateGracePeriodAsync(CancellationToken ct)
     {
-        if (_tenantSettingsResolver == null) return null;
+        if (_companySettingsResolver == null) return null;
         try
         {
-            var resolved = await _tenantSettingsResolver.GetSettingsAsync(ct: ct);
+            var resolved = await _companySettingsResolver.GetSettingsAsync(ct: ct);
             return resolved.LateGracePeriodMinutes > 0 ? resolved.LateGracePeriodMinutes : null;
         }
         catch { return null; }
     }
 
     /// <summary>
-    /// Gets the company-level early leave grace period from TenantSettings.
+    /// Gets the company-level early leave grace period from CompanySettings.
     /// </summary>
     private async Task<int?> GetTenantEarlyLeaveGracePeriodAsync(CancellationToken ct)
     {
-        if (_tenantSettingsResolver == null) return null;
+        if (_companySettingsResolver == null) return null;
         try
         {
-            var resolved = await _tenantSettingsResolver.GetSettingsAsync(ct: ct);
+            var resolved = await _companySettingsResolver.GetSettingsAsync(ct: ct);
             return resolved.EarlyLeaveGracePeriodMinutes > 0 ? resolved.EarlyLeaveGracePeriodMinutes : null;
         }
         catch { return null; }

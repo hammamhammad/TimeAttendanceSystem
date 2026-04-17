@@ -38,7 +38,7 @@ public class SuccessionPlanReviewReminderJob : IInvocable
         try
         {
             var today = DateTime.UtcNow.Date;
-            var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync();
+            var settings = await _context.CompanySettings.AsNoTracking().FirstOrDefaultAsync();
             var reminderDays = BackgroundJobSettingsHelper.ParseCsvDays(settings?.SuccessionPlanReminderDaysCsv, DefaultReminderDays);
 
             // Resolve recipients once (legacy "HR" / "Admin" preserved as extras for backward-compat).

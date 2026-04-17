@@ -9,7 +9,7 @@ namespace TecAxle.Hrms.Application.Abstractions;
 /// <remarks>
 /// Resolution:
 /// <list type="number">
-///   <item>Reads <see cref="Domain.Tenants.TenantSettings.NotificationRecipientRolesCsv"/> —
+///   <item>Reads <see cref="Domain.Company.CompanySettings.NotificationRecipientRolesCsv"/> —
 ///         a CSV of role names. Default "HRManager,SystemAdmin".</item>
 ///   <item>If the tenant row doesn't exist or the CSV is empty, falls back to
 ///         "HRManager,SystemAdmin" — preserves pre-v13.4 behavior.</item>

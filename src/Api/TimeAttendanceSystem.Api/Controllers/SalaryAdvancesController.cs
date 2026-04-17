@@ -27,7 +27,8 @@ public class SalaryAdvancesController : ControllerBase
     public async Task<IActionResult> GetAll(
         [FromQuery] long? employeeId = null,
         [FromQuery] SalaryAdvanceStatus? status = null,
-        [FromQuery] int? deductionMonth = null,
+        [FromQuery] DateTime? deductionFrom = null,
+        [FromQuery] DateTime? deductionTo = null,
         [FromQuery] string? search = null,
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 20)
@@ -36,7 +37,11 @@ public class SalaryAdvancesController : ControllerBase
 
         if (employeeId.HasValue) query = query.Where(x => x.EmployeeId == employeeId.Value);
         if (status.HasValue) query = query.Where(x => x.Status == status.Value);
-        if (deductionMonth.HasValue) query = query.Where(x => x.DeductionMonth == deductionMonth.Value);
+        // Phase 6: filter by deduction window via the date range instead of legacy YYYYMM.
+        if (deductionFrom.HasValue)
+            query = query.Where(x => x.DeductionEndDate >= deductionFrom.Value);
+        if (deductionTo.HasValue)
+            query = query.Where(x => x.DeductionStartDate <= deductionTo.Value);
         if (!string.IsNullOrWhiteSpace(search))
             query = query.Where(x => x.Reason != null && x.Reason.Contains(search));
 
@@ -49,7 +54,8 @@ public class SalaryAdvancesController : ControllerBase
             {
                 x.Id, x.EmployeeId,
                 EmployeeName = x.Employee.FirstName + " " + x.Employee.LastName,
-                x.Amount, x.Currency, x.RequestDate, x.DeductionMonth,
+                x.Amount, x.Currency, x.RequestDate,
+                x.DeductionStartDate, x.DeductionEndDate,
                 x.Reason, x.ReasonAr, x.Status, x.ApprovedAt,
                 x.CreatedAtUtc
             })
@@ -68,7 +74,8 @@ public class SalaryAdvancesController : ControllerBase
             {
                 x.Id, x.EmployeeId,
                 EmployeeName = x.Employee.FirstName + " " + x.Employee.LastName,
-                x.Amount, x.Currency, x.RequestDate, x.DeductionMonth,
+                x.Amount, x.Currency, x.RequestDate,
+                x.DeductionStartDate, x.DeductionEndDate,
                 x.Reason, x.ReasonAr, x.Status, x.RejectionReason,
                 x.ApprovedByUserId, x.ApprovedAt, x.PayrollRecordId,
                 x.WorkflowInstanceId, x.SubmittedByUserId,
@@ -83,13 +90,17 @@ public class SalaryAdvancesController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateSalaryAdvanceRequest request)
     {
+        // Phase 6: the API now only accepts the date-range deduction window. Old clients
+        // that still send DeductionMonth should be migrated. If both date fields are
+        // omitted the SalaryAdvanceExecutor falls back to next-month-after-approval.
         var entity = new SalaryAdvance
         {
             EmployeeId = request.EmployeeId,
             Amount = request.Amount,
             Currency = request.Currency ?? "SAR",
             RequestDate = DateTime.UtcNow,
-            DeductionMonth = request.DeductionMonth,
+            DeductionStartDate = request.DeductionStartDate,
+            DeductionEndDate = request.DeductionEndDate,
             Reason = request.Reason,
             ReasonAr = request.ReasonAr,
             Status = SalaryAdvanceStatus.Pending,
@@ -161,7 +172,12 @@ public class CreateSalaryAdvanceRequest
     public long EmployeeId { get; set; }
     public decimal Amount { get; set; }
     public string? Currency { get; set; }
-    public int DeductionMonth { get; set; }
+
+    // Phase 6 (v14.6): replaced the legacy YYYYMM `DeductionMonth` int with an explicit
+    // date range. The executor back-fills a sensible default if these are omitted.
+    public DateTime? DeductionStartDate { get; set; }
+    public DateTime? DeductionEndDate { get; set; }
+
     public string? Reason { get; set; }
     public string? ReasonAr { get; set; }
 }

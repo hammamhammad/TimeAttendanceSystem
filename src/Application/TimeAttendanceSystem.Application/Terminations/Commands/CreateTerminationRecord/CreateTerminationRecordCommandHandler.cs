@@ -60,7 +60,7 @@ public class CreateTerminationRecordCommandHandler : BaseHandler<CreateTerminati
         await Context.SaveChangesAsync(cancellationToken);
 
         // v13.5: Clearance auto-creation is now driven by a lifecycle handler (reading
-        // TenantSettings.AutoCreateClearanceOnTermination; default true → same as v13.x).
+        // CompanySettings.AutoCreateClearanceOnTermination; default true → same as v13.x).
         // The handler also runs SuspendEmployeeCommand based on
         // AutoSuspendEmployeeOnTerminationCreated.
         await _lifecyclePublisher.PublishAsync(

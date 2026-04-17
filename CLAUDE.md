@@ -46,7 +46,7 @@ TecAxle HRMS is a comprehensive enterprise HRMS / workforce-management system ow
 - Role-based access control (RBAC) + fine-grained permission system (70+ resources, 26 actions, 223+ authorization policies).
 - Branch-scoped access control via `UserBranchScope` — users only see data from their assigned branches (SystemAdmin sees all).
 - Session management, blacklisted tokens, password policies & history tracking.
-- Login attempt tracking + progressive lockout driven by tenant-configurable `LoginLockoutPolicyJson` in `TenantSettings`.
+- Login attempt tracking + progressive lockout driven by company-configurable `LoginLockoutPolicyJson` in `CompanySettings`.
 
 ### 2. Organization Structure
 
@@ -89,7 +89,7 @@ RemoteWorkPolicy, RemoteWorkRequest, blackout periods, department eligibility.
 - Multi-step, approver types (Role, User, Manager, DirectManager, DepartmentHead, BranchManager).
 - **v13.6 hardening**: per-step `RoleAssignmentStrategy` (FirstMatch, RoundRobin, LeastPendingApprovals, FixedPriority), bounded delegation depth + cycle detection, explicit `FailedRouting` terminal status, `ReturnForCorrection`/`Resubmit` non-terminal actions, validation rules via `IWorkflowValidationRule`, system-action audit trail (`WorkflowSystemActionAudit`), role-assignment cursor (`WorkflowRoleAssignmentCursor`), definition-version snapshots on instance creation.
 - Endpoints: `POST /api/v1/approvals/{id}/return-for-correction`, `POST /api/v1/approvals/{id}/resubmit`, `GET /api/v1/workflows/validation-rules`, `GET /api/v1/workflows/system-actions`, `GET /api/v1/workflows/role-assignment-stats`.
-- Tenant-configurable: `WorkflowFallbackApproverRole`, `WorkflowFallbackApproverUserId`, `MaxWorkflowDelegationDepth` (default 2), `MaxWorkflowResubmissions` (default 3).
+- Company-configurable: `WorkflowFallbackApproverRole`, `WorkflowFallbackApproverUserId`, `MaxWorkflowDelegationDepth` (default 2), `MaxWorkflowResubmissions` (default 3).
 
 ### 9. Self-Service Portal
 
@@ -206,7 +206,7 @@ Automates seven HR lifecycle transitions via MediatR domain events. Every automa
 
 **`ILifecycleEventPublisher`** wraps MediatR `IPublisher` with try/catch — handler failures never propagate to the triggering command.
 
-**16 new `TenantSettings` fields** — all additive, DB defaults preserve pre-v13.5 behavior. Master kill-switch: `LifecycleAutomationEnabled`.
+**16 new `CompanySettings` fields** — all additive, DB defaults preserve pre-v13.5 behavior. Master kill-switch: `LifecycleAutomationEnabled`.
 
 **Audit API**: `GET /api/v1/lifecycle-automation/audit`, `GET /audit/{id}`, `GET /audit/by-entity`.
 
@@ -221,14 +221,14 @@ Automates seven HR lifecycle transitions via MediatR domain events. Every automa
 
 ## Company Configuration & Policy Framework
 
-- **`TenantSettings`** — singleton row. Centralized operational settings covering 10 categories (General, Attendance, Leave, Payroll, Approval, Notification, Mobile, Security, Business-Rule Thresholds, Lifecycle Automation). Field name kept as "Tenant" for schema stability but represents the single company's settings.
+- **`CompanySettings`** (table: `CompanySettings`, entity path: `src/Domain/TimeAttendanceSystem.Domain/Company/CompanySettings.cs`) — singleton row. Centralized operational settings covering 10 categories (General, Attendance, Leave, Payroll, Approval, Notification, Mobile, Security, Business-Rule Thresholds, Lifecycle Automation). Renamed from `TenantSettings` in v14.5; all Tenant* naming was retired in v14.5/14.7.
 - **`BranchSettingsOverride`** — per-branch nullable overrides for attendance/mobile.
 - **`DepartmentSettingsOverride`** — per-department overrides for default shift + approval comments.
-- **`ITenantSettingsResolver.GetSettingsAsync(branchId?, deptId?)`** — inheritance chain Company → Branch → Department. 5-min memory cache, `InvalidateCache()` after mutation.
+- **`ICompanySettingsResolver.GetSettingsAsync(branchId?, deptId?)`** — inheritance chain Company → Branch → Department. 5-min memory cache, `InvalidateCache()` after mutation.
 
-### Tenant-configurable business rules
+### Company-configurable business rules
 
-All hardcoded business rules were moved to `TenantSettings` in v13.3 + v13.4. Examples:
+All hardcoded business rules were moved to `CompanySettings` in v13.3 + v13.4. Examples:
 
 - **Password policy**: `PasswordMinLength`, `LoginLockoutPolicyJson`.
 - **Alert windows**: `ContractExpiryAlertDaysCsv` ("30,15,7"), `VisaExpiryAlertDaysCsv` ("90,60,30,15,7"), `DocumentExpiryAlertDaysCsv`, `AssetWarrantyExpiryAlertDaysCsv`, `AssetOverdueReturnAlertDaysCsv`, `TrainingSessionReminderDaysCsv`, `SuccessionPlanReminderDaysCsv`, `GrievanceSlaAlertDaysCsv`, `ReviewReminderDaysCsv`.
@@ -240,16 +240,16 @@ All hardcoded business rules were moved to `TenantSettings` in v13.3 + v13.4. Ex
 ### Services
 
 - **`IValidationSettingsProvider`** — scoped cache of thresholds for FluentValidation. `WarmAsync()` hydrates; `Current` is read synchronously inside rules.
-- **`ITenantPayrollCalendarService`** — one-off monthly daily-rate resolution outside the payroll pipeline.
+- **`ICompanyPayrollCalendarService`** (renamed from `ITenantPayrollCalendarService` in v14.7) — one-off monthly daily-rate resolution outside the payroll pipeline.
 - **`ISystemUserResolver`** — returns the system user ID (`IsSystemUser=true`, preferring `systemadmin`). 5-min cache, throws on unresolvable.
 - **`INotificationRecipientResolver`** — single abstraction for resolving notification recipient user IDs by role CSV.
 - **`ILifecycleEventPublisher`** — MediatR publisher wrapper that swallows handler failures.
 
 ### API endpoints
 
-- `GET/PUT /api/v1/tenant-configuration` — company settings CRUD
-- `GET /api/v1/tenant-configuration/resolved?branchId=&deptId=` — resolved settings with inheritance
-- `GET/PUT/DELETE /api/v1/tenant-configuration/branches/{id}` — branch overrides
+- `GET/PUT /api/v1/company-configuration` — company settings CRUD (renamed from `/api/v1/tenant-configuration` in v14.5)
+- `GET /api/v1/company-configuration/resolved?branchId=&deptId=` — resolved settings with inheritance
+- `GET/PUT/DELETE /api/v1/company-configuration/branches/{id}` — branch overrides
 
 ---
 
@@ -521,7 +521,7 @@ HMAC-SHA256 signed payload. `appsettings.json`:
 - Async/await for all I/O.
 - Pagination on list endpoints.
 - `.Include()` to avoid N+1.
-- Cache (e.g. `ITenantSettingsResolver` 5-min).
+- Cache (e.g. `ICompanySettingsResolver` 5-min).
 - Background jobs for long-running tasks.
 - Proper EF indexing.
 
@@ -552,21 +552,32 @@ HMAC-SHA256 signed payload. `appsettings.json`:
 - [ ] Verify Arabic RTL
 - [ ] Verify form validation + error handling + loading states
 
-### Test projects (162 passing tests)
+### Test projects (167 backend + 12 frontend passing; v14.7)
 
 | Project | Tests | Coverage |
 |---|---|---|
 | `tests/TecAxle.Hrms.Payroll.Tests/` | 27 | Proration, Tax, Calendar, Absence calculators |
 | `tests/TecAxle.Hrms.BusinessRules.Tests/` | 31 | EOS Saudi, LoginLockoutPolicy, CSV parsing, NotificationRecipientResolver, v13.4 defaults |
-| `tests/TecAxle.Hrms.LifecycleAutomation.Tests/` | 25 | Handler behavior, idempotency, kill-switch, employee state |
+| `tests/TecAxle.Hrms.LifecycleAutomation.Tests/` | 91 | Handler behavior, idempotency, kill-switch, employee state, Phase 1-4 coverage, Phase 6/7 deprecation pins, Phase 6 real-Postgres rollback integration (3) |
 | `tests/TecAxle.Hrms.Workflow.Tests/` | 18 | Dept-head routing, role strategies, delegation, validation rules, snapshot versioning |
 
-Run all:
-```bash
-for p in tests/TecAxle.Hrms.{Payroll,BusinessRules,LifecycleAutomation,Workflow}.Tests; do
-  dotnet test "$p"/$(basename "$p").csproj --nologo
-done
-```
+### Three test layers (v14.7)
+
+Tests are split into three clearly-labelled layers. Each has a dedicated script in `scripts/`:
+
+| Layer | Script | Requires Postgres | What runs |
+|---|---|---|---|
+| Backend unit | `./scripts/test-backend-unit.sh` | No (auto-skips) | Everything in `./TimeAttendanceSystem.sln`. `[PostgresRequiredFact]` tests auto-skip when `HRMS_INTEGRATION_DB` is unset and no dev Postgres is reachable. |
+| Backend integration | `./scripts/test-backend-integration.sh` | Yes | `PayrollTransactionRollbackTests` against real Postgres transactions, FK constraints, full migration chain. See `PostgresTestHarness`. |
+| Frontend | `./scripts/test-frontend.sh` | No | Karma + Jasmine specs (12 passing) via headless Chrome. |
+| All layers | `./scripts/test-all.sh` (bash) / `./scripts/test-all.ps1` (PowerShell) | Optional | Runs all three in sequence. |
+
+### Postgres integration harness
+
+- **`PostgresTestHarness`** (tests/TecAxle.Hrms.LifecycleAutomation.Tests/) provisions a disposable `tecaxle_test_{guid}` database per test class, applies the full EF migration chain, and drops it on tear-down.
+- Point at any Postgres cluster via `HRMS_INTEGRATION_DB` env-var; falls back to the dev connection string when unset.
+- CI (`.github/workflows/ci.yml`) runs the integration job against a Postgres 18 service container in a dedicated `backend-integration` job.
+- **`[PostgresRequiredFact]`** attribute auto-skips with a precise reason when the cluster is unreachable.
 
 ---
 
@@ -648,7 +659,7 @@ cd tests/TecAxle.Hrms.Payroll.Tests && dotnet test
 | IApplicationDbContext | [IApplicationDbContext.cs](src/Application/TimeAttendanceSystem.Application/Abstractions/IApplicationDbContext.cs) |
 | LoginCommandHandler | [LoginCommandHandler.cs](src/Application/TimeAttendanceSystem.Application/Authorization/Commands/Login/LoginCommandHandler.cs) |
 | Domain entities | [src/Domain/TimeAttendanceSystem.Domain/](src/Domain/TimeAttendanceSystem.Domain/) |
-| TenantSettings | [TenantSettings.cs](src/Domain/TimeAttendanceSystem.Domain/Tenants/TenantSettings.cs) |
+| CompanySettings | [CompanySettings.cs](src/Domain/TimeAttendanceSystem.Domain/Company/CompanySettings.cs) (renamed from `TenantSettings` in v14.5) |
 | DbContext | [TecAxleDbContext.cs](src/Infrastructure/TimeAttendanceSystem.Infrastructure/Persistence/Common/TecAxleDbContext.cs) |
 | SeedData | [SeedData.cs](src/Infrastructure/TimeAttendanceSystem.Infrastructure/Persistence/Common/SeedData.cs) |
 | Migrations | [Persistence/PostgreSql/Migrations/](src/Infrastructure/TimeAttendanceSystem.Infrastructure/Persistence/PostgreSql/Migrations/) |
@@ -803,7 +814,7 @@ cd tests/TecAxle.Hrms.Payroll.Tests && dotnet test
 - Not logging failed verification attempts to `AttendanceVerificationLogs`
 - Not configuring branch GPS coordinates before enabling mobile attendance
 - Forgetting timezone conversion for mobile transaction timestamps
-- Hardcoding business rules — move to `TenantSettings`
+- Hardcoding business rules — move to `CompanySettings`
 - Hardcoding role names in notification queries — use `INotificationRecipientResolver`
 - Using `Role.Name == "HR"` pattern — use `NotificationRecipientRolesCsv` setting
 - Hardcoding 30-day month in payroll math — use `IPayrollCalendarResolver`
@@ -823,6 +834,13 @@ cd tests/TecAxle.Hrms.Payroll.Tests && dotnet test
 - `WORKFLOW_ROUTING_HARDENING_FIX.md` — v13.6 workflow routing
 - `MODULE_ENTITLEMENT_ENFORCEMENT_FIX.md` — v13.2 (historical; entitlement layer removed in v14.0)
 - `HRMS_BUSINESS_FLOW_REVIEW.md` — business flow overview
+- `PHASE1_CRITICAL_FIX_IMPLEMENTATION.md` — v14.1 approval execution + payroll transactional safety
+- `PHASE2_IMPLEMENTATION_REPORT.md` — v14.2 attendance timezone + operational visibility
+- `PHASE3_IMPLEMENTATION_REPORT.md` — v14.3 shift auto-checkout + global search
+- `PHASE4_IMPLEMENTATION_REPORT.md` — v14.4 admin UI + legacy deprecation
+- `PHASE5_TENANT_CLEANUP_REPORT.md` + `PHASE5_SIGNOFF_ADDENDUM.md` — v14.5 Tenant→Company rename
+- `PHASE6_IMPLEMENTATION_REPORT.md` — v14.6 real-Postgres harness + deprecation retirements + omnibox
+- `FINAL_CLEANUP_AND_POLISH_REPORT.md` — v14.7 final consolidated cleanup
 
 ### Testing
 
@@ -835,10 +853,48 @@ cd tests/TecAxle.Hrms.Payroll.Tests && dotnet test
 
 ---
 
-**Last Updated**: April 16, 2026
-**Version**: 14.0 — Single-Company Collapse
+**Last Updated**: April 17, 2026
+**Version**: 14.7 — Final Cleanup & Polish
 
-Removed multi-tenant SaaS architecture. System is now a single-company HRMS with one database (`tecaxle_hrms`), one `TecAxleDbContext`, single-step email+password login, and no subscription/entitlement system.
+System is a single-company HRMS with one database (`tecaxle_hrms`), one `TecAxleDbContext`, single-step email+password login, and no subscription/entitlement system. The v14.x series replaced the multi-tenant SaaS architecture, retired every remnant of tenant-based naming and dead entitlement metadata, and hardened payroll transactional safety via real-Postgres integration tests.
+
+### Summary of v14.7 changes (Final Cleanup & Polish)
+
+- **`SalaryAdvance.DeductionMonth` fully removed** — entity, EF index, API, admin UI, frontend model, and DB column. Data-preserving migration `20260417152940_RemoveDeductionMonth` back-fills `DeductionStartDate`/`EndDate` from any legacy YYYYMM rows **before** dropping. Replaced single-column index with composite `IX_SalaryAdvances_DeductionRange`.
+- **`ITenantPayrollCalendarService` → `ICompanyPayrollCalendarService`** — interface + class + file + DI + all call sites.
+- **CI pipeline rewritten** in `.github/workflows/ci.yml` — fixed broken `./src/TimeAttendanceSystem.sln` path (was always at repo root) and split into 3 jobs: `backend-unit`, `backend-integration` (Postgres 18 service container), `frontend`.
+- **Dev test scripts** added under `scripts/`: `test-backend-unit.sh`, `test-backend-integration.sh`, `test-frontend.sh`, `test-all.sh`, plus `test-all.ps1` for Windows.
+- **README 🧪 Testing section** added documenting the three test layers and `HRMS_INTEGRATION_DB`.
+- **Dead metadata swept** — 304 `module: 'TimeAttendance'` + `moduleStrict:` entries from `app.routes.ts` (leftover from the v14.0-removed entitlement layer); dead `cardModuleMap` in dashboard component; obsolete `tenant-config-page` CSS class.
+- **Canonical route** `/settings/company-config` with `/settings/tenant-config` as permanent redirect preserving child segments + bookmarks.
+- **Pre-existing frontend specs fixed** — `StatusBadgeComponent` (was querying `.badge` instead of `.erp-badge`) and `App` (was expecting `ng new` template text). 12/12 frontend specs now pass.
+- **Omnibox URL sync + Escape-to-clear** — the topbar omnibox mirrors `?q=` of the active search page and clears on Escape.
+
+### Summary of v14.6 changes (Reliability & Deprecation)
+
+- **Real-Postgres integration harness** (`PostgresTestHarness` + `PostgresRequiredFactAttribute`) replaces the broken Phase 1 `SqliteTestHarness` (deleted). Per-test-class disposable DB with full EF migration chain.
+- **3 previously-skipped rollback tests now run** — commit path, rollback path, rerun-after-rollback-idempotently — all against real Postgres transactions.
+- **`SalaryAdvance.DeductionMonth` write-frozen** — API no longer accepts it on create; executor only reads (for back-compat on pre-Phase-6 rows); response projections dropped it.
+- **`CompanySettings.AutoCheckOutEnabled` / `AutoCheckOutTime` fully removed** — entity, DTOs (`CompanySettingsDto`, `ResolvedSettingsDto`, `BranchSettingsOverrideDto`), `UpdateCompanySettings*`/`UpdateBranchSettingsOverride*` commands + handlers, `GetCompanySettings`/`GetBranchSettingsOverride` query handlers, admin UI (`attendance-settings.component.html`), and DB columns. Migration `20260417131611_RemoveLegacyAutoCheckoutSettings`. Shift-driven `ShiftDrivenAutoCheckOutJob` is the single source of truth.
+- **Top-nav omnibox** added to admin shell — Enter → `/global-search?q=<query>`, `Ctrl/⌘+K` focuses from anywhere, RTL-safe, i18n in EN + AR (`search.placeholder`).
+- **Dead `tenants.*` i18n block** (40 keys for the v14.0-removed Tenants-management page) deleted from `en.json` and `ar.json`.
+
+### Summary of v14.5 changes (Tenant → Company Naming Cleanup)
+
+Retired all remnant `Tenant*` naming from the codebase and DB schema (the v14.0 collapse removed the multi-tenant feature but kept tenant-* names for schema stability). Cleanup covers **~80 backend files + test files + frontend folder** renamed.
+
+- **Entity**: `TenantSettings` → `CompanySettings`
+- **DB table**: `TenantSettings` → `CompanySettings` via `20260417121022_RenameTenantSettingsToCompanySettings` (data-preserving `RenameTable` + `ALTER INDEX` for PK)
+- **Service**: `ITenantSettingsResolver` → `ICompanySettingsResolver`; impl `TenantSettingsResolver` → `CompanySettingsResolver`
+- **Controller**: `TenantConfigurationController` → `CompanyConfigurationController`
+- **Route**: `/api/v1/tenant-configuration/*` → `/api/v1/company-configuration/*`
+- **EF config**: `TenantSettingsConfiguration` → `CompanySettingsConfiguration`
+- **Domain folder**: `src/Domain/TimeAttendanceSystem.Domain/Tenants/` → `Company/`
+- **Application folder**: `TenantConfiguration/` → `CompanyConfiguration/` (incl. CQRS `UpdateTenantSettings*` → `UpdateCompanySettings*`, `GetTenantSettings*` → `GetCompanySettings*`, `TenantSettingsDto` → `CompanySettingsDto`)
+- **Frontend**: `pages/settings/tenant-configuration/` → `company-configuration/` (all 6 files)
+- **Tests**: all `Domain.Tenants` and `Application.TenantConfiguration` references updated
+- **Incidental production fix**: `PayrollSideEffectReverser.CascadeDeleteDetailsAsync` now calls `.IgnoreQueryFilters()` so the cascade actually fires on soft-deleted parents (pre-existing bug surfaced during v14.5 verification)
+- **Incidental portability win**: `GlobalSearchService` swapped 24× Postgres-only `EF.Functions.ILike(...)` for portable `.ToLower().Contains(qLower)` so the search works under EF InMemory too
 
 ### Summary of v14.0 changes
 
@@ -933,20 +989,31 @@ Removed multi-tenant SaaS architecture. System is now a single-company HRMS with
 
 **Test results**: 162 passing tests across 4 projects (was 5 with Entitlement). Build clean on backend + all 3 frontends + mobile.
 
-**What remains of "tenant" naming** (kept for schema stability, can be renamed in a cosmetic follow-up):
-- `TenantSettings` entity name + table — represents the single company's settings
-- `TenantConfigurationController` route `/api/v1/tenant-configuration`
-- `TenantSettingsConfiguration` EF config file
-- `TenantSettingsResolver` / `ITenantSettingsResolver` service name
-- `TenantConfiguration/` CQRS folder name
-- `BranchSettingsOverride` + `DepartmentSettingsOverride` entities + endpoints (were never tenant-scoped anyway)
+**Tenant naming cleanup status** (resolved in v14.5 + v14.7; see "Summary of v14.5 changes" and "Summary of v14.7 changes" above):
+- ✅ `TenantSettings` entity + DB table → renamed to `CompanySettings`
+- ✅ `TenantConfigurationController` + route → `CompanyConfigurationController` + `/api/v1/company-configuration`
+- ✅ `TenantSettingsConfiguration` EF config file → `CompanySettingsConfiguration`
+- ✅ `TenantSettingsResolver` / `ITenantSettingsResolver` → `CompanySettingsResolver` / `ICompanySettingsResolver`
+- ✅ `TenantConfiguration/` CQRS folder → `CompanyConfiguration/`
+- ✅ `ITenantPayrollCalendarService` → `ICompanyPayrollCalendarService` (v14.7)
+- ✅ `/settings/tenant-config` route → `/settings/company-config` with legacy redirect (v14.7)
+- `BranchSettingsOverride` + `DepartmentSettingsOverride` entities + endpoints (kept — these are legitimate branch/department scoping, never tenant-related)
+- The `tenant_configuration.*` i18n key block retained deliberately — 60+ keys used across 8 child components; operator-visible text already says "Company Configuration", renaming keys would be churn without user-visible gain.
 
 ### Previous versions
 
+- **v14.7** — Final Cleanup & Polish: fully retire `DeductionMonth`, fix CI pipeline, 3-layer test scripts, canonical `/settings/company-config` route, dead-metadata sweep (see `FINAL_CLEANUP_AND_POLISH_REPORT.md`)
+- **v14.6** — Real-Postgres integration harness; retire `AutoCheckOutEnabled`/`AutoCheckOutTime`; top-nav omnibox (see `PHASE6_IMPLEMENTATION_REPORT.md`)
+- **v14.5** — Tenant → Company naming cleanup (entity, DB, controller, route, service, folders) (see `PHASE5_TENANT_CLEANUP_REPORT.md` + `PHASE5_SIGNOFF_ADDENDUM.md`)
+- **v14.4** — Phase 4 admin UI backend tests (global search shape, failure-alert service, legacy back-fill)
+- **v14.3** — Shift-driven auto-checkout job, PIP follow-through, global-search, operational-failure alerts + dashboard
+- **v14.2** — Attendance timezone correctness, silent-failure surfacer, payroll integrity, loan/benefit/training validators
+- **v14.1** — Approval-to-execution executors, benefits-to-payroll integration, payroll transactional safety, `PayrollSideEffectReverser`
+- **v14.0** — Single-Company Collapse — removed multi-tenant SaaS architecture (~4,500 LOC deleted)
 - **v13.6** — Workflow Routing Hardening (department-head routing, role assignment strategies, delegation depth, return-for-correction/resubmit)
 - **v13.5** — Lifecycle Automation (7 automated HR transitions via domain events)
-- **v13.4** — Remaining hardcoded business rules migrated to `TenantSettings`; `INotificationRecipientResolver` consolidated 15 divergent role-name checks
-- **v13.3** — Hardcoded business rules migrated to `TenantSettings` (EOS policy, payroll calendar, validation thresholds, login lockout)
+- **v13.4** — Remaining hardcoded business rules migrated to `CompanySettings`; `INotificationRecipientResolver` consolidated 15 divergent role-name checks
+- **v13.3** — Hardcoded business rules migrated to `CompanySettings` (EOS policy, payroll calendar, validation thresholds, login lockout)
 - **v13.2** — Module entitlement enforcement hardening (HTTP filter layer, removed in v14.0)
 - **v13.1** — Payroll production-safety follow-ups (calendar policy CRUD, run audit UI, admin-unlock)
 - **v13.0** — Production-safe payroll calculation pipeline

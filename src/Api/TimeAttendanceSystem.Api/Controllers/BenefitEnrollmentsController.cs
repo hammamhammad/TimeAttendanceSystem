@@ -14,11 +14,16 @@ public class BenefitEnrollmentsController : ControllerBase
 {
     private readonly IApplicationDbContext _context;
     private readonly ICurrentUser _currentUser;
+    private readonly IBenefitEligibilityEvaluator _eligibilityEvaluator;
 
-    public BenefitEnrollmentsController(IApplicationDbContext context, ICurrentUser currentUser)
+    public BenefitEnrollmentsController(
+        IApplicationDbContext context,
+        ICurrentUser currentUser,
+        IBenefitEligibilityEvaluator eligibilityEvaluator)
     {
         _context = context;
         _currentUser = currentUser;
+        _eligibilityEvaluator = eligibilityEvaluator;
     }
 
     /// <summary>Lists benefit enrollments with optional filters.</summary>
@@ -205,6 +210,12 @@ public class BenefitEnrollmentsController : ControllerBase
                 && x.Status == BenefitEnrollmentStatus.Active);
         if (hasDuplicate)
             return BadRequest(new { error = "Employee already has an active enrollment for this benefit plan." });
+
+        // Phase 2 completion: enforce BenefitEligibilityRule rows on the plan.
+        // Plans with no active rules are open to everyone (explicit opt-in model).
+        var eligibility = await _eligibilityEvaluator.EvaluateAsync(request.EmployeeId, request.BenefitPlanId);
+        if (eligibility.IsFailure)
+            return BadRequest(new { error = eligibility.Error });
 
         var entity = new BenefitEnrollment
         {

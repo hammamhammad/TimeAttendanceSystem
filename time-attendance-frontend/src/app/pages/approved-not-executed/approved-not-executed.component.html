@@ -1,0 +1,44 @@
+<div class="ane-page">
+  <header class="page-header">
+    <h1>Approved but not executed</h1>
+    <p class="subtitle">Requests that reached Approved status but whose downstream business artifact was never produced. Click a row to see execution details and retry.</p>
+    <div class="actions">
+      <button type="button" (click)="reload()" [disabled]="loading()">
+        {{ loading() ? 'Refreshing…' : 'Refresh' }}
+      </button>
+      <a routerLink="/ops-dashboard" class="back-link">← Dashboard</a>
+    </div>
+  </header>
+
+  <div *ngIf="error()" class="error-banner">{{ error() }}</div>
+
+  <div *ngFor="let s of sections" class="section">
+    <h2 class="section-title">
+      {{ s.title }}
+      <span class="count">{{ rowsFor(s).length }}</span>
+    </h2>
+
+    <table *ngIf="rowsFor(s).length > 0; else emptyTpl" class="ane-table">
+      <thead>
+        <tr>
+          <th *ngFor="let c of s.columns">{{ c.label }}</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of rowsFor(s)">
+          <td *ngFor="let c of s.columns" [class.error-cell]="c.field === 'executionError' && row[c.field]">
+            {{ format(row[c.field]) }}
+          </td>
+          <td>
+            <a [routerLink]="['/execution-status', s.targetType, row.id]" class="action-link">Open</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #emptyTpl>
+      <p class="empty-row" *ngIf="!loading()">All {{ s.title.toLowerCase() }} executed. 🎉</p>
+    </ng-template>
+  </div>
+</div>

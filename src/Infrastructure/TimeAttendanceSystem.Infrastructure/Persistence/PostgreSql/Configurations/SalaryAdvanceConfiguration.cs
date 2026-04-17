@@ -39,7 +39,9 @@ public class SalaryAdvanceConfiguration : IEntityTypeConfiguration<SalaryAdvance
 
         builder.HasIndex(x => x.EmployeeId).HasDatabaseName("IX_SalaryAdvances_EmployeeId");
         builder.HasIndex(x => x.Status).HasDatabaseName("IX_SalaryAdvances_Status");
-        builder.HasIndex(x => x.DeductionMonth).HasDatabaseName("IX_SalaryAdvances_DeductionMonth");
+        // Phase 7 (v14.7): IX_SalaryAdvances_DeductionMonth removed together with the column.
+        builder.HasIndex(x => new { x.DeductionStartDate, x.DeductionEndDate })
+            .HasDatabaseName("IX_SalaryAdvances_DeductionRange");
 
         builder.HasQueryFilter(x => !x.IsDeleted);
     }

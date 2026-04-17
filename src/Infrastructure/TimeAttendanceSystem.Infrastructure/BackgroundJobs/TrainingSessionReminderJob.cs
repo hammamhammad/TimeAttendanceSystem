@@ -31,7 +31,7 @@ public class TrainingSessionReminderJob : IInvocable
         try
         {
             var today = DateTime.UtcNow.Date;
-            var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync();
+            var settings = await _context.CompanySettings.AsNoTracking().FirstOrDefaultAsync();
             var reminderDays = BackgroundJobSettingsHelper.ParseCsvDays(settings?.TrainingSessionReminderDaysCsv, DefaultReminderDays);
             var notificationCount = 0;
 

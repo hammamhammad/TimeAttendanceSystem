@@ -1,0 +1,97 @@
+<div class="ops-summary-page">
+  <header class="page-header">
+    <h1>Operations Dashboard</h1>
+    <p class="subtitle">Cross-module operational health. Click a card to drill into the relevant queue.</p>
+    <button type="button" class="refresh" (click)="reload()" [disabled]="loading()">
+      {{ loading() ? 'Refreshing…' : 'Refresh' }}
+    </button>
+  </header>
+
+  <div *ngIf="error()" class="error-banner">{{ error() }}</div>
+
+  <section *ngIf="data()" class="summary-grid">
+    <!-- Alerts -->
+    <a class="card" routerLink="/operational-alerts">
+      <header class="card-title">Unresolved Alerts</header>
+      <div class="big-number">{{ data()!.alerts.totalUnresolved }}</div>
+      <div class="card-breakdown">
+        <span *ngFor="let pair of severityEntries()" class="badge severity-{{ pair[0] | lowercase }}">
+          {{ pair[0] }}: {{ pair[1] }}
+        </span>
+      </div>
+      <footer class="card-breakdown muted">
+        <span *ngFor="let pair of categoryEntries()">{{ pair[0] }}: {{ pair[1] }}</span>
+      </footer>
+    </a>
+
+    <!-- Lifecycle failures -->
+    <a class="card" routerLink="/operational-alerts" [queryParams]="{ category: 'LifecycleAutomation' }">
+      <header class="card-title">Lifecycle failures (7d)</header>
+      <div class="big-number">{{ data()!.lifecycle.failuresLast7Days }}</div>
+      <footer class="card-breakdown muted">
+        <span *ngFor="let pair of lifecycleEntries()">{{ pair[0] }}: {{ pair[1] }}</span>
+        <span *ngIf="lifecycleEntries().length === 0">No failures in the last 7 days.</span>
+      </footer>
+    </a>
+
+    <!-- Payroll -->
+    <a class="card" routerLink="/operational-alerts" [queryParams]="{ category: 'PayrollProcessing' }">
+      <header class="card-title">Payroll exceptions</header>
+      <div class="big-number">{{ data()!.payroll.openAlerts }}</div>
+      <footer class="card-breakdown muted">
+        <span>Runs w/ failures last 7d: {{ data()!.payroll.runsWithFailuresLast7Days }}</span>
+      </footer>
+    </a>
+
+    <!-- Approved not executed -->
+    <a class="card" routerLink="/approved-not-executed">
+      <header class="card-title">Approved but not executed</header>
+      <div class="big-number">{{ totalApprovedNotExecuted() }}</div>
+      <footer class="card-breakdown muted">
+        <span>Allowances: {{ data()!.approvedNotExecuted.allowanceRequests }}</span>
+        <span>Loans: {{ data()!.approvedNotExecuted.loanApplications }}</span>
+        <span>Advances: {{ data()!.approvedNotExecuted.salaryAdvances }}</span>
+        <span>Expenses: {{ data()!.approvedNotExecuted.expenseClaims }}</span>
+        <span>Benefits: {{ data()!.approvedNotExecuted.benefitEnrollments }}</span>
+        <span>Letters: {{ data()!.approvedNotExecuted.letterRequests }}</span>
+      </footer>
+    </a>
+
+    <!-- Overdue approvals -->
+    <a class="card" routerLink="/work-queues/overdue-approvals">
+      <header class="card-title">Overdue approvals</header>
+      <div class="big-number">{{ data()!.overdue.workflowApprovals }}</div>
+      <footer class="card-breakdown muted">
+        <span>Workflow steps past their DueAt.</span>
+      </footer>
+    </a>
+
+    <!-- Overdue onboarding -->
+    <a class="card" routerLink="/work-queues/overdue-onboarding-tasks">
+      <header class="card-title">Overdue onboarding tasks</header>
+      <div class="big-number">{{ data()!.overdue.onboardingTasks }}</div>
+    </a>
+
+    <!-- Overdue clearance -->
+    <a class="card" routerLink="/work-queues/overdue-clearance-items">
+      <header class="card-title">Overdue clearance items</header>
+      <div class="big-number">{{ data()!.overdue.clearanceItems }}</div>
+    </a>
+
+    <!-- Auto-checkout review -->
+    <a class="card" routerLink="/work-queues/auto-checkout-review">
+      <header class="card-title">Auto-checkout review</header>
+      <div class="big-number">—</div>
+      <footer class="card-breakdown muted">Last 7 days of system-generated checkouts.</footer>
+    </a>
+
+    <!-- PIP follow-through -->
+    <a class="card" routerLink="/work-queues/pip-follow-through">
+      <header class="card-title">PIP follow-through</header>
+      <div class="big-number">—</div>
+      <footer class="card-breakdown muted">Unsuccessful PIPs requiring HR action.</footer>
+    </a>
+  </section>
+
+  <footer class="timestamp" *ngIf="data()">Generated at {{ data()!.generatedAtUtc | date:'short' }}</footer>
+</div>

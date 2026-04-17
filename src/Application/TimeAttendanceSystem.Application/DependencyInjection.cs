@@ -63,7 +63,7 @@ public static class DependencyInjection
 
         // Tenant-configurable validation settings + monthly daily-rate resolver
         services.AddScoped<Validation.IValidationSettingsProvider, Validation.ValidationSettingsProvider>();
-        services.AddScoped<Payroll.Services.ITenantPayrollCalendarService, Payroll.Services.TenantPayrollCalendarService>();
+        services.AddScoped<Payroll.Services.ICompanyPayrollCalendarService, Payroll.Services.CompanyPayrollCalendarService>();
 
         return services;
     }

@@ -1,0 +1,47 @@
+<div class="exec-status-page">
+  <header class="page-header">
+    <h1>Execution status · {{ targetType() }} #{{ id() }}</h1>
+    <a routerLink="/approved-not-executed" class="back-link">← Approved-not-executed</a>
+  </header>
+
+  <div *ngIf="error()" class="error-banner">{{ error() }}</div>
+  <div *ngIf="toastMessage()" class="toast">{{ toastMessage() }}</div>
+  <div *ngIf="loading()" class="loading-banner">Loading…</div>
+
+  <section *ngIf="record()" class="status-panel">
+    <div class="status-row">
+      <span class="label">Executed:</span>
+      <span class="badge" [class.success]="record().isExecuted" [class.warn]="!record().isExecuted">
+        {{ record().isExecuted ? 'Yes' : 'No' }}
+      </span>
+    </div>
+    <div class="status-row" *ngIf="record().status">
+      <span class="label">Entity status:</span>
+      <span>{{ record().status }}</span>
+    </div>
+    <div class="status-row" *ngIf="record().executionError">
+      <span class="label">Last error:</span>
+      <span class="error-text">{{ record().executionError }}</span>
+    </div>
+    <div class="actions">
+      <button type="button" (click)="reload()" [disabled]="loading() || retrying()">Refresh</button>
+      <button type="button" class="primary"
+              [disabled]="retrying() || record().isExecuted"
+              (click)="retry()">
+        {{ retrying() ? 'Retrying…' : 'Retry execution' }}
+      </button>
+    </div>
+  </section>
+
+  <section *ngIf="record()" class="kv-panel">
+    <h2>All fields</h2>
+    <table>
+      <tbody>
+        <tr *ngFor="let pair of recordEntries()">
+          <th>{{ pair[0] }}</th>
+          <td>{{ format(pair[1]) }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>

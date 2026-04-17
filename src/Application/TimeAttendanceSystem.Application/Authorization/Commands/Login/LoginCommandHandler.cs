@@ -44,7 +44,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<LoginRes
             user.FailedLoginAttempts++;
             user.LastFailedLoginAtUtc = DateTime.UtcNow;
 
-            var settings = await _db.TenantSettings.AsNoTracking().FirstOrDefaultAsync(ct);
+            var settings = await _db.CompanySettings.AsNoTracking().FirstOrDefaultAsync(ct);
             var policy = Services.LoginLockoutPolicy.ParseOrDefault(settings?.LoginLockoutPolicyJson);
             var lockoutDuration = policy.GetLockoutForAttempts(user.FailedLoginAttempts);
             if (lockoutDuration.HasValue)

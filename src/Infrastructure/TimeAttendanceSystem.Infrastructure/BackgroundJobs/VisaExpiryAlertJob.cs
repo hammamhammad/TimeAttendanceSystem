@@ -9,7 +9,7 @@ namespace TecAxle.Hrms.Infrastructure.BackgroundJobs;
 
 /// <summary>
 /// Background job that checks for employee visas expiring within the tenant-configured alert
-/// windows (<see cref="Domain.Tenants.TenantSettings.VisaExpiryAlertDaysCsv"/>,
+/// windows (<see cref="Domain.Company.CompanySettings.VisaExpiryAlertDaysCsv"/>,
 /// default "90,60,30,15,7") and creates notifications for HR users to take action.
 /// </summary>
 public class VisaExpiryAlertJob : IInvocable
@@ -37,7 +37,7 @@ public class VisaExpiryAlertJob : IInvocable
         try
         {
             var today = DateTime.UtcNow.Date;
-            var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync();
+            var settings = await _context.CompanySettings.AsNoTracking().FirstOrDefaultAsync();
             var alertDays = BackgroundJobSettingsHelper.ParseCsvDays(settings?.VisaExpiryAlertDaysCsv, DefaultAlertDays);
 
             var hrUserIds = await _recipientResolver.GetRecipientUserIdsAsync();

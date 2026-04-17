@@ -36,7 +36,7 @@ public class AssetWarrantyExpiryAlertJob : IInvocable
         try
         {
             var today = DateTime.UtcNow.Date;
-            var settings = await _context.TenantSettings.AsNoTracking().FirstOrDefaultAsync();
+            var settings = await _context.CompanySettings.AsNoTracking().FirstOrDefaultAsync();
             var alertDays = BackgroundJobSettingsHelper.ParseCsvDays(settings?.AssetWarrantyExpiryAlertDaysCsv, DefaultAlertDays);
 
             // Recipients via resolver; pass "Admin" as extra role so legacy behavior is preserved

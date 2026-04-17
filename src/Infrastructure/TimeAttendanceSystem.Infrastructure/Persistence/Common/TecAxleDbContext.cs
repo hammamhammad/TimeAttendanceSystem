@@ -13,7 +13,7 @@ using TecAxle.Hrms.Domain.RemoteWork;
 using TecAxle.Hrms.Domain.Workflows;
 using TecAxle.Hrms.Domain.LeaveManagement;
 using TecAxle.Hrms.Domain.Notifications;
-using TecAxle.Hrms.Domain.Tenants;
+using TecAxle.Hrms.Domain.Company;
 using TecAxle.Hrms.Domain.Payroll;
 using TecAxle.Hrms.Domain.Offboarding;
 using TecAxle.Hrms.Domain.Recruitment;
@@ -353,13 +353,17 @@ public class TecAxleDbContext : DbContext, IApplicationDbContext
     public DbSet<ScheduledReport> ScheduledReports => Set<ScheduledReport>();
 
     // Tenant Configuration & Policy Framework
-    public DbSet<TenantSettings> TenantSettings => Set<TenantSettings>();
+    public DbSet<CompanySettings> CompanySettings => Set<CompanySettings>();
     public DbSet<BranchSettingsOverride> BranchSettingsOverrides => Set<BranchSettingsOverride>();
     public DbSet<DepartmentSettingsOverride> DepartmentSettingsOverrides => Set<DepartmentSettingsOverride>();
 
     // v13.5: Lifecycle Automation
     public DbSet<Domain.Lifecycle.LifecycleAutomationAudit> LifecycleAutomationAudits
         => Set<Domain.Lifecycle.LifecycleAutomationAudit>();
+
+    // Phase 1 (v14.1): Operational failure alerts
+    public DbSet<Domain.Operations.OperationalFailureAlert> OperationalFailureAlerts
+        => Set<Domain.Operations.OperationalFailureAlert>();
 
     /// <summary>
     /// Configures the database model using Fluent API configurations from the current assembly.
@@ -521,5 +525,17 @@ public class TecAxleDbContext : DbContext, IApplicationDbContext
     public void ClearChangeTracker()
     {
         ChangeTracker.Clear();
+    }
+
+    /// <summary>
+    /// Phase 1 (v14.1): Begin an explicit DB transaction across multiple SaveChangesAsync calls.
+    /// Returns null on providers without real transactions (EF InMemory) so tests can continue
+    /// without changing call sites.
+    /// </summary>
+    public async Task<Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction?> BeginTransactionAsync(
+        CancellationToken cancellationToken = default)
+    {
+        if (Database.ProviderName?.Contains("InMemory", StringComparison.OrdinalIgnoreCase) == true) return null;
+        return await Database.BeginTransactionAsync(cancellationToken);
     }
 }

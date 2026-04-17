@@ -27,7 +27,7 @@ public static class DependencyInjection
         services.AddScoped<IApplicationDbContext, ApplicationDbContextAdapter>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<ICurrentUser, CurrentUser>();
-        services.AddScoped<ITenantSettingsResolver, TenantSettingsResolver>();
+        services.AddScoped<ICompanySettingsResolver, CompanySettingsResolver>();
         services.AddScoped<ISystemUserResolver, SystemUserResolver>();
         services.AddScoped<INotificationRecipientResolver, NotificationRecipientResolver>();
         services.AddScoped<IEmailService, EmailService>();
@@ -46,6 +46,38 @@ public static class DependencyInjection
         // never cascade back into the originating command.
         services.AddScoped<ILifecycleEventPublisher, LifecycleEventPublisher>();
 
+        // Phase 1 (v14.1): Operational failure alerts + approval-to-execution infrastructure.
+        services.AddScoped<IFailureAlertService, FailureAlertService>();
+
+        // Phase 2 (v14.2): Unified timezone service used by the attendance pipeline.
+        services.AddScoped<ITimezoneService, TimezoneService>();
+
+        // Phase 2 (v14.2): Reverses payroll-linked side-effects on recalc/admin-unlock/cancel.
+        services.AddScoped<IPayrollSideEffectReverser, PayrollSideEffectReverser>();
+
+        // Phase 2 (v14.2) completion: business-rule enforcers.
+        services.AddScoped<ILoanPolicyValidator, LoanPolicyValidator>();
+        services.AddScoped<IBenefitEligibilityEvaluator, BenefitEligibilityEvaluator>();
+        services.AddScoped<ITrainingEnrollmentValidator, TrainingEnrollmentValidator>();
+        services.AddTransient<LeaveCarryoverExpiryJob>();
+
+        // Phase 3 (v14.3): shift-driven auto-checkout + PIP follow-through + global search backing.
+        services.AddTransient<ShiftDrivenAutoCheckOutJob>();
+        services.AddTransient<PipFollowThroughJob>();
+        services.AddScoped<IGlobalSearchService, GlobalSearchService>();
+        services.AddScoped<TecAxle.Hrms.Application.Features.ApprovalExecution.IApprovalExecutor,
+                           TecAxle.Hrms.Application.Features.ApprovalExecution.AllowanceRequestExecutor>();
+        services.AddScoped<TecAxle.Hrms.Application.Features.ApprovalExecution.IApprovalExecutor,
+                           TecAxle.Hrms.Application.Features.ApprovalExecution.LoanApplicationExecutor>();
+        services.AddScoped<TecAxle.Hrms.Application.Features.ApprovalExecution.IApprovalExecutor,
+                           TecAxle.Hrms.Application.Features.ApprovalExecution.SalaryAdvanceExecutor>();
+        services.AddScoped<TecAxle.Hrms.Application.Features.ApprovalExecution.IApprovalExecutor,
+                           TecAxle.Hrms.Application.Features.ApprovalExecution.ExpenseClaimExecutor>();
+        services.AddScoped<TecAxle.Hrms.Application.Features.ApprovalExecution.IApprovalExecutor,
+                           TecAxle.Hrms.Application.Features.ApprovalExecution.BenefitEnrollmentExecutor>();
+        services.AddScoped<TecAxle.Hrms.Application.Features.ApprovalExecution.IApprovalExecutor,
+                           TecAxle.Hrms.Application.Features.ApprovalExecution.LetterRequestExecutor>();
+
         // Add Coravel for background jobs
         services.AddScheduler();
         services.AddTransient<DailyAttendanceGenerationJob>();
@@ -53,6 +85,7 @@ public static class DependencyInjection
         services.AddTransient<MonthlyLeaveAccrualJob>();
         services.AddTransient<WorkflowTimeoutProcessingJob>();
         services.AddTransient<FrozenWorkflowCleanupJob>();
+        services.AddTransient<OperationalFailureSurfacerJob>();
         services.AddTransient<ExpireTemporaryAllowancesJob>();
         services.AddTransient<ContractExpiryAlertJob>();
         services.AddTransient<VisaExpiryAlertJob>();

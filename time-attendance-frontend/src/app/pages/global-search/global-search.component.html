@@ -1,0 +1,52 @@
+<div class="gs-page">
+  <header class="page-header">
+    <h1>Global Search</h1>
+    <p class="subtitle">Search across employees, loans, expenses, benefits, letters, and unresolved alerts.</p>
+  </header>
+
+  <section class="search-row">
+    <input class="search-input" type="text" placeholder="Start typing… (minimum 2 characters)"
+           [ngModel]="query()" (ngModelChange)="onInput($event)" />
+  </section>
+
+  <section class="type-filters">
+    <label *ngFor="let t of types()" class="type-chip" [class.selected]="t.selected">
+      <input type="checkbox" [checked]="t.selected" (change)="toggleType(t)" />
+      {{ t.label }}
+    </label>
+  </section>
+
+  <div *ngIf="error()" class="error-banner">{{ error() }}</div>
+  <div *ngIf="loading()" class="loading-banner">Searching…</div>
+
+  <section *ngIf="result() && !loading()">
+    <p class="result-count" *ngIf="query().length >= 2">
+      {{ result()!.totalCount }} result{{ result()!.totalCount === 1 ? '' : 's' }}
+      for "<strong>{{ result()!.query }}</strong>"
+    </p>
+
+    <div *ngFor="let group of groups()" class="group">
+      <h2 class="group-title">{{ group.type }}
+        <span class="count">{{ group.list.length }}</span>
+      </h2>
+      <ul class="result-list">
+        <li *ngFor="let item of group.list">
+          <a [routerLink]="linkFor(item)" class="result-link">
+            <div class="title">{{ item.title }}</div>
+            <div class="subtitle" *ngIf="item.subtitle">{{ item.subtitle }}</div>
+            <div class="meta">
+              <span *ngIf="item.status" class="status">{{ item.status }}</span>
+              <span *ngIf="item.branchId" class="meta-badge">Branch {{ item.branchId }}</span>
+            </div>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <p class="empty-state" *ngIf="result()!.items.length === 0 && query().length >= 2">
+      No matches. Try a broader term or fewer type filters.
+    </p>
+  </section>
+
+  <p class="hint" *ngIf="query().length < 2">Enter at least 2 characters to search.</p>
+</div>

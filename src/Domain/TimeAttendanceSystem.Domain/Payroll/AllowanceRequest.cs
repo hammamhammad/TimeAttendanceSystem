@@ -28,6 +28,15 @@ public class AllowanceRequest : BaseEntity
     public long? WorkflowInstanceId { get; set; }
     public long? SubmittedByUserId { get; set; }
 
+    // Phase 1 (v14.1): Approval-to-execution tracking.
+    // After workflow approval, the AllowanceRequestExecutor materializes an AllowanceAssignment.
+    // IsExecuted guards against duplicate execution on retry/recalculation.
+    public bool IsExecuted { get; set; }
+    public DateTime? ExecutedAtUtc { get; set; }
+    public long? ExecutedByUserId { get; set; }
+    public string? ExecutionError { get; set; }
+    public long? ResultingAssignmentId { get; set; }
+
     // Navigation
     public Employee Employee { get; set; } = null!;
     public AllowanceType AllowanceType { get; set; } = null!;

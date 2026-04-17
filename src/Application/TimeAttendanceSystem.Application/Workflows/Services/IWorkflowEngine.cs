@@ -117,7 +117,7 @@ public interface IWorkflowEngine
     /// v13.6 — requester resubmits a returned workflow. Resumes execution at step 1
     /// (or the first active step after snapshot lookup). Increments
     /// <c>WorkflowInstance.ResubmissionCount</c>; capped by
-    /// <c>TenantSettings.MaxWorkflowResubmissions</c>.
+    /// <c>CompanySettings.MaxWorkflowResubmissions</c>.
     /// </summary>
     Task<WorkflowResult<bool>> ResubmitAsync(long workflowInstanceId, long userId, string? comments);
 }

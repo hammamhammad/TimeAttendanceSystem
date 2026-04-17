@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TecAxle.Hrms.Application.Abstractions;
-using TecAxle.Hrms.Domain.Tenants;
+using TecAxle.Hrms.Domain.Company;
 
 namespace TecAxle.Hrms.Application.Validation;
 
@@ -32,7 +32,7 @@ public sealed class ValidationThresholds
 }
 
 /// <summary>
-/// Default implementation. Reads <see cref="TenantSettings"/> lazily on first access (or via
+/// Default implementation. Reads <see cref="CompanySettings"/> lazily on first access (or via
 /// <see cref="WarmAsync"/>) and caches per scoped lifetime — which matches request lifetime.
 /// </summary>
 public sealed class ValidationSettingsProvider : IValidationSettingsProvider
@@ -51,7 +51,7 @@ public sealed class ValidationSettingsProvider : IValidationSettingsProvider
     {
         if (_cached != null) return;
 
-        var s = await _context.TenantSettings
+        var s = await _context.CompanySettings
             .AsNoTracking()
             .FirstOrDefaultAsync(t => !t.IsDeleted, ct);
 

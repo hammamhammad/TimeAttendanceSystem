@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
-using TecAxle.Hrms.Domain.Tenants;
+using TecAxle.Hrms.Domain.Company;
 using TecAxle.Hrms.Domain.Users;
 using TecAxle.Hrms.Infrastructure.Persistence;
 using TecAxle.Hrms.Infrastructure.Services;
@@ -59,7 +59,7 @@ public class NotificationRecipientResolverTests
 
         if (rolesCsv != null)
         {
-            db.TenantSettings.Add(new TenantSettings
+            db.CompanySettings.Add(new CompanySettings
             {
                 NotificationRecipientRolesCsv = rolesCsv,
                 CreatedAtUtc = DateTime.UtcNow,
@@ -89,7 +89,7 @@ public class NotificationRecipientResolverTests
     }
 
     [Fact]
-    public async Task Reads_configured_CSV_from_TenantSettings()
+    public async Task Reads_configured_CSV_from_CompanySettings()
     {
         await using var db = NewInMemoryDb();
         await SeedUsersAsync(db, new[]

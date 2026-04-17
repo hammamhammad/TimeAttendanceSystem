@@ -21,6 +21,14 @@ public class LetterRequest : BaseEntity
     public long? WorkflowInstanceId { get; set; }
     public long? SubmittedByUserId { get; set; }
 
+    // Phase 1 (v14.1): Execution tracking.
+    // The LetterRequestExecutor renders the configured template, writes the output file,
+    // sets GeneratedDocumentUrl, and transitions Status to Generated.
+    public bool IsExecuted { get; set; }
+    public DateTime? ExecutedAtUtc { get; set; }
+    public long? ExecutedByUserId { get; set; }
+    public string? ExecutionError { get; set; }
+
     // Navigation
     public Employee Employee { get; set; } = null!;
     public LetterTemplate? Template { get; set; }

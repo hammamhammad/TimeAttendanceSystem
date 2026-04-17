@@ -162,7 +162,9 @@ export interface SalaryAdvanceDto {
   requestedAmount: number;
   approvedAmount?: number;
   reason?: string;
-  deductionMonth: string;
+  // Phase 7 (v14.7): replaced legacy `deductionMonth` (string/YYYYMM) with an explicit date range.
+  deductionStartDate?: string;
+  deductionEndDate?: string;
   status: SalaryAdvanceStatus;
   approvedByName?: string;
   approvedAtUtc?: string;
@@ -174,7 +176,8 @@ export interface CreateSalaryAdvanceRequest {
   employeeId: number;
   amount: number;
   currency?: string;
-  deductionMonth: number;
+  deductionStartDate?: string;
+  deductionEndDate?: string;
   reason?: string;
   reasonAr?: string;
 }
