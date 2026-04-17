@@ -35,18 +35,12 @@ public class UpdateBranchSettingsOverrideCommandHandler : BaseHandler<UpdateBran
             Context.BranchSettingsOverrides.Add(overrides);
         }
 
-        overrides.EnableGpsAttendance = request.EnableGpsAttendance;
-        overrides.EnableNfcAttendance = request.EnableNfcAttendance;
         overrides.EnableBiometricAttendance = request.EnableBiometricAttendance;
         overrides.EnableManualAttendance = request.EnableManualAttendance;
-        // Phase 6: AutoCheckOutEnabled / AutoCheckOutTime removed.
         overrides.LateGracePeriodMinutes = request.LateGracePeriodMinutes;
         overrides.EarlyLeaveGracePeriodMinutes = request.EarlyLeaveGracePeriodMinutes;
         overrides.TrackBreakTime = request.TrackBreakTime;
         overrides.MinimumWorkingHoursForPresent = request.MinimumWorkingHoursForPresent;
-        overrides.MobileCheckInEnabled = request.MobileCheckInEnabled;
-        overrides.RequireNfcForMobile = request.RequireNfcForMobile;
-        overrides.RequireGpsForMobile = request.RequireGpsForMobile;
         overrides.ModifiedBy = CurrentUser.Username ?? "SYSTEM";
 
         await Context.SaveChangesAsync(cancellationToken);

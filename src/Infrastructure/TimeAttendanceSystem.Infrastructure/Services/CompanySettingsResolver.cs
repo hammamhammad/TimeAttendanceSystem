@@ -89,11 +89,8 @@ public class CompanySettingsResolver : ICompanySettingsResolver
         dto.NumberFormat = settings.NumberFormat;
 
         // Attendance
-        dto.EnableGpsAttendance = settings.EnableGpsAttendance;
-        dto.EnableNfcAttendance = settings.EnableNfcAttendance;
         dto.EnableBiometricAttendance = settings.EnableBiometricAttendance;
         dto.EnableManualAttendance = settings.EnableManualAttendance;
-        // Phase 6: AutoCheckOutEnabled / AutoCheckOutTime removed.
         dto.LateGracePeriodMinutes = settings.LateGracePeriodMinutes;
         dto.EarlyLeaveGracePeriodMinutes = settings.EarlyLeaveGracePeriodMinutes;
         dto.TrackBreakTime = settings.TrackBreakTime;
@@ -121,17 +118,10 @@ public class CompanySettingsResolver : ICompanySettingsResolver
 
         // Notification
         dto.EnableEmailNotifications = settings.EnableEmailNotifications;
-        dto.EnablePushNotifications = settings.EnablePushNotifications;
         dto.EnableSmsNotifications = settings.EnableSmsNotifications;
         dto.NotifyManagerOnLeaveRequest = settings.NotifyManagerOnLeaveRequest;
         dto.NotifyEmployeeOnApproval = settings.NotifyEmployeeOnApproval;
         dto.DailyAttendanceSummaryEnabled = settings.DailyAttendanceSummaryEnabled;
-
-        // Mobile
-        dto.MobileCheckInEnabled = settings.MobileCheckInEnabled;
-        dto.RequireNfcForMobile = settings.RequireNfcForMobile;
-        dto.RequireGpsForMobile = settings.RequireGpsForMobile;
-        dto.AllowMockLocation = settings.AllowMockLocation;
 
         // Security
         dto.PasswordExpiryDays = settings.PasswordExpiryDays;
@@ -178,18 +168,12 @@ public class CompanySettingsResolver : ICompanySettingsResolver
 
     private static void ApplyBranchOverrides(ResolvedSettingsDto dto, Domain.Branches.BranchSettingsOverride o)
     {
-        if (o.EnableGpsAttendance.HasValue) { dto.EnableGpsAttendance = o.EnableGpsAttendance.Value; dto.Sources["enableGpsAttendance"] = "branch"; }
-        if (o.EnableNfcAttendance.HasValue) { dto.EnableNfcAttendance = o.EnableNfcAttendance.Value; dto.Sources["enableNfcAttendance"] = "branch"; }
         if (o.EnableBiometricAttendance.HasValue) { dto.EnableBiometricAttendance = o.EnableBiometricAttendance.Value; dto.Sources["enableBiometricAttendance"] = "branch"; }
         if (o.EnableManualAttendance.HasValue) { dto.EnableManualAttendance = o.EnableManualAttendance.Value; dto.Sources["enableManualAttendance"] = "branch"; }
-        // Phase 6: AutoCheckOutEnabled / AutoCheckOutTime removed from the branch override.
         if (o.LateGracePeriodMinutes.HasValue) { dto.LateGracePeriodMinutes = o.LateGracePeriodMinutes.Value; dto.Sources["lateGracePeriodMinutes"] = "branch"; }
         if (o.EarlyLeaveGracePeriodMinutes.HasValue) { dto.EarlyLeaveGracePeriodMinutes = o.EarlyLeaveGracePeriodMinutes.Value; dto.Sources["earlyLeaveGracePeriodMinutes"] = "branch"; }
         if (o.TrackBreakTime.HasValue) { dto.TrackBreakTime = o.TrackBreakTime.Value; dto.Sources["trackBreakTime"] = "branch"; }
         if (o.MinimumWorkingHoursForPresent.HasValue) { dto.MinimumWorkingHoursForPresent = o.MinimumWorkingHoursForPresent.Value; dto.Sources["minimumWorkingHoursForPresent"] = "branch"; }
-        if (o.MobileCheckInEnabled.HasValue) { dto.MobileCheckInEnabled = o.MobileCheckInEnabled.Value; dto.Sources["mobileCheckInEnabled"] = "branch"; }
-        if (o.RequireNfcForMobile.HasValue) { dto.RequireNfcForMobile = o.RequireNfcForMobile.Value; dto.Sources["requireNfcForMobile"] = "branch"; }
-        if (o.RequireGpsForMobile.HasValue) { dto.RequireGpsForMobile = o.RequireGpsForMobile.Value; dto.Sources["requireGpsForMobile"] = "branch"; }
     }
 
     private static void ApplyDepartmentOverrides(ResolvedSettingsDto dto, Domain.Departments.DepartmentSettingsOverride o)
@@ -203,16 +187,15 @@ public class CompanySettingsResolver : ICompanySettingsResolver
         var fields = new[]
         {
             "fiscalYearStartMonth", "weekStartDay", "dateFormat", "timeFormat", "numberFormat",
-            "enableGpsAttendance", "enableNfcAttendance", "enableBiometricAttendance", "enableManualAttendance",
-            "autoCheckOutEnabled", "autoCheckOutTime", "lateGracePeriodMinutes", "earlyLeaveGracePeriodMinutes",
+            "enableBiometricAttendance", "enableManualAttendance",
+            "lateGracePeriodMinutes", "earlyLeaveGracePeriodMinutes",
             "trackBreakTime", "minimumWorkingHoursForPresent",
             "allowNegativeLeaveBalance", "requireAttachmentForSickLeave", "minDaysBeforeLeaveRequest",
             "allowHalfDayLeave", "allowLeaveEncashment", "leaveYearStart",
             "payrollCutOffDay", "payrollCurrency", "enableEndOfServiceCalc", "salaryCalculationBasis",
             "autoApproveAfterTimeout", "defaultApprovalTimeoutHours", "allowSelfApproval", "requireApprovalComments",
-            "enableEmailNotifications", "enablePushNotifications", "enableSmsNotifications",
+            "enableEmailNotifications", "enableSmsNotifications",
             "notifyManagerOnLeaveRequest", "notifyEmployeeOnApproval", "dailyAttendanceSummaryEnabled",
-            "mobileCheckInEnabled", "requireNfcForMobile", "requireGpsForMobile", "allowMockLocation",
             "passwordExpiryDays", "maxLoginAttempts", "sessionTimeoutMinutes", "require2FA", "passwordHistoryCount"
         };
 

@@ -40,8 +40,6 @@ public class CompanySettings : BaseEntity
 
     // ── Attendance Settings ──────────────────────────────
 
-    public bool EnableGpsAttendance { get; set; } = false;
-    public bool EnableNfcAttendance { get; set; } = false;
     public bool EnableBiometricAttendance { get; set; } = true;
     public bool EnableManualAttendance { get; set; } = true;
 
@@ -88,18 +86,10 @@ public class CompanySettings : BaseEntity
     // ── Notification Settings ────────────────────────────
 
     public bool EnableEmailNotifications { get; set; } = true;
-    public bool EnablePushNotifications { get; set; } = true;
     public bool EnableSmsNotifications { get; set; } = false;
     public bool NotifyManagerOnLeaveRequest { get; set; } = true;
     public bool NotifyEmployeeOnApproval { get; set; } = true;
     public bool DailyAttendanceSummaryEnabled { get; set; } = false;
-
-    // ── Mobile App Settings ──────────────────────────────
-
-    public bool MobileCheckInEnabled { get; set; } = true;
-    public bool RequireNfcForMobile { get; set; } = false;
-    public bool RequireGpsForMobile { get; set; } = true;
-    public bool AllowMockLocation { get; set; } = false;
 
     // ── Security Settings ────────────────────────────────
 

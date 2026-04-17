@@ -2,18 +2,18 @@
 
 ## System Overview
 
-TecAxle HRMS is a comprehensive enterprise HRMS / workforce-management system owned and operated by **TecAxle**. A single backend, admin frontend, self-service frontend, and mobile app serve a single company. Multi-branch within the company is fully supported (branches, departments, user branch scopes).
+TecAxle HRMS is a comprehensive enterprise HRMS / workforce-management system owned and operated by **TecAxle**. A single backend, admin frontend, and self-service frontend serve a single company. Multi-branch within the company is fully supported (branches, departments, user branch scopes).
 
 ### High-level capabilities
 
-- **Time & attendance tracking** — automated daily attendance, overtime, late/early detection, device integration (biometric, GPS+NFC mobile)
+- **Time & attendance tracking** — automated daily attendance, overtime, late/early detection, biometric fingerprint device integration
 - **Leave management** — vacation types, policies, balances, accruals, transactions, approvals
 - **Employee self-service portal** — employees manage their own vacation/excuse/remote-work/fingerprint requests; managers approve their team's
 - **Approval workflows** — multi-step configurable approval processes with delegation, escalation, return-for-correction, resubmission
 - **Organization management** — multi-branch, departments with hierarchy, employees, users, roles, permissions, user-branch-scopes
 - **Shift management** — regular/flexible/split/rotating/night shifts, shift periods, shift assignments, off days, grace periods, overtime rules
 - **Remote work management** — policies and requests for remote/hybrid work
-- **Real-time notifications** — SignalR-based in-app notifications, Firebase push on mobile
+- **Real-time notifications** — SignalR-based in-app notifications (web)
 - **Comprehensive reporting** — attendance, leave, payroll, custom reports, audit logs
 - **Recruitment** — job requisitions, postings, candidates, applications, interviews, offer letters
 - **Onboarding** — templates, processes, tasks, documents
@@ -31,7 +31,7 @@ TecAxle HRMS is a comprehensive enterprise HRMS / workforce-management system ow
 - **Single-step login**: `POST /api/v1/auth/login` with `{email, password}` → returns JWT + user info.
 - **No subscription/entitlement system**: every feature is always enabled. No `[RequiresModule]`, `[RequiresModuleEndpoint]`, `[RequiresLimit]`, `[AllowModuleReadOnly]` attributes anywhere. No `EntitlementService`, `ModuleDeactivationService`, or `SystemModule` enum.
 - **No Platform menu**: admin sidebar contains only business modules. No Tenants, Subscription Plans, or Platform admin UI.
-- **Mobile**: no tenant-discovery screen; app launches directly to login. `AppConfig.apiBaseUrl` is the hardcoded backend URL.
+- **No mobile app**: the Flutter ESS app and all mobile-specific backend surface (FCM push, NFC tags, GPS verification, mobile endpoints) were removed in v14.8. Employees interact with the system via the web self-service portal only. Branch GPS coordinates are retained as branch metadata (displayed on the admin map picker).
 - **C# namespaces**: `TecAxle.Hrms.*` (project directories are still named `TimeAttendanceSystem.*` with `RootNamespace`/`AssemblyName` overrides in `.csproj`).
 
 ---
@@ -50,7 +50,7 @@ TecAxle HRMS is a comprehensive enterprise HRMS / workforce-management system ow
 
 ### 2. Organization Structure
 
-- **Branches** — multi-branch organization support, GPS geofencing (latitude, longitude, `GeofenceRadiusMeters`) with interactive Leaflet map picker. `Branch.ManagerEmployeeId` for workflow routing.
+- **Branches** — multi-branch organization support, GPS coordinates (latitude, longitude, `GeofenceRadiusMeters`) used as branch metadata with interactive Leaflet map picker. `Branch.ManagerEmployeeId` for workflow routing.
 - **Departments** — hierarchical (parent-child), `Department.ManagerEmployeeId`.
 - **Employees** — `IsActive`, `IsSuspended` (two-phase offboarding), `IsPreHire` (lifecycle automation), `OnboardingCompletedAt` milestone timestamp.
 - **Users** — login accounts linked to employees via `EmployeeUserLink`.
@@ -62,8 +62,7 @@ TecAxle HRMS is a comprehensive enterprise HRMS / workforce-management system ow
 - AttendanceRecord (daily auto-generated), AttendanceTransaction (check-in/out, break), calculated working hours, overtime, late/early minutes.
 - Status tracking: Present, Absent, Late, OnLeave, Holiday, Weekend, etc.
 - Manual override with approval workflow; finalization locks records.
-- Device integration: biometric fingerprint devices + GPS+NFC mobile.
-- Mobile GPS+NFC dual verification (Haversine geofence distance + HMAC-SHA256 signed NFC payload), `AttendanceVerificationLog` audits every attempt.
+- Device integration: biometric fingerprint devices.
 
 ### 4. Shift Management
 
@@ -94,12 +93,6 @@ RemoteWorkPolicy, RemoteWorkRequest, blackout periods, department eligibility.
 ### 9. Self-Service Portal
 
 Separate Angular app (`time-attendance-selfservice-frontend/`, port 4201). Employees: attendance, vacation, excuse, remote-work, fingerprint requests, personal dashboard. Managers: team view, pending approvals, manager dashboard. All restricted to current user / team.
-
-### 10. NFC Tag Management & Security
-
-- `NfcTag` — physical NFC tags registered to branches, status lifecycle (Unregistered/Registered/Active/Disabled/Lost).
-- HMAC-SHA256 signed payload: `{tagId}|{branchId}|{tagUid}|{timestamp}|{hmacSignature}`.
-- `NfcEncryption:SecretKey` + `RequirePayload` toggle in `appsettings.json`.
 
 ### 11. Fingerprint / Biometric Management
 
@@ -134,7 +127,7 @@ Full English + Arabic (RTL). Bilingual entity names. ~2,700+ translation keys pe
 
 ### 18. Real-Time Notifications
 
-SignalR hub at `/hubs/notifications`. Bilingual notifications (RequestSubmitted/Approved/Rejected/Delegated/Escalated/ApprovalPending/DelegationReceived/ApprovalReminder). Read tracking, action URLs. Firebase Cloud Messaging for mobile push.
+SignalR hub at `/hubs/notifications`. Bilingual notifications (RequestSubmitted/Approved/Rejected/Delegated/Escalated/ApprovalPending/DelegationReceived/ApprovalReminder). Read tracking, action URLs.
 
 ### 19. Recruitment & Hiring
 
@@ -221,8 +214,8 @@ Automates seven HR lifecycle transitions via MediatR domain events. Every automa
 
 ## Company Configuration & Policy Framework
 
-- **`CompanySettings`** (table: `CompanySettings`, entity path: `src/Domain/TimeAttendanceSystem.Domain/Company/CompanySettings.cs`) — singleton row. Centralized operational settings covering 10 categories (General, Attendance, Leave, Payroll, Approval, Notification, Mobile, Security, Business-Rule Thresholds, Lifecycle Automation). Renamed from `TenantSettings` in v14.5; all Tenant* naming was retired in v14.5/14.7.
-- **`BranchSettingsOverride`** — per-branch nullable overrides for attendance/mobile.
+- **`CompanySettings`** (table: `CompanySettings`, entity path: `src/Domain/TimeAttendanceSystem.Domain/Company/CompanySettings.cs`) — singleton row. Centralized operational settings covering 9 categories (General, Attendance, Leave, Payroll, Approval, Notification, Security, Business-Rule Thresholds, Lifecycle Automation). Renamed from `TenantSettings` in v14.5; all Tenant* naming was retired in v14.5/14.7. Mobile-only fields (`EnableGpsAttendance`, `EnableNfcAttendance`, `EnablePushNotifications`, `MobileCheckInEnabled`, `RequireNfcForMobile`, `RequireGpsForMobile`, `AllowMockLocation`) were removed in v14.8.
+- **`BranchSettingsOverride`** — per-branch nullable overrides for attendance.
 - **`DepartmentSettingsOverride`** — per-department overrides for default shift + approval comments.
 - **`ICompanySettingsResolver.GetSettingsAsync(branchId?, deptId?)`** — inheritance chain Company → Branch → Department. 5-min memory cache, `InvalidateCache()` after mutation.
 
@@ -260,7 +253,6 @@ All hardcoded business rules were moved to `CompanySettings` in v13.3 + v13.4. E
 - **PostgreSQL 15+** running on localhost:5432 (tested with 18).
 - **.NET 9 SDK** (project targets `net9.0`).
 - **Node.js 20+** + npm.
-- **Flutter 3.22+** for mobile (optional).
 
 ### First-run setup
 
@@ -324,7 +316,6 @@ Sample employees follow the pattern `{first}.{last}@company.com` / `Emp@123!`.
 | Backend API | http://localhost:5099 | REST API + SignalR Hub + Swagger |
 | Admin Portal | http://localhost:4200 | Full system management (HR/Admin) |
 | Self-Service Portal | http://localhost:4201 | Employee self-service + manager approvals |
-| Mobile App | Device/Emulator | Flutter — GPS+NFC attendance |
 
 ### Troubleshooting
 
@@ -333,7 +324,6 @@ Sample employees follow the pattern `{first}.{last}@company.com` / `Emp@123!`.
 - **Port conflicts** → check 4200/4201/5099, use `--port` to change.
 - **Can't log in** → use the full email address. `MustChangePassword` redirects on first login.
 - **SignalR not connecting** → check browser console for WebSocket errors, verify JWT token is sent.
-- **Mobile NFC/GPS** → real hardware only. Verify branch has GPS coords + `GeofenceRadiusMeters` configured.
 
 ---
 
@@ -343,7 +333,7 @@ Sample employees follow the pattern `{first}.{last}@company.com` / `Emp@123!`.
 
 - Split new components into three files (`ts`, `html`, `css`).
 - Follow established folder patterns.
-- **Three UI apps**: `time-attendance-frontend/` (4200), `time-attendance-selfservice-frontend/` (4201), `ess_mobile_app/` (Flutter).
+- **Two UI apps**: `time-attendance-frontend/` (4200), `time-attendance-selfservice-frontend/` (4201).
 
 ### Development Workflow
 
@@ -485,18 +475,6 @@ Page bg: `#F5F6FA`. Sidebar: deep navy `#0F1629`.
 - Role-based + permission-based authorization.
 - Branch-scoped data access via `UserBranchScope`.
 
-### NFC Tag Security
-
-HMAC-SHA256 signed payload. `appsettings.json`:
-```json
-"NfcEncryption": {
-  "SecretKey": "your-hmac-secret-key",
-  "RequirePayload": false
-}
-```
-- `RequirePayload: false` → graceful degradation (UID-only verification).
-- `RequirePayload: true` → full payload signature verification.
-
 ### Data Security
 
 - Passwords: PBKDF2-SHA256, 10000 iterations, unique salts.
@@ -588,7 +566,6 @@ Tests are split into three clearly-labelled layers. Each has a dedicated script 
 - **Backend + DB**: Ubuntu 24.04 LTS at `https://api.clockn.net`
 - **Admin Portal**: Cloudflare Pages at `https://www.clockn.net`
 - **Self-Service Portal**: Cloudflare Pages at `https://portal.clockn.net`
-- **Mobile App**: Flutter connecting to `https://api.clockn.net`
 
 ### Production considerations
 
@@ -631,12 +608,6 @@ cd time-attendance-frontend && npx ng build
 # --- Self-service frontend ---
 cd time-attendance-selfservice-frontend && npm start
 cd time-attendance-selfservice-frontend && npx ng build
-
-# --- Mobile ---
-cd ess_mobile_app
-flutter pub get
-flutter pub run build_runner build --delete-conflicting-outputs
-flutter run
 
 # --- Tests ---
 cd tests/TecAxle.Hrms.Payroll.Tests && dotnet test
@@ -699,19 +670,6 @@ cd tests/TecAxle.Hrms.Payroll.Tests && dotnet test
 | i18n | [src/app/core/i18n/translations/](time-attendance-selfservice-frontend/src/app/core/i18n/translations/) |
 | Shared components | [src/app/shared/components/](time-attendance-selfservice-frontend/src/app/shared/components/) |
 
-#### Mobile (`ess_mobile_app/`)
-
-| Area | Path |
-|---|---|
-| Router | [lib/app/router.dart](ess_mobile_app/lib/app/router.dart) |
-| API client | [lib/core/network/api_client.dart](ess_mobile_app/lib/core/network/api_client.dart) |
-| Auth interceptor | [lib/core/network/auth_interceptor.dart](ess_mobile_app/lib/core/network/auth_interceptor.dart) |
-| Auth provider | [lib/shared/providers/auth_provider.dart](ess_mobile_app/lib/shared/providers/auth_provider.dart) |
-| Config | [lib/core/config/app_config.dart](ess_mobile_app/lib/core/config/app_config.dart) |
-| Theme | [lib/core/theme/app_theme.dart](ess_mobile_app/lib/core/theme/app_theme.dart) |
-| Features | [lib/features/](ess_mobile_app/lib/features/) |
-| Push | [lib/shared/services/push_notification_service.dart](ess_mobile_app/lib/shared/services/push_notification_service.dart) |
-
 ---
 
 ## Feature-specific rules
@@ -725,14 +683,6 @@ cd tests/TecAxle.Hrms.Payroll.Tests && dotnet test
 - Apply grace periods before marking late.
 - Calculate regular + premium overtime.
 - Track manual overrides separately.
-
-### Mobile attendance verification
-
-- Dual verification: GPS geofence + NFC tag.
-- Audit every attempt to `AttendanceVerificationLogs`.
-- Failure reasons: `GpsOutsideGeofence`, `NfcTagMismatch`, `NfcTagNotRegistered`, `NfcTagInactive`, `BranchNotConfigured`, `GpsUnavailable`, `NfcPayloadInvalid`, `NfcPayloadTampering`.
-- Capture device ID, model, platform, app version.
-- Convert UTC to branch local time for transaction timestamps.
 
 ### Payroll
 
@@ -811,9 +761,6 @@ cd tests/TecAxle.Hrms.Payroll.Tests && dotnet test
 - Forgetting to update audit logs
 - Missing pagination on large datasets
 - Not sending notifications for workflow events
-- Not logging failed verification attempts to `AttendanceVerificationLogs`
-- Not configuring branch GPS coordinates before enabling mobile attendance
-- Forgetting timezone conversion for mobile transaction timestamps
 - Hardcoding business rules — move to `CompanySettings`
 - Hardcoding role names in notification queries — use `INotificationRecipientResolver`
 - Using `Role.Name == "HR"` pattern — use `NotificationRecipientRolesCsv` setting
@@ -854,9 +801,90 @@ cd tests/TecAxle.Hrms.Payroll.Tests && dotnet test
 ---
 
 **Last Updated**: April 17, 2026
-**Version**: 14.7 — Final Cleanup & Polish
+**Version**: 14.8 — Mobile App Removal
 
-System is a single-company HRMS with one database (`tecaxle_hrms`), one `TecAxleDbContext`, single-step email+password login, and no subscription/entitlement system. The v14.x series replaced the multi-tenant SaaS architecture, retired every remnant of tenant-based naming and dead entitlement metadata, and hardened payroll transactional safety via real-Postgres integration tests.
+System is a single-company HRMS with one database (`tecaxle_hrms`), one `TecAxleDbContext`, single-step email+password login, and no subscription/entitlement system. The v14.x series replaced the multi-tenant SaaS architecture, retired every remnant of tenant-based naming and dead entitlement metadata, hardened payroll transactional safety via real-Postgres integration tests, and in v14.8 removed the Flutter mobile app along with every mobile-specific backend surface.
+
+### Summary of v14.8 changes (Mobile App Removal)
+
+Full removal of the Flutter ESS app and all mobile-specific backend code. Option B from the scope proposal: the app directory, FCM push notifications, NFC tag management, GPS+NFC attendance verification, and dedicated mobile endpoints are all gone. Branch GPS fields (`Latitude`, `Longitude`, `GeofenceRadiusMeters`) are retained purely as branch metadata; they no longer drive any runtime behavior.
+
+**Deletions (Flutter app)**:
+- `ess_mobile_app/` — entire Flutter project (lib, android, ios, web, windows, integration_test, assets, pubspec, README, RELEASE_GUIDE, setup.ps1). Android had `google-services.json` (FCM) — gone with the folder.
+- `.gitignore` — removed the `# --- Flutter / mobile` block.
+
+**Deletions (backend — controllers)**:
+- `PushTokensController.cs`
+- `NfcTagsController.cs`
+- `MobileAttendanceController.cs`
+- `MobileScheduleController.cs`
+- `NotificationBroadcastsController.cs`
+
+**Deletions (backend — CQRS folders)**:
+- `Application/MobileAttendance/` (ProcessMobileTransaction + CheckLocation)
+- `Application/NfcTags/` (8 commands + 5 queries)
+- `Application/Notifications/Commands/RegisterPushToken/`
+- `Application/Notifications/Commands/UnregisterPushToken/`
+- `Application/Notifications/Commands/CreateBroadcast/`
+- `Application/Notifications/Queries/GetBroadcasts/`
+
+**Deletions (backend — services + EF configs)**:
+- `Infrastructure/Services/NfcTagEncryptionService.cs`
+- `Application/Abstractions/INfcTagEncryptionService.cs`
+- `PushNotificationTokenConfiguration.cs`
+- `NfcTagConfiguration.cs`
+- `AttendanceVerificationLogConfiguration.cs`
+- `NotificationBroadcastConfiguration.cs`
+
+**Deletions (backend — domain entities)**:
+- `Domain/Notifications/PushNotificationToken.cs`
+- `Domain/Notifications/NotificationBroadcast.cs` (incl. `BroadcastTargetType` + `NotificationChannel` enums — the `InApp`/`Push`/`Both` enum moved with the entity since every consumer is gone)
+- `Domain/Branches/NfcTag.cs` + `NfcTagStatus.cs`
+- `Domain/Attendance/AttendanceVerificationLog.cs` (incl. `VerificationTransactionType`, `VerificationStatus`, `VerificationFailureReason` enums)
+
+**Edits (backend — entity/DTO field strips)**:
+- `Domain/Notifications/Notification.cs` — dropped `Channel`, `BroadcastId`, `DeepLink`, and `Broadcast` navigation. In-app notifications don't need channel selection anymore.
+- `Domain/Company/CompanySettings.cs` — dropped `EnableGpsAttendance`, `EnableNfcAttendance`, `EnablePushNotifications`, `MobileCheckInEnabled`, `RequireNfcForMobile`, `RequireGpsForMobile`, `AllowMockLocation`.
+- `Domain/Branches/BranchSettingsOverride.cs` — dropped matching nullable override fields for the same 7 company fields.
+- DTOs updated in lockstep: `CompanySettingsDto`, `ResolvedSettingsDto`, `BranchSettingsOverrideDto`.
+- `UpdateCompanySettingsCommand`/`Handler` + `GetCompanySettingsQueryHandler` — fields removed from DTOs and assignments.
+- `UpdateBranchSettingsOverrideCommand`/`Handler` + `GetBranchSettingsOverrideQueryHandler` — same treatment.
+- `CompanySettingsResolver` (`MapFromCompanySettings`, `ApplyBranchOverrides`, `SetAllSources`) — all three updated.
+
+**Edits (backend — DbContext + DI + config)**:
+- `TecAxleDbContext` — dropped 4 `DbSet`s (`NfcTags`, `PushNotificationTokens`, `AttendanceVerificationLogs`, `NotificationBroadcasts`).
+- `IApplicationDbContext` + `ApplicationDbContextAdapter` — matching `DbSet` property drops.
+- `DependencyInjection` — removed `INfcTagEncryptionService` registration and the `MOBILE ESS POLICIES` block (`NotificationManagement`, `NfcTagManagement`, `NfcTagRead`).
+- `NotificationConfiguration` (EF config) — stripped `Channel`, `BroadcastId`, `DeepLink` property configs, `HasOne(n => n.Broadcast)` FK, and `IX_Notifications_BroadcastId` index.
+- `appsettings.json` — removed `NfcEncryption` block (SecretKey + RequirePayload).
+
+**Deletions (admin frontend)**:
+- `pages/nfc-tags/` — list, form, view, service.
+- `pages/settings/company-configuration/mobile-settings/`.
+- `pages/notifications/` — `send-notification` + `broadcast-history` components. Folder now empty and deleted.
+- `core/services/notification-broadcast.service.ts`.
+- `shared/components/notification-center-widget/` — the entire widget (broadcast-stat-driven, no other consumers).
+- `shared/models/nfc-tag.model.ts`.
+
+**Edits (admin frontend)**:
+- `app.routes.ts` — stripped `settings/mobile` sub-route, 4 `/nfc-tags/*` routes, 2 `/notifications/send` + `/notifications/history` routes.
+- `company-configuration.component.ts` — removed the Mobile navItem (the 6th tab).
+- `company-configuration.models.ts` — dropped `enableGpsAttendance`, `enableNfcAttendance`, `enablePushNotifications`, `mobileCheckInEnabled`, `requireNfcForMobile`, `requireGpsForMobile`, `allowMockLocation` from `CompanySettingsDto` + `BranchSettingsOverrideDto`.
+- `attendance-settings.component.html` — removed the two toggles (GPS + NFC).
+- `notification-settings.component.ts` — removed the Push toggle.
+- `i18n/translations/en.json` + `ar.json` — deleted: `nfc_tags.*` (full block), `tenant_configuration.attendance.{gps,nfc}`, `tenant_configuration.notification.push`, `tenant_configuration.mobile.*`, and the 80+ broadcast/send-notification keys in `notifications.*` (kept core notification keys).
+
+**Deletions (tests + docs)**:
+- `TestCases/14-NFC-nfc-notifications.md`
+- `e2e/pages/admin/nfc-tags.page.ts`
+- `e2e/pages/admin/notifications.page.ts`
+- `e2e/tests/14-nfc-notifications/` (whole folder)
+
+**Migration**: A single `RemoveMobileAndNfc` EF migration drops the tables `PushNotificationTokens`, `NfcTags`, `AttendanceVerificationLogs`, `NotificationBroadcasts`, and strips the associated `Notifications.Channel`, `Notifications.BroadcastId`, `Notifications.DeepLink` columns + `IX_Notifications_BroadcastId` + `FK_Notifications_NotificationBroadcasts`. Also drops 7 bool columns from `CompanySettings` (the mobile fields) and 5 bool? columns from `BranchSettingsOverrides`.
+
+**Self-service frontend**: zero changes. Never had any mobile/NFC/push UI.
+
+**Tests**: no backend test files referenced any of the deleted types, so no test changes were needed. All 167 tests still valid.
 
 ### Summary of v14.7 changes (Final Cleanup & Polish)
 
@@ -1002,6 +1030,7 @@ Retired all remnant `Tenant*` naming from the codebase and DB schema (the v14.0 
 
 ### Previous versions
 
+- **v14.8** — Mobile App Removal — deleted Flutter ESS app + all mobile-specific backend (FCM push, NFC tags, GPS verification, mobile endpoints, `NotificationBroadcast`); single EF migration `RemoveMobileAndNfc` drops 4 tables + 3 `Notifications` columns + 7 `CompanySettings` bool columns
 - **v14.7** — Final Cleanup & Polish: fully retire `DeductionMonth`, fix CI pipeline, 3-layer test scripts, canonical `/settings/company-config` route, dead-metadata sweep (see `FINAL_CLEANUP_AND_POLISH_REPORT.md`)
 - **v14.6** — Real-Postgres integration harness; retire `AutoCheckOutEnabled`/`AutoCheckOutTime`; top-nav omnibox (see `PHASE6_IMPLEMENTATION_REPORT.md`)
 - **v14.5** — Tenant → Company naming cleanup (entity, DB, controller, route, service, folders) (see `PHASE5_TENANT_CLEANUP_REPORT.md` + `PHASE5_SIGNOFF_ADDENDUM.md`)

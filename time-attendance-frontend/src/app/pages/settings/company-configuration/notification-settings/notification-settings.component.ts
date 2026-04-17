@@ -28,13 +28,6 @@ import { LoadingSpinnerComponent } from '../../../../shared/components/loading-s
             </div>
             <div class="col-md-6">
               <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="enablePushNotifications"
-                       [ngModel]="s.enablePushNotifications" (ngModelChange)="s.enablePushNotifications = $event">
-                <label class="form-check-label" for="enablePushNotifications">{{ t('tenant_configuration.notification.push') }}</label>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="form-check form-switch">
                 <input class="form-check-input" type="checkbox" id="enableSmsNotifications"
                        [ngModel]="s.enableSmsNotifications" (ngModelChange)="s.enableSmsNotifications = $event">
                 <label class="form-check-label" for="enableSmsNotifications">{{ t('tenant_configuration.notification.sms') }}</label>

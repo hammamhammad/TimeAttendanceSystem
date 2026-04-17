@@ -100,12 +100,6 @@ public class ApplicationDbContextAdapter : IApplicationDbContext
 
     // Notification entities
     public DbSet<Notification> Notifications => _context.Notifications;
-    public DbSet<NotificationBroadcast> NotificationBroadcasts => _context.NotificationBroadcasts;
-    public DbSet<PushNotificationToken> PushNotificationTokens => _context.PushNotificationTokens;
-
-    // Mobile check-in entities
-    public DbSet<NfcTag> NfcTags => _context.NfcTags;
-    public DbSet<AttendanceVerificationLog> AttendanceVerificationLogs => _context.AttendanceVerificationLogs;
 
     // Platform entities (Tenants, Subscriptions, etc.) are in MasterDbContext only
 

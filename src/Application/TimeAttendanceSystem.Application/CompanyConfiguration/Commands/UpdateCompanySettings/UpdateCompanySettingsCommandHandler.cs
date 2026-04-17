@@ -36,11 +36,8 @@ public class UpdateCompanySettingsCommandHandler : BaseHandler<UpdateCompanySett
         settings.NumberFormat = request.NumberFormat ?? "en-US";
 
         // Attendance
-        settings.EnableGpsAttendance = request.EnableGpsAttendance;
-        settings.EnableNfcAttendance = request.EnableNfcAttendance;
         settings.EnableBiometricAttendance = request.EnableBiometricAttendance;
         settings.EnableManualAttendance = request.EnableManualAttendance;
-        // Phase 6: AutoCheckOutEnabled / AutoCheckOutTime removed.
         settings.LateGracePeriodMinutes = request.LateGracePeriodMinutes;
         settings.EarlyLeaveGracePeriodMinutes = request.EarlyLeaveGracePeriodMinutes;
         settings.TrackBreakTime = request.TrackBreakTime;
@@ -68,17 +65,10 @@ public class UpdateCompanySettingsCommandHandler : BaseHandler<UpdateCompanySett
 
         // Notification
         settings.EnableEmailNotifications = request.EnableEmailNotifications;
-        settings.EnablePushNotifications = request.EnablePushNotifications;
         settings.EnableSmsNotifications = request.EnableSmsNotifications;
         settings.NotifyManagerOnLeaveRequest = request.NotifyManagerOnLeaveRequest;
         settings.NotifyEmployeeOnApproval = request.NotifyEmployeeOnApproval;
         settings.DailyAttendanceSummaryEnabled = request.DailyAttendanceSummaryEnabled;
-
-        // Mobile
-        settings.MobileCheckInEnabled = request.MobileCheckInEnabled;
-        settings.RequireNfcForMobile = request.RequireNfcForMobile;
-        settings.RequireGpsForMobile = request.RequireGpsForMobile;
-        settings.AllowMockLocation = request.AllowMockLocation;
 
         // Security
         settings.PasswordExpiryDays = request.PasswordExpiryDays;

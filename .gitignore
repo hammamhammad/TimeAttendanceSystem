@@ -34,12 +34,6 @@ yarn-debug.log*
 yarn-error.log*
 *.tsbuildinfo
 
-# --- Flutter / mobile ------------------------------------------------------
-ess_mobile_app/.dart_tool/
-ess_mobile_app/.flutter-plugins
-ess_mobile_app/.flutter-plugins-dependencies
-ess_mobile_app/build/
-
 # --- Claude Code per-user settings -----------------------------------------
 # (The committed .claude/settings.json is the shared config; settings.local.json
 #  and settings.{user}.json are per-developer and should not be tracked.)

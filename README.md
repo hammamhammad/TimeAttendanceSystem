@@ -39,7 +39,6 @@ The **TecAxle HRMS** is a comprehensive enterprise-grade workforce management so
 |-------------|----------|------|---------|
 | **Admin Portal** | `time-attendance-frontend/` | 4200 | Full system management for HR/Admins |
 | **Self-Service Portal** | `time-attendance-selfservice-frontend/` | 4201 | Employee self-service and manager approvals |
-| **Mobile ESS App** | `ess_mobile_app/` (Flutter) | N/A | Mobile attendance with GPS+NFC verification |
 
 **Frontend Stack**:
 - **Framework**: Angular 17+ with Standalone Components
@@ -47,12 +46,6 @@ The **TecAxle HRMS** is a comprehensive enterprise-grade workforce management so
 - **UI Library**: Bootstrap 5.3 + FontAwesome 6
 - **Internationalization**: ngx-translate (English/Arabic)
 - **Modern Syntax**: `@if` / `@for` control flow
-
-**Mobile Stack** (Flutter ESS):
-- **Framework**: Flutter 3.x
-- **State Management**: Riverpod
-- **Features**: GPS geofencing, NFC tag scanning, biometric auth
-- **Platforms**: iOS and Android
 
 ---
 
@@ -183,49 +176,6 @@ Separate Angular application for employee self-service:
 - **Entity Names**: All entities support bilingual names
 - **RTL Support**: Right-to-left layout for Arabic
 - **Translation Service**: Centralized i18n service
-
-### 14. Mobile ESS Platform (NEW)
-A Flutter-based mobile application for employee self-service with dual-verification attendance:
-
-**Mobile Attendance (GPS + NFC)**:
-- **GPS Geofencing**: Validates employee location against branch coordinates
-- **NFC Tag Verification**: Scans registered NFC tags at branch locations
-- **Dual Verification**: Requires both GPS and NFC for check-in/out
-- **Haversine Distance Calculation**: Accurate GPS distance calculations
-- **Verification Audit Logs**: Complete audit trail of all attendance attempts
-- **Configurable Geofence Radius**: Per-branch geofence settings
-
-**NFC Tag Management**:
-- **Tag Registration**: Register NFC tags to specific branches
-- **Tag Validation**: Real-time tag UID validation
-- **Write Protection**: Permanent write-lock capability for security
-- **Tag Lifecycle**: Activate/deactivate tags as needed
-
-**Push Notifications (FCM)**:
-- **Token Registration**: Firebase Cloud Messaging integration
-- **Device Management**: Multi-device token support
-- **Token Lifecycle**: Automatic cleanup on logout
-
-**Admin Broadcast Notifications**:
-- **Targeted Broadcasts**: Send to all, by branch, by department, or specific employees
-- **Multi-Channel**: In-app and push notification support
-- **Bilingual Messages**: English and Arabic content
-- **Delivery Tracking**: Monitor broadcast delivery status
-
-**Multi-Tenant Support**:
-- **Tenant Discovery**: Subdomain-based tenant lookup
-- **Custom Domains**: Support for enterprise custom domains
-- **Dynamic API Configuration**: Tenant-specific API base URLs
-
-**API Endpoints**:
-| Endpoint | Description |
-|----------|-------------|
-| `POST /api/v1/mobile/attendance/transaction` | Process mobile check-in/out |
-| `POST /api/v1/mobile/attendance/check-location` | Check geofence proximity |
-| `GET /api/v1/tenants/discover?domain=...` | Discover tenant by subdomain |
-| `POST /api/v1/push-tokens/register` | Register FCM token |
-| `POST /api/v1/notification-broadcasts` | Create admin broadcast |
-| `GET /api/v1/nfc-tags` | List NFC tags |
 
 ---
 
@@ -469,31 +419,6 @@ After starting all applications:
 ## 📄 License
 
 This project is proprietary software for enterprise use.
-
----
-
-## 📱 Mobile App Setup (Flutter)
-
-The mobile application is located in `ess_mobile_app/`.
-A local Flutter SDK is installed in `flutter/`.
-
-### Prerequisites
-- Windows 10/11
-- PowerShell
-
-### Setup & Run
-1. **Navigate to the project**:
-   ```powershell
-   cd ess_mobile_app
-   ```
-
-2. **Run the App**:
-   ```powershell
-   # Use the local Flutter SDK
-   ../flutter/bin/flutter run
-   ```
-
-**Note**: The Flutter SDK is installed locally in `d:\Work\TecAxle.Hrms\flutter` to avoid conflicts with global installations.
 
 ---
 

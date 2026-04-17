@@ -689,34 +689,6 @@ public interface IApplicationDbContext
     /// </remarks>
     DbSet<Notification> Notifications { get; }
 
-    /// <summary>
-    /// Gets the database set for NotificationBroadcast entities representing admin broadcast notifications.
-    /// Enables sending targeted notifications to selected employees, groups, branches, or all users.
-    /// </summary>
-    /// <value>DbSet for querying and managing NotificationBroadcast entities</value>
-    DbSet<NotificationBroadcast> NotificationBroadcasts { get; }
-
-    /// <summary>
-    /// Gets the database set for PushNotificationToken entities representing FCM device tokens.
-    /// Enables push notification delivery to mobile devices when the app is in background or closed.
-    /// </summary>
-    /// <value>DbSet for querying and managing PushNotificationToken entities</value>
-    DbSet<PushNotificationToken> PushNotificationTokens { get; }
-
-    /// <summary>
-    /// Gets the database set for NfcTag entities representing registered NFC tags for branch check-in.
-    /// Enables dual-verification (GPS + NFC) for mobile attendance validation.
-    /// </summary>
-    /// <value>DbSet for querying and managing NfcTag entities</value>
-    DbSet<NfcTag> NfcTags { get; }
-
-    /// <summary>
-    /// Gets the database set for AttendanceVerificationLog entities for audit logging of mobile check-in attempts.
-    /// Records both successful and failed dual-verification attempts for security and compliance.
-    /// </summary>
-    /// <value>DbSet for querying and managing AttendanceVerificationLog entities</value>
-    DbSet<AttendanceVerificationLog> AttendanceVerificationLogs { get; }
-
     // Phase 1: Employee Lifecycle
     DbSet<EmployeeContract> EmployeeContracts { get; }
     DbSet<EmployeeTransfer> EmployeeTransfers { get; }

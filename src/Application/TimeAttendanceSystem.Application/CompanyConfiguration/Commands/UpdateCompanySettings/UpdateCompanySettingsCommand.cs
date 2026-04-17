@@ -15,8 +15,6 @@ public record UpdateCompanySettingsCommand(
     string? TimeFormat,
     string? NumberFormat,
     // Attendance
-    bool EnableGpsAttendance,
-    bool EnableNfcAttendance,
     bool EnableBiometricAttendance,
     bool EnableManualAttendance,
     int LateGracePeriodMinutes,
@@ -42,16 +40,10 @@ public record UpdateCompanySettingsCommand(
     bool RequireApprovalComments,
     // Notification
     bool EnableEmailNotifications,
-    bool EnablePushNotifications,
     bool EnableSmsNotifications,
     bool NotifyManagerOnLeaveRequest,
     bool NotifyEmployeeOnApproval,
     bool DailyAttendanceSummaryEnabled,
-    // Mobile
-    bool MobileCheckInEnabled,
-    bool RequireNfcForMobile,
-    bool RequireGpsForMobile,
-    bool AllowMockLocation,
     // Security
     int PasswordExpiryDays,
     int MaxLoginAttempts,

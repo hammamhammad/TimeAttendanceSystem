@@ -28,11 +28,8 @@ public class ResolvedSettingsDto
     public int AttendanceDuplicateSuppressionSeconds { get; set; } = 30;
 
     // Attendance
-    public bool EnableGpsAttendance { get; set; }
-    public bool EnableNfcAttendance { get; set; }
     public bool EnableBiometricAttendance { get; set; }
     public bool EnableManualAttendance { get; set; }
-    // Phase 6: AutoCheckOutEnabled / AutoCheckOutTime removed.
     public int LateGracePeriodMinutes { get; set; }
     public int EarlyLeaveGracePeriodMinutes { get; set; }
     public bool TrackBreakTime { get; set; }
@@ -60,17 +57,10 @@ public class ResolvedSettingsDto
 
     // Notification
     public bool EnableEmailNotifications { get; set; }
-    public bool EnablePushNotifications { get; set; }
     public bool EnableSmsNotifications { get; set; }
     public bool NotifyManagerOnLeaveRequest { get; set; }
     public bool NotifyEmployeeOnApproval { get; set; }
     public bool DailyAttendanceSummaryEnabled { get; set; }
-
-    // Mobile
-    public bool MobileCheckInEnabled { get; set; }
-    public bool RequireNfcForMobile { get; set; }
-    public bool RequireGpsForMobile { get; set; }
-    public bool AllowMockLocation { get; set; }
 
     // Security
     public int PasswordExpiryDays { get; set; }

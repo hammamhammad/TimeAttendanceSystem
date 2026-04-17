@@ -107,7 +107,6 @@ public class TecAxleDbContext : DbContext, IApplicationDbContext
 
     public DbSet<Branch> Branches => Set<Branch>();
     public DbSet<Department> Departments => Set<Department>();
-    public DbSet<NfcTag> NfcTags => Set<NfcTag>();
     public DbSet<User> Users => Set<User>();
     public DbSet<Role> Roles => Set<Role>();
     public DbSet<Permission> Permissions => Set<Permission>();
@@ -129,7 +128,6 @@ public class TecAxleDbContext : DbContext, IApplicationDbContext
     public DbSet<ShiftAssignment> ShiftAssignments => Set<ShiftAssignment>();
     public DbSet<AttendanceRecord> AttendanceRecords => Set<AttendanceRecord>();
     public DbSet<AttendanceTransaction> AttendanceTransactions => Set<AttendanceTransaction>();
-    public DbSet<AttendanceVerificationLog> AttendanceVerificationLogs => Set<AttendanceVerificationLog>();
     public DbSet<WorkingDay> WorkingDays => Set<WorkingDay>();
     public DbSet<OvertimeConfiguration> OvertimeConfigurations => Set<OvertimeConfiguration>();
     public DbSet<PublicHoliday> PublicHolidays => Set<PublicHoliday>();
@@ -163,8 +161,6 @@ public class TecAxleDbContext : DbContext, IApplicationDbContext
 
     // Notification entities
     public DbSet<Notification> Notifications => Set<Notification>();
-    public DbSet<NotificationBroadcast> NotificationBroadcasts => Set<NotificationBroadcast>();
-    public DbSet<PushNotificationToken> PushNotificationTokens => Set<PushNotificationToken>();
 
     // Phase 1: Employee Lifecycle
     public DbSet<EmployeeContract> EmployeeContracts => Set<EmployeeContract>();

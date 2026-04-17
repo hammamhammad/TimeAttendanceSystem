@@ -4,16 +4,10 @@ namespace TecAxle.Hrms.Application.CompanyConfiguration.Commands.UpdateBranchSet
 
 public record UpdateBranchSettingsOverrideCommand(
     long BranchId,
-    bool? EnableGpsAttendance,
-    bool? EnableNfcAttendance,
     bool? EnableBiometricAttendance,
     bool? EnableManualAttendance,
-    // Phase 6: AutoCheckOutEnabled / AutoCheckOutTime removed.
     int? LateGracePeriodMinutes,
     int? EarlyLeaveGracePeriodMinutes,
     bool? TrackBreakTime,
-    int? MinimumWorkingHoursForPresent,
-    bool? MobileCheckInEnabled,
-    bool? RequireNfcForMobile,
-    bool? RequireGpsForMobile
+    int? MinimumWorkingHoursForPresent
 ) : ICommand<Result>;

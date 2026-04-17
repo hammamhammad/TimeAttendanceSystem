@@ -442,7 +442,6 @@ export const routes: Routes = [
           { path: 'leave', loadComponent: () => import('./pages/settings/company-configuration/leave-settings/leave-settings.component').then(m => m.LeaveSettingsComponent), data: { title: 'tenant_configuration.leave.title' } },
           { path: 'approval', loadComponent: () => import('./pages/settings/company-configuration/approval-settings/approval-settings.component').then(m => m.ApprovalSettingsComponent), data: { title: 'tenant_configuration.approval.title' } },
           { path: 'notification', loadComponent: () => import('./pages/settings/company-configuration/notification-settings/notification-settings.component').then(m => m.NotificationSettingsComponent), data: { title: 'tenant_configuration.notification.title' } },
-          { path: 'mobile', loadComponent: () => import('./pages/settings/company-configuration/mobile-settings/mobile-settings.component').then(m => m.MobileSettingsComponent), data: { title: 'tenant_configuration.mobile.title' } },
           { path: 'security', loadComponent: () => import('./pages/settings/company-configuration/security-settings/security-settings.component').then(m => m.SecuritySettingsComponent), data: { title: 'tenant_configuration.security.title' } },
         ]
       },
@@ -937,65 +936,6 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/reports/custom-reports/create-custom-report/create-custom-report.component').then(m => m.CreateCustomReportComponent),
         data: {title: 'customReports.edit', permission: 'customReport.update' },
         canMatch: [authGuard]
-      },
-
-      // Notification Broadcast Routes
-      {
-        path: 'notifications/send',
-        loadComponent: () => import('./pages/notifications/send-notification.component').then(m => m.SendNotificationComponent),
-        data: {
-          title: 'notifications.send_notification',
-          permission: 'notification.broadcast'
-        },
-        canMatch: [adminGuard]
-      },
-      {
-        path: 'notifications/history',
-        loadComponent: () => import('./pages/notifications/broadcast-history.component').then(m => m.BroadcastHistoryComponent),
-        data: {
-          title: 'notifications.broadcast_history',
-          permission: 'notification.broadcast'
-        },
-        canMatch: [adminGuard]
-      },
-      // NFC Tags Routes
-      {
-        path: 'nfc-tags',
-        loadComponent: () => import('./pages/nfc-tags/nfc-tags.component').then(m => m.NfcTagsComponent),
-        data: {
-          title: 'nfc_tags.title',
-          permission: 'branch.management'
-        },
-        canMatch: [adminGuard]
-      },
-      {
-        path: 'nfc-tags/create',
-        loadComponent: () => import('./pages/nfc-tags/nfc-tag-form/nfc-tag-form.component').then(m => m.NfcTagFormComponent),
-        data: {
-
-          title: 'nfc_tags.register_tag',
-          permission: 'branch.management'
-        },
-        canMatch: [adminGuard]
-      },
-      {
-        path: 'nfc-tags/:id/view',
-        loadComponent: () => import('./pages/nfc-tags/view-nfc-tag/view-nfc-tag.component').then(m => m.ViewNfcTagComponent),
-        data: {
-          title: 'nfc_tags.view_tag',
-          permission: 'branch.management'
-        },
-        canMatch: [adminGuard]
-      },
-      {
-        path: 'nfc-tags/:id/edit',
-        loadComponent: () => import('./pages/nfc-tags/nfc-tag-form/nfc-tag-form.component').then(m => m.NfcTagFormComponent),
-        data: {
-
-          title: 'nfc_tags.edit_tag',
-          permission: 'branch.management'
-        },
-        canMatch: [adminGuard]
       },
 
       // ============================================================

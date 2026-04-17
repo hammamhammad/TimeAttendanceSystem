@@ -9,8 +9,6 @@ export interface CompanySettingsDto {
   timeFormat: string;
   numberFormat: string;
   // Attendance
-  enableGpsAttendance: boolean;
-  enableNfcAttendance: boolean;
   enableBiometricAttendance: boolean;
   enableManualAttendance: boolean;
   // Phase 6: autoCheckOutEnabled / autoCheckOutTime removed.
@@ -37,16 +35,10 @@ export interface CompanySettingsDto {
   requireApprovalComments: boolean;
   // Notification
   enableEmailNotifications: boolean;
-  enablePushNotifications: boolean;
   enableSmsNotifications: boolean;
   notifyManagerOnLeaveRequest: boolean;
   notifyEmployeeOnApproval: boolean;
   dailyAttendanceSummaryEnabled: boolean;
-  // Mobile
-  mobileCheckInEnabled: boolean;
-  requireNfcForMobile: boolean;
-  requireGpsForMobile: boolean;
-  allowMockLocation: boolean;
   // Security
   passwordExpiryDays: number;
   maxLoginAttempts: number;
@@ -75,8 +67,6 @@ export interface CompanySettingsDto {
 export interface BranchSettingsOverrideDto {
   id: number;
   branchId: number;
-  enableGpsAttendance: boolean | null;
-  enableNfcAttendance: boolean | null;
   enableBiometricAttendance: boolean | null;
   enableManualAttendance: boolean | null;
   // Phase 6: autoCheckOutEnabled / autoCheckOutTime removed.
@@ -84,9 +74,6 @@ export interface BranchSettingsOverrideDto {
   earlyLeaveGracePeriodMinutes: number | null;
   trackBreakTime: boolean | null;
   minimumWorkingHoursForPresent: number | null;
-  mobileCheckInEnabled: boolean | null;
-  requireNfcForMobile: boolean | null;
-  requireGpsForMobile: boolean | null;
 }
 
 // ── Resolved Settings ────────────────────────────────────────

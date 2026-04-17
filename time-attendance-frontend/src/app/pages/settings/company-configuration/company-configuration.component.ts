@@ -35,7 +35,6 @@ export class CompanyConfigurationComponent {
     { route: 'leave', icon: 'fa-solid fa-calendar-alt', labelKey: 'tenant_configuration.leave.title' },
     { route: 'approval', icon: 'fa-solid fa-check-double', labelKey: 'tenant_configuration.approval.title' },
     { route: 'notification', icon: 'fa-solid fa-bell', labelKey: 'tenant_configuration.notification.title' },
-    { route: 'mobile', icon: 'fa-solid fa-mobile-alt', labelKey: 'tenant_configuration.mobile.title' },
     { route: 'security', icon: 'fa-solid fa-shield-alt', labelKey: 'tenant_configuration.security.title' }
   ];
 }

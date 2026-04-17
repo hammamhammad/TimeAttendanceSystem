@@ -37,18 +37,12 @@ public class GetBranchSettingsOverrideQueryHandler : BaseHandler<GetBranchSettin
         {
             Id = overrides.Id,
             BranchId = overrides.BranchId,
-            EnableGpsAttendance = overrides.EnableGpsAttendance,
-            EnableNfcAttendance = overrides.EnableNfcAttendance,
             EnableBiometricAttendance = overrides.EnableBiometricAttendance,
             EnableManualAttendance = overrides.EnableManualAttendance,
-            // Phase 6: AutoCheckOutEnabled / AutoCheckOutTime removed.
             LateGracePeriodMinutes = overrides.LateGracePeriodMinutes,
             EarlyLeaveGracePeriodMinutes = overrides.EarlyLeaveGracePeriodMinutes,
             TrackBreakTime = overrides.TrackBreakTime,
-            MinimumWorkingHoursForPresent = overrides.MinimumWorkingHoursForPresent,
-            MobileCheckInEnabled = overrides.MobileCheckInEnabled,
-            RequireNfcForMobile = overrides.RequireNfcForMobile,
-            RequireGpsForMobile = overrides.RequireGpsForMobile
+            MinimumWorkingHoursForPresent = overrides.MinimumWorkingHoursForPresent
         };
 
         return Result.Success(dto);
