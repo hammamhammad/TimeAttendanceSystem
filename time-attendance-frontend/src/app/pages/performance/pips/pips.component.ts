@@ -56,7 +56,7 @@ export class PipsComponent implements OnInit {
   }
 
   onTableAction(event: { action: string; item: PerformanceImprovementPlan }): void {
-    if (event.action === 'view') this.router.navigate(['/performance/pips', event.item.id, 'view']);
+    if (event.action === 'view') this.router.navigate(['/performance/pips', event.item.id, 'edit']);
   }
 
   onPageChange(p: number): void { this.currentPage.set(p); this.loadData(); }

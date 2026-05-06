@@ -11,6 +11,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-section
 import { FileUploadComponent } from '../../../../shared/components/file-upload/file-upload.component';
 import { SearchableSelectComponent } from '../../../../shared/components/searchable-select/searchable-select.component';
 
+import { PermissionService } from '../../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-policy',
   standalone: true,
@@ -26,6 +27,16 @@ export class CreatePolicyComponent implements OnInit {
   private readonly service = inject(DocumentService);
   private readonly notification = inject(NotificationService);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('companyPolicy.update');
+  }
   form!: FormGroup;
   saving = signal(false);
   isEdit = signal(false);
@@ -62,6 +73,9 @@ export class CreatePolicyComponent implements OnInit {
             effectiveDate: policy.effectiveDate?.split('T')[0], expiryDate: policy.expiryDate?.split('T')[0],
             requiresAcknowledgment: policy.requiresAcknowledgment
           });
+          if (!this.canEdit()) {
+            this.form.disable();
+          }
         },
         error: () => this.notification.error(this.i18n.t('common.error'))
       });

@@ -1,4 +1,4 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, effect } from '@angular/core';
 
 export interface MenuItem {
   path: string;
@@ -8,11 +8,34 @@ export interface MenuItem {
   children?: MenuItem[];
 }
 
+export type NavAreaKey = 'dashboard' | 'people' | 'workforce' | 'payroll' | 'operations';
+
 export interface MenuGroup {
   groupKey: string;
   titleKey: string;
+  area: NavAreaKey;
   items: MenuItem[];
 }
+
+export interface NavArea {
+  key: NavAreaKey;
+  titleKey: string;
+  icon: string;
+}
+
+export type AppModuleKey = 'hr' | 'crm' | 'sales' | 'inventory';
+
+export interface AppModule {
+  key: AppModuleKey;
+  nameKey: string;
+  descriptionKey: string;
+  icon: string;
+  gradient: string;
+  active: boolean;
+  comingSoon: boolean;
+}
+
+const AREA_STORAGE_KEY = 'nav.activeArea';
 
 @Injectable({
   providedIn: 'root'
@@ -23,6 +46,7 @@ export class MenuService {
     {
       groupKey: 'main',
       titleKey: 'nav_group.main',
+      area: 'dashboard',
       items: [
         {
           path: '/dashboard',
@@ -36,6 +60,7 @@ export class MenuService {
     {
       groupKey: 'organization',
       titleKey: 'nav_group.organization',
+      area: 'people',
       items: [
         { path: '/users', titleKey: 'nav.users', icon: 'fa-solid fa-users', permission: 'user.read' },
         { path: '/employees', titleKey: 'nav.employees', icon: 'fa-solid fa-id-card', permission: 'employee.read' },
@@ -48,6 +73,7 @@ export class MenuService {
     {
       groupKey: 'timeAttendance',
       titleKey: 'nav_group.timeAttendance',
+      area: 'workforce',
       items: [
         {
           path: '/shifts',
@@ -78,6 +104,7 @@ export class MenuService {
     {
       groupKey: 'leaveAbsence',
       titleKey: 'nav_group.leaveAbsence',
+      area: 'workforce',
       items: [
         { path: '/employee-vacations', titleKey: 'nav.employeeVacations', icon: 'fa-solid fa-calendar-week', permission: 'vacation.read' },
         { path: '/employee-excuses', titleKey: 'employee_excuses.title', icon: 'fa-solid fa-clipboard-check', permission: 'excuse.read' },
@@ -98,6 +125,7 @@ export class MenuService {
     {
       groupKey: 'hrLifecycle',
       titleKey: 'nav_group.hrLifecycle',
+      area: 'people',
       items: [
         {
           path: '/hr',
@@ -157,6 +185,7 @@ export class MenuService {
     {
       groupKey: 'compensation',
       titleKey: 'nav_group.compensation',
+      area: 'payroll',
       items: [
         {
           path: '/payroll',
@@ -187,6 +216,7 @@ export class MenuService {
     {
       groupKey: 'performanceGrowth',
       titleKey: 'nav_group.performanceGrowth',
+      area: 'workforce',
       items: [
         {
           path: '/performance',
@@ -236,6 +266,7 @@ export class MenuService {
     {
       groupKey: 'workplace',
       titleKey: 'nav_group.workplace',
+      area: 'people',
       items: [
         {
           path: '/documents',
@@ -323,6 +354,7 @@ export class MenuService {
     {
       groupKey: 'workflowApprovals',
       titleKey: 'nav_group.workflowApprovals',
+      area: 'operations',
       items: [
         {
           path: '/approvals',
@@ -342,6 +374,7 @@ export class MenuService {
     {
       groupKey: 'operations',
       titleKey: 'nav_group.operations',
+      area: 'operations',
       items: [
         { path: '/ops-dashboard',        titleKey: 'Operations Dashboard', icon: 'fa-solid fa-gauge-high' },
         { path: '/operational-alerts',   titleKey: 'Operational Alerts',   icon: 'fa-solid fa-triangle-exclamation' },
@@ -366,6 +399,7 @@ export class MenuService {
     {
       groupKey: 'reportsAnalytics',
       titleKey: 'nav_group.reportsAnalytics',
+      area: 'operations',
       items: [
         {
           path: '/reports',
@@ -416,6 +450,7 @@ export class MenuService {
     {
       groupKey: 'settings',
       titleKey: 'nav_group.settings',
+      area: 'operations',
       items: [
         {
           path: '/settings',
@@ -445,12 +480,109 @@ export class MenuService {
     this.menuGroups().flatMap(group => group.items)
   );
 
+  private readonly navAreas: NavArea[] = [
+    { key: 'dashboard',  titleKey: 'nav.areas.dashboard',  icon: 'fa-solid fa-gauge-high' },
+    { key: 'people',     titleKey: 'nav.areas.people',     icon: 'fa-solid fa-users' },
+    { key: 'workforce',  titleKey: 'nav.areas.workforce',  icon: 'fa-solid fa-clock' },
+    { key: 'payroll',    titleKey: 'nav.areas.payroll',    icon: 'fa-solid fa-wallet' },
+    { key: 'operations', titleKey: 'nav.areas.operations', icon: 'fa-solid fa-chart-line' }
+  ];
+
+  private readonly _activeArea = signal<NavAreaKey>(this.readPersistedArea());
+
+  // ERP Suite modules shown by the launcher panel. HR is the currently active
+  // module; the others are placeholders for future ERP surfaces.
+  private readonly modules: AppModule[] = [
+    {
+      key: 'hr',
+      nameKey: 'nav.modules.hr.name',
+      descriptionKey: 'nav.modules.hr.description',
+      icon: 'fa-solid fa-user-tie',
+      gradient: 'linear-gradient(135deg, #6384FF, #3B51D4)',
+      active: true,
+      comingSoon: false
+    },
+    {
+      key: 'crm',
+      nameKey: 'nav.modules.crm.name',
+      descriptionKey: 'nav.modules.crm.description',
+      icon: 'fa-solid fa-address-book',
+      gradient: 'linear-gradient(135deg, #A78BFA, #7C3AED)',
+      active: false,
+      comingSoon: true
+    },
+    {
+      key: 'sales',
+      nameKey: 'nav.modules.sales.name',
+      descriptionKey: 'nav.modules.sales.description',
+      icon: 'fa-solid fa-chart-line',
+      gradient: 'linear-gradient(135deg, #6EE7B7, #10B981)',
+      active: false,
+      comingSoon: true
+    },
+    {
+      key: 'inventory',
+      nameKey: 'nav.modules.inventory.name',
+      descriptionKey: 'nav.modules.inventory.description',
+      icon: 'fa-solid fa-boxes-stacked',
+      gradient: 'linear-gradient(135deg, #FCD34D, #D97706)',
+      active: false,
+      comingSoon: true
+    }
+  ];
+
+  constructor() {
+    effect(() => {
+      try { localStorage.setItem(AREA_STORAGE_KEY, this._activeArea()); } catch { /* ignore */ }
+    });
+  }
+
+  private readPersistedArea(): NavAreaKey {
+    try {
+      const saved = localStorage.getItem(AREA_STORAGE_KEY) as NavAreaKey | null;
+      if (saved && ['dashboard', 'people', 'workforce', 'payroll', 'operations'].includes(saved)) {
+        return saved;
+      }
+    } catch { /* ignore */ }
+    return 'dashboard';
+  }
+
   getMenuGroups() {
     return this.menuGroups();
   }
 
   getMenuGroups$() {
     return this.menuGroups;
+  }
+
+  getNavAreas(): NavArea[] {
+    return this.navAreas;
+  }
+
+  activeArea() {
+    return this._activeArea();
+  }
+
+  activeArea$() {
+    return this._activeArea;
+  }
+
+  setActiveArea(key: NavAreaKey): void {
+    this._activeArea.set(key);
+  }
+
+  groupsForArea(areaKey: NavAreaKey): MenuGroup[] {
+    return this.menuGroups().filter(g => g.area === areaKey);
+  }
+
+  findAreaForPath(path: string): NavAreaKey | undefined {
+    for (const group of this.menuGroups()) {
+      for (const item of group.items) {
+        if (item.path === path) return group.area;
+        if (item.children?.some(c => c.path === path)) return group.area;
+      }
+    }
+    return undefined;
   }
 
   getMenuItems() {
@@ -463,5 +595,13 @@ export class MenuService {
 
   findMenuItem(path: string): MenuItem | undefined {
     return this.menuItems().find(item => item.path === path);
+  }
+
+  getModules(): AppModule[] {
+    return this.modules;
+  }
+
+  activeModule(): AppModule {
+    return this.modules.find(m => m.active) ?? this.modules[0];
   }
 }

@@ -12,6 +12,7 @@ import { SearchableSelectComponent, SearchableSelectOption } from '../../../../s
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { environment } from '../../../../../environments/environment';
 
+import { PermissionService } from '../../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-requisition',
   standalone: true,
@@ -29,6 +30,16 @@ export class CreateRequisitionComponent implements OnInit {
 
   private route = inject(ActivatedRoute);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('jobRequisition.manage');
+  }
   submitting = signal(false);
   loading = signal(false);
   isEditMode = signal(false);
@@ -108,6 +119,9 @@ export class CreateRequisitionComponent implements OnInit {
           isReplacement: data.isReplacement,
           notes: data.notes
         });
+        if (!this.canEdit()) {
+          this.form.disable();
+        }
         this.loading.set(false);
       },
       error: () => {

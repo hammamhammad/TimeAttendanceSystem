@@ -61,7 +61,7 @@ export class LoanApplicationsComponent implements OnInit {
   onPageSizeChange(size: number): void { this.pageSize.set(size); this.currentPage.set(1); this.loadData(); }
 
   onActionClick(event: { action: string; item: LoanApplicationDto }): void {
-    if (event.action === 'view') this.router.navigate(['/loans/applications', event.item.id, 'view']);
+    if (event.action === 'view') this.router.navigate(['/loans/applications', event.item.id, 'edit']);
     else if (event.action === 'approve') { this.service.approveApplication(event.item.id).subscribe({ next: () => { this.notification.success(this.i18n.t('loan_applications.approved')); this.loadData(); }, error: () => this.notification.error(this.i18n.t('common.error')) }); }
     else if (event.action === 'reject') { this.service.rejectApplication(event.item.id, '').subscribe({ next: () => { this.notification.success(this.i18n.t('loan_applications.rejected')); this.loadData(); }, error: () => this.notification.error(this.i18n.t('common.error')) }); }
   }

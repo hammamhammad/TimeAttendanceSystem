@@ -1,6 +1,11 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using TecAxle.Hrms.Application.Abstractions;
+using TecAxle.Hrms.Application.Common;
+using TecAxle.Hrms.Application.Common.Extensions;
+using TecAxle.Hrms.Application.Common.QueryParameters;
 using TecAxle.Hrms.Application.Employees.Commands.CreateEmployee;
 using TecAxle.Hrms.Application.Employees.Commands.UpdateEmployee;
 using TecAxle.Hrms.Application.Employees.Commands.DeleteEmployee;
@@ -87,9 +92,130 @@ public class EmployeesController : ControllerBase
     /// Sets up the controller with MediatR for CQRS command and query processing.
     /// </summary>
     /// <param name="mediator">MediatR mediator for command and query dispatching</param>
-    public EmployeesController(IMediator mediator)
+    private readonly IApplicationDbContext? _context;
+
+    public EmployeesController(IMediator mediator, IApplicationDbContext context)
     {
         _mediator = mediator;
+        _context = context;
+    }
+
+    /// <summary>
+    /// ERP grid query endpoint (spec §7 + §15) — accepts a PageQuery body with
+    /// dotted-path sort, 22-operator AND-combined filters, and pagination.
+    /// Bypasses MediatR to demonstrate the generic pipeline.
+    /// </summary>
+    [HttpPost("query")]
+    public async Task<IActionResult> Query([FromBody] PageQuery q, CancellationToken ct)
+    {
+        if (_context is null) return StatusCode(500, "Context not available");
+
+        var baseQuery = _context.Employees.AsNoTracking()
+            .Include(e => e.Branch)
+            .Include(e => e.Department)
+            .AsQueryable();
+
+        // Global free-text search
+        if (!string.IsNullOrWhiteSpace(q.Search))
+        {
+            var s = q.Search;
+            baseQuery = baseQuery.Where(e =>
+                EF.Functions.ILike(e.FirstName, $"%{s}%") ||
+                EF.Functions.ILike(e.LastName, $"%{s}%") ||
+                EF.Functions.ILike(e.EmployeeNumber, $"%{s}%") ||
+                (e.Email != null && EF.Functions.ILike(e.Email, $"%{s}%")));
+        }
+
+        baseQuery = baseQuery.ApplyFilters(q.Filter).ApplySort(q.Sort);
+
+        var total = await baseQuery.CountAsync(ct);
+        var page = Math.Max(1, q.Page);
+        var pageSize = Math.Clamp(q.PageSize, 1, 500);
+
+        var items = await baseQuery
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(e => new
+            {
+                e.Id,
+                e.EmployeeNumber,
+                e.FirstName,
+                e.LastName,
+                FullName = e.FirstName + " " + e.LastName,
+                e.Email,
+                e.IsActive,
+                BranchName = e.Branch.Name,
+                DepartmentName = e.Department != null ? e.Department.Name : null,
+                EmploymentStatus = e.EmploymentStatus.ToString(),
+                e.HireDate
+            })
+            .ToListAsync(ct);
+
+        return Ok(new PagedResult<object>(items.Cast<object>().ToList(), total, page, pageSize));
+    }
+
+    /// <summary>
+    /// ERP spec §7 toolbar → Export. Streams the currently filtered/sorted
+    /// employee set as CSV. Ignores pagination (full set).
+    /// </summary>
+    [HttpPost("export")]
+    public async Task<IActionResult> Export([FromBody] PageQuery q, CancellationToken ct)
+    {
+        if (_context is null) return StatusCode(500, "Context not available");
+
+        var baseQuery = _context.Employees.AsNoTracking()
+            .Include(e => e.Branch)
+            .Include(e => e.Department)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(q.Search))
+        {
+            var s = q.Search;
+            baseQuery = baseQuery.Where(e =>
+                EF.Functions.ILike(e.FirstName, $"%{s}%") ||
+                EF.Functions.ILike(e.LastName, $"%{s}%") ||
+                EF.Functions.ILike(e.EmployeeNumber, $"%{s}%"));
+        }
+
+        baseQuery = baseQuery.ApplyFilters(q.Filter).ApplySort(q.Sort);
+
+        var rows = await baseQuery
+            .Select(e => new
+            {
+                Code = e.EmployeeNumber,
+                FullName = e.FirstName + " " + e.LastName,
+                e.Email,
+                Branch = e.Branch.Name,
+                Department = e.Department != null ? e.Department.Name : "",
+                Status = e.EmploymentStatus.ToString(),
+                HireDate = e.HireDate.ToString("yyyy-MM-dd")
+            })
+            .ToListAsync(ct);
+
+        var sb = new System.Text.StringBuilder();
+        sb.Append('\uFEFF'); // UTF-8 BOM for Excel
+        sb.AppendLine("Code,Full Name,Email,Branch,Department,Status,Hire Date");
+        foreach (var r in rows)
+        {
+            sb.Append(CsvCell(r.Code)).Append(',');
+            sb.Append(CsvCell(r.FullName)).Append(',');
+            sb.Append(CsvCell(r.Email ?? "")).Append(',');
+            sb.Append(CsvCell(r.Branch)).Append(',');
+            sb.Append(CsvCell(r.Department)).Append(',');
+            sb.Append(CsvCell(r.Status)).Append(',');
+            sb.AppendLine(CsvCell(r.HireDate));
+        }
+
+        var filename = $"employees-{DateTime.UtcNow:yyyyMMdd-HHmmss}.csv";
+        return File(System.Text.Encoding.UTF8.GetBytes(sb.ToString()), "text/csv", filename);
+    }
+
+    private static string CsvCell(string value)
+    {
+        if (string.IsNullOrEmpty(value)) return "";
+        var needsQuoting = value.IndexOfAny(new[] { ',', '"', '\r', '\n' }) >= 0;
+        var escaped = value.Replace("\"", "\"\"");
+        return needsQuoting ? $"\"{escaped}\"" : escaped;
     }
 
     /// <summary>
@@ -120,9 +246,11 @@ public class EmployeesController : ControllerBase
         [FromQuery] long? departmentId = null,
         [FromQuery] long? managerId = null,
         [FromQuery] bool? isActive = null,
-        [FromQuery] string? employmentStatus = null)
+        [FromQuery] string? employmentStatus = null,
+        [FromQuery] string? sortBy = null,
+        [FromQuery] string? sortDirection = null)
     {
-        var query = new GetEmployeesQuery(page, pageSize, search, branchId, departmentId, managerId, isActive, employmentStatus);
+        var query = new GetEmployeesQuery(page, pageSize, search, branchId, departmentId, managerId, isActive, employmentStatus, sortBy, sortDirection);
         var result = await _mediator.Send(query);
 
         if (result.IsFailure)

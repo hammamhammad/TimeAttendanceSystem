@@ -10,6 +10,7 @@ import { SearchableSelectComponent, SearchableSelectOption } from '../../../../s
 import { FormHeaderComponent } from '../../../../shared/components/form-header/form-header.component';
 import { FormSectionComponent } from '../../../../shared/components/form-section/form-section.component';
 
+import { PermissionService } from '../../../../core/auth/permission.service';
 @Component({
   selector: 'app-edit-public-holiday',
   standalone: true,
@@ -31,6 +32,11 @@ export class EditPublicHolidayComponent implements OnInit {
   private publicHolidaysService = inject(PublicHolidaysService);
   public i18n = inject(I18nService);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    return this.permissionService.has('publicHoliday.update');
+  }
   // State
   loading = signal(false);
   saving = signal(false);
@@ -182,6 +188,10 @@ export class EditPublicHolidayComponent implements OnInit {
 
     // Update form validation after populating values
     this.updateFormValidation();
+
+    if (!this.canEdit()) {
+      this.holidayForm.disable();
+    }
   }
 
   /**
@@ -261,7 +271,7 @@ export class EditPublicHolidayComponent implements OnInit {
       next: () => {
         this.saving.set(false);
         this.notificationService.success(this.i18n.t('public_holidays.success.updated'));
-        this.router.navigate(['/settings/public-holidays', holiday.id, 'view']);
+        this.router.navigate(['/settings/public-holidays']);
       },
       error: (error) => {
         this.saving.set(false);
@@ -275,12 +285,7 @@ export class EditPublicHolidayComponent implements OnInit {
    * Cancel and navigate back
    */
   onCancel(): void {
-    const holiday = this.currentHoliday();
-    if (holiday) {
-      this.router.navigate(['/settings/public-holidays', holiday.id, 'view']);
-    } else {
-      this.router.navigate(['/settings/public-holidays']);
-    }
+    this.router.navigate(['/settings/public-holidays']);
   }
 
   /**

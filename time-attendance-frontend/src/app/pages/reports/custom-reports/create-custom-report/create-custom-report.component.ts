@@ -7,6 +7,7 @@ import { NotificationService } from '../../../../core/notifications/notification
 import { FormSectionComponent } from '../../../../shared/components/form-section/form-section.component';
 import { DataSourceMetadata } from '../../../../shared/models/custom-report.model';
 
+import { PermissionService } from '../../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-custom-report',
   standalone: true,
@@ -22,6 +23,16 @@ export class CreateCustomReportComponent implements OnInit {
   private notificationService = inject(NotificationService);
   public i18n = inject(I18nService);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('customReport.update');
+  }
   form!: FormGroup;
   loading = signal(false);
   isEditMode = signal(false);
@@ -74,6 +85,9 @@ export class CreateCustomReportComponent implements OnInit {
           dataSource: report.dataSource,
           isPublic: report.isPublic
         });
+        if (!this.canEdit()) {
+          this.form.disable();
+        }
         try {
           this.selectedColumns.set(JSON.parse(report.columnsJson || '[]'));
         } catch { this.selectedColumns.set([]); }

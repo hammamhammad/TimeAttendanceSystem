@@ -14,6 +14,7 @@ import {
   UpdateAttendanceRecordRequest
 } from '../../../shared/models/attendance.model';
 
+import { PermissionService } from '../../../core/auth/permission.service';
 @Component({
   selector: 'app-edit-attendance',
   standalone: true,
@@ -29,6 +30,11 @@ export class EditAttendanceComponent implements OnInit {
   private notificationService = inject(NotificationService);
   public i18n = inject(I18nService);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    return this.permissionService.has('attendance.update');
+  }
   // Signals for reactive state management
   attendanceRecord = signal<AttendanceRecord | null>(null);
   loading = signal(true);
@@ -179,6 +185,10 @@ export class EditAttendanceComponent implements OnInit {
 
     // Don't override backend calculations with client-side calculations
     // The backend values are authoritative and include flexible hours business logic
+
+    if (!this.canEdit()) {
+      this.editForm.disable();
+    }
   }
 
   /**

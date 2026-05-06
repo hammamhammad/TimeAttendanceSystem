@@ -11,6 +11,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-section
 import { SearchableSelectComponent, SearchableSelectOption } from '../../../../shared/components/searchable-select/searchable-select.component';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 
+import { PermissionService } from '../../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-goal',
   standalone: true,
@@ -26,6 +27,16 @@ export class CreateGoalComponent implements OnInit {
   private service = inject(PerformanceService);
   private employeeService = inject(EmployeeService);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('goal.manage');
+  }
   submitting = signal(false);
   loading = signal(false);
   employeeOptions: SearchableSelectOption[] = [];

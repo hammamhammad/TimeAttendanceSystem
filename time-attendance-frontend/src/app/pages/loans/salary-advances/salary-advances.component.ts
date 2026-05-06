@@ -62,7 +62,7 @@ export class SalaryAdvancesComponent implements OnInit {
 
   onActionClick(event: { action: string; item: SalaryAdvanceDto }): void {
     if (event.action === 'view') {
-      this.router.navigate(['/loans/salary-advances', event.item.id, 'view']);
+      this.router.navigate(['/loans/salary-advances', event.item.id, 'edit']);
     } else if (event.action === 'approve') {
       this.service.approveSalaryAdvance(event.item.id).subscribe({ next: () => { this.notification.success(this.i18n.t('salary_advances.approved')); this.loadData(); }, error: () => this.notification.error(this.i18n.t('common.error')) });
     } else if (event.action === 'reject') {

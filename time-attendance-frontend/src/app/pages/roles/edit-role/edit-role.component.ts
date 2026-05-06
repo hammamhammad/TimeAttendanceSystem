@@ -6,6 +6,7 @@ import { RolesService } from '../roles.service';
 import { Role } from '../../../shared/models/role.model';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { NotificationService } from '../../../core/notifications/notification.service';
+import { PermissionService } from '../../../core/auth/permission.service';
 
 @Component({
   selector: 'app-edit-role',
@@ -76,7 +77,6 @@ import { NotificationService } from '../../../core/notifications/notification.se
                     formControlName="name"
                     [class.is-invalid]="isFieldInvalid('name')"
                     [placeholder]="i18n.t('roles.name_placeholder')"
-                    [disabled]="role()?.isSystem || false"
                   />
                   @if (isFieldInvalid('name')) {
                     <div class="invalid-feedback">{{ getFieldError('name') }}</div>
@@ -254,20 +254,22 @@ import { NotificationService } from '../../../core/notifications/notification.se
               <div class="d-flex justify-content-end gap-2 mt-4">
                 <button type="button" class="btn btn-outline-secondary" (click)="onCancel()" [disabled]="saving()">
                   <i class="fa-solid fa-times me-2"></i>
-                  {{ i18n.t('common.cancel') }}
+                  {{ canEdit() ? i18n.t('common.cancel') : i18n.t('common.back') }}
                 </button>
-                <button 
-                  type="submit" 
-                  class="btn btn-primary" 
-                  [disabled]="roleForm.invalid || saving()"
-                >
-                  @if (saving()) {
-                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                  } @else {
-                    <i class="fa-solid fa-save me-2"></i>
-                  }
-                  {{ saving() ? i18n.t('common.saving') : i18n.t('roles.update_role') }}
-                </button>
+                @if (canEdit()) {
+                  <button
+                    type="submit"
+                    class="btn btn-primary"
+                    [disabled]="roleForm.invalid || saving()"
+                  >
+                    @if (saving()) {
+                      <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    } @else {
+                      <i class="fa-solid fa-save me-2"></i>
+                    }
+                    {{ saving() ? i18n.t('common.saving') : i18n.t('roles.update_role') }}
+                  </button>
+                }
               </div>
             </form>
           </div>
@@ -288,6 +290,11 @@ export class EditRoleComponent implements OnInit {
   private fb = inject(FormBuilder);
   private notificationService = inject(NotificationService);
   public i18n = inject(I18nService);
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    return this.permissionService.has('role.update');
+  }
 
   role = signal<Role | null>(null);
   allPermissions = signal<any[]>([]);
@@ -360,6 +367,15 @@ export class EditRoleComponent implements OnInit {
     // Set selected permissions
     const permissionIds = new Set(role.permissions.map(p => p.id.toString()));
     this.selectedPermissions.set(permissionIds);
+
+    // Disable the form when the user lacks edit permission OR when this is a
+    // built-in system role (its name is locked). Done programmatically to
+    // avoid the [disabled]+formControlName Angular warning.
+    if (!this.canEdit()) {
+      this.roleForm.disable();
+    } else if (role.isSystem) {
+      this.roleForm.get('name')?.disable();
+    }
   }
 
   onSubmit(): void {
@@ -384,7 +400,7 @@ export class EditRoleComponent implements OnInit {
           this.i18n.t('app.success'),
           this.i18n.t('roles.role_updated_successfully')
         );
-        this.router.navigate(['/roles', this.role()!.id, 'view']);
+        this.router.navigate(['/roles']);
       },
       error: (error) => {
         this.saving.set(false);
@@ -474,11 +490,7 @@ export class EditRoleComponent implements OnInit {
   }
 
   onCancel(): void {
-    if (this.role()) {
-      this.router.navigate(['/roles', this.role()!.id, 'view']);
-    } else {
-      this.router.navigate(['/roles']);
-    }
+    this.router.navigate(['/roles']);
   }
 
   // Form field helpers

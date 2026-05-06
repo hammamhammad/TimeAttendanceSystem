@@ -92,15 +92,7 @@ export const routes: Routes = [
         },
         canMatch: [adminGuard]
       },
-      {
-        path: 'users/:id/view',
-        loadComponent: () => import('./pages/users/view-user/view-user.component').then(m => m.ViewUserComponent),
-        data: {
-          title: 'users.view_details',
-          permission: 'user.read'
-        },
-        canMatch: [adminGuard]
-      },
+      { path: 'users/:id/view', redirectTo: 'users/:id/edit', pathMatch: 'full' },
       {
         path: 'users/:id/edit',
         loadComponent: () => import('./pages/users/edit-user-page/edit-user-page.component').then(m => m.EditUserPageComponent),
@@ -128,15 +120,7 @@ export const routes: Routes = [
         },
         canMatch: [adminGuard]
       },
-      {
-        path: 'employees/:id/view',
-        loadComponent: () => import('./pages/employees/view-employee/view-employee.component').then(m => m.ViewEmployeeComponent),
-        data: {
-          title: 'employees.view_details',
-          permission: 'employee.read'
-        },
-        canMatch: [managerGuard]
-      },
+      { path: 'employees/:id/view', redirectTo: 'employees/:id/edit', pathMatch: 'full' },
       {
         path: 'employees/:id/edit',
         loadComponent: () => import('./pages/employees/edit-employee/edit-employee.component').then(m => m.EditEmployeeComponent),
@@ -173,15 +157,7 @@ export const routes: Routes = [
         },
         canMatch: [adminGuard]
       },
-      {
-        path: 'roles/:id/view',
-        loadComponent: () => import('./pages/roles/view-role/view-role.component').then(m => m.ViewRoleComponent),
-        data: {
-          title: 'roles.view_details',
-          permission: 'role.read'
-        },
-        canMatch: [adminGuard]
-      },
+      { path: 'roles/:id/view', redirectTo: 'roles/:id/edit', pathMatch: 'full' },
       {
         path: 'roles/:id/edit',
         loadComponent: () => import('./pages/roles/edit-role/edit-role.component').then(m => m.EditRoleComponent),
@@ -209,15 +185,7 @@ export const routes: Routes = [
         },
         canMatch: [authGuard]
       },
-      {
-        path: 'branches/:id/view',
-        loadComponent: () => import('./pages/branches/view-branch/view-branch.component').then(m => m.ViewBranchComponent),
-        data: {
-          title: 'branches.view_details',
-          permission: 'branch.read'
-        },
-        canMatch: [authGuard]
-      },
+      { path: 'branches/:id/view', redirectTo: 'branches/:id/edit', pathMatch: 'full' },
       {
         path: 'branches/:id/edit',
         loadComponent: () => import('./pages/branches/edit-branch/edit-branch.component').then(m => m.EditBranchComponent),
@@ -245,15 +213,7 @@ export const routes: Routes = [
         },
         canMatch: [authGuard]
       },
-      {
-        path: 'departments/:id/view',
-        loadComponent: () => import('./pages/departments/view-department/view-department.component').then(m => m.ViewDepartmentComponent),
-        data: {
-          title: 'departments.view_details',
-          permission: 'department.read'
-        },
-        canMatch: [authGuard]
-      },
+      { path: 'departments/:id/view', redirectTo: 'departments/:id/edit', pathMatch: 'full' },
       {
         path: 'departments/:id/edit',
         loadComponent: () => import('./pages/departments/edit-department/edit-department.component').then(m => m.EditDepartmentComponent),
@@ -282,15 +242,7 @@ export const routes: Routes = [
         },
         canMatch: [adminGuard]
       },
-      {
-        path: 'shifts/:id/view',
-        loadComponent: () => import('./pages/shifts/view-shift/view-shift.component').then(m => m.ViewShiftComponent),
-        data: {
-          title: 'shifts.view_details',
-          permission: 'shift.read'
-        },
-        canMatch: [managerGuard]
-      },
+      { path: 'shifts/:id/view', redirectTo: 'shifts/:id/edit', pathMatch: 'full' },
       {
         path: 'shifts/:id/edit',
         loadComponent: () => import('./pages/shifts/edit-shift/edit-shift.component').then(m => m.EditShiftComponent),
@@ -393,7 +345,7 @@ export const routes: Routes = [
         canMatch: [authGuard]
       },
       {
-        path: 'attendance/shift-swaps/:id/view',
+        path: 'attendance/shift-swaps/:id/edit',
         loadComponent: () => import('./pages/attendance/shift-swaps/view-shift-swap/view-shift-swap.component').then(m => m.ViewShiftSwapComponent),
         data: { title: 'shiftSwaps.view', permission: 'shiftSwapRequest.read' },
         canMatch: [authGuard]
@@ -411,12 +363,7 @@ export const routes: Routes = [
         data: {title: 'onCall.create', permission: 'onCallSchedule.create' },
         canMatch: [authGuard]
       },
-      {
-        path: 'attendance/on-call/:id/view',
-        loadComponent: () => import('./pages/attendance/on-call/view-on-call/view-on-call.component').then(m => m.ViewOnCallComponent),
-        data: { title: 'onCall.view', permission: 'onCallSchedule.read' },
-        canMatch: [authGuard]
-      },
+      { path: 'attendance/on-call/:id/view', redirectTo: 'attendance/on-call/:id/edit', pathMatch: 'full' },
       {
         path: 'attendance/on-call/:id/edit',
         loadComponent: () => import('./pages/attendance/on-call/create-on-call/create-on-call.component').then(m => m.CreateOnCallComponent),
@@ -479,15 +426,7 @@ export const routes: Routes = [
         },
         canMatch: [adminGuard]
       },
-      {
-        path: 'settings/overtime/:id/view',
-        loadComponent: () => import('./pages/settings/overtime/view-overtime-configuration/view-overtime-configuration.component').then(m => m.ViewOvertimeConfigurationComponent),
-        data: {
-          title: 'settings.overtime.view_details',
-          permission: 'settings.overtime.read'
-        },
-        canMatch: [adminGuard]
-      },
+      { path: 'settings/overtime/:id/view', redirectTo: 'settings/overtime/edit/:id', pathMatch: 'full' },
       {
         path: 'settings/public-holidays',
         loadComponent: () => import('./pages/settings/public-holidays/public-holidays.component').then(m => m.PublicHolidaysComponent),
@@ -507,15 +446,7 @@ export const routes: Routes = [
         },
         canMatch: [adminGuard]
       },
-      {
-        path: 'settings/public-holidays/:id/view',
-        loadComponent: () => import('./pages/settings/public-holidays/view-public-holiday/view-public-holiday.component').then(m => m.ViewPublicHolidayComponent),
-        data: {
-          title: 'settings.holidays.view_details',
-          permission: 'publicHoliday.read'
-        },
-        canMatch: [adminGuard]
-      },
+      { path: 'settings/public-holidays/:id/view', redirectTo: 'settings/public-holidays/:id/edit', pathMatch: 'full' },
       {
         path: 'settings/public-holidays/:id/edit',
         loadComponent: () => import('./pages/settings/public-holidays/edit-public-holiday/edit-public-holiday.component').then(m => m.EditPublicHolidayComponent),
@@ -583,15 +514,7 @@ export const routes: Routes = [
         },
         canMatch: [authGuard]
       },
-      {
-        path: 'employee-vacations/:id/view',
-        loadComponent: () => import('./pages/employee-vacations/view-employee-vacation/view-employee-vacation.component').then(m => m.ViewEmployeeVacationComponent),
-        data: {
-          title: 'employee_vacations.view_details',
-          permission: 'vacation.read'
-        },
-        canMatch: [authGuard]
-      },
+      { path: 'employee-vacations/:id/view', redirectTo: 'employee-vacations/:id/edit', pathMatch: 'full' },
       {
         path: 'employee-vacations/:id/edit',
         loadComponent: () => import('./pages/employee-vacations/edit-employee-vacation/edit-employee-vacation.component').then(m => m.EditEmployeeVacationComponent),
@@ -622,15 +545,7 @@ export const routes: Routes = [
         },
         canMatch: [authGuard]
       },
-      {
-        path: 'employee-excuses/:id/view',
-        loadComponent: () => import('./pages/employee-excuses/excuse-details/excuse-details.component').then(m => m.ExcuseDetailsComponent),
-        data: {
-          title: 'employee_excuses.excuse_details',
-          permission: 'excuse.read'
-        },
-        canMatch: [authGuard]
-      },
+      { path: 'employee-excuses/:id/view', redirectTo: 'employee-excuses/:id/edit', pathMatch: 'full' },
       {
         path: 'employee-excuses/:id/edit',
         loadComponent: () => import('./pages/employee-excuses/excuse-request-form/excuse-request-form.component').then(m => m.ExcuseRequestFormComponent),
@@ -661,15 +576,7 @@ export const routes: Routes = [
         },
         canMatch: [managerGuard]
       },
-      {
-        path: 'remote-work/:id/view',
-        loadComponent: () => import('./pages/remote-work/view-remote-work-assignment/view-remote-work-assignment.component').then(m => m.ViewRemoteWorkAssignmentComponent),
-        data: {
-          title: 'remoteWork.request.view_details',
-          permission: 'remoteWork.request.read'
-        },
-        canMatch: [managerGuard]
-      },
+      { path: 'remote-work/:id/view', redirectTo: 'remote-work/edit/:id', pathMatch: 'full' },
       {
         path: 'remote-work/edit/:id',
         loadComponent: () => import('./pages/remote-work/edit-remote-work/edit-remote-work.component').then(m => m.EditRemoteWorkComponent),
@@ -699,15 +606,7 @@ export const routes: Routes = [
         },
         canMatch: [adminGuard]
       },
-      {
-        path: 'settings/remote-work-policy/:id/view',
-        loadComponent: () => import('./pages/settings/remote-work-policy/view-remote-work-policy/view-remote-work-policy.component').then(m => m.ViewRemoteWorkPolicyComponent),
-        data: {
-          title: 'remoteWork.policy.policy_details',
-          permission: 'remoteWork.policy.read'
-        },
-        canMatch: [adminGuard]
-      },
+      { path: 'settings/remote-work-policy/:id/view', redirectTo: 'settings/remote-work-policy/:id/edit', pathMatch: 'full' },
       {
         path: 'settings/remote-work-policy/:id/edit',
         loadComponent: () => import('./pages/settings/remote-work-policy/edit-remote-work-policy/edit-remote-work-policy.component').then(m => m.EditRemoteWorkPolicyComponent),
@@ -738,15 +637,7 @@ export const routes: Routes = [
         },
         canMatch: [adminGuard]
       },
-      {
-        path: 'settings/excuse-policies/:id/view',
-        loadComponent: () => import('./pages/settings/excuse-policies/view-excuse-policy/view-excuse-policy.component').then(m => m.ViewExcusePolicyComponent),
-        data: {
-          title: 'excuse_policies.view_policy',
-          permission: 'settings.excusePolicy.read'
-        },
-        canMatch: [adminGuard]
-      },
+      { path: 'settings/excuse-policies/:id/view', redirectTo: 'settings/excuse-policies/:id/edit', pathMatch: 'full' },
       {
         path: 'settings/excuse-policies/:id/edit',
         loadComponent: () => import('./pages/settings/excuse-policies/edit-excuse-policy/edit-excuse-policy.component').then(m => m.EditExcusePolicyComponent),
@@ -777,15 +668,7 @@ export const routes: Routes = [
         },
         canMatch: [adminGuard]
       },
-      {
-        path: 'settings/workflows/:id/view',
-        loadComponent: () => import('./pages/settings/workflows/workflow-form/workflow-form.component').then(m => m.WorkflowFormComponent),
-        data: {
-          title: 'workflows.view_workflow',
-          permission: 'workflow.read'
-        },
-        canMatch: [adminGuard]
-      },
+      { path: 'settings/workflows/:id/view', redirectTo: 'settings/workflows/:id/edit', pathMatch: 'full' },
       {
         path: 'settings/workflows/:id/edit',
         loadComponent: () => import('./pages/settings/workflows/workflow-form/workflow-form.component').then(m => m.WorkflowFormComponent),
@@ -880,7 +763,7 @@ export const routes: Routes = [
         canMatch: [authGuard]
       },
       {
-        path: 'leave-management/compensatory-offs/:id/view',
+        path: 'leave-management/compensatory-offs/:id/edit',
         loadComponent: () => import('./pages/leave-management/compensatory-offs/view-compensatory-off/view-compensatory-off.component').then(m => m.ViewCompensatoryOffComponent),
         data: { title: 'compensatoryOff.view', permission: 'compensatoryOff.read' },
         canMatch: [authGuard]
@@ -892,7 +775,7 @@ export const routes: Routes = [
         canMatch: [authGuard]
       },
       {
-        path: 'leave-management/leave-encashments/:id/view',
+        path: 'leave-management/leave-encashments/:id/edit',
         loadComponent: () => import('./pages/leave-management/leave-encashments/view-leave-encashment/view-leave-encashment.component').then(m => m.ViewLeaveEncashmentComponent),
         data: { title: 'leaveEncashment.view', permission: 'leaveEncashment.read' },
         canMatch: [authGuard]
@@ -925,12 +808,7 @@ export const routes: Routes = [
         data: {title: 'customReports.create', permission: 'customReport.create' },
         canMatch: [authGuard]
       },
-      {
-        path: 'reports/custom-reports/:id/view',
-        loadComponent: () => import('./pages/reports/custom-reports/view-custom-report/view-custom-report.component').then(m => m.ViewCustomReportComponent),
-        data: { title: 'customReports.view', permission: 'customReport.read' },
-        canMatch: [authGuard]
-      },
+      { path: 'reports/custom-reports/:id/view', redirectTo: 'reports/custom-reports/:id/edit', pathMatch: 'full' },
       {
         path: 'reports/custom-reports/:id/edit',
         loadComponent: () => import('./pages/reports/custom-reports/create-custom-report/create-custom-report.component').then(m => m.CreateCustomReportComponent),
@@ -953,12 +831,7 @@ export const routes: Routes = [
         data: {title: 'employee_contracts.create', permission: 'contract.manage' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'employee-contracts/:id/view',
-        loadComponent: () => import('./pages/employee-contracts/view-contract/view-contract.component').then(m => m.ViewContractComponent),
-        data: { title: 'employee_contracts.view', permission: 'contract.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'employee-contracts/:id/view', redirectTo: 'employee-contracts/:id/edit', pathMatch: 'full' },
       {
         path: 'employee-contracts/:id/edit',
         loadComponent: () => import('./pages/employee-contracts/create-contract/create-contract.component').then(m => m.CreateContractComponent),
@@ -977,12 +850,7 @@ export const routes: Routes = [
         data: {title: 'employee_transfers.create', permission: 'transfer.manage' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'employee-transfers/:id/view',
-        loadComponent: () => import('./pages/employee-transfers/view-transfer/view-transfer.component').then(m => m.ViewTransferComponent),
-        data: { title: 'employee_transfers.view', permission: 'transfer.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'employee-transfers/:id/view', redirectTo: 'employee-transfers/:id/edit', pathMatch: 'full' },
       {
         path: 'employee-transfers/:id/edit',
         loadComponent: () => import('./pages/employee-transfers/create-transfer/create-transfer.component').then(m => m.CreateTransferComponent),
@@ -1001,12 +869,7 @@ export const routes: Routes = [
         data: {title: 'employee_promotions.create', permission: 'promotion.manage' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'employee-promotions/:id/view',
-        loadComponent: () => import('./pages/employee-promotions/view-promotion/view-promotion.component').then(m => m.ViewPromotionComponent),
-        data: { title: 'employee_promotions.view', permission: 'promotion.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'employee-promotions/:id/view', redirectTo: 'employee-promotions/:id/edit', pathMatch: 'full' },
       {
         path: 'employee-promotions/:id/edit',
         loadComponent: () => import('./pages/employee-promotions/create-promotion/create-promotion.component').then(m => m.CreatePromotionComponent),
@@ -1025,12 +888,7 @@ export const routes: Routes = [
         data: {title: 'salary_adjustments.create', permission: 'salaryAdjustment.manage' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'salary-adjustments/:id/view',
-        loadComponent: () => import('./pages/salary-adjustments/view-adjustment/view-adjustment.component').then(m => m.ViewAdjustmentComponent),
-        data: { title: 'salary_adjustments.view', permission: 'salaryAdjustment.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'salary-adjustments/:id/view', redirectTo: 'salary-adjustments/:id/edit', pathMatch: 'full' },
       {
         path: 'salary-adjustments/:id/edit',
         loadComponent: () => import('./pages/salary-adjustments/create-adjustment/create-adjustment.component').then(m => m.CreateAdjustmentComponent),
@@ -1049,12 +907,7 @@ export const routes: Routes = [
         data: {title: 'job_grades.create', permission: 'jobGrade.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'job-grades/:id/view',
-        loadComponent: () => import('./pages/job-grades/view-grade/view-grade.component').then(m => m.ViewGradeComponent),
-        data: { title: 'job_grades.view', permission: 'jobGrade.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'job-grades/:id/view', redirectTo: 'job-grades/:id/edit', pathMatch: 'full' },
       {
         path: 'job-grades/:id/edit',
         loadComponent: () => import('./pages/job-grades/create-grade/create-grade.component').then(m => m.CreateGradeComponent),
@@ -1077,12 +930,7 @@ export const routes: Routes = [
         data: {title: 'payroll.salary_structures.create', permission: 'salaryStructure.manage' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'payroll/salary-structures/:id/view',
-        loadComponent: () => import('./pages/payroll/salary-structures/view-salary-structure/view-salary-structure.component').then(m => m.ViewSalaryStructureComponent),
-        data: { title: 'payroll.salary_structures.view', permission: 'salaryStructure.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'payroll/salary-structures/:id/view', redirectTo: 'payroll/salary-structures/:id/edit', pathMatch: 'full' },
       {
         path: 'payroll/salary-structures/:id/edit',
         loadComponent: () => import('./pages/payroll/salary-structures/create-salary-structure/create-salary-structure.component').then(m => m.CreateSalaryStructureComponent),
@@ -1101,12 +949,7 @@ export const routes: Routes = [
         data: {title: 'payroll.periods.create', permission: 'payroll.manage' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'payroll/periods/:id/view',
-        loadComponent: () => import('./pages/payroll/payroll-periods/view-payroll-period/view-payroll-period.component').then(m => m.ViewPayrollPeriodComponent),
-        data: { title: 'payroll.periods.view', permission: 'payroll.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'payroll/periods/:id/view', redirectTo: 'payroll/periods/:id/edit', pathMatch: 'full' },
       {
         path: 'payroll/periods/:id/edit',
         loadComponent: () => import('./pages/payroll/payroll-periods/create-payroll-period/create-payroll-period.component').then(m => m.CreatePayrollPeriodComponent),
@@ -1130,7 +973,7 @@ export const routes: Routes = [
         canMatch: [adminGuard]
       },
       {
-        path: 'offboarding/resignations/:id/view',
+        path: 'offboarding/resignations/:id/edit',
         loadComponent: () => import('./pages/offboarding/resignation-requests/view-resignation/view-resignation.component').then(m => m.ViewResignationComponent),
         data: { title: 'offboarding.resignations.view', permission: 'resignation.read' },
         canMatch: [adminGuard]
@@ -1147,12 +990,7 @@ export const routes: Routes = [
         data: {title: 'offboarding.terminations.create', permission: 'termination.manage' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'offboarding/terminations/:id/view',
-        loadComponent: () => import('./pages/offboarding/terminations/view-termination/view-termination.component').then(m => m.ViewTerminationComponent),
-        data: { title: 'offboarding.terminations.view', permission: 'termination.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'offboarding/terminations/:id/view', redirectTo: 'offboarding/terminations/:id/edit', pathMatch: 'full' },
       {
         path: 'offboarding/terminations/:id/edit',
         loadComponent: () => import('./pages/offboarding/terminations/create-termination/create-termination.component').then(m => m.CreateTerminationComponent),
@@ -1189,12 +1027,7 @@ export const routes: Routes = [
         data: {title: 'benefits.plans.create', permission: 'benefitPlan.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'benefits/plans/:id/view',
-        loadComponent: () => import('./pages/benefits/plans/view-plan/view-plan.component').then(m => m.ViewPlanComponent),
-        data: { title: 'benefits.plans.view', permission: 'benefitPlan.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'benefits/plans/:id/view', redirectTo: 'benefits/plans/:id/edit', pathMatch: 'full' },
       {
         path: 'benefits/plans/:id/edit',
         loadComponent: () => import('./pages/benefits/plans/create-plan/create-plan.component').then(m => m.CreatePlanComponent),
@@ -1213,12 +1046,7 @@ export const routes: Routes = [
         data: {title: 'benefits.periods.create', permission: 'openEnrollmentPeriod.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'benefits/enrollment-periods/:id/view',
-        loadComponent: () => import('./pages/benefits/enrollment-periods/view-enrollment-period/view-enrollment-period.component').then(m => m.ViewEnrollmentPeriodComponent),
-        data: { title: 'benefits.periods.view', permission: 'openEnrollmentPeriod.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'benefits/enrollment-periods/:id/view', redirectTo: 'benefits/enrollment-periods/:id/edit', pathMatch: 'full' },
       {
         path: 'benefits/enrollment-periods/:id/edit',
         loadComponent: () => import('./pages/benefits/enrollment-periods/create-enrollment-period/create-enrollment-period.component').then(m => m.CreateEnrollmentPeriodComponent),
@@ -1232,7 +1060,7 @@ export const routes: Routes = [
         canMatch: [adminGuard]
       },
       {
-        path: 'benefits/enrollments/:id/view',
+        path: 'benefits/enrollments/:id/edit',
         loadComponent: () => import('./pages/benefits/enrollments/view-enrollment/view-enrollment.component').then(m => m.ViewEnrollmentComponent),
         data: { title: 'benefits.enrollments.view', permission: 'benefitEnrollment.read' },
         canMatch: [adminGuard]
@@ -1244,7 +1072,7 @@ export const routes: Routes = [
         canMatch: [adminGuard]
       },
       {
-        path: 'benefits/claims/:id/view',
+        path: 'benefits/claims/:id/edit',
         loadComponent: () => import('./pages/benefits/claims/view-claim/view-claim.component').then(m => m.ViewClaimComponent),
         data: { title: 'benefits.claims.view', permission: 'benefitClaim.read' },
         canMatch: [adminGuard]
@@ -1265,12 +1093,7 @@ export const routes: Routes = [
         data: {title: 'allowance_types.create', permission: 'allowanceType.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'settings/allowance-types/:id/view',
-        loadComponent: () => import('./pages/settings/allowance-types/view-allowance-type/view-allowance-type.component').then(m => m.ViewAllowanceTypeComponent),
-        data: { title: 'allowance_types.view', permission: 'allowanceType.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'settings/allowance-types/:id/view', redirectTo: 'settings/allowance-types/:id/edit', pathMatch: 'full' },
       {
         path: 'settings/allowance-types/:id/edit',
         loadComponent: () => import('./pages/settings/allowance-types/create-allowance-type/create-allowance-type.component').then(m => m.CreateAllowanceTypeComponent),
@@ -1289,12 +1112,7 @@ export const routes: Routes = [
         data: {title: 'allowance_policies.create', permission: 'allowancePolicy.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'settings/allowance-policies/:id/view',
-        loadComponent: () => import('./pages/settings/allowance-policies/view-allowance-policy/view-allowance-policy.component').then(m => m.ViewAllowancePolicyComponent),
-        data: { title: 'allowance_policies.view', permission: 'allowancePolicy.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'settings/allowance-policies/:id/view', redirectTo: 'settings/allowance-policies/:id/edit', pathMatch: 'full' },
       {
         path: 'settings/allowance-policies/:id/edit',
         loadComponent: () => import('./pages/settings/allowance-policies/create-allowance-policy/create-allowance-policy.component').then(m => m.CreateAllowancePolicyComponent),
@@ -1314,7 +1132,7 @@ export const routes: Routes = [
         canMatch: [adminGuard]
       },
       {
-        path: 'allowances/:id/view',
+        path: 'allowances/:id/edit',
         loadComponent: () => import('./pages/allowances/view-allowance/view-allowance.component').then(m => m.ViewAllowanceComponent),
         data: { title: 'allowance_assignments.view', permission: 'allowanceAssignment.read' },
         canMatch: [adminGuard]
@@ -1326,7 +1144,7 @@ export const routes: Routes = [
         canMatch: [adminGuard]
       },
       {
-        path: 'allowance-requests/:id/view',
+        path: 'allowance-requests/:id/edit',
         loadComponent: () => import('./pages/allowance-requests/view-allowance-request/view-allowance-request.component').then(m => m.ViewAllowanceRequestComponent),
         data: { title: 'allowance_requests.view', permission: 'allowanceRequest.read' },
         canMatch: [adminGuard]
@@ -1347,12 +1165,7 @@ export const routes: Routes = [
         data: {title: 'job_requisitions.create', permission: 'jobRequisition.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'recruitment/requisitions/:id/view',
-        loadComponent: () => import('./pages/recruitment/job-requisitions/view-requisition/view-requisition.component').then(m => m.ViewRequisitionComponent),
-        data: { title: 'job_requisitions.view', permission: 'jobRequisition.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'recruitment/requisitions/:id/view', redirectTo: 'recruitment/requisitions/:id/edit', pathMatch: 'full' },
       {
         path: 'recruitment/requisitions/:id/edit',
         loadComponent: () => import('./pages/recruitment/job-requisitions/create-requisition/create-requisition.component').then(m => m.CreateRequisitionComponent),
@@ -1371,12 +1184,7 @@ export const routes: Routes = [
         data: {title: 'job_postings.create', permission: 'jobPosting.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'recruitment/postings/:id/view',
-        loadComponent: () => import('./pages/recruitment/job-postings/view-posting/view-posting.component').then(m => m.ViewPostingComponent),
-        data: { title: 'job_postings.view', permission: 'jobPosting.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'recruitment/postings/:id/view', redirectTo: 'recruitment/postings/:id/edit', pathMatch: 'full' },
       {
         path: 'recruitment/postings/:id/edit',
         loadComponent: () => import('./pages/recruitment/job-postings/create-posting/create-posting.component').then(m => m.CreatePostingComponent),
@@ -1389,12 +1197,7 @@ export const routes: Routes = [
         data: { title: 'candidates.title', permission: 'candidate.read' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'recruitment/candidates/:id/view',
-        loadComponent: () => import('./pages/recruitment/candidates/view-candidate/view-candidate.component').then(m => m.ViewCandidateComponent),
-        data: { title: 'candidates.view', permission: 'candidate.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'recruitment/candidates/:id/view', redirectTo: 'recruitment/candidates/:id/edit', pathMatch: 'full' },
       {
         path: 'recruitment/candidates/create',
         loadComponent: () => import('./pages/recruitment/candidates/create-candidate/create-candidate.component').then(m => m.CreateCandidateComponent),
@@ -1414,7 +1217,7 @@ export const routes: Routes = [
         canMatch: [adminGuard]
       },
       {
-        path: 'recruitment/applications/:id/view',
+        path: 'recruitment/applications/:id/edit',
         loadComponent: () => import('./pages/recruitment/applications/view-application/view-application.component').then(m => m.ViewApplicationComponent),
         data: { title: 'job_applications.view', permission: 'jobApplication.read' },
         canMatch: [adminGuard]
@@ -1426,7 +1229,7 @@ export const routes: Routes = [
         canMatch: [adminGuard]
       },
       {
-        path: 'recruitment/offers/:id/view',
+        path: 'recruitment/offers/:id/edit',
         loadComponent: () => import('./pages/recruitment/offers/view-offer/view-offer.component').then(m => m.ViewOfferComponent),
         data: { title: 'offer_letters.view', permission: 'offerLetter.read' },
         canMatch: [adminGuard]
@@ -1451,12 +1254,7 @@ export const routes: Routes = [
         data: {title: 'interviews.create', permission: 'interview.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'recruitment/interviews/:id/view',
-        loadComponent: () => import('./pages/recruitment/interviews/view-interview/view-interview.component').then(m => m.ViewInterviewComponent),
-        data: { title: 'interviews.view', permission: 'interview.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'recruitment/interviews/:id/view', redirectTo: 'recruitment/interviews/:id/edit', pathMatch: 'full' },
       {
         path: 'recruitment/interviews/:id/edit',
         loadComponent: () => import('./pages/recruitment/interviews/create-interview/create-interview.component').then(m => m.CreateInterviewComponent),
@@ -1479,12 +1277,7 @@ export const routes: Routes = [
         data: {title: 'onboarding_templates.create', permission: 'onboardingTemplate.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'onboarding/templates/:id/view',
-        loadComponent: () => import('./pages/onboarding/templates/view-template/view-template.component').then(m => m.ViewOnboardingTemplateComponent),
-        data: { title: 'onboarding_templates.view', permission: 'onboardingTemplate.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'onboarding/templates/:id/view', redirectTo: 'onboarding/templates/:id/edit', pathMatch: 'full' },
       {
         path: 'onboarding/templates/:id/edit',
         loadComponent: () => import('./pages/onboarding/templates/create-template/create-template.component').then(m => m.CreateOnboardingTemplateComponent),
@@ -1504,7 +1297,7 @@ export const routes: Routes = [
         canMatch: [adminGuard]
       },
       {
-        path: 'onboarding/processes/:id/view',
+        path: 'onboarding/processes/:id/edit',
         loadComponent: () => import('./pages/onboarding/processes/view-process/view-process.component').then(m => m.ViewOnboardingProcessComponent),
         data: { title: 'onboarding_processes.view', permission: 'onboarding.read' },
         canMatch: [adminGuard]
@@ -1531,12 +1324,7 @@ export const routes: Routes = [
         data: {title: 'performance_cycles.create', permission: 'performanceReviewCycle.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'performance/cycles/:id/view',
-        loadComponent: () => import('./pages/performance/cycles/view-cycle/view-cycle.component').then(m => m.ViewCycleComponent),
-        data: { title: 'performance_cycles.view', permission: 'performanceReviewCycle.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'performance/cycles/:id/view', redirectTo: 'performance/cycles/:id/edit', pathMatch: 'full' },
       {
         path: 'performance/cycles/:id/edit',
         loadComponent: () => import('./pages/performance/cycles/create-cycle/create-cycle.component').then(m => m.CreateCycleComponent),
@@ -1550,7 +1338,7 @@ export const routes: Routes = [
         canMatch: [adminGuard]
       },
       {
-        path: 'performance/reviews/:id/view',
+        path: 'performance/reviews/:id/edit',
         loadComponent: () => import('./pages/performance/reviews/view-review/view-review.component').then(m => m.ViewReviewComponent),
         data: { title: 'performance_reviews.view', permission: 'performanceReview.read' },
         canMatch: [adminGuard]
@@ -1567,12 +1355,7 @@ export const routes: Routes = [
         data: {title: 'goals.create', permission: 'goal.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'performance/goals/:id/view',
-        loadComponent: () => import('./pages/performance/goals/view-goal/view-goal.component').then(m => m.ViewGoalComponent),
-        data: { title: 'goals.view', permission: 'goal.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'performance/goals/:id/view', redirectTo: 'performance/goals/:id/edit', pathMatch: 'full' },
       {
         path: 'performance/goals/:id/edit',
         loadComponent: () => import('./pages/performance/goals/create-goal/create-goal.component').then(m => m.CreateGoalComponent),
@@ -1592,7 +1375,7 @@ export const routes: Routes = [
         canMatch: [adminGuard]
       },
       {
-        path: 'performance/competencies/:id/view',
+        path: 'performance/competencies/:id/edit',
         loadComponent: () => import('./pages/performance/competency-frameworks/competency-frameworks.component').then(m => m.CompetencyFrameworksComponent),
         data: { title: 'competencies.view', permission: 'competencyFramework.read' },
         canMatch: [adminGuard]
@@ -1610,7 +1393,7 @@ export const routes: Routes = [
         canMatch: [adminGuard]
       },
       {
-        path: 'performance/pips/:id/view',
+        path: 'performance/pips/:id/edit',
         loadComponent: () => import('./pages/performance/pips/view-pip/view-pip.component').then(m => m.ViewPipComponent),
         data: { title: 'pips.view', permission: 'pip.read' },
         canMatch: [adminGuard]
@@ -1630,7 +1413,7 @@ export const routes: Routes = [
         canMatch: [adminGuard]
       },
       {
-        path: 'performance/feedback-requests/:id/view',
+        path: 'performance/feedback-requests/:id/edit',
         loadComponent: () => import('./pages/performance/feedback-requests/view-feedback-request/view-feedback-request.component').then(m => m.ViewFeedbackRequestComponent),
         data: { title: 'feedback_360.view', permission: 'feedback360.read' },
         canMatch: [adminGuard]
@@ -1651,12 +1434,7 @@ export const routes: Routes = [
         data: {title: 'succession.key_positions.create', permission: 'keyPosition.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'succession/key-positions/:id/view',
-        loadComponent: () => import('./pages/succession/key-positions/view-key-position/view-key-position.component').then(m => m.ViewKeyPositionComponent),
-        data: { title: 'succession.key_positions.view', permission: 'keyPosition.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'succession/key-positions/:id/view', redirectTo: 'succession/key-positions/:id/edit', pathMatch: 'full' },
       {
         path: 'succession/key-positions/:id/edit',
         loadComponent: () => import('./pages/succession/key-positions/create-key-position/create-key-position.component').then(m => m.CreateKeyPositionComponent),
@@ -1675,12 +1453,7 @@ export const routes: Routes = [
         data: {title: 'succession.talent_profiles.create', permission: 'talentProfile.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'succession/talent-profiles/:id/view',
-        loadComponent: () => import('./pages/succession/talent-profiles/view-talent-profile/view-talent-profile.component').then(m => m.ViewTalentProfileComponent),
-        data: { title: 'succession.talent_profiles.view', permission: 'talentProfile.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'succession/talent-profiles/:id/view', redirectTo: 'succession/talent-profiles/:id/edit', pathMatch: 'full' },
       {
         path: 'succession/talent-profiles/:id/edit',
         loadComponent: () => import('./pages/succession/talent-profiles/create-talent-profile/create-talent-profile.component').then(m => m.CreateTalentProfileComponent),
@@ -1699,12 +1472,7 @@ export const routes: Routes = [
         data: {title: 'succession.plans.create', permission: 'successionPlan.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'succession/plans/:id/view',
-        loadComponent: () => import('./pages/succession/succession-plans/view-succession-plan/view-succession-plan.component').then(m => m.ViewSuccessionPlanComponent),
-        data: { title: 'succession.plans.view', permission: 'successionPlan.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'succession/plans/:id/view', redirectTo: 'succession/plans/:id/edit', pathMatch: 'full' },
       {
         path: 'succession/plans/:id/edit',
         loadComponent: () => import('./pages/succession/succession-plans/create-succession-plan/create-succession-plan.component').then(m => m.CreateSuccessionPlanComponent),
@@ -1723,12 +1491,7 @@ export const routes: Routes = [
         data: {title: 'succession.career_paths.create', permission: 'careerPath.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'succession/career-paths/:id/view',
-        loadComponent: () => import('./pages/succession/career-paths/view-career-path/view-career-path.component').then(m => m.ViewCareerPathComponent),
-        data: { title: 'succession.career_paths.view', permission: 'careerPath.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'succession/career-paths/:id/view', redirectTo: 'succession/career-paths/:id/edit', pathMatch: 'full' },
       {
         path: 'succession/career-paths/:id/edit',
         loadComponent: () => import('./pages/succession/career-paths/create-career-path/create-career-path.component').then(m => m.CreateCareerPathComponent),
@@ -1764,7 +1527,7 @@ export const routes: Routes = [
         canMatch: [adminGuard]
       },
       {
-        path: 'documents/employee-documents/:id/view',
+        path: 'documents/employee-documents/:id/edit',
         loadComponent: () => import('./pages/documents/employee-documents/view-document/view-document.component').then(m => m.ViewDocumentComponent),
         data: { title: 'employee_documents.view', permission: 'employeeDocument.read' },
         canMatch: [adminGuard]
@@ -1781,12 +1544,7 @@ export const routes: Routes = [
         data: {title: 'company_policies.create', permission: 'companyPolicy.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'documents/company-policies/:id/view',
-        loadComponent: () => import('./pages/documents/company-policies/view-policy/view-policy.component').then(m => m.ViewPolicyComponent),
-        data: { title: 'company_policies.view', permission: 'companyPolicy.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'documents/company-policies/:id/view', redirectTo: 'documents/company-policies/:id/edit', pathMatch: 'full' },
       {
         path: 'documents/company-policies/:id/edit',
         loadComponent: () => import('./pages/documents/company-policies/create-policy/create-policy.component').then(m => m.CreatePolicyComponent),
@@ -1805,12 +1563,7 @@ export const routes: Routes = [
         data: {title: 'letter_templates.create', permission: 'letterTemplate.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'documents/letter-templates/:id/view',
-        loadComponent: () => import('./pages/documents/letter-templates/view-template/view-template.component').then(m => m.ViewTemplateComponent),
-        data: { title: 'letter_templates.view', permission: 'letterTemplate.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'documents/letter-templates/:id/view', redirectTo: 'documents/letter-templates/:id/edit', pathMatch: 'full' },
       {
         path: 'documents/letter-templates/:id/edit',
         loadComponent: () => import('./pages/documents/letter-templates/create-template/create-template.component').then(m => m.CreateTemplateComponent),
@@ -1830,7 +1583,7 @@ export const routes: Routes = [
         canMatch: [adminGuard]
       },
       {
-        path: 'documents/letter-requests/:id/view',
+        path: 'documents/letter-requests/:id/edit',
         loadComponent: () => import('./pages/documents/letter-requests/view-request/view-request.component').then(m => m.ViewRequestComponent),
         data: { title: 'letter_requests.view', permission: 'letterRequest.read' },
         canMatch: [adminGuard]
@@ -1857,12 +1610,7 @@ export const routes: Routes = [
         data: {title: 'expense_policies.create', permission: 'expensePolicy.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'expenses/policies/:id/view',
-        loadComponent: () => import('./pages/expenses/policies/view-policy/view-expense-policy.component').then(m => m.ViewExpensePolicyComponent),
-        data: { title: 'expense_policies.view', permission: 'expensePolicy.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'expenses/policies/:id/view', redirectTo: 'expenses/policies/:id/edit', pathMatch: 'full' },
       {
         path: 'expenses/policies/:id/edit',
         loadComponent: () => import('./pages/expenses/policies/create-policy/create-expense-policy.component').then(m => m.CreateExpensePolicyComponent),
@@ -1882,7 +1630,7 @@ export const routes: Routes = [
         canMatch: [adminGuard]
       },
       {
-        path: 'expenses/claims/:id/view',
+        path: 'expenses/claims/:id/edit',
         loadComponent: () => import('./pages/expenses/claims/view-claim/view-claim.component').then(m => m.ViewClaimComponent),
         data: { title: 'expense_claims.view', permission: 'expenseClaim.read' },
         canMatch: [adminGuard]
@@ -1916,7 +1664,7 @@ export const routes: Routes = [
         canMatch: [adminGuard]
       },
       {
-        path: 'loans/applications/:id/view',
+        path: 'loans/applications/:id/edit',
         loadComponent: () => import('./pages/loans/applications/view-application/view-application.component').then(m => m.ViewApplicationComponent),
         data: { title: 'loan_applications.view', permission: 'loanApplication.read' },
         canMatch: [adminGuard]
@@ -1934,7 +1682,7 @@ export const routes: Routes = [
         canMatch: [adminGuard]
       },
       {
-        path: 'loans/salary-advances/:id/view',
+        path: 'loans/salary-advances/:id/edit',
         loadComponent: () => import('./pages/loans/salary-advances/view-advance/view-advance.component').then(m => m.ViewAdvanceComponent),
         data: { title: 'salary_advances.view', permission: 'salaryAdvance.read' },
         canMatch: [adminGuard]
@@ -1960,12 +1708,7 @@ export const routes: Routes = [
         data: {title: 'announcements.create', permission: 'announcement.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'announcements/:id/view',
-        loadComponent: () => import('./pages/announcements/view-announcement/view-announcement.component').then(m => m.ViewAnnouncementComponent),
-        data: { title: 'announcements.view', permission: 'announcement.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'announcements/:id/view', redirectTo: 'announcements/:id/edit', pathMatch: 'full' },
       {
         path: 'announcements/:id/edit',
         loadComponent: () => import('./pages/announcements/create-announcement/create-announcement.component').then(m => m.CreateAnnouncementComponent),
@@ -1994,12 +1737,7 @@ export const routes: Routes = [
         data: {title: 'training_courses.create', permission: 'trainingCourse.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'training/courses/:id/view',
-        loadComponent: () => import('./pages/training/courses/view-course/view-course.component').then(m => m.ViewCourseComponent),
-        data: { title: 'training_courses.view', permission: 'trainingCourse.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'training/courses/:id/view', redirectTo: 'training/courses/:id/edit', pathMatch: 'full' },
       {
         path: 'training/courses/:id/edit',
         loadComponent: () => import('./pages/training/courses/create-course/create-course.component').then(m => m.CreateCourseComponent),
@@ -2018,12 +1756,7 @@ export const routes: Routes = [
         data: {title: 'training_programs.create', permission: 'trainingProgram.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'training/programs/:id/view',
-        loadComponent: () => import('./pages/training/programs/view-program/view-program.component').then(m => m.ViewProgramComponent),
-        data: { title: 'training_programs.view', permission: 'trainingProgram.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'training/programs/:id/view', redirectTo: 'training/programs/:id/edit', pathMatch: 'full' },
       {
         path: 'training/programs/:id/edit',
         loadComponent: () => import('./pages/training/programs/create-program/create-program.component').then(m => m.CreateProgramComponent),
@@ -2042,12 +1775,7 @@ export const routes: Routes = [
         data: {title: 'training_sessions.create', permission: 'trainingSession.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'training/sessions/:id/view',
-        loadComponent: () => import('./pages/training/sessions/view-session/view-session.component').then(m => m.ViewSessionComponent),
-        data: { title: 'training_sessions.view', permission: 'trainingSession.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'training/sessions/:id/view', redirectTo: 'training/sessions/:id/edit', pathMatch: 'full' },
       {
         path: 'training/sessions/:id/edit',
         loadComponent: () => import('./pages/training/sessions/create-session/create-session.component').then(m => m.CreateSessionComponent),
@@ -2072,12 +1800,7 @@ export const routes: Routes = [
         data: {title: 'certifications.create', permission: 'employeeCertification.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'training/certifications/:id/view',
-        loadComponent: () => import('./pages/training/certifications/view-certification/view-certification.component').then(m => m.ViewCertificationComponent),
-        data: { title: 'certifications.view', permission: 'employeeCertification.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'training/certifications/:id/view', redirectTo: 'training/certifications/:id/edit', pathMatch: 'full' },
       {
         path: 'training/certifications/:id/edit',
         loadComponent: () => import('./pages/training/certifications/create-certification/create-certification.component').then(m => m.CreateCertificationComponent),
@@ -2106,12 +1829,7 @@ export const routes: Routes = [
         data: {title: 'grievances.create', permission: 'grievance.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'employee-relations/grievances/:id/view',
-        loadComponent: () => import('./pages/employee-relations/grievances/view-grievance/view-grievance.component').then(m => m.ViewGrievanceComponent),
-        data: { title: 'grievances.view', permission: 'grievance.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'employee-relations/grievances/:id/view', redirectTo: 'employee-relations/grievances/:id/edit', pathMatch: 'full' },
       {
         path: 'employee-relations/grievances/:id/edit',
         loadComponent: () => import('./pages/employee-relations/grievances/create-grievance/create-grievance.component').then(m => m.CreateGrievanceComponent),
@@ -2130,12 +1848,7 @@ export const routes: Routes = [
         data: {title: 'disciplinary_actions.create', permission: 'disciplinaryAction.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'employee-relations/disciplinary-actions/:id/view',
-        loadComponent: () => import('./pages/employee-relations/disciplinary-actions/view-action/view-action.component').then(m => m.ViewActionComponent),
-        data: { title: 'disciplinary_actions.view', permission: 'disciplinaryAction.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'employee-relations/disciplinary-actions/:id/view', redirectTo: 'employee-relations/disciplinary-actions/:id/edit', pathMatch: 'full' },
       {
         path: 'employee-relations/disciplinary-actions/:id/edit',
         loadComponent: () => import('./pages/employee-relations/disciplinary-actions/create-action/create-action.component').then(m => m.CreateActionComponent),
@@ -2154,12 +1867,7 @@ export const routes: Routes = [
         data: {title: 'investigations.create', permission: 'investigation.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'employee-relations/investigations/:id/view',
-        loadComponent: () => import('./pages/employee-relations/investigations/view-investigation/view-investigation.component').then(m => m.ViewInvestigationComponent),
-        data: { title: 'investigations.view', permission: 'investigation.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'employee-relations/investigations/:id/view', redirectTo: 'employee-relations/investigations/:id/edit', pathMatch: 'full' },
       {
         path: 'employee-relations/investigations/:id/edit',
         loadComponent: () => import('./pages/employee-relations/investigations/create-investigation/create-investigation.component').then(m => m.CreateInvestigationComponent),
@@ -2178,12 +1886,7 @@ export const routes: Routes = [
         data: {title: 'counseling_records.create', permission: 'counselingRecord.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'employee-relations/counseling/:id/view',
-        loadComponent: () => import('./pages/employee-relations/counseling/view-counseling/view-counseling.component').then(m => m.ViewCounselingComponent),
-        data: { title: 'counseling_records.view', permission: 'counselingRecord.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'employee-relations/counseling/:id/view', redirectTo: 'employee-relations/counseling/:id/edit', pathMatch: 'full' },
       {
         path: 'employee-relations/counseling/:id/edit',
         loadComponent: () => import('./pages/employee-relations/counseling/create-counseling/create-counseling.component').then(m => m.CreateCounselingComponent),
@@ -2227,12 +1930,7 @@ export const routes: Routes = [
         data: { title: 'assets.maintenance.title', permission: 'assetMaintenance.read' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'assets/:id/view',
-        loadComponent: () => import('./pages/assets/view-asset/view-asset.component').then(m => m.ViewAssetComponent),
-        data: { title: 'assets.view', permission: 'asset.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'assets/:id/view', redirectTo: 'assets/:id/edit', pathMatch: 'full' },
       {
         path: 'assets/:id/edit',
         loadComponent: () => import('./pages/assets/create-asset/create-asset.component').then(m => m.CreateAssetComponent),
@@ -2254,12 +1952,7 @@ export const routes: Routes = [
         data: {title: 'surveys.create_template', permission: 'surveyTemplate.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'surveys/templates/:id/view',
-        loadComponent: () => import('./pages/surveys/view-template/view-template.component').then(m => m.ViewTemplateComponent),
-        data: { title: 'surveys.view_template', permission: 'surveyTemplate.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'surveys/templates/:id/view', redirectTo: 'surveys/templates/:id/edit', pathMatch: 'full' },
       {
         path: 'surveys/templates/:id/edit',
         loadComponent: () => import('./pages/surveys/create-template/create-template.component').then(m => m.CreateTemplateComponent),
@@ -2278,12 +1971,7 @@ export const routes: Routes = [
         data: {title: 'surveys.create_distribution', permission: 'surveyDistribution.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'surveys/distributions/:id/view',
-        loadComponent: () => import('./pages/surveys/view-distribution/view-distribution.component').then(m => m.ViewDistributionComponent),
-        data: { title: 'surveys.view_distribution', permission: 'surveyDistribution.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'surveys/distributions/:id/view', redirectTo: 'surveys/distributions/:id/edit', pathMatch: 'full' },
       {
         path: 'surveys/distributions/:id/edit',
         loadComponent: () => import('./pages/surveys/create-distribution/create-distribution.component').then(m => m.CreateDistributionComponent),
@@ -2364,12 +2052,7 @@ export const routes: Routes = [
         data: {title: 'timesheets.projects.create', permission: 'project.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'timesheets/projects/:id/view',
-        loadComponent: () => import('./pages/timesheets/projects/view-project/view-project.component').then(m => m.ViewProjectComponent),
-        data: { title: 'timesheets.projects.view', permission: 'project.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'timesheets/projects/:id/view', redirectTo: 'timesheets/projects/:id/edit', pathMatch: 'full' },
       {
         path: 'timesheets/projects/:id/edit',
         loadComponent: () => import('./pages/timesheets/projects/create-project/create-project.component').then(m => m.CreateProjectComponent),
@@ -2388,12 +2071,7 @@ export const routes: Routes = [
         data: {title: 'timesheets.periods.create', permission: 'timesheetPeriod.create' },
         canMatch: [adminGuard]
       },
-      {
-        path: 'timesheets/periods/:id/view',
-        loadComponent: () => import('./pages/timesheets/periods/view-period/view-period.component').then(m => m.ViewPeriodComponent),
-        data: { title: 'timesheets.periods.view', permission: 'timesheetPeriod.read' },
-        canMatch: [adminGuard]
-      },
+      { path: 'timesheets/periods/:id/view', redirectTo: 'timesheets/periods/:id/edit', pathMatch: 'full' },
       {
         path: 'timesheets/periods/:id/edit',
         loadComponent: () => import('./pages/timesheets/periods/create-period/create-period.component').then(m => m.CreatePeriodComponent),
@@ -2407,7 +2085,7 @@ export const routes: Routes = [
         canMatch: [adminGuard]
       },
       {
-        path: 'timesheets/timesheets/:id/view',
+        path: 'timesheets/timesheets/:id/edit',
         loadComponent: () => import('./pages/timesheets/timesheets/view-timesheet/view-timesheet.component').then(m => m.ViewTimesheetComponent),
         data: { title: 'timesheets.timesheets.view', permission: 'timesheet.read' },
         canMatch: [adminGuard]

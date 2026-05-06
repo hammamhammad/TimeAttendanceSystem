@@ -1,11 +1,16 @@
-import { Component, Input, Output, EventEmitter, signal, computed, HostListener } from '@angular/core';
+import { Component, Input, signal, computed, HostListener, ElementRef, inject, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { Router, NavigationEnd } from '@angular/router';
-import { filter, map } from 'rxjs';
+import { filter } from 'rxjs';
 import { AuthService } from '../../core/auth/auth.service';
 import { I18nService, Locale } from '../../core/i18n/i18n.service';
 import { NotificationBellComponent } from '../../shared/components/notification-bell/notification-bell.component';
+
+interface Crumb {
+  label: string;
+  url?: string;
+}
 
 @Component({
   selector: 'app-topbar',
@@ -16,70 +21,86 @@ import { NotificationBellComponent } from '../../shared/components/notification-
 })
 export class TopbarComponent {
   @Input() sidenavCollapsed = signal(false);
-  @Output() toggleSidenav = new EventEmitter<void>();
+
+  private authService = inject(AuthService);
+  public i18n = inject(I18nService);
+  private router = inject(Router);
+  private host = inject(ElementRef<HTMLElement>);
 
   currentUser = computed(() => this.authService.currentUser());
   currentLocale = computed(() => this.i18n.locale());
   isRtl = computed(() => this.i18n.isRtl());
 
-  private pageTitleKey = signal('nav.dashboard');
+  private pageTitleKey = signal<string>('nav.dashboard');
   showUserMenu = signal(false);
+  showSearch = signal(false);
 
-  // Phase 6: top-nav omnibox. Pressing Enter navigates to the dedicated global-search
-  // page with the query pre-filled; Ctrl/Cmd+K focuses the input from anywhere.
   searchQuery = signal('');
 
-  // Reactive page title - re-translates when locale changes
   pageTitle = computed(() => {
     // Reading locale() makes this recompute on language switch
     this.i18n.locale();
     return this.t(this.pageTitleKey()) || this.t('nav.dashboard');
   });
 
-  constructor(
-    private authService: AuthService,
-    public i18n: I18nService,
-    private router: Router
-  ) {
-    // Listen to route changes to update page title key and — when the active
-    // route is the global-search page — mirror its `?q=` into the omnibox so
-    // the search value stays visible when the user navigates there directly.
+  breadcrumb = computed<Crumb[]>(() => {
+    this.i18n.locale();
+    const title = this.t(this.pageTitleKey()) || this.t('nav.dashboard');
+    const home: Crumb = { label: this.t('nav.dashboard'), url: '/dashboard' };
+    if (this.pageTitleKey() === 'nav.dashboard') {
+      return [{ label: home.label }];
+    }
+    return [home, { label: title }];
+  });
+
+  userInitials = computed(() => {
+    const name = this.currentUser()?.username ?? '';
+    if (!name) return '?';
+    const parts = name.split(/[\s._-]+/).filter(Boolean);
+    if (parts.length === 0) return name.charAt(0).toUpperCase();
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  });
+
+  constructor() {
     this.router.events
-      .pipe(
-        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
-        map((event: NavigationEnd) => {
-          let route = this.router.routerState.root;
-          while (route.firstChild) {
-            route = route.firstChild;
-          }
-          return {
-            titleKey: route.snapshot.data?.['title'] || 'nav.dashboard',
-            queryParams: route.snapshot.queryParamMap,
-            urlPath: event.urlAfterRedirects
-          };
-        })
-      )
-      .subscribe(({ titleKey, queryParams, urlPath }) => {
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe((event) => {
+        let route = this.router.routerState.root;
+        while (route.firstChild) route = route.firstChild;
+        const titleKey = route.snapshot.data?.['title'] || 'nav.dashboard';
         this.pageTitleKey.set(titleKey);
-        // Only sync the omnibox when the user is on the search page itself;
-        // every other route leaves the current query untouched.
-        if (urlPath.startsWith('/global-search')) {
-          const q = queryParams.get('q') ?? '';
+
+        if (event.urlAfterRedirects.startsWith('/global-search')) {
+          const q = route.snapshot.queryParamMap.get('q') ?? '';
           if (q !== this.searchQuery()) this.searchQuery.set(q);
         }
       });
+
+    // Focus the search input when the popover opens.
+    effect(() => {
+      if (this.showSearch()) {
+        queueMicrotask(() => {
+          const el = document.getElementById('topbar-omnibox') as HTMLInputElement | null;
+          el?.focus();
+          el?.select();
+        });
+      }
+    });
   }
 
   t(key: string): string {
     return this.i18n.t(key);
   }
 
-  onToggleSidenav(): void {
-    this.toggleSidenav.emit();
-  }
-
   onToggleUserMenu(): void {
     this.showUserMenu.update(show => !show);
+    if (this.showUserMenu()) this.showSearch.set(false);
+  }
+
+  onToggleSearch(): void {
+    this.showSearch.update(v => !v);
+    if (this.showSearch()) this.showUserMenu.set(false);
   }
 
   onSwitchLanguage(): void {
@@ -93,22 +114,36 @@ export class TopbarComponent {
     this.showUserMenu.set(false);
   }
 
-  onClickOutside(): void {
-    this.showUserMenu.set(false);
-  }
-
   onSearchSubmit(): void {
     const q = this.searchQuery().trim();
-    if (q.length < 2) return; // mirror backend min-length
+    if (q.length < 2) return;
     this.router.navigate(['/global-search'], { queryParams: { q } });
+    this.showSearch.set(false);
+  }
+
+  goCrumb(crumb: Crumb, event: MouseEvent): void {
+    if (!crumb.url) return;
+    event.preventDefault();
+    this.router.navigateByUrl(crumb.url);
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(e: MouseEvent): void {
+    const target = e.target as Node;
+    if (!this.host.nativeElement.contains(target)) {
+      this.showUserMenu.set(false);
+      this.showSearch.set(false);
+    }
   }
 
   @HostListener('document:keydown', ['$event'])
   onKeydown(e: KeyboardEvent): void {
-    // Ctrl/Cmd+K → focus the omnibox from anywhere in the admin app.
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-      const el = document.getElementById('topbar-omnibox') as HTMLInputElement | null;
-      if (el) { e.preventDefault(); el.focus(); el.select(); }
+      e.preventDefault();
+      this.showSearch.set(true);
+    } else if (e.key === 'Escape') {
+      if (this.showSearch()) this.showSearch.set(false);
+      if (this.showUserMenu()) this.showUserMenu.set(false);
     }
   }
 }

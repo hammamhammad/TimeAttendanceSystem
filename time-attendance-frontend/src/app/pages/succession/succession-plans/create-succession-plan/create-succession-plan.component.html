@@ -11,7 +11,7 @@
           <div class="col-md-6">
             <div class="app-modern-field">
               <label class="app-modern-label">{{ i18n.t('succession.plans.key_position') }} <span class="text-danger">*</span></label>
-              <app-searchable-select [options]="keyPositionOptions()" [formControl]="$any(form.get('keyPositionId'))" [placeholder]="i18n.t('common.select')" [disabled]="isEditMode()" />
+              <app-searchable-select [options]="keyPositionOptions()" [formControl]="$any(form.get('keyPositionId'))" [placeholder]="i18n.t('common.select')" />
             </div>
           </div>
           <div class="col-md-6">

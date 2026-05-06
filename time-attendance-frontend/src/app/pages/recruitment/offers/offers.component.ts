@@ -59,7 +59,7 @@ export class OffersComponent implements OnInit {
   }
 
   onTableAction(event: { action: string; item: OfferLetter }): void {
-    if (event.action === 'view') this.router.navigate(['/recruitment/offers', event.item.id, 'view']);
+    if (event.action === 'view') this.router.navigate(['/recruitment/offers', event.item.id, 'edit']);
   }
 
   onPageChange(p: number): void { this.currentPage.set(p); this.loadData(); }

@@ -99,7 +99,7 @@ export class RolesComponent implements OnInit {
       sortable: false,
       width: '120px',
       align: 'center',
-      priority: 'low',
+      priority: 'medium',
       hideOnMobile: true,
       mobileLabel: this.t('roles.type'),
       renderHtml: true

@@ -5,6 +5,7 @@ import { DepartmentFormComponent } from '../department-form/department-form.comp
 import { DepartmentsService } from '../departments.service';
 import { Department, DepartmentDto, CreateDepartmentRequest, UpdateDepartmentRequest } from '../../../shared/models/department.model';
 import { I18nService } from '../../../core/i18n/i18n.service';
+import { PermissionService } from '../../../core/auth/permission.service';
 
 @Component({
   selector: 'app-edit-department',
@@ -64,6 +65,7 @@ import { I18nService } from '../../../core/i18n/i18n.service';
               [department]="department()"
               [branchId]="department()?.branchId || null"
               [isEditMode]="true"
+              [readonly]="!canEdit()"
               [externalSaving]="saving()"
               (save)="onDepartmentSaved($event)"
               (cancel)="onCancel()">
@@ -84,11 +86,16 @@ export class EditDepartmentComponent implements OnInit {
   private router = inject(Router);
   private departmentsService = inject(DepartmentsService);
   public i18n = inject(I18nService);
+  private permissionService = inject(PermissionService);
 
   department = signal<Department | null>(null);
   loading = signal(true);
   saving = signal(false);
   error = signal('');
+
+  canEdit(): boolean {
+    return this.permissionService.has('department.update');
+  }
 
   ngOnInit(): void {
     const departmentId = this.route.snapshot.paramMap.get('id');

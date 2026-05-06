@@ -94,5 +94,7 @@ public record GetEmployeesQuery(
     long? DepartmentId = null,
     long? ManagerId = null,
     bool? IsActive = null,
-    string? EmploymentStatus = null
+    string? EmploymentStatus = null,
+    string? SortBy = null,
+    string? SortDirection = null
 ) : IRequest<Result<PagedResult<EmployeeDto>>>;

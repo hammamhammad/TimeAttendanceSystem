@@ -13,6 +13,7 @@ import { FormSectionComponent } from '../../../shared/components/form-section/fo
 import { SearchableSelectComponent, SearchableSelectOption } from '../../../shared/components/searchable-select/searchable-select.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
+import { PermissionService } from '../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-promotion',
   standalone: true,
@@ -39,6 +40,16 @@ export class CreatePromotionComponent implements OnInit {
 
   private route = inject(ActivatedRoute);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('promotion.manage');
+  }
   submitting = signal(false);
   loading = signal(false);
   isEditMode = signal(false);
@@ -84,6 +95,9 @@ export class CreatePromotionComponent implements OnInit {
           reasonAr: data.reasonAr,
           notes: data.notes
         });
+        if (!this.canEdit()) {
+          this.form.disable();
+        }
       },
       error: () => {
         this.notification.error(this.i18n.t('common.error_loading'));

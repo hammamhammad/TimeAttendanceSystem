@@ -10,6 +10,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-section
 import { SearchableSelectComponent, SearchableSelectOption } from '../../../../shared/components/searchable-select/searchable-select.component';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 
+import { PermissionService } from '../../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-posting',
   standalone: true,
@@ -24,6 +25,16 @@ export class CreatePostingComponent implements OnInit {
   private notification = inject(NotificationService);
   private service = inject(RecruitmentService);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('jobPosting.manage');
+  }
   submitting = signal(false);
   loading = signal(false);
   requisitionOptions: SearchableSelectOption[] = [];

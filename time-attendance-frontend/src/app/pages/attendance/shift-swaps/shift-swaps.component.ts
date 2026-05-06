@@ -151,7 +151,7 @@ export class ShiftSwapsComponent implements OnInit {
 
     switch (action) {
       case 'view':
-        this.router.navigate(['/attendance/shift-swaps', item.id, 'view']);
+        this.router.navigate(['/attendance/shift-swaps', item.id, 'edit']);
         break;
       case 'partner_approve':
         this.partnerApprove(item);

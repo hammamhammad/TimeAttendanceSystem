@@ -5,6 +5,7 @@ import { UserFormComponent } from '../user-form/user-form.component';
 import { UsersService } from '../users.service';
 import { UserDto } from '../../../shared/models/user.model';
 import { I18nService } from '../../../core/i18n/i18n.service';
+import { PermissionService } from '../../../core/auth/permission.service';
 
 @Component({
   selector: 'app-edit-user-page',
@@ -32,9 +33,10 @@ import { I18nService } from '../../../core/i18n/i18n.service';
           </div>
         </div>
       } @else {
-        <app-user-form 
-          [user]="user()" 
+        <app-user-form
+          [user]="user()"
           [show]="true"
+          [readonly]="!canEdit()"
           (userSaved)="onUserSaved($event)">
         </app-user-form>
       }
@@ -51,10 +53,15 @@ export class EditUserPageComponent implements OnInit {
   private router = inject(Router);
   private usersService = inject(UsersService);
   public i18n = inject(I18nService);
+  private permissionService = inject(PermissionService);
 
   user = signal<UserDto | null>(null);
   loading = signal(true);
   error = signal('');
+
+  canEdit(): boolean {
+    return this.permissionService.has('user.update');
+  }
 
   ngOnInit(): void {
     const userId = this.route.snapshot.paramMap.get('id');
@@ -84,7 +91,7 @@ export class EditUserPageComponent implements OnInit {
   }
 
   onUserSaved(user: UserDto): void {
-    this.router.navigate(['/users', user.id, 'view']);
+    this.router.navigate(['/users']);
   }
 
   private getErrorMessage(error: any): string {

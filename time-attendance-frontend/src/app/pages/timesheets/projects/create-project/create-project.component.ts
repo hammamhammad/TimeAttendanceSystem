@@ -8,6 +8,7 @@ import { TimesheetService } from '../../../../core/services/timesheet.service';
 import { FormHeaderComponent } from '../../../../shared/components/form-header/form-header.component';
 import { FormSectionComponent } from '../../../../shared/components/form-section/form-section.component';
 
+import { PermissionService } from '../../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-project',
   standalone: true,
@@ -23,6 +24,16 @@ export class CreateProjectComponent implements OnInit {
   private readonly service = inject(TimesheetService);
   private readonly notification = inject(NotificationService);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('project.update');
+  }
   form!: FormGroup;
   saving = signal(false);
   isEdit = signal(false);
@@ -56,13 +67,18 @@ export class CreateProjectComponent implements OnInit {
       this.isEdit.set(true);
       this.entityId.set(+id);
       this.service.getProject(+id).subscribe({
-        next: (p) => this.form.patchValue({
-          code: p.code, name: p.name, nameAr: p.nameAr, description: p.description, descriptionAr: p.descriptionAr,
-          clientName: p.clientName, clientNameAr: p.clientNameAr, managerEmployeeId: p.managerEmployeeId,
-          branchId: p.branchId, startDate: p.startDate ? p.startDate.substring(0, 10) : '',
-          endDate: p.endDate ? p.endDate.substring(0, 10) : '', budgetHours: p.budgetHours,
-          status: p.status, isActive: p.isActive, isChargeable: p.isChargeable
-        }),
+        next: (p) => {
+          this.form.patchValue({
+            code: p.code, name: p.name, nameAr: p.nameAr, description: p.description, descriptionAr: p.descriptionAr,
+            clientName: p.clientName, clientNameAr: p.clientNameAr, managerEmployeeId: p.managerEmployeeId,
+            branchId: p.branchId, startDate: p.startDate ? p.startDate.substring(0, 10) : '',
+            endDate: p.endDate ? p.endDate.substring(0, 10) : '', budgetHours: p.budgetHours,
+            status: p.status, isActive: p.isActive, isChargeable: p.isChargeable
+          });
+          if (!this.canEdit()) {
+            this.form.disable({ emitEvent: false });
+          }
+        },
         error: () => this.notification.error(this.i18n.t('common.error'))
       });
     }

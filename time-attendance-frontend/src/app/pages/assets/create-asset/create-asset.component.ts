@@ -13,6 +13,7 @@ import { SearchableSelectComponent, SearchableSelectOption } from '../../../shar
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { environment } from '../../../../environments/environment';
 
+import { PermissionService } from '../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-asset',
   standalone: true,
@@ -36,6 +37,16 @@ export class CreateAssetComponent implements OnInit {
   private readonly assetService = inject(AssetService);
   private readonly notification = inject(NotificationService);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('asset.update');
+  }
   loading = signal(false);
   saving = signal(false);
   isEditMode = signal(false);
@@ -140,6 +151,9 @@ export class CreateAssetComponent implements OnInit {
           location: asset.location || '',
           notes: asset.notes || ''
         });
+        if (!this.canEdit()) {
+          this.assetForm.disable();
+        }
         this.loading.set(false);
       },
       error: () => {
@@ -168,7 +182,7 @@ export class CreateAssetComponent implements OnInit {
       this.assetService.updateAsset(this.assetId()!, request).subscribe({
         next: () => {
           this.notification.success(this.i18n.t('assets.updated'));
-          this.router.navigate(['/assets', this.assetId(), 'view']);
+          this.router.navigate(['/assets']);
           this.saving.set(false);
         },
         error: () => {
@@ -186,7 +200,7 @@ export class CreateAssetComponent implements OnInit {
       this.assetService.createAsset(request).subscribe({
         next: (asset) => {
           this.notification.success(this.i18n.t('assets.created'));
-          this.router.navigate(['/assets', asset.id, 'view']);
+          this.router.navigate(['/assets']);
           this.saving.set(false);
         },
         error: () => {

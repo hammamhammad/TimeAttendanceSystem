@@ -74,7 +74,7 @@ export class BenefitClaimsComponent implements OnInit {
   }
 
   onActionClick(event: { action: string; item: any }): void {
-    if (event.action === 'view') this.router.navigate(['/benefits/claims', event.item.id, 'view']);
+    if (event.action === 'view') this.router.navigate(['/benefits/claims', event.item.id, 'edit']);
   }
 
   onSearchChange(term: string): void { this.searchTerm.set(term); this.currentPage.set(1); this.loadData(); }

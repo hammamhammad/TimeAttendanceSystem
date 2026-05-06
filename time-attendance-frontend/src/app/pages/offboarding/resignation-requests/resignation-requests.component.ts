@@ -66,7 +66,7 @@ export class ResignationRequestsComponent implements OnInit {
   onActionClick(event: { action: string; item: Resignation }): void {
     switch (event.action) {
       case 'view':
-        this.router.navigate(['/offboarding/resignations', event.item.id, 'view']);
+        this.router.navigate(['/offboarding/resignations', event.item.id, 'edit']);
         break;
       case 'approve':
         this.approveResignation(event.item);

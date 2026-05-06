@@ -226,7 +226,7 @@ export class AllowanceRequestsComponent implements OnInit {
     const { action, item } = event;
     switch (action) {
       case 'view':
-        this.router.navigate(['/allowance-requests', item.id, 'view']);
+        this.router.navigate(['/allowance-requests', item.id, 'edit']);
         break;
       case 'approve':
         this.onApprove(item);

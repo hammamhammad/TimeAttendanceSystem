@@ -1,4 +1,4 @@
-import { Component, signal, inject, OnInit, OnDestroy, computed } from '@angular/core';
+import { Component, signal, inject, OnInit, OnDestroy, computed, effect } from '@angular/core';
 
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -84,6 +84,22 @@ export class CreateEmployeeVacationComponent implements OnInit, OnDestroy {
 
   constructor() {
     this.vacationForm = this.createForm();
+
+    // Programmatic disable wiring (replaces template [disabled] bindings to avoid the
+    // reactive-forms "disabled attribute with reactive form directive" warning)
+    effect(() => {
+      const isSaving = this.saving();
+      const controlNames = ['startDate', 'endDate', 'notes'];
+      for (const name of controlNames) {
+        const ctrl = this.vacationForm?.get(name);
+        if (!ctrl) continue;
+        if (isSaving && ctrl.enabled) {
+          ctrl.disable({ emitEvent: false });
+        } else if (!isSaving && ctrl.disabled) {
+          ctrl.enable({ emitEvent: false });
+        }
+      }
+    });
   }
 
   ngOnInit(): void {

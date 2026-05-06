@@ -90,14 +90,25 @@
 
   <!-- Error Message -->
   @if (showError && error) {
-    <div class="invalid-feedback d-block">
-      {{ error }}
+    <div class="form-error">
+      <i class="fa-solid fa-exclamation-circle"></i>
+      <span>{{ error }}</span>
     </div>
   }
 
-  <!-- Help Text -->
-  @if (helpText && (!showError || !error)) {
-    <div class="form-text">{{ helpText }}</div>
+  <!-- Success Message -->
+  @if ((!showError || !error) && success) {
+    <div class="form-success">
+      <i class="fa-solid fa-check-circle"></i>
+      <span>{{ success }}</span>
+    </div>
+  }
+
+  <!-- Hint / Help Text -->
+  @if ((!showError || !error) && !success && (hint || helpText)) {
+    <div class="form-hint">
+      <span>{{ hint || helpText }}</span>
+    </div>
   }
 
   <!-- Custom content slot -->

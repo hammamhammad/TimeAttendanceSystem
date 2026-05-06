@@ -57,7 +57,7 @@ export class PerformanceReviewsComponent implements OnInit {
   }
 
   onTableAction(event: { action: string; item: PerformanceReview }): void {
-    if (event.action === 'view') this.router.navigate(['/performance/reviews', event.item.id, 'view']);
+    if (event.action === 'view') this.router.navigate(['/performance/reviews', event.item.id, 'edit']);
   }
 
   onPageChange(p: number): void { this.currentPage.set(p); this.loadData(); }

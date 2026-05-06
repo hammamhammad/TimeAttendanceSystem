@@ -1,4 +1,5 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
+import { ConfirmationService } from '../confirmation/confirmation.service';
 
 export interface Notification {
   id: string;
@@ -69,6 +70,7 @@ export interface Notification {
 export class NotificationService {
   private notifications = signal<Notification[]>([]);
   private idCounter = 0;
+  private confirmationService = inject(ConfirmationService);
 
   /** Readonly signal exposing current notifications for component consumption */
   readonly notifications$ = this.notifications.asReadonly();
@@ -100,6 +102,11 @@ export class NotificationService {
    * @param options - Optional configuration for duration and persistence behavior
    */
   error(title: string, message?: string, options?: { duration?: number; persistent?: boolean }): void {
+    // Suppress error toasts that fire from components' error handlers when the
+    // user dismissed the global confirmation modal — not a real error.
+    if (this.confirmationService.wasJustCancelled()) {
+      return;
+    }
     this.addNotification({
       type: 'error',
       title,
@@ -118,6 +125,9 @@ export class NotificationService {
    * @param options - Optional configuration for duration and persistence behavior
    */
   warning(title: string, message?: string, options?: { duration?: number; persistent?: boolean }): void {
+    if (this.confirmationService.wasJustCancelled()) {
+      return;
+    }
     this.addNotification({
       type: 'warning',
       title,

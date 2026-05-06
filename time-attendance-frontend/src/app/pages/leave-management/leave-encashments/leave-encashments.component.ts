@@ -75,7 +75,7 @@ export class LeaveEncashmentsComponent implements OnInit {
 
   async onActionClick(event: { action: string; item: any }): Promise<void> {
     if (event.action === 'view') {
-      this.router.navigate(['/leave-management/leave-encashments', event.item.id, 'view']);
+      this.router.navigate(['/leave-management/leave-encashments', event.item.id, 'edit']);
     } else if (event.action === 'approve') {
       const result = await this.confirmationService.confirm({ title: this.t('common.confirm'), message: this.t('leave_encashments.approve_confirm'), confirmText: this.t('common.approve'), cancelText: this.t('common.cancel'), confirmButtonClass: 'btn-success', icon: 'fa-check', iconClass: 'text-success' });
       if (result.confirmed) {

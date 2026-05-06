@@ -65,7 +65,7 @@ export class TimesheetsListComponent implements OnInit {
   })));
 
   onActionClick(event: { action: string; item: any }): void {
-    if (event.action === 'view') this.router.navigate(['/timesheets/timesheets', event.item.id, 'view']);
+    if (event.action === 'view') this.router.navigate(['/timesheets/timesheets', event.item.id, 'edit']);
   }
 
   private getStatusBadge(status: string): string {

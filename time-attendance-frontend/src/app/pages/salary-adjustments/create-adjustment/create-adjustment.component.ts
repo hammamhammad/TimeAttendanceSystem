@@ -13,6 +13,7 @@ import { SearchableSelectComponent, SearchableSelectOption } from '../../../shar
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { FileUploadComponent, FileUploadedEvent } from '../../../shared/components/file-upload/file-upload.component';
 
+import { PermissionService } from '../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-adjustment',
   standalone: true,
@@ -39,6 +40,16 @@ export class CreateAdjustmentComponent implements OnInit {
 
   private route = inject(ActivatedRoute);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('salaryAdjustment.manage');
+  }
   submitting = signal(false);
   loading = signal(false);
   isEditMode = signal(false);
@@ -93,6 +104,9 @@ export class CreateAdjustmentComponent implements OnInit {
           justification: data.justification,
           documentUrl: data.documentUrl
         });
+        if (!this.canEdit()) {
+          this.form.disable();
+        }
       },
       error: () => {
         this.notification.error(this.i18n.t('common.error_loading'));

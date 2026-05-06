@@ -14,6 +14,7 @@ import {
   UpdateShiftRequest,
   UpdateShiftPeriodRequest
 } from '../../../shared/models/shift.model';
+import { PermissionService } from '../../../core/auth/permission.service';
 
 @Component({
   selector: 'app-edit-shift',
@@ -27,6 +28,11 @@ export class EditShiftComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   public i18n = inject(I18nService);
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    return this.permissionService.has('shift.update');
+  }
 
   // Enum references for template
   readonly ShiftType = ShiftType;

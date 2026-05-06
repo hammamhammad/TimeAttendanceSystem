@@ -9,6 +9,7 @@ import { OvertimeConfigurationsService, UpdateOvertimeConfigurationRequest, Over
 import { NotificationService } from '../../../../core/notifications/notification.service';
 import { ConfirmationService } from '../../../../core/confirmation/confirmation.service';
 
+import { PermissionService } from '../../../../core/auth/permission.service';
 @Component({
   selector: 'app-edit-overtime-configuration',
   standalone: true,
@@ -24,6 +25,11 @@ export class EditOvertimeConfigurationComponent implements OnInit {
   private confirmationService = inject(ConfirmationService);
   public i18n = inject(I18nService);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    return this.permissionService.has('settings.overtime.update');
+  }
   // Signals for state management
   loading = signal(false);
   submitting = signal(false);

@@ -61,31 +61,11 @@ export class FormHeaderComponent {
   get defaultActions(): FormHeaderAction[] {
     const actions: FormHeaderAction[] = [];
 
-    // Add mode-specific default actions
-    if (this.mode === 'edit' && this.entityId) {
-      actions.push({
-        label: this.t('common.view_details'),
-        icon: 'fa-solid fa-eye',
-        type: 'outline-info',
-        route: `/${this.moduleRoute}/${this.entityId}/view`,
-        action: () => {}
-      });
-    }
+    // View pages are being phased out — view/edit are unified into a single
+    // edit form that becomes read-only when the user lacks edit permission.
+    // Therefore we no longer render the "View Details" or "Edit" jump buttons.
 
-    if (this.mode === 'view' && this.entityId) {
-      const editPermission = this.getEditPermission();
-      if (!editPermission || this.permissionService.has(editPermission)) {
-        actions.push({
-          label: this.t('common.edit'),
-          icon: 'fa-solid fa-edit',
-          type: 'primary',
-          route: `/${this.moduleRoute}/${this.entityId}/edit`,
-          action: () => {}
-        });
-      }
-    }
-
-    // Always add back button
+    // Always add back button → returns to the list page.
     actions.push({
       label: this.t('common.back'),
       icon: 'fa-solid fa-arrow-left',

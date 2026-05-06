@@ -76,8 +76,7 @@
                         formControlName="startDate"
                         class="form-control"
                         placeholder="{{ i18n.t('fields.startDate') }}"
-                        [class.is-invalid]="isFieldInvalid('startDate')"
-                        [disabled]="saving()">
+                        [class.is-invalid]="isFieldInvalid('startDate')">
                       <label for="startDate">
                         {{ i18n.t('fields.startDate') }} <span class="text-danger">*</span>
                       </label>
@@ -98,8 +97,7 @@
                         formControlName="endDate"
                         class="form-control"
                         placeholder="{{ i18n.t('fields.endDate') }}"
-                        [class.is-invalid]="isFieldInvalid('endDate')"
-                        [disabled]="saving()">
+                        [class.is-invalid]="isFieldInvalid('endDate')">
                       <label for="endDate">
                         {{ i18n.t('fields.endDate') }} <span class="text-danger">*</span>
                       </label>
@@ -124,7 +122,6 @@
                       class="form-control"
                       rows="4"
                       placeholder="{{ i18n.t('fields.notes') }}"
-                      [disabled]="saving()"
                       style="height: 120px">
                     </textarea>
                     <label for="notes">
@@ -142,30 +139,32 @@
               (click)="onCancel()"
               [disabled]="saving()">
               <i class="fas fa-times me-2"></i>
-              {{ i18n.t('common.cancel') }}
+              {{ canEdit() ? i18n.t('common.cancel') : i18n.t('common.back') }}
             </button>
 
-            <button
-              type="button"
-              class="btn btn-outline-secondary"
-              (click)="onReset()"
-              [disabled]="saving()">
-              <i class="fas fa-undo me-2"></i>
-              {{ i18n.t('common.reset') }}
-            </button>
+            @if (canEdit()) {
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                (click)="onReset()"
+                [disabled]="saving()">
+                <i class="fas fa-undo me-2"></i>
+                {{ i18n.t('common.reset') }}
+              </button>
 
-            <button
-              type="submit"
-              class="btn btn-primary"
-              [disabled]="vacationForm.invalid || saving()">
-              @if (saving()) {
-                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                {{ i18n.t('common.saving') }}
-              } @else {
-                <i class="fas fa-save me-2"></i>
-                {{ i18n.t('common.save') }}
-              }
-            </button>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="vacationForm.invalid || saving()">
+                @if (saving()) {
+                  <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  {{ i18n.t('common.saving') }}
+                } @else {
+                  <i class="fas fa-save me-2"></i>
+                  {{ i18n.t('common.save') }}
+                }
+              </button>
+            }
           </div>
         </form>
       </div>

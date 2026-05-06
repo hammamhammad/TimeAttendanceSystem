@@ -165,71 +165,19 @@
     <div class="row g-3">
     <!-- Manager -->
     <div class="col-md-6">
-      <div class="form-floating">
-        <input
-          type="text"
-          class="form-control"
-          id="manager"
-          [value]="managerSearchTerm() || getSelectedManagerName()"
-          [class.is-invalid]="isFieldInvalid('managerEmployeeId')"
-          placeholder="{{ i18n.t('department.manager') }}"
-          (input)="onManagerSearch($event)"
-          (focus)="onManagerFocus()"
-          (blur)="onManagerBlur()"
+      <div class="app-modern-field">
+        <label class="app-modern-label">{{ i18n.t('department.manager') }}</label>
+        <app-searchable-select
+          [options]="managerSelectOptions"
+          [value]="form.get('managerEmployeeId')?.value?.toString() || ''"
+          (selectionChange)="onManagerSelectionChange($event)"
+          [placeholder]="i18n.t('department.manager')"
+          [searchable]="true"
+          [clearable]="true"
           [disabled]="loadingManagers()"
-        />
-        <label for="manager">{{ i18n.t('department.manager') }}</label>
-
-        <!-- Loading indicator -->
-        @if (loadingManagers()) {
-          <div class="position-absolute top-50 end-0 translate-middle-y me-3">
-            <app-loading-spinner
-              [size]="'sm'"
-              [showMessage]="false">
-            </app-loading-spinner>
-          </div>
-        }
-
-        <!-- Dropdown -->
-        @if (showManagerDropdown() && !loadingManagers() && filteredManagers().length > 0) {
-          <div
-            class="dropdown-menu show w-100 mt-1 shadow"
-            style="max-height: 200px; overflow-y: auto; position: absolute; z-index: 1050;"
-          >
-            @for (manager of filteredManagers(); track $index) {
-              <button
-                type="button"
-                class="dropdown-item d-flex justify-content-between align-items-center"
-                (click)="onSelectManager(manager)"
-              >
-                <div class="d-flex flex-column">
-                  <span class="fw-medium">{{ manager.name }}</span>
-                  <small class="text-muted">{{ manager.employeeNumber }}</small>
-                </div>
-              </button>
-            }
-          </div>
-        }
-
-        <!-- No results -->
-        @if (showManagerDropdown() && !loadingManagers() && filteredManagers().length === 0 && managerSearchTerm()) {
-          <div
-            class="dropdown-menu show w-100 mt-1 shadow text-center py-3"
-            style="position: absolute; z-index: 1050;"
-          >
-            <span class="text-muted">{{ i18n.t('common.noResultsFound') }}</span>
-          </div>
-        }
-
-        <!-- No branch selected message for create mode -->
-        @if (!isEditMode && showManagerDropdown() && !loadingManagers() && managers().length === 0) {
-          <div
-            class="dropdown-menu show w-100 mt-1 shadow text-center py-3"
-            style="position: absolute; z-index: 1050;"
-          >
-            <span class="text-muted">{{ i18n.t('department.selectBranchFirst') }}</span>
-          </div>
-        }
+          [loading]="loadingManagers()"
+          [class.is-invalid]="isFieldInvalid('managerEmployeeId')"
+        ></app-searchable-select>
       </div>
       @if (isFieldInvalid('managerEmployeeId')) {
         <div class="invalid-feedback d-block">
@@ -374,15 +322,17 @@
   <div class="app-form-actions">
     <div class="d-flex justify-content-between">
       <div>
-        <button
-          type="button"
-          class="btn btn-outline-secondary"
-          (click)="onReset()"
-          [disabled]="isSaving()"
-        >
-          <i class="fas fa-undo me-2"></i>
-          {{ i18n.t('common.reset') }}
-        </button>
+        @if (!readonly) {
+          <button
+            type="button"
+            class="btn btn-outline-secondary"
+            (click)="onReset()"
+            [disabled]="isSaving()"
+          >
+            <i class="fas fa-undo me-2"></i>
+            {{ i18n.t('common.reset') }}
+          </button>
+        }
       </div>
       <div class="d-flex gap-2">
         <button
@@ -392,21 +342,23 @@
           [disabled]="isSaving()"
         >
           <i class="fas fa-times me-2"></i>
-          {{ i18n.t('common.cancel') }}
+          {{ readonly ? i18n.t('common.back') : i18n.t('common.cancel') }}
         </button>
-        <button
-          type="submit"
-          class="btn btn-primary"
-          [disabled]="form.invalid || isSaving()"
-        >
-          @if (isSaving()) {
-            <span class="spinner-border spinner-border-sm me-2"></span>
-          }
-          @if (!isSaving()) {
-            <i class="fas fa-save me-2"></i>
-          }
-          {{ isSaving() ? i18n.t('common.saving') : (isEditMode ? i18n.t('common.update') : i18n.t('common.save')) }}
-        </button>
+        @if (!readonly) {
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="form.invalid || isSaving()"
+          >
+            @if (isSaving()) {
+              <span class="spinner-border spinner-border-sm me-2"></span>
+            }
+            @if (!isSaving()) {
+              <i class="fas fa-save me-2"></i>
+            }
+            {{ isSaving() ? i18n.t('common.saving') : (isEditMode ? i18n.t('common.update') : i18n.t('common.save')) }}
+          </button>
+        }
       </div>
     </div>
   </div>

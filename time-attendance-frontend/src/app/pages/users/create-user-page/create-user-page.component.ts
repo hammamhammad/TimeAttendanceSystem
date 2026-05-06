@@ -22,6 +22,6 @@ export class CreateUserPageComponent {
   public i18n = inject(I18nService);
 
   onUserCreated(user: UserDto): void {
-    this.router.navigate(['/users', user.id, 'view']);
+    this.router.navigate(['/users']);
   }
 }

@@ -12,6 +12,7 @@ import { SearchableSelectComponent } from '../../../../shared/components/searcha
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
 
+import { PermissionService } from '../../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-career-path',
   standalone: true,
@@ -27,6 +28,16 @@ export class CreateCareerPathComponent implements OnInit {
   private notification = inject(NotificationService);
   private service = inject(SuccessionService);
   private http = inject(HttpClient);
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('careerPath.update');
+  }
   private baseUrl = `${environment.apiUrl}/api/v1`;
 
   submitting = signal(false);
@@ -61,6 +72,9 @@ export class CreateCareerPathComponent implements OnInit {
             descriptionAr: d.descriptionAr || '',
             isActive: d.isActive
           });
+          if (!this.canEdit()) {
+            this.form.disable();
+          }
           if (d.steps) {
             this.steps.set(d.steps.map(s => ({
               fromJobGradeId: s.fromJobGradeId || null,

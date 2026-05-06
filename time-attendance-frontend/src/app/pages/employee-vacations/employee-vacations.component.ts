@@ -99,7 +99,7 @@ export class EmployeeVacationsComponent {
       sortable: true,
       width: '10%',
       align: 'center',
-      priority: 'low'
+      priority: 'medium'
     },
     {
       key: 'status',
@@ -114,7 +114,7 @@ export class EmployeeVacationsComponent {
       label: this.i18n.t('employee_vacations.current_status'),
       width: '12%',
       align: 'center',
-      priority: 'low'
+      priority: 'medium'
     },
     {
       key: 'notes',

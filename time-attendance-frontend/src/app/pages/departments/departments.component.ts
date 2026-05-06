@@ -1,45 +1,41 @@
-import { Component, signal, inject, OnInit } from '@angular/core';
-
-import { FormsModule } from '@angular/forms';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { DepartmentsService } from './departments.service';
 import { DepartmentDto } from '../../shared/models/department.model';
-import { BranchDto } from '../../shared/models/employee.model';
-import { DepartmentTableComponent } from './department-table/department-table.component';
-import { DepartmentTreeComponent } from './department-tree/department-tree.component';
-import { UnifiedFilterComponent } from '../../shared/components/unified-filter/unified-filter.component';
-import { DepartmentInfoPanelComponent } from './department-info-panel/department-info-panel.component';
 import { ConfirmationService } from '../../core/confirmation/confirmation.service';
+import { NotificationService } from '../../core/notifications/notification.service';
 import { PermissionService } from '../../core/auth/permission.service';
 import { PermissionResources, PermissionActions } from '../../shared/utils/permission.utils';
-import { SearchableSelectOption } from '../../shared/components/searchable-select/searchable-select.component';
+import { UnifiedFilterComponent } from '../../shared/components/unified-filter/unified-filter.component';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
+import { DepartmentTableComponent } from './department-table/department-table.component';
 
-type ViewMode = 'table' | 'tree';
+interface DepartmentFilterState {
+  search?: string;
+  branchId?: number | string;
+  isActive?: 'true' | 'false' | '';
+}
 
 @Component({
   selector: 'app-departments',
   standalone: true,
   imports: [
-    FormsModule,
-    DepartmentTableComponent,
-    DepartmentTreeComponent,
     UnifiedFilterComponent,
-    DepartmentInfoPanelComponent,
-    PageHeaderComponent
-],
+    PageHeaderComponent,
+    DepartmentTableComponent
+  ],
   templateUrl: './departments.component.html',
   styleUrls: ['./departments.component.css']
 })
 export class DepartmentsComponent implements OnInit {
   public i18n = inject(I18nService);
+  public permissionService = inject(PermissionService);
   private departmentsService = inject(DepartmentsService);
   private confirmationService = inject(ConfirmationService);
-  public permissionService = inject(PermissionService);
+  private notificationService = inject(NotificationService);
   private router = inject(Router);
 
-  // Permission constants for use in template
   readonly PERMISSIONS = {
     DEPARTMENT_CREATE: `${PermissionResources.DEPARTMENT}.${PermissionActions.CREATE}`,
     DEPARTMENT_READ: `${PermissionResources.DEPARTMENT}.${PermissionActions.READ}`,
@@ -48,116 +44,204 @@ export class DepartmentsComponent implements OnInit {
     DEPARTMENT_MANAGE: `${PermissionResources.DEPARTMENT}.${PermissionActions.MANAGE}`
   };
 
+  loading = signal(false);
+  allDepartments = signal<DepartmentDto[]>([]);
+  departments = signal<DepartmentDto[]>([]);
 
-  // Signals
-  viewMode = signal<ViewMode>('table');
-  selectedBranch = signal<BranchDto | null>(null);
-  selectedDepartment = signal<DepartmentDto | null>(null);
-  branchesLoading = signal(false);
-  branches = signal<BranchDto[]>([]);
-  currentFilter: any = {};
+  currentPage = signal(1);
+  pageSize = signal(10);
+  totalCount = signal(0);
+  totalPages = signal(0);
 
+  sortColumn = signal<string>('path');
+  sortDirection = signal<'asc' | 'desc'>('asc');
 
-  ngOnInit() {
-    // Component initialization if needed
+  private currentFilter: DepartmentFilterState = {};
+
+  ngOnInit(): void {
+    this.loadDepartments();
   }
 
+  private loadDepartments(): void {
+    this.loading.set(true);
+    const branchId = this.parseBranchId(this.currentFilter.branchId);
 
-  onViewModeChange(mode: ViewMode) {
-    this.viewMode.set(mode);
+    this.departmentsService.getDepartments({
+      branchId,
+      includeTree: false,
+      includeInactive: true
+    }).subscribe({
+      next: (list) => {
+        this.allDepartments.set(list || []);
+        this.applyFiltersAndSort();
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Failed to load departments:', err);
+        this.loading.set(false);
+        this.notificationService.error(
+          this.i18n.t('app.error'),
+          this.i18n.t('errors.server')
+        );
+      }
+    });
   }
 
-  onBranchChange(branchId: number) {
-    if (!branchId || branchId === 0) {
-      this.selectedBranch.set(null);
-      return;
+  private applyFiltersAndSort(): void {
+    let list = [...this.allDepartments()];
+
+    const search = (this.currentFilter.search || '').trim().toLowerCase();
+    if (search) {
+      list = list.filter(d =>
+        d.name.toLowerCase().includes(search) ||
+        d.code.toLowerCase().includes(search) ||
+        (d.nameAr && d.nameAr.toLowerCase().includes(search)) ||
+        (d.path && d.path.toLowerCase().includes(search)) ||
+        (d.parentDepartmentName && d.parentDepartmentName.toLowerCase().includes(search)) ||
+        (d.managerName && d.managerName.toLowerCase().includes(search)) ||
+        (d.branchName && d.branchName.toLowerCase().includes(search))
+      );
     }
 
-    const branch = this.branches().find(b => b.id === branchId);
-    this.selectedBranch.set(branch || null);
+    const isActive = this.currentFilter.isActive;
+    if (isActive === 'true') list = list.filter(d => d.isActive);
+    else if (isActive === 'false') list = list.filter(d => !d.isActive);
+
+    const col = this.sortColumn();
+    const dir = this.sortDirection();
+    list.sort((a, b) => this.compareRows(a, b, col, dir));
+
+    this.totalCount.set(list.length);
+    this.totalPages.set(Math.max(1, Math.ceil(list.length / this.pageSize())));
+    if (this.currentPage() > this.totalPages()) {
+      this.currentPage.set(1);
+    }
+    this.departments.set(list);
   }
 
-  onBranchSelectionChange(branchIdStr: string) {
-    const branchId = branchIdStr ? parseInt(branchIdStr) : 0;
-    this.onBranchChange(branchId);
+  private compareRows(a: DepartmentDto, b: DepartmentDto, col: string, dir: 'asc' | 'desc'): number {
+    const av = this.resolveSortValue(a, col);
+    const bv = this.resolveSortValue(b, col);
+
+    if (av == null && bv == null) return 0;
+    if (av == null) return dir === 'asc' ? 1 : -1;
+    if (bv == null) return dir === 'asc' ? -1 : 1;
+
+    let cmp = 0;
+    if (typeof av === 'number' && typeof bv === 'number') cmp = av - bv;
+    else if (typeof av === 'boolean' && typeof bv === 'boolean') cmp = (av === bv) ? 0 : av ? -1 : 1;
+    else cmp = String(av).localeCompare(String(bv));
+
+    return dir === 'asc' ? cmp : -cmp;
   }
 
-  onCloseInfoPanel() {
-    this.selectedDepartment.set(null);
+  private resolveSortValue(d: DepartmentDto, col: string): any {
+    switch (col) {
+      case 'department': return d.name;
+      case 'parent': return d.parentDepartmentName ?? '';
+      case 'manager': return d.managerName ?? '';
+      case 'status': return d.isActive;
+      default: return (d as any)[col];
+    }
   }
 
-  onDepartmentSelected(department: DepartmentDto) {
-    this.selectedDepartment.set(department);
+  private parseBranchId(value: number | string | undefined): number | undefined {
+    if (value === null || value === undefined || value === '') return undefined;
+    const n = typeof value === 'number' ? value : parseInt(value, 10);
+    return Number.isFinite(n) && n > 0 ? n : undefined;
   }
 
-  onDepartmentView(department: DepartmentDto) {
+  onSearchChange(searchTerm: string): void {
+    this.currentFilter = { ...this.currentFilter, search: searchTerm };
+    this.currentPage.set(1);
+    this.applyFiltersAndSort();
+  }
+
+  onFiltersChange(filters: any): void {
+    const next: DepartmentFilterState = {
+      search: this.currentFilter.search,
+      branchId: filters?.branchId,
+      isActive: filters?.isActive
+    };
+    const branchChanged = this.parseBranchId(this.currentFilter.branchId) !== this.parseBranchId(next.branchId);
+    this.currentFilter = next;
+    this.currentPage.set(1);
+
+    if (branchChanged) {
+      this.loadDepartments();
+    } else {
+      this.applyFiltersAndSort();
+    }
+  }
+
+  onRefreshData(): void {
+    this.currentFilter = {};
+    this.currentPage.set(1);
+    this.sortColumn.set('path');
+    this.sortDirection.set('asc');
+    this.loadDepartments();
+  }
+
+  onAddDepartment(): void {
+    this.router.navigate(['/departments/create']);
+  }
+
+  onDepartmentView(department: DepartmentDto): void {
     this.router.navigate(['/departments', department.id, 'view']);
   }
 
-  onDepartmentEdit(department: DepartmentDto) {
+  onDepartmentEdit(department: DepartmentDto): void {
     this.router.navigate(['/departments', department.id, 'edit']);
   }
 
   async onDepartmentDelete(department: DepartmentDto): Promise<void> {
     const result = await this.confirmationService.confirm({
-      title: 'Delete Department',
-      message: `Are you sure you want to delete "${department.name}"? This action cannot be undone.`,
+      title: this.i18n.t('common.delete'),
+      message: this.i18n.t('department.confirmDelete'),
       confirmText: this.i18n.t('common.delete'),
       cancelText: this.i18n.t('common.cancel'),
       confirmButtonClass: 'btn-danger',
       icon: 'fa-trash',
       iconClass: 'text-danger'
     });
-    
-    if (result.confirmed) {
-      this.deleteDepartment(department.id);
-    }
+
+    if (!result.confirmed) return;
+
+    this.departmentsService.deleteDepartment(department.id).subscribe({
+      next: () => {
+        this.notificationService.success(
+          this.i18n.t('app.success'),
+          this.i18n.t('common.deleted')
+        );
+        this.loadDepartments();
+      },
+      error: (err) => {
+        console.error('Failed to delete department:', err);
+        this.notificationService.error(
+          this.i18n.t('app.error'),
+          this.i18n.t('errors.server')
+        );
+      }
+    });
   }
 
-  onDepartmentAdd(data?: { parentId?: number }) {
-    if (data?.parentId) {
-      this.router.navigate(['/departments/create'], { queryParams: { parentId: data.parentId } });
-    } else {
-      this.router.navigate(['/departments/create']);
-    }
+  onPageChange(page: number): void {
+    this.currentPage.set(page);
   }
 
-  // Unified filter event handlers
-  onSearchChange(searchTerm: string): void {
-    this.currentFilter = { ...this.currentFilter, search: searchTerm };
-    // Handle search functionality if needed
+  onPageSizeChange(size: number): void {
+    this.pageSize.set(size);
+    this.currentPage.set(1);
+    this.applyFiltersAndSort();
   }
 
-  onFiltersChange(filters: any): void {
-    this.currentFilter = { ...filters };
-    // Handle branch filter changes
-    if (filters.branchId) {
-      this.onBranchChange(parseInt(filters.branchId));
-    } else {
-      this.selectedBranch.set(null);
-    }
+  onSortChange(event: { column: string; direction: 'asc' | 'desc' }): void {
+    this.sortColumn.set(event.column);
+    this.sortDirection.set(event.direction);
+    this.applyFiltersAndSort();
   }
 
-  onRefreshData(): void {
-    // Reset filters
-    this.currentFilter = {};
-    this.selectedBranch.set(null);
-    this.refreshData();
-  }
-
-
-  private async deleteDepartment(id: number) {
-    try {
-      await this.departmentsService.deleteDepartment(id).toPromise();
-      this.refreshData();
-    } catch (error) {
-      console.error('Failed to delete department:', error);
-    }
-  }
-
-  private refreshData() {
-    // Trigger refresh in child components
-    // This could be improved with a shared state management solution
-    window.location.reload();
+  onSelectionChange(_selected: DepartmentDto[]): void {
+    // Reserved for bulk-action wiring
   }
 }

@@ -13,6 +13,7 @@ import { FormHeaderComponent } from '../../../shared/components/form-header/form
 import { FormSectionComponent } from '../../../shared/components/form-section/form-section.component';
 import { SearchableSelectComponent } from '../../../shared/components/searchable-select/searchable-select.component';
 
+import { PermissionService } from '../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-distribution',
   standalone: true,
@@ -31,6 +32,16 @@ export class CreateDistributionComponent implements OnInit {
   private readonly departmentsService = inject(DepartmentsService);
   private readonly rolesService = inject(RolesService);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('surveyDistribution.update');
+  }
   form!: FormGroup;
   saving = signal(false);
   isEdit = signal(false);
@@ -68,6 +79,9 @@ export class CreateDistributionComponent implements OnInit {
             targetAudience: dist.targetAudience, isAnonymous: dist.isAnonymous,
             startDate: dist.startDate?.split('T')[0], endDate: dist.endDate?.split('T')[0]
           });
+          if (!this.canEdit()) {
+            this.form.disable();
+          }
           this.selectedTargetAudience.set(dist.targetAudience);
           this.selectedTargetIds.set(dist.targetIds ?? []);
           this.loadTargetOptions(dist.targetAudience);

@@ -10,6 +10,7 @@ import { SearchableSelectComponent, SearchableSelectOption } from '../../../shar
 import { TIMEZONE_OPTIONS } from '../../../shared/constants/timezone.constants';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { FormSectionComponent } from '../../../shared/components/form-section/form-section.component';
+import { PermissionService } from '../../../core/auth/permission.service';
 
 @Component({
   selector: 'app-edit-branch',
@@ -270,16 +271,18 @@ import { FormSectionComponent } from '../../../shared/components/form-section/fo
               <div class="app-form-actions">
                 <button type="button" class="btn btn-secondary" (click)="onCancel()" [disabled]="saving()">
                   <i class="fa-solid fa-times me-2"></i>
-                  {{ i18n.t('common.cancel') }}
+                  {{ canEdit() ? i18n.t('common.cancel') : i18n.t('common.back') }}
                 </button>
-                <button type="submit" class="btn btn-primary" [disabled]="branchForm.invalid || saving()">
-                  @if (saving()) {
-                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                  } @else {
-                    <i class="fa-solid fa-save me-2"></i>
-                  }
-                  {{ saving() ? i18n.t('common.saving') : i18n.t('branches.update_branch') }}
-                </button>
+                @if (canEdit()) {
+                  <button type="submit" class="btn btn-primary" [disabled]="branchForm.invalid || saving()">
+                    @if (saving()) {
+                      <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    } @else {
+                      <i class="fa-solid fa-save me-2"></i>
+                    }
+                    {{ saving() ? i18n.t('common.saving') : i18n.t('branches.update_branch') }}
+                  </button>
+                }
               </div>
             </form>
           </div>
@@ -300,11 +303,16 @@ export class EditBranchComponent implements OnInit {
   private fb = inject(FormBuilder);
   private notificationService = inject(NotificationService);
   public i18n = inject(I18nService);
+  private permissionService = inject(PermissionService);
 
   branch = signal<Branch | null>(null);
   loading = signal(true);
   saving = signal(false);
   error = signal('');
+
+  canEdit(): boolean {
+    return this.permissionService.has('branch.update');
+  }
 
   timezoneOptions: SearchableSelectOption[] = TIMEZONE_OPTIONS.map(tz => ({
     value: tz.value,
@@ -370,6 +378,10 @@ export class EditBranchComponent implements OnInit {
       longitude: branch.longitude,
       geofenceRadiusMeters: branch.geofenceRadiusMeters || 100
     });
+
+    if (!this.canEdit()) {
+      this.branchForm.disable();
+    }
   }
 
   onTimezoneChange(timezone: string): void {
@@ -417,7 +429,7 @@ export class EditBranchComponent implements OnInit {
               this.i18n.t('app.success'),
               this.i18n.t('branches.branch_updated')
             );
-            this.router.navigate(['/branches', branchId, 'view']);
+            this.router.navigate(['/branches']);
           },
           error: (err) => {
             this.saving.set(false);
@@ -433,11 +445,7 @@ export class EditBranchComponent implements OnInit {
   }
 
   onCancel(): void {
-    if (this.branch()) {
-      this.router.navigate(['/branches', this.branch()!.id, 'view']);
-    } else {
-      this.router.navigate(['/branches']);
-    }
+    this.router.navigate(['/branches']);
   }
 
   isFieldInvalid(fieldName: string): boolean {

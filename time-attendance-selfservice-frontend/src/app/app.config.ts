@@ -3,6 +3,7 @@ import { provideRouter, withComponentInputBinding, withHashLocation, TitleStrate
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
 import { authInterceptor } from './core/auth/auth.interceptor';
+import { confirmationInterceptor } from './core/confirmation/confirmation.interceptor';
 import { AppTitleStrategy } from './core/title/app-title.strategy';
 
 export const appConfig: ApplicationConfig = {
@@ -10,7 +11,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes, withComponentInputBinding(), withHashLocation()),
-    provideHttpClient(withInterceptors([authInterceptor])),
+    provideHttpClient(withInterceptors([confirmationInterceptor, authInterceptor])),
     {
       provide: TitleStrategy,
       useClass: AppTitleStrategy

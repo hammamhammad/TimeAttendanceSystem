@@ -1,122 +1,195 @@
-<div class="searchable-select position-relative">
-  <div class="input-group">
+<div
+  class="lookup-field"
+  [class.is-searching]="showDropdown() && !showSelectedChip()"
+  [class.is-disabled]="disabled"
+  (keydown)="onKeydown($event)">
+
+  <!-- State 3 / 4 — selected chip (value present, not searching) -->
+  @if (showSelectedChip()) {
+    <div
+      class="lookup-selected"
+      [class.lookup-selected--readonly]="readOnly"
+      role="group">
+      @if (getHref(selectedOption()!); as href) {
+        <a
+          class="lookup-selected-link"
+          [href]="href"
+          target="_blank"
+          rel="noopener noreferrer"
+          [title]="i18n.t('lookup.open_in_new_tab').replace('{{name}}', selectedOption()?.label || '')">
+          <i [class]="'fas ' + entityIcon" style="font-size: 12px; color: var(--app-gray-400);"></i>
+          <span class="text-truncate">{{ selectedOption()?.label }}</span>
+          <i class="fas fa-external-link-alt"></i>
+        </a>
+      } @else {
+        <span class="lookup-selected-link" style="cursor: default;">
+          <i [class]="'fas ' + entityIcon" style="font-size: 12px; color: var(--app-gray-400);"></i>
+          <span class="text-truncate">{{ selectedOption()?.label }}</span>
+        </span>
+      }
+
+      @if (metaField !== 'none' && getMeta(selectedOption()!)) {
+        <span class="lookup-selected-meta">{{ getMeta(selectedOption()!) }}</span>
+      }
+
+      @if (!readOnly && !disabled) {
+        <div class="lookup-field-actions">
+          @if (clearable) {
+            <button
+              type="button"
+              class="lookup-btn"
+              (mousedown)="onClear($event)"
+              [title]="i18n.t('lookup.clear_selection')">
+              <i class="fas fa-times"></i>
+            </button>
+          }
+          @if (searchable) {
+            <button
+              type="button"
+              class="lookup-btn"
+              (mousedown)="onChange_edit($event)"
+              [title]="i18n.t('lookup.change_selection')">
+              <i class="fas fa-pen" style="font-size: 11px;"></i>
+            </button>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- State 1 / 2 — search input (no value, or editing) -->
+  @if (!showSelectedChip()) {
     <input
       type="text"
       class="form-control"
-      [class.is-invalid]="isInvalid || (required && !selectedValue() && searchTerm().trim() === '')"
+      [class.is-invalid]="isInvalid"
       [value]="displayValue()"
       [placeholder]="placeholder"
       [disabled]="disabled"
       [readonly]="!searchable"
       (input)="searchable ? onSearchInput($event) : null"
       (focus)="onInputFocus()"
-      (blur)="onInputBlur()"
       (click)="!searchable ? onToggleDropdown() : null"
       autocomplete="off"
+      role="combobox"
+      [attr.aria-expanded]="showDropdown()"
+      [attr.aria-autocomplete]="searchable ? 'list' : 'none'"
     />
 
-    @if (loading) {
-      <div class="input-group-text">
-        <div class="spinner-border spinner-border-sm" role="status">
-          <span class="visually-hidden">{{ loadingMessage }}...</span>
-        </div>
-      </div>
-    }
-
-    @if (clearable && selectedValue() && !loading && !disabled) {
-      <button
-        type="button"
-        class="btn btn-outline-secondary"
-        (click)="onClear($event)"
-        [title]="i18n.t('common.clear')"
-      >
-        <i class="fas fa-times"></i>
-      </button>
-    }
-
-    @if (!loading) {
-      <button
-        type="button"
-        class="btn btn-outline-secondary dropdown-toggle"
-        [disabled]="disabled"
-        (click)="onToggleDropdown()"
-        [attr.aria-expanded]="showDropdown()"
-      >
-        <span class="visually-hidden">{{ i18n.t('common.select') }}</span>
-      </button>
-    }
-  </div>
-
-  @if (showDropdown() && !loading) {
-    <div
-      class="dropdown-menu show w-100 mt-1 shadow"
-      [style.max-height]="maxDropdownHeight"
-      [style.overflow-y]="'auto'"
-      [style.position]="'absolute'"
-      [style.z-index]="'1050'"
-    >
-      @if (hasResults()) {
-        @for (option of filteredOptions(); track trackByValue($index, option)) {
-          <button
-            type="button"
-            class="dropdown-item"
-            [class.disabled]="option.disabled"
-            (mousedown)="onSelectOption(option, $event)"
-          >
-            <div class="d-flex flex-column">
-              <span class="fw-medium" [class.text-muted]="option.disabled">
-                {{ option.label }}
-              </span>
-              @if (option.subLabel) {
-                <small class="text-muted">
-                  {{ option.subLabel }}
-                </small>
-              }
-            </div>
-          </button>
-        }
+    <div class="lookup-field-actions">
+      @if (loading) {
+        <span class="lookup-btn" aria-live="polite">
+          <span class="spinner-border spinner-border-sm" role="status" style="width: 12px; height: 12px;">
+            <span class="visually-hidden">{{ loadingMessage }}</span>
+          </span>
+        </span>
       }
-
-      @if (shouldShowCustomValueOption()) {
+      @if (!loading && clearable && searchTerm() && !selectedValue()) {
         <button
           type="button"
-          class="dropdown-item"
-          (mousedown)="onSelectCustomValue($event)"
-        >
-          <div class="d-flex align-items-center">
-            <i class="fas fa-plus me-2 text-primary"></i>
-            <span class="text-primary">
-              {{ customValueMessage }}: "{{ searchTerm() }}"
-            </span>
-          </div>
+          class="lookup-btn"
+          (mousedown)="onClear($event)"
+          [title]="i18n.t('common.clear')">
+          <i class="fas fa-times"></i>
         </button>
       }
-
-      @if (shouldShowNoResults()) {
-        <div class="dropdown-item-text text-center py-3 text-muted">
-          {{ noResultsMessage }}
-        </div>
-      }
-
-      @if (shouldShowEmptyMessage()) {
-        <div class="dropdown-item-text text-center py-3 text-muted">
-          {{ emptyMessage }}
-        </div>
+      @if (!loading) {
+        <button
+          type="button"
+          class="lookup-btn"
+          [disabled]="disabled"
+          (click)="onToggleDropdown()"
+          [attr.aria-label]="i18n.t('lookup.browse_all')"
+          [title]="i18n.t('lookup.browse_all')">
+          <i class="fas fa-search"></i>
+        </button>
       }
     </div>
-  }
 
-  @if (showDropdown() && loading) {
-    <div
-      class="dropdown-menu show w-100 mt-1 shadow text-center py-3"
-      style="position: absolute; z-index: 1050;"
-    >
-      <div class="d-flex align-items-center justify-content-center">
-        <div class="spinner-border spinner-border-sm me-2" role="status">
-          <span class="visually-hidden">{{ loadingMessage }}...</span>
-        </div>
-        <span class="text-muted">{{ loadingMessage }}...</span>
+    <!-- Dropdown results -->
+    @if (showDropdown() && !loading) {
+      <div
+        class="lookup-dropdown"
+        [style.max-height]="maxDropdownHeight"
+        role="listbox">
+
+        @if (hasResults()) {
+          @for (option of filteredOptions(); track trackByValue($index, option); let i = $index) {
+            <div
+              class="lookup-dropdown-item"
+              [class.highlighted]="i === highlightedIndex()"
+              [class.disabled]="option.disabled"
+              role="option"
+              [attr.aria-selected]="i === highlightedIndex()"
+              (mousedown)="onSelectOption(option, $event)"
+              (mouseenter)="highlightedIndex.set(i)">
+              <div class="lookup-dropdown-icon">
+                <i [class]="'fas ' + entityIcon"></i>
+              </div>
+              <div class="lookup-dropdown-info">
+                <div class="lookup-dropdown-name" [innerHTML]="renderHighlighted(option.label)"></div>
+                @if (option.subLabel || option.code) {
+                  <div class="lookup-dropdown-sub">
+                    @if (option.subLabel) {
+                      <span><i class="fas fa-hashtag"></i> {{ option.subLabel }}</span>
+                    }
+                    @if (option.code) {
+                      <span><i class="fas fa-barcode"></i> {{ option.code }}</span>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        }
+
+        @if (shouldShowCustomValueOption()) {
+          <div
+            class="lookup-dropdown-item"
+            (mousedown)="onSelectCustomValue($event)">
+            <div class="lookup-dropdown-icon" style="color: var(--app-primary-500);">
+              <i class="fas fa-plus"></i>
+            </div>
+            <div class="lookup-dropdown-info">
+              <div class="lookup-dropdown-name" style="color: var(--app-primary-500);">
+                {{ customValueMessage }}: "{{ searchTerm() }}"
+              </div>
+            </div>
+          </div>
+        }
+
+        @if (shouldShowNoResults()) {
+          <div class="lookup-dropdown-empty">
+            <i class="fas fa-search"></i>
+            <span [innerHTML]="i18n.t('lookup.no_results_for').replace('{{query}}', '<strong>' + searchTerm() + '</strong>')"></span>
+          </div>
+        }
+
+        @if (shouldShowEmptyMessage()) {
+          <div class="lookup-dropdown-empty">
+            <i class="fas fa-inbox"></i>
+            {{ emptyMessage }}
+          </div>
+        }
+
+        @if (hasResults() && (showKeyboardHint || filteredOptions().length > 0)) {
+          <div class="lookup-dropdown-footer">
+            <span>{{ resultCountLabel() }}</span>
+            @if (showKeyboardHint) {
+              <span><i class="fas fa-keyboard"></i> {{ keyboardHint() }}</span>
+            }
+          </div>
+        }
       </div>
-    </div>
+    }
+
+    @if (showDropdown() && loading) {
+      <div class="lookup-dropdown">
+        <div class="lookup-dropdown-loading">
+          <div class="spinner-border spinner-border-sm me-2" role="status" style="width: 14px; height: 14px;"></div>
+          {{ loadingMessage }}
+        </div>
+      </div>
+    }
   }
 </div>

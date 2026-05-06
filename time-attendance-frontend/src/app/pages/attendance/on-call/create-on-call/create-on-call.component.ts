@@ -9,6 +9,7 @@ import { EmployeeService } from '../../../../core/services/employee.service';
 import { FormSectionComponent } from '../../../../shared/components/form-section/form-section.component';
 import { SearchableSelectComponent, SearchableSelectOption } from '../../../../shared/components/searchable-select/searchable-select.component';
 
+import { PermissionService } from '../../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-on-call',
   standalone: true,
@@ -31,6 +32,16 @@ export class CreateOnCallComponent implements OnInit {
   private service = inject(OnCallScheduleService);
   private employeeService = inject(EmployeeService);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('onCallSchedule.update');
+  }
   submitting = signal(false);
   loading = signal(false);
   isEditMode = signal(false);
@@ -91,6 +102,9 @@ export class CreateOnCallComponent implements OnInit {
           notesAr: schedule.notesAr,
           isActive: schedule.isActive
         });
+        if (!this.canEdit()) {
+          this.form.disable();
+        }
         this.loading.set(false);
       },
       error: () => {

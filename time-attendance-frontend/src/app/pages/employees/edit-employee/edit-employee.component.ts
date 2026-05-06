@@ -10,6 +10,7 @@ import { I18nService } from '../../../core/i18n/i18n.service';
 import { SearchableSelectComponent, SearchableSelectOption } from '../../../shared/components/searchable-select/searchable-select.component';
 import { FormSectionComponent } from '../../../shared/components/form-section/form-section.component';
 import { FileUploadComponent, FileUploadedEvent } from '../../../shared/components/file-upload/file-upload.component';
+import { PermissionService } from '../../../core/auth/permission.service';
 
 @Component({
   selector: 'app-edit-employee',
@@ -400,19 +401,21 @@ import { FileUploadComponent, FileUploadedEvent } from '../../../shared/componen
           <div class="app-form-actions">
             <button type="button" class="btn btn-outline-secondary" (click)="onCancel()" [disabled]="saving()">
               <i class="fa-solid fa-times me-2"></i>
-              {{ i18n.t('common.cancel') }}
+              {{ canEdit() ? i18n.t('common.cancel') : i18n.t('common.back') }}
             </button>
-            <button
-              type="submit"
-              class="btn btn-primary"
-              [disabled]="employeeForm.invalid || saving()">
-              @if (saving()) {
-                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-              } @else {
-                <i class="fa-solid fa-save me-2"></i>
-              }
-              {{ saving() ? i18n.t('common.saving') : i18n.t('employees.update_employee') }}
-            </button>
+            @if (canEdit()) {
+              <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="employeeForm.invalid || saving()">
+                @if (saving()) {
+                  <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                } @else {
+                  <i class="fa-solid fa-save me-2"></i>
+                }
+                {{ saving() ? i18n.t('common.saving') : i18n.t('employees.update_employee') }}
+              </button>
+            }
           </div>
         </form>
       } @else {
@@ -430,6 +433,11 @@ export class EditEmployeeComponent implements OnInit {
   private employeesService = inject(EmployeesService);
   private fb = inject(FormBuilder);
   public i18n = inject(I18nService);
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    return this.permissionService.has('employee.update');
+  }
 
   employee = signal<Employee | null>(null);
   departments = signal<DepartmentDto[]>([]);
@@ -577,6 +585,10 @@ export class EditEmployeeComponent implements OnInit {
       managerEmployeeId: employee.managerEmployeeId ? employee.managerEmployeeId.toString() : '',
       photoUrl: employee.photoUrl || ''
     });
+
+    if (!this.canEdit()) {
+      this.employeeForm.disable();
+    }
   }
 
   onSubmit(): void {
@@ -611,7 +623,7 @@ export class EditEmployeeComponent implements OnInit {
     this.employeesService.updateEmployee(this.employee()!.id, updateRequest).subscribe({
       next: () => {
         this.saving.set(false);
-        this.router.navigate(['/employees', this.employee()!.id, 'view']);
+        this.router.navigate(['/employees']);
       },
       error: (error) => {
         this.saving.set(false);
@@ -621,11 +633,7 @@ export class EditEmployeeComponent implements OnInit {
   }
 
   onCancel(): void {
-    if (this.employee()) {
-      this.router.navigate(['/employees', this.employee()!.id, 'view']);
-    } else {
-      this.router.navigate(['/employees']);
-    }
+    this.router.navigate(['/employees']);
   }
 
   // Form field helpers

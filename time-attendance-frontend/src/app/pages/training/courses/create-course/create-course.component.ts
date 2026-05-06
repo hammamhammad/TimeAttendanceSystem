@@ -8,6 +8,7 @@ import { FormHeaderComponent } from '../../../../shared/components/form-header/f
 import { FormSectionComponent } from '../../../../shared/components/form-section/form-section.component';
 import { SearchableSelectComponent, SearchableSelectOption } from '../../../../shared/components/searchable-select/searchable-select.component';
 
+import { PermissionService } from '../../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-course',
   standalone: true,
@@ -23,6 +24,16 @@ export class CreateCourseComponent implements OnInit {
   private readonly service = inject(TrainingService);
   private readonly notification = inject(NotificationService);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('trainingCourse.update');
+  }
   form!: FormGroup;
   saving = signal(false);
   isEditMode = signal(false);
@@ -72,6 +83,9 @@ export class CreateCourseComponent implements OnInit {
     this.service.getCourse(id).subscribe({
       next: (course) => {
         this.form.patchValue(course);
+        if (!this.canEdit()) {
+          this.form.disable();
+        }
       },
       error: () => { this.notification.error(this.i18n.t('common.error')); this.router.navigate(['/training/courses']); }
     });

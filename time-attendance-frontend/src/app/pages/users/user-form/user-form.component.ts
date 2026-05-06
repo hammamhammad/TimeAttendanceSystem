@@ -29,6 +29,7 @@ interface Branch {
 export class UserFormComponent implements OnInit {
   @Input() user: UserDto | null = null;
   @Input() show = false;
+  @Input() readonly: boolean = false;
   @Output() showChange = new EventEmitter<boolean>();
   @Output() userSaved = new EventEmitter<UserDto>();
   @Output() userCreated = new EventEmitter<UserDto>();
@@ -69,11 +70,18 @@ export class UserFormComponent implements OnInit {
     this.loadRoles();
     this.loadBranches();
     this.loadAvailableEmployees();
+
+    if (this.readonly) {
+      this.userForm.disable();
+    }
   }
 
   ngOnChanges(): void {
     if (this.userForm && this.user) {
       this.populateForm();
+    }
+    if (this.userForm && this.readonly) {
+      this.userForm.disable();
     }
   }
 

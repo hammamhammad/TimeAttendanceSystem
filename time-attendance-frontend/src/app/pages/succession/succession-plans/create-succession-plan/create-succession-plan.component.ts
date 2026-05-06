@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, computed } from '@angular/core';
+import { Component, inject, signal, OnInit, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
@@ -11,6 +11,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-section
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { SearchableSelectComponent, SearchableSelectOption } from '../../../../shared/components/searchable-select/searchable-select.component';
 
+import { PermissionService } from '../../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-succession-plan',
   standalone: true,
@@ -26,6 +27,16 @@ export class CreateSuccessionPlanComponent implements OnInit {
   private notification = inject(NotificationService);
   private service = inject(SuccessionService);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('successionPlan.update');
+  }
   submitting = signal(false);
   isEditMode = signal(false);
   editId = signal<number | null>(null);
@@ -47,6 +58,22 @@ export class CreateSuccessionPlanComponent implements OnInit {
     notes: ['']
   });
 
+  constructor() {
+    // Programmatic disable wiring (replaces template [disabled] binding on the
+    // keyPositionId searchable-select to avoid the reactive-forms warning).
+    // The key position is locked once a succession plan exists.
+    effect(() => {
+      const editing = this.isEditMode();
+      const ctrl = this.form.get('keyPositionId');
+      if (!ctrl) return;
+      if (editing && ctrl.enabled) {
+        ctrl.disable({ emitEvent: false });
+      } else if (!editing && ctrl.disabled) {
+        ctrl.enable({ emitEvent: false });
+      }
+    });
+  }
+
   ngOnInit(): void {
     this.service.getKeyPositionDropdown().subscribe(d => this.keyPositions.set(d));
     const id = this.route.snapshot.paramMap.get('id');
@@ -66,6 +93,9 @@ export class CreateSuccessionPlanComponent implements OnInit {
             isActive: d.isActive,
             notes: d.notes || ''
           });
+          if (!this.canEdit()) {
+            this.form.disable();
+          }
           this.loadingData.set(false);
         },
         error: () => { this.notification.error(this.i18n.t('succession.plans.load_error')); this.router.navigate(['/succession/plans']); }

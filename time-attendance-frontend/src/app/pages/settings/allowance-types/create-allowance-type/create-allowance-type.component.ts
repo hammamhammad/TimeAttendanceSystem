@@ -15,6 +15,7 @@ import {
   AllowanceType
 } from '../../../../shared/models/allowance.model';
 
+import { PermissionService } from '../../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-allowance-type',
   standalone: true,
@@ -30,6 +31,17 @@ export class CreateAllowanceTypeComponent implements OnInit {
   private notificationService = inject(NotificationService);
   public i18n = inject(I18nService);
 
+  private permissionService = inject(PermissionService);
+
+  // TODO: wire up readonly disable when canEdit is false (form is a plain object with ngModel — not a FormGroup)
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('allowanceType.update');
+  }
   submitting = signal(false);
   branches = signal<any[]>([]);
   isEditMode = signal(false);
@@ -179,7 +191,7 @@ export class CreateAllowanceTypeComponent implements OnInit {
         next: () => {
           this.submitting.set(false);
           this.notificationService.success(this.t('app.success'), this.t('allowance_types.updated_success'));
-          this.router.navigate(['/settings/allowance-types', this.editId(), 'view']);
+          this.router.navigate(['/settings/allowance-types']);
         },
         error: (error) => {
           this.submitting.set(false);
@@ -207,7 +219,7 @@ export class CreateAllowanceTypeComponent implements OnInit {
         next: (id) => {
           this.submitting.set(false);
           this.notificationService.success(this.t('app.success'), this.t('allowance_types.created_success'));
-          this.router.navigate(['/settings/allowance-types', id, 'view']);
+          this.router.navigate(['/settings/allowance-types']);
         },
         error: (error) => {
           this.submitting.set(false);

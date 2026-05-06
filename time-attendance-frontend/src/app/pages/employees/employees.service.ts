@@ -35,6 +35,8 @@ export class EmployeesService {
     if (filter.managerId) httpParams = httpParams.set('managerId', filter.managerId.toString());
     if (filter.isActive !== undefined) httpParams = httpParams.set('isActive', filter.isActive.toString());
     if (filter.employmentStatus) httpParams = httpParams.set('employmentStatus', filter.employmentStatus);
+    if (filter.sortBy) httpParams = httpParams.set('sortBy', filter.sortBy);
+    if (filter.sortDirection) httpParams = httpParams.set('sortDirection', filter.sortDirection);
 
     return this.http.get<PagedResult<EmployeeDto>>(this.baseUrl, { params: httpParams });
   }

@@ -9,6 +9,7 @@ import { FormHeaderComponent } from '../../../../shared/components/form-header/f
 import { FormSectionComponent } from '../../../../shared/components/form-section/form-section.component';
 import { SearchableSelectComponent, SearchableSelectOption } from '../../../../shared/components/searchable-select/searchable-select.component';
 
+import { PermissionService } from '../../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-counseling',
   standalone: true,
@@ -25,6 +26,16 @@ export class CreateCounselingComponent implements OnInit {
   private readonly employeeService = inject(EmployeeService);
   private readonly notification = inject(NotificationService);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('counselingRecord.update');
+  }
   form!: FormGroup;
   saving = signal(false);
   isEditMode = signal(false);
@@ -74,6 +85,9 @@ export class CreateCounselingComponent implements OnInit {
           sessionDate: r.sessionDate ? r.sessionDate.substring(0, 10) : '',
           followUpDate: r.followUpDate ? r.followUpDate.substring(0, 10) : ''
         });
+        if (!this.canEdit()) {
+          this.form.disable();
+        }
       },
       error: () => { this.notification.error(this.i18n.t('common.error')); this.router.navigate(['/employee-relations/counseling']); }
     });

@@ -10,6 +10,7 @@ import { FormHeaderComponent } from '../../../shared/components/form-header/form
 import { FormSectionComponent } from '../../../shared/components/form-section/form-section.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
+import { PermissionService } from '../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-grade',
   standalone: true,
@@ -32,6 +33,16 @@ export class CreateGradeComponent implements OnInit {
   private notification = inject(NotificationService);
   private gradeService = inject(JobGradeService);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('jobGrade.update');
+  }
   submitting = signal(false);
   loading = signal(false);
   isEditMode = signal(false);
@@ -75,6 +86,9 @@ export class CreateGradeComponent implements OnInit {
           maxSalary: data.maxSalary,
           isActive: data.isActive
         });
+        if (!this.canEdit()) {
+          this.form.disable();
+        }
         this.loading.set(false);
       },
       error: () => {

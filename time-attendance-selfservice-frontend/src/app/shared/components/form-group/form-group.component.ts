@@ -1,11 +1,11 @@
 import { Component, Input, forwardRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-form-group',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [ReactiveFormsModule, FormsModule],
   templateUrl: './form-group.component.html',
   styleUrls: ['./form-group.component.css'],
   providers: [
@@ -22,6 +22,9 @@ export class FormGroupComponent implements ControlValueAccessor {
   @Input() type: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'date' | 'time' | 'datetime-local' | 'textarea' | 'select' = 'text';
   @Input() placeholder = '';
   @Input() helpText = '';
+  @Input() hint = '';
+  @Input() success = '';
+  @Input() isValid = false;
   @Input() error = '';
   @Input() showError = false;
   @Input() disabled = false;
@@ -73,6 +76,8 @@ export class FormGroupComponent implements ControlValueAccessor {
 
     if (this.showError && this.error) {
       classes.push('is-invalid');
+    } else if (this.isValid || this.success) {
+      classes.push('is-valid');
     }
 
     return classes.join(' ');

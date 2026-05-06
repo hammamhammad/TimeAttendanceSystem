@@ -83,7 +83,6 @@
                         formControlName="startDate"
                         placeholder="{{ i18n.t('fields.startDate') }}"
                         [class.is-invalid]="isFieldInvalid('startDate')"
-                        [disabled]="saving()"
                       />
                       <label for="startDate">
                         {{ i18n.t('fields.startDate') }} <span class="text-danger">*</span>
@@ -106,7 +105,6 @@
                         formControlName="endDate"
                         placeholder="{{ i18n.t('fields.endDate') }}"
                         [class.is-invalid]="isFieldInvalid('endDate')"
-                        [disabled]="saving()"
                       />
                       <label for="endDate">
                         {{ i18n.t('fields.endDate') }} <span class="text-danger">*</span>
@@ -132,7 +130,6 @@
                       rows="3"
                       formControlName="notes"
                       placeholder="{{ i18n.t('fields.notes') }}"
-                      [disabled]="saving()"
                       style="height: 100px"
                     ></textarea>
                     <label for="notes">{{ i18n.t('fields.notes') }}</label>

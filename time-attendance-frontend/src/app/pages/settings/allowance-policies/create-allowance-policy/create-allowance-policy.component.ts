@@ -13,6 +13,7 @@ import {
   AllowancePolicy
 } from '../../../../shared/models/allowance.model';
 
+import { PermissionService } from '../../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-allowance-policy',
   standalone: true,
@@ -28,6 +29,17 @@ export class CreateAllowancePolicyComponent implements OnInit {
   private notificationService = inject(NotificationService);
   public i18n = inject(I18nService);
 
+  private permissionService = inject(PermissionService);
+
+  // TODO: wire up readonly disable when canEdit is false (form is a plain object with ngModel — not a FormGroup)
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('allowancePolicy.update');
+  }
   submitting = signal(false);
   branches = signal<any[]>([]);
   allowanceTypes = signal<any[]>([]);
@@ -160,7 +172,7 @@ export class CreateAllowancePolicyComponent implements OnInit {
         next: () => {
           this.submitting.set(false);
           this.notificationService.success(this.t('app.success'), this.t('allowance_policies.updated_success'));
-          this.router.navigate(['/settings/allowance-policies', this.editId(), 'view']);
+          this.router.navigate(['/settings/allowance-policies']);
         },
         error: (error) => {
           this.submitting.set(false);
@@ -190,7 +202,7 @@ export class CreateAllowancePolicyComponent implements OnInit {
         next: (id) => {
           this.submitting.set(false);
           this.notificationService.success(this.t('app.success'), this.t('allowance_policies.created_success'));
-          this.router.navigate(['/settings/allowance-policies', id, 'view']);
+          this.router.navigate(['/settings/allowance-policies']);
         },
         error: (error) => {
           this.submitting.set(false);

@@ -2,6 +2,54 @@
   "search": {
     "placeholder": "ابحث في كل شيء… (Ctrl+K)"
   },
+  "lookup": {
+    "empty_search_hint": "ابدأ الكتابة للبحث، أو انقر على أيقونة البحث لتصفح كل السجلات",
+    "readonly_hint": "يتم التفعيل بعد اختيار {{dependency}}",
+    "no_results_for": "لا توجد سجلات مطابقة لـ \"{{query}}\"",
+    "results_found": "تم العثور على {{count}} نتيجة",
+    "keyboard_hint": "↑↓ للتنقل · Enter للاختيار · Esc للإغلاق",
+    "clear_selection": "مسح الاختيار",
+    "change_selection": "تغيير",
+    "browse_all": "تصفح الكل",
+    "open_in_new_tab": "فتح {{name}} في نافذة جديدة"
+  },
+  "form": {
+    "required_marker": "*",
+    "code_available": "الرمز متاح",
+    "code_unique_error": "يجب أن تكون القيمة فريدة"
+  },
+  "filter": {
+    "condition": "الشرط",
+    "value": "القيمة",
+    "to": "إلى",
+    "enter_value": "أدخل قيمة",
+    "no_values": "لا توجد قيم للتصفية",
+    "no_match": "لا توجد نتائج مطابقة",
+    "op": {
+      "contains": "يحتوي",
+      "notContains": "لا يحتوي",
+      "equals": "يساوي",
+      "notEquals": "لا يساوي",
+      "startsWith": "يبدأ بـ",
+      "endsWith": "ينتهي بـ",
+      "greaterThan": "أكبر من",
+      "greaterOrEqual": "أكبر أو يساوي",
+      "lessThan": "أصغر من",
+      "lessOrEqual": "أصغر أو يساوي",
+      "between": "بين",
+      "before": "قبل",
+      "after": "بعد",
+      "today": "اليوم",
+      "thisWeek": "هذا الأسبوع",
+      "thisMonth": "هذا الشهر",
+      "thisYear": "هذا العام",
+      "isTrue": "صحيح",
+      "isFalse": "غير صحيح",
+      "isAnyOf": "أي من",
+      "isEmpty": "فارغ",
+      "isNotEmpty": "غير فارغ"
+    }
+  },
   "lifecycle_automation": {
     "history_title": "سجل الأتمتة",
     "no_history": "لا توجد أحداث أتمتة مسجلة لهذا السجل.",
@@ -177,6 +225,42 @@
     "settings": "الإعدادات",
     "logout": "تسجيل الخروج",
     "toggle_menu": "تبديل القائمة",
+    "brand": "ERP Suite",
+    "switchArea": "تبديل المنطقة",
+    "areas": {
+      "dashboard": "لوحة التحكم",
+      "people": "الموظفون",
+      "workforce": "القوى العاملة",
+      "payroll": "الرواتب",
+      "operations": "العمليات",
+      "me": "أنا",
+      "pay": "الراتب",
+      "services": "الخدمات",
+      "approvals": "الموافقات"
+    },
+    "modules": {
+      "title": "الوحدات",
+      "subtitle": "تنقل بين وحدات نظام تخطيط موارد المؤسسة. تفتح كل وحدة بقائمتها الخاصة.",
+      "soon": "قريباً",
+      "active": "نشطة",
+      "areas_count": "أقسام",
+      "hr": {
+        "name": "الموارد البشرية",
+        "description": "الموظفون، الحضور، الإجازات، الرواتب"
+      },
+      "crm": {
+        "name": "إدارة العملاء",
+        "description": "العملاء المحتملون، الحسابات، جهات الاتصال، الفرص"
+      },
+      "sales": {
+        "name": "المبيعات",
+        "description": "عروض الأسعار، الطلبات، الفواتير"
+      },
+      "inventory": {
+        "name": "المخزون",
+        "description": "المخزون، المستودعات، التحويلات"
+      }
+    },
     "hr": "ادارة الموارد البشرية",
     "contracts": "العقود",
     "transfers": "النقل",
@@ -2664,6 +2748,8 @@
     "description": "الوصف",
     "approve": "موافقة",
     "reject": "رفض",
+    "apply": "تطبيق",
+    "no_data": "لا توجد بيانات",
     "days_text": "أيام",
     "dayUnit": "يوم",
     "select_employee": "اختر الموظف",
@@ -2706,6 +2792,9 @@
     "no_data": "لا توجد بيانات متاحة",
     "unlimited": "غير محدود",
     "employee_number": "رقم الموظف",
+    "select_row_for_actions": "اختر صفًا لتفعيل الإجراءات",
+    "one_row_selected": "تم اختيار صف واحد",
+    "rows_selected": "صفوف مختارة",
     "showing": "عرض",
     "of": "من",
     "cancel": "إلغاء",

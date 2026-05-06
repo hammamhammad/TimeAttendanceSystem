@@ -42,7 +42,7 @@
                 </label>
                 <app-searchable-select [options]="employeeOptions()"
                   [placeholder]="i18n.t('employee_excuses.select_employee')" [searchable]="true" [clearable]="true"
-                  [disabled]="noPolicyActive() || isEditMode()" formControlName="employeeId"
+                  formControlName="employeeId"
                   [class.is-invalid]="isFieldInvalid('employeeId')">
                 </app-searchable-select>
               </div>

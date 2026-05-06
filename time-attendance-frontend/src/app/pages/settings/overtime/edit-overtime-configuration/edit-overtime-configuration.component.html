@@ -44,6 +44,7 @@
 
     <!-- Form -->
     <form (ngSubmit)="onSubmit()" #formRef="ngForm">
+      <fieldset [disabled]="!canEdit()" style="border:0;padding:0;margin:0;">
       <div class="row">
         <!-- Main Configuration -->
         <div class="col-lg-8">
@@ -428,25 +429,28 @@
           </app-form-section>
 
           <!-- Submit Section -->
-          <div class="card">
-            <div class="card-body">
-              <div class="app-form-actions">
-                <button
-                  type="submit"
-                  class="btn btn-primary"
-                  [disabled]="submitting()">
-                  @if (submitting()) {
-                    <i class="fa-solid fa-spinner fa-spin me-2"></i>
-                  } @else {
-                    <i class="fa-solid fa-save me-2"></i>
-                  }
-                  {{ submitting() ? t('common.saving') : t('settings.overtime.updatePolicy') }}
-                </button>
+          @if (canEdit()) {
+            <div class="card">
+              <div class="card-body">
+                <div class="app-form-actions">
+                  <button
+                    type="submit"
+                    class="btn btn-primary"
+                    [disabled]="submitting()">
+                    @if (submitting()) {
+                      <i class="fa-solid fa-spinner fa-spin me-2"></i>
+                    } @else {
+                      <i class="fa-solid fa-save me-2"></i>
+                    }
+                    {{ submitting() ? t('common.saving') : t('settings.overtime.updatePolicy') }}
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+          }
         </div>
       </div>
+      </fieldset>
     </form>
   }
 </div>

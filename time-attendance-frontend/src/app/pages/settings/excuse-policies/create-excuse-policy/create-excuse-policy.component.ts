@@ -142,7 +142,7 @@ export class CreateExcusePolicyComponent implements OnInit {
           this.t('app.success'),
           this.t('excuse_policies.create_success')
         );
-        this.router.navigate(['/settings/excuse-policies', id, 'view']);
+        this.router.navigate(['/settings/excuse-policies']);
       },
       error: (error) => {
         this.submitting.set(false);

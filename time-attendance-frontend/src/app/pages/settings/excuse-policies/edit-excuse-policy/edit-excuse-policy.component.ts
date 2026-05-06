@@ -12,6 +12,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-section
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { UpdateExcusePolicyRequest } from '../../../../shared/models/excuse-policy.model';
 
+import { PermissionService } from '../../../../core/auth/permission.service';
 @Component({
   selector: 'app-edit-excuse-policy',
   standalone: true,
@@ -25,6 +26,11 @@ export class EditExcusePolicyComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private notificationService = inject(NotificationService);
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    return this.permissionService.has('settings.excusePolicy.update');
+  }
   private destroy$ = new Subject<void>();
   public i18n = inject(I18nService);
 
@@ -199,7 +205,7 @@ export class EditExcusePolicyComponent implements OnInit, OnDestroy {
           this.t('app.success'),
           this.t('excuse_policies.update_success')
         );
-        this.router.navigate(['/settings/excuse-policies', this.policyForm.id, 'view']);
+        this.router.navigate(['/settings/excuse-policies']);
       },
       error: (error) => {
         this.submitting.set(false);
@@ -222,6 +228,6 @@ export class EditExcusePolicyComponent implements OnInit, OnDestroy {
   }
 
   onCancel(): void {
-    this.router.navigate(['/settings/excuse-policies', this.policyForm.id, 'view']);
+    this.router.navigate(['/settings/excuse-policies']);
   }
 }

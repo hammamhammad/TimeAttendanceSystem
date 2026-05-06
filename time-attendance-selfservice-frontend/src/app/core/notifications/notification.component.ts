@@ -1,120 +1,182 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NotificationService, Notification } from './notification.service';
+import { NotificationService } from './notification.service';
 
 @Component({
   selector: 'app-notifications',
   standalone: true,
   imports: [CommonModule],
   template: `
-    <!-- Toast Container -->
-    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+    <div class="erp-toast-container" aria-live="polite" aria-atomic="false">
       @for (notification of notificationService.notifications$(); track notification.id) {
-        <div 
-          class="toast show"
-          [ngClass]="getToastClass(notification.type)"
-          role="alert" 
-          aria-live="assertive" 
+        <div
+          class="erp-toast"
+          [ngClass]="'erp-toast-' + notification.type"
+          role="alert"
           aria-atomic="true"
         >
-          <div class="toast-header">
-            <div 
-              class="rounded me-2"
-              [ngClass]="getIconClass(notification.type)"
-              style="width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;"
-            >
-              <i class="fas" [ngClass]="getIcon(notification.type)" style="font-size: 12px;"></i>
-            </div>
-            <strong class="me-auto">{{ notification.title }}</strong>
-            <small class="text-muted">now</small>
-            <button 
-              type="button" 
-              class="btn-close" 
-              (click)="notificationService.remove(notification.id)"
-              aria-label="Close"
-            ></button>
+          <div class="erp-toast-icon">
+            <i class="fa-solid" [ngClass]="getIcon(notification.type)"></i>
           </div>
-          @if (notification.message) {
-            <div class="toast-body">
-              {{ notification.message }}
-            </div>
-          }
+          <div class="erp-toast-body">
+            <div class="erp-toast-title">{{ notification.title }}</div>
+            @if (notification.message) {
+              <div class="erp-toast-message">{{ notification.message }}</div>
+            }
+          </div>
+          <button
+            type="button"
+            class="erp-toast-close"
+            (click)="notificationService.remove(notification.id)"
+            aria-label="Close"
+          >
+            <i class="fa-solid fa-times"></i>
+          </button>
         </div>
       }
     </div>
   `,
   styles: [`
-    .toast {
+    .erp-toast-container {
+      position: fixed;
+      top: calc(var(--topbar-height, 44px) + 12px);
+      right: 16px;
+      z-index: 1080;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+      max-width: 400px;
+    }
+
+    .erp-toast {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 16px;
+      border-radius: var(--app-border-radius-md, 8px);
+      box-shadow: var(--app-shadow-lg);
+      border: 1px solid;
+      background: #ffffff;
+      pointer-events: auto;
       min-width: 300px;
-      margin-bottom: 0.5rem;
+      max-width: 400px;
+      animation: erp-toast-slide-in 0.2s ease-out;
     }
-    
-    .toast-success .toast-header {
-      background-color: #d1e7dd;
-      border-color: #badbcc;
+
+    .erp-toast-success {
+      background: var(--app-success-50, #F0FDF4);
+      border-color: var(--app-success-200, #BBF7D0);
+      color: var(--app-success-600, #16A34A);
     }
-    
-    .toast-error .toast-header {
-      background-color: #f8d7da;
-      border-color: #f5c6cb;
+    .erp-toast-error {
+      background: var(--app-danger-50, #FEF2F2);
+      border-color: var(--app-danger-100, #FEE2E2);
+      color: var(--app-danger-600, #DC2626);
     }
-    
-    .toast-warning .toast-header {
-      background-color: #fff3cd;
-      border-color: #ffecb5;
+    .erp-toast-warning {
+      background: var(--app-warning-50, #FFFBEB);
+      border-color: var(--app-warning-100, #FEF3C7);
+      color: var(--app-warning-600, #D97706);
     }
-    
-    .toast-info .toast-header {
-      background-color: #d1ecf1;
-      border-color: #bee5eb;
+    .erp-toast-info {
+      background: var(--app-info-50, #EFF6FF);
+      border-color: var(--app-info-100, #DBEAFE);
+      color: var(--app-info-600, #2563EB);
+    }
+
+    .erp-toast-icon {
+      font-size: 18px;
+      line-height: 1;
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
+
+    .erp-toast-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .erp-toast-title {
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.35;
+      word-wrap: break-word;
+    }
+
+    .erp-toast-message {
+      font-size: 13px;
+      opacity: 0.85;
+      margin-top: 2px;
+      line-height: 1.45;
+      word-wrap: break-word;
+    }
+
+    .erp-toast-close {
+      flex-shrink: 0;
+      width: 22px;
+      height: 22px;
+      padding: 0;
+      border: none;
+      background: transparent;
+      color: currentColor;
+      opacity: 0.55;
+      cursor: pointer;
+      border-radius: var(--app-border-radius-sm, 6px);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      transition: opacity 0.15s ease, background-color 0.15s ease;
+    }
+
+    .erp-toast-close:hover {
+      opacity: 1;
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    :host-context([dir="rtl"]) .erp-toast-container {
+      right: auto;
+      left: 16px;
+    }
+
+    @keyframes erp-toast-slide-in {
+      from {
+        opacity: 0;
+        transform: translateX(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    :host-context([dir="rtl"]) .erp-toast {
+      animation-name: erp-toast-slide-in-rtl;
+    }
+
+    @keyframes erp-toast-slide-in-rtl {
+      from {
+        opacity: 0;
+        transform: translateX(-16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
     }
   `]
 })
 export class NotificationComponent {
   notificationService = inject(NotificationService);
 
-  getToastClass(type: string): string {
-    switch (type) {
-      case 'success':
-        return 'toast-success';
-      case 'error':
-        return 'toast-error';
-      case 'warning':
-        return 'toast-warning';
-      case 'info':
-        return 'toast-info';
-      default:
-        return 'toast-info';
-    }
-  }
-
-  getIconClass(type: string): string {
-    switch (type) {
-      case 'success':
-        return 'bg-success';
-      case 'error':
-        return 'bg-danger';
-      case 'warning':
-        return 'bg-warning';
-      case 'info':
-        return 'bg-info';
-      default:
-        return 'bg-info';
-    }
-  }
-
   getIcon(type: string): string {
     switch (type) {
-      case 'success':
-        return 'fa-check';
-      case 'error':
-        return 'fa-times';
-      case 'warning':
-        return 'fa-exclamation-triangle';
-      case 'info':
-        return 'fa-info';
-      default:
-        return 'fa-info';
+      case 'success': return 'fa-check-circle';
+      case 'error': return 'fa-exclamation-circle';
+      case 'warning': return 'fa-exclamation-triangle';
+      case 'info': return 'fa-info-circle';
+      default: return 'fa-info-circle';
     }
   }
 }

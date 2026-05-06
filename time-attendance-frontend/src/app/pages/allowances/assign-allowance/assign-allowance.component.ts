@@ -140,7 +140,7 @@ export class AssignAllowanceComponent implements OnInit {
       next: (id) => {
         this.submitting.set(false);
         this.notificationService.success(this.t('app.success'), this.t('allowance_assignments.assigned_success'));
-        this.router.navigate(['/allowances', id, 'view']);
+        this.router.navigate(['/allowances']);
       },
       error: (error) => {
         this.submitting.set(false);

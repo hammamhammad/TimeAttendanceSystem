@@ -8,6 +8,7 @@ import { TimesheetService } from '../../../../core/services/timesheet.service';
 import { FormHeaderComponent } from '../../../../shared/components/form-header/form-header.component';
 import { FormSectionComponent } from '../../../../shared/components/form-section/form-section.component';
 
+import { PermissionService } from '../../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-period',
   standalone: true,
@@ -23,6 +24,16 @@ export class CreatePeriodComponent implements OnInit {
   private readonly service = inject(TimesheetService);
   private readonly notification = inject(NotificationService);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('timesheetPeriod.update');
+  }
   form!: FormGroup;
   saving = signal(false);
   isEdit = signal(false);
@@ -47,11 +58,16 @@ export class CreatePeriodComponent implements OnInit {
       this.isEdit.set(true);
       this.entityId.set(+id);
       this.service.getTimesheetPeriod(+id).subscribe({
-        next: (p) => this.form.patchValue({
-          branchId: p.branchId, name: p.name, periodType: p.periodType,
-          startDate: p.startDate.substring(0, 10), endDate: p.endDate.substring(0, 10),
-          submissionDeadline: p.submissionDeadline.substring(0, 10), isActive: p.isActive
-        }),
+        next: (p) => {
+          this.form.patchValue({
+            branchId: p.branchId, name: p.name, periodType: p.periodType,
+            startDate: p.startDate.substring(0, 10), endDate: p.endDate.substring(0, 10),
+            submissionDeadline: p.submissionDeadline.substring(0, 10), isActive: p.isActive
+          });
+          if (!this.canEdit()) {
+            this.form.disable({ emitEvent: false });
+          }
+        },
         error: () => this.notification.error(this.i18n.t('common.error'))
       });
     }

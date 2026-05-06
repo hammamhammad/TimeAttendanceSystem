@@ -288,23 +288,25 @@
       <div class="app-form-actions">
         <button type="button" class="btn btn-outline-secondary" (click)="onCancel()">
           <i class="fas fa-times me-2"></i>
-          {{ i18n.t('attendance.edit.discard_changes') }}
+          {{ canEdit() ? i18n.t('attendance.edit.discard_changes') : i18n.t('common.back') }}
         </button>
-        <button
-          type="submit"
-          class="btn btn-primary"
-          [disabled]="saving() || editForm.invalid"
-          [class.loading]="saving()">
-          @if (!saving()) {
-            <i class="fas fa-save me-2"></i>
-          }
-          @if (saving()) {
-            <div class="spinner-border spinner-border-sm me-2" role="status">
-              <span class="visually-hidden">{{ i18n.t('attendance.edit.saving') }}</span>
-            </div>
-          }
-          {{ saving() ? i18n.t('attendance.edit.saving') : i18n.t('attendance.edit.save_changes') }}
-        </button>
+        @if (canEdit()) {
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="saving() || editForm.invalid"
+            [class.loading]="saving()">
+            @if (!saving()) {
+              <i class="fas fa-save me-2"></i>
+            }
+            @if (saving()) {
+              <div class="spinner-border spinner-border-sm me-2" role="status">
+                <span class="visually-hidden">{{ i18n.t('attendance.edit.saving') }}</span>
+              </div>
+            }
+            {{ saving() ? i18n.t('attendance.edit.saving') : i18n.t('attendance.edit.save_changes') }}
+          </button>
+        }
       </div>
     </form>
   }

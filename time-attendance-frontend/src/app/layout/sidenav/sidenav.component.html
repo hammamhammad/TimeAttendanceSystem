@@ -1,78 +1,162 @@
-<nav class="sidenav" [class.collapsed]="collapsed()" [class.show]="show()" [attr.aria-expanded]="!collapsed()">
+<nav class="sidebar-mock"
+     [class.sidebar-collapsed]="collapsed()"
+     [class.show]="show()"
+     [attr.aria-expanded]="!collapsed()">
 
-  <div class="sidenav-header p-3">
-    @if (!collapsed()) {
-    <div class="d-flex align-items-center">
-      <img src="assets/images/logo.svg" alt="TecAxle HRMS" class="sidenav-logo me-2">
-    </div>
-    } @else {
-    <img src="assets/images/logo.svg" alt="TecAxle HRMS" class="sidenav-logo-collapsed">
-    }
+  <!-- Fixed logo strip (always 180px, stays visible when body collapses) -->
+  <div class="sidebar-logo">
+    <button type="button"
+            class="sidebar-logo-icon"
+            (click)="toggleModuleLauncher($event)"
+            [attr.aria-label]="t('nav.modules.title')"
+            [attr.aria-expanded]="moduleLauncherOpen()"
+            [title]="t('nav.modules.title')">
+      <i class="fa-solid fa-th"></i>
+    </button>
+    <span class="sidebar-logo-text">{{ t('nav.brand') }}</span>
   </div>
 
-  <ul class="nav flex-column mt-2">
-    @for (group of menuGroups(); track group.groupKey) {
-    @if (hasVisibleGroup(group)) {
-    <!-- Group header -->
-    <li class="nav-group-header">
-      @if (!collapsed()) {
-      <span class="nav-group-label">{{ t(group.titleKey) }}</span>
-      } @else {
-      <span class="nav-group-divider"></span>
-      }
-    </li>
+  <!-- Collapsible body -->
+  <div class="sidebar-body-mock">
+    <div class="sidebar-body-header">
+      <button type="button"
+              class="sidebar-toggle-btn"
+              (click)="onToggleCollapsed()"
+              [attr.aria-label]="t('nav.toggle_menu')"
+              [attr.aria-expanded]="!collapsed()">
+        <i class="fa-solid" [class.fa-angle-left]="!collapsed() && !isRtl()"
+                            [class.fa-angle-right]="(!collapsed() && isRtl()) || (collapsed() && !isRtl())"
+                            [class.fa-angle-left-rtl]="collapsed() && isRtl()"></i>
+      </button>
+    </div>
 
-    <!-- Group items -->
-    @for (item of group.items; track item.path) {
-    @if (hasParentMenuPermission(item)) {
-    <li class="nav-item">
-      <!-- Parent menu item -->
-      @if (item.children && item.children.length > 0) {
-      <!-- Menu item with children -->
-      <a class="nav-link d-flex align-items-center justify-content-between" [class.active]="isParentActive(item)"
-        (click)="toggleSubmenu(item.path)" style="cursor: pointer" [title]="collapsed() ? t(item.titleKey) : ''">
-        <div class="d-flex align-items-center">
-          <i class="{{ item.icon }} nav-icon"></i>
-          @if (!collapsed()) {
-          <span class="text-truncate">{{ t(item.titleKey) }}</span>
-          }
-        </div>
-        @if (!collapsed() && hasVisibleChildren(item)) {
-        <i class="fas" [class.fa-chevron-down]="!isRtl()" [class.fa-chevron-left]="isRtl()"
-          [class.rotate-180]="isSubmenuOpen(item.path)"
-          style="transition: transform 0.2s ease; font-size: 0.75rem;"></i>
+    <div class="sidebar-scroll-mock">
+      @for (group of menuGroups(); track group.groupKey) {
+        @if (hasVisibleGroup(group)) {
+          <div class="sidebar-section">
+            @for (item of group.items; track item.path) {
+              @if (hasParentMenuPermission(item)) {
+                @if (item.children && item.children.length > 0) {
+                  <a class="sidebar-item"
+                     [class.active]="isParentActive(item) || isSubmenuOpen(item.path)"
+                     [attr.title]="collapsed() ? t(item.titleKey) : null"
+                     (click)="toggleSubmenu(item.path)">
+                    <i class="{{ item.icon }}"></i>
+                    @if (!collapsed()) {
+                      <span>{{ t(item.titleKey) }}</span>
+                      @if (hasVisibleChildren(item)) {
+                        <i class="fa-solid fa-chevron-down submenu-caret"
+                           [class.rotate-180]="isSubmenuOpen(item.path)"></i>
+                      }
+                    }
+                  </a>
+                  @if (!collapsed() && isSubmenuOpen(item.path) && hasVisibleChildren(item)) {
+                    <div class="sidebar-submenu">
+                      @for (child of item.children; track child.path) {
+                        @if (hasChildMenuPermission(child)) {
+                          <a class="sidebar-item sidebar-item-child"
+                             [routerLink]="child.path"
+                             routerLinkActive="active"
+                             [title]="t(child.titleKey)">
+                            <i class="{{ child.icon }}"></i>
+                            <span>{{ t(child.titleKey) }}</span>
+                          </a>
+                        }
+                      }
+                    </div>
+                  }
+                } @else {
+                  <a class="sidebar-item"
+                     [routerLink]="item.path"
+                     routerLinkActive="active"
+                     [attr.title]="collapsed() ? t(item.titleKey) : null">
+                    <i class="{{ item.icon }}"></i>
+                    @if (!collapsed()) {
+                      <span>{{ t(item.titleKey) }}</span>
+                    }
+                  </a>
+                }
+              }
+            }
+          </div>
         }
-      </a>
-      <!-- Submenu -->
-      @if (!collapsed() && isSubmenuOpen(item.path) && hasVisibleChildren(item)) {
-      <ul class="nav flex-column submenu ms-3">
-        @for (child of item.children; track child.path) {
-        @if (hasChildMenuPermission(child)) {
-        <li class="nav-item">
-          <a class="nav-link d-flex align-items-center" [routerLink]="child.path" routerLinkActive="active"
-            [title]="t(child.titleKey)">
-            <i class="{{ child.icon }} nav-icon"></i>
-            <span class="text-truncate">{{ t(child.titleKey) }}</span>
-          </a>
-        </li>
-        }
-        }
-      </ul>
       }
-      } @else {
-      <!-- Simple menu item without children -->
-      <a class="nav-link d-flex align-items-center" [routerLink]="item.path" routerLinkActive="active"
-        [title]="collapsed() ? t(item.titleKey) : ''">
-        <i class="{{ item.icon }} nav-icon"></i>
+    </div>
+
+    <!-- Area switcher (bottom) -->
+    <div class="sidebar-area-wrapper">
+      <button type="button"
+              class="sidebar-area-trigger"
+              [class.open]="areaMenuOpen()"
+              (click)="toggleAreaMenu($event)"
+              [attr.aria-expanded]="areaMenuOpen()"
+              [attr.title]="collapsed() ? t(activeAreaInfo().titleKey) : null">
+        <i class="{{ activeAreaInfo().icon }} area-icon"></i>
         @if (!collapsed()) {
-        <span class="text-truncate">{{ t(item.titleKey) }}</span>
+          <span class="area-name">{{ t(activeAreaInfo().titleKey) }}</span>
+          <i class="fa-solid fa-chevron-up caret"></i>
         }
-      </a>
-      }
-    </li>
-    }
-    }
-    }
-    }
-  </ul>
+      </button>
+
+      <div class="sidebar-area-menu" [class.open]="areaMenuOpen()">
+        <div class="sidebar-area-menu-header">{{ t('nav.switchArea') }}</div>
+        @for (area of areas; track area.key) {
+          @if (areaHasAnyVisibleGroup(area.key)) {
+            <button type="button"
+                    class="sidebar-area-menu-item"
+                    [class.active]="area.key === activeArea()"
+                    (click)="selectArea(area.key, $event)">
+              <i class="{{ area.icon }} area-icon"></i>
+              <span class="label">{{ t(area.titleKey) }}</span>
+              <i class="fa-solid fa-check check"></i>
+            </button>
+          }
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Module launcher: full-height left drawer + backdrop -->
+  @if (moduleLauncherOpen()) {
+    <div class="module-launcher-backdrop" (click)="closeModuleLauncher()"></div>
+    <aside class="module-launcher-panel" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+      <div class="launcher-header">
+        <div class="launcher-header-icon"><i class="fa-solid fa-th"></i></div>
+        <div class="launcher-header-title">{{ t('nav.modules.title') }}</div>
+        <button type="button" class="launcher-close" (click)="closeModuleLauncher()" [attr.aria-label]="t('app.close')">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="launcher-subtitle">{{ t('nav.modules.subtitle') }}</div>
+      <div class="launcher-grid">
+        @for (module of modules; track module.key) {
+          <button type="button"
+                  class="module-tile"
+                  [class.active]="module.active"
+                  [class.coming-soon]="module.comingSoon"
+                  [disabled]="module.comingSoon"
+                  (click)="selectModule(module, $event)">
+            @if (module.comingSoon) {
+              <span class="module-soon-badge">{{ t('nav.modules.soon') }}</span>
+            }
+            <span class="module-tile-icon" [style.background]="module.gradient">
+              <i class="{{ module.icon }}"></i>
+            </span>
+            <span class="module-tile-name-row">
+              <span class="module-tile-name">{{ t(module.nameKey) }}</span>
+              @if (module.active) {
+                <span class="module-active-check" [attr.aria-label]="t('nav.modules.active')">
+                  <i class="fa-solid fa-check"></i>
+                </span>
+              }
+            </span>
+            <span class="module-tile-desc">{{ t(module.descriptionKey) }}</span>
+          </button>
+        }
+      </div>
+      <div class="launcher-footer">
+        {{ t(activeModule.nameKey) }} · {{ areas.length }} {{ t('nav.modules.areas_count') }}
+      </div>
+    </aside>
+  }
 </nav>

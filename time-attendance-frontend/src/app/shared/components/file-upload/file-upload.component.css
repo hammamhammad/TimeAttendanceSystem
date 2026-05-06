@@ -1,23 +1,19 @@
-.upload-label {
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.upload-label:hover {
-  background: var(--app-gray-100);
-}
-
-.border-dashed {
-  border-style: dashed !important;
-}
+/* Local styles — .app-dropzone lives in global components.css. */
 
 .current-file,
 .uploaded-file {
-  padding: 0.5rem 0.75rem;
-  background: var(--app-gray-100);
-  border-radius: 0.375rem;
+  padding: 10px 14px;
+  background: var(--app-gray-50);
+  border: 1px solid var(--app-gray-200);
+  border-radius: var(--app-border-radius-md, 8px);
+  font-size: 13px;
 }
 
 .text-truncate {
   max-width: 250px;
+}
+
+.app-dropzone.is-invalid {
+  border-color: var(--app-danger-500);
+  background: var(--app-danger-50);
 }

@@ -34,8 +34,9 @@
   --gray-500: #667085; --gray-600: #475467; --gray-700: #344054;
   --gray-800: #1D2939; --gray-900: #101828;
 
-  --sidebar-bg: #0F1629; --sidebar-hover: #1A2342; --sidebar-active: #252F4A;
-  --sidebar-text: #94A3C4; --sidebar-text-active: #FFFFFF;
+  /* Sidebar (light theme — switched from the original dark navy in 2026 Q2). */
+  --sidebar-bg: #F8FAFC; --sidebar-hover: #EEF2FF; --sidebar-active: #E0E7FF;
+  --sidebar-text: #475569; --sidebar-text-active: #4338CA;
 
   --shadow-xs: 0 1px 2px rgba(16,24,40,0.05);
   --shadow-sm: 0 1px 3px rgba(16,24,40,0.1), 0 1px 2px rgba(16,24,40,0.06);
@@ -194,28 +195,48 @@ h4 { font-size: 14px; font-weight: 600; color: var(--gray-600); margin: 20px 0 1
 .grid-filter-btn { padding: 8px 14px; border: 1px solid var(--gray-300); border-radius: var(--radius-sm); background: white; font-size: 13px; color: var(--gray-600); cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: inherit; }
 .grid-filter-btn:hover { background: var(--gray-50); }
 
-table.data-grid { width: 100%; border-collapse: collapse; font-size: 13px; }
-table.data-grid thead th { padding: 12px 16px; text-align: left; font-weight: 600; color: var(--gray-600); background: var(--gray-50); border-bottom: 1px solid var(--gray-200); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; position: relative; cursor: pointer; user-select: none; }
+/* Compact baseline: body 6/14 · 12px, header 8/14 · 11px, line-height 1.35. */
+table.data-grid { width: 100%; border-collapse: collapse; font-size: 12px; }
+table.data-grid thead th { padding: 8px 14px; text-align: left; font-weight: 600; color: var(--gray-600); background: var(--gray-50); border-bottom: 1px solid var(--gray-200); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; position: relative; cursor: pointer; user-select: none; }
 table.data-grid thead th:hover { background: var(--gray-100); }
 table.data-grid thead th .sort-icon { margin-left: 4px; font-size: 10px; color: var(--gray-300); }
 table.data-grid thead th.sorted .sort-icon { color: var(--primary-500); }
-table.data-grid tbody td { padding: 12px 16px; border-bottom: 1px solid var(--gray-100); color: var(--gray-700); vertical-align: middle; }
-table.data-grid tbody tr { transition: background 0.1s; }
+table.data-grid thead th .filter-icon { margin-left: 4px; font-size: 10px; color: var(--gray-300); cursor: pointer; }
+table.data-grid thead th .filter-icon.active { color: var(--primary-500); }
+table.data-grid tbody td { padding: 6px 14px; line-height: 1.35; border-bottom: 1px solid var(--gray-100); color: var(--gray-700); vertical-align: middle; }
+/* Rows open on double-click — no Actions column. Pointer + no-select so the row reads as clickable and double-click doesn't highlight text. */
+table.data-grid tbody tr { transition: background 0.1s; cursor: pointer; user-select: none; }
 table.data-grid tbody tr:hover { background: var(--primary-50); }
 table.data-grid tbody tr.selected { background: var(--primary-100); }
 table.data-grid tbody td .cell-link { color: var(--primary-500); font-weight: 500; text-decoration: none; cursor: pointer; }
 table.data-grid tbody td .cell-link:hover { color: var(--primary-700); text-decoration: underline; }
-table.data-grid .cell-code { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--gray-600); }
+table.data-grid .cell-code { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--gray-600); }
 table.data-grid .cell-money { font-family: 'JetBrains Mono', monospace; text-align: right; }
 table.data-grid .cell-date { color: var(--gray-500); white-space: nowrap; }
+/* .cell-actions retained for sub-grid inline edit/delete only — main grids have no Actions column. */
 table.data-grid .cell-actions { display: flex; gap: 4px; }
-table.data-grid .row-checkbox { width: 18px; height: 18px; accent-color: var(--primary-500); cursor: pointer; }
+table.data-grid .row-checkbox { width: 14px; height: 14px; accent-color: var(--primary-500); cursor: pointer; }
 
-.grid-pagination { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-top: 1px solid var(--gray-200); background: var(--gray-25); font-size: 13px; color: var(--gray-500); }
+/* Pagination: 26×26 page buttons, 8/14 footer padding. */
+.grid-pagination { display: flex; justify-content: space-between; align-items: center; padding: 8px 14px; border-top: 1px solid var(--gray-200); background: var(--gray-25); font-size: 12px; color: var(--gray-500); }
 .pagination-pages { display: flex; gap: 4px; }
-.pagination-pages button { width: 32px; height: 32px; border: 1px solid var(--gray-300); background: white; border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; font-family: inherit; color: var(--gray-600); transition: all 0.1s; }
+.pagination-pages button { width: 26px; height: 26px; border: 1px solid var(--gray-300); background: white; border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; font-family: inherit; color: var(--gray-600); transition: all 0.1s; }
 .pagination-pages button:hover { background: var(--gray-50); }
 .pagination-pages button.active { background: var(--primary-500); color: white; border-color: var(--primary-500); }
+
+/* Toolbar-scoped compact buttons — keeps global btn-erp-sm at its normal size elsewhere. */
+.grid-toolbar .btn, .grid-toolbar .grid-filter-btn { padding: 4px 10px; font-size: 12px; }
+
+/* "N selected · Clear" pill appearing in the toolbar when rows are selected. */
+.grid-selection-pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; background: var(--primary-50); color: var(--primary-700); border-radius: 12px; font-size: 12px; font-weight: 500; }
+.grid-selection-pill button { background: transparent; border: none; color: var(--primary-600); cursor: pointer; font-size: 12px; text-decoration: underline; padding: 0; font-family: inherit; }
+
+/* Active filter chips rail — docks directly below the toolbar. */
+.grid-filter-chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 8px 14px; background: var(--gray-25); border-bottom: 1px solid var(--gray-200); font-size: 12px; }
+.grid-filter-chips .filter-chip { display: inline-flex; align-items: center; gap: 4px; background: var(--primary-50); color: var(--primary-700); padding: 3px 8px; border-radius: 12px; }
+.grid-filter-chips .filter-chip button { background: transparent; border: none; color: var(--primary-600); cursor: pointer; padding: 0 0 0 4px; font-size: 10px; }
+.grid-filter-chips .filter-chip-mono { font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+.grid-filter-chips .clear-all { background: transparent; border: none; color: var(--gray-600); cursor: pointer; font-size: 12px; text-decoration: underline; padding: 0; margin-left: 4px; }
 
 /* Sub-Grid */
 .subgrid-container { margin-top: 24px; }
@@ -270,27 +291,86 @@ table.data-grid .row-checkbox { width: 18px; height: 18px; accent-color: var(--p
 .timeline-user { font-size: 12px; color: var(--gray-400); margin-top: 6px; display: flex; align-items: center; gap: 6px; }
 .timeline-user-avatar { width: 20px; height: 20px; border-radius: 50%; background: var(--gray-200); display: inline-flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; color: var(--gray-500); }
 
-/* Sidebar Nav */
-.sidebar-mock { width: 260px; background: var(--sidebar-bg); border-radius: var(--radius-lg); padding: 16px 0; color: var(--sidebar-text); }
-.sidebar-logo { padding: 8px 20px 24px; display: flex; align-items: center; gap: 12px; }
-.sidebar-logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary-400), var(--primary-600)); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; font-weight: 800; }
-.sidebar-logo-text { font-size: 18px; font-weight: 700; color: white; letter-spacing: -0.5px; }
-.sidebar-section { margin-top: 8px; }
-.sidebar-section-title { padding: 8px 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.2px; color: #4B5A7A; }
-.sidebar-item { display: flex; align-items: center; gap: 12px; padding: 10px 20px; cursor: pointer; transition: all 0.15s; font-size: 14px; border-left: 3px solid transparent; }
-.sidebar-item:hover { background: var(--sidebar-hover); color: #C4D0E8; }
-.sidebar-item.active { background: var(--sidebar-active); color: var(--sidebar-text-active); border-left-color: var(--primary-500); }
-.sidebar-item i { width: 20px; text-align: center; font-size: 15px; }
-.sidebar-item .item-badge { margin-left: auto; background: var(--primary-500); color: white; padding: 1px 7px; border-radius: 10px; font-size: 11px; font-weight: 600; }
-.sidebar-expand { margin-left: auto; font-size: 10px; transition: transform 0.2s; }
-.sidebar-children { overflow: hidden; max-height: 0; transition: max-height 0.3s; }
-.sidebar-children.open { max-height: 400px; }
-.sidebar-child { padding: 8px 20px 8px 52px; font-size: 13px; cursor: pointer; transition: all 0.1s; }
-.sidebar-child:hover { color: #C4D0E8; }
-.sidebar-child.active { color: var(--primary-400); }
+/* Sidebar Nav — two-part structure: an absolutely-positioned 180px-wide logo strip
+   (44px tall, matches header) + a collapsible body (180px ↔ 56px). Only the body
+   carries the .sidebar-collapsed class; the logo always stays at full width and
+   overhangs the narrowed body on the right when collapsed. Light theme palette. */
+.sidebar-mock { width: 180px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); overflow: hidden; position: relative; transition: width 0.2s ease; }
+.sidebar-logo { position: absolute; top: 0; left: 0; z-index: 2; width: 180px; height: 44px; padding: 0 14px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--gray-200); background: var(--sidebar-bg); flex-shrink: 0; }
+.sidebar-logo-icon { width: 28px; height: 28px; background: linear-gradient(135deg, var(--primary-400), var(--primary-600)); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 800; box-shadow: 0 2px 6px rgba(79, 107, 246, 0.25); cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease; }
+.sidebar-logo-icon:hover { transform: translateY(-1px); filter: brightness(1.05); box-shadow: 0 4px 12px rgba(79, 107, 246, 0.35); }
+.sidebar-logo-text { font-size: 14px; font-weight: 700; color: var(--gray-900); letter-spacing: -0.2px; }
+.sidebar-body-mock { margin-top: 44px; flex: 1; min-height: 0; width: 180px; display: flex; flex-direction: column; transition: width 0.2s ease; }
+.sidebar-scroll-mock { flex: 1; overflow-y: auto; min-height: 0; padding: 6px 0 8px; }
+.sidebar-scroll-mock::-webkit-scrollbar { width: 6px; }
+.sidebar-scroll-mock::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 3px; }
+.sidebar-section { margin-top: 2px; }
+.sidebar-section-title { padding: 10px 16px 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--gray-400); display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; transition: color 0.15s; }
+.sidebar-section-title:hover { color: var(--gray-600); }
+.sidebar-section-title i { font-size: 9px; transition: transform 0.2s; color: var(--gray-300); }
+.sidebar-item { display: flex; align-items: center; gap: 10px; padding: 7px 14px; margin: 1px 8px; cursor: pointer; transition: all 0.15s; font-size: 13px; border-radius: var(--radius-sm); color: var(--sidebar-text); text-decoration: none; position: relative; }
+.sidebar-item:hover { background: var(--sidebar-hover); color: var(--primary-700, #4338CA); }
+.sidebar-item:hover i { color: var(--primary-500); }
+.sidebar-item.active { background: var(--sidebar-active); color: var(--sidebar-text-active); font-weight: 600; }
+.sidebar-item.active::before { content: ''; position: absolute; left: -8px; top: 6px; bottom: 6px; width: 3px; border-radius: 0 3px 3px 0; background: var(--primary-500); }
+.sidebar-item.active i { color: var(--primary-500); }
+.sidebar-item i { width: 18px; text-align: center; font-size: 13px; color: var(--gray-400); transition: color 0.15s; }
+.sidebar-item .item-badge { margin-left: auto; background: var(--primary-500); color: white; padding: 1px 7px; border-radius: 10px; font-size: 10px; font-weight: 600; }
+
+/* Area switcher — compact trigger at the bottom + popup menu */
+.sidebar-area-wrapper { position: relative; flex-shrink: 0; border-top: 1px solid var(--gray-200); }
+.sidebar-area-trigger { display: flex; align-items: center; gap: 10px; padding: 11px 16px; cursor: pointer; background: var(--gray-50); font-size: 13px; font-weight: 600; user-select: none; transition: background 0.15s; }
+.sidebar-area-trigger:hover { background: var(--sidebar-hover); }
+.sidebar-area-trigger.open { background: var(--sidebar-hover); }
+.sidebar-area-trigger .area-icon { font-size: 14px; color: var(--primary-500); width: 18px; text-align: center; flex-shrink: 0; }
+.sidebar-area-trigger .area-name { flex: 1; color: var(--gray-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sidebar-area-trigger .caret { font-size: 10px; color: var(--gray-400); transition: transform 0.2s; }
+.sidebar-area-trigger.open .caret { transform: rotate(180deg); color: var(--primary-500); }
+.sidebar-area-menu { position: absolute; left: 8px; right: 8px; bottom: calc(100% + 6px); background: white; border: 1px solid var(--gray-200); border-radius: 10px; box-shadow: 0 10px 28px rgba(15, 23, 42, 0.12); overflow: hidden; transform-origin: bottom center; opacity: 0; transform: translateY(6px) scale(0.98); pointer-events: none; transition: opacity 0.15s, transform 0.15s; }
+.sidebar-area-menu.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+.sidebar-area-menu-header { padding: 10px 14px 6px; font-size: 9px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--gray-400); font-weight: 700; border-bottom: 1px solid var(--gray-100); }
+.sidebar-area-menu-item { display: flex; align-items: center; gap: 12px; padding: 9px 14px; font-size: 13px; cursor: pointer; color: var(--sidebar-text); border-left: 3px solid transparent; transition: all 0.1s; }
+.sidebar-area-menu-item:hover { background: var(--sidebar-hover); color: var(--sidebar-text-active); }
+.sidebar-area-menu-item.active { background: var(--sidebar-active); color: var(--sidebar-text-active); border-left-color: var(--primary-500); font-weight: 600; }
+.sidebar-area-menu-item > i.area-icon { font-size: 14px; width: 18px; text-align: center; color: var(--gray-500); flex-shrink: 0; }
+.sidebar-area-menu-item.active > i.area-icon { color: var(--primary-500); }
+.sidebar-area-menu-item .label { flex: 1; font-weight: 500; }
+.sidebar-area-menu-item.active .label { font-weight: 600; }
+.sidebar-area-menu-item .check { color: var(--primary-500); font-size: 11px; opacity: 0; }
+.sidebar-area-menu-item.active .check { opacity: 1; }
+
+/* Sidebar toggle button — lives in the body's header row, right-aligned when expanded, centered when collapsed. */
+.sidebar-body-header { display: flex; justify-content: flex-end; padding: 4px 6px; flex-shrink: 0; border-bottom: 1px solid var(--gray-100); }
+.sidebar-toggle-btn { width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border: none; background: transparent; color: var(--gray-400); font-size: 11px; cursor: pointer; border-radius: 4px; transition: all 0.15s; flex-shrink: 0; }
+.sidebar-toggle-btn:hover { background: var(--gray-100); color: var(--gray-700); }
+
+/* Collapsed body state (56px icon rail). Only the body receives the class — the logo keeps its full 180px width. */
+.sidebar-mock.sidebar-collapsed .sidebar-body-mock { width: 56px; }
+.sidebar-mock.sidebar-collapsed { width: 56px; }
+.sidebar-mock.sidebar-collapsed .sidebar-body-header { justify-content: center; padding: 4px 0; }
+.sidebar-mock.sidebar-collapsed .sidebar-section-title { display: none; }
+.sidebar-mock.sidebar-collapsed .sidebar-item { justify-content: center; padding: 9px 0; margin: 2px 8px; }
+.sidebar-mock.sidebar-collapsed .sidebar-item.active::before { display: none; }
+.sidebar-mock.sidebar-collapsed .sidebar-item i { width: auto; font-size: 16px; }
+.sidebar-mock.sidebar-collapsed .sidebar-item span,
+.sidebar-mock.sidebar-collapsed .sidebar-item .item-badge { display: none; }
+.sidebar-mock.sidebar-collapsed .sidebar-area-trigger { justify-content: center; padding: 12px 0; }
+.sidebar-mock.sidebar-collapsed .sidebar-area-trigger .area-name,
+.sidebar-mock.sidebar-collapsed .sidebar-area-trigger .caret { display: none; }
+
+/* Module launcher panel (slides in from the left when the logo-icon is clicked). */
+.launcher-panel-mock { width: 380px; background: white; border: 1px solid var(--gray-200); border-radius: 14px; box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12); overflow: hidden; }
+.launcher-panel-mock .launcher-header-mock { display: flex; justify-content: space-between; align-items: center; padding: 18px 22px 8px; }
+.launcher-panel-mock .launcher-grid-mock { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 4px 18px 14px; }
+.module-tile-mock { border: 1px solid var(--gray-200); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; background: white; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, background 0.15s ease; }
+.module-tile-mock:hover { transform: translateY(-2px); border-color: var(--primary-300, #A5B4FC); box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08); }
+.module-tile-mock.active { background: var(--primary-50, #EEF2FF); border-color: var(--primary-400); box-shadow: 0 0 0 3px rgba(79, 107, 246, 0.12); }
+.module-tile-mock .tile-icon-mock { width: 44px; height: 44px; border-radius: 12px; color: white; font-size: 18px; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(15, 23, 42, 0.12); }
+.module-tile-mock .tile-name-mock { font-size: 14px; font-weight: 600; color: var(--gray-900); }
+.module-tile-mock .tile-desc-mock { font-size: 11px; color: var(--gray-500); line-height: 1.35; }
 
 /* Header Bar */
-.header-bar { display: flex; justify-content: space-between; align-items: center; padding: 12px 24px; background: white; border-bottom: 1px solid var(--gray-200); }
+.header-bar { display: flex; justify-content: space-between; align-items: center; padding: 6px 20px; height: 44px; background: white; border-bottom: 1px solid var(--gray-200); }
 .header-breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray-400); }
 .header-breadcrumb a { color: var(--gray-500); text-decoration: none; }
 .header-breadcrumb a:hover { color: var(--primary-500); }
@@ -479,7 +559,7 @@ table.data-grid .row-checkbox { width: 18px; height: 18px; accent-color: var(--p
     <table style="width:100%; font-size:13px; border-collapse:collapse;">
       <tr style="border-bottom:1px solid var(--gray-200);"><td style="padding:10px; font-weight:600; width:200px;">Page background</td><td style="padding:10px;"><span style="display:inline-block;width:16px;height:16px;background:#F5F6FA;border:1px solid var(--gray-200);border-radius:3px;vertical-align:middle;margin-right:8px;"></span> <code class="code-inline">#F5F6FA</code></td></tr>
       <tr style="border-bottom:1px solid var(--gray-200);"><td style="padding:10px; font-weight:600;">Card / Panel background</td><td style="padding:10px;"><span style="display:inline-block;width:16px;height:16px;background:white;border:1px solid var(--gray-200);border-radius:3px;vertical-align:middle;margin-right:8px;"></span> <code class="code-inline">#FFFFFF</code></td></tr>
-      <tr style="border-bottom:1px solid var(--gray-200);"><td style="padding:10px; font-weight:600;">Sidebar background</td><td style="padding:10px;"><span style="display:inline-block;width:16px;height:16px;background:var(--sidebar-bg);border-radius:3px;vertical-align:middle;margin-right:8px;"></span> <code class="code-inline">#0F1629</code> Deep navy</td></tr>
+      <tr style="border-bottom:1px solid var(--gray-200);"><td style="padding:10px; font-weight:600;">Sidebar background</td><td style="padding:10px;"><span style="display:inline-block;width:16px;height:16px;background:var(--sidebar-bg);border-radius:3px;border:1px solid var(--gray-200);vertical-align:middle;margin-right:8px;"></span> <code class="code-inline">#F8FAFC</code> Slate-50 (light theme)</td></tr>
       <tr style="border-bottom:1px solid var(--gray-200);"><td style="padding:10px; font-weight:600;">Primary text</td><td style="padding:10px;"><span style="display:inline-block;width:16px;height:16px;background:var(--gray-900);border-radius:3px;vertical-align:middle;margin-right:8px;"></span> <code class="code-inline">Gray-900</code></td></tr>
       <tr style="border-bottom:1px solid var(--gray-200);"><td style="padding:10px; font-weight:600;">Secondary text</td><td style="padding:10px;"><span style="display:inline-block;width:16px;height:16px;background:var(--gray-500);border-radius:3px;vertical-align:middle;margin-right:8px;"></span> <code class="code-inline">Gray-500</code></td></tr>
       <tr><td style="padding:10px; font-weight:600;">Border / Divider</td><td style="padding:10px;"><span style="display:inline-block;width:16px;height:16px;background:var(--gray-200);border:1px solid var(--gray-300);border-radius:3px;vertical-align:middle;margin-right:8px;"></span> <code class="code-inline">Gray-200</code></td></tr>
@@ -510,48 +590,60 @@ table.data-grid .row-checkbox { width: 18px; height: 18px; accent-color: var(--p
   <div class="section-header">
     <div class="section-num">03</div>
     <h2>Navigation &amp; Layout</h2>
-    <p>Dark sidebar navigation with collapsible module groups. Fixed header with breadcrumbs, search, notifications, and user profile. Content area with page-level padding.</p>
+    <p><strong>Light sidebar</strong> split into two parts: a fixed <em>logo strip</em> (44px tall, always at full 180px width) and a <em>collapsible body</em> (180px ↔ 56px). The logo-icon is a <strong>module launcher</strong> button — clicking it opens a slide-in panel with tiles for every ERP module (CRM, Sales, Inventory, Planning, Procurement, Finance, HR, Reporting, Administration). Each module declares which <em>areas</em> it exposes (Home · Customers · Sales · Catalog · Approval · Configuration · Admin for the CRM module); the area-switcher at the bottom of the body lists those. The header-bar is also 44px tall so the logo and header read as a continuous top strip. When the body collapses, the logo overhangs the narrowed sidebar into the header area; the header's <code class="code-inline">padding-left: calc(20px + max(0px, 180px - var(--sidebar-width)))</code> keeps the breadcrumb clear of the overhang. Nav items use <strong>pill styling</strong> (margin 1px 8px, 6px radius) with a 3px left accent bar on active. Both the collapsed state and the active module/area persist via localStorage.</p>
   </div>
 
   <div class="layout-mock">
-    <!-- Sidebar -->
+    <!-- Sidebar: module = CRM, area = Customers, showing Customers section -->
     <div class="sidebar-mock" style="border-radius:0; height:auto; min-height:100%;">
+      <!-- Fixed logo strip (always visible, always 180px wide) -->
       <div class="sidebar-logo">
-        <div class="sidebar-logo-icon">E</div>
+        <button class="sidebar-logo-icon" title="Open module launcher"><i class="fas fa-grip"></i></button>
         <div class="sidebar-logo-text">ERP Suite</div>
       </div>
 
-      <div class="sidebar-section">
-        <div class="sidebar-section-title">Main</div>
-        <div class="sidebar-item"><i class="fas fa-th-large"></i> Dashboard</div>
-      </div>
+      <!-- Collapsible body (180px expanded / 56px collapsed) -->
+      <div class="sidebar-body-mock">
+        <div class="sidebar-body-header">
+          <button class="sidebar-toggle-btn" title="Collapse sidebar"><i class="fas fa-chevron-left"></i></button>
+        </div>
 
-      <div class="sidebar-section">
-        <div class="sidebar-section-title">CRM</div>
-        <div class="sidebar-item"><i class="fas fa-bullseye"></i> Leads <span class="item-badge">12</span></div>
-        <div class="sidebar-item active"><i class="fas fa-building"></i> Accounts</div>
-        <div class="sidebar-item"><i class="fas fa-user-tie"></i> Contacts</div>
-      </div>
+        <div class="sidebar-scroll-mock">
+          <div class="sidebar-section">
+            <div class="sidebar-section-title"><span>Customers</span><i class="fas fa-chevron-up"></i></div>
+            <div class="sidebar-item"><i class="fas fa-bullseye"></i> <span>Leads</span> <span class="item-badge">12</span></div>
+            <div class="sidebar-item active"><i class="fas fa-building"></i> <span>Accounts</span></div>
+            <div class="sidebar-item"><i class="fas fa-user-tie"></i> <span>Contacts</span></div>
+            <div class="sidebar-item"><i class="fas fa-map-marked-alt"></i> <span>Customer Addresses</span></div>
+          </div>
 
-      <div class="sidebar-section">
-        <div class="sidebar-section-title">Sales</div>
-        <div class="sidebar-item"><i class="fas fa-chart-line"></i> Opportunities <span class="item-badge">8</span></div>
-        <div class="sidebar-item"><i class="fas fa-file-invoice"></i> Quotes</div>
-        <div class="sidebar-item"><i class="fas fa-shopping-cart"></i> Orders</div>
-        <div class="sidebar-item"><i class="fas fa-file-invoice-dollar"></i> Invoices</div>
-        <div class="sidebar-item"><i class="fas fa-undo-alt"></i> Returns</div>
-      </div>
+          <div class="sidebar-section">
+            <div class="sidebar-section-title"><span>Sales</span><i class="fas fa-chevron-up"></i></div>
+            <div class="sidebar-item"><i class="fas fa-chart-line"></i> <span>Opportunities</span></div>
+            <div class="sidebar-item"><i class="fas fa-file-invoice"></i> <span>Quotes</span></div>
+            <div class="sidebar-item"><i class="fas fa-shopping-cart"></i> <span>Orders</span></div>
+            <div class="sidebar-item"><i class="fas fa-file-invoice-dollar"></i> <span>Invoices</span></div>
+          </div>
+        </div>
 
-      <div class="sidebar-section">
-        <div class="sidebar-section-title">Catalog</div>
-        <div class="sidebar-item"><i class="fas fa-boxes-stacked"></i> Items</div>
-        <div class="sidebar-item"><i class="fas fa-tags"></i> Pricelists</div>
+      <!-- Area switcher: trigger + popup menu (shown open for demonstration) -->
+      <div class="sidebar-area-wrapper">
+        <div class="sidebar-area-menu open">
+          <div class="sidebar-area-menu-header">Switch Area</div>
+          <div class="sidebar-area-menu-item"><i class="fas area-icon fa-house"></i><span class="label">Home</span><i class="fas fa-check check"></i></div>
+          <div class="sidebar-area-menu-item active"><i class="fas area-icon fa-users"></i><span class="label">Customers</span><i class="fas fa-check check"></i></div>
+          <div class="sidebar-area-menu-item"><i class="fas area-icon fa-chart-line"></i><span class="label">Sales</span><i class="fas fa-check check"></i></div>
+          <div class="sidebar-area-menu-item"><i class="fas area-icon fa-box"></i><span class="label">Catalog</span><i class="fas fa-check check"></i></div>
+          <div class="sidebar-area-menu-item"><i class="fas area-icon fa-circle-check"></i><span class="label">Approval</span><i class="fas fa-check check"></i></div>
+          <div class="sidebar-area-menu-item"><i class="fas area-icon fa-sliders"></i><span class="label">Configuration</span><i class="fas fa-check check"></i></div>
+          <div class="sidebar-area-menu-item"><i class="fas area-icon fa-gears"></i><span class="label">Admin</span><i class="fas fa-check check"></i></div>
+        </div>
+        <div class="sidebar-area-trigger open">
+          <i class="fas area-icon fa-users"></i>
+          <span class="area-name">Customers</span>
+          <i class="fas fa-chevron-up caret"></i>
+        </div>
       </div>
-
-      <div class="sidebar-section">
-        <div class="sidebar-section-title">Settings</div>
-        <div class="sidebar-item"><i class="fas fa-sitemap"></i> Organization</div>
-        <div class="sidebar-item"><i class="fas fa-shield-halved"></i> Security</div>
       </div>
     </div>
 
@@ -560,7 +652,7 @@ table.data-grid .row-checkbox { width: 18px; height: 18px; accent-color: var(--p
       <!-- Header -->
       <div class="header-bar">
         <div class="header-breadcrumb">
-          <a href="#">CRM</a>
+          <a href="#">Customers</a>
           <i class="fas fa-chevron-right separator"></i>
           <span class="current">Accounts</span>
         </div>
@@ -578,32 +670,32 @@ table.data-grid .row-checkbox { width: 18px; height: 18px; accent-color: var(--p
       <!-- Content -->
       <div class="layout-content">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-          <h2 style="font-size:22px; font-weight:700;">Accounts</h2>
-          <button class="btn btn-primary"><i class="fas fa-plus"></i> New Account</button>
+          <h2 style="font-size:22px; font-weight:700;">Orders</h2>
+          <button class="btn btn-primary"><i class="fas fa-plus"></i> New Order</button>
         </div>
 
         <!-- Stats Row -->
         <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:20px;">
           <div class="stat-card">
-            <div class="stat-card-header"><div class="stat-card-icon" style="background:var(--primary-50); color:var(--primary-500);"><i class="fas fa-building"></i></div></div>
+            <div class="stat-card-header"><div class="stat-card-icon" style="background:var(--primary-50); color:var(--primary-500);"><i class="fas fa-shopping-cart"></i></div></div>
             <div class="stat-card-value">1,284</div>
-            <div class="stat-card-label">Total Accounts</div>
+            <div class="stat-card-label">Total Orders</div>
             <div class="stat-card-change up"><i class="fas fa-arrow-up" style="font-size:10px;"></i> 12% this month</div>
           </div>
           <div class="stat-card">
             <div class="stat-card-header"><div class="stat-card-icon" style="background:var(--secondary-50); color:var(--secondary-500);"><i class="fas fa-check-circle"></i></div></div>
-            <div class="stat-card-value">1,156</div>
-            <div class="stat-card-label">Active</div>
+            <div class="stat-card-value">892</div>
+            <div class="stat-card-label">Confirmed</div>
           </div>
           <div class="stat-card">
-            <div class="stat-card-header"><div class="stat-card-icon" style="background:var(--warning-50); color:var(--warning-500);"><i class="fas fa-pause-circle"></i></div></div>
-            <div class="stat-card-value">128</div>
-            <div class="stat-card-label">Suspended</div>
+            <div class="stat-card-header"><div class="stat-card-icon" style="background:var(--warning-50); color:var(--warning-500);"><i class="fas fa-hourglass-half"></i></div></div>
+            <div class="stat-card-value">264</div>
+            <div class="stat-card-label">Pending Approval</div>
           </div>
           <div class="stat-card">
             <div class="stat-card-header"><div class="stat-card-icon" style="background:var(--accent-50); color:var(--accent-500);"><i class="fas fa-dollar-sign"></i></div></div>
             <div class="stat-card-value" style="font-size:22px;">SAR 4.2M</div>
-            <div class="stat-card-label">Total Revenue</div>
+            <div class="stat-card-label">Order Value</div>
             <div class="stat-card-change up"><i class="fas fa-arrow-up" style="font-size:10px;"></i> 8% vs last quarter</div>
           </div>
         </div>
@@ -612,7 +704,7 @@ table.data-grid .row-checkbox { width: 18px; height: 18px; accent-color: var(--p
         <div class="grid-container" style="font-size:12px;">
           <div class="grid-toolbar" style="padding:10px 14px;">
             <div class="grid-toolbar-left">
-              <div class="grid-search"><i class="fas fa-search"></i><input placeholder="Search accounts..." style="width:180px; font-size:12px; padding:6px 10px 6px 28px;"></div>
+              <div class="grid-search"><i class="fas fa-search"></i><input placeholder="Search orders..." style="width:180px; font-size:12px; padding:6px 10px 6px 28px;"></div>
             </div>
             <div class="grid-toolbar-right">
               <button class="grid-filter-btn" style="padding:6px 10px; font-size:12px;"><i class="fas fa-filter"></i> Filter</button>
@@ -620,14 +712,107 @@ table.data-grid .row-checkbox { width: 18px; height: 18px; accent-color: var(--p
             </div>
           </div>
           <table class="data-grid" style="font-size:11px;">
-            <thead><tr><th style="padding:8px 10px; font-size:10px;">Code</th><th style="padding:8px 10px; font-size:10px;">Name</th><th style="padding:8px 10px; font-size:10px;">Type</th><th style="padding:8px 10px; font-size:10px;">Status</th></tr></thead>
+            <thead><tr><th style="padding:8px 10px; font-size:10px;">Code</th><th style="padding:8px 10px; font-size:10px;">Account</th><th style="padding:8px 10px; font-size:10px;">Total</th><th style="padding:8px 10px; font-size:10px;">Status</th></tr></thead>
             <tbody>
-              <tr><td style="padding:6px 10px;" class="cell-code">ACC-001</td><td style="padding:6px 10px;"><span class="cell-link">Acme Corp</span></td><td style="padding:6px 10px;">Enterprise</td><td style="padding:6px 10px;"><span class="badge badge-active" style="font-size:10px; padding:1px 6px;"><span class="badge-dot"></span>Active</span></td></tr>
-              <tr><td style="padding:6px 10px;" class="cell-code">ACC-002</td><td style="padding:6px 10px;"><span class="cell-link">GlobalTech</span></td><td style="padding:6px 10px;">SME</td><td style="padding:6px 10px;"><span class="badge badge-active" style="font-size:10px; padding:1px 6px;"><span class="badge-dot"></span>Active</span></td></tr>
+              <tr><td style="padding:6px 10px;" class="cell-code">SO-001</td><td style="padding:6px 10px;"><span class="cell-link">Acme Corp</span></td><td style="padding:6px 10px;">SAR 48,200</td><td style="padding:6px 10px;"><span class="badge badge-active" style="font-size:10px; padding:1px 6px;"><span class="badge-dot"></span>Confirmed</span></td></tr>
+              <tr><td style="padding:6px 10px;" class="cell-code">SO-002</td><td style="padding:6px 10px;"><span class="cell-link">GlobalTech</span></td><td style="padding:6px 10px;">SAR 21,750</td><td style="padding:6px 10px;"><span class="badge badge-active" style="font-size:10px; padding:1px 6px;"><span class="badge-dot"></span>Invoiced</span></td></tr>
             </tbody>
           </table>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Collapsed sidebar preview -->
+  <h3 style="margin-top:32px;">Collapsed Sidebar (Icons-Only Rail)</h3>
+  <p class="text-sm text-muted mb-4">The collapse class is applied <strong>only to the body</strong>. The logo strip keeps its full 180px width and overhangs the narrowed body (56px), floating into the header row above the main content. The toggle button lives inside the body header. Hover over icons to see tooltips.</p>
+  <div style="display:flex; gap:24px; align-items:flex-start;">
+    <!-- Collapsed sidebar -->
+    <div class="sidebar-mock sidebar-collapsed" style="height:420px; flex-shrink:0;">
+      <div class="sidebar-logo">
+        <button class="sidebar-logo-icon" title="Open module launcher"><i class="fas fa-grip"></i></button>
+        <div class="sidebar-logo-text">ERP Suite</div>
+      </div>
+      <div class="sidebar-body-mock">
+        <div class="sidebar-body-header">
+          <button class="sidebar-toggle-btn" title="Expand sidebar"><i class="fas fa-chevron-right"></i></button>
+        </div>
+        <div class="sidebar-scroll-mock">
+          <div class="sidebar-section">
+            <div class="sidebar-item" title="Leads"><i class="fas fa-bullseye"></i></div>
+            <div class="sidebar-item active" title="Accounts"><i class="fas fa-building"></i></div>
+            <div class="sidebar-item" title="Contacts"><i class="fas fa-user-tie"></i></div>
+            <div class="sidebar-item" title="Customer Addresses"><i class="fas fa-map-marked-alt"></i></div>
+          </div>
+          <div class="sidebar-section">
+            <div class="sidebar-item" title="Opportunities"><i class="fas fa-chart-line"></i></div>
+            <div class="sidebar-item" title="Quotes"><i class="fas fa-file-invoice"></i></div>
+            <div class="sidebar-item" title="Orders"><i class="fas fa-shopping-cart"></i></div>
+            <div class="sidebar-item" title="Invoices"><i class="fas fa-file-invoice-dollar"></i></div>
+          </div>
+        </div>
+        <div class="sidebar-area-wrapper">
+          <div class="sidebar-area-trigger" title="Customers">
+            <i class="fas area-icon fa-users"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Description -->
+    <div style="padding:16px 0; font-size:13px; color:var(--gray-500); max-width:380px;">
+      <strong style="color:var(--gray-700);">Collapsed state behavior:</strong>
+      <ul style="margin:8px 0 0 16px; padding:0; line-height:1.8;">
+        <li>Body shrinks from <code style="background:var(--gray-100); padding:1px 4px; border-radius:3px;">180px</code> to <code style="background:var(--gray-100); padding:1px 4px; border-radius:3px;">56px</code>; the logo stays at its full 180px width and overhangs the narrow body into the header row</li>
+        <li>Header breadcrumb padding adjusts automatically via <code style="background:var(--gray-100); padding:1px 4px; border-radius:3px;">calc(20px + max(0px, 180px - var(--sidebar-width)))</code></li>
+        <li>Section titles hide; nav items show centered icons only (pill styling reduces to a centered icon)</li>
+        <li>Hover on any icon → native title tooltip with the label</li>
+        <li>Area trigger shows only its icon</li>
+        <li>Area menu popup opens at full width (overlays content)</li>
+        <li>Main content's <code style="background:var(--gray-100); padding:1px 4px; border-radius:3px;">margin-left</code> tracks via the <code style="background:var(--gray-100); padding:1px 4px; border-radius:3px;">--sidebar-width</code> CSS var</li>
+        <li>Both collapsed state and active module/area persist in localStorage</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Module Launcher preview -->
+  <h3 style="margin-top:32px;">Module Launcher</h3>
+  <p class="text-sm text-muted mb-4">Clicking the gradient grip icon in the logo strip opens a slide-in panel listing every ERP module. Each <code class="code-inline">AppModule</code> declares its own <code class="code-inline">areaIds</code> — selecting a module re-scopes the sidebar's area-switcher to that module's areas. Only <strong>CRM</strong> is implemented today; other modules render a "Soon" badge and are disabled.</p>
+  <div class="launcher-panel-mock" style="max-width:480px;">
+    <div class="launcher-header-mock">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div style="width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg, var(--primary-400), var(--primary-600)); color:white; display:inline-flex; align-items:center; justify-content:center; font-size:14px; box-shadow:0 2px 6px rgba(79,107,246,0.25);"><i class="fas fa-grip"></i></div>
+        <h2 style="margin:0; font-size:18px; font-weight:700; color:var(--gray-900);">Modules</h2>
+      </div>
+      <button style="width:32px; height:32px; border:none; background:transparent; color:var(--gray-400); font-size:14px; cursor:pointer; border-radius:8px;"><i class="fas fa-times"></i></button>
+    </div>
+    <p style="margin:0 22px 14px; font-size:12px; color:var(--gray-500); line-height:1.4;">Switch between ERP modules. Each module opens with its own navigation.</p>
+    <div class="launcher-grid-mock">
+      <div class="module-tile-mock active">
+        <div class="tile-icon-mock" style="background:linear-gradient(135deg,#6366F1,#4338CA);"><i class="fas fa-users"></i></div>
+        <div class="tile-name-mock">CRM <i class="fas fa-circle-check" style="color:var(--primary-500); font-size:12px; margin-left:4px;"></i></div>
+        <div class="tile-desc-mock">Leads, accounts, contacts, opportunities</div>
+      </div>
+      <div class="module-tile-mock" style="opacity:0.65; cursor:not-allowed; position:relative;">
+        <span style="position:absolute; top:10px; right:10px; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; padding:2px 7px; border-radius:10px; background:var(--gray-100); color:var(--gray-500);">Soon</span>
+        <div class="tile-icon-mock" style="background:linear-gradient(135deg,#10B981,#047857); filter:saturate(0.6);"><i class="fas fa-chart-line"></i></div>
+        <div class="tile-name-mock">Sales</div>
+        <div class="tile-desc-mock">Quotations, orders, invoicing</div>
+      </div>
+      <div class="module-tile-mock" style="opacity:0.65; cursor:not-allowed; position:relative;">
+        <span style="position:absolute; top:10px; right:10px; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; padding:2px 7px; border-radius:10px; background:var(--gray-100); color:var(--gray-500);">Soon</span>
+        <div class="tile-icon-mock" style="background:linear-gradient(135deg,#F59E0B,#B45309); filter:saturate(0.6);"><i class="fas fa-boxes-stacked"></i></div>
+        <div class="tile-name-mock">Inventory</div>
+        <div class="tile-desc-mock">Stock, warehouses, transfers</div>
+      </div>
+      <div class="module-tile-mock" style="opacity:0.65; cursor:not-allowed; position:relative;">
+        <span style="position:absolute; top:10px; right:10px; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; padding:2px 7px; border-radius:10px; background:var(--gray-100); color:var(--gray-500);">Soon</span>
+        <div class="tile-icon-mock" style="background:linear-gradient(135deg,#64748B,#334155); filter:saturate(0.6);"><i class="fas fa-user-shield"></i></div>
+        <div class="tile-name-mock">Administration</div>
+        <div class="tile-desc-mock">Users, roles, system settings</div>
+      </div>
+    </div>
+    <div style="padding:10px 22px 16px; font-size:11px; color:var(--gray-400); border-top:1px solid var(--gray-100); display:flex; justify-content:space-between; align-items:center;">
+      <span>CRM · 7 areas</span>
     </div>
   </div>
 </div>
@@ -1073,7 +1258,7 @@ table.data-grid .row-checkbox { width: 18px; height: 18px; accent-color: var(--p
   <div class="section-header">
     <div class="section-num">07</div>
     <h2>Main Data Grid</h2>
-    <p>The primary list view for all entities. Features: sortable columns, row selection, inline status badges, search, filter panel, column-specific formatting, pagination, and bulk actions.</p>
+    <p>The primary list view for every entity in the system &mdash; one shared <code>&lt;app-entity-list&gt;</code> component, no per-feature templates. Rows <strong>open on double-click</strong>; there is <strong>no Actions column</strong>. The same grid carries selection, sorting, server-side filtering, audit-column auto-append, search, and pagination.</p>
   </div>
 
   <div class="grid-container">
@@ -1083,91 +1268,98 @@ table.data-grid .row-checkbox { width: 18px; height: 18px; accent-color: var(--p
           <i class="fas fa-search"></i>
           <input placeholder="Search opportunities...">
         </div>
-        <button class="grid-filter-btn"><i class="fas fa-filter"></i> Filters <span style="background:var(--primary-500); color:white; padding:1px 6px; border-radius:8px; font-size:10px; margin-left:4px;">2</span></button>
-        <button class="grid-filter-btn"><i class="fas fa-columns"></i> Columns</button>
+        <span class="grid-selection-pill"><i class="fas fa-check-circle"></i> 2 selected <button>Clear</button></span>
       </div>
       <div class="grid-toolbar-right">
-        <button class="grid-filter-btn"><i class="fas fa-file-export"></i> Export</button>
-        <button class="grid-filter-btn"><i class="fas fa-file-import"></i> Import</button>
         <button class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> New Opportunity</button>
       </div>
+    </div>
+
+    <!-- Active filter chips dock under the toolbar when filters exist. -->
+    <div class="grid-filter-chips">
+      <span class="filter-chip"><strong>Status</strong> <span style="color:var(--primary-600);">Equals</span> <span class="filter-chip-mono">InProgress</span> <button>&times;</button></span>
+      <span class="filter-chip"><strong>Est. Revenue</strong> <span style="color:var(--primary-600);">Between</span> <span class="filter-chip-mono">100,000 &ndash; 500,000</span> <button>&times;</button></span>
+      <button class="clear-all">Clear all</button>
     </div>
 
     <table class="data-grid">
       <thead>
         <tr>
-          <th style="width:40px;"><input type="checkbox" class="row-checkbox"></th>
-          <th class="sorted">Code <i class="fas fa-sort-up sort-icon"></i></th>
-          <th>Title</th>
-          <th>Account</th>
-          <th>Status</th>
-          <th>Est. Revenue</th>
-          <th>Probability</th>
-          <th>Close Date</th>
-          <th>Owner</th>
-          <th style="width:80px;">Actions</th>
+          <th style="width:36px; text-align:center;"><input type="checkbox" class="row-checkbox" style="vertical-align:middle;"></th>
+          <th class="sorted" style="width:120px;">Code <i class="fas fa-sort-up sort-icon"></i></th>
+          <th>Title <i class="fas fa-sort sort-icon"></i> <i class="fas fa-filter filter-icon"></i></th>
+          <th>Account <i class="fas fa-sort sort-icon"></i> <i class="fas fa-filter filter-icon"></i></th>
+          <th>Status <i class="fas fa-sort sort-icon"></i> <i class="fas fa-filter filter-icon active"></i></th>
+          <th style="text-align:right;">Est. Revenue <i class="fas fa-sort sort-icon"></i> <i class="fas fa-filter filter-icon active"></i></th>
+          <th style="text-align:right;">Probability <i class="fas fa-sort sort-icon"></i></th>
+          <th>Close Date <i class="fas fa-sort sort-icon"></i></th>
+          <th>Owner <i class="fas fa-sort sort-icon"></i></th>
+          <th>Created On <i class="fas fa-sort sort-icon"></i></th>
+          <th>Created By</th>
+          <th>Modified By</th>
+          <th>Modified On <i class="fas fa-sort sort-icon"></i></th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td><input type="checkbox" class="row-checkbox"></td>
+        <tr class="selected">
+          <td style="text-align:center;"><input type="checkbox" class="row-checkbox" checked style="vertical-align:middle;"></td>
           <td class="cell-code">OPP-000142</td>
-          <td><a class="cell-link">Cloud Migration Project</a></td>
+          <td>Cloud Migration Project</td>
           <td>Acme Corporation</td>
           <td><span class="badge badge-info"><span class="badge-dot"></span> In Progress</span></td>
           <td class="cell-money">SAR 125,000.00</td>
-          <td>75%</td>
+          <td style="text-align:right; font-family:'JetBrains Mono',monospace;">75%</td>
           <td class="cell-date">Jun 30, 2026</td>
           <td>Ahmed H.</td>
-          <td class="cell-actions">
-            <button class="btn btn-secondary btn-icon btn-sm" title="Edit"><i class="fas fa-pen" style="font-size:11px;"></i></button>
-            <button class="btn btn-secondary btn-icon btn-sm" title="More"><i class="fas fa-ellipsis-v" style="font-size:11px;"></i></button>
-          </td>
+          <td class="cell-date">Apr 6, 2026, 3:45 PM</td>
+          <td>Sara M.</td>
+          <td>Ahmed H.</td>
+          <td class="cell-date">Apr 18, 2026, 10:12 AM</td>
         </tr>
         <tr>
-          <td><input type="checkbox" class="row-checkbox"></td>
+          <td style="text-align:center;"><input type="checkbox" class="row-checkbox" style="vertical-align:middle;"></td>
           <td class="cell-code">OPP-000141</td>
-          <td><a class="cell-link">ERP Implementation Phase 2</a></td>
+          <td>ERP Implementation Phase 2</td>
           <td>GlobalTech Solutions</td>
-          <td><span class="badge badge-active"><span class="badge-dot"></span> Won</span></td>
+          <td><span class="badge badge-info"><span class="badge-dot"></span> In Progress</span></td>
           <td class="cell-money">SAR 450,000.00</td>
-          <td>100%</td>
+          <td style="text-align:right; font-family:'JetBrains Mono',monospace;">100%</td>
           <td class="cell-date">May 15, 2026</td>
           <td>Sara M.</td>
-          <td class="cell-actions">
-            <button class="btn btn-secondary btn-icon btn-sm" title="View"><i class="fas fa-eye" style="font-size:11px;"></i></button>
-            <button class="btn btn-secondary btn-icon btn-sm" title="More"><i class="fas fa-ellipsis-v" style="font-size:11px;"></i></button>
-          </td>
+          <td class="cell-date">Apr 2, 2026, 11:20 AM</td>
+          <td>Omar K.</td>
+          <td>Sara M.</td>
+          <td class="cell-date">Apr 15, 2026, 2:08 PM</td>
         </tr>
-        <tr>
-          <td><input type="checkbox" class="row-checkbox"></td>
+        <tr class="selected">
+          <td style="text-align:center;"><input type="checkbox" class="row-checkbox" checked style="vertical-align:middle;"></td>
           <td class="cell-code">OPP-000140</td>
-          <td><a class="cell-link">Data Analytics Platform</a></td>
+          <td>Data Analytics Platform</td>
           <td>TechVision Inc.</td>
-          <td><span class="badge badge-danger"><span class="badge-dot"></span> Lost</span></td>
-          <td class="cell-money">SAR 85,000.00</td>
-          <td>0%</td>
+          <td><span class="badge badge-info"><span class="badge-dot"></span> In Progress</span></td>
+          <td class="cell-money">SAR 185,000.00</td>
+          <td style="text-align:right; font-family:'JetBrains Mono',monospace;">40%</td>
           <td class="cell-date">Apr 20, 2026</td>
           <td>Omar K.</td>
-          <td class="cell-actions">
-            <button class="btn btn-secondary btn-icon btn-sm" title="View"><i class="fas fa-eye" style="font-size:11px;"></i></button>
-            <button class="btn btn-secondary btn-icon btn-sm" title="More"><i class="fas fa-ellipsis-v" style="font-size:11px;"></i></button>
-          </td>
+          <td class="cell-date">Mar 28, 2026, 9:05 AM</td>
+          <td>Ahmed H.</td>
+          <td>Omar K.</td>
+          <td class="cell-date">Apr 14, 2026, 5:30 PM</td>
         </tr>
         <tr>
-          <td><input type="checkbox" class="row-checkbox"></td>
+          <td style="text-align:center;"><input type="checkbox" class="row-checkbox" style="vertical-align:middle;"></td>
           <td class="cell-code">OPP-000139</td>
-          <td><a class="cell-link">Security Infrastructure Upgrade</a></td>
+          <td>Security Infrastructure Upgrade</td>
           <td>SafeNet Corp</td>
           <td><span class="badge badge-info"><span class="badge-dot"></span> In Progress</span></td>
           <td class="cell-money">SAR 210,000.00</td>
-          <td>40%</td>
+          <td style="text-align:right; font-family:'JetBrains Mono',monospace;">55%</td>
           <td class="cell-date">Aug 15, 2026</td>
           <td>Ahmed H.</td>
-          <td class="cell-actions">
-            <button class="btn btn-secondary btn-icon btn-sm" title="Edit"><i class="fas fa-pen" style="font-size:11px;"></i></button>
-            <button class="btn btn-secondary btn-icon btn-sm" title="More"><i class="fas fa-ellipsis-v" style="font-size:11px;"></i></button>
-          </td>
+          <td class="cell-date">Mar 22, 2026, 1:42 PM</td>
+          <td>Sara M.</td>
+          <td>Ahmed H.</td>
+          <td class="cell-date">Apr 12, 2026, 10:55 AM</td>
         </tr>
       </tbody>
     </table>
@@ -1185,6 +1377,267 @@ table.data-grid .row-checkbox { width: 18px; height: 18px; accent-color: var(--p
       </div>
     </div>
   </div>
+
+  <!-- ===== 7A-SPEC. DATA GRID FEATURE MAP ===== -->
+  <h3 style="margin-top:32px;">Feature Map</h3>
+  <p style="font-size:13px; color:var(--gray-500); margin-bottom:16px;">Everything the shared grid does, and the inputs that toggle each piece.</p>
+
+  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:16px;">
+
+    <div class="spec-card" style="background:white; border:1px solid var(--gray-200); border-radius:var(--radius-md); padding:14px 16px;">
+      <h4 style="font-size:13px; font-weight:600; color:var(--gray-700); margin:0 0 8px; display:flex; align-items:center; gap:6px;"><i class="fas fa-mouse-pointer" style="color:var(--primary-500);"></i> Row interaction</h4>
+      <ul style="font-size:12px; color:var(--gray-600); line-height:1.6; padding-left:18px; margin:0;">
+        <li><strong>No Actions column</strong> &mdash; no pencil / eye / ellipsis buttons anywhere.</li>
+        <li><strong>Double-click</strong> a row to open it &mdash; routes to <code>[detailRoute, row.id]</code> normally, or emits <code>(onView)</code> when <code>[viewMode]="true"</code>.</li>
+        <li>Rows carry <code>cursor: pointer; user-select: none</code> so they read as clickable and the double-click doesn't leave a text selection.</li>
+      </ul>
+    </div>
+
+    <div class="spec-card" style="background:white; border:1px solid var(--gray-200); border-radius:var(--radius-md); padding:14px 16px;">
+      <h4 style="font-size:13px; font-weight:600; color:var(--gray-700); margin:0 0 8px; display:flex; align-items:center; gap:6px;"><i class="fas fa-check-square" style="color:var(--primary-500);"></i> Row selection</h4>
+      <ul style="font-size:12px; color:var(--gray-600); line-height:1.6; padding-left:18px; margin:0;">
+        <li>Leftmost checkbox column &mdash; on by default (<code>[selectable]="true"</code>).</li>
+        <li>Header checkbox selects / deselects <strong>all rows on the current page</strong> (indeterminate when partial).</li>
+        <li><strong>Shift-click</strong> on a row checkbox for range selection.</li>
+        <li>Selections persist across page / sort / filter changes (keyed by <code>row.id</code> in a Map).</li>
+        <li>"<code>N selected &middot; Clear</code>" pill appears in the toolbar when &gt; 0 rows are selected.</li>
+        <li><code>(selectionChange)</code> emits the selected row objects; <code>clearSelection()</code> exposed via <code>@ViewChild</code>.</li>
+      </ul>
+    </div>
+
+    <div class="spec-card" style="background:white; border:1px solid var(--gray-200); border-radius:var(--radius-md); padding:14px 16px;">
+      <h4 style="font-size:13px; font-weight:600; color:var(--gray-700); margin:0 0 8px; display:flex; align-items:center; gap:6px;"><i class="fas fa-sort-amount-down" style="color:var(--primary-500);"></i> Sorting</h4>
+      <ul style="font-size:12px; color:var(--gray-600); line-height:1.6; padding-left:18px; margin:0;">
+        <li>All columns sortable by default (<code>col.sortable !== false</code>).</li>
+        <li>Click a header &rarr; sends <code>sortBy</code> / <code>sortDir</code> to the backend via <code>ApplySort</code>, then the page is re-sorted client-side for uniform edge-case handling.</li>
+        <li>Dotted nav-prop paths via <code>sortField: 'Account.AccountName'</code> &mdash; server walks the path by reflection.</li>
+        <li><strong>Null ordering (server + client agreement):</strong> nulls always sort to the <strong>end</strong>, regardless of direction. Server emits a two-step <code>ORDER BY CASE WHEN NULL &hellip; , col</code>; client wraps every comparator in <code>withNullHandling</code>.</li>
+      </ul>
+    </div>
+
+    <div class="spec-card" style="background:white; border:1px solid var(--gray-200); border-radius:var(--radius-md); padding:14px 16px;">
+      <h4 style="font-size:13px; font-weight:600; color:var(--gray-700); margin:0 0 8px; display:flex; align-items:center; gap:6px;"><i class="fas fa-filter" style="color:var(--primary-500);"></i> Filtering</h4>
+      <ul style="font-size:12px; color:var(--gray-600); line-height:1.6; padding-left:18px; margin:0;">
+        <li>Per-column filter icon in the header &mdash; highlighted when a filter is active.</li>
+        <li>Popover uses <code>position: fixed</code> + <code>getBoundingClientRect()</code> to escape the table's <code>overflow: auto</code> container, viewport-clamped so it never extends past the scrollbar.</li>
+        <li>Active filters show as chips below the toolbar with <code>&times;</code> remove and "Clear all".</li>
+        <li><strong>Server-side by default</strong> (<code>filterMode: 'client'</code>): <code>FilterDescriptor[]</code> serialised as JSON in <code>ListQueryParams.Filter</code>, applied before <code>CountAsync + Skip + Take</code> so pagination reflects the globally-filtered set.</li>
+        <li>Operator list driven by <code>OPERATOR_CONFIG[columnType]</code>; value widget by <code>WIDGET_REGISTRY[columnType]</code>. No per-type branches in the popover.</li>
+      </ul>
+    </div>
+
+    <div class="spec-card" style="background:white; border:1px solid var(--gray-200); border-radius:var(--radius-md); padding:14px 16px;">
+      <h4 style="font-size:13px; font-weight:600; color:var(--gray-700); margin:0 0 8px; display:flex; align-items:center; gap:6px;"><i class="fas fa-shield-halved" style="color:var(--primary-500);"></i> Audit columns (auto-appended)</h4>
+      <ul style="font-size:12px; color:var(--gray-600); line-height:1.6; padding-left:18px; margin:0;">
+        <li>Every grid automatically appends: <strong>Owner &middot; Created On &middot; Created By &middot; Modified By &middot; Modified On</strong>.</li>
+        <li>Feature components <strong>should not</strong> manually re-add these &mdash; they'll duplicate.</li>
+        <li>Defined once in <code>AUDIT_COLUMNS</code> and spliced in by the <code>columns</code> setter.</li>
+        <li>Opt-out with <code>[hideAuditColumns]="true"</code> for grids that don't read BaseEntity-shaped rows.</li>
+        <li>Timestamp columns use <code>type: 'dateTime'</code> &mdash; formatted as <code>Apr 6, 2026, 3:45 PM</code> via <code>UserDatePipe</code> in the viewer's profile timezone.</li>
+      </ul>
+    </div>
+
+    <div class="spec-card" style="background:white; border:1px solid var(--gray-200); border-radius:var(--radius-md); padding:14px 16px;">
+      <h4 style="font-size:13px; font-weight:600; color:var(--gray-700); margin:0 0 8px; display:flex; align-items:center; gap:6px;"><i class="fas fa-magnifying-glass" style="color:var(--primary-500);"></i> Search &amp; toolbar</h4>
+      <ul style="font-size:12px; color:var(--gray-600); line-height:1.6; padding-left:18px; margin:0;">
+        <li>Toolbar-left: search input + the "N selected &middot; Clear" pill when rows are selected.</li>
+        <li>Toolbar-right: "New {entity}" button. Hidden via <code>[showCreate]="false"</code> (used by the six top-level activity grids, since activities are created inside the regarding entity).</li>
+        <li>Search is case-insensitive, sent to the backend as <code>ListQueryParams.Search</code>, applied as <code>WHERE Name ILIKE ... OR Code ILIKE ...</code>.</li>
+        <li>Toolbar buttons use a scoped compact override (<code>4px 10px</code>, font 12) so the global <code>btn-erp-sm</code> elsewhere keeps its regular size.</li>
+      </ul>
+    </div>
+
+    <div class="spec-card" style="background:white; border:1px solid var(--gray-200); border-radius:var(--radius-md); padding:14px 16px;">
+      <h4 style="font-size:13px; font-weight:600; color:var(--gray-700); margin:0 0 8px; display:flex; align-items:center; gap:6px;"><i class="fas fa-list-ol" style="color:var(--primary-500);"></i> Pagination &amp; layout</h4>
+      <ul style="font-size:12px; color:var(--gray-600); line-height:1.6; padding-left:18px; margin:0;">
+        <li>Footer padded <code>8/14</code>, page buttons <strong>26&times;26</strong>.</li>
+        <li>Page resets to 1 whenever filters, search, or sort change.</li>
+        <li>Table fills remaining viewport height with scrollable body, <strong>sticky headers</strong>, and horizontal scroll when columns exceed width.</li>
+        <li>Compact baseline: body cells <code>6px 14px</code>, line-height <code>1.35</code>; header cells <code>8px 14px</code>, font 11.</li>
+      </ul>
+    </div>
+
+    <div class="spec-card" style="background:white; border:1px solid var(--gray-200); border-radius:var(--radius-md); padding:14px 16px;">
+      <h4 style="font-size:13px; font-weight:600; color:var(--gray-700); margin:0 0 8px; display:flex; align-items:center; gap:6px;"><i class="fas fa-wand-magic-sparkles" style="color:var(--primary-500);"></i> Column types &amp; auto-detection</h4>
+      <ul style="font-size:12px; color:var(--gray-600); line-height:1.6; padding-left:18px; margin:0;">
+        <li>Visual types: <code>text</code>, <code>code</code>, <code>link</code>, <code>money</code>, <code>date</code>, <code>dateTime</code>, <code>status</code>, <code>boolean</code> (renders &check; / &mdash;).</li>
+        <li>Sort / filter types (12 in total): <code>string</code>, <code>number</code>, <code>money</code>, <code>date</code>, <code>dateTime</code>, <code>boolean</code>, <code>reference</code>, <code>phone</code>, <code>email</code>, <code>enum</code>, <code>percentage</code>, <code>status</code>.</li>
+        <li><strong>Auto-type-detection</strong>: columns without an explicit <code>type</code> / <code>sortType</code> / <code>filterType</code> peek at the first non-null cell value. <code>typeof v === 'number'</code> &rarr; <code>number</code>; <code>typeof v === 'boolean'</code> &rarr; <code>boolean</code>; otherwise <code>string</code>.</li>
+        <li>Enum / reference filters auto-populate their dropdown from the backend's <code>/filter-options?path={dottedPath}</code> endpoint (distinct values across <strong>all pages</strong>, not just the current one).</li>
+      </ul>
+    </div>
+
+    <div class="spec-card" style="background:white; border:1px solid var(--gray-200); border-radius:var(--radius-md); padding:14px 16px;">
+      <h4 style="font-size:13px; font-weight:600; color:var(--gray-700); margin:0 0 8px; display:flex; align-items:center; gap:6px;"><i class="fas fa-sliders" style="color:var(--primary-500);"></i> Key inputs</h4>
+      <ul style="font-size:12px; color:var(--gray-600); line-height:1.6; padding-left:18px; margin:0;">
+        <li><code>[columns]</code> &mdash; column definitions (audit columns are appended automatically by the setter).</li>
+        <li><code>[selectable]</code> (default <code>true</code>), <code>[showCreate]</code> (default <code>true</code>), <code>[viewMode]</code> (default <code>false</code>), <code>[hideAuditColumns]</code> (default <code>false</code>).</li>
+        <li><code>[filters]</code> / <code>(filterChange)</code> &mdash; controlled filter state. Signal-backed internally so the grid works both uncontrolled and controlled.</li>
+        <li><code>[filterMode]</code> &mdash; <code>'client'</code> (default) applies client filters on the page <em>and</em> sends descriptors to the backend; <code>'server'</code> skips client filtering.</li>
+        <li>Events: <code>(onCreate)</code>, <code>(onView)</code>, <code>(selectionChange)</code>, <code>(filterChange)</code>.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <h3 style="margin-top:28px;">Column Definition Quick Reference</h3>
+  <table class="data-grid" style="width:100%; margin-top:8px;">
+    <thead>
+      <tr>
+        <th>Property</th>
+        <th>Type</th>
+        <th>Purpose</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><code>field</code></td><td>string</td><td>Property on the row object to read. Dotted paths supported client-side; use <code>sortField</code> for server-side dotted sort.</td></tr>
+      <tr><td><code>header</code></td><td>string</td><td>Column header label.</td></tr>
+      <tr><td><code>type</code></td><td>enum</td><td>Visual type: <code>text</code> / <code>code</code> / <code>link</code> / <code>money</code> / <code>date</code> / <code>dateTime</code> / <code>status</code> / <code>boolean</code>. Auto-detected from cell values when omitted.</td></tr>
+      <tr><td><code>sortable</code></td><td>boolean</td><td>Defaults to <code>true</code>. Set <code>false</code> to disable click-to-sort on this column.</td></tr>
+      <tr><td><code>sortField</code></td><td>string</td><td>Dotted backend path when the sort target differs from <code>field</code> (e.g. <code>Account.AccountName</code> for a projected <code>accountName</code> column).</td></tr>
+      <tr><td><code>sortType</code> / <code>filterType</code></td><td>enum</td><td>Override the inferred sort or filter strategy (e.g. <code>phone</code> / <code>email</code> / <code>percentage</code>).</td></tr>
+      <tr><td><code>clickable</code></td><td>boolean</td><td>When <code>true</code> and <code>viewMode</code> is on, cell value renders as a clickable link emitting <code>(onView)</code>.</td></tr>
+      <tr><td><code>labels</code></td><td><code>Record&lt;string, string&gt;</code></td><td>Per-value display mapping for <code>status</code> columns (e.g. <code>Open &rarr; Scheduled</code> for meetings).</td></tr>
+      <tr><td><code>enumOptions</code> / <code>fetchOptions</code> / <code>currencySymbol</code></td><td>assorted</td><td>Filter metadata &mdash; usually unnecessary, auto-populated from <code>/filter-options</code> for enum / reference columns.</td></tr>
+      <tr><td><code>width</code></td><td>string</td><td>Fixed column width, e.g. <code>'120px'</code>. Omit to let the browser flex.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== 7B. DATA GRID — Row Selection ===== -->
+<h3>Row Selection (Checkbox Column)</h3>
+<p style="font-size:13px; color:var(--gray-500); margin-bottom:16px;">Opt-in via <code>[selectable]="true"</code> (default on). Header checkbox selects/deselects all on the current page (indeterminate when partial). Shift-click for range selection. Selections persist across sort/filter/page changes (keyed by <code>row.id</code>). "N selected &middot; Clear" pill appears in the toolbar.</p>
+<div class="showcase">
+  <table class="data-grid" style="width:100%;">
+    <thead>
+      <tr>
+        <th style="width:40px; text-align:center; padding:12px;"><input type="checkbox" style="accent-color:var(--primary-500); width:14px; height:14px; cursor:pointer;"></th>
+        <th>CODE <i class="fas fa-sort-up sort-icon" style="color:var(--primary-500);"></i></th>
+        <th>NAME</th>
+        <th>STATUS</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="selected">
+        <td style="text-align:center;"><input type="checkbox" checked style="accent-color:var(--primary-500); width:14px; height:14px; cursor:pointer;"></td>
+        <td class="cell-code">CUR-001</td>
+        <td>US Dollar</td>
+        <td><span class="badge badge-active"><span class="badge-dot"></span> Active</span></td>
+      </tr>
+      <tr>
+        <td style="text-align:center;"><input type="checkbox" style="accent-color:var(--primary-500); width:14px; height:14px; cursor:pointer;"></td>
+        <td class="cell-code">CUR-002</td>
+        <td>Euro</td>
+        <td><span class="badge badge-active"><span class="badge-dot"></span> Active</span></td>
+      </tr>
+      <tr class="selected">
+        <td style="text-align:center;"><input type="checkbox" checked style="accent-color:var(--primary-500); width:14px; height:14px; cursor:pointer;"></td>
+        <td class="cell-code">CUR-003</td>
+        <td>Saudi Riyal</td>
+        <td><span class="badge badge-inactive"><span class="badge-dot"></span> Inactive</span></td>
+      </tr>
+    </tbody>
+  </table>
+  <div style="padding:10px 16px; display:flex; gap:8px; align-items:center; font-size:12px; color:var(--primary-700); background:var(--primary-50); border-radius:0 0 var(--radius-md) var(--radius-md);">
+    <i class="fas fa-check-circle"></i> 2 selected
+    <button style="background:transparent; border:none; color:var(--primary-600); cursor:pointer; font-size:12px; text-decoration:underline; padding:0; font-family:inherit;">Clear</button>
+  </div>
+</div>
+
+<!-- ===== 7C. DATA GRID — Column Sorting ===== -->
+<h3>Column Sorting</h3>
+<p style="font-size:13px; color:var(--gray-500); margin-bottom:16px;">All columns sortable by default (<code>col.sortable !== false</code>). Click toggles ASC → DESC → ASC. Active column shows a sort arrow (▲/▼). For navigation-projected columns (e.g. <code>accountName</code>), use <code>sortField: 'Account.AccountName'</code> on the column definition — backend's <code>ApplySort</code> walks the dotted path via reflection.</p>
+<div class="showcase">
+  <table class="data-grid" style="width:100%;">
+    <thead>
+      <tr>
+        <th class="sorted">CODE <i class="fas fa-sort-up sort-icon" style="color:var(--primary-500);"></i></th>
+        <th>TITLE <i class="fas fa-sort sort-icon"></i></th>
+        <th>ACCOUNT <i class="fas fa-sort sort-icon"></i> <i class="fas fa-filter" style="font-size:10px; color:var(--gray-400); margin-left:4px;"></i></th>
+        <th>TOTAL <i class="fas fa-sort sort-icon"></i></th>
+        <th>CREATED <i class="fas fa-sort sort-icon"></i></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="cell-code">SO-000018</td><td>Project Alpha</td><td>Acme Corp</td><td class="cell-money">12,500.00</td><td class="cell-date">Apr 7, 2026</td></tr>
+      <tr><td class="cell-code">SO-000021</td><td>Bulk Order</td><td>Beta LLC</td><td class="cell-money">8,750.00</td><td class="cell-date">Apr 10, 2026</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== 7D. DATA GRID — Column Filtering ===== -->
+<h3>Column Filtering</h3>
+<p style="font-size:13px; color:var(--gray-500); margin-bottom:16px;">Each filterable column header shows a filter icon (highlighted when active). Clicking opens a popover. Active filters display as chips below the toolbar with remove &times; and "Clear all". Filters are AND-combined. Server-side filtering ensures pagination reflects the globally-filtered set.</p>
+
+<h4>Filter Popover</h4>
+<div class="showcase" style="display:flex; gap:24px; flex-wrap:wrap;">
+  <!-- String filter example -->
+  <div style="background:white; border:1px solid var(--gray-200); border-radius:var(--radius-md); box-shadow:var(--shadow-lg); min-width:280px; max-width:320px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-bottom:1px solid var(--gray-100); background:var(--gray-50); border-radius:var(--radius-md) var(--radius-md) 0 0;">
+      <span style="font-size:13px; font-weight:600; color:var(--gray-700); display:flex; align-items:center; gap:6px;"><i class="fas fa-filter" style="color:var(--primary-500);"></i> Filter <span style="font-weight:400; color:var(--gray-500);">&mdash; Title</span></span>
+      <button style="background:transparent; border:none; color:var(--gray-400); cursor:pointer; font-size:12px;">&times;</button>
+    </div>
+    <div style="padding:12px; display:flex; flex-direction:column; gap:10px;">
+      <div><label class="form-label">Condition</label><select class="form-control form-select" style="font-size:13px; padding:6px 10px;"><option>Contains</option><option>Equals</option><option>Starts with</option><option>Ends with</option><option>Is empty</option></select></div>
+      <div><label class="form-label">Value</label><input type="text" class="form-control" placeholder="Search..." value="alpha" style="font-size:13px; padding:6px 10px;"></div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:6px; padding:10px 12px; border-top:1px solid var(--gray-100); background:var(--gray-25); border-radius:0 0 var(--radius-md) var(--radius-md);">
+      <button class="btn btn-secondary btn-sm">Clear</button>
+      <button class="btn btn-primary btn-sm">Apply</button>
+    </div>
+  </div>
+
+  <!-- Enum/Status filter example -->
+  <div style="background:white; border:1px solid var(--gray-200); border-radius:var(--radius-md); box-shadow:var(--shadow-lg); min-width:280px; max-width:320px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-bottom:1px solid var(--gray-100); background:var(--gray-50); border-radius:var(--radius-md) var(--radius-md) 0 0;">
+      <span style="font-size:13px; font-weight:600; color:var(--gray-700); display:flex; align-items:center; gap:6px;"><i class="fas fa-filter" style="color:var(--primary-500);"></i> Filter <span style="font-weight:400; color:var(--gray-500);">&mdash; Status</span></span>
+      <button style="background:transparent; border:none; color:var(--gray-400); cursor:pointer; font-size:12px;">&times;</button>
+    </div>
+    <div style="padding:12px; display:flex; flex-direction:column; gap:10px;">
+      <div><label class="form-label">Condition</label><select class="form-control form-select" style="font-size:13px; padding:6px 10px;"><option>Equals</option><option>Is any of</option><option>Is empty</option></select></div>
+      <div><label class="form-label">Value</label><input type="text" class="form-control" placeholder="Search..." style="font-size:13px; padding:6px 10px; margin-bottom:4px;">
+        <ul style="list-style:none; margin:0; padding:2px 0; max-height:140px; overflow-y:auto; border:1px solid var(--gray-200); border-radius:var(--radius-sm); background:white;">
+          <li style="padding:6px 10px; cursor:pointer; font-size:13px; display:flex; align-items:center; gap:6px; background:var(--primary-50); font-weight:500;">Confirmed <i class="fas fa-check" style="margin-left:auto; font-size:11px; color:var(--primary-500);"></i></li>
+          <li style="padding:6px 10px; cursor:pointer; font-size:13px;">Invoiced</li>
+          <li style="padding:6px 10px; cursor:pointer; font-size:13px;">PendingPreparation</li>
+          <li style="padding:6px 10px; cursor:pointer; font-size:13px;">Cancelled</li>
+        </ul>
+      </div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:6px; padding:10px 12px; border-top:1px solid var(--gray-100); background:var(--gray-25); border-radius:0 0 var(--radius-md) var(--radius-md);">
+      <button class="btn btn-secondary btn-sm">Clear</button>
+      <button class="btn btn-primary btn-sm">Apply</button>
+    </div>
+  </div>
+</div>
+
+<h4>Active Filter Chips Bar</h4>
+<div class="showcase">
+  <div style="display:flex; flex-wrap:wrap; gap:6px; align-items:center; padding:8px 14px; background:var(--gray-25); border:1px solid var(--gray-200); border-radius:var(--radius-md); font-size:12px;">
+    <span style="display:inline-flex; align-items:center; gap:4px; background:var(--primary-50); color:var(--primary-700); padding:3px 8px; border-radius:12px;"><strong>Title</strong> <span style="color:var(--primary-600);">Contains</span> <span style="font-family:'JetBrains Mono',monospace; font-size:11px;">alpha</span> <button style="background:transparent; border:none; color:var(--primary-600); cursor:pointer; padding:0 0 0 4px; font-size:10px;">&times;</button></span>
+    <span style="display:inline-flex; align-items:center; gap:4px; background:var(--primary-50); color:var(--primary-700); padding:3px 8px; border-radius:12px;"><strong>Status</strong> <span style="color:var(--primary-600);">Equals</span> <span style="font-family:'JetBrains Mono',monospace; font-size:11px;">Confirmed</span> <button style="background:transparent; border:none; color:var(--primary-600); cursor:pointer; padding:0 0 0 4px; font-size:10px;">&times;</button></span>
+    <span style="display:inline-flex; align-items:center; gap:4px; background:var(--primary-50); color:var(--primary-700); padding:3px 8px; border-radius:12px;"><strong>Total</strong> <span style="color:var(--primary-600);">Between</span> <span style="font-family:'JetBrains Mono',monospace; font-size:11px;">1000 &ndash; 50000</span> <button style="background:transparent; border:none; color:var(--primary-600); cursor:pointer; padding:0 0 0 4px; font-size:10px;">&times;</button></span>
+    <button style="background:transparent; border:none; color:var(--gray-600); cursor:pointer; font-size:12px; text-decoration:underline; padding:0; margin-left:4px;">Clear all</button>
+  </div>
+</div>
+
+<h4>Filter Operator Matrix</h4>
+<div style="overflow-x:auto; margin:16px 0;">
+<table class="data-grid" style="width:100%; font-size:12px;">
+  <thead><tr><th>Column Type</th><th>Operators</th><th>Value Widget</th></tr></thead>
+  <tbody>
+    <tr><td><strong>string</strong></td><td>contains, notContains, equals, notEquals, startsWith, endsWith, isEmpty, isNotEmpty</td><td>Text input</td></tr>
+    <tr><td><strong>number / money / percentage</strong></td><td>equals, notEquals, &gt;, &ge;, &lt;, &le;, between, isEmpty, isNotEmpty</td><td>Number input (adornment for currency/%). Two inputs for "between"</td></tr>
+    <tr><td><strong>date / dateTime</strong></td><td>equals, notEquals, before, after, between, today, thisWeek, thisMonth, thisYear, isEmpty, isNotEmpty</td><td>Date picker. Shortcuts need no value input</td></tr>
+    <tr><td><strong>boolean</strong></td><td>isTrue, isFalse, isEmpty</td><td>No value input &mdash; operator alone carries intent</td></tr>
+    <tr><td><strong>enum / status</strong></td><td>equals, notEquals, isAnyOf, isEmpty, isNotEmpty</td><td>Searchable dropdown from Enum.GetNames() via /filter-options endpoint</td></tr>
+    <tr><td><strong>reference</strong></td><td>equals, notEquals, isAnyOf, isEmpty, isNotEmpty</td><td>Searchable dropdown from SELECT DISTINCT via /filter-options endpoint</td></tr>
+    <tr><td><strong>phone</strong></td><td>contains, equals, startsWith, isEmpty, isNotEmpty</td><td>Text input (digit-stripped comparison)</td></tr>
+    <tr><td><strong>email</strong></td><td>contains, equals, endsWith, isEmpty, isNotEmpty</td><td>Text input (case-insensitive)</td></tr>
+  </tbody>
+</table>
+</div>
+
 </div>
 
 <!-- ===== 8. DETAIL PAGE ===== -->
@@ -1605,9 +2058,192 @@ table.data-grid .row-checkbox { width: 18px; height: 18px; accent-color: var(--p
   </div>
 </div>
 
+<!-- ===== 14. CONFIRMATION MODAL ===== -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">14</div>
+    <h2>Confirmation Modal</h2>
+    <p>Built into <code>entity-detail</code>. Auto-triggered for Activate / Deactivate actions; opt-in for any other action via <code>ActionDef.confirm</code>. All current and future entities get it free &mdash; zero per-feature configuration.</p>
+  </div>
+
+  <h3>Visual Design</h3>
+  <div class="showcase" style="display:flex; justify-content:center;">
+    <div style="width:380px; background:white; border-radius:var(--radius-lg); box-shadow:0 12px 40px rgba(0,0,0,0.2); overflow:hidden;">
+      <div style="display:flex; justify-content:center; padding:20px 20px 0;">
+        <div style="width:48px; height:48px; border-radius:50%; background:var(--warning-50); color:var(--warning-500); display:flex; align-items:center; justify-content:center; font-size:20px;"><i class="fas fa-exclamation-triangle"></i></div>
+      </div>
+      <div style="padding:12px 24px 4px; text-align:center;">
+        <h3 style="font-size:16px; font-weight:600; color:var(--gray-800); margin:0 0 6px;">Confirm Action</h3>
+        <p style="font-size:13px; color:var(--gray-600); margin:0; line-height:1.5;">Are you sure you want to deactivate this currency?</p>
+      </div>
+      <div style="display:flex; justify-content:center; gap:8px; padding:16px 24px 20px;">
+        <button class="btn btn-secondary btn-sm" style="min-width:90px;">Cancel</button>
+        <button class="btn btn-warning btn-sm" style="min-width:90px;"><i class="fas fa-ban"></i> Deactivate</button>
+      </div>
+    </div>
+  </div>
+
+  <h3>How It Works</h3>
+  <div style="font-size:13px; color:var(--gray-600); line-height:1.8; max-width:700px;">
+    <ul style="padding-left:20px;">
+      <li><strong>Auto-confirm actions</strong>: <code>'activate'</code> and <code>'deactivate'</code> (case-insensitive) always show the modal &mdash; no <code>confirm</code> flag needed.</li>
+      <li><strong><code>ActionDef.confirm: true</code></strong> &mdash; default message: "Are you sure you want to {label} this {entityName}?"</li>
+      <li><strong><code>ActionDef.confirm: "Custom text"</code></strong> &mdash; custom message shown in the modal body.</li>
+      <li><strong>Dismiss</strong>: backdrop click, Cancel button, or Escape key.</li>
+      <li><strong>Confirm button</strong>: inherits the action's <code>class</code> (color) + <code>icon</code> + <code>label</code>.</li>
+    </ul>
+  </div>
+
+  <h3>Usage in ActionDef</h3>
+  <div class="showcase" style="background:var(--gray-800); color:var(--gray-200); font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.7; white-space:pre; overflow-x:auto; padding:20px 24px;">actions: ActionDef[] = [
+  // Auto-confirmed (action name match):
+  { label: 'Activate',   icon: 'fa-check-circle', class: 'btn-erp-success', action: 'activate',
+    condition: (e) => e?.status === 'Inactive' },
+  { label: 'Deactivate', icon: 'fa-ban',          class: 'btn-erp-warning', action: 'deactivate',
+    condition: (e) => e?.status === 'Active' },
+
+  // Explicit confirm with custom message:
+  { label: 'Cancel Order', icon: 'fa-times', class: 'btn-erp-danger', action: 'cancel',
+    confirm: 'This will permanently cancel the order. Are you sure?' },
+
+  // No confirmation (default for non-listed actions):
+  { label: 'Create Invoice', icon: 'fa-file-invoice-dollar', class: 'btn-erp-primary',
+    action: 'create-invoice' },
+];</div>
+</div>
+
+<!-- ===== 15. CENTRALIZED SORT & FILTER ARCHITECTURE ===== -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">15</div>
+    <h2>Centralized Sort &amp; Filter Architecture</h2>
+    <p>Strategy-pattern utilities that the data grid relies on. One source of truth per concern: adding a new column type never touches existing comparators or predicates.</p>
+  </div>
+
+  <h3>Pipeline</h3>
+  <div class="showcase" style="text-align:center; font-size:14px; color:var(--gray-700);">
+    <div style="display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap;">
+      <span style="background:var(--gray-100); padding:6px 14px; border-radius:var(--radius-sm); font-weight:500;">Server Response</span>
+      <i class="fas fa-arrow-right" style="color:var(--gray-400);"></i>
+      <span style="background:var(--info-50); color:var(--info-600); padding:6px 14px; border-radius:var(--radius-sm); font-weight:500;"><i class="fas fa-filter"></i> applyFilters()</span>
+      <i class="fas fa-arrow-right" style="color:var(--gray-400);"></i>
+      <span style="background:var(--accent-50); color:var(--accent-600); padding:6px 14px; border-radius:var(--radius-sm); font-weight:500;"><i class="fas fa-sort"></i> sortRows()</span>
+      <i class="fas fa-arrow-right" style="color:var(--gray-400);"></i>
+      <span style="background:var(--secondary-50); color:var(--secondary-600); padding:6px 14px; border-radius:var(--radius-sm); font-weight:500;"><i class="fas fa-table"></i> Rendered</span>
+    </div>
+    <p style="font-size:12px; color:var(--gray-400); margin-top:12px;">Mode B (entity-list): server sorts/filters globally for pagination; client re-runs both passes on the returned page for uniform edge-case handling.</p>
+  </div>
+
+  <h3>File Layout</h3>
+  <div class="showcase" style="background:var(--gray-800); color:var(--gray-300); font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.8; white-space:pre; overflow-x:auto; padding:20px 24px;">shared/utils/sorting/                   &larr; 12-type sort engine (89 tests)
+  types.ts                               ColumnType, ColumnConfig, ComparatorFn, MultiSortKey
+  parsers.ts                             parseNumber, parseMoney, parsePhone, parseDate, ...
+  with-null-handling.ts                  HOF: nulls always last, direction-aware, throw recovery
+  comparators.ts                         COMPARATOR_REGISTRY: Record&lt;ColumnType, ComparatorFn&gt;
+  sort-utils.ts                          sortRows(), sortRowsByColumn(), resolveFieldValue()
+
+shared/utils/filtering/                  &larr; 12-type filter engine (72 tests)
+  types.ts                               FilterOperator (22), FilterDescriptor, FilterPredicateFn
+  with-null-handling.ts                  HOF: isEmpty/isNotEmpty universal, null &rarr; false
+  operators.ts                           OPERATOR_CONFIG: Record&lt;ColumnType, OperatorConfig[]&gt;
+  predicates/                            One file per type + _numeric-base + _date-base + registry
+  filter-utils.ts                        applyFilters() with memoization
+
+shared/components/filter-panel/          &larr; Filter UI
+  filter-popover.component.ts            Operator &lt;select&gt; + dynamic widget via ngComponentOutlet
+  filter-chips-bar.component.ts          Active-filter chips + "Clear all"
+  widgets/                               5 shared components covering 12 types via WIDGET_REGISTRY
+
+src/ERP.Application/Common/Extensions/   &larr; Backend helpers
+  QueryableSortExtensions.cs             ApplySort&lt;T&gt;(query, p) &mdash; dotted-path reflection
+  QueryableFilterExtensions.cs           ApplyFilters&lt;T&gt;(query, p) &mdash; 22-operator Expression builder
+  QueryableDistinctOptionsExtensions.cs  GetDistinctStringsAsync&lt;T&gt;(query, path) &mdash; string + enum</div>
+
+  <h3>Adding a New Column Type</h3>
+  <div style="font-size:13px; color:var(--gray-600); line-height:1.8; max-width:700px;">
+    <ol style="padding-left:20px;">
+      <li>Add the literal to <code>ColumnType</code> union in <code>sorting/types.ts</code>.</li>
+      <li>Create <code>sorting/comparators.ts</code> &mdash; add one core comparator + one line in <code>COMPARATOR_REGISTRY</code>.</li>
+      <li>Create <code>filtering/predicates/&lt;type&gt;.predicate.ts</code> &mdash; one exported function.</li>
+      <li>Register in <code>PREDICATE_REGISTRY</code>, <code>OPERATOR_CONFIG</code>, <code>WIDGET_REGISTRY</code> &mdash; one line each.</li>
+    </ol>
+    <p style="margin-top:8px;"><strong>Zero changes</strong> to existing comparators, predicates, or the DataGrid component.</p>
+  </div>
+
+  <h3>Supported Column Types (12)</h3>
+  <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:8px; margin:16px 0;">
+    <div style="background:var(--gray-50); padding:8px 12px; border-radius:var(--radius-sm); font-size:12px; font-weight:500; font-family:'JetBrains Mono',monospace; text-align:center; border:1px solid var(--gray-200);">string</div>
+    <div style="background:var(--gray-50); padding:8px 12px; border-radius:var(--radius-sm); font-size:12px; font-weight:500; font-family:'JetBrains Mono',monospace; text-align:center; border:1px solid var(--gray-200);">number</div>
+    <div style="background:var(--gray-50); padding:8px 12px; border-radius:var(--radius-sm); font-size:12px; font-weight:500; font-family:'JetBrains Mono',monospace; text-align:center; border:1px solid var(--gray-200);">money</div>
+    <div style="background:var(--gray-50); padding:8px 12px; border-radius:var(--radius-sm); font-size:12px; font-weight:500; font-family:'JetBrains Mono',monospace; text-align:center; border:1px solid var(--gray-200);">date</div>
+    <div style="background:var(--gray-50); padding:8px 12px; border-radius:var(--radius-sm); font-size:12px; font-weight:500; font-family:'JetBrains Mono',monospace; text-align:center; border:1px solid var(--gray-200);">dateTime</div>
+    <div style="background:var(--gray-50); padding:8px 12px; border-radius:var(--radius-sm); font-size:12px; font-weight:500; font-family:'JetBrains Mono',monospace; text-align:center; border:1px solid var(--gray-200);">boolean</div>
+    <div style="background:var(--gray-50); padding:8px 12px; border-radius:var(--radius-sm); font-size:12px; font-weight:500; font-family:'JetBrains Mono',monospace; text-align:center; border:1px solid var(--gray-200);">reference</div>
+    <div style="background:var(--gray-50); padding:8px 12px; border-radius:var(--radius-sm); font-size:12px; font-weight:500; font-family:'JetBrains Mono',monospace; text-align:center; border:1px solid var(--gray-200);">phone</div>
+    <div style="background:var(--gray-50); padding:8px 12px; border-radius:var(--radius-sm); font-size:12px; font-weight:500; font-family:'JetBrains Mono',monospace; text-align:center; border:1px solid var(--gray-200);">email</div>
+    <div style="background:var(--gray-50); padding:8px 12px; border-radius:var(--radius-sm); font-size:12px; font-weight:500; font-family:'JetBrains Mono',monospace; text-align:center; border:1px solid var(--gray-200);">enum</div>
+    <div style="background:var(--gray-50); padding:8px 12px; border-radius:var(--radius-sm); font-size:12px; font-weight:500; font-family:'JetBrains Mono',monospace; text-align:center; border:1px solid var(--gray-200);">percentage</div>
+    <div style="background:var(--gray-50); padding:8px 12px; border-radius:var(--radius-sm); font-size:12px; font-weight:500; font-family:'JetBrains Mono',monospace; text-align:center; border:1px solid var(--gray-200);">status</div>
+  </div>
+
+  <h3>ColumnDef Interface (Full)</h3>
+  <div class="showcase" style="background:var(--gray-800); color:var(--gray-200); font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.7; white-space:pre; overflow-x:auto; padding:20px 24px;">export interface ColumnDef {
+  field: string;                    // flat key on row object (e.g. 'accountName')
+  header: string;                   // column header label
+  type?: 'text'|'code'|'money'|'date'|'status'|'link'|'boolean';  // visual rendering
+  sortable?: boolean;               // default true
+  sortField?: string;               // dotted backend path (e.g. 'Account.AccountName')
+  sortType?: ColumnType;            // override sort comparator type
+  filterable?: boolean;             // default true
+  filterType?: ColumnType;          // override filter predicate type
+  enumOptions?: { label: string; value: string; color?: string }[];
+  fetchOptions?: (search: string) =&gt; Promise&lt;{ label: string; value: string }[]&gt;;
+  currencySymbol?: string;          // adornment for money filter input
+  displayField?: string;            // for reference: which object property to read
+  enumOrder?: string[];             // for enum/status: priority order in sort
+  dateFormat?: 'iso'|'DD/MM/YYYY'|'MM/DD/YYYY'|'YYYY-MM-DD'|'epochMs';
+  width?: string;
+  clickable?: boolean;              // emits onView when clicked (viewMode grids)
+  labels?: Record&lt;string, string&gt;;  // display label remap (e.g. PendingPreparation -&gt; Pending)
+  confirm?: boolean | string;       // confirmation modal on action click
+}</div>
+</div>
+
+<!-- ===== 16. I18N STUB ===== -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num">16</div>
+    <h2>Internationalization (i18n) Stub</h2>
+    <p>Minimal <code>TranslateService</code> with a local key &rarr; string dictionary. Components call <code>translate('filter.operator.contains')</code>. When a real i18n library lands, swap the service implementation &mdash; no component changes.</p>
+  </div>
+  <div class="showcase" style="background:var(--gray-800); color:var(--gray-200); font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.7; white-space:pre; overflow-x:auto; padding:20px 24px;">// core/services/translate.service.ts
+@Injectable({ providedIn: 'root' })
+export class TranslateService {
+  private dict: Record&lt;string, string&gt; = {
+    'filter.operator.contains': 'Contains',
+    'filter.operator.equals': 'Equals',
+    'filter.action.apply': 'Apply',
+    'filter.action.clear': 'Clear',
+    'filter.action.clearAll': 'Clear all',
+    'filter.widget.search': 'Search...',
+    // ... 30+ keys covering all filter/action labels
+  };
+
+  translate(key: string, fallback?: string): string {
+    return this.dict[key] ?? fallback ?? key;
+  }
+  readonly t = (key: string) =&gt; this.translate(key);
+}
+
+// Usage in component templates:
+{{ t('filter.action.apply') }}          &rarr; "Apply"
+{{ t('filter.operator.between') }}      &rarr; "Between"</div>
+</div>
+
 <!-- Footer -->
 <div style="text-align:center; padding:40px 0; color:var(--gray-400); font-size:13px;">
-  ERP Design System v1.0 &mdash; April 2026<br>
+  ERP Design System v2.0 &mdash; April 2026<br>
+  <span style="font-size:11px;">Covers: Design Tokens &bull; Layout &bull; Data Grid (selection, sorting, filtering) &bull; Detail Pages &bull; Modals &bull; Sort/Filter Architecture &bull; i18n</span><br>
   <span style="font-size:11px;">Open in browser and press Ctrl+P to export as PDF</span>
 </div>
 

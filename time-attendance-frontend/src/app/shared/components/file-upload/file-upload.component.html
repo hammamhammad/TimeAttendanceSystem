@@ -21,14 +21,15 @@
 
   @if (!uploadedFile()) {
     <div class="upload-area">
-      <label class="upload-label d-flex align-items-center gap-2 p-3 border border-dashed rounded"
-             [class.border-danger]="error()">
+      <label class="app-dropzone d-block"
+             [class.is-invalid]="error()">
         @if (uploading()) {
-          <span class="spinner-border spinner-border-sm"></span>
-          <span>{{ i18n.t('files.uploading') }}</span>
+          <i class="fa-solid fa-spinner fa-spin app-dropzone__icon"></i>
+          <div class="app-dropzone__title">{{ i18n.t('files.uploading') }}</div>
         } @else {
-          <i class="fa-solid fa-cloud-upload-alt text-muted"></i>
-          <span class="text-muted">{{ displayLabel }}</span>
+          <i class="fa-solid fa-cloud-upload-alt app-dropzone__icon"></i>
+          <div class="app-dropzone__title">{{ displayLabel }}</div>
+          <div class="app-dropzone__hint">{{ accept }} &middot; {{ maxSizeMB }} MB</div>
         }
         <input type="file"
                class="d-none"
@@ -37,7 +38,10 @@
                [disabled]="uploading()">
       </label>
       @if (error()) {
-        <small class="text-danger mt-1 d-block">{{ error() }}</small>
+        <div class="form-error">
+          <i class="fa-solid fa-exclamation-circle"></i>
+          <span>{{ error() }}</span>
+        </div>
       }
     </div>
   }

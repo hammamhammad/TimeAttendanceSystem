@@ -111,7 +111,7 @@ export class LeaveEntitlementsListComponent implements OnInit {
       sortable: false,
       width: '120px',
       align: 'right',
-      priority: 'low',
+      priority: 'medium',
       hideOnMobile: true,
       mobileLabel: this.t('leaveBalance.carryOverDays')
     },
@@ -121,7 +121,7 @@ export class LeaveEntitlementsListComponent implements OnInit {
       sortable: false,
       width: '130px',
       align: 'center',
-      priority: 'low',
+      priority: 'medium',
       hideOnMobile: true,
       mobileLabel: this.t('leaveBalance.expiresAtYearEnd'),
       renderHtml: true

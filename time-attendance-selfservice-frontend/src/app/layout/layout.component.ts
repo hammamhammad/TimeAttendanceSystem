@@ -1,4 +1,4 @@
-import { Component, signal, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, signal, OnInit, OnDestroy, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet } from '@angular/router';
 import { Subject, fromEvent, takeUntil } from 'rxjs';
@@ -7,6 +7,8 @@ import { TopbarComponent } from './topbar/topbar.component';
 import { NotificationComponent } from '../core/notifications/notification.component';
 import { ConfirmationComponent } from '../core/confirmation/confirmation.component';
 import { AuthService } from '../core/auth/auth.service';
+
+const SIDENAV_STORAGE_KEY = 'nav.sidebarCollapsed';
 
 @Component({
   selector: 'app-layout',
@@ -19,11 +21,25 @@ export class LayoutComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private authService = inject(AuthService);
 
-  sidenavCollapsed = signal(false);
+  sidenavCollapsed = signal<boolean>(this.readPersistedCollapsed());
   showMobileSidenav = signal(false);
   isMobile = signal(false);
 
   private destroy$ = new Subject<void>();
+
+  constructor() {
+    effect(() => {
+      const root = document.documentElement;
+      if (this.isMobile()) {
+        root.style.setProperty('--sidebar-width', '0px');
+      } else if (this.sidenavCollapsed()) {
+        root.style.setProperty('--sidebar-width', 'var(--sidebar-width-collapsed, 56px)');
+      } else {
+        root.style.setProperty('--sidebar-width', '180px');
+      }
+      try { localStorage.setItem(SIDENAV_STORAGE_KEY, String(this.sidenavCollapsed())); } catch { /* ignore */ }
+    });
+  }
 
   ngOnInit(): void {
     if (this.authService.getMustChangePassword()) {
@@ -33,7 +49,6 @@ export class LayoutComponent implements OnInit, OnDestroy {
 
     this.checkScreenSize();
 
-    // Listen for window resize
     fromEvent(window, 'resize')
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
@@ -46,14 +61,19 @@ export class LayoutComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  private readPersistedCollapsed(): boolean {
+    try {
+      return localStorage.getItem(SIDENAV_STORAGE_KEY) === 'true';
+    } catch {
+      return false;
+    }
+  }
+
   private checkScreenSize(): void {
     const isMobile = window.innerWidth < 768;
     this.isMobile.set(isMobile);
-    
+
     if (isMobile) {
-      this.sidenavCollapsed.set(false);
-      this.showMobileSidenav.set(false);
-    } else {
       this.showMobileSidenav.set(false);
     }
   }

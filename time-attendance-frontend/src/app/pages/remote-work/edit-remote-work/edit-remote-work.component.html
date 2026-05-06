@@ -105,17 +105,19 @@
           class="btn btn-secondary"
           (click)="onCancel()"
           [disabled]="submitting()">
-          {{ i18n.t('common.cancel') }}
+          {{ canEdit() ? i18n.t('common.cancel') : i18n.t('common.back') }}
         </button>
-        <button
-          type="submit"
-          class="btn btn-primary"
-          [disabled]="submitting() || form.invalid">
-          @if (submitting()) {
-            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-          }
-          {{ i18n.t('common.save') }}
-        </button>
+        @if (canEdit()) {
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="submitting() || form.invalid">
+            @if (submitting()) {
+              <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            }
+            {{ i18n.t('common.save') }}
+          </button>
+        }
       </div>
     </form>
   }

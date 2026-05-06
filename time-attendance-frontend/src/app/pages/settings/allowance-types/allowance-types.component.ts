@@ -99,7 +99,7 @@ export class AllowanceTypesComponent implements OnInit {
       sortable: false,
       width: '100px',
       align: 'center',
-      priority: 'low',
+      priority: 'medium',
       hideOnMobile: true,
       mobileLabel: this.t('allowance_types.is_taxable'),
       renderHtml: true

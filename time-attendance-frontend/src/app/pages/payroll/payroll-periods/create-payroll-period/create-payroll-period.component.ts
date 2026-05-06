@@ -11,6 +11,7 @@ import { SearchableSelectComponent, SearchableSelectOption } from '../../../../s
 import { PayrollPeriodType } from '../../../../shared/models/payroll.model';
 import { environment } from '../../../../../environments/environment';
 
+import { PermissionService } from '../../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-payroll-period',
   standalone: true,
@@ -27,6 +28,16 @@ export class CreatePayrollPeriodComponent implements OnInit {
   private notificationService = inject(NotificationService);
   readonly i18n = inject(I18nService);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('payroll.manage');
+  }
   submitting = signal(false);
   loading = signal(false);
   isEditMode = signal(false);
@@ -63,6 +74,9 @@ export class CreatePayrollPeriodComponent implements OnInit {
           startDate: data.startDate?.substring(0, 10),
           endDate: data.endDate?.substring(0, 10)
         });
+        if (!this.canEdit()) {
+          this.form.disable();
+        }
       },
       error: () => {
         this.notificationService.error(this.i18n.t('common.error_loading'));
@@ -93,7 +107,7 @@ export class CreatePayrollPeriodComponent implements OnInit {
     action$.subscribe({
       next: (result: any) => {
         this.notificationService.success(this.i18n.t(this.isEditMode() ? 'payroll.periods.updated_successfully' : 'payroll.periods.created_successfully'));
-        this.router.navigate(['/payroll/periods', this.isEditMode() ? this.editId() : result.id, 'view']);
+        this.router.navigate(['/payroll/periods']);
       },
       error: () => {
         this.notificationService.error(this.i18n.t('common.error_saving'));

@@ -12,6 +12,7 @@ import { LoadingSpinnerComponent } from '../../../../shared/components/loading-s
 import { SearchableSelectComponent, SearchableSelectOption } from '../../../../shared/components/searchable-select/searchable-select.component';
 import { environment } from '../../../../../environments/environment';
 
+import { PermissionService } from '../../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-salary-structure',
   standalone: true,
@@ -29,6 +30,16 @@ export class CreateSalaryStructureComponent implements OnInit {
   private notificationService = inject(NotificationService);
   readonly i18n = inject(I18nService);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('salaryStructure.manage');
+  }
   submitting = signal(false);
   loading = signal(false);
   isEditMode = signal(false);
@@ -135,6 +146,9 @@ export class CreateSalaryStructureComponent implements OnInit {
           branchId: data.branchId,
           isActive: data.isActive
         });
+        if (!this.canEdit()) {
+          this.form.disable();
+        }
         if (data.components?.length) {
           data.components.forEach((comp: any) => {
             this.components.push(this.fb.group({

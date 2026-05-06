@@ -1,97 +1,51 @@
 import { Component, Input, Output, EventEmitter, signal, computed } from '@angular/core';
 
-
 @Component({
   selector: 'app-pagination',
   standalone: true,
   imports: [],
   template: `
     @if (totalPages() > 1) {
-      <nav aria-label="Page navigation">
-        <ul class="pagination justify-content-center">
-          <!-- First page -->
-          <li class="page-item" [class.disabled]="currentPage() === 1">
-            <button class="page-link" (click)="goToPage(1)" [disabled]="currentPage() === 1">
-              <i class="fas fa-angle-double-left"></i>
-            </button>
-          </li>
-          <!-- Previous page -->
-          <li class="page-item" [class.disabled]="currentPage() === 1">
-            <button class="page-link" (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() === 1">
-              <i class="fas fa-angle-left"></i>
-            </button>
-          </li>
-          <!-- Page numbers -->
-          @for (page of visiblePages(); track page) {
-            <li class="page-item"
-              [class.active]="page === currentPage()">
-              <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
-            </li>
+      <div class="grid-pagination">
+        @if (showInfo) {
+          <span>
+            Showing {{ startItem() }}&ndash;{{ endItem() }} of {{ totalItems() }} records
+          </span>
+        } @else {
+          <span></span>
+        }
+
+        <div class="pagination-pages">
+          <button type="button"
+                  (click)="goToPage(currentPage() - 1)"
+                  [disabled]="currentPage() === 1"
+                  title="Previous page">
+            <i class="fas fa-chevron-left" style="font-size: 10px;"></i>
+          </button>
+          @for (page of visiblePages(); track $index) {
+            @if (page === -1) {
+              <span class="pagination-ellipsis">&hellip;</span>
+            } @else {
+              <button type="button"
+                      [class.active]="page === currentPage()"
+                      (click)="goToPage(page)">
+                {{ page }}
+              </button>
+            }
           }
-          <!-- Next page -->
-          <li class="page-item" [class.disabled]="currentPage() === totalPages()">
-            <button class="page-link" (click)="goToPage(currentPage() + 1)" [disabled]="currentPage() === totalPages()">
-              <i class="fas fa-angle-right"></i>
-            </button>
-          </li>
-          <!-- Last page -->
-          <li class="page-item" [class.disabled]="currentPage() === totalPages()">
-            <button class="page-link" (click)="goToPage(totalPages())" [disabled]="currentPage() === totalPages()">
-              <i class="fas fa-angle-double-right"></i>
-            </button>
-          </li>
-        </ul>
-      </nav>
-    }
-    
-    <!-- Page info -->
-    @if (showInfo) {
-      <div class="d-flex justify-content-between align-items-center mt-3">
-        <small class="text-muted">
-          Showing {{ startItem() }} to {{ endItem() }} of {{ totalItems() }} entries
-        </small>
-        <small class="text-muted">
-          Page {{ currentPage() }} of {{ totalPages() }}
-        </small>
+          <button type="button"
+                  (click)="goToPage(currentPage() + 1)"
+                  [disabled]="currentPage() === totalPages()"
+                  title="Next page">
+            <i class="fas fa-chevron-right" style="font-size: 10px;"></i>
+          </button>
+        </div>
       </div>
     }
-    `,
+  `,
   styles: [`
-    .page-link {
-      border: 1px solid var(--app-gray-300, #D0D5DD);
-      color: var(--app-gray-600, #475467);
-      font-size: 13px;
-      min-width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: var(--app-border-radius-sm, 6px);
-      transition: all 0.1s ease;
-    }
-
-    .page-link:hover {
-      background-color: var(--app-gray-50, #F9FAFB);
-      border-color: var(--app-gray-300, #D0D5DD);
-      color: var(--app-gray-700, #344054);
-    }
-
-    .page-item.active .page-link {
-      background-color: var(--app-primary, #4F6BF6);
-      border-color: var(--app-primary, #4F6BF6);
-      color: #fff;
-    }
-
-    .page-item.disabled .page-link {
-      color: var(--app-gray-400, #98A2B3);
-      background-color: #fff;
-      border-color: var(--app-gray-200, #EAECF0);
-      cursor: not-allowed;
-    }
-
-    .pagination {
-      gap: 4px;
-    }
+    /* All styling comes from global .grid-pagination / .pagination-pages in components.css */
+    :host { display: block; }
   `]
 })
 export class PaginationComponent {
@@ -103,38 +57,30 @@ export class PaginationComponent {
 
   @Output() pageChange = new EventEmitter<number>();
 
-  visiblePages = computed(() => {
+  /** Elided page list: [1, -1 (…), 4, 5, 6, -1 (…), 12]. */
+  visiblePages = computed<number[]>(() => {
     const current = this.currentPage();
     const total = this.totalPages();
-    const delta = 2;
+    const delta = 1;
     const pages: number[] = [];
 
-    let start = Math.max(1, current - delta);
-    let end = Math.min(total, current + delta);
-
-    // Adjust range to show 5 pages when possible
-    if (end - start < 4 && total > 4) {
-      if (start === 1) {
-        end = Math.min(total, start + 4);
-      } else if (end === total) {
-        start = Math.max(1, end - 4);
-      }
+    if (total <= 7) {
+      for (let i = 1; i <= total; i++) pages.push(i);
+      return pages;
     }
 
-    for (let i = start; i <= end; i++) {
+    pages.push(1);
+    if (current - delta > 2) pages.push(-1);
+    for (let i = Math.max(2, current - delta); i <= Math.min(total - 1, current + delta); i++) {
       pages.push(i);
     }
-
+    if (current + delta < total - 1) pages.push(-1);
+    pages.push(total);
     return pages;
   });
 
-  startItem = computed(() => {
-    return (this.currentPage() - 1) * this.pageSize() + 1;
-  });
-
-  endItem = computed(() => {
-    return Math.min(this.currentPage() * this.pageSize(), this.totalItems());
-  });
+  startItem = computed(() => (this.currentPage() - 1) * this.pageSize() + 1);
+  endItem = computed(() => Math.min(this.currentPage() * this.pageSize(), this.totalItems()));
 
   goToPage(page: number) {
     if (page >= 1 && page <= this.totalPages() && page !== this.currentPage()) {

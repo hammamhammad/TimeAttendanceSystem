@@ -38,7 +38,7 @@ export class BenefitEnrollmentsComponent implements OnInit {
     { key: 'employeeName', label: this.t('common.employee'), sortable: true, width: '180px', priority: 'high', mobileLabel: this.t('common.employee') },
     { key: 'benefitPlanName', label: this.t('benefits.enrollments.plan'), sortable: true, width: '180px', priority: 'high', mobileLabel: this.t('benefits.enrollments.plan') },
     { key: 'benefitTypeBadge', label: this.t('benefits.plans.benefit_type'), sortable: false, width: '110px', align: 'center', priority: 'medium', mobileLabel: this.t('benefits.plans.benefit_type'), renderHtml: true },
-    { key: 'contributionDisplay', label: this.t('benefits.enrollments.employee_contribution'), sortable: false, width: '140px', align: 'center', priority: 'low', hideOnMobile: true, mobileLabel: this.t('benefits.enrollments.employee_contribution') },
+    { key: 'contributionDisplay', label: this.t('benefits.enrollments.employee_contribution'), sortable: false, width: '140px', align: 'center', priority: 'medium', hideOnMobile: true, mobileLabel: this.t('benefits.enrollments.employee_contribution') },
     { key: 'effectiveDateDisplay', label: this.t('benefits.enrollments.effective_date'), sortable: true, width: '130px', priority: 'medium', mobileLabel: this.t('benefits.enrollments.effective_date') },
     { key: 'statusBadge', label: this.t('common.status'), sortable: false, width: '130px', align: 'center', priority: 'high', mobileLabel: this.t('common.status'), renderHtml: true }
   ]);
@@ -74,7 +74,7 @@ export class BenefitEnrollmentsComponent implements OnInit {
   }
 
   onActionClick(event: { action: string; item: any }): void {
-    if (event.action === 'view') this.router.navigate(['/benefits/enrollments', event.item.id, 'view']);
+    if (event.action === 'view') this.router.navigate(['/benefits/enrollments', event.item.id, 'edit']);
   }
 
   onSearchChange(term: string): void { this.searchTerm.set(term); this.currentPage.set(1); this.loadData(); }

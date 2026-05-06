@@ -8,6 +8,7 @@ import { DocumentService } from '../../../../core/services/document.service';
 import { FormHeaderComponent } from '../../../../shared/components/form-header/form-header.component';
 import { FormSectionComponent } from '../../../../shared/components/form-section/form-section.component';
 
+import { PermissionService } from '../../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-template',
   standalone: true,
@@ -23,6 +24,16 @@ export class CreateTemplateComponent implements OnInit {
   private readonly service = inject(DocumentService);
   private readonly notification = inject(NotificationService);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('letterTemplate.update');
+  }
   form!: FormGroup;
   saving = signal(false);
   isEdit = signal(false);
@@ -43,7 +54,12 @@ export class CreateTemplateComponent implements OnInit {
       this.isEdit.set(true);
       this.entityId.set(+id);
       this.service.getLetterTemplate(+id).subscribe({
-        next: (t) => this.form.patchValue({ name: t.name, nameAr: t.nameAr, description: t.description, category: t.category, htmlContent: t.htmlContent, isActive: t.isActive }),
+        next: (t) => {
+          this.form.patchValue({ name: t.name, nameAr: t.nameAr, description: t.description, category: t.category, htmlContent: t.htmlContent, isActive: t.isActive });
+          if (!this.canEdit()) {
+            this.form.disable({ emitEvent: false });
+          }
+        },
         error: () => this.notification.error(this.i18n.t('common.error'))
       });
     }

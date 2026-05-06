@@ -3,19 +3,17 @@
   <app-sidenav
     [collapsed]="sidenavCollapsed"
     [show]="showMobileSidenav"
+    (toggleCollapsed)="onToggleSidenav()"
     [class.mobile]="isMobile()">
   </app-sidenav>
 
   <!-- Main content area -->
-  <div class="main-content" 
+  <div class="main-content"
        [class.sidenav-collapsed]="sidenavCollapsed() && !isMobile()"
        [class.mobile]="isMobile()">
-    
+
     <!-- Topbar -->
-    <app-topbar 
-      [sidenavCollapsed]="sidenavCollapsed"
-      (toggleSidenav)="onToggleSidenav()">
-    </app-topbar>
+    <app-topbar [sidenavCollapsed]="sidenavCollapsed"></app-topbar>
 
     <!-- Page content -->
     <main class="page-content">

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, TemplateRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, TemplateRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -16,6 +16,7 @@ export class ModalWrapperComponent {
   @Input() showFooter = true;
   @Input() showCloseButton = true;
   @Input() closeOnBackdropClick = true;
+  @Input() closeOnEscape = true;
   @Input() centered = false;
   @Input() scrollable = false;
   @Input() loading = false;
@@ -24,13 +25,20 @@ export class ModalWrapperComponent {
   @Output() close = new EventEmitter<void>();
 
   onBackdropClick(event: MouseEvent): void {
-    if (this.closeOnBackdropClick && event.target === event.currentTarget) {
+    if (this.closeOnBackdropClick && !this.loading && event.target === event.currentTarget) {
       this.close.emit();
     }
   }
 
   onCloseClick(): void {
     this.close.emit();
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.show && this.closeOnEscape && !this.loading) {
+      this.close.emit();
+    }
   }
 
   getModalDialogClasses(): string {

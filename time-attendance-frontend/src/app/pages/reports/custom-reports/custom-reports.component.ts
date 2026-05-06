@@ -36,10 +36,10 @@ export class CustomReportsComponent implements OnInit {
 
   tableColumns = computed<TableColumn[]>(() => [
     { key: 'name', label: this.t('custom_reports.name'), sortable: true, width: '200px', priority: 'high', mobileLabel: this.t('custom_reports.name') },
-    { key: 'dataSource', label: this.t('custom_reports.data_source'), sortable: false, width: '150px', priority: 'medium', mobileLabel: this.t('custom_reports.data_source') },
+    { key: 'dataSource', label: this.t('custom_reports.data_source'), sortable: false, width: '150px', priority: 'high', mobileLabel: this.t('custom_reports.data_source') },
     { key: 'publicBadge', label: this.t('custom_reports.is_public'), sortable: false, width: '100px', align: 'center', priority: 'medium', mobileLabel: this.t('custom_reports.is_public'), renderHtml: true },
     { key: 'scheduledReportCount', label: this.t('custom_reports.schedules'), sortable: false, width: '100px', align: 'center', priority: 'medium', mobileLabel: this.t('custom_reports.schedules') },
-    { key: 'createdByUsername', label: this.t('fields.createdBy'), sortable: false, width: '140px', priority: 'medium', mobileLabel: this.t('fields.createdBy') }
+    { key: 'createdByUsername', label: this.t('fields.createdBy'), sortable: false, width: '140px', priority: 'high', mobileLabel: this.t('fields.createdBy') }
   ]);
 
   tableActions = computed<TableAction[]>(() => [

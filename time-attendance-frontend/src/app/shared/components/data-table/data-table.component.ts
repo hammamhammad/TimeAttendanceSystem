@@ -1,9 +1,13 @@
-import { Component, Input, Output, EventEmitter, signal, TemplateRef, ContentChild, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, computed, TemplateRef, ContentChild, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LoadingSpinnerComponent } from '../loading-spinner/loading-spinner.component';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
+import { FilterPopoverComponent } from '../filter-popover/filter-popover.component';
+import { FilterChipsBarComponent } from '../filter-chips-bar/filter-chips-bar.component';
 import { I18nService } from '../../../core/i18n/i18n.service';
+import { ColumnType, FilterDescriptor, FILTER_EMPTY_SENTINEL } from '../../utils/filter-engine/types';
+import { applyFilters } from '../../utils/filter-engine/predicates';
 
 export interface TableColumn {
   key: string;
@@ -15,6 +19,25 @@ export interface TableColumn {
   priority?: 'high' | 'medium' | 'low';
   mobileLabel?: string;
   renderHtml?: boolean;
+  /** ERP cell type — applies cell-code / cell-money / cell-date / cell-link styling automatically. */
+  type?: 'text' | 'code' | 'money' | 'date' | 'link' | 'status' | 'boolean';
+  /** Optional currency prefix for type='money' (defaults to no prefix). */
+  currencySymbol?: string;
+  /** Per-column filter toggle. Defaults to true when the table's filterable=true. */
+  filterable?: boolean;
+  /** Override inferred filter type (12 types per spec §15). */
+  filterType?: ColumnType;
+  /** Options for enum/select/reference filter widgets. */
+  filterOptions?: { label: string; value: any }[];
+  /** Real field name on the row object used for filtering + sorting when the
+   *  display `key` doesn't exist on the DTO (e.g. a custom cellTemplate maps
+   *  `key='status'` to `row.isActive`). Also used to auto-extract distinct values. */
+  filterField?: string;
+  /** Display label for null/empty values in this column (e.g. "Root Department"
+   *  for a parent-department column where root rows render as a synthetic badge).
+   *  When set and the data has any null/empty rows, the filter list shows this
+   *  as a clickable option that maps to `isEmpty`/`isNotEmpty` operators. */
+  emptyValueLabel?: string;
 }
 
 export interface TableAction {
@@ -25,6 +48,14 @@ export interface TableAction {
   condition?: (item: any) => boolean;
 }
 
+export interface BulkAction {
+  key: string;
+  label: string;
+  icon?: string;
+  color?: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info';
+  requiresConfirmation?: boolean;
+}
+
 export interface SortEvent {
   column: string;
   direction: 'asc' | 'desc';
@@ -33,9 +64,58 @@ export interface SortEvent {
 @Component({
   selector: 'app-data-table',
   standalone: true,
-  imports: [CommonModule, FormsModule, LoadingSpinnerComponent, EmptyStateComponent],
+  imports: [CommonModule, FormsModule, LoadingSpinnerComponent, EmptyStateComponent, FilterPopoverComponent, FilterChipsBarComponent],
   template: `
-    <div class="unified-data-table">
+    <div [class]="variant === 'subgrid' ? 'subgrid-body' : 'grid-container'">
+      <!-- Table-level toolbar — kebab menu for row actions on the selected row.
+           Sits at the top of the table, near the parent page's Add button. -->
+      @if (actions.length > 0 && variant !== 'subgrid') {
+        <div class="grid-row-toolbar" (click)="$event.stopPropagation()">
+          <span class="grid-row-toolbar__hint">
+            @if (selectedItems().length === 0) {
+              {{ i18n.t('common.select_row_for_actions') }}
+            } @else if (selectedItems().length === 1) {
+              {{ i18n.t('common.one_row_selected') }}
+            } @else {
+              {{ selectedItems().length }} {{ i18n.t('common.rows_selected') }}
+            }
+          </span>
+          <button
+            type="button"
+            class="grid-row-toolbar__kebab"
+            [disabled]="selectedItems().length !== 1"
+            [title]="i18n.t('common.actions')"
+            (click)="toggleRowMenu($event)">
+            <i class="fas fa-ellipsis-v"></i>
+          </button>
+          @if (rowMenuOpen()) {
+            <div class="row-actions-menu row-actions-menu--toolbar" (click)="$event.stopPropagation()">
+              @for (action of getAvailableActions(selectedItems()[0]); track action.key) {
+                <button
+                  type="button"
+                  class="row-actions-menu__item"
+                  [class.row-actions-menu__item--danger]="action.color === 'danger'"
+                  (click)="onAction(action.key, selectedItems()[0]); rowMenuOpen.set(false)">
+                  @if (action.icon) {
+                    <i [class]="'fas ' + action.icon + ' row-actions-menu__icon'"></i>
+                  }
+                  <span>{{ action.label }}</span>
+                </button>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Filter chips bar (above table when filters active) -->
+      @if (filterable && activeFilters().length > 0 && variant !== 'subgrid') {
+        <app-filter-chips-bar
+          [filters]="activeFilters()"
+          (remove)="removeFilter($event)"
+          (clearAll)="clearAllFilters()">
+        </app-filter-chips-bar>
+      }
+
       <!-- Loading State -->
       @if (isLoading()) {
         <app-loading-spinner></app-loading-spinner>
@@ -126,121 +206,98 @@ export interface SortEvent {
       <!-- Desktop Table View -->
       <div class="table-container" [class.d-none]="isMobileView() && (responsiveMode === 'cards' || responsiveMode === 'auto')" [class.d-md-block]="responsiveMode === 'cards' || responsiveMode === 'auto'">
         <div class="table-responsive" [class.overflow-auto]="responsiveMode === 'horizontal-scroll'">
-          <table class="table table-hover">
-            <thead class="table-light sticky-top">
+          <table class="data-grid" [class.sticky-header]="stickyHeader && variant !== 'subgrid'">
+            <thead>
               <tr>
                 <!-- Selection column -->
                 @if (allowSelection) {
-                  <th class="selection-column">
-                    <div class="form-check">
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        [checked]="allSelected()"
-                        [indeterminate]="someSelected()"
-                        (change)="toggleSelectAll($event)"
-                        />
-                    </div>
+                  <th style="width: 40px;">
+                    <input
+                      type="checkbox"
+                      class="row-checkbox"
+                      [checked]="allSelected()"
+                      [indeterminate]="someSelected()"
+                      (change)="toggleSelectAll($event)"
+                      />
                   </th>
                 }
-    
+
                 <!-- Data columns -->
                 @for (column of getVisibleColumns(); track column.key) {
                   <th
                     [style.width]="column.width"
                     [class.sortable]="column.sortable"
+                    [class.sorted]="column.sortable && getSortColumn() === column.key"
                     [class.text-center]="column.align === 'center'"
                     [class.text-end]="column.align === 'right'"
                     [class.d-none]="column.hideOnMobile && isMobileView()"
                     [class.d-md-table-cell]="column.hideOnMobile"
-                    (click)="onSort(column)">
-                    <div class="d-flex align-items-center"
-                      [class.justify-content-center]="column.align === 'center'"
-                      [class.justify-content-end]="column.align === 'right'">
-                      <span>{{ column.label }}</span>
-                      @if (column.sortable && getSortColumn() === column.key) {
-                        <i
-                          class="ms-2 fas"
-                          [class.fa-sort-up]="getSortDirection() === 'asc'"
-                        [class.fa-sort-down]="getSortDirection() === 'desc'"></i>
+                    [attr.data-priority]="column.priority || null">
+                    <span (click)="column.sortable && onSort(column)"
+                          [style.cursor]="column.sortable ? 'pointer' : 'default'">
+                      {{ column.label }}
+                      @if (column.sortable) {
+                        <i class="fas sort-icon"
+                           [class.fa-sort]="getSortColumn() !== column.key"
+                           [class.fa-sort-up]="getSortColumn() === column.key && getSortDirection() === 'asc'"
+                           [class.fa-sort-down]="getSortColumn() === column.key && getSortDirection() === 'desc'"></i>
                       }
-                      @if (column.sortable && getSortColumn() !== column.key) {
-                        <i
-                        class="ms-2 fas fa-sort text-muted"></i>
-                      }
-                    </div>
+                    </span>
+                    @if (filterable && isColumnFilterable(column)) {
+                      <i class="fas fa-filter grid-funnel-icon"
+                         [class.grid-funnel-icon--active]="hasActiveFilter(column.key)"
+                         (click)="openFilterPopover(column, $event)"
+                         [title]="i18n.t('common.filter')"></i>
+                    }
                   </th>
                 }
-    
-                <!-- Actions column -->
-                @if (actions.length > 0) {
-                  <th class="actions-column">{{ i18n.t('common.actions') }}</th>
-                }
+
+                <!-- Actions column removed — actions are invoked via the
+                     table-level kebab menu in the page toolbar. -->
               </tr>
             </thead>
             <tbody>
               @for (item of getDisplayedData(); track trackByFn($index, item)) {
                 <tr
-                  [class.selected-row]="isSelected(item)"
-                  [class.inactive-row]="!isActiveItem(item)">
+                  [class.selected]="isSelected(item)"
+                  [class.inactive-row]="!isActiveItem(item)"
+                  [class.row-clickable]="hasOpenAction(item)"
+                  (dblclick)="onRowDoubleClick(item, $event)">
                   <!-- Selection cell -->
                   @if (allowSelection) {
-                    <td class="selection-column">
-                      <div class="form-check">
-                        <input
-                          class="form-check-input"
-                          type="checkbox"
-                          [checked]="isSelected(item)"
-                          (change)="toggleSelection(item, $event); $event.stopPropagation()"
-                          />
-                      </div>
+                    <td style="width: 40px;">
+                      <input
+                        type="checkbox"
+                        class="row-checkbox"
+                        [checked]="isSelected(item)"
+                        (change)="toggleSelection(item, $event); $event.stopPropagation()"
+                        />
                     </td>
                   }
                   <!-- Data cells -->
                   @for (column of getVisibleColumns(); track column.key) {
                     <td
+                      [class]="getCellClass(column)"
                       [class.text-center]="column.align === 'center'"
                       [class.text-end]="column.align === 'right'"
                       [class.d-none]="column.hideOnMobile && isMobileView()"
-                      [class.d-md-table-cell]="column.hideOnMobile">
-                      @switch (column.key) {
-                        @default {
-                          <ng-container *ngTemplateOutlet="cellTemplate; context: { $implicit: item, column: column }">
-                          </ng-container>
-                          @if (!cellTemplate && !column.renderHtml) {
-                            <span>{{ getNestedValue(item, column.key) }}</span>
-                          }
-                          @if (!cellTemplate && column.renderHtml) {
-                            <span [innerHTML]="getNestedValue(item, column.key)"></span>
-                          }
-                        }
+                      [class.d-md-table-cell]="column.hideOnMobile"
+                      [attr.data-priority]="column.priority || null">
+                      <ng-container *ngTemplateOutlet="cellTemplate; context: { $implicit: item, column: column }">
+                      </ng-container>
+                      @if (!cellTemplate && !column.renderHtml) {
+                        <span>{{ getNestedValue(item, column.key) }}</span>
+                      }
+                      @if (!cellTemplate && column.renderHtml) {
+                        <span [innerHTML]="getNestedValue(item, column.key)"></span>
                       }
                     </td>
                   }
-                  <!-- Actions cell -->
-                  @if (actions.length > 0) {
-                    <td class="actions-column">
-                      <div class="btn-group btn-group-sm">
-                        @for (action of getAvailableActions(item); track action.key) {
-                          <button
-                            class="btn"
-                            [class]="'btn-outline-' + (action.color || 'primary')"
-                            [title]="action.label"
-                            (click)="onAction(action.key, item); $event.stopPropagation()">
-                            @if (action.icon) {
-                              <i [class]="'fas ' + action.icon"></i>
-                            }
-                            @if (!action.icon) {
-                              <span>{{ action.label }}</span>
-                            }
-                          </button>
-                        }
-                      </div>
-                    </td>
-                  }
+                  <!-- Actions cell removed — per-row actions are now invoked
+                       via the table-level kebab menu rendered above the table. -->
                 </tr>
               }
-    
+
               <!-- Empty state -->
               @if (data.length === 0) {
                 <tr>
@@ -256,335 +313,206 @@ export interface SortEvent {
             </tbody>
           </table>
         </div>
+
+        <!-- Floating filter popover -->
+        @if (filterPopover(); as pop) {
+          <app-filter-popover
+            [field]="pop.column.key"
+            [fieldLabel]="pop.column.label"
+            [columnType]="resolveColumnType(pop.column)"
+            [options]="pop.options"
+            [initial]="findFilter(pop.column.key)"
+            [top]="pop.top"
+            [left]="pop.left"
+            (apply)="onApplyFilter($event)"
+            (clear)="onClearFilter(pop.column.key)"
+            (close)="filterPopover.set(null)">
+          </app-filter-popover>
+        }
+
+        <!-- Selection pill (ERP spec §7B) -->
+        @if (allowSelection && selectedItems().length > 0 && variant !== 'subgrid') {
+          <div class="grid-selection-pill">
+            <i class="fas fa-check-circle"></i>
+            <span>{{ selectedItems().length }} {{ i18n.t('common.selected') }}</span>
+            <button type="button" (click)="clearSelection()">{{ i18n.t('common.clear') }}</button>
+            @if (bulkActions.length > 0) {
+              <div class="ms-auto d-flex gap-2">
+                @for (action of bulkActions; track action.key) {
+                  <button type="button"
+                          class="btn btn-sm"
+                          [class]="'btn-' + (action.color || 'secondary')"
+                          (click)="onBulkAction(action.key)">
+                    @if (action.icon) { <i [class]="'fas ' + action.icon + ' me-1'"></i> }
+                    {{ action.label }}
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        }
     
-        <!-- Enhanced Pagination -->
-        @if (showPagination && getTotalPagesValue() > 1) {
-          <nav class="mt-3">
-            <div class="row align-items-center">
-              <div class="col-md-6">
-                <div class="d-flex align-items-center">
-                  <label class="form-label me-2 mb-0">{{ i18n.t('common.page_size') }}:</label>
-                  <select
-                    class="form-select form-select-sm"
-                    style="width: auto;"
-                    [value]="getPageSizeValue()"
-                    (change)="onPageSizeChange(+$any($event.target).value)"
-                    >
-                    @for (size of pageSizeOptions; track size) {
-                      <option [value]="size">{{ size }}</option>
-                    }
-                  </select>
-                  <span class="text-muted ms-3">
-                    {{ i18n.t('common.showing') }}
-                    {{ getDisplayStart() }}-{{ getDisplayEnd() }}
-                    {{ i18n.t('common.of') }}
-                    {{ getTotalItemsValue() }}
-                  </span>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <ul class="pagination pagination-sm justify-content-end mb-0">
-                  <li class="page-item" [class.disabled]="getCurrentPage() === 1">
-                    <button class="page-link" (click)="onPageChange(getCurrentPage() - 1)" [disabled]="getCurrentPage() === 1">
-                      <i class="fas fa-chevron-left rtl-flip"></i>
-                    </button>
-                  </li>
-                  @for (page of getPageNumbers(); track page) {
-                    <li
-                      class="page-item"
-                      [class.active]="page === getCurrentPage()"
-                      [class.disabled]="page === -1">
-                      @if (page !== -1) {
-                        <button
-                          class="page-link"
-                          (click)="onPageChange(page)"
-                          >
-                          {{ page }}
-                        </button>
-                      }
-                      @if (page === -1) {
-                        <span class="page-link">...</span>
-                      }
-                    </li>
-                  }
-                  <li class="page-item" [class.disabled]="getCurrentPage() === getTotalPagesValue()">
-                    <button class="page-link" (click)="onPageChange(getCurrentPage() + 1)" [disabled]="getCurrentPage() === getTotalPagesValue()">
-                      <i class="fas fa-chevron-right rtl-flip"></i>
-                    </button>
-                  </li>
-                </ul>
-              </div>
+        <!-- ERP Pagination Strip -->
+        @if (showPagination && getTotalPagesValue() > 1 && variant !== 'subgrid') {
+          <div class="grid-pagination">
+            <div class="d-flex align-items-center" style="gap: 12px;">
+              <span>
+                {{ i18n.t('common.showing') }}
+                {{ getDisplayStart() }}-{{ getDisplayEnd() }}
+                {{ i18n.t('common.of') }}
+                {{ getTotalItemsValue() }}
+              </span>
+              <select
+                class="form-select form-select-sm"
+                style="width: auto; font-size: 13px; padding: 4px 24px 4px 8px;"
+                (change)="onPageSizeChange(+$any($event.target).value)">
+                @for (size of pageSizeOptions; track size) {
+                  <option [value]="size" [selected]="size === getPageSizeValue()">{{ size }} / {{ i18n.t('common.page_size') }}</option>
+                }
+              </select>
             </div>
-          </nav>
+
+            <div class="pagination-pages">
+              <button type="button"
+                      (click)="onPageChange(getCurrentPage() - 1)"
+                      [disabled]="getCurrentPage() === 1"
+                      [title]="i18n.t('common.previous')">
+                <i class="fas fa-chevron-left" style="font-size: 10px;"></i>
+              </button>
+              @for (page of getPageNumbers(); track $index) {
+                @if (page === -1) {
+                  <span class="pagination-ellipsis">&hellip;</span>
+                } @else {
+                  <button type="button"
+                          [class.active]="page === getCurrentPage()"
+                          (click)="onPageChange(page)">
+                    {{ page }}
+                  </button>
+                }
+              }
+              <button type="button"
+                      (click)="onPageChange(getCurrentPage() + 1)"
+                      [disabled]="getCurrentPage() === getTotalPagesValue()"
+                      [title]="i18n.t('common.next')">
+                <i class="fas fa-chevron-right" style="font-size: 10px;"></i>
+              </button>
+            </div>
+          </div>
         }
       </div>
     </div>
     `,
   styles: [`
-    /* Main Container */
-    .unified-data-table {
-      background: white;
-      border: 1px solid var(--app-gray-200, #EAECF0);
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: var(--app-shadow-sm, 0 1px 3px rgba(16, 24, 40, 0.1));
-    }
+    /* The main .grid-container, .data-grid, .cell-*, .grid-pagination rules
+       live in global components.css. Keep only responsive + mobile-card-specific
+       styling here. */
 
-    /* Table Container */
-    .table-container {
-      min-height: 400px;
-      overflow: visible;
-    }
+    .table-container { min-height: 400px; overflow: visible; }
+    /* Horizontal scroll inside the rounded grid-container when the table's
+       declared column widths legitimately exceed the viewport. Vertical
+       overflow stays visible so floating popovers (filter, etc) aren't clipped. */
+    .table-responsive { overflow-x: auto; overflow-y: visible; }
 
-    /* Table Styles */
-    .table {
-      margin-bottom: 0;
-    }
+    /* Keep the warning-tint for rows flagged inactive */
+    table.data-grid tbody tr.inactive-row { background-color: var(--app-warning-50, #FFFBEB); }
+    table.data-grid tbody tr.inactive-row:hover { background-color: #ffeaa7; }
 
-    .table thead th {
-      border-bottom: 1px solid var(--app-gray-200, #EAECF0);
-      background-color: var(--app-gray-50, #F9FAFB);
-      font-weight: 600;
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--app-gray-600, #475467);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
+    /* Double-clickable rows show the pointer cursor on hover */
+    table.data-grid tbody tr.row-clickable { cursor: pointer; user-select: none; }
 
-    .table tbody tr {
-      transition: all 0.2s ease;
-      animation: fadeIn 0.3s ease-out;
-    }
-
-    .table tbody tr:hover {
-      background-color: var(--app-primary-50, #EEF2FF);
-      cursor: pointer;
-    }
-
-    .table tbody tr.selected-row {
-      background-color: var(--app-primary-50, #EEF2FF);
-      border-left: 4px solid var(--app-primary, #4F6BF6);
-    }
-
-    .table tbody tr.inactive-row {
-      background-color: var(--app-warning-50, #FFFBEB);
-    }
-
-    .table tbody tr.inactive-row:hover {
-      background-color: #ffeaa7;
-    }
-
-    /* Column Styles */
-    .selection-column {
-      width: 50px;
-      text-align: center;
-    }
-
-    .actions-column {
-      width: 100px;
-      text-align: center;
-    }
-
-    /* Action buttons as separate items with gap */
-    .actions-column .btn-group {
+    /* Table-level kebab menu in the top toolbar */
+    .grid-row-toolbar {
       display: flex;
-      gap: 4px;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--app-gray-100, #F2F4F7);
+      background: var(--app-gray-25, #FCFCFD);
+      position: relative;
     }
-
-    .actions-column .btn-group .btn {
-      border-radius: 6px !important;
-    }
-
-    /* Sortable Headers */
-    .sortable {
-      cursor: pointer;
-      user-select: none;
-      transition: color 0.2s ease;
-    }
-
-    .sortable:hover {
-      color: var(--app-primary, #4F6BF6);
-      background-color: var(--app-primary-50, #EEF2FF);
-    }
-
-    .sortable .fas {
-      font-size: 0.75rem;
-      opacity: 0.6;
-      transition: opacity 0.2s ease, transform 0.2s ease;
-    }
-
-    .sortable:hover .fas {
-      opacity: 1;
-      transform: scale(1.1);
-    }
-
-    /* Action Button Styles - ERP clean bordered icon buttons */
-    .btn-group .btn {
-      background: white;
-      border: 1px solid var(--app-gray-300, #D0D5DD);
-      color: var(--app-gray-500, #667085);
-      box-shadow: none;
-      transition: all 0.15s ease;
-      padding: 4px 8px;
-      border-radius: 6px;
+    .grid-row-toolbar__hint {
       font-size: 12px;
-    }
-
-    .btn-group .btn:hover {
-      background-color: var(--app-gray-50, #F9FAFB);
-      border-color: var(--app-gray-300, #D0D5DD);
-      color: var(--app-gray-700, #344054);
-      transform: none;
-      box-shadow: none;
-    }
-
-    .btn-group .btn i {
-      font-size: 12px;
-    }
-
-    /* Specific action color hints on hover */
-    .btn-outline-primary:hover {
-      color: var(--app-primary, #4F6BF6);
-      border-color: var(--app-primary-200, #B3C2FF);
-      background-color: var(--app-primary-50, #EEF2FF);
-    }
-
-    .btn-outline-info:hover {
-      color: var(--app-info, #3B82F6);
-      border-color: var(--app-info-100, #DBEAFE);
-      background-color: var(--app-info-50, #EFF6FF);
-    }
-
-    .btn-outline-danger:hover {
-      color: var(--app-danger, #EF4444);
-      border-color: var(--app-danger-100, #FEE2E2);
-      background-color: var(--app-danger-50, #FEF2F2);
-    }
-
-    .btn-outline-warning:hover {
-      color: var(--app-warning-600, #D97706);
-      border-color: var(--app-warning-100, #FEF3C7);
-      background-color: var(--app-warning-50, #FFFBEB);
-    }
-
-    .btn-outline-success:hover {
-      color: var(--app-success, #22C55E);
-      border-color: var(--app-success-100, #DCFCE7);
-      background-color: var(--app-success-50, #F0FDF4);
-    }
-
-    .btn-outline-secondary:hover {
-      color: var(--app-gray-700, #344054);
-      border-color: var(--app-gray-300, #D0D5DD);
-      background-color: var(--app-gray-50, #F9FAFB);
-    }
-
-    /* Form Controls */
-    .form-check-input {
-      cursor: pointer;
-      transition: all 0.2s ease;
-      accent-color: var(--app-primary, #4F6BF6);
-    }
-
-    .form-check-input:checked {
-      background-color: var(--app-primary, #4F6BF6);
-      border-color: var(--app-primary, #4F6BF6);
-    }
-
-    .form-check-input:indeterminate {
-      background-color: var(--app-warning, #F59E0B);
-      border-color: var(--app-warning, #F59E0B);
-    }
-
-    .form-select {
-      cursor: pointer;
-      transition: border-color 0.2s ease;
-    }
-
-    .form-select:focus {
-      border-color: var(--app-primary, #4F6BF6);
-      box-shadow: 0 0 0 0.2rem rgba(79, 107, 246, 0.25);
-    }
-
-    /* Pagination */
-    .pagination {
-      margin-bottom: 0;
-    }
-
-    .page-link {
       color: var(--app-gray-500, #667085);
+    }
+    .grid-row-toolbar__kebab {
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
       border: 1px solid var(--app-gray-200, #EAECF0);
-      transition: all 0.2s ease;
+      border-radius: var(--app-border-radius-sm, 6px);
+      color: var(--app-gray-600, #475467);
+      cursor: pointer;
+      transition: all 0.15s ease;
     }
-
-    .page-link:hover {
-      color: var(--app-primary, #4F6BF6);
-      background-color: var(--app-gray-50, #F9FAFB);
-      border-color: var(--app-gray-200, #EAECF0);
+    .grid-row-toolbar__kebab:hover:not(:disabled) {
+      background: var(--app-primary-50, #EEF2FF);
+      border-color: var(--app-primary-200, #C7D2FE);
+      color: var(--app-primary-600, #3B49C9);
     }
-
-    .page-item.active .page-link {
-      background-color: var(--app-primary, #4F6BF6);
-      border-color: var(--app-primary, #4F6BF6);
-      color: white;
-    }
-
-    .page-item.disabled .page-link {
-      color: #adb5bd;
-      background-color: #fff;
-      border-color: var(--app-gray-200, #EAECF0);
+    .grid-row-toolbar__kebab:disabled {
+      opacity: 0.45;
       cursor: not-allowed;
     }
-
-    /* Loading State */
-    .spinner-border {
-      color: var(--app-primary, #4F6BF6);
-      width: 3rem;
-      height: 3rem;
+    .row-actions-menu--toolbar {
+      top: calc(100% - 4px);
+    }
+    .row-actions-menu {
+      position: absolute;
+      right: 8px;
+      top: 100%;
+      z-index: 1050;
+      min-width: 160px;
+      background: #fff;
+      border: 1px solid var(--app-gray-200, #EAECF0);
+      border-radius: var(--app-border-radius-md, 8px);
+      box-shadow: var(--app-shadow-lg, 0 8px 16px rgba(16, 24, 40, 0.12));
+      padding: 4px 0;
+      text-align: left;
+    }
+    :root[dir="rtl"] .row-actions-menu { right: auto; left: 8px; text-align: right; }
+    .row-actions-menu__item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      padding: 8px 12px;
+      background: transparent;
+      border: none;
+      font-size: 13px;
+      color: var(--app-gray-700, #344054);
+      cursor: pointer;
+      transition: background-color 0.1s ease;
+    }
+    .row-actions-menu__item:hover {
+      background: var(--app-gray-50, #F9FAFB);
+    }
+    .row-actions-menu__item--danger {
+      color: var(--app-danger, #EF4444);
+    }
+    .row-actions-menu__item--danger:hover {
+      background: var(--app-danger-50, #FEF2F2);
+    }
+    .row-actions-menu__icon {
+      width: 14px;
+      font-size: 12px;
+      text-align: center;
     }
 
-    /* Empty State */
-    .text-muted i.fa-3x {
-      color: #adb5bd !important;
-      margin-bottom: 1rem;
+    /* Per-column filter funnel icon */
+    .grid-funnel-icon {
+      font-size: 10px;
+      color: var(--app-gray-300, #D0D5DD);
+      margin-left: 6px;
+      cursor: pointer;
+      transition: color 0.15s ease;
     }
-
-    /* Focus States */
-    .table tbody tr:focus-within {
-      outline: 2px solid var(--app-primary, #4F6BF6);
-      outline-offset: -2px;
-    }
-
-    .btn:focus {
-      box-shadow: 0 0 0 0.2rem rgba(79, 107, 246, 0.25);
-    }
-
-    /* Enhanced Table Layout */
-    .table-responsive {
-      border-radius: 8px;
-      overflow: visible;
-    }
-
-    /* Animations */
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* RTL Support */
-    [dir="rtl"] .table tbody tr.selected-row {
-      border-left: none;
-      border-right: 4px solid var(--app-primary, #4F6BF6);
-    }
+    .grid-funnel-icon:hover { color: var(--app-gray-500, #667085); }
+    .grid-funnel-icon--active { color: var(--app-primary-500, #4F6BF6); }
+    :root[dir="rtl"] .grid-funnel-icon { margin-left: 0; margin-right: 6px; }
 
     /* Mobile Cards */
     .mobile-cards {
@@ -606,7 +534,7 @@ export interface SortEvent {
       transform: translateY(-2px);
     }
 
-    .mobile-card.selected-row {
+    .mobile-card.selected {
       border-color: var(--app-primary, #4F6BF6);
       background-color: var(--app-primary-50, #EEF2FF);
     }
@@ -676,124 +604,36 @@ export interface SortEvent {
       color: #adb5bd;
     }
 
-    /* Enhanced Responsive Design */
-    @media (max-width: 768px) {
-      .table-responsive {
-        font-size: 0.875rem;
-      }
+    /* Responsive — hide priority columns on narrower viewports.
+       Tables across the system have priority calibrated assuming most users
+       are on 1280-1920px laptops; we hide low at <1280, medium at <1024. */
+    @media (max-width: 1280px) {
+      table.data-grid th[data-priority="low"],
+      table.data-grid td[data-priority="low"] { display: none !important; }
+    }
 
-      .btn-group .btn {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.75rem;
-      }
-
-      .pagination {
-        justify-content: center;
-        margin-top: 1rem;
-      }
-
-      .d-flex.align-items-center span.text-muted {
-        display: none;
-      }
-
-      /* Hide low priority columns on tablets */
-      .table th[data-priority="low"],
-      .table td[data-priority="low"] {
-        display: none !important;
-      }
+    @media (max-width: 1024px) {
+      table.data-grid th[data-priority="medium"],
+      table.data-grid td[data-priority="medium"] { display: none !important; }
     }
 
     @media (max-width: 576px) {
-      .table-container {
-        min-height: 300px;
-      }
-
-      .table thead th {
-        font-size: 0.75rem;
-        padding: 0.5rem 0.25rem;
-      }
-
-      .table tbody td {
-        padding: 0.5rem 0.25rem;
-      }
-
-      .btn-group {
-        flex-direction: column;
-      }
-
-      .btn-group .btn {
-        margin-bottom: 2px;
-        border-radius: 4px !important;
-      }
-
-      .actions-column {
-        width: 80px;
-      }
-
-      /* Hide medium and low priority columns on phones */
-      .table th[data-priority="medium"],
-      .table td[data-priority="medium"],
-      .table th[data-priority="low"],
-      .table td[data-priority="low"] {
-        display: none !important;
-      }
-
-      .mobile-cards {
-        padding: 0.5rem;
-      }
-
-      .mobile-card {
-        margin-bottom: 0.75rem;
-      }
-
-      .mobile-label {
-        flex: 0 0 35%;
-        font-size: 0.8rem;
-      }
-
-      .mobile-value {
-        font-size: 0.8rem;
-      }
-
-      .mobile-card-actions .btn {
-        font-size: 0.75rem;
-        padding: 0.375rem 0.5rem;
-      }
+      .table-container { min-height: 300px; }
+      table.data-grid thead th { font-size: 11px; padding: 8px 10px; }
+      table.data-grid tbody td { padding: 8px 10px; font-size: 12px; }
+      .mobile-cards { padding: 0.5rem; }
+      .mobile-card { margin-bottom: 0.75rem; }
+      .mobile-label { flex: 0 0 35%; font-size: 0.8rem; }
+      .mobile-value { font-size: 0.8rem; }
+      .mobile-card-actions .btn { font-size: 0.75rem; padding: 0.375rem 0.5rem; }
     }
 
-    /* Ultra-wide screens */
-    @media (min-width: 1400px) {
-      .table-container {
-        font-size: 0.95rem;
-      }
-    }
-
-    /* Tablet landscape optimizations */
-    @media (min-width: 768px) and (max-width: 1024px) {
-      .table {
-        font-size: 0.9rem;
-      }
-
-      .btn-group .btn {
-        padding: 0.375rem 0.75rem;
-        font-size: 0.8rem;
-      }
-    }
-
-    /* Print Styles */
     @media print {
-      .actions-column,
-      .pagination {
-        display: none !important;
-      }
-
-      .table {
-        font-size: 0.8rem;
-      }
-
-      .table tbody tr.selected-row {
+      .grid-pagination,
+      .cell-actions { display: none !important; }
+      table.data-grid { font-size: 0.8rem; }
+      table.data-grid tbody tr.selected {
         background-color: transparent !important;
-        border-left: none !important;
       }
     }
   `]
@@ -804,8 +644,12 @@ export class DataTableComponent {
   @Input() columns: TableColumn[] = [];
   @Input() actions: TableAction[] = [];
   @Input() loading: any = false;
-  @Input() allowSelection = false;
+  /** Selection is ON by default — every list page gets checkboxes + pill.
+   *  Pass `[allowSelection]="false"` to opt out (e.g. nested data-table in a modal). */
+  @Input() allowSelection = true;
   @Input() showPagination = true;
+  /** Unique page key used to persist hidden columns in localStorage. */
+  @Input() pageKey?: string;
   @Input() emptyMessage = 'No data available';
   @Input() emptyTitle = 'No Data';
   @Input() responsiveMode: 'cards' | 'horizontal-scroll' | 'auto' = 'auto';
@@ -814,6 +658,14 @@ export class DataTableComponent {
   @Input() sortable = false;
   @Input() exportable = false;
   @Input() paginated = false;
+  /** 'grid' → full ERP grid (toolbar-ready wrapper); 'subgrid' → compact detail-page variant. */
+  @Input() variant: 'grid' | 'subgrid' = 'grid';
+  /** Sticky header for long scrollable grids. Default true for 'grid', always false for 'subgrid'. */
+  @Input() stickyHeader = true;
+  /** Column keys to hide (from ColumnsPicker popover, persisted per page). */
+  @Input() hiddenColumnKeys: string[] = [];
+  /** Per-column filter funnel + chip bar + client-side filtering (ON by default — opt out per-page). */
+  @Input() filterable = true;
 
   // Pagination
   @Input() currentPage: any = 1;
@@ -829,15 +681,58 @@ export class DataTableComponent {
   // Custom template outlets
   @ContentChild('cellTemplate') cellTemplate!: TemplateRef<any>;
 
+  @Input() bulkActions: BulkAction[] = [];
+
   @Output() actionClick = new EventEmitter<{action: string, item: any}>();
   @Output() selectionChange = new EventEmitter<any[]>();
+  @Output() bulkActionClick = new EventEmitter<{action: string, items: any[]}>();
   @Output() sortChange = new EventEmitter<SortEvent>();
   @Output() pageChange = new EventEmitter<number>();
   @Output() pageSizeChange = new EventEmitter<number>();
+  /** Emits when a row is double-clicked. Pages can subscribe to navigate to
+   *  the row's detail/edit page. The data-table also auto-triggers the row's
+   *  'edit' action (if defined) so most list pages get this behavior for free. */
+  @Output() rowDoubleClick = new EventEmitter<any>();
+  @Output() filtersChange = new EventEmitter<FilterDescriptor[]>();
+
+  /** Index of the last-clicked row for shift-click range selection. */
+  private lastClickedIndex: number | null = null;
+
+  /** Active filters (managed in-memory; emits `filtersChange`). */
+  activeFilters = signal<FilterDescriptor[]>([]);
+  /** State for the floating filter popover. */
+  filterPopover = signal<{ column: TableColumn; top: number; left: number; options: { label: string; value: any }[] } | null>(null);
+  /** Cache of auto-extracted distinct values per column, invalidated when the data reference changes. */
+  private autoOptionsCache = new Map<string, { label: string; value: any }[]>();
+  private autoOptionsCacheDataRef: any[] | null = null;
 
   selectedItems = signal<any[]>([]);
   allSelected = signal(false);
   someSelected = signal(false);
+
+  /** Whether the table-level kebab menu is open. */
+  rowMenuOpen = signal<boolean>(false);
+
+  toggleRowMenu(event: Event): void {
+    event.stopPropagation();
+    this.rowMenuOpen.update(v => !v);
+  }
+
+  /** Close any open kebab menu when the user clicks outside the data-table. */
+  @HostListener('document:click')
+  onDocClick(): void {
+    if (this.rowMenuOpen()) {
+      this.rowMenuOpen.set(false);
+    }
+  }
+
+  /** Close on Escape key for keyboard accessibility. */
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.rowMenuOpen()) {
+      this.rowMenuOpen.set(false);
+    }
+  }
 
   // Helper to get loading value whether it's a signal or boolean
   isLoading(): boolean {
@@ -881,16 +776,20 @@ export class DataTableComponent {
     return typeof this.sortDirection === 'function' ? this.sortDirection() : this.sortDirection;
   }
 
-  // Get displayed data (paginated or full)
+  // Get displayed data (paginated or full) — applies active filters first when filterable=true
   getDisplayedData(): any[] {
+    let rows = this.data;
+    if (this.filterable && this.activeFilters().length > 0) {
+      rows = applyFilters(rows, this.activeFilters());
+    }
     if (this.paginated) {
       const pageSize = this.getPageSizeValue();
       const currentPage = this.getCurrentPage();
       const startIndex = (currentPage - 1) * pageSize;
       const endIndex = startIndex + pageSize;
-      return this.data.slice(startIndex, endIndex);
+      return rows.slice(startIndex, endIndex);
     }
-    return this.data;
+    return rows;
   }
 
   trackByFn(index: number, item: any): any {
@@ -900,7 +799,6 @@ export class DataTableComponent {
   getTotalColumns(): number {
     let count = this.columns.length;
     if (this.allowSelection) count++;
-    if (this.actions.length > 0) count++;
     return count;
   }
 
@@ -908,8 +806,94 @@ export class DataTableComponent {
     return path.split('.').reduce((current, prop) => current?.[prop], obj);
   }
 
+  /** ERP cell-type class for the <td>.
+   *  Uses explicit column.type when set; otherwise auto-detects from the
+   *  column key (unambiguous naming patterns only). */
+  getCellClass(column: TableColumn): string {
+    const explicit = column.type;
+    if (explicit) {
+      switch (explicit) {
+        case 'code': return 'cell-code';
+        case 'money': return 'cell-money';
+        case 'date': return 'cell-date';
+        case 'link': return 'cell-link';
+        default: return '';
+      }
+    }
+    const key = (column.key || '').toLowerCase();
+    if (!key) return '';
+
+    // Dates — covers hireDate, closeDate, createdAt, createdAtUtc, *On, dob, *_at, *_on
+    if (
+      key === 'dob' ||
+      key.endsWith('date') ||
+      key.endsWith('atutc') ||
+      key.endsWith('onutc') ||
+      key.endsWith('_at') ||
+      key.endsWith('_on') ||
+      key === 'createdat' || key === 'updatedat' || key === 'modifiedat' ||
+      key === 'createdon' || key === 'updatedon' || key === 'modifiedon' ||
+      key === 'created'   || key === 'updated'   || key === 'modified'
+    ) {
+      return 'cell-date';
+    }
+
+    // Codes — code, *Code, number, *Number, employeeNumber, reference, sku, barcode
+    if (
+      key === 'code' ||
+      key === 'number' ||
+      key === 'reference' ||
+      key === 'sku' ||
+      key === 'barcode' ||
+      key === 'uuid' ||
+      key === 'empno' ||
+      key === 'employeeno' ||
+      key === 'employeenumber' ||
+      key.endsWith('code') ||
+      key.endsWith('number') ||
+      key.endsWith('reference')
+    ) {
+      return 'cell-code';
+    }
+
+    // Money — salary, amount, price, revenue, balance, total/subtotal, tax, etc.
+    if (/(amount|salary|price|revenue|balance|total|subtotal|tax|netpay|grosspay|basicpay|allowance|deduction|fee|cost|credit|debit)/.test(key)) {
+      return 'cell-money';
+    }
+
+    return '';
+  }
+
   getAvailableActions(item: any): TableAction[] {
-    return this.actions.filter(action => !action.condition || action.condition(item));
+    // System-wide: 'view' actions are removed — view/edit are unified into a
+    // single edit form that becomes read-only when the user lacks edit permission.
+    return this.actions
+      .filter(action => action.key !== 'view')
+      .filter(action => !action.condition || action.condition(item));
+  }
+
+  /** True when this row has an `edit` (or `view`-aliased) action available,
+   *  meaning a double-click can usefully open the record. Drives the
+   *  `cursor: pointer` hint on the row. */
+  hasOpenAction(item: any): boolean {
+    const actions = this.getAvailableActions(item);
+    return actions.some(a => a.key === 'edit' || a.key === 'view');
+  }
+
+  /** Double-click on a row → emit rowDoubleClick AND auto-trigger the row's
+   *  `edit` action if it has one. Skip when the click originated on an
+   *  interactive element (checkbox, kebab button) so users selecting rows
+   *  don't accidentally open them. */
+  onRowDoubleClick(item: any, event: Event): void {
+    const target = event.target as HTMLElement;
+    if (target.closest('input, button, a, .row-actions-menu, .grid-row-toolbar')) {
+      return;
+    }
+    this.rowDoubleClick.emit(item);
+    const editAction = this.getAvailableActions(item).find(a => a.key === 'edit');
+    if (editAction) {
+      this.actionClick.emit({ action: editAction.key, item });
+    }
   }
 
   isSelected(item: any): boolean {
@@ -917,17 +901,51 @@ export class DataTableComponent {
   }
 
   toggleSelection(item: any, event: Event): void {
+    const evt = event as MouseEvent;
     const checked = (event.target as HTMLInputElement).checked;
-    const selected = this.selectedItems();
+    const displayed = this.getDisplayedData();
+    const index = displayed.findIndex(r => r.id === item.id);
 
-    if (checked) {
-      this.selectedItems.set([...selected, item]);
+    // Shift-click range selection — toggle all rows between last click and this one
+    if (evt.shiftKey && this.lastClickedIndex !== null && index !== -1) {
+      const [from, to] = [this.lastClickedIndex, index].sort((a, b) => a - b);
+      const range = displayed.slice(from, to + 1);
+      const current = this.selectedItems();
+      const currentIds = new Set(current.map(r => r.id));
+      const nextItems = [...current];
+      for (const r of range) {
+        if (checked && !currentIds.has(r.id)) nextItems.push(r);
+        if (!checked && currentIds.has(r.id)) {
+          const idx = nextItems.findIndex(s => s.id === r.id);
+          if (idx !== -1) nextItems.splice(idx, 1);
+        }
+      }
+      this.selectedItems.set(nextItems);
     } else {
-      this.selectedItems.set(selected.filter(s => s.id !== item.id));
+      const selected = this.selectedItems();
+      if (checked) {
+        if (!selected.some(s => s.id === item.id)) {
+          this.selectedItems.set([...selected, item]);
+        }
+      } else {
+        this.selectedItems.set(selected.filter(s => s.id !== item.id));
+      }
     }
 
+    this.lastClickedIndex = index;
     this.updateSelectionState();
     this.selectionChange.emit(this.selectedItems());
+  }
+
+  clearSelection(): void {
+    this.selectedItems.set([]);
+    this.lastClickedIndex = null;
+    this.updateSelectionState();
+    this.selectionChange.emit(this.selectedItems());
+  }
+
+  onBulkAction(key: string): void {
+    this.bulkActionClick.emit({ action: key, items: this.selectedItems() });
   }
 
   toggleSelectAll(event: Event): void {
@@ -1034,13 +1052,16 @@ export class DataTableComponent {
   }
 
   getVisibleColumns(): TableColumn[] {
-    if (typeof window === 'undefined') return this.columns;
-
-    const isMobile = window.innerWidth < 768;
-    if (!isMobile) return this.columns;
-
-    // On mobile, filter out columns marked as hideOnMobile
-    return this.columns.filter(col => !col.hideOnMobile);
+    let cols = this.columns;
+    // Apply user-hidden columns from ColumnsPicker
+    if (this.hiddenColumnKeys?.length > 0) {
+      const hidden = new Set(this.hiddenColumnKeys);
+      cols = cols.filter(c => !hidden.has(c.key));
+    }
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      cols = cols.filter(col => !col.hideOnMobile);
+    }
+    return cols;
   }
 
   getColumnPriority(column: TableColumn): number {
@@ -1055,5 +1076,239 @@ export class DataTableComponent {
   isMobileView(): boolean {
     if (typeof window === 'undefined') return false;
     return window.innerWidth < 768;
+  }
+
+  // --- Filter helpers ---
+  isColumnFilterable(column: TableColumn): boolean {
+    return column.filterable !== false;
+  }
+
+  hasActiveFilter(key: string): boolean {
+    const column = this.columns.find(c => c.key === key);
+    const field = column ? this.resolveFilterField(column) : key;
+    return this.activeFilters().some(f => f.field === field);
+  }
+
+  findFilter(key: string): FilterDescriptor | undefined {
+    const column = this.columns.find(c => c.key === key);
+    const field = column ? this.resolveFilterField(column) : key;
+    return this.activeFilters().find(f => f.field === field);
+  }
+
+  openFilterPopover(column: TableColumn, event: MouseEvent): void {
+    event.stopPropagation();
+    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    const options = this.buildFilterOptions(column);
+    this.filterPopover.set({
+      column,
+      options,
+      top: rect.bottom + 4,
+      left: Math.max(8, Math.min(rect.left - 10, window.innerWidth - 340))
+    });
+  }
+
+  /** Returns the actual data-field path for a column — `filterField` wins,
+   *  else column.key, with common UI-key → data-key fallbacks. */
+  private resolveFilterField(column: TableColumn): string {
+    if (column.filterField) return column.filterField;
+    if (!this.data.length) return column.key;
+    const first = this.data[0];
+    if (first && Object.prototype.hasOwnProperty.call(first, column.key)) return column.key;
+    // Common aliases when the UI key doesn't exist on the DTO
+    const aliases: Record<string, string[]> = {
+      status: ['isActive', 'employmentStatus', 'state'],
+      employmentstatus: ['employmentStatus', 'status'],
+      department: ['departmentName', 'department'],
+      branch: ['branchName', 'branch'],
+      location: ['workLocationType', 'locationType', 'location'],
+      manager: ['managerName', 'managerFullName', 'manager'],
+      shift: ['currentShiftName', 'shiftName', 'shift'],
+      employee: ['fullName', 'name', 'firstName'],
+      name: ['fullName', 'firstName'],
+      code: ['employeeNumber', 'code'],
+      employeecode: ['employeeNumber', 'code'],
+      // Timestamp aliases
+      created: ['createdAtUtc', 'createdAt', 'created'],
+      updated: ['modifiedAtUtc', 'updatedAtUtc', 'updatedAt', 'modifiedAt', 'updated'],
+      modified: ['modifiedAtUtc', 'updatedAtUtc', 'modifiedAt', 'updatedAt'],
+      createdat: ['createdAtUtc', 'createdAt'],
+      updatedat: ['modifiedAtUtc', 'updatedAtUtc', 'updatedAt', 'modifiedAt']
+    };
+    const key = column.key.toLowerCase();
+    for (const alias of aliases[key] ?? []) {
+      if (Object.prototype.hasOwnProperty.call(first, alias)) return alias;
+    }
+    return column.key;
+  }
+
+  /** Page-provided options take priority. Otherwise, we derive distinct values
+   *  from `this.data` for any filterable column that isn't number/date/email/phone.
+   *  The popover then decides to render a list widget (equals/isAnyOf operators)
+   *  or a text widget (contains/startsWith/etc) based on the operator + cardinality. */
+  private buildFilterOptions(column: TableColumn): { label: string; value: any }[] {
+    if (column.filterOptions && column.filterOptions.length > 0) return column.filterOptions;
+    const type = this.resolveColumnType(column);
+    // Types that have their own dedicated widget — don't extract distinct values.
+    if (type === 'number' || type === 'money' || type === 'percentage'
+        || type === 'date' || type === 'dateTime'
+        || type === 'email' || type === 'phone') return [];
+
+    // Invalidate cache when the data reference changes.
+    if (this.autoOptionsCacheDataRef !== this.data) {
+      this.autoOptionsCache.clear();
+      this.autoOptionsCacheDataRef = this.data;
+    }
+    const cacheKey = column.key;
+    const cached = this.autoOptionsCache.get(cacheKey);
+    if (cached) return cached;
+
+    const field = this.resolveFilterField(column);
+    const seen = new Set<string>();
+    const options: { label: string; value: any }[] = [];
+    const MAX_DISTINCT_AS_LIST = 50;
+    const MAX_LABEL_LEN = 80;
+    let hasEmptyRows = false;
+
+    for (const row of this.data) {
+      const raw = this.getNestedValue(row, field);
+      if (raw === null || raw === undefined || raw === '') {
+        hasEmptyRows = true;
+        continue;
+      }
+      const normalized = this.normalizeFilterValue(raw);
+      if (normalized === '' || normalized === null || normalized === undefined) {
+        hasEmptyRows = true;
+        continue;
+      }
+      const dedupKey = String(normalized);
+      if (dedupKey.length > MAX_LABEL_LEN) {
+        // Long text value — bail out, treat this column as free-text only.
+        this.autoOptionsCache.set(cacheKey, []);
+        return [];
+      }
+      if (seen.has(dedupKey)) continue;
+      seen.add(dedupKey);
+      options.push({ label: this.formatFilterLabel(normalized), value: normalized });
+      if (options.length > MAX_DISTINCT_AS_LIST) {
+        // Too many distinct values — treat as free-text.
+        this.autoOptionsCache.set(cacheKey, []);
+        return [];
+      }
+    }
+    options.sort((a, b) => a.label.localeCompare(b.label));
+
+    // Surface null/empty rows as a clickable filter option when the column
+    // declares a label for them (e.g. "Root Department"). This option maps
+    // to isEmpty/isNotEmpty in onApplyFilter so the predicate engine
+    // actually matches the empty rows.
+    if (hasEmptyRows && column.emptyValueLabel) {
+      options.unshift({ label: column.emptyValueLabel, value: FILTER_EMPTY_SENTINEL });
+    }
+    this.autoOptionsCache.set(cacheKey, options);
+    return options;
+  }
+
+  private normalizeFilterValue(raw: any): any {
+    if (typeof raw !== 'string') return raw;
+    if (!/<[^>]+>/.test(raw)) return raw.trim();
+    // Strip HTML tags + decode common entities
+    const tmp = document.createElement('div');
+    tmp.innerHTML = raw;
+    return (tmp.textContent || tmp.innerText || '').trim();
+  }
+
+  private formatFilterLabel(raw: any): string {
+    if (raw === true) return this.i18n.t('common.active');
+    if (raw === false) return this.i18n.t('common.inactive');
+    return String(raw);
+  }
+
+  resolveColumnType(column: TableColumn): ColumnType {
+    if (column.filterType) return column.filterType;
+    switch (column.type) {
+      case 'money': return 'money';
+      case 'date': return 'date';
+      case 'code': return 'string';
+      case 'link': return 'string';
+      case 'status': return 'status';
+      case 'boolean': return 'boolean';
+    }
+    // Auto-detect from key name
+    const key = (column.key || '').toLowerCase();
+    // Date heuristics — covers `created`, `updated`, `modified`, `hireDate`, `*AtUtc`, `*On`, etc.
+    if (
+      key === 'created' || key === 'updated' || key === 'modified' ||
+      key === 'createdat' || key === 'updatedat' || key === 'modifiedat' ||
+      key === 'createdon' || key === 'updatedon' || key === 'modifiedon' ||
+      key.endsWith('date') || key.endsWith('atutc') || key.endsWith('onutc')
+    ) return 'date';
+    if (/amount|salary|price|revenue|balance|total|tax|fee|cost|netpay|grosspay/.test(key)) return 'money';
+    if (key === 'email' || key.endsWith('email')) return 'email';
+    if (/phone|mobile/.test(key)) return 'phone';
+    // Status / enum heuristics
+    if (/^status$|status$|^state$|state$|type$|category$|priority$|kind$|gender$/.test(key)) return 'status';
+    if (key === 'isactive' || key.startsWith('is') && key.length > 2) return 'boolean';
+    // Reference heuristics — columns that name another entity
+    if (/(name|branch|department|manager|shift|location|role|designation|supervisor|employee)$/.test(key)
+        && key !== 'name' && key !== 'fullname' && key !== 'firstname' && key !== 'lastname') return 'reference';
+    return 'string';
+  }
+
+  onApplyFilter(desc: FilterDescriptor): void {
+    // Remap the descriptor's field to the actual data path so the predicate
+    // engine can find the value on each row. Keep the original key as label.
+    const column = this.columns.find(c => c.key === desc.field);
+    const realField = column ? this.resolveFilterField(column) : desc.field;
+    let remapped: FilterDescriptor = { ...desc, field: realField };
+
+    // Selecting the synthetic empty-value option (e.g. "Root Department")
+    // means "filter rows where this field is null/empty" — translate to
+    // isEmpty/isNotEmpty so the predicate engine actually matches.
+    if (this.isEmptySentinel(remapped.value)) {
+      remapped = {
+        ...remapped,
+        operator: remapped.operator === 'notEquals' ? 'isNotEmpty' : 'isEmpty',
+        value: undefined,
+        value2: undefined,
+      };
+    }
+
+    const current = this.activeFilters();
+    const idx = current.findIndex(f => f.field === remapped.field);
+    let next: FilterDescriptor[];
+    if (idx === -1) {
+      next = [...current, remapped];
+    } else {
+      next = [...current];
+      next[idx] = remapped;
+    }
+    this.activeFilters.set(next);
+    this.filterPopover.set(null);
+    this.filtersChange.emit(next);
+  }
+
+  private isEmptySentinel(value: any): boolean {
+    if (value === FILTER_EMPTY_SENTINEL) return true;
+    if (typeof value === 'string' && value.split(',').map(s => s.trim()).includes(FILTER_EMPTY_SENTINEL)) return true;
+    if (Array.isArray(value) && value.includes(FILTER_EMPTY_SENTINEL)) return true;
+    return false;
+  }
+
+  onClearFilter(key: string): void {
+    const column = this.columns.find(c => c.key === key);
+    const field = column ? this.resolveFilterField(column) : key;
+    const next = this.activeFilters().filter(f => f.field !== field);
+    this.activeFilters.set(next);
+    this.filterPopover.set(null);
+    this.filtersChange.emit(next);
+  }
+
+  removeFilter(desc: FilterDescriptor): void {
+    this.onClearFilter(desc.field);
+  }
+
+  clearAllFilters(): void {
+    this.activeFilters.set([]);
+    this.filtersChange.emit([]);
   }
 }

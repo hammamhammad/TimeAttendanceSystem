@@ -12,6 +12,7 @@ import { FormSectionComponent } from '../../../../shared/components/form-section
 import { SearchableSelectComponent } from '../../../../shared/components/searchable-select/searchable-select.component';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 
+import { PermissionService } from '../../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-interview',
   standalone: true,
@@ -28,6 +29,16 @@ export class CreateInterviewComponent implements OnInit {
   private service = inject(RecruitmentService);
   private employeeService = inject(EmployeeService);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('interview.manage');
+  }
   submitting = signal(false);
   isEditMode = signal(false);
   editId = signal<number | null>(null);
@@ -99,6 +110,9 @@ export class CreateInterviewComponent implements OnInit {
           meetingLink: data.meetingLink || '',
           notes: data.notes || ''
         });
+        if (!this.canEdit()) {
+          this.form.disable();
+        }
         this.loadingData.set(false);
       },
       error: () => {

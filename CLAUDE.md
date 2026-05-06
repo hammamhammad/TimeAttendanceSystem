@@ -375,21 +375,32 @@ Sample employees follow the pattern `{first}.{last}@company.com` / `Emp@123!`.
 
 #### View pages
 
-Use `StatusBadgeComponent`, `DefinitionListComponent`, `BadgeListComponent`, `FormHeaderComponent`, `DetailCardComponent`. `computed()` for reactive badge config.
+**As of v15.0 there are no dedicated view-* components in most modules** — the view/edit split was collapsed into a single edit form that becomes read-only when the user lacks edit permission. Don't create new `view-*` components or `/view` routes. The 21 entities that retained display-only components (resignations, applications, performance reviews, timesheets, etc.) live at `/<entity>/:id/edit` URLs and use `StatusBadgeComponent`, `DefinitionListComponent`, `BadgeListComponent`, `FormHeaderComponent`, `DetailCardComponent` for layout.
 
 #### List pages
 
-Use `DataTableComponent`, `TableActionsComponent`, `SearchFilterComponent` / `UnifiedFilterComponent`, `BulkActionsToolbarComponent`, `PaginationComponent`, `EmptyStateComponent`.
+Use `DataTableComponent`, `SearchFilterComponent` / `UnifiedFilterComponent`, `BulkActionsToolbarComponent`, `PaginationComponent`, `EmptyStateComponent`.
 
 **Required pattern**: `<app-page-header>` has NO child content. Add/Create button goes on `<app-unified-filter>` via `[showAddButton]` + `[addButtonText]` + `(add)` event.
 
-**Table actions**: use `computed<TableAction[]>()` with `condition` functions for conditional visibility.
+**Row actions** (v15.0): Don't render per-row action buttons. Just declare `[actions]="actions"` on `<app-data-table>` — the data-table renders a single ⋮ kebab menu in its top toolbar that operates on the selected row. The kebab is enabled only when exactly one row is checked. Use `computed<TableAction[]>()` with `condition` functions for conditional visibility. Don't include `view` actions (key='view'); they're filtered out globally because view/edit are unified.
+
+**Column priority** (v15.0): Set `priority: 'high' | 'medium' | 'low'` on every `TableColumn` for responsive hiding. `low` hides at <1280px, `medium` hides at <1024px, `high` always visible. Calibrate so the high-priority columns fit a 1280px laptop without horizontal scroll.
 
 **Enum values**: Frontend TypeScript enums use **string values** matching backend JSON serialization (`Draft = 'Draft'`, not `Draft = 1`).
 
 #### Form pages
 
 Use `FormHeaderComponent`, `FormSectionComponent` (with `variant="modern"`), `FormGroupComponent`, `SearchableSelectComponent`, `DateRangePickerComponent`, `TimeRangeInputComponent`, `LocationPickerComponent`.
+
+**Read-only by permission** (v15.0): Every `edit-*` (and dual-purpose `create-*`) page must:
+- Inject `PermissionService` and expose `canEdit(): boolean` returning `this.permissionService.has('<entity>.update')`.
+- After form-population (`patchValue()`), call `if (!this.canEdit()) this.form.disable({ emitEvent: false });`.
+- Hide Save/Reset/Submit buttons via `@if (canEdit())`. Cancel button text swaps: `canEdit() ? i18n.t('common.cancel') : i18n.t('common.back')`.
+- Cancel/Back navigates to the LIST page (`/${entity}`), NOT to a `/view` URL — that path now redirects to `/edit`, causing a redirect loop.
+- For ngModel/template-driven forms, wrap content in `<fieldset [disabled]="!canEdit()" style="border:0;padding:0;margin:0;">`.
+
+**Reactive forms `[disabled]` rule** (v15.0): NEVER bind `[disabled]="EXPR"` on an element/component that also has `formControlName="..."` or `[formControl]`. Triggers Angular's runtime warning and can cause "changed after checked" errors. Use `form.get('x').disable({ emitEvent: false })` programmatically — wrap in `effect()` if reactive to signals, or call after `patchValue()` for one-shot disables. Buttons with `[disabled]` are fine; only form-control directives are affected.
 
 #### Modal standards
 
@@ -421,7 +432,30 @@ All view/detail pages use `.app-modern-view`. Clean cards (1px gray-200 border, 
 | `--app-info` | `#3B82F6` | Info, in-progress |
 | `--app-accent` | `#F97316` | Highlights |
 
-Page bg: `#F5F6FA`. Sidebar: deep navy `#0F1629`.
+Page bg: `#F5F6FA`. Sidebar: **light** `#F8FAFC` (ERP port, v14.9 — see below).
+
+### Navigation & Layout (ERP Design System port, v14.9)
+
+Both frontends use a light-indigo sidebar modeled on `ERP_Design_System.html`, replacing the previous dark-navy shell.
+
+- **Brand**: "ERP Suite" — i18n key `nav.brand`. The left-side logo icon (purple gradient grid) opens the **Module Launcher**.
+- **Sidebar** ([sidenav.component.*](time-attendance-frontend/src/app/layout/sidenav/)): 180px expanded / 56px collapsed, flush to the screen edge (no border-radius, no floating margin), light `#F8FAFC` background with a 1px right divider. Menu items are **pill-shaped** (6px radius, 7×14 padding), active state is indigo (`#E0E7FF` bg, `#4338CA` text) with a 3px absolute accent bar anchored at `left: -8px`. Long item text **wraps** (`white-space: normal; overflow-wrap: anywhere`) — no ellipsis truncation. Group section titles (MAIN/ORGANIZATION/etc.) are **not rendered** — groups are structural only, the area switcher plays the top-level grouping role.
+- **Logo header strip**: `position: fixed`, top-left, width `--sidebar-header-width` (fixed 180px, never collapses), height = `--topbar-height` (44px). When the sidebar body collapses to 56px, the logo **overhangs** — this is intentional (ERP spec). Click the logo icon to open the Module Launcher.
+- **Collapse toggle**: sidebar body header (not the topbar). Collapsed state persists to `localStorage['nav.sidebarCollapsed']`.
+- **Area switcher** at the bottom of the sidebar — a popup over its trigger that filters the visible groups to one macro-area. Selected area persists to `localStorage['nav.activeArea']`. Navigating to a route auto-switches to the area that owns it. Admin areas (5): `dashboard`, `people`, `workforce`, `payroll`, `operations`. Self-service areas (4): `me`, `pay`, `services`, `approvals`. Tagged via the `area: NavAreaKey` field on each `MenuGroup` in [menu.service.ts](time-attendance-frontend/src/app/core/menu/menu.service.ts).
+- **Module Launcher**: full-height left drawer (420px, slides from left, `translateX(-100%) → translateX(0)` over 0.25s) with a `backdrop-filter: blur(6px)` backdrop over the rest of the page. Shows 4 ERP modules: **HR** (active, indigo), **CRM** / **Sales** / **Inventory** (SOON placeholder badges). Active tile has an indigo border + `#F5F7FF` tint + inline blue check badge next to the module name. Click outside or Escape closes. Lives in [sidenav.component.html](time-attendance-frontend/src/app/layout/sidenav/sidenav.component.html) + CSS as `.module-launcher-backdrop` / `.module-launcher-panel`. Data comes from `MenuService.getModules()` / `activeModule()`.
+- **Topbar** ([topbar.component.*](time-attendance-frontend/src/app/layout/topbar/)): 44px tall, `left: var(--sidebar-header-width)` so it always starts right of the fixed logo (doesn't reflow when the body collapses). **Breadcrumb** on the left (route-driven from `data.title` + `NavigationEnd`), icon buttons + user avatar on the right. Inline search was replaced with a **magnifier icon → popover** (360px, anchored below the icon); `Ctrl+K` opens it, `Escape` closes, submitting navigates to `/global-search?q=`. No hamburger toggle in the topbar — the collapse toggle lives in the sidebar body header.
+- **Layout shell** ([layout.component.ts](time-attendance-frontend/src/app/layout/layout.component.ts)): drives `--sidebar-width` via an `effect()` (180/56/0 for expanded/collapsed/mobile) so topbar + main-content margins stay in sync with the live width.
+- **CSS tokens** ([erp-tokens.css](time-attendance-frontend/src/styles/erp-tokens.css)):
+  - `--app-sidebar-bg: #F8FAFC` / `--app-sidebar-hover: #EEF2FF` / `--app-sidebar-active: #E0E7FF`
+  - `--app-sidebar-text: #475569` / `--app-sidebar-text-active: #4338CA`
+  - `--app-sidebar-section-title: #98A2B3`
+  - `--sidebar-width: 180px` (runtime-toggled to 56px)
+  - `--sidebar-width-collapsed: 56px`
+  - `--sidebar-header-width: 180px` (fixed, never collapses — drives topbar `left` and logo width)
+  - `--topbar-height: 44px`
+- **i18n keys added**: `nav.brand`, `nav.switchArea`, `nav.areas.{dashboard,people,workforce,payroll,operations,me,pay,services,approvals}`, `nav.modules.{title,subtitle,soon,active,areas_count,hr.*,crm.*,sales.*,inventory.*}`.
+- **Budget**: both frontends have `anyComponentStyle.maximumError: 10kB` (self-service was bumped from 8kB to match admin — sidenav.component.css is the largest at ~9kB).
 
 ---
 
@@ -767,6 +801,13 @@ cd tests/TecAxle.Hrms.Payroll.Tests && dotnet test
 - Hardcoding 30-day month in payroll math — use `IPayrollCalendarResolver`
 - Adding `if`-block payroll logic instead of a new calculator service
 - Writing a migration that drops/renames a column without preserving data
+- Adding a new `view-*` component or `/view` route (v15.0) — single edit form per entity, use `[readonly]` based on permission
+- Per-row action buttons in list pages (v15.0) — declare `actions` on `app-data-table` and the kebab will render them
+- Including a `view` action on a list page (v15.0) — filtered out globally; just don't define it
+- Cancel/Back in an edit page navigating to `/<entity>/:id/view` (v15.0) — use the LIST URL `/<entity>`; `/view` redirects to `/edit` and creates a loop
+- Binding `[disabled]` on an input that has `formControlName` (v15.0) — disable programmatically via `form.get('x').disable()` (in `effect()` if reactive to signals)
+- Using `[value]="x"` on a `<select>` to set its initial selection (v15.0) — use `[selected]="opt === x"` on each `<option>` instead; `[value]` doesn't fire reliably on first render
+- Setting `table-layout: fixed` on a data-grid (v15.0) — overflows `.grid-container { overflow: hidden }`. Use `auto` and rely on `.table-responsive { overflow-x: auto }` for horizontal scroll fallback
 
 ---
 
@@ -800,10 +841,131 @@ cd tests/TecAxle.Hrms.Payroll.Tests && dotnet test
 
 ---
 
-**Last Updated**: April 17, 2026
-**Version**: 14.8 — Mobile App Removal
+**Last Updated**: May 5, 2026
+**Version**: 15.0 — Grid + View/Edit Unification
 
-System is a single-company HRMS with one database (`tecaxle_hrms`), one `TecAxleDbContext`, single-step email+password login, and no subscription/entitlement system. The v14.x series replaced the multi-tenant SaaS architecture, retired every remnant of tenant-based naming and dead entitlement metadata, hardened payroll transactional safety via real-Postgres integration tests, and in v14.8 removed the Flutter mobile app along with every mobile-specific backend surface.
+System is a single-company HRMS with one database (`tecaxle_hrms`), one `TecAxleDbContext`, single-step email+password login, and no subscription/entitlement system. The v14.x series replaced the multi-tenant SaaS architecture, retired every remnant of tenant-based naming and dead entitlement metadata, hardened payroll transactional safety via real-Postgres integration tests, removed the Flutter mobile app (v14.8), and in v14.9 ported both web frontends' navigation and layout shell to the ERP Design System. **v15.0 unifies the list-page and form trees**: the per-row Actions column was replaced with a single table-level kebab menu, the `view-*`/`edit-*` component split was collapsed into a single edit form that becomes read-only when the user lacks edit permission, and the grid header / responsive / filter-popover layers were rebuilt for predictability.
+
+### Summary of v15.0 changes (Grid + View/Edit Unification)
+
+Two big architectural changes plus a long tail of corrections that fell out of them. All changes are frontend-only — no backend, no DB schema, no API contract changes.
+
+**1. Per-row Actions removed → table-level kebab menu**
+
+- `app-data-table` no longer renders a per-row Actions column. The `actions: TableAction[]` input still works the same; the kebab in the new top toolbar is what renders them.
+- New `.grid-row-toolbar` strip at the top of every list-page table (above the column headers, just below the page-level Refresh + Add button). Layout: `[hint text] [⋮ kebab]`.
+- The kebab is enabled only when **exactly one row is selected** (via the existing checkbox column). Hint text reads "Select a row to enable actions" / "1 row selected" / "N rows selected" via `common.select_row_for_actions` / `one_row_selected` / `rows_selected`.
+- Click ⋮ → dropdown shows the available actions for the selected row (after each action's `condition` callback). Click → emits `actionClick` with that row.
+- `view` actions are filtered out globally in `getAvailableActions()` so they never render in the kebab — the historical View entries can stay in `actions: TableAction[]` arrays but they're inert.
+- Closes on outside click + Escape.
+- Files: `time-attendance-frontend/src/app/shared/components/data-table/data-table.component.ts` and the mirrored self-service copy.
+
+**2. View/Edit unification — single edit form per entity**
+
+- All `/<entity>/:id/view` URLs are gone. **56 routes** redirect (`pathMatch: 'full'`, `redirectTo: '/<entity>/:id/edit'`) to their edit equivalents. **21 view-only routes** that had no edit equivalent (resignations, applications, performance reviews, timesheets, etc.) had `path: '...:id/view'` simply renamed to `path: '...:id/edit'` — the underlying view-* component still loads, just at the unified URL.
+- **53 orphan `view-*` component folders deleted** under `time-attendance-frontend/src/app/pages/...`. Routes already redirected away from them.
+- Edit forms become read-only when the user lacks the `<entity>.update` permission. Standard pattern in every `edit-*` (and dual-purpose `create-*`) component:
+  - Inject `PermissionService`, expose a `canEdit(): boolean` getter (`return this.permissionService.has('<entity>.update');`).
+  - After form-population (`patchValue()`), call `if (!this.canEdit()) this.form.disable({ emitEvent: false });`.
+  - Hide Save / Reset / Submit buttons via `@if (canEdit())`.
+  - Cancel button text swaps: `canEdit() ? i18n.t('common.cancel') : i18n.t('common.back')`.
+- For form components that take a `[readonly]` boolean input (e.g. `DepartmentFormComponent`), changes are reflected via `ngOnChanges` so toggling `enable()` / `disable()` lives at the form-component level instead of the page level.
+- 4 `create-*` components that use plain JS objects + ngModel (not `FormGroup`) carry a `// TODO: wire up readonly disable when canEdit is false (form is a plain object with ngModel — not a FormGroup)` comment instead. Those need fieldset wrapping (`<fieldset [disabled]="!canEdit()">`).
+- Form-header default actions stripped — no more "View Details" or "Edit" jump buttons. Only the Back-to-list button remains.
+- **Edit-page Cancel/Back navigates to the LIST page** (e.g. `/branches`), NOT the old `/view` URL — that previously caused an infinite redirect loop (`/edit` → click Back → `/view` → redirects to `/edit`). Same for post-save redirects.
+- List-page row-click handlers still navigate to `[entity, id, 'view']` and that's intentional — the route silently redirects to edit, which is the desired UX.
+
+**3. Data-table layout fixes (system-wide)**
+
+The chain of fixes that ended at the current behavior:
+
+- `table.data-grid` → `table-layout: auto` so each column auto-sizes to fit its header + cell content. NOT `fixed` (that mode used the larger of "table width" or "sum of column widths" and overflowed `.grid-container { overflow: hidden }` clipping the rightmost columns).
+- Headers stay on **one line** (`white-space: nowrap`). No truncation, no wrapping. Long labels grow the column.
+- `.table-responsive { overflow-x: auto; overflow-y: visible; }` — when the resulting table is wider than the viewport, the user gets a horizontal scrollbar **inside** the rounded `.grid-container` (which keeps `overflow: hidden` for clean borders). `overflow-y: visible` keeps filter popovers floating correctly.
+- Tightened header chrome: `padding: 12px 12px` (down from 12 16), `letter-spacing: 0.4px` (down from 0.5).
+- Cell `overflow-wrap: break-word` so long values wrap on word boundaries without breaking words mid-character.
+- Page-size `<select>` uses `[selected]="size === getPageSizeValue()"` on each `<option>`, NOT `[value]` on the select. The latter doesn't reliably set the displayed option on first render — the select would display "5" while the table actually rendered 10 rows.
+
+**4. Responsive priority breakpoints — settled at 1280 / 1024**
+
+The `priority: 'low' | 'medium' | 'high'` field on `TableColumn` was already there but the `data-priority` attribute was never being emitted on `<th>`/`<td>` (so the CSS rules never fired). Fixed via `[attr.data-priority]="column.priority || null"` on both header cells and body cells.
+
+Final breakpoints (after a few iterations — 1600/1400 was too aggressive, 1440/1200 still too aggressive — settled here):
+- `@media (max-width: 1280px)`: hide `priority="low"` columns
+- `@media (max-width: 1024px)`: hide `priority="medium"` columns
+- `@media (max-width: 768px)`: switch to mobile-card layout (existing)
+
+Calibrate column priority for a 1280px laptop. 11 list-page tables had business-critical columns that were marked too aggressively (`employmentStatus`, `overtimeHours`/`lateMinutes`, `taxableBadge`, `currentStatus`, etc.) — promoted to `medium` or `high`.
+
+**5. Filter popover — signal-backed inputs + null-row support**
+
+The big root-cause fix: `columnType` and `options` on `FilterPopoverComponent` were plain `@Input` properties read by `computed()`. Computed only tracks **signal** dependencies, so the popover memoized stale results from initial empty options. Fixed by wrapping with setter-backed signals:
+
+```ts
+private _options = signal<{ label: string; value: any }[]>([]);
+@Input() set options(val: ...) { this._options.set(val ?? []); }
+get options() { return this._options(); }
+```
+
+Same fix applied to `SearchableSelectComponent` (the `filteredOptions` computed had identical staleness — typing "dal" returned no results until managers loaded).
+
+UX improvements:
+- For list-bounded column types (reference / enum / status / boolean), `widgetType` always renders the list widget — even when there are no distinct values. Empty state = clean dashed-border card with "No values to filter by" + two presence-operator chips ("Is empty" / "Is not empty"). The misleading "Search…" input is hidden when options is empty.
+- New `FILTER_EMPTY_SENTINEL = '__filter_empty_value__'` constant in `filter-engine/types.ts`.
+- New `emptyValueLabel?: string` field on `TableColumn`. When set AND the data has any null/empty rows in that field, `buildFilterOptions()` prepends a synthetic option `{ label: emptyValueLabel, value: FILTER_EMPTY_SENTINEL }` to the dropdown. Example: department list's parent column declares `emptyValueLabel: i18n.t('department.root_department')` so "Root Department" shows up as a clickable filter value.
+- `data-table.onApplyFilter()` rewrites the descriptor: when `value === FILTER_EMPTY_SENTINEL`, operator becomes `isEmpty` (or `isNotEmpty` when the original was `notEquals`), value/value2 cleared.
+
+**6. `[disabled]` + `formControlName` warnings — eliminated**
+
+Angular's runtime warning fires when `[disabled]="EXPR"` is bound on an element/component that also has `formControlName="..."` or `[formControl]`. Fixed across 5 form files (10 attribute removals): employee-vacations create+edit, leave-entitlement-form, talent-profiles create, succession-plans create, employee-excuse request form, edit-role.
+
+Replacement pattern: `effect()` in the constructor that watches the relevant signals and calls `ctrl.disable({ emitEvent: false })` / `ctrl.enable({ emitEvent: false })` only when the current state differs. For `populateForm()`-style flows, just call `form.disable()` after `patchValue()`.
+
+**7. Manager dropdown refactor (department form)**
+
+`pages/departments/department-form/` previously rolled its own dropdown for the Manager field (raw input + manual `dropdown-menu` + custom focus/blur/search state). v15.0 swapped it for the standard `<app-searchable-select>` (matching Branch and Parent Department on the same form). Removed branch-scoping: managers were previously loaded with `getManagers(branchId)` so a department in Dammam couldn't list a manager from Makkah. Real-world usage needs cross-branch managers (regional, shared services), so `loadManagers()` now passes no branch filter — any active employee is a candidate.
+
+**8. Modern form pseudo-element fix**
+
+Bootstrap's `.form-floating > label::after` pseudo-element renders a small white masking rectangle behind floating labels (so they look clean overlapping inputs). In `app-modern-form`, the label sits ABOVE the input (not floating), so this pseudo showed up as a stray bar at the top of textareas. Killed in `components.css` (admin + self-service) via `display: none !important; content: none !important;`.
+
+**9. i18n keys cleaned**
+
+- `filter.no_values` ("No values to filter by") + `filter.no_match` ("No matching values") added.
+- `common.select_row_for_actions` / `common.one_row_selected` / `common.rows_selected` added (kebab-toolbar hints).
+- Duplicate `type_probationary` / `type_part_time` keys removed from the `employee_contracts` block in `en.json` (build was emitting "Duplicate key" warnings).
+
+**Going forward**
+
+- Don't add new `view-*` components. Single edit form per entity with `[readonly]="!canEdit()"`.
+- Don't add per-row action columns to list pages. Just declare `actions: TableAction[]` on the data-table input — the kebab renders them at the top of the table. Don't include `view` actions; they're filtered out.
+- Don't bind `[disabled]` directly on inputs/selects/components that use `formControlName` or `[formControl]`. Use `form.get('x').disable()` programmatically (in an `effect()` if reactive to signals).
+- Set `priority: 'high' | 'medium' | 'low'` on every `TableColumn` for proper responsive hiding. High = always visible. Medium = hides at <1024px. Low = hides at <1280px.
+- Set `emptyValueLabel` on a column when null rows have a meaningful UI render (e.g. badges like "Root Department", "Unassigned"). The filter list will surface that as a clickable empty-rows option.
+- Edit-page Cancel/Back navigates to the LIST page, not back to a `/view` URL. Same for post-save redirects.
+
+### Summary of v14.9 changes (ERP Design System Navigation Port)
+
+Both frontends (admin + self-service) adopted the Navigation & Layout section of `ERP_Design_System.html` with local adaptations. See the **Navigation & Layout** subsection under *Frontend Component Standards* above for the full specification — this entry is just the changelog.
+
+- **Brand** → "ERP Suite" (`nav.brand` i18n key). The purple gradient grid icon in the top-left opens the Module Launcher.
+- **Sidebar skin** flipped from dark navy `#0F1629` to light `#F8FAFC` with indigo pill active state (`#E0E7FF` bg, `#4338CA` text, 3px accent bar). Widths changed from 250/72 → 180/56. Now flush to the screen edge with no border-radius or floating margin.
+- **Logo strip is `position: fixed`** at top-left with `--sidebar-header-width: 180px` — stays visible and at full width when the body collapses to 56px (ERP "overhang" pattern). The topbar always starts at `left: var(--sidebar-header-width)` so the breadcrumb never slides under the logo.
+- **Group section titles removed** from the sidebar HTML (MAIN/ORGANIZATION/etc. no longer render). Groups are structural only; the area switcher is the new top-level grouping.
+- **Area switcher** added at the bottom of the sidebar — Dashboard/People/Workforce/Payroll/Operations (admin) or Me/Pay/Services/Approvals (self-service). `MenuGroup.area: NavAreaKey` field tags each group; active area persists to `localStorage['nav.activeArea']`; navigation auto-switches to the owning area.
+- **Module Launcher** added as a full-height left drawer (420px, slide-in 0.25s) with a `backdrop-filter: blur(6px)` overlay. Four tiles: HR (active), CRM/Sales/Inventory (SOON). Triggered by clicking the sidebar logo icon.
+- **Long item text wraps** (`white-space: normal; overflow-wrap: anywhere`) — no more ellipsis truncation on "Employee Vacations", "Leave Management", etc.
+- **Topbar** shortened from 60px → 44px. Inline omnibox removed; search now a **magnifier icon → popover** (360px), keeps the `Ctrl+K` shortcut and `/global-search?q=` navigation. Collapse-sidebar hamburger moved off the topbar to the sidebar body header. Page title replaced by a route-driven **breadcrumb** on the left.
+- **Layout shell**: `LayoutComponent` drives `--sidebar-width` via an `effect()` (180/56/0 for expanded/collapsed/mobile); collapsed state persists to `localStorage['nav.sidebarCollapsed']`.
+- **CSS tokens** in [erp-tokens.css](time-attendance-frontend/src/styles/erp-tokens.css): the six `--app-sidebar-*` tokens got the light palette; added `--sidebar-width` (runtime-toggled), `--sidebar-width-collapsed`, `--sidebar-header-width`, `--topbar-height`.
+- **i18n keys added** to `nav.*` in both admin and self-service translation files: `brand`, `switchArea`, `areas.*`, `modules.*`.
+- **Angular budgets**: self-service `anyComponentStyle.maximumError` bumped 8kB → 10kB to accommodate the richer sidenav styling (matches admin).
+- **Files touched** (per frontend): `src/styles/erp-tokens.css`, `src/app/core/menu/menu.service.ts`, `src/app/layout/layout.component.{ts,html,css}`, `src/app/layout/sidenav/sidenav.component.{ts,html,css}`, `src/app/layout/topbar/topbar.component.{ts,html,css}`, `src/app/core/i18n/translations/{en,ar}.json`.
+
+**v14.9 follow-up — RTL layout-width consistency fix.** Two stale leftovers from the pre-ERP-port floating sidebar were still driving the RTL shell and produced a visible ~70px gap between the content card and the sidebar in Arabic mode:
+- `:root[dir="rtl"] .main-content { margin-right: 250px !important; }` + `:root[dir="rtl"] .main-content.sidenav-collapsed { margin-right: 72px !important; }` in both frontends' `src/styles.css` hardcoded the old 250/72 sidebar widths and, via `!important`, silently overrode the correct `var(--sidebar-width)` from `layout.component.css`. Replaced with `margin-right: var(--sidebar-width, 180px) !important;` and the `.sidenav-collapsed` override was deleted (`LayoutComponent.effect()` already toggles the var 180↔56).
+- `:host-context([dir="rtl"]) .sidebar-mock { left: auto; right: 8px; }` in both `sidenav.component.css` files kept the RTL sidebar 8px off the screen edge while the logo (at `right: 0`) was already flush. Changed to `right: 0` so LTR and RTL both sit flush at the edge per spec.
+- **Rule going forward:** layout dimensions (sidebar width, topbar height) must reference `var(--sidebar-width)` / `var(--sidebar-header-width)` / `var(--topbar-height)` — never hardcoded px, and never `!important` combined with a hardcoded px for layout dimensions.
 
 ### Summary of v14.8 changes (Mobile App Removal)
 
@@ -1030,6 +1192,8 @@ Retired all remnant `Tenant*` naming from the codebase and DB schema (the v14.0 
 
 ### Previous versions
 
+- **v15.0** — Grid + View/Edit Unification: per-row Actions column replaced with a single table-level kebab menu (operates on the selected row); all `/<entity>/:id/view` URLs collapsed (56 redirected, 21 path-renamed); 53 orphan view-* component folders deleted; edit forms become read-only when user lacks edit permission via `form.disable()`; `table-layout: auto` + horizontal scroll fallback so every column fits; `data-priority` attribute properly emitted (1280/1024 breakpoints); filter popover signal-backed inputs + null-row "Root Department" support via `emptyValueLabel`; system-wide `[disabled]` + `formControlName` warning fixes; manager dropdown unified with `app-searchable-select` and de-scoped from branch
+- **v14.9** — ERP Design System Navigation Port: both web frontends adopted the ERP spec's light-sidebar nav shell. "ERP Suite" branding, 180/56px sidebar widths, fixed-width logo header (overhang on collapse), pill menu items with wrapped long text, Area switcher at the bottom (Dashboard/People/Workforce/Payroll/Operations for admin, Me/Pay/Services/Approvals for self-service), Module Launcher (HR/CRM/Sales/Inventory) as a full-height left drawer with blurred backdrop, 44px breadcrumb topbar, magnifier-icon search popover replacing the inline omnibox
 - **v14.8** — Mobile App Removal — deleted Flutter ESS app + all mobile-specific backend (FCM push, NFC tags, GPS verification, mobile endpoints, `NotificationBroadcast`); single EF migration `RemoveMobileAndNfc` drops 4 tables + 3 `Notifications` columns + 7 `CompanySettings` bool columns
 - **v14.7** — Final Cleanup & Polish: fully retire `DeductionMonth`, fix CI pipeline, 3-layer test scripts, canonical `/settings/company-config` route, dead-metadata sweep (see `FINAL_CLEANUP_AND_POLISH_REPORT.md`)
 - **v14.6** — Real-Postgres integration harness; retire `AutoCheckOutEnabled`/`AutoCheckOutTime`; top-nav omnibox (see `PHASE6_IMPLEMENTATION_REPORT.md`)

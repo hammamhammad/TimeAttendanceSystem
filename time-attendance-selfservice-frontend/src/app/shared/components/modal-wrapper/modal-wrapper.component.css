@@ -1,6 +1,6 @@
-/* Modal wrapper styles - ERP Design System */
+/* Modal wrapper styles — ERP Design System (Section 11) */
 .modal {
-  background-color: rgba(16, 24, 40, 0.6);
+  background-color: var(--app-overlay-bg-dark, rgba(16, 24, 40, 0.6));
   z-index: 1050;
 }
 
@@ -18,12 +18,56 @@
 .modal-header {
   padding: 20px 24px;
   border-bottom: 1px solid var(--app-gray-200, #EAECF0);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .modal-header .modal-title {
   font-size: 18px;
   font-weight: 600;
   color: var(--app-gray-900, #101828);
+  margin: 0;
+}
+
+.modal-header .btn-close {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  margin: 0;
+  border-radius: var(--app-border-radius-sm, 6px);
+  background-color: transparent;
+  background-image: none;
+  color: var(--app-gray-400, #98A2B3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  position: relative;
+}
+
+.modal-header .btn-close::before {
+  content: "\f00d"; /* fa-times */
+  font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", "FontAwesome";
+  font-weight: 900;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.modal-header .btn-close:hover {
+  background-color: var(--app-gray-100, #F2F4F7);
+  color: var(--app-gray-600, #475467);
+}
+
+.modal-header .btn-close:focus {
+  box-shadow: 0 0 0 3px var(--app-primary-100, #D8E0FF);
+  outline: none;
+}
+
+.modal-header .btn-close:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .modal-body {
@@ -33,4 +77,12 @@
 .modal-footer {
   padding: 16px 24px;
   border-top: 1px solid var(--app-gray-200, #EAECF0);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* Bootstrap's default horizontal spacing on direct children — reset it since we use gap. */
+.modal-footer > * {
+  margin: 0 !important;
 }

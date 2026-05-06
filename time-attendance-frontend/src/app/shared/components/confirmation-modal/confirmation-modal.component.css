@@ -1,8 +1,112 @@
-.confirmation-content {
-  padding: 1rem 0;
+/* ERP Confirmation Modal — spec: Section 14 of ERP_Design_System.html */
+
+.erp-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1070;
+  background: var(--app-overlay-bg-dark, rgba(16, 24, 40, 0.6));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: erp-confirm-fade-in 0.15s ease-out;
 }
 
-.confirmation-content p {
-  font-size: 1.1rem;
-  color: #495057;
+.erp-confirm-box {
+  width: 100%;
+  max-width: 380px;
+  background: #ffffff;
+  border-radius: var(--app-border-radius-lg, 12px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  animation: erp-confirm-scale-in 0.15s ease-out;
+}
+
+.erp-confirm-icon-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 20px 20px 0;
+}
+
+.erp-confirm-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.erp-confirm-icon--warning {
+  background: var(--app-warning-50, #FFFBEB);
+  color: var(--app-warning-500, #F59E0B);
+}
+.erp-confirm-icon--danger {
+  background: var(--app-danger-50, #FEF2F2);
+  color: var(--app-danger-500, #EF4444);
+}
+.erp-confirm-icon--info {
+  background: var(--app-info-50, #EFF6FF);
+  color: var(--app-info-500, #3B82F6);
+}
+.erp-confirm-icon--success {
+  background: var(--app-success-50, #F0FDF4);
+  color: var(--app-success-500, #22C55E);
+}
+
+.erp-confirm-content {
+  padding: 12px 24px 4px;
+  text-align: center;
+}
+
+.erp-confirm-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--app-gray-800, #1D2939);
+  margin: 0 0 6px;
+}
+
+.erp-confirm-message {
+  font-size: 13px;
+  color: var(--app-gray-600, #475467);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.erp-confirm-details {
+  margin-top: 14px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--app-gray-700, #344054);
+  background: var(--app-gray-50, #F9FAFB);
+  border: 1px solid var(--app-gray-200, #EAECF0);
+  border-radius: var(--app-border-radius-md, 8px);
+  text-align: left;
+  line-height: 1.5;
+}
+
+.erp-confirm-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 24px 20px;
+}
+
+.erp-confirm-btn {
+  min-width: 90px;
+}
+
+@keyframes erp-confirm-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes erp-confirm-scale-in {
+  from { transform: scale(0.96); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+:host-context([dir="rtl"]) .erp-confirm-details {
+  text-align: right;
 }

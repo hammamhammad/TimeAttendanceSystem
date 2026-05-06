@@ -345,29 +345,31 @@
             </div>
             <div class="card-body">
               <div class="app-form-actions-vertical">
-                <!-- Save Button -->
-                <button
-                  type="submit"
-                  class="btn btn-primary"
-                  [disabled]="holidayForm.invalid || saving()">
-                  @if (saving()) {
-                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                    {{ i18n.t('common.saving') }}
-                  } @else {
-                    <i class="fas fa-save me-2"></i>
-                    {{ i18n.t('common.save') }}
-                  }
-                </button>
+                @if (canEdit()) {
+                  <!-- Save Button -->
+                  <button
+                    type="submit"
+                    class="btn btn-primary"
+                    [disabled]="holidayForm.invalid || saving()">
+                    @if (saving()) {
+                      <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                      {{ i18n.t('common.saving') }}
+                    } @else {
+                      <i class="fas fa-save me-2"></i>
+                      {{ i18n.t('common.save') }}
+                    }
+                  </button>
 
-                <!-- Reset Button -->
-                <button
-                  type="button"
-                  class="btn btn-outline-secondary"
-                  (click)="onReset()"
-                  [disabled]="saving()">
-                  <i class="fas fa-undo me-2"></i>
-                  {{ i18n.t('common.reset') }}
-                </button>
+                  <!-- Reset Button -->
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary"
+                    (click)="onReset()"
+                    [disabled]="saving()">
+                    <i class="fas fa-undo me-2"></i>
+                    {{ i18n.t('common.reset') }}
+                  </button>
+                }
 
                 <!-- Cancel Button -->
                 <button
@@ -376,7 +378,7 @@
                   (click)="onCancel()"
                   [disabled]="saving()">
                   <i class="fas fa-times me-2"></i>
-                  {{ i18n.t('common.cancel') }}
+                  {{ canEdit() ? i18n.t('common.cancel') : i18n.t('common.back') }}
                 </button>
               </div>
             </div>

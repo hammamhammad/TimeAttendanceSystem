@@ -1,181 +1,20 @@
-.searchable-select {
-  position: relative;
-}
+/* SearchableSelectComponent — most styling now lives in global components.css
+   under the ERP Lookup / Reference Field block. Keep only host-level tweaks here. */
 
-.searchable-select .dropdown-menu {
-  border: 1px solid var(--app-gray-200, #EAECF0);
-  border-radius: var(--app-border-radius-md, 8px);
-  box-shadow: var(--app-shadow-lg);
-  max-height: 280px;
-  overflow-y: auto;
-}
-
-.searchable-select .dropdown-item {
-  padding: 0.5rem 1rem;
-  border: none;
-  background: none;
-  text-align: left;
+:host {
+  display: block;
   width: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 13px;
-  color: var(--app-gray-700, #344054);
-  transition: background 0.1s;
-  border-bottom: 1px solid var(--app-gray-50, #F9FAFB);
 }
 
-.searchable-select .dropdown-item:last-child {
-  border-bottom: none;
+/* Ensure the host doesn't clip the absolute-positioned dropdown */
+:host,
+:host .lookup-field {
+  overflow: visible;
 }
 
-.searchable-select .dropdown-item:hover:not(.disabled) {
-  background-color: var(--app-primary-50, #EEF2FF);
-  color: var(--app-gray-800, #1D2939);
-}
-
-.searchable-select .dropdown-item:focus:not(.disabled) {
-  background-color: var(--app-primary-50, #EEF2FF);
-  color: var(--app-gray-800, #1D2939);
-  outline: 0;
-}
-
-.searchable-select .dropdown-item.disabled {
-  color: var(--app-gray-400, #98A2B3);
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-.searchable-select .dropdown-item .fw-medium {
-  font-weight: 500;
-}
-
-.searchable-select .dropdown-item small {
-  font-size: 0.875rem;
-  opacity: 0.8;
-}
-
-.searchable-select .dropdown-item-text {
-  padding: 0.5rem 1rem;
-  margin-bottom: 0;
-  font-size: 0.875rem;
-}
-
-.searchable-select .input-group .btn {
-  border-color: var(--app-gray-300, #D0D5DD);
-}
-
-.searchable-select .input-group .btn:hover {
-  border-color: var(--app-gray-400, #98A2B3);
-  background-color: var(--app-gray-50, #F9FAFB);
-}
-
-.searchable-select .input-group .btn:focus {
-  box-shadow: 0 0 0 3px rgba(79, 107, 246, 0.12);
-  border-color: var(--app-primary, #4F6BF6);
-}
-
-.searchable-select .form-control:focus {
-  border-color: var(--app-primary, #4F6BF6);
-  box-shadow: 0 0 0 3px rgba(79, 107, 246, 0.12);
-}
-
-.searchable-select .form-control[readonly] {
-  cursor: pointer;
-}
-
-.searchable-select .spinner-border-sm {
-  width: 1rem;
-  height: 1rem;
-}
-
-/* Custom scrollbar for dropdown */
-.searchable-select .dropdown-menu::-webkit-scrollbar {
-  width: 6px;
-}
-
-.searchable-select .dropdown-menu::-webkit-scrollbar-track {
-  background: var(--app-gray-50, #F9FAFB);
-}
-
-.searchable-select .dropdown-menu::-webkit-scrollbar-thumb {
-  background: var(--app-gray-300, #D0D5DD);
-  border-radius: 3px;
-}
-
-.searchable-select .dropdown-menu::-webkit-scrollbar-thumb:hover {
-  background: var(--app-gray-400, #98A2B3);
-}
-
-/* RTL Support */
-:host-context([dir="rtl"]) .searchable-select .dropdown-item {
-  text-align: right;
-}
-
-:host-context([dir="rtl"]) .searchable-select .form-control {
-  text-align: right;
-}
-
-:host-context([dir="rtl"]) .searchable-select .input-group {
-  direction: rtl;
-}
-
-/* Fix border-radius: input gets rounded on right, last button rounded on left */
-:host-context([dir="rtl"]) .searchable-select .input-group > .form-control {
-  border-top-right-radius: var(--app-border-radius-sm, 6px) !important;
-  border-bottom-right-radius: var(--app-border-radius-sm, 6px) !important;
-  border-top-left-radius: 0 !important;
-  border-bottom-left-radius: 0 !important;
-}
-
-:host-context([dir="rtl"]) .searchable-select .input-group > .btn:last-child,
-:host-context([dir="rtl"]) .searchable-select .input-group > .btn:only-of-type:last-child {
-  border-top-left-radius: var(--app-border-radius-sm, 6px) !important;
-  border-bottom-left-radius: var(--app-border-radius-sm, 6px) !important;
-  border-top-right-radius: 0 !important;
-  border-bottom-right-radius: 0 !important;
-}
-
-:host-context([dir="rtl"]) .searchable-select .input-group > .btn:not(:last-child),
-:host-context([dir="rtl"]) .searchable-select .input-group > .input-group-text {
-  border-radius: 0 !important;
-}
-
-/* Responsive adjustments */
-@media (max-width: 576px) {
-  .searchable-select .dropdown-menu {
-    max-height: 150px !important;
-  }
-
-  .searchable-select .dropdown-item {
-    padding: 0.75rem 1rem;
-  }
-}
-
-/* Animation */
-.searchable-select .dropdown-menu.show {
-  animation: dropdown-fade-in 0.15s ease-out;
-}
-
-@keyframes dropdown-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(-5px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Loading state */
-.searchable-select .loading .input-group-text {
-  background-color: transparent;
-  border: none;
-}
-
-/* Focus within */
-.searchable-select:focus-within .input-group .form-control {
-  border-color: var(--app-primary, #4F6BF6);
-  box-shadow: 0 0 0 3px rgba(79, 107, 246, 0.12);
+/* When the lookup is embedded inside .app-modern-field, align heights so it
+   sits flush with sibling inputs. */
+.app-modern-field :host .lookup-field .form-control,
+.app-modern-field :host .lookup-selected {
+  min-height: 42px;
 }

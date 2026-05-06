@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, computed } from '@angular/core';
+import { Component, inject, signal, OnInit, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormArray, Validators } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
@@ -12,6 +12,7 @@ import { SearchableSelectComponent, SearchableSelectOption } from '../../../../s
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
 
+import { PermissionService } from '../../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-talent-profile',
   standalone: true,
@@ -27,6 +28,16 @@ export class CreateTalentProfileComponent implements OnInit {
   private notification = inject(NotificationService);
   private service = inject(SuccessionService);
   private http = inject(HttpClient);
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('talentProfile.update');
+  }
   private baseUrl = `${environment.apiUrl}/api/v1`;
 
   submitting = signal(false);
@@ -58,6 +69,22 @@ export class CreateTalentProfileComponent implements OnInit {
 
   skills = signal<{ skillName: string; skillNameAr: string; proficiencyLevel: string; yearsOfExperience: number | null; isVerified: boolean }[]>([]);
 
+  constructor() {
+    // Programmatic disable wiring (replaces template [disabled] binding on the
+    // employeeId searchable-select to avoid the reactive-forms warning). The
+    // employee can't be reassigned once a talent profile exists.
+    effect(() => {
+      const editing = this.isEditMode();
+      const ctrl = this.form.get('employeeId');
+      if (!ctrl) return;
+      if (editing && ctrl.enabled) {
+        ctrl.disable({ emitEvent: false });
+      } else if (!editing && ctrl.disabled) {
+        ctrl.enable({ emitEvent: false });
+      }
+    });
+  }
+
   ngOnInit(): void {
     this.http.get<any[]>(`${this.baseUrl}/employees/dropdown`).subscribe(d => this.employees.set(d));
     const id = this.route.snapshot.paramMap.get('id');
@@ -83,6 +110,9 @@ export class CreateTalentProfileComponent implements OnInit {
             isActive: d.isActive,
             notes: d.notes || ''
           });
+          if (!this.canEdit()) {
+            this.form.disable();
+          }
           if (d.skills) {
             this.skills.set(d.skills.map(s => ({
               skillName: s.skillName,

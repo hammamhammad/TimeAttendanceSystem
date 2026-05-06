@@ -59,7 +59,7 @@ export class ApplicationsComponent implements OnInit {
   }
 
   onTableAction(event: { action: string; item: JobApplication }): void {
-    if (event.action === 'view') this.router.navigate(['/recruitment/applications', event.item.id, 'view']);
+    if (event.action === 'view') this.router.navigate(['/recruitment/applications', event.item.id, 'edit']);
   }
 
   onPageChange(p: number): void { this.currentPage.set(p); this.loadData(); }

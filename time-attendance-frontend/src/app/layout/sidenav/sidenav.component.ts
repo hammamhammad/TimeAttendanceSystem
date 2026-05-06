@@ -1,7 +1,8 @@
-import { Component, Input, signal, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, inject, computed, ElementRef, HostListener } from '@angular/core';
 
-import { RouterModule, Router } from '@angular/router';
-import { MenuService, MenuItem, MenuGroup } from '../../core/menu/menu.service';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs';
+import { MenuService, MenuItem, MenuGroup, AppModule, NavAreaKey } from '../../core/menu/menu.service';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { PermissionService } from '../../core/auth/permission.service';
 
@@ -15,15 +16,42 @@ import { PermissionService } from '../../core/auth/permission.service';
 export class SidenavComponent {
   @Input() collapsed = signal(false);
   @Input() show = signal(false);
+  @Output() toggleCollapsed = new EventEmitter<void>();
 
   private menuService = inject(MenuService);
   private router = inject(Router);
   public i18n = inject(I18nService);
   public permissionService = inject(PermissionService);
+  private host = inject(ElementRef<HTMLElement>);
 
-  menuGroups = this.menuService.getMenuGroups$();
+  areas = this.menuService.getNavAreas();
+  activeArea = this.menuService.activeArea$();
+
+  // Groups restricted to the currently active area.
+  menuGroups = computed<MenuGroup[]>(() => this.menuService.groupsForArea(this.activeArea()));
+
+  activeAreaInfo = computed(() =>
+    this.areas.find(a => a.key === this.activeArea()) ?? this.areas[0]
+  );
+
+  areaMenuOpen = signal(false);
+
+  modules: AppModule[] = this.menuService.getModules();
+  activeModule: AppModule = this.menuService.activeModule();
+  moduleLauncherOpen = signal(false);
 
   private openSubmenus = signal<Set<string>>(new Set());
+
+  constructor() {
+    this.router.events
+      .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
+      .subscribe((event) => {
+        const area = this.menuService.findAreaForPath(event.urlAfterRedirects.split('?')[0]);
+        if (area && area !== this.activeArea()) {
+          this.menuService.setActiveArea(area);
+        }
+      });
+  }
 
   isRtl(): boolean {
     return this.i18n.isRtl();
@@ -91,5 +119,54 @@ export class SidenavComponent {
 
   hasVisibleGroup(group: MenuGroup): boolean {
     return group.items.some(item => this.hasParentMenuPermission(item));
+  }
+
+  areaHasAnyVisibleGroup(areaKey: NavAreaKey): boolean {
+    return this.menuService.groupsForArea(areaKey).some(g => this.hasVisibleGroup(g));
+  }
+
+  toggleAreaMenu(event?: Event): void {
+    event?.stopPropagation();
+    this.areaMenuOpen.update(v => !v);
+  }
+
+  selectArea(key: NavAreaKey, event?: Event): void {
+    event?.stopPropagation();
+    this.menuService.setActiveArea(key);
+    this.areaMenuOpen.set(false);
+  }
+
+  toggleModuleLauncher(event?: Event): void {
+    event?.stopPropagation();
+    this.moduleLauncherOpen.update(v => !v);
+  }
+
+  closeModuleLauncher(): void {
+    this.moduleLauncherOpen.set(false);
+  }
+
+  selectModule(module: AppModule, event?: Event): void {
+    event?.stopPropagation();
+    if (module.comingSoon) return;
+    this.closeModuleLauncher();
+  }
+
+  onToggleCollapsed(): void {
+    this.toggleCollapsed.emit();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(e: MouseEvent): void {
+    const target = e.target as Node;
+    if (!this.host.nativeElement.contains(target)) {
+      if (this.moduleLauncherOpen()) this.closeModuleLauncher();
+      if (this.areaMenuOpen()) this.areaMenuOpen.set(false);
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.moduleLauncherOpen()) this.closeModuleLauncher();
+    if (this.areaMenuOpen()) this.areaMenuOpen.set(false);
   }
 }

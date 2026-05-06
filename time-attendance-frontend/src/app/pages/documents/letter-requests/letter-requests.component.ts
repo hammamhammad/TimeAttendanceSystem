@@ -60,7 +60,7 @@ export class LetterRequestsComponent implements OnInit {
   navigateToCreate(): void { this.router.navigate(['/documents/letter-requests/create']); }
 
   onActionClick(event: { action: string; item: LetterRequestDto }): void {
-    if (event.action === 'view') this.router.navigate(['/documents/letter-requests', event.item.id, 'view']);
+    if (event.action === 'view') this.router.navigate(['/documents/letter-requests', event.item.id, 'edit']);
     else if (event.action === 'approve') {
       this.service.approveLetterRequest(event.item.id).subscribe({
         next: () => { this.notification.success(this.i18n.t('letter_requests.approved')); this.loadData(); },

@@ -2,6 +2,54 @@
   "search": {
     "placeholder": "Search everything… (Ctrl+K)"
   },
+  "lookup": {
+    "empty_search_hint": "Start typing to search, or click the search icon to browse all records",
+    "readonly_hint": "Enabled after selecting {{dependency}}",
+    "no_results_for": "No records found for \"{{query}}\"",
+    "results_found": "{{count}} results found",
+    "keyboard_hint": "↑↓ navigate · Enter select · Esc close",
+    "clear_selection": "Clear selection",
+    "change_selection": "Change",
+    "browse_all": "Browse all",
+    "open_in_new_tab": "Open {{name}} in new tab"
+  },
+  "form": {
+    "required_marker": "*",
+    "code_available": "Code is available",
+    "code_unique_error": "Value must be unique"
+  },
+  "filter": {
+    "condition": "Condition",
+    "value": "Value",
+    "to": "to",
+    "enter_value": "Enter value",
+    "no_values": "No values to filter by",
+    "no_match": "No matching values",
+    "op": {
+      "contains": "Contains",
+      "notContains": "Does not contain",
+      "equals": "Equals",
+      "notEquals": "Does not equal",
+      "startsWith": "Starts with",
+      "endsWith": "Ends with",
+      "greaterThan": "Greater than",
+      "greaterOrEqual": "Greater or equal",
+      "lessThan": "Less than",
+      "lessOrEqual": "Less or equal",
+      "between": "Between",
+      "before": "Before",
+      "after": "After",
+      "today": "Today",
+      "thisWeek": "This week",
+      "thisMonth": "This month",
+      "thisYear": "This year",
+      "isTrue": "Is true",
+      "isFalse": "Is false",
+      "isAnyOf": "Is any of",
+      "isEmpty": "Is empty",
+      "isNotEmpty": "Is not empty"
+    }
+  },
   "lifecycle_automation": {
     "history_title": "Automation History",
     "no_history": "No automation events recorded for this record.",
@@ -177,6 +225,42 @@
     "settings": "Settings",
     "logout": "Logout",
     "toggle_menu": "Toggle menu",
+    "brand": "ERP Suite",
+    "switchArea": "Switch Area",
+    "areas": {
+      "dashboard": "Dashboard",
+      "people": "People",
+      "workforce": "Workforce",
+      "payroll": "Payroll",
+      "operations": "Operations",
+      "me": "Me",
+      "pay": "Pay",
+      "services": "Services",
+      "approvals": "Approvals"
+    },
+    "modules": {
+      "title": "Modules",
+      "subtitle": "Switch between ERP modules. Each module opens with its own navigation.",
+      "soon": "SOON",
+      "active": "Active",
+      "areas_count": "areas",
+      "hr": {
+        "name": "HR",
+        "description": "Employees, time, leave, payroll"
+      },
+      "crm": {
+        "name": "CRM",
+        "description": "Leads, accounts, contacts, opportunities"
+      },
+      "sales": {
+        "name": "Sales",
+        "description": "Quotations, orders, invoicing"
+      },
+      "inventory": {
+        "name": "Inventory",
+        "description": "Stock, warehouses, transfers"
+      }
+    },
     "hr": "HR Management",
     "contracts": "Contracts",
     "transfers": "Transfers",
@@ -2664,6 +2748,8 @@
     "description": "Description",
     "approve": "Approve",
     "reject": "Reject",
+    "apply": "Apply",
+    "no_data": "No data",
     "days_text": "days",
     "dayUnit": "day",
     "select_employee": "Select Employee",
@@ -2706,6 +2792,9 @@
     "no_data": "No data available",
     "unlimited": "Unlimited",
     "employee_number": "Employee #",
+    "select_row_for_actions": "Select a row to enable actions",
+    "one_row_selected": "1 row selected",
+    "rows_selected": "rows selected",
     "select": "Select",
     "create": "Create",
     "edit": "Edit",
@@ -3805,9 +3894,6 @@
     "renew_error": "Failed to renew contract",
     "renewed_successfully": "Contract renewed successfully",
     "created_successfully": "Contract created successfully",
-    "type_temporary": "Temporary",
-    "type_probationary": "Probationary",
-    "type_part_time": "Part Time",
     "renewed": "Renewed",
     "hints": {
       "employee": "Select the employee this contract belongs to",

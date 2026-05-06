@@ -13,6 +13,7 @@ import { SearchableSelectComponent, SearchableSelectOption } from '../../../../s
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { TerminationType } from '../../../../shared/models/termination.model';
 
+import { PermissionService } from '../../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-termination',
   standalone: true,
@@ -30,6 +31,16 @@ export class CreateTerminationComponent implements OnInit {
   private notificationService = inject(NotificationService);
   readonly i18n = inject(I18nService);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('termination.manage');
+  }
   submitting = signal(false);
   loading = signal(false);
   isEditMode = signal(false);
@@ -66,6 +77,9 @@ export class CreateTerminationComponent implements OnInit {
           lastWorkingDate: data.lastWorkingDate?.substring(0, 10),
           reason: data.reason
         });
+        if (!this.canEdit()) {
+          this.form.disable();
+        }
       },
       error: () => {
         this.notificationService.error(this.i18n.t('common.error_loading'));
@@ -101,7 +115,7 @@ export class CreateTerminationComponent implements OnInit {
     action$.subscribe({
       next: (result: any) => {
         this.notificationService.success(this.i18n.t(this.isEditMode() ? 'offboarding.terminations.updated_successfully' : 'offboarding.terminations.created_successfully'));
-        this.router.navigate(['/offboarding/terminations', this.isEditMode() ? this.editId() : result.id, 'view']);
+        this.router.navigate(['/offboarding/terminations']);
       },
       error: () => {
         this.notificationService.error(this.i18n.t('common.error_saving'));

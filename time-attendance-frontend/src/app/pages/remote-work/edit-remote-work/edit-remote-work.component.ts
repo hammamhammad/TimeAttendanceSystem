@@ -12,6 +12,7 @@ import { FormSectionComponent } from '../../../shared/components/form-section/fo
 import { SearchableSelectComponent } from '../../../shared/components/searchable-select/searchable-select.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
+import { PermissionService } from '../../../core/auth/permission.service';
 @Component({
   selector: 'app-edit-remote-work',
   standalone: true,
@@ -34,6 +35,11 @@ export class EditRemoteWorkComponent implements OnInit {
   private readonly notification = inject(NotificationService);
   readonly i18n = inject(I18nService);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    return this.permissionService.has('remoteWork.request.update');
+  }
   form!: FormGroup;
   loading = signal(false);
   submitting = signal(false);
@@ -98,6 +104,9 @@ export class EditRemoteWorkComponent implements OnInit {
           status: request.status,
           rejectionReason: request.rejectionReason || ''
         });
+        if (!this.canEdit()) {
+          this.form.disable();
+        }
         this.loading.set(false);
       },
       error: () => {
@@ -156,11 +165,6 @@ export class EditRemoteWorkComponent implements OnInit {
   }
 
   onCancel(): void {
-    const id = this.requestId();
-    if (id) {
-      this.router.navigate(['/remote-work', id, 'view']);
-    } else {
-      this.router.navigate(['/remote-work']);
-    }
+    this.router.navigate(['/remote-work']);
   }
 }

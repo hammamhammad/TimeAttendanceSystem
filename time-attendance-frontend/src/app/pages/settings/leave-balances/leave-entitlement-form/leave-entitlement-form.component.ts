@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, inject, effect } from '@angular/core';
 
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -13,6 +13,7 @@ import { SetLeaveEntitlementRequest } from '../../../../shared/models/leave-bala
 import { EmployeesService } from '../../../employees/employees.service';
 import { VacationTypesService } from '../../../vacation-types/vacation-types.service';
 
+import { PermissionService } from '../../../../core/auth/permission.service';
 /**
  * Component for creating and editing leave entitlements.
  * Allows HR to configure annual leave allocations for employees.
@@ -40,6 +41,16 @@ export class LeaveEntitlementFormComponent implements OnInit {
   private notificationService = inject(NotificationService);
   readonly i18n = inject(I18nService);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('leaveBalance.update');
+  }
   // State
   entitlementId = signal<number | null>(null);
   loading = signal<boolean>(false);
@@ -66,6 +77,24 @@ export class LeaveEntitlementFormComponent implements OnInit {
       effectiveStartDate: [null],
       effectiveEndDate: [null],
       notes: ['', [Validators.maxLength(500)]]
+    });
+
+    // Programmatic disable wiring (replaces template [disabled] bindings on
+    // formControlName-bound controls to avoid the reactive-forms warning).
+    // employeeId + vacationTypeId are locked once we're editing an existing
+    // entitlement (you can't reassign the entitlement to a different employee/type).
+    effect(() => {
+      const editing = this.isEditMode();
+      const lockedNames = ['employeeId', 'vacationTypeId'];
+      for (const name of lockedNames) {
+        const ctrl = this.entitlementForm?.get(name);
+        if (!ctrl) continue;
+        if (editing && ctrl.enabled) {
+          ctrl.disable({ emitEvent: false });
+        } else if (!editing && ctrl.disabled) {
+          ctrl.enable({ emitEvent: false });
+        }
+      }
     });
   }
 
@@ -233,6 +262,9 @@ export class LeaveEntitlementFormComponent implements OnInit {
       this.entitlementForm.patchValue({
         maxCarryOverDays: carryOver
       });
+      if (!this.canEdit()) {
+        this.entitlementForm.disable();
+      }
     }
   }
 }

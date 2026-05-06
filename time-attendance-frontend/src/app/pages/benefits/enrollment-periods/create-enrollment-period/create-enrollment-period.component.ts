@@ -8,6 +8,7 @@ import { FormHeaderComponent } from '../../../../shared/components/form-header/f
 import { FormSectionComponent } from '../../../../shared/components/form-section/form-section.component';
 import { OpenEnrollmentPeriod } from '../../../../shared/models/benefit.model';
 
+import { PermissionService } from '../../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-enrollment-period',
   standalone: true,
@@ -22,6 +23,17 @@ export class CreateEnrollmentPeriodComponent implements OnInit {
   private notificationService = inject(NotificationService);
   public i18n = inject(I18nService);
 
+  private permissionService = inject(PermissionService);
+
+  // TODO: wire up readonly disable when canEdit is false (form is a plain object with ngModel — not a FormGroup)
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('openEnrollmentPeriod.update');
+  }
   submitting = signal(false);
   isEdit = signal(false);
   editId = signal<number | null>(null);
@@ -74,12 +86,12 @@ export class CreateEnrollmentPeriodComponent implements OnInit {
 
     if (this.isEdit()) {
       this.benefitService.updateOpenEnrollmentPeriod(this.editId()!, payload).subscribe({
-        next: () => { this.notificationService.success(this.t('app.success'), this.t('benefits.periods.updated_success')); this.router.navigate(['/benefits/enrollment-periods', this.editId(), 'view']); this.submitting.set(false); },
+        next: () => { this.notificationService.success(this.t('app.success'), this.t('benefits.periods.updated_success')); this.router.navigate(['/benefits/enrollment-periods']); this.submitting.set(false); },
         error: (err) => { this.submitting.set(false); this.notificationService.error(this.t('app.error'), err?.error?.error || this.t('benefits.periods.save_error')); }
       });
     } else {
       this.benefitService.createOpenEnrollmentPeriod(payload).subscribe({
-        next: (res) => { this.notificationService.success(this.t('app.success'), this.t('benefits.periods.created_success')); this.router.navigate(['/benefits/enrollment-periods', res.id, 'view']); this.submitting.set(false); },
+        next: (res) => { this.notificationService.success(this.t('app.success'), this.t('benefits.periods.created_success')); this.router.navigate(['/benefits/enrollment-periods']); this.submitting.set(false); },
         error: (err) => { this.submitting.set(false); this.notificationService.error(this.t('app.error'), err?.error?.error || this.t('benefits.periods.save_error')); }
       });
     }

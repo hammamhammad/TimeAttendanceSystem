@@ -23,6 +23,7 @@ export class DepartmentFormComponent implements OnInit, OnChanges {
   @Input() branchId: number | null = null;
   @Input() parentId: number | null = null;
   @Input() isEditMode = false;
+  @Input() readonly: boolean = false;
   @Input() externalSaving: boolean = false;
   @Output() save = new EventEmitter<CreateDepartmentRequest | UpdateDepartmentRequest>();
   @Output() cancel = new EventEmitter<void>();
@@ -39,11 +40,8 @@ export class DepartmentFormComponent implements OnInit, OnChanges {
   departments = signal<DepartmentDto[]>([]);
   branches = signal<BranchDto[]>([]);
   managers = signal<EmployeeSelectOption[]>([]);
-  filteredManagers = signal<EmployeeSelectOption[]>([]);
   loadingBranches = signal(false);
   loadingManagers = signal(false);
-  showManagerDropdown = signal(false);
-  managerSearchTerm = signal('');
 
   // Computed signal for saving state (either internal or external)
   isSaving = computed(() => this.saving() || this.externalSaving);
@@ -56,18 +54,31 @@ export class DepartmentFormComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
+    // Managers are loaded globally (not branch-scoped), so we can fetch them
+    // up front in both create and edit mode.
+    this.loadManagers();
+
     if (!this.isEditMode) {
       this.loadBranches();
     } else {
-      // In edit mode, load departments and managers for the current branch
       this.loadDepartments();
-      this.loadManagers();
+    }
+
+    if (this.readonly) {
+      this.form.disable();
     }
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['department'] && this.department) {
       this.populateForm();
+    }
+    if (changes['readonly']) {
+      if (this.readonly) {
+        this.form?.disable();
+      } else {
+        this.form?.enable();
+      }
     }
   }
 
@@ -110,13 +121,10 @@ export class DepartmentFormComponent implements OnInit, OnChanges {
       isActive: this.department.isActive
     });
 
-    // Clear search term so selected manager name is displayed properly
-    this.managerSearchTerm.set('');
-
-    // Reload managers and departments for the department's branch in edit mode
+    // Reload departments for the department's branch in edit mode (managers
+    // are loaded globally in ngOnInit, no need to reload them on branch change).
     if (this.isEditMode) {
       this.loadDepartments();
-      this.loadManagers();
     }
   }
 
@@ -165,22 +173,15 @@ export class DepartmentFormComponent implements OnInit, OnChanges {
   }
 
   private loadManagers() {
-    const selectedBranchId = this.branchId || this.form.get('branchId')?.value;
-
-    // Don't load managers if no branch is selected in create mode
-    if (!this.isEditMode && !selectedBranchId) {
-      this.managers.set([]);
-      this.filteredManagers.set([]);
-      return;
-    }
-
     this.loadingManagers.set(true);
 
-    // Load managers for specific branch if available, otherwise load all managers
-    this.employeesService.getManagers(selectedBranchId || undefined).subscribe({
+    // Load all active employees as candidate managers — branch is no longer
+    // required because a department may legitimately be managed by an
+    // employee from a different branch (regional managers, shared services,
+    // etc.). The user can search the full list via the dropdown.
+    this.employeesService.getManagers().subscribe({
       next: (managers) => {
         this.managers.set(managers);
-        this.filteredManagers.set(managers);
         this.loadingManagers.set(false);
       },
       error: (error) => {
@@ -226,14 +227,14 @@ export class DepartmentFormComponent implements OnInit, OnChanges {
   }
 
   onBranchChange() {
-    // When branch changes, reload departments and managers for the new branch
+    // When branch changes, reset the parent department since it's branch-scoped.
+    // Manager stays selected because manager candidates are no longer
+    // branch-scoped (a department in any branch can be managed by any employee).
     this.form.patchValue({
-      parentDepartmentId: null,  // Reset parent department
-      managerEmployeeId: null    // Reset manager
+      parentDepartmentId: null
     });
 
     this.loadDepartments();
-    this.loadManagers();
   }
 
   private markFormGroupTouched() {
@@ -263,55 +264,17 @@ export class DepartmentFormComponent implements OnInit, OnChanges {
     return '';
   }
 
-  onManagerSearch(event: Event) {
-    const target = event.target as HTMLInputElement;
-    const searchTerm = target.value.toLowerCase();
-    this.managerSearchTerm.set(target.value);
-
-    if (searchTerm.trim() === '') {
-      this.filteredManagers.set(this.managers());
-    } else {
-      const filtered = this.managers().filter(manager =>
-        manager.name.toLowerCase().includes(searchTerm) ||
-        manager.employeeNumber.toLowerCase().includes(searchTerm)
-      );
-      this.filteredManagers.set(filtered);
-    }
-    this.showManagerDropdown.set(true);
+  onManagerSelectionChange(managerIdStr: string) {
+    const managerId = managerIdStr ? parseInt(managerIdStr) : null;
+    this.form.patchValue({ managerEmployeeId: managerId });
   }
 
-  onSelectManager(manager: EmployeeSelectOption) {
-    this.form.get('managerEmployeeId')?.setValue(manager.id);
-    this.managerSearchTerm.set(''); // Clear search term so getSelectedManagerName() is used
-    this.showManagerDropdown.set(false);
-  }
-
-  onManagerFocus() {
-    this.showManagerDropdown.set(true);
-
-    // If there's a selected manager, clear search term so user can type to search
-    const selectedId = this.form.get('managerEmployeeId')?.value;
-    if (selectedId) {
-      this.managerSearchTerm.set('');
-    }
-    // Always show all available managers when focusing
-    this.filteredManagers.set(this.managers());
-  }
-
-  onManagerBlur() {
-    setTimeout(() => this.showManagerDropdown.set(false), 200);
-  }
-
-  getSelectedManagerName(): string {
-    const selectedId = this.form.get('managerEmployeeId')?.value;
-    if (!selectedId) return '';
-
-    const manager = this.managers().find(m => m.id === selectedId);
-    return manager ? manager.name : '';
-  }
-
-  trackByManagerId(index: number, manager: EmployeeSelectOption): number {
-    return manager.id;
+  get managerSelectOptions(): SearchableSelectOption[] {
+    return this.managers().map(manager => ({
+      value: manager.id.toString(),
+      label: manager.name,
+      subLabel: manager.employeeNumber
+    }));
   }
 
   // Searchable select options

@@ -62,10 +62,27 @@ public class GetEmployeesQueryHandler : BaseHandler<GetEmployeesQuery, Result<Pa
         // Get total count
         var totalCount = await query.CountAsync(cancellationToken);
 
+        // Apply sorting — falls back to (LastName, FirstName) when no SortBy given.
+        // Accepts both domain-field names (fullName, employeeNumber) and UI column keys (name, employeeCode).
+        var desc = string.Equals(request.SortDirection, "desc", StringComparison.OrdinalIgnoreCase);
+        IQueryable<Domain.Employees.Employee> ordered = (request.SortBy?.ToLowerInvariant()) switch
+        {
+            "fullname" or "lastname" or "employee" or "name" => desc
+                ? query.OrderByDescending(e => e.LastName).ThenByDescending(e => e.FirstName)
+                : query.OrderBy(e => e.LastName).ThenBy(e => e.FirstName),
+            "firstname" => desc ? query.OrderByDescending(e => e.FirstName) : query.OrderBy(e => e.FirstName),
+            "employeenumber" or "code" or "employeecode" => desc ? query.OrderByDescending(e => e.EmployeeNumber) : query.OrderBy(e => e.EmployeeNumber),
+            "email" => desc ? query.OrderByDescending(e => e.Email) : query.OrderBy(e => e.Email),
+            "branch" or "branchname" => desc ? query.OrderByDescending(e => e.Branch.Name) : query.OrderBy(e => e.Branch.Name),
+            "department" or "departmentname" => desc ? query.OrderByDescending(e => e.Department!.Name) : query.OrderBy(e => e.Department!.Name),
+            "hiredate" => desc ? query.OrderByDescending(e => e.HireDate) : query.OrderBy(e => e.HireDate),
+            "status" or "isactive" => desc ? query.OrderByDescending(e => e.IsActive) : query.OrderBy(e => e.IsActive),
+            "employmentstatus" => desc ? query.OrderByDescending(e => e.EmploymentStatus) : query.OrderBy(e => e.EmploymentStatus),
+            _ => query.OrderBy(e => e.LastName).ThenBy(e => e.FirstName)
+        };
+
         // Apply pagination
-        var employees = await query
-            .OrderBy(e => e.LastName)
-            .ThenBy(e => e.FirstName)
+        var employees = await ordered
             .Skip((request.Page - 1) * request.PageSize)
             .Take(request.PageSize)
             .Select(e => new EmployeeDto

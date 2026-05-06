@@ -46,7 +46,7 @@ export class BenefitPlansComponent implements OnInit {
     { key: 'name', label: this.t('common.name'), sortable: true, width: '200px', priority: 'high', mobileLabel: this.t('common.name') },
     { key: 'benefitTypeBadge', label: this.t('benefits.plans.benefit_type'), sortable: false, width: '120px', align: 'center', priority: 'medium', mobileLabel: this.t('benefits.plans.benefit_type'), renderHtml: true },
     { key: 'planYear', label: this.t('benefits.plans.plan_year'), sortable: true, width: '100px', align: 'center', priority: 'medium', mobileLabel: this.t('benefits.plans.plan_year') },
-    { key: 'premiumDisplay', label: this.t('benefits.plans.employee_premium'), sortable: false, width: '140px', align: 'center', priority: 'low', hideOnMobile: true, mobileLabel: this.t('benefits.plans.employee_premium') },
+    { key: 'premiumDisplay', label: this.t('benefits.plans.employee_premium'), sortable: false, width: '140px', align: 'center', priority: 'medium', hideOnMobile: true, mobileLabel: this.t('benefits.plans.employee_premium') },
     { key: 'statusBadge', label: this.t('common.status'), sortable: false, width: '100px', align: 'center', priority: 'high', mobileLabel: this.t('common.status'), renderHtml: true }
   ]);
 

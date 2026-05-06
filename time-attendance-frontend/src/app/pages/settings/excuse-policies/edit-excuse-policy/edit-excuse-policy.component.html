@@ -13,6 +13,7 @@
     </app-form-header>
 
     <form #policyFormRef="ngForm" (ngSubmit)="onSubmit()">
+    <fieldset [disabled]="!canEdit()" style="border:0;padding:0;margin:0;">
     <div class="row">
       <!-- Scope Configuration -->
       <div class="col-md-12 mb-4">
@@ -218,18 +219,23 @@
         </app-form-section>
       </div>
 
+    </div>
+    </fieldset>
+    <div class="row">
       <!-- Form Actions -->
       <div class="col-12">
         <div class="app-form-actions">
           <button type="button" class="btn btn-outline-secondary" (click)="onCancel()" [disabled]="submitting()">
-            {{ t('common.cancel') }}
+            {{ canEdit() ? t('common.cancel') : t('common.back') }}
           </button>
-          <button type="submit" class="btn btn-primary" [disabled]="submitting()">
-            @if (submitting()) {
-              <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-            }
-            {{ t('common.save') }}
-          </button>
+          @if (canEdit()) {
+            <button type="submit" class="btn btn-primary" [disabled]="submitting()">
+              @if (submitting()) {
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              }
+              {{ t('common.save') }}
+            </button>
+          }
         </div>
       </div>
     </div>

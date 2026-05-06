@@ -61,7 +61,7 @@ export class OnboardingProcessesComponent implements OnInit {
   }
 
   onTableAction(event: { action: string; item: OnboardingProcess }): void {
-    if (event.action === 'view') this.router.navigate(['/onboarding/processes', event.item.id, 'view']);
+    if (event.action === 'view') this.router.navigate(['/onboarding/processes', event.item.id, 'edit']);
   }
 
   onPageChange(p: number): void { this.currentPage.set(p); this.loadData(); }

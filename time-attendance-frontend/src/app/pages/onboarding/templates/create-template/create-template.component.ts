@@ -9,6 +9,7 @@ import { FormHeaderComponent } from '../../../../shared/components/form-header/f
 import { FormSectionComponent } from '../../../../shared/components/form-section/form-section.component';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 
+import { PermissionService } from '../../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-template',
   standalone: true,
@@ -24,6 +25,16 @@ export class CreateOnboardingTemplateComponent implements OnInit {
   private notification = inject(NotificationService);
   private service = inject(OnboardingService);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('onboardingTemplate.manage');
+  }
   submitting = signal(false);
   isEditMode = signal(false);
   editId = signal<number | null>(null);
@@ -57,6 +68,9 @@ export class CreateOnboardingTemplateComponent implements OnInit {
             isActive: t.isActive,
             isDefault: t.isDefault
           });
+          if (!this.canEdit()) {
+            this.form.disable();
+          }
           this.tasks.clear();
           if (t.tasks?.length) {
             t.tasks.forEach(task => {

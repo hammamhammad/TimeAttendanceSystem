@@ -233,7 +233,7 @@ export class AllowancesComponent implements OnInit {
     const { action, item } = event;
     switch (action) {
       case 'view':
-        this.router.navigate(['/allowances', item.id, 'view']);
+        this.router.navigate(['/allowances', item.id, 'edit']);
         break;
       case 'suspend':
         this.onSuspend(item);

@@ -1,16 +1,19 @@
+/* =========================================================
+   Layout shell — ERP Design System
+   Sidebar floats with 8px margin + 12px radius; main content
+   margin mirrors --sidebar-width (live-toggled by component).
+   ========================================================= */
+
 .layout-container {
   position: relative;
   min-height: 100vh;
+  background: var(--app-page-bg, #F5F6FA);
 }
 
 .main-content {
-  margin-left: 250px;
+  margin-left: var(--sidebar-width, 180px);
   min-height: 100vh;
-  transition: margin-left 0.3s ease;
-}
-
-.main-content.sidenav-collapsed {
-  margin-left: 72px;
+  transition: margin-left 0.2s ease, margin-right 0.2s ease;
 }
 
 .main-content.mobile {
@@ -18,13 +21,13 @@
 }
 
 .page-content {
-  padding-top: 60px;
+  padding-top: var(--topbar-height, 44px);
   padding-bottom: 2rem;
-  min-height: calc(100vh - 60px);
+  min-height: calc(100vh - var(--topbar-height, 44px));
 }
 
 .page-content .container-fluid {
-  padding: 2rem 1rem;
+  padding: 1.5rem 1.25rem;
 }
 
 .mobile-backdrop {
@@ -33,34 +36,34 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(16, 24, 40, 0.5);
   z-index: 1040;
 }
 
-/* RTL Support */
+/* RTL */
 :host-context([dir="rtl"]) .main-content {
   margin-left: 0 !important;
-  margin-right: 260px !important;
-}
-
-:host-context([dir="rtl"]) .main-content.sidenav-collapsed {
-  margin-right: 72px !important;
+  margin-right: var(--sidebar-width, 180px);
 }
 
 :host-context([dir="rtl"]) .main-content.mobile {
   margin-right: 0 !important;
 }
 
-/* Mobile responsiveness */
+/* Mobile */
 @media (max-width: 767.98px) {
   .main-content {
     margin-left: 0;
   }
-  
+
   :host-context([dir="rtl"]) .main-content {
     margin-right: 0 !important;
   }
-  
+
+  .page-content {
+    padding-top: calc(var(--topbar-height, 44px) + 8px);
+  }
+
   .page-content .container-fluid {
     padding: 1rem 0.75rem;
   }

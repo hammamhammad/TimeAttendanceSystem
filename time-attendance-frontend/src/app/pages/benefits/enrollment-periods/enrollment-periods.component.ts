@@ -45,7 +45,7 @@ export class EnrollmentPeriodsComponent implements OnInit {
     { key: 'planYear', label: this.t('benefits.periods.plan_year'), sortable: true, width: '100px', align: 'center', priority: 'medium', mobileLabel: this.t('benefits.periods.plan_year') },
     { key: 'branchDisplay', label: this.t('common.branch'), sortable: false, width: '150px', priority: 'medium', mobileLabel: this.t('common.branch') },
     { key: 'startDateDisplay', label: this.t('benefits.periods.start_date'), sortable: true, width: '130px', priority: 'medium', mobileLabel: this.t('benefits.periods.start_date') },
-    { key: 'endDateDisplay', label: this.t('benefits.periods.end_date'), sortable: true, width: '130px', priority: 'low', hideOnMobile: true, mobileLabel: this.t('benefits.periods.end_date') },
+    { key: 'endDateDisplay', label: this.t('benefits.periods.end_date'), sortable: true, width: '130px', priority: 'medium', hideOnMobile: true, mobileLabel: this.t('benefits.periods.end_date') },
     { key: 'statusBadge', label: this.t('common.status'), sortable: false, width: '120px', align: 'center', priority: 'high', mobileLabel: this.t('common.status'), renderHtml: true }
   ]);
 

@@ -60,7 +60,7 @@ export class FeedbackRequestsComponent implements OnInit {
   }
 
   onTableAction(event: { action: string; item: FeedbackRequest360 }): void {
-    if (event.action === 'view') this.router.navigate(['/performance/feedback-requests', event.item.id, 'view']);
+    if (event.action === 'view') this.router.navigate(['/performance/feedback-requests', event.item.id, 'edit']);
   }
 
   navigateToCreate(): void { this.router.navigate(['/performance/feedback-requests/create']); }

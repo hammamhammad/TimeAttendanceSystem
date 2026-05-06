@@ -1014,31 +1014,45 @@
 }
 
 /* --- Floating Label → ERP Label-Above-Input --- */
+/* ERP label-above-input pattern — flex column-reverse lets us keep the
+   Bootstrap <input><label> DOM order while visually rendering the label
+   above the input. Compact 40px inputs per ERP spec §6. */
 .app-modern-form .form-floating {
   position: relative;
   margin-bottom: 0;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 6px;
 }
 
-/* Remove the animated underline pseudo-element */
-.app-modern-form .form-floating::after {
-  display: none;
+.app-modern-form .form-floating::after { display: none; }
+
+/* Bootstrap renders a `::after` pseudo on the label that masks part of the
+   textarea so a floating label can overlap cleanly. In the modern-form
+   layout the label sits above the textarea (not floating), so this pseudo
+   shows as a stray bar at the top of the textarea — kill it. */
+.app-modern-form .form-floating > label::after,
+.app-modern-form .form-floating > .form-control:focus ~ label::after,
+.app-modern-form .form-floating > .form-control:not(:placeholder-shown) ~ label::after,
+.app-modern-form .form-floating > .form-control:-webkit-autofill ~ label::after {
+  display: none !important;
+  content: none !important;
 }
 
-/* Input: full border, not bottom-only */
+/* Compact input — ERP spec: 10/14 padding, 40px height, 14px font */
 .app-modern-form .form-floating > .form-control {
   border: 1px solid var(--app-gray-300, #D0D5DD);
   border-radius: var(--app-border-radius-sm, 6px);
   background-color: #fff;
-  padding: 26px 14px 8px 14px;
+  padding: 10px 14px;
   height: auto;
-  min-height: 52px;
+  min-height: 40px;
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.45;
   color: var(--app-gray-900, #101828);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-/* Focus: primary border + focus ring */
 .app-modern-form .form-floating > .form-control:focus {
   border-color: var(--app-primary, #4F6BF6);
   box-shadow: 0 0 0 3px var(--app-primary-100, #D8E0FF);
@@ -1046,57 +1060,62 @@
   outline: none;
 }
 
-/* Disabled input */
-.app-modern-form .form-floating > .form-control:disabled {
+.app-modern-form .form-floating > .form-control:disabled,
+.app-modern-form .form-floating > .form-control[readonly] {
   background-color: var(--app-gray-50, #F9FAFB);
   color: var(--app-gray-400, #98A2B3);
   cursor: not-allowed;
 }
 
-/* Label: ALWAYS show in "above" position */
+/* Label rendered as a plain block above the input */
 .app-modern-form .form-floating > label {
-  position: absolute;
-  top: 0;
-  left: 0;
-  padding: 6px 14px 0 14px;
+  position: static;
+  padding: 0;
+  margin: 0;
   transform: none !important;
   font-size: 13px;
   font-weight: 500;
   color: var(--app-gray-700, #344054);
   opacity: 1 !important;
-  pointer-events: none;
+  pointer-events: auto;
   transition: color 0.15s ease;
   border: none;
   height: auto;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: calc(100% - 28px);
+  display: block;
+  line-height: 1.3;
+  max-width: 100%;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
 }
 
-/* Override Bootstrap's floated label transforms */
+/* No transforms on focus/filled — label stays where it is */
 .app-modern-form .form-floating > .form-control:focus ~ label,
 .app-modern-form .form-floating > .form-control:not(:placeholder-shown) ~ label,
-.app-modern-form .form-floating > .form-control:-webkit-autofill ~ label {
+.app-modern-form .form-floating > .form-control:-webkit-autofill ~ label,
+.app-modern-form .form-floating > .form-select ~ label,
+.app-modern-form .form-floating > .form-select:focus ~ label {
   transform: none !important;
   font-size: 13px;
   opacity: 1 !important;
   font-weight: 500;
+  padding: 0;
 }
 
-/* On focus, label turns primary */
-.app-modern-form .form-floating > .form-control:focus ~ label {
+/* Focused label → primary indigo */
+.app-modern-form .form-floating > .form-control:focus ~ label,
+.app-modern-form .form-floating > .form-select:focus ~ label {
   color: var(--app-primary, #4F6BF6);
 }
 
-/* --- Select Elements --- */
+/* Select — match input compactness + ERP chevron (defined in global .form-select rule) */
 .app-modern-form .form-floating > .form-select {
   border: 1px solid var(--app-gray-300, #D0D5DD);
   border-radius: var(--app-border-radius-sm, 6px);
   background-color: #fff;
-  padding: 26px 36px 8px 14px;
+  padding: 10px 36px 10px 14px;
   height: auto;
-  min-height: 52px;
+  min-height: 40px;
   font-size: 14px;
   color: var(--app-gray-900, #101828);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
@@ -1109,28 +1128,16 @@
   outline: none;
 }
 
-/* Select label - always above */
-.app-modern-form .form-floating > .form-select ~ label {
-  position: absolute;
-  top: 0;
-  left: 0;
-  padding: 6px 14px 0 14px;
-  transform: none !important;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--app-gray-700, #344054);
-  opacity: 1 !important;
+:root[dir="rtl"] .app-modern-form .form-floating > .form-select {
+  padding: 10px 14px 10px 36px;
 }
 
-.app-modern-form .form-floating > .form-select:focus ~ label {
-  color: var(--app-primary, #4F6BF6);
-}
-
-/* --- Textarea --- */
+/* Textarea — keep vertical resize, taller min-height */
 .app-modern-form .form-floating > textarea.form-control {
   height: auto;
   min-height: 80px;
   resize: vertical;
+  padding: 10px 14px;
 }
 
 /* --- Validation States --- */
@@ -1799,4 +1806,768 @@
   background-color: var(--app-warning, #F59E0B);
   border-color: var(--app-warning, #F59E0B);
   color: #fff;
+}
+
+/* ============================================================
+   ERP Form Fields & Input Types — spec §6
+   ============================================================ */
+
+/* Helper text utilities */
+.form-hint {
+  font-size: 12px;
+  color: var(--app-gray-400, #98A2B3);
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.45;
+}
+.form-hint i { font-size: 10px; }
+
+.form-error {
+  font-size: 12px;
+  color: var(--app-danger-500, #EF4444);
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.45;
+}
+.form-error i { font-size: 11px; }
+
+.form-success {
+  font-size: 12px;
+  color: var(--app-success-500, #22C55E);
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.45;
+}
+.form-success i { font-size: 11px; }
+
+/* Success validation state */
+.form-control.is-valid,
+.form-select.is-valid {
+  border-color: var(--app-success-500, #22C55E);
+}
+.form-control.is-valid:focus,
+.form-select.is-valid:focus {
+  border-color: var(--app-success-500, #22C55E);
+  box-shadow: 0 0 0 3px var(--app-success-100, #DCFCE7);
+}
+
+/* Required marker — ERP color */
+.form-label .required,
+.form-floating > label .required,
+.app-modern-label .required {
+  color: var(--app-danger-500, #EF4444);
+  margin-left: 2px;
+  font-weight: 500;
+}
+:root[dir="rtl"] .form-label .required,
+:root[dir="rtl"] .form-floating > label .required,
+:root[dir="rtl"] .app-modern-label .required {
+  margin-left: 0;
+  margin-right: 2px;
+}
+
+/* ERP select chevron */
+.form-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8.5L1 3.5h10L6 8.5z' fill='%23667085'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px;
+  padding-right: 36px;
+}
+:root[dir="rtl"] .form-select {
+  background-position: left 12px center;
+  padding-right: 14px;
+  padding-left: 36px;
+}
+
+/* ============================================================
+   ERP Money / Percentage input adornments
+   ============================================================ */
+.input-adornment { position: relative; }
+.input-adornment .form-control {
+  font-family: var(--app-font-family-mono, 'JetBrains Mono', 'Courier New', monospace);
+  text-align: right;
+}
+.input-adornment__prefix,
+.input-adornment__suffix {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: var(--app-gray-400, #98A2B3);
+  font-weight: 500;
+  pointer-events: none;
+  line-height: 1;
+}
+.input-adornment__prefix { left: 12px; }
+.input-adornment__suffix { right: 12px; }
+.input-adornment--prefix .form-control { padding-left: 44px; }
+.input-adornment--suffix .form-control { padding-right: 32px; }
+
+:root[dir="rtl"] .input-adornment--prefix .form-control {
+  padding-left: 14px;
+  padding-right: 44px;
+}
+:root[dir="rtl"] .input-adornment--prefix .input-adornment__prefix {
+  left: auto;
+  right: 12px;
+}
+:root[dir="rtl"] .input-adornment--suffix .form-control {
+  padding-right: 14px;
+  padding-left: 32px;
+}
+:root[dir="rtl"] .input-adornment--suffix .input-adornment__suffix {
+  right: auto;
+  left: 12px;
+}
+
+/* ============================================================
+   ERP File-upload dropzone
+   ============================================================ */
+.app-dropzone {
+  border: 2px dashed var(--app-gray-300, #D0D5DD);
+  border-radius: var(--app-border-radius-md, 8px);
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+  background: #ffffff;
+}
+.app-dropzone:hover,
+.app-dropzone.is-dragover {
+  border-color: var(--app-primary-500, #4F6BF6);
+  background: var(--app-primary-50, #EEF2FF);
+}
+.app-dropzone__icon {
+  font-size: 24px;
+  color: var(--app-gray-300, #D0D5DD);
+  display: block;
+}
+.app-dropzone__title {
+  font-size: 12px;
+  color: var(--app-gray-500, #667085);
+  margin-top: 8px;
+  font-weight: 500;
+}
+.app-dropzone__hint {
+  font-size: 11px;
+  color: var(--app-gray-400, #98A2B3);
+  margin-top: 4px;
+}
+
+/* ============================================================
+   ERP Lookup / Reference Field — spec §6 (States 1-4)
+   ============================================================ */
+.lookup-field {
+  position: relative;
+}
+.lookup-field .form-control {
+  padding-right: 80px;
+}
+:root[dir="rtl"] .lookup-field .form-control {
+  padding-right: 14px;
+  padding-left: 80px;
+}
+
+.lookup-field-actions {
+  position: absolute;
+  right: 1px;
+  top: 1px;
+  bottom: 1px;
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  padding: 0 4px;
+  z-index: 2;
+}
+:root[dir="rtl"] .lookup-field-actions {
+  right: auto;
+  left: 1px;
+}
+
+.lookup-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--app-gray-400, #98A2B3);
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  padding: 0;
+}
+.lookup-btn:hover {
+  background: var(--app-gray-100, #F2F4F7);
+  color: var(--app-gray-600, #475467);
+}
+.lookup-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* State 2 — searching */
+.lookup-field.is-searching .form-control {
+  border-color: var(--app-primary-500, #4F6BF6);
+  box-shadow: 0 0 0 3px var(--app-primary-100, #D8E0FF);
+  border-radius: var(--app-border-radius-sm, 6px) var(--app-border-radius-sm, 6px) 0 0;
+  position: relative;
+  z-index: 2;
+}
+
+/* State 3 — selected chip */
+.lookup-selected {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 80px 9px 14px;
+  border: 1px solid var(--app-gray-300, #D0D5DD);
+  border-radius: var(--app-border-radius-sm, 6px);
+  background: #ffffff;
+  min-height: 42px;
+}
+:root[dir="rtl"] .lookup-selected {
+  padding: 9px 14px 9px 80px;
+}
+
+.lookup-selected--readonly {
+  background: var(--app-gray-50, #F9FAFB);
+  border-color: var(--app-gray-200, #EAECF0);
+}
+
+.lookup-selected-link {
+  color: var(--app-primary-500, #4F6BF6);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.lookup-selected-link:hover {
+  color: var(--app-primary-700, #2D3EB3);
+  text-decoration: underline;
+}
+.lookup-selected-link i.fa-external-link-alt {
+  font-size: 10px;
+  opacity: 0.5;
+  transition: opacity 0.15s ease;
+  flex-shrink: 0;
+}
+.lookup-selected-link:hover i.fa-external-link-alt {
+  opacity: 1;
+}
+.lookup-selected--readonly .lookup-selected-link {
+  color: var(--app-primary-400, #6384FF);
+}
+
+.lookup-selected-meta {
+  font-size: 11px;
+  color: var(--app-gray-400, #98A2B3);
+  font-family: var(--app-font-family-mono, 'JetBrains Mono', 'Courier New', monospace);
+  margin-left: 4px;
+  flex-shrink: 0;
+}
+:root[dir="rtl"] .lookup-selected-meta {
+  margin-left: 0;
+  margin-right: 4px;
+}
+
+/* Dropdown results */
+.lookup-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: #ffffff;
+  border: 1px solid var(--app-gray-200, #EAECF0);
+  border-top: none;
+  border-radius: 0 0 var(--app-border-radius-md, 8px) var(--app-border-radius-md, 8px);
+  box-shadow: var(--app-shadow-lg);
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.lookup-dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background-color 0.1s ease;
+  border-bottom: 1px solid var(--app-gray-50, #F9FAFB);
+  gap: 12px;
+}
+.lookup-dropdown-item:last-child {
+  border-bottom: none;
+}
+.lookup-dropdown-item:hover,
+.lookup-dropdown-item.highlighted {
+  background: var(--app-primary-50, #EEF2FF);
+}
+
+.lookup-dropdown-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--app-border-radius-sm, 6px);
+  background: var(--app-gray-100, #F2F4F7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--app-gray-400, #98A2B3);
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.lookup-dropdown-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.lookup-dropdown-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--app-gray-800, #1D2939);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lookup-dropdown-name mark {
+  background: var(--app-primary-100, #D8E0FF);
+  color: var(--app-primary-700, #2D3EB3);
+  padding: 0 2px;
+  border-radius: 2px;
+  font-weight: 600;
+}
+
+.lookup-dropdown-sub {
+  display: flex;
+  gap: 12px;
+  margin-top: 2px;
+  flex-wrap: wrap;
+}
+.lookup-dropdown-sub span {
+  font-size: 11px;
+  color: var(--app-gray-400, #98A2B3);
+  font-family: var(--app-font-family-mono, 'JetBrains Mono', 'Courier New', monospace);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.lookup-dropdown-sub span i {
+  font-size: 9px;
+}
+
+.lookup-dropdown-empty {
+  padding: 20px 14px;
+  text-align: center;
+  color: var(--app-gray-400, #98A2B3);
+  font-size: 13px;
+}
+.lookup-dropdown-empty i {
+  font-size: 18px;
+  color: var(--app-gray-300, #D0D5DD);
+  display: block;
+  margin-bottom: 8px;
+}
+
+.lookup-dropdown-loading {
+  padding: 16px 14px;
+  text-align: center;
+  color: var(--app-gray-400, #98A2B3);
+  font-size: 13px;
+}
+
+.lookup-dropdown-footer {
+  padding: 8px 14px;
+  border-top: 1px solid var(--app-gray-200, #EAECF0);
+  background: var(--app-gray-50, #F9FAFB);
+  font-size: 11px;
+  color: var(--app-gray-400, #98A2B3);
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.lookup-dropdown-footer i {
+  font-size: 9px;
+}
+
+/* ============================================================
+   ERP Main Data Grid — spec §7 (§7B row selection, §7C sorting, §9 sub-grid)
+   ============================================================ */
+
+/* --- Grid container + toolbar + pagination strips --- */
+.grid-container {
+  border: 1px solid var(--app-gray-200, #EAECF0);
+  border-radius: var(--app-border-radius-lg, 12px);
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.grid-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--app-gray-200, #EAECF0);
+  background: var(--app-gray-25, #FCFCFD);
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.grid-toolbar-left {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.grid-toolbar-right {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.grid-search {
+  position: relative;
+  display: inline-block;
+}
+.grid-search input {
+  padding: 8px 12px 8px 34px;
+  border: 1px solid var(--app-gray-300, #D0D5DD);
+  border-radius: var(--app-border-radius-sm, 6px);
+  font-size: 13px;
+  width: 260px;
+  outline: none;
+  font-family: inherit;
+  color: var(--app-gray-900, #101828);
+  background: #ffffff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.grid-search input:focus {
+  border-color: var(--app-primary-500, #4F6BF6);
+  box-shadow: 0 0 0 3px var(--app-primary-100, #D8E0FF);
+}
+.grid-search > i {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--app-gray-400, #98A2B3);
+  font-size: 13px;
+  pointer-events: none;
+}
+
+.grid-filter-btn {
+  padding: 8px 14px;
+  border: 1px solid var(--app-gray-300, #D0D5DD);
+  border-radius: var(--app-border-radius-sm, 6px);
+  background: #ffffff;
+  font-size: 13px;
+  color: var(--app-gray-600, #475467);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: inherit;
+  line-height: 1.2;
+  transition: background-color 0.15s ease;
+}
+.grid-filter-btn:hover:not(:disabled) {
+  background: var(--app-gray-50, #F9FAFB);
+}
+.grid-filter-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.grid-filter-btn__count {
+  background: var(--app-primary-500, #4F6BF6);
+  color: #ffffff;
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+/* --- The data-grid table itself --- */
+table.data-grid {
+  width: 100%;
+  /* `table-layout: auto` lets each column auto-size to fit its header and
+     cell content. Headers stay on one line at full length; if the resulting
+     table is wider than the viewport, the .table-responsive wrapper scrolls
+     horizontally (overflow-x: auto), keeping every column fully visible. */
+  table-layout: auto;
+  border-collapse: collapse;
+  font-size: 13px;
+  background: #ffffff;
+}
+table.data-grid thead th {
+  padding: 12px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--app-gray-600, #475467);
+  background: var(--app-gray-50, #F9FAFB);
+  border-bottom: 1px solid var(--app-gray-200, #EAECF0);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  /* Headers stay on one line at full length. The auto table-layout grows
+     the column to fit; if the table outgrows the viewport, the
+     .table-responsive wrapper scrolls horizontally. */
+  white-space: nowrap;
+  line-height: 1.25;
+  position: relative;
+  user-select: none;
+  vertical-align: middle;
+}
+table.data-grid thead th.sortable { cursor: pointer; }
+table.data-grid thead th.sortable:hover { background: var(--app-gray-100, #F2F4F7); }
+table.data-grid thead th .sort-icon {
+  margin-left: 4px;
+  font-size: 10px;
+  color: var(--app-gray-300, #D0D5DD);
+}
+table.data-grid thead th.sorted .sort-icon {
+  color: var(--app-primary-500, #4F6BF6);
+}
+table.data-grid tbody td {
+  padding: 12px 12px;
+  border-bottom: 1px solid var(--app-gray-100, #F2F4F7);
+  color: var(--app-gray-700, #344054);
+  vertical-align: middle;
+  /* Wrap on word boundaries (not inside words) so cell content stays inside
+     the column without breaking words like "Department" mid-character. */
+  overflow-wrap: break-word;
+}
+table.data-grid tbody tr {
+  transition: background-color 0.1s ease;
+}
+table.data-grid tbody tr:hover {
+  background: var(--app-primary-50, #EEF2FF);
+}
+table.data-grid tbody tr.selected {
+  background: var(--app-primary-100, #D8E0FF);
+}
+
+/* Sticky header (opt-in) */
+table.data-grid.sticky-header thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+/* --- Cell typography utilities --- */
+table.data-grid .cell-link {
+  color: var(--app-primary-500, #4F6BF6);
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+}
+table.data-grid .cell-link:hover {
+  color: var(--app-primary-700, #2D3EB3);
+  text-decoration: underline;
+}
+table.data-grid .cell-code {
+  font-family: var(--app-font-family-mono, 'JetBrains Mono', 'Courier New', monospace);
+  font-size: 12px;
+  color: var(--app-gray-600, #475467);
+}
+table.data-grid .cell-money {
+  font-family: var(--app-font-family-mono, 'JetBrains Mono', 'Courier New', monospace);
+  text-align: right;
+  white-space: nowrap;
+}
+table.data-grid .cell-date {
+  color: var(--app-gray-500, #667085);
+  white-space: nowrap;
+}
+table.data-grid .cell-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+table.data-grid .row-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--app-primary-500, #4F6BF6);
+  cursor: pointer;
+  margin: 0;
+}
+
+/* --- Compact icon-only action button for row actions --- */
+.btn-erp-icon {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--app-gray-300, #D0D5DD);
+  border-radius: var(--app-border-radius-sm, 6px);
+  background: #ffffff;
+  color: var(--app-gray-600, #475467);
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.btn-erp-icon:hover:not(:disabled) {
+  background: var(--app-gray-50, #F9FAFB);
+  color: var(--app-gray-800, #1D2939);
+}
+.btn-erp-icon:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-erp-icon--danger { color: var(--app-danger-500, #EF4444); }
+.btn-erp-icon--danger:hover:not(:disabled) {
+  background: var(--app-danger-50, #FEF2F2);
+  color: var(--app-danger-600, #DC2626);
+}
+
+/* --- Grid pagination strip --- */
+.grid-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  border-top: 1px solid var(--app-gray-200, #EAECF0);
+  background: var(--app-gray-25, #FCFCFD);
+  font-size: 13px;
+  color: var(--app-gray-500, #667085);
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.pagination-pages {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.pagination-pages button {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--app-gray-300, #D0D5DD);
+  background: #ffffff;
+  border-radius: var(--app-border-radius-sm, 6px);
+  cursor: pointer;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--app-gray-600, #475467);
+  transition: background-color 0.1s ease, color 0.1s ease, border-color 0.1s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.pagination-pages button:hover:not(:disabled):not(.active) {
+  background: var(--app-gray-50, #F9FAFB);
+}
+.pagination-pages button.active {
+  background: var(--app-primary-500, #4F6BF6);
+  color: #ffffff;
+  border-color: var(--app-primary-500, #4F6BF6);
+}
+.pagination-pages button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.pagination-pages .pagination-ellipsis {
+  min-width: 28px;
+  text-align: center;
+  color: var(--app-gray-400, #98A2B3);
+  user-select: none;
+}
+
+/* --- Bulk-selection pill (inline footer above/below grid) --- */
+.grid-selection-pill {
+  padding: 10px 16px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+  color: var(--app-primary-700, #2D3EB3);
+  background: var(--app-primary-50, #EEF2FF);
+  border-top: 1px solid var(--app-primary-100, #D8E0FF);
+}
+.grid-selection-pill button {
+  background: transparent;
+  border: none;
+  color: var(--app-primary-600, #3B51D4);
+  cursor: pointer;
+  font-size: 12px;
+  text-decoration: underline;
+  padding: 0;
+  font-family: inherit;
+}
+
+/* --- Sub-grid (spec §9) --- */
+.subgrid-container {
+  margin-top: 24px;
+}
+.subgrid-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--app-gray-50, #F9FAFB);
+  border: 1px solid var(--app-gray-200, #EAECF0);
+  border-radius: var(--app-border-radius-md, 8px) var(--app-border-radius-md, 8px) 0 0;
+  gap: 12px;
+}
+.subgrid-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--app-gray-700, #344054);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.subgrid-count {
+  background: var(--app-gray-200, #EAECF0);
+  color: var(--app-gray-600, #475467);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.subgrid-body {
+  border: 1px solid var(--app-gray-200, #EAECF0);
+  border-top: none;
+  border-radius: 0 0 var(--app-border-radius-md, 8px) var(--app-border-radius-md, 8px);
+  overflow: hidden;
+  background: #ffffff;
+}
+.subgrid-body table.data-grid thead th {
+  font-size: 11px;
+  padding: 8px 12px;
+}
+.subgrid-body table.data-grid tbody td {
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+/* --- RTL overrides --- */
+:root[dir="rtl"] table.data-grid thead th { text-align: right; }
+:root[dir="rtl"] table.data-grid thead th .sort-icon {
+  margin-left: 0;
+  margin-right: 4px;
+}
+:root[dir="rtl"] table.data-grid .cell-money { text-align: left; }
+:root[dir="rtl"] .grid-search > i { left: auto; right: 12px; }
+:root[dir="rtl"] .grid-search input {
+  padding: 8px 34px 8px 12px;
+}
+:root[dir="rtl"] .grid-filter-btn__count {
+  margin-left: 0;
+  margin-right: 4px;
 }

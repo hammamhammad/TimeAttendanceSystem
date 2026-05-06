@@ -12,6 +12,7 @@ import { FormHeaderComponent } from '../../../../shared/components/form-header/f
 import { SearchableSelectComponent, SearchableSelectOption } from '../../../../shared/components/searchable-select/searchable-select.component';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 
+import { PermissionService } from '../../../../core/auth/permission.service';
 @Component({
   selector: 'app-edit-remote-work-policy',
   standalone: true,
@@ -25,6 +26,11 @@ export class EditRemoteWorkPolicyComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private notificationService = inject(NotificationService);
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    return this.permissionService.has('remoteWork.policy.update');
+  }
   private destroy$ = new Subject<void>();
   public i18n = inject(I18nService);
 

@@ -8,6 +8,7 @@ import { FormHeaderComponent } from '../../../../shared/components/form-header/f
 import { FormSectionComponent } from '../../../../shared/components/form-section/form-section.component';
 import { BenefitType, BenefitPlan } from '../../../../shared/models/benefit.model';
 
+import { PermissionService } from '../../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-plan',
   standalone: true,
@@ -22,6 +23,17 @@ export class CreatePlanComponent implements OnInit {
   private notificationService = inject(NotificationService);
   public i18n = inject(I18nService);
 
+  private permissionService = inject(PermissionService);
+
+  // TODO: wire up readonly disable when canEdit is false (form is a plain object with ngModel — not a FormGroup)
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('benefitPlan.update');
+  }
   submitting = signal(false);
   isEdit = signal(false);
   editId = signal<number | null>(null);
@@ -105,7 +117,7 @@ export class CreatePlanComponent implements OnInit {
       this.benefitService.updateBenefitPlan(this.editId()!, payload).subscribe({
         next: () => {
           this.notificationService.success(this.t('app.success'), this.t('benefits.plans.updated_success'));
-          this.router.navigate(['/benefits/plans', this.editId(), 'view']);
+          this.router.navigate(['/benefits/plans']);
           this.submitting.set(false);
         },
         error: (err) => {
@@ -117,7 +129,7 @@ export class CreatePlanComponent implements OnInit {
       this.benefitService.createBenefitPlan(payload).subscribe({
         next: (res) => {
           this.notificationService.success(this.t('app.success'), this.t('benefits.plans.created_success'));
-          this.router.navigate(['/benefits/plans', res.id, 'view']);
+          this.router.navigate(['/benefits/plans']);
           this.submitting.set(false);
         },
         error: (err) => {

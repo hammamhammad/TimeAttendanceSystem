@@ -1,4 +1,4 @@
-import { Component, signal, inject, OnInit } from '@angular/core';
+import { Component, signal, inject, OnInit, effect } from '@angular/core';
 
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -11,6 +11,7 @@ import { FormHeaderComponent } from '../../../shared/components/form-header/form
 import { FormSectionComponent } from '../../../shared/components/form-section/form-section.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
+import { PermissionService } from '../../../core/auth/permission.service';
 
 @Component({
   selector: 'app-edit-employee-vacation',
@@ -34,6 +35,11 @@ export class EditEmployeeVacationComponent implements OnInit {
   private notificationService = inject(NotificationService);
   private employeeVacationsService = inject(EmployeeVacationsService);
   public i18n = inject(I18nService);
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    return this.permissionService.has('vacation.update');
+  }
 
   // State
   loading = signal(false);
@@ -57,6 +63,24 @@ export class EditEmployeeVacationComponent implements OnInit {
 
   constructor() {
     this.vacationForm = this.createForm();
+
+    // Programmatic disable wiring (replaces template [disabled] bindings to avoid the
+    // reactive-forms "disabled attribute with reactive form directive" warning)
+    effect(() => {
+      const isSaving = this.saving();
+      // Only toggle when canEdit (otherwise populateForm() disables the whole form).
+      if (!this.canEdit()) return;
+      const controlNames = ['startDate', 'endDate', 'notes'];
+      for (const name of controlNames) {
+        const ctrl = this.vacationForm?.get(name);
+        if (!ctrl) continue;
+        if (isSaving && ctrl.enabled) {
+          ctrl.disable({ emitEvent: false });
+        } else if (!isSaving && ctrl.disabled) {
+          ctrl.enable({ emitEvent: false });
+        }
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -131,6 +155,10 @@ export class EditEmployeeVacationComponent implements OnInit {
       isApproved: vacation.isApproved,
       notes: vacation.notes || ''
     });
+
+    if (!this.canEdit()) {
+      this.vacationForm.disable();
+    }
   }
 
   /**
@@ -171,7 +199,7 @@ export class EditEmployeeVacationComponent implements OnInit {
       next: () => {
         this.saving.set(false);
         this.notificationService.success(this.i18n.t('employee_vacations.success.updated'));
-        this.router.navigate(['/employee-vacations', vacation.id, 'view']);
+        this.router.navigate(['/employee-vacations']);
       },
       error: (error) => {
         this.saving.set(false);
@@ -185,12 +213,7 @@ export class EditEmployeeVacationComponent implements OnInit {
    * Cancel and navigate back
    */
   onCancel(): void {
-    const vacation = this.currentVacation();
-    if (vacation) {
-      this.router.navigate(['/employee-vacations', vacation.id, 'view']);
-    } else {
-      this.router.navigate(['/employee-vacations']);
-    }
+    this.router.navigate(['/employee-vacations']);
   }
 
   /**

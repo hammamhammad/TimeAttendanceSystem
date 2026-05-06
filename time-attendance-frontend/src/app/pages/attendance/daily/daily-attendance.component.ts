@@ -276,7 +276,7 @@ export class DailyAttendanceComponent implements OnInit, OnDestroy {
       sortable: true,
       width: '120px',
       align: 'center',
-      priority: 'low',
+      priority: 'medium',
       hideOnMobile: true,
       mobileLabel: this.i18n.t('attendance.fields.overtime')
     },
@@ -286,7 +286,7 @@ export class DailyAttendanceComponent implements OnInit, OnDestroy {
       sortable: true,
       width: '90px',
       align: 'center',
-      priority: 'low',
+      priority: 'medium',
       hideOnMobile: true,
       mobileLabel: this.i18n.t('attendance.fields.late')
     },

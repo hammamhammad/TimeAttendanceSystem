@@ -304,24 +304,26 @@
         <div class="app-form-actions">
           <button type="button" class="btn btn-outline-secondary" (click)="closeModal()" [disabled]="loading()">
             <i class="fa-solid fa-times me-2"></i>
-            {{ t('common.cancel') }}
+            {{ readonly ? t('common.back') : t('common.cancel') }}
           </button>
-          <button
-            type="submit"
-            class="btn btn-primary"
-            [disabled]="userForm.invalid || loading()"
-          >
-            @if (loading()) {
-              <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-            }
-            @if (isEditMode()) {
-              <i class="fa-solid fa-save me-2"></i>
-              {{ t('common.save') }}
-            } @else {
-              <i class="fa-solid fa-plus me-2"></i>
-              {{ t('users.create_user') }}
-            }
-          </button>
+          @if (!readonly) {
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="userForm.invalid || loading()"
+            >
+              @if (loading()) {
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              }
+              @if (isEditMode()) {
+                <i class="fa-solid fa-save me-2"></i>
+                {{ t('common.save') }}
+              } @else {
+                <i class="fa-solid fa-plus me-2"></i>
+                {{ t('users.create_user') }}
+              }
+            </button>
+          }
         </div>
       </form>
     </div>

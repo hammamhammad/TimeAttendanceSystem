@@ -62,7 +62,7 @@ export class EmployeeDocumentsComponent implements OnInit {
 
   onActionClick(event: { action: string; item: EmployeeDocumentDto }): void {
     if (event.action === 'view') {
-      this.router.navigate(['/documents/employee-documents', event.item.id, 'view']);
+      this.router.navigate(['/documents/employee-documents', event.item.id, 'edit']);
     } else if (event.action === 'delete') {
       this.service.deleteDocument(event.item.id).subscribe({
         next: () => { this.notification.success(this.i18n.t('employee_documents.deleted')); this.loadData(); },

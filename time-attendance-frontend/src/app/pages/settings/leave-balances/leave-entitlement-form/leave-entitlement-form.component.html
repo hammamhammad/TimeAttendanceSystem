@@ -37,8 +37,7 @@
                     <app-searchable-select
                       formControlName="employeeId"
                       [options]="employees()"
-                      [placeholder]="i18n.t('leaveBalance.selectEmployee')"
-                      [disabled]="isEditMode()">
+                      [placeholder]="i18n.t('leaveBalance.selectEmployee')">
                     </app-searchable-select>
                   </div>
                   @if (entitlementForm.get('employeeId')?.invalid && entitlementForm.get('employeeId')?.touched) {
@@ -58,8 +57,7 @@
                     <app-searchable-select
                       formControlName="vacationTypeId"
                       [options]="vacationTypes()"
-                      [placeholder]="i18n.t('leaveBalance.selectVacationType')"
-                      [disabled]="isEditMode()">
+                      [placeholder]="i18n.t('leaveBalance.selectVacationType')">
                     </app-searchable-select>
                   </div>
                   @if (entitlementForm.get('vacationTypeId')?.invalid && entitlementForm.get('vacationTypeId')?.touched) {

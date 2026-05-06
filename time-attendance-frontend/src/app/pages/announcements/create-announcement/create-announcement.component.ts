@@ -13,6 +13,7 @@ import { FormHeaderComponent } from '../../../shared/components/form-header/form
 import { FormSectionComponent } from '../../../shared/components/form-section/form-section.component';
 import { SearchableSelectComponent } from '../../../shared/components/searchable-select/searchable-select.component';
 
+import { PermissionService } from '../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-announcement',
   standalone: true,
@@ -31,6 +32,16 @@ export class CreateAnnouncementComponent implements OnInit {
   private readonly departmentsService = inject(DepartmentsService);
   private readonly rolesService = inject(RolesService);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('announcement.update');
+  }
   form!: FormGroup;
   saving = signal(false);
   isEdit = signal(false);
@@ -75,6 +86,9 @@ export class CreateAnnouncementComponent implements OnInit {
             scheduledDate: ann.scheduledDate?.split('T')[0], expiryDate: ann.expiryDate?.split('T')[0],
             isPinned: ann.isPinned, requiresAcknowledgment: ann.requiresAcknowledgment
           });
+          if (!this.canEdit()) {
+            this.form.disable();
+          }
           this.selectedTargetAudience.set(ann.targetAudience);
           this.selectedTargetIds.set(ann.targetIds ?? []);
           this.loadTargetOptions(ann.targetAudience);

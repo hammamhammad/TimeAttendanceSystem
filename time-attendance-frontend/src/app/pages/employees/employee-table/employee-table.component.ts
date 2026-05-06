@@ -182,7 +182,7 @@ export class EmployeeTableComponent {
         width: '120px',
         align: 'center',
         sortable: true,
-        priority: 'low',
+        priority: 'medium',
         hideOnMobile: true,
         mobileLabel: this.i18n.t('employees.columns.status')
       },

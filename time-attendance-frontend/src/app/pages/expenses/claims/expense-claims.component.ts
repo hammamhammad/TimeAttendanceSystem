@@ -61,7 +61,7 @@ export class ExpenseClaimsComponent implements OnInit {
   onPageSizeChange(size: number): void { this.pageSize.set(size); this.currentPage.set(1); this.loadData(); }
 
   onActionClick(event: { action: string; item: ExpenseClaimDto }): void {
-    if (event.action === 'view') this.router.navigate(['/expenses/claims', event.item.id, 'view']);
+    if (event.action === 'view') this.router.navigate(['/expenses/claims', event.item.id, 'edit']);
     else if (event.action === 'approve') {
       this.service.approveClaim(event.item.id).subscribe({
         next: () => { this.notification.success(this.i18n.t('expense_claims.approved')); this.loadData(); },

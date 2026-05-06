@@ -9,6 +9,7 @@ import { FormHeaderComponent } from '../../../../shared/components/form-header/f
 import { FormSectionComponent } from '../../../../shared/components/form-section/form-section.component';
 import { SearchableSelectComponent, SearchableSelectOption } from '../../../../shared/components/searchable-select/searchable-select.component';
 
+import { PermissionService } from '../../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-grievance',
   standalone: true,
@@ -25,6 +26,16 @@ export class CreateGrievanceComponent implements OnInit {
   private readonly employeeService = inject(EmployeeService);
   private readonly notification = inject(NotificationService);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('grievance.update');
+  }
   form!: FormGroup;
   saving = signal(false);
   isEditMode = signal(false);
@@ -63,7 +74,12 @@ export class CreateGrievanceComponent implements OnInit {
 
   private loadGrievance(id: number): void {
     this.service.getGrievance(id).subscribe({
-      next: (g) => this.form.patchValue(g),
+      next: (g) => {
+        this.form.patchValue(g);
+        if (!this.canEdit()) {
+          this.form.disable({ emitEvent: false });
+        }
+      },
       error: () => { this.notification.error(this.i18n.t('common.error')); this.router.navigate(['/employee-relations/grievances']); }
     });
   }

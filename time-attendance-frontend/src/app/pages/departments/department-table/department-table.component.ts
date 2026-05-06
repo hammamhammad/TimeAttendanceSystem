@@ -1,317 +1,194 @@
-import { Component, signal, inject, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, inject, OnInit } from '@angular/core';
 
-import { FormsModule } from '@angular/forms';
-import { I18nService } from '../../../core/i18n/i18n.service';
-import { DepartmentsService } from '../departments.service';
+import { DataTableComponent, TableColumn, TableAction } from '../../../shared/components/data-table/data-table.component';
 import { DepartmentDto } from '../../../shared/models/department.model';
+import { I18nService } from '../../../core/i18n/i18n.service';
 import { PermissionService } from '../../../core/auth/permission.service';
 import { PermissionResources, PermissionActions } from '../../../shared/utils/permission.utils';
-import { HasPermissionDirective } from '../../../shared/directives/has-permission.directive';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
-import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
-
-interface SortConfig {
-  column: keyof DepartmentDto;
-  direction: 'asc' | 'desc';
-}
 
 @Component({
   selector: 'app-department-table',
   standalone: true,
-  imports: [FormsModule, HasPermissionDirective, StatusBadgeComponent, LoadingSpinnerComponent],
-  templateUrl: './department-table.component.html',
-  styleUrls: ['./department-table.component.css']
-})
-export class DepartmentTableComponent implements OnInit, OnChanges {
-  @Input() selectedBranchId?: number;
-  @Input() allowSelection = true;
-  @Input() allowEdit = true;
-  @Input() allowDelete = true;
-  @Input() showControls = true;
-  @Output() departmentSelected = new EventEmitter<DepartmentDto>();
-  @Output() departmentView = new EventEmitter<DepartmentDto>();
-  @Output() departmentEdit = new EventEmitter<DepartmentDto>();
-  @Output() departmentDelete = new EventEmitter<DepartmentDto>();
-  @Output() departmentAdd = new EventEmitter<void>();
+  imports: [DataTableComponent, StatusBadgeComponent],
+  template: `
+    <app-data-table
+      [data]="departments"
+      [columns]="columns"
+      [actions]="actions"
+      [loading]="loading"
+      [paginated]="true"
+      [currentPage]="currentPage"
+      [totalPages]="totalPages"
+      [totalItems]="totalItems"
+      [pageSize]="pageSize"
+      [emptyMessage]="i18n.t('department.noDepartments')"
+      (actionClick)="onActionClick($event)"
+      (pageChange)="pageChange.emit($event)"
+      (pageSizeChange)="pageSizeChange.emit($event)"
+      (selectionChange)="selectionChange.emit($event)"
+      (sortChange)="sortChange.emit($event)">
 
-  public i18n = inject(I18nService);
-  private departmentsService = inject(DepartmentsService);
-  public permissionService = inject(PermissionService);
+      <ng-template #cellTemplate let-dept let-column="column">
+        @switch (column.key) {
 
-  // Permission constants for use in template
-  readonly PERMISSIONS = {
-    DEPARTMENT_CREATE: `${PermissionResources.DEPARTMENT}.${PermissionActions.CREATE}`,
-    DEPARTMENT_READ: `${PermissionResources.DEPARTMENT}.${PermissionActions.READ}`,
-    DEPARTMENT_UPDATE: `${PermissionResources.DEPARTMENT}.${PermissionActions.UPDATE}`,
-    DEPARTMENT_DELETE: `${PermissionResources.DEPARTMENT}.${PermissionActions.DELETE}`
-  };
+          @case ('department') {
+            <div class="dept-cell" [style.padding-inline-start.px]="(dept.level || 0) * 18">
+              <div class="d-flex align-items-center">
+                @if (dept.level > 0) {
+                  <span class="dept-tree-marker" aria-hidden="true">
+                    <i class="fas fa-level-up-alt fa-rotate-90"></i>
+                  </span>
+                }
+                <i class="fas fa-building text-primary me-2"></i>
+                <div class="flex-grow-1 min-width-0">
+                  <div class="fw-medium text-truncate">{{ dept.name }}</div>
+                  @if (dept.nameAr) {
+                    <small class="text-muted d-block text-truncate">{{ dept.nameAr }}</small>
+                  }
+                </div>
+              </div>
+            </div>
+          }
 
-  // Signals
-  loading = signal(false);
-  departments = signal<DepartmentDto[]>([]);
-  filteredDepartments = signal<DepartmentDto[]>([]);
-  selectedDepartments = signal<Set<number>>(new Set());
-  sortConfig = signal<SortConfig>({ column: 'name', direction: 'asc' });
-  searchTerm = signal('');
-  showInactive = signal(false);
-  
-  // Pagination
-  currentPage = signal(1);
-  pageSize = signal(10);
-  totalPages = signal(0);
-  
-  // View options
-  showHierarchy = signal(false);
-  pageSizeOptions = [5, 10, 25, 50, 100];
+          @case ('code') {
+            <app-status-badge [status]="'secondary'" [label]="dept.code"></app-status-badge>
+          }
 
-  ngOnInit() {
-    console.log('DepartmentTableComponent ngOnInit - selectedBranchId:', this.selectedBranchId);
-    this.loadDepartments();
-  }
+          @case ('branchName') {
+            @if (dept.branchName) {
+              <span>{{ dept.branchName }}</span>
+            } @else {
+              <span class="text-muted">-</span>
+            }
+          }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    console.log('DepartmentTableComponent ngOnChanges:', changes);
-    if (changes['selectedBranchId']) {
-      console.log('selectedBranchId changed from', changes['selectedBranchId'].previousValue, 'to', changes['selectedBranchId'].currentValue);
-      this.loadDepartments();
-    }
-  }
+          @case ('parent') {
+            @if (dept.parentDepartmentName) {
+              <div class="d-flex align-items-center">
+                <i class="fas fa-sitemap text-muted me-2"></i>
+                <span>{{ dept.parentDepartmentName }}</span>
+              </div>
+            } @else {
+              <span class="badge-root">{{ i18n.t('department.root_department') }}</span>
+            }
+          }
 
-  loadDepartments() {
-    console.log('loadDepartments called - selectedBranchId:', this.selectedBranchId);
-    this.loading.set(true);
+          @case ('path') {
+            <small class="text-muted">{{ dept.path }}</small>
+          }
 
-    console.log('Making departments API call with params:', {
-      branchId: this.selectedBranchId,
-      includeTree: false,
-      includeInactive: this.showInactive()
-    });
+          @case ('manager') {
+            @if (dept.managerName) {
+              <div class="d-flex align-items-center">
+                <i class="fas fa-user-tie text-secondary me-2"></i>
+                <span>{{ dept.managerName }}</span>
+              </div>
+            } @else {
+              <span class="text-muted">-</span>
+            }
+          }
 
-    this.departmentsService.getDepartments({
-      branchId: this.selectedBranchId,
-      includeTree: false,
-      includeInactive: this.showInactive()
-    }).subscribe({
-      next: (departments) => {
-        console.log('Departments API response:', departments);
-        if (departments) {
-          this.departments.set(departments);
-          this.applyFiltersAndSort();
+          @case ('employeeCount') {
+            <app-status-badge
+              [status]="dept.employeeCount > 0 ? 'success' : 'secondary'"
+              [label]="(dept.employeeCount || 0).toString()">
+            </app-status-badge>
+          }
+
+          @case ('status') {
+            <app-status-badge
+              [status]="dept.isActive ? 'active' : 'inactive'"
+              [label]="dept.isActive ? i18n.t('common.active') : i18n.t('common.inactive')"
+              [showIcon]="true">
+            </app-status-badge>
+          }
         }
-        this.loading.set(false);
-      },
-      error: (error) => {
-        console.error('Failed to load departments:', error);
-        this.loading.set(false);
-      }
-    });
-  }
-
-  applyFiltersAndSort() {
-    let filtered = [...this.departments()];
-    
-    // Apply search filter
-    const searchTerm = this.searchTerm().toLowerCase();
-    if (searchTerm) {
-      filtered = filtered.filter(dept => 
-        dept.name.toLowerCase().includes(searchTerm) ||
-        dept.code.toLowerCase().includes(searchTerm) ||
-        (dept.nameAr && dept.nameAr.toLowerCase().includes(searchTerm)) ||
-        (dept.description && dept.description.toLowerCase().includes(searchTerm)) ||
-        (dept.costCenter && dept.costCenter.toLowerCase().includes(searchTerm)) ||
-        dept.path.toLowerCase().includes(searchTerm)
-      );
+      </ng-template>
+    </app-data-table>
+  `,
+  styles: [`
+    .dept-cell { display: flex; align-items: center; min-width: 0; }
+    .dept-tree-marker {
+      color: var(--app-gray-400, #98A2B3);
+      font-size: 11px;
+      margin-inline-end: 6px;
+      display: inline-flex;
+      align-items: center;
     }
-    
-    // Apply active filter
-    if (!this.showInactive()) {
-      filtered = filtered.filter(dept => dept.isActive);
+    .min-width-0 { min-width: 0; }
+    .badge-root {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: var(--app-gray-100, #F2F4F7);
+      color: var(--app-gray-600, #475467);
+      font-size: 11px;
+      font-weight: 500;
     }
-    
-    // Apply sorting
-    const sort = this.sortConfig();
-    filtered.sort((a, b) => {
-      const aVal = a[sort.column];
-      const bVal = b[sort.column];
-      
-      if (aVal == null && bVal == null) return 0;
-      if (aVal == null) return sort.direction === 'asc' ? 1 : -1;
-      if (bVal == null) return sort.direction === 'asc' ? -1 : 1;
-      
-      let comparison = 0;
-      if (typeof aVal === 'string' && typeof bVal === 'string') {
-        comparison = aVal.localeCompare(bVal);
-      } else if (typeof aVal === 'number' && typeof bVal === 'number') {
-        comparison = aVal - bVal;
-      } else {
-        comparison = String(aVal).localeCompare(String(bVal));
-      }
-      
-      return sort.direction === 'asc' ? comparison : -comparison;
-    });
-    
-    this.filteredDepartments.set(filtered);
-    this.updatePagination();
+  `]
+})
+export class DepartmentTableComponent implements OnInit {
+  i18n = inject(I18nService);
+  private permissionService = inject(PermissionService);
+
+  @Input() departments: DepartmentDto[] = [];
+  @Input() loading: any = signal(false);
+  @Input() currentPage: any = signal(1);
+  @Input() totalPages: any = signal(1);
+  @Input() totalItems: any = signal(0);
+  @Input() pageSize: any = signal(10);
+
+  @Output() viewDepartment = new EventEmitter<DepartmentDto>();
+  @Output() editDepartment = new EventEmitter<DepartmentDto>();
+  @Output() deleteDepartment = new EventEmitter<DepartmentDto>();
+  @Output() pageChange = new EventEmitter<number>();
+  @Output() pageSizeChange = new EventEmitter<number>();
+  @Output() selectionChange = new EventEmitter<DepartmentDto[]>();
+  @Output() sortChange = new EventEmitter<{ column: string; direction: 'asc' | 'desc' }>();
+
+  columns: TableColumn[] = [];
+
+  ngOnInit(): void {
+    this.columns = [
+      { key: 'department', label: this.i18n.t('department.name'), width: '220px', sortable: true, filterField: 'name', priority: 'high' },
+      { key: 'code', label: this.i18n.t('department.code'), width: '110px', sortable: true, type: 'code', priority: 'high' },
+      { key: 'branchName', label: this.i18n.t('common.branch'), width: '140px', sortable: true, filterType: 'reference', priority: 'medium' },
+      { key: 'parent', label: this.i18n.t('department.parentDepartment'), width: '160px', sortable: true, filterField: 'parentDepartmentName', filterType: 'reference', emptyValueLabel: this.i18n.t('department.root_department'), priority: 'medium' },
+      { key: 'path', label: this.i18n.t('department.path'), width: '200px', sortable: true, hideOnMobile: true, priority: 'low' },
+      { key: 'manager', label: this.i18n.t('department.manager'), width: '160px', sortable: true, filterField: 'managerName', filterType: 'reference', priority: 'medium' },
+      { key: 'employeeCount', label: this.i18n.t('common.employees'), width: '110px', align: 'center', sortable: true, filterType: 'number', priority: 'high' },
+      { key: 'status', label: this.i18n.t('common.status'), width: '110px', align: 'center', sortable: true, filterField: 'isActive', filterType: 'boolean', priority: 'high' }
+    ];
   }
 
-  updatePagination() {
-    const total = this.filteredDepartments().length;
-    const pages = Math.ceil(total / this.pageSize());
-    this.totalPages.set(pages);
-    
-    // Adjust current page if necessary
-    if (this.currentPage() > pages && pages > 0) {
-      this.currentPage.set(pages);
+  get actions(): TableAction[] {
+    const actions: TableAction[] = [];
+
+    if (this.permissionService.has(`${PermissionResources.DEPARTMENT}.${PermissionActions.READ}`)) {
+      actions.push({ key: 'view', label: this.i18n.t('common.view'), icon: 'fa-eye', color: 'info' });
+    }
+    if (this.permissionService.has(`${PermissionResources.DEPARTMENT}.${PermissionActions.UPDATE}`)) {
+      actions.push({ key: 'edit', label: this.i18n.t('common.edit'), icon: 'fa-edit', color: 'primary' });
+    }
+    if (this.permissionService.has(`${PermissionResources.DEPARTMENT}.${PermissionActions.DELETE}`)) {
+      actions.push({
+        key: 'delete',
+        label: this.i18n.t('common.delete'),
+        icon: 'fa-trash',
+        color: 'danger',
+        condition: (d: DepartmentDto) => (d.employeeCount || 0) === 0 && !d.hasChildren
+      });
+    }
+
+    return actions;
+  }
+
+  onActionClick(event: { action: string; item: DepartmentDto }): void {
+    switch (event.action) {
+      case 'view': this.viewDepartment.emit(event.item); break;
+      case 'edit': this.editDepartment.emit(event.item); break;
+      case 'delete': this.deleteDepartment.emit(event.item); break;
     }
   }
-
-  getPaginatedDepartments(): DepartmentDto[] {
-    const start = (this.currentPage() - 1) * this.pageSize();
-    const end = start + this.pageSize();
-    return this.filteredDepartments().slice(start, end);
-  }
-
-  onSort(column: keyof DepartmentDto) {
-    const currentSort = this.sortConfig();
-    const direction = currentSort.column === column && currentSort.direction === 'asc' 
-      ? 'desc' 
-      : 'asc';
-    
-    this.sortConfig.set({ column, direction });
-    this.applyFiltersAndSort();
-  }
-
-  getSortIcon(column: keyof DepartmentDto): string {
-    const sort = this.sortConfig();
-    if (sort.column !== column) return 'fas fa-sort';
-    return sort.direction === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down';
-  }
-
-  onSearchChange(term: string) {
-    this.searchTerm.set(term);
-    this.currentPage.set(1);
-    this.applyFiltersAndSort();
-  }
-
-  onShowInactiveChange(show: boolean) {
-    this.showInactive.set(show);
-    this.currentPage.set(1);
-    this.loadDepartments();
-  }
-
-  onPageSizeChange(size: number) {
-    this.pageSize.set(size);
-    this.currentPage.set(1);
-    this.updatePagination();
-  }
-
-  onPageChange(page: number) {
-    this.currentPage.set(page);
-  }
-
-  getPageNumbers(): number[] {
-    const total = this.totalPages();
-    const current = this.currentPage();
-    const pages: number[] = [];
-    
-    if (total <= 7) {
-      for (let i = 1; i <= total; i++) {
-        pages.push(i);
-      }
-    } else {
-      if (current <= 4) {
-        pages.push(1, 2, 3, 4, 5, -1, total);
-      } else if (current >= total - 3) {
-        pages.push(1, -1, total - 4, total - 3, total - 2, total - 1, total);
-      } else {
-        pages.push(1, -1, current - 1, current, current + 1, -1, total);
-      }
-    }
-    
-    return pages;
-  }
-
-  selectDepartment(dept: DepartmentDto) {
-    if (!this.allowSelection) return;
-    this.departmentSelected.emit(dept);
-  }
-
-  toggleSelection(deptId: number) {
-    const selected = this.selectedDepartments();
-    if (selected.has(deptId)) {
-      selected.delete(deptId);
-    } else {
-      selected.add(deptId);
-    }
-    this.selectedDepartments.set(new Set(selected));
-  }
-
-  toggleAllSelection() {
-    const selected = this.selectedDepartments();
-    const paginated = this.getPaginatedDepartments();
-    
-    if (this.isAllPageSelected()) {
-      paginated.forEach(dept => selected.delete(dept.id));
-    } else {
-      paginated.forEach(dept => selected.add(dept.id));
-    }
-    
-    this.selectedDepartments.set(new Set(selected));
-  }
-
-  isSelected(deptId: number): boolean {
-    return this.selectedDepartments().has(deptId);
-  }
-
-  isAllPageSelected(): boolean {
-    const paginated = this.getPaginatedDepartments();
-    return paginated.length > 0 && paginated.every(dept => this.isSelected(dept.id));
-  }
-
-  isSomePageSelected(): boolean {
-    const paginated = this.getPaginatedDepartments();
-    return paginated.some(dept => this.isSelected(dept.id)) && !this.isAllPageSelected();
-  }
-
-  onAddDepartment() {
-    this.departmentAdd.emit();
-  }
-
-  onViewDepartment(dept: DepartmentDto) {
-    this.departmentView.emit(dept);
-  }
-
-  onEditDepartment(dept: DepartmentDto) {
-    this.departmentEdit.emit(dept);
-  }
-
-  onDeleteDepartment(dept: DepartmentDto) {
-    this.departmentDelete.emit(dept);
-  }
-
-  onBulkDelete() {
-    const selected = this.selectedDepartments();
-    const departments = this.departments().filter(dept => selected.has(dept.id));
-    // Emit bulk delete event or handle individually
-    departments.forEach(dept => this.departmentDelete.emit(dept));
-  }
-
-  clearSelection() {
-    this.selectedDepartments.set(new Set());
-  }
-
-  refresh() {
-    this.loadDepartments();
-  }
-
-  getIndentClass(level: number): string {
-    return `indent-${Math.min(level, 5)}`;
-  }
-
-  trackByDeptId(index: number, dept: DepartmentDto): number {
-    return dept.id;
-  }
-
-  // Expose Math for template usage
-  Math = Math;
 }

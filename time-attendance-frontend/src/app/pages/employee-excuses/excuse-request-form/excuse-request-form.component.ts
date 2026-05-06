@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, computed } from '@angular/core';
+import { Component, OnInit, signal, inject, computed, effect } from '@angular/core';
 
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -16,6 +16,7 @@ import {
   ExcuseType
 } from '../../../shared/models/employee-excuse.model';
 
+import { PermissionService } from '../../../core/auth/permission.service';
 @Component({
   selector: 'app-excuse-request-form',
   standalone: true,
@@ -37,6 +38,16 @@ export class ExcuseRequestFormComponent implements OnInit {
   private employeesService = inject(EmployeesService);
   private notificationService = inject(NotificationService);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('excuse.update');
+  }
   // Signals
   loading = signal(false);
   saving = signal(false);
@@ -63,6 +74,19 @@ export class ExcuseRequestFormComponent implements OnInit {
 
   constructor() {
     this.form = this.createForm();
+
+    // Reactive disable for the employeeId control — set programmatically
+    // (instead of via [disabled] in the template) to avoid the
+    // "It looks like you're using the disabled attribute with a reactive
+    // form directive" warning Angular raises when [disabled] is bound on
+    // a control that's also bound via formControlName.
+    effect(() => {
+      const ctrl = this.form?.get('employeeId');
+      if (!ctrl) return;
+      const shouldDisable = this.noPolicyActive() || this.isEditMode();
+      if (shouldDisable && ctrl.enabled) ctrl.disable({ emitEvent: false });
+      else if (!shouldDisable && ctrl.disabled) ctrl.enable({ emitEvent: false });
+    });
   }
 
   ngOnInit(): void {
@@ -152,6 +176,9 @@ export class ExcuseRequestFormComponent implements OnInit {
       approvalStatus: excuse.status || 'Pending',
       reviewerComments: excuse.reviewerComments || ''
     });
+    if (!this.canEdit()) {
+      this.form.disable();
+    }
 
     // Disable the employee field in edit mode
     if (this.isEditMode()) {

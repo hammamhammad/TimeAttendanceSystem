@@ -1,13 +1,12 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-
-import { ModalWrapperComponent } from '../modal-wrapper/modal-wrapper.component';
+import { Component, Input, Output, EventEmitter, HostListener } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 export type ConfirmationType = 'danger' | 'warning' | 'info' | 'success';
 
 @Component({
   selector: 'app-confirmation-modal',
   standalone: true,
-  imports: [ModalWrapperComponent],
+  imports: [CommonModule],
   templateUrl: './confirmation-modal.component.html',
   styleUrls: ['./confirmation-modal.component.css']
 })
@@ -20,11 +19,15 @@ export class ConfirmationModalComponent {
   @Input() type: ConfirmationType = 'warning';
   @Input() confirmButtonVariant = 'danger';
   @Input() icon?: string;
+  @Input() confirmIcon?: string;
   @Input() loading = false;
   @Input() details?: string;
+  @Input() closeOnBackdropClick = true;
 
   @Output() confirm = new EventEmitter<void>();
   @Output() cancel = new EventEmitter<void>();
+
+  readonly titleId = `erp-confirm-title-${Math.random().toString(36).slice(2, 9)}`;
 
   onConfirm(): void {
     if (!this.loading) {
@@ -38,26 +41,40 @@ export class ConfirmationModalComponent {
     }
   }
 
+  onBackdropClick(event: MouseEvent): void {
+    if (!this.closeOnBackdropClick || this.loading) {
+      return;
+    }
+    if (event.target === event.currentTarget) {
+      this.cancel.emit();
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.show && !this.loading) {
+      this.cancel.emit();
+    }
+  }
+
   getIconClass(): string {
     if (this.icon) {
       return this.icon;
     }
-
     switch (this.type) {
-      case 'danger':
-        return 'fa-solid fa-exclamation-triangle text-danger';
-      case 'warning':
-        return 'fa-solid fa-exclamation-circle text-warning';
-      case 'info':
-        return 'fa-solid fa-info-circle text-info';
-      case 'success':
-        return 'fa-solid fa-check-circle text-success';
-      default:
-        return 'fa-solid fa-question-circle text-secondary';
+      case 'danger': return 'fa-solid fa-exclamation-triangle';
+      case 'warning': return 'fa-solid fa-exclamation-triangle';
+      case 'info': return 'fa-solid fa-info-circle';
+      case 'success': return 'fa-solid fa-check-circle';
+      default: return 'fa-solid fa-question-circle';
     }
   }
 
+  getIconWrapClass(): string {
+    return `erp-confirm-icon--${this.type}`;
+  }
+
   getButtonClass(): string {
-    return `btn btn-${this.confirmButtonVariant}`;
+    return `btn btn-${this.confirmButtonVariant} btn-sm erp-confirm-btn`;
   }
 }

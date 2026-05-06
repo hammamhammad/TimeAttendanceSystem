@@ -167,7 +167,7 @@ export class AssignShiftsComponent implements OnInit {
       sortable: false,
       width: '100px',
       align: 'center',
-      priority: 'low',
+      priority: 'medium',
       renderHtml: true
     }
   ]);

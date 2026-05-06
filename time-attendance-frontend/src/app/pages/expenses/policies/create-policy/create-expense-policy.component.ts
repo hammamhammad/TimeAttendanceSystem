@@ -8,6 +8,7 @@ import { ExpenseService } from '../../../../core/services/expense.service';
 import { FormHeaderComponent } from '../../../../shared/components/form-header/form-header.component';
 import { FormSectionComponent } from '../../../../shared/components/form-section/form-section.component';
 
+import { PermissionService } from '../../../../core/auth/permission.service';
 @Component({
   selector: 'app-create-expense-policy',
   standalone: true,
@@ -23,6 +24,16 @@ export class CreateExpensePolicyComponent implements OnInit {
   private readonly service = inject(ExpenseService);
   private readonly notification = inject(NotificationService);
 
+  private permissionService = inject(PermissionService);
+
+  canEdit(): boolean {
+    // In create mode (no isEditMode signal or it's false), always allow.
+    // In edit mode, require update permission.
+    const editMode = (this as any).isEditMode;
+    if (!editMode) return true;
+    const inEdit = typeof editMode === 'function' ? editMode() : editMode;
+    return !inEdit || this.permissionService.has('expensePolicy.update');
+  }
   form!: FormGroup;
   saving = signal(false);
   isEdit = signal(false);
@@ -46,7 +57,12 @@ export class CreateExpensePolicyComponent implements OnInit {
       this.isEdit.set(true);
       this.entityId.set(+id);
       this.service.getPolicy(+id).subscribe({
-        next: (p) => this.form.patchValue(p),
+        next: (p) => {
+          this.form.patchValue(p);
+          if (!this.canEdit()) {
+            this.form.disable({ emitEvent: false });
+          }
+        },
         error: () => this.notification.error(this.i18n.t('common.error'))
       });
     }
