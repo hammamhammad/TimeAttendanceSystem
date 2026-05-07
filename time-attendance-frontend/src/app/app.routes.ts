@@ -27,7 +27,22 @@ export const routes: Routes = [
       {
         path: 'dashboard',
         loadComponent: () => import('./pages/dashboard/dashboard.component').then(m => m.DashboardComponent),
-        data: { title: 'dashboard.title' }
+        data: { title: 'dashboard.title', area: 'people' }
+      },
+      {
+        path: 'dashboard/workforce',
+        loadComponent: () => import('./pages/area-dashboard/area-dashboard.component').then(m => m.AreaDashboardComponent),
+        data: { title: 'nav.areas.workforce', area: 'workforce' }
+      },
+      {
+        path: 'dashboard/payroll',
+        loadComponent: () => import('./pages/area-dashboard/area-dashboard.component').then(m => m.AreaDashboardComponent),
+        data: { title: 'nav.areas.payroll', area: 'payroll' }
+      },
+      {
+        path: 'dashboard/operations',
+        loadComponent: () => import('./pages/area-dashboard/area-dashboard.component').then(m => m.AreaDashboardComponent),
+        data: { title: 'nav.areas.operations', area: 'operations' }
       },
       {
         // Phase 3 (v14.3): Admin UI for operational alerts + ops dashboard.

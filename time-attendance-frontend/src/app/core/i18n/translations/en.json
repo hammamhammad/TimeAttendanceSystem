@@ -471,6 +471,46 @@
   },
   "dashboard": {
     "title": "Dashboard",
+    "area": {
+      "subtitle": "Quick access to everything in this area",
+      "empty": "No items available in this area.",
+      "people": {
+        "intro": "Organization, employees, hiring, and lifecycle.",
+        "kpi": {
+          "headcount": "Total Employees",
+          "openRoles": "Open Roles",
+          "onboarding": "In Onboarding",
+          "contractsExp": "Contracts Expiring"
+        }
+      },
+      "workforce": {
+        "intro": "Time, attendance, leave, and performance.",
+        "kpi": {
+          "presentToday": "Present Today",
+          "lateToday": "Late Today",
+          "onLeave": "On Leave",
+          "pendingLeaves": "Pending Leave Requests"
+        }
+      },
+      "payroll": {
+        "intro": "Compensation, periods, allowances, and benefits.",
+        "kpi": {
+          "activePeriod": "Active Payroll Period",
+          "monthlyPayroll": "Monthly Payroll Cost",
+          "pendingClaims": "Pending Claims",
+          "allowanceReqs": "Allowance Requests"
+        }
+      },
+      "operations": {
+        "intro": "Approvals, alerts, work queues, and system health.",
+        "kpi": {
+          "pendingApprovals": "Pending Approvals",
+          "openAlerts": "Open Alerts",
+          "notExecuted": "Approved · Not Executed",
+          "workQueues": "Work Queues"
+        }
+      }
+    },
     "welcome": "Welcome back, {{username}}",
     "welcome_message": "Here's what's happening at your organization today",
     "total_users": "Total Users",

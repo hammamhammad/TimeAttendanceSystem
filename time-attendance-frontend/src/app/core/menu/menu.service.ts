@@ -8,7 +8,7 @@ export interface MenuItem {
   children?: MenuItem[];
 }
 
-export type NavAreaKey = 'dashboard' | 'people' | 'workforce' | 'payroll' | 'operations';
+export type NavAreaKey = 'people' | 'workforce' | 'payroll' | 'operations';
 
 export interface MenuGroup {
   groupKey: string;
@@ -46,10 +46,49 @@ export class MenuService {
     {
       groupKey: 'main',
       titleKey: 'nav_group.main',
-      area: 'dashboard',
+      area: 'people',
       items: [
         {
           path: '/dashboard',
+          titleKey: 'nav.dashboard',
+          icon: 'fa-solid fa-chart-line',
+          permission: undefined
+        }
+      ]
+    },
+    {
+      groupKey: 'main-workforce',
+      titleKey: 'nav_group.main',
+      area: 'workforce',
+      items: [
+        {
+          path: '/dashboard/workforce',
+          titleKey: 'nav.dashboard',
+          icon: 'fa-solid fa-chart-line',
+          permission: undefined
+        }
+      ]
+    },
+    {
+      groupKey: 'main-payroll',
+      titleKey: 'nav_group.main',
+      area: 'payroll',
+      items: [
+        {
+          path: '/dashboard/payroll',
+          titleKey: 'nav.dashboard',
+          icon: 'fa-solid fa-chart-line',
+          permission: undefined
+        }
+      ]
+    },
+    {
+      groupKey: 'main-operations',
+      titleKey: 'nav_group.main',
+      area: 'operations',
+      items: [
+        {
+          path: '/dashboard/operations',
           titleKey: 'nav.dashboard',
           icon: 'fa-solid fa-chart-line',
           permission: undefined
@@ -481,7 +520,6 @@ export class MenuService {
   );
 
   private readonly navAreas: NavArea[] = [
-    { key: 'dashboard',  titleKey: 'nav.areas.dashboard',  icon: 'fa-solid fa-gauge-high' },
     { key: 'people',     titleKey: 'nav.areas.people',     icon: 'fa-solid fa-users' },
     { key: 'workforce',  titleKey: 'nav.areas.workforce',  icon: 'fa-solid fa-clock' },
     { key: 'payroll',    titleKey: 'nav.areas.payroll',    icon: 'fa-solid fa-wallet' },
@@ -540,11 +578,11 @@ export class MenuService {
   private readPersistedArea(): NavAreaKey {
     try {
       const saved = localStorage.getItem(AREA_STORAGE_KEY) as NavAreaKey | null;
-      if (saved && ['dashboard', 'people', 'workforce', 'payroll', 'operations'].includes(saved)) {
+      if (saved && ['people', 'workforce', 'payroll', 'operations'].includes(saved)) {
         return saved;
       }
     } catch { /* ignore */ }
-    return 'dashboard';
+    return 'people';
   }
 
   getMenuGroups() {
@@ -573,6 +611,14 @@ export class MenuService {
 
   groupsForArea(areaKey: NavAreaKey): MenuGroup[] {
     return this.menuGroups().filter(g => g.area === areaKey);
+  }
+
+  dashboardPathForArea(areaKey: NavAreaKey): string {
+    return areaKey === 'people' ? '/dashboard' : `/dashboard/${areaKey}`;
+  }
+
+  areaTitleKey(areaKey: NavAreaKey): string {
+    return this.navAreas.find(a => a.key === areaKey)?.titleKey ?? 'nav.areas.people';
   }
 
   findAreaForPath(path: string): NavAreaKey | undefined {

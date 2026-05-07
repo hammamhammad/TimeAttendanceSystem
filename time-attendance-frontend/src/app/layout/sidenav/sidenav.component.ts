@@ -46,7 +46,13 @@ export class SidenavComponent {
     this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
       .subscribe((event) => {
-        const area = this.menuService.findAreaForPath(event.urlAfterRedirects.split('?')[0]);
+        // Prefer route.data.area when set on the matched route — more reliable
+        // than path-string matching for parameterised routes and area dashboards.
+        let route = this.router.routerState.root;
+        while (route.firstChild) route = route.firstChild;
+        const dataArea = route.snapshot.data?.['area'] as NavAreaKey | undefined;
+        const area = dataArea
+          ?? this.menuService.findAreaForPath(event.urlAfterRedirects.split('?')[0]);
         if (area && area !== this.activeArea()) {
           this.menuService.setActiveArea(area);
         }
@@ -134,6 +140,8 @@ export class SidenavComponent {
     event?.stopPropagation();
     this.menuService.setActiveArea(key);
     this.areaMenuOpen.set(false);
+    // Navigate to that area's dashboard so the page reflects the switch.
+    this.router.navigateByUrl(this.menuService.dashboardPathForArea(key));
   }
 
   toggleModuleLauncher(event?: Event): void {

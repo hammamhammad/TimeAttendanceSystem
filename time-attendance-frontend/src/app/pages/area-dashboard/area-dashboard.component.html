@@ -1,0 +1,51 @@
+<app-page-header
+  [title]="title()"
+  [subtitle]="intro()"
+  icon="fa-solid fa-gauge-high">
+</app-page-header>
+
+<div class="area-dashboard" [attr.data-area]="area()">
+  <!-- Area-specific highlight cards -->
+  <section class="area-dashboard-highlights">
+    @for (h of highlights(); track h.labelKey) {
+      <button type="button"
+              class="highlight-card"
+              [attr.data-accent]="h.accent"
+              (click)="h.route && go(h.route)">
+        <span class="highlight-icon">
+          <i [class]="h.icon" aria-hidden="true"></i>
+        </span>
+        <span class="highlight-body">
+          <span class="highlight-value">{{ h.value }}</span>
+          <span class="highlight-label">{{ t(h.labelKey) }}</span>
+        </span>
+      </button>
+    }
+  </section>
+
+  <!-- Quick links per group -->
+  @for (group of quickLinks(); track group.groupTitle) {
+    <section class="area-dashboard-section">
+      <h2 class="area-dashboard-section-title">{{ group.groupTitle }}</h2>
+      <div class="area-dashboard-grid">
+        @for (link of group.items; track link.path) {
+          <button type="button" class="area-dashboard-card" (click)="go(link.path)">
+            <span class="area-dashboard-card-icon">
+              <i [class]="link.icon" aria-hidden="true"></i>
+            </span>
+            <span class="area-dashboard-card-title">{{ link.title }}</span>
+            <i class="fa-solid area-dashboard-card-chevron"
+               [class.fa-chevron-right]="!i18n.isRtl()"
+               [class.fa-chevron-left]="i18n.isRtl()"
+               aria-hidden="true"></i>
+          </button>
+        }
+      </div>
+    </section>
+  } @empty {
+    <div class="area-dashboard-empty">
+      <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+      <span>{{ t('dashboard.area.empty') }}</span>
+    </div>
+  }
+</div>

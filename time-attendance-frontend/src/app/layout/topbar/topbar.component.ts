@@ -5,6 +5,7 @@ import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs';
 import { AuthService } from '../../core/auth/auth.service';
 import { I18nService, Locale } from '../../core/i18n/i18n.service';
+import { MenuService } from '../../core/menu/menu.service';
 import { NotificationBellComponent } from '../../shared/components/notification-bell/notification-bell.component';
 
 interface Crumb {
@@ -25,6 +26,7 @@ export class TopbarComponent {
   private authService = inject(AuthService);
   public i18n = inject(I18nService);
   private router = inject(Router);
+  private menu = inject(MenuService);
   private host = inject(ElementRef<HTMLElement>);
 
   currentUser = computed(() => this.authService.currentUser());
@@ -45,12 +47,19 @@ export class TopbarComponent {
 
   breadcrumb = computed<Crumb[]>(() => {
     this.i18n.locale();
-    const title = this.t(this.pageTitleKey()) || this.t('nav.dashboard');
-    const home: Crumb = { label: this.t('nav.dashboard'), url: '/dashboard' };
-    if (this.pageTitleKey() === 'nav.dashboard') {
-      return [{ label: home.label }];
+    const titleKey = this.pageTitleKey();
+    const title = this.t(titleKey) || this.t('nav.dashboard');
+    const area = this.menu.activeArea();
+    const areaLabel = this.t(this.menu.areaTitleKey(area));
+    const areaUrl = this.menu.dashboardPathForArea(area);
+
+    // On the area's dashboard itself, just show the area as the current crumb.
+    const onAreaDashboard = titleKey === 'dashboard.title'
+      || titleKey === this.menu.areaTitleKey(area);
+    if (onAreaDashboard) {
+      return [{ label: areaLabel }];
     }
-    return [home, { label: title }];
+    return [{ label: areaLabel, url: areaUrl }, { label: title }];
   });
 
   userInitials = computed(() => {
